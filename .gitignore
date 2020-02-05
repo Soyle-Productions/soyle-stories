@@ -15,3 +15,6 @@ gradle-app.setting
 
 # Ignore intellij-idea folder
 .idea
+/gradlew
+/gradlew.bat
+/gradle/
