@@ -4,6 +4,11 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
+/**
+ * Created by Brendan
+ * Date: 2/5/2020
+ * Time: 3:30 PM
+ */
 class EntityTest {
 
     class EntityType1(override val id: String, val name: String = "") : Entity<String>
