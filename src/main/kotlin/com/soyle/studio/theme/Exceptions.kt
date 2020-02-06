@@ -9,7 +9,8 @@ import java.util.*
  */
 
 data class CannotCreateCharacterArcForCharacterNotInTheme(val characterId: UUID)
-data class CannotExcludeCharactersWithExplicitlyCreatedArcs(
+data class CannotCreateCharacterArcIfAlreadyCreatedInTheme(val characterId: UUID)
+data class CannotExcludeCharactersWithACharacterArc(
 	val charactersWithArcs: List<UUID>,
 	val charactersOkToExclude: List<UUID>
 )

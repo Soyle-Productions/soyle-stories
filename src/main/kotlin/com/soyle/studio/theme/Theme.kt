@@ -15,33 +15,36 @@ import com.soyle.studio.common.PairOf
 import com.soyle.studio.theme.entities.CharacterArcSection
 import com.soyle.studio.theme.events.*
 import com.soyle.studio.theme.valueobjects.CharacterArc
+import com.soyle.studio.theme.valueobjects.CharacterComparison
+import com.soyle.studio.theme.valueobjects.CharacterThematicValueSet
 import java.util.*
 
 class Theme private constructor(
 	override val id: Id,
 	val projectId: UUID,
 	val line: String,
-	val characterArcs: Map<UUID, CharacterArc>,
+	val characterThematicValues: Map<UUID, CharacterThematicValueSet>,
 	override val events: List<DomainEvent<Id>>
 ) : AggregateRoot<Theme.Id> {
 
 	val arcSectionTypeSet
 		get() = DefaultArcSectionSet
 
-	constructor(id: Id, projectId: UUID, line: String, characterArcs: Map<UUID, CharacterArc>) : this(
+	constructor(id: Id, projectId: UUID, line: String, characterThematicValues: Map<UUID, CharacterThematicValueSet>) : this(
 		id,
 		projectId,
 		line,
-		characterArcs,
+		characterThematicValues,
 		emptyList()
 	)
 
 	private fun copy(
 		line: String = this.line,
-		characterArcs: Map<UUID, CharacterArc> = this.characterArcs,
+		characterThematicValues: Map<UUID, CharacterThematicValueSet> = this.characterThematicValues,
 		events: List<DomainEvent<Id>> = this.events
-	) = Theme(id, projectId, line, characterArcs, events)
+	) = Theme(id, projectId, line, characterThematicValues, events)
 
+	private fun silentFailure() = this.right()
 	private fun initialArcSections() = arcSectionTypeSet.filter { it.usedInCharacterComp }.map {
 		CharacterArcSection(
 			CharacterArcSection.Id(UUID.randomUUID()),
@@ -50,39 +53,48 @@ class Theme private constructor(
 	}
 
 	fun includeCharacters(characters: List<UUID>): Either<*, Theme> {
-		val newCharacters = characters.filter { it !in characterArcs }
-		if (newCharacters.isEmpty()) return this.right()
-		val newArcs = newCharacters.associateWith { CharacterArc(false, initialArcSections()) }
+		// prevent duplicates
+		val newCharacters = characters.filter { it !in characterThematicValues }
+		if (newCharacters.isEmpty()) return silentFailure()
+
+		// for each new character, create a new character comparison
+		val newComparisons = newCharacters.associateWith {
+			CharacterComparison(initialArcSections())
+		}
+
 		return copy(
-			characterArcs = characterArcs + newArcs,
-			events = events + CharactersAddedToTheme(
-				id,
-				newCharacters.toSet()
-			) + newArcs.flatMap { (characterId, arc) ->
-				arc.sections.map {
-					CharacterArcSectionCreated(id, characterId, it.id, it.type)
-				}
-			}
+			characterThematicValues = characterThematicValues + newComparisons,
+			events = events + CharactersAddedToTheme(id, newCharacters.toSet()) +
+			  newComparisons.flatMap { (characterId, comparison) ->
+				  comparison.sections.map {
+					  CharacterArcSectionCreated(id, characterId, it.id, it.type)
+				  }
+			  }
 		).right()
 	}
 
 	fun createCharacterArc(characterId: UUID): Either<*, Theme> {
-		val characterArc = characterArcs[characterId]
+
+		val thematicValueSet = characterThematicValues[characterId]
 			?: return CannotCreateCharacterArcForCharacterNotInTheme(characterId).left()
-		val newArcSections = arcSectionTypeSet.asSequence()
-			.filter { it.isRequired }
-			.filterNot { it.usedInCharacterComp }
+
+		if (thematicValueSet !is CharacterComparison)
+			return CannotCreateCharacterArcIfAlreadyCreatedInTheme(characterId).left()
+
+		val newArcSections = arcSectionTypeSet
+			.filter { it.isRequired && ! it.usedInCharacterComp }
 			.map {
 				CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), it)
 			}
+
 		val arcSectionCreationEvents = newArcSections
 			.map {
 				CharacterArcSectionCreated(id, characterId, it.id, it.type)
 			}
 
 		return copy(
-			characterArcs = characterArcs.minus(characterId).plus(
-				characterId to characterArc.markCreated().addSections(
+			characterThematicValues = characterThematicValues.minus(characterId).plus(
+				characterId to thematicValueSet.createCharacterArc().addSections(
 					newArcSections.toList()
 				)
 			),
@@ -91,17 +103,20 @@ class Theme private constructor(
 	}
 
 	fun excludeCharacters(characters: List<UUID>): Either<*, Theme> {
-		val toRemove = characters.filter { it in characterArcs }
+
+		val toRemove = characters.filter { it in characterThematicValues }
 		if (toRemove.isEmpty()) return this.right()
-		val removedArcs = toRemove.map(characterArcs::getValue)
-		if (removedArcs.any { it.explicitlyCreated }) {
-			return CannotExcludeCharactersWithExplicitlyCreatedArcs(
-				toRemove.filter { characterArcs.getValue(it).explicitlyCreated },
-				toRemove.filterNot { characterArcs.getValue(it).explicitlyCreated }
+
+		val removedArcs = toRemove.map(characterThematicValues::getValue)
+		if (removedArcs.any { it is CharacterArc }) {
+			return CannotExcludeCharactersWithACharacterArc(
+				toRemove.filter { characterThematicValues.getValue(it) is CharacterArc },
+				toRemove.filterNot { characterThematicValues.getValue(it) is CharacterArc }
 			).left()
 		}
+
 		return copy(
-			characterArcs = characterArcs.minus(toRemove),
+			characterThematicValues = characterThematicValues.minus(toRemove),
 			events = events + CharactersRemovedFromTheme(id, toRemove)
 		).right()
 	}
@@ -134,13 +149,13 @@ class Theme private constructor(
 					)
 				)
 			)
-				.includeCharacters(theme.characterArcs.keys.toList())
+				.includeCharacters(theme.characterThematicValues.keys.toList())
 				.map {
 					it.copy(
-						characterArcs = it.characterArcs
+						characterThematicValues = it.characterThematicValues
 							.minus(characterId)
-							.plus(characterId to theme.characterArcs.getValue(characterId).let {
-								CharacterArc(it.explicitlyCreated, it.sections.map {
+							.plus(characterId to theme.characterThematicValues.getValue(characterId).let {
+								CharacterArc(it.sections.map {
 									CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), it.type)
 								})
 							})
@@ -150,22 +165,22 @@ class Theme private constructor(
 
 		fun separateCharacterArcFromTheme(theme: Theme, characterId: UUID): Either<*, PairOf<Theme>> {
 
-			val arc = theme.characterArcs[characterId] ?: return Either.left(
+			val arc = theme.characterThematicValues[characterId] ?: return Either.left(
 				CannotSeparateCharacterArcNotInTheme(
 					characterId
 				)
 			)
 
-			if (!arc.explicitlyCreated) return CannotSeparateCharacterArcNotYetCreated(characterId).left()
+			if (arc !is CharacterArc) return CannotSeparateCharacterArcNotYetCreated(characterId).left()
 
 			val newTheme = createNewThemeAsCopy(theme, characterId)
 
 			if (newTheme !is Either.Right) return newTheme as Either.Left
 
 			val oldTheme = theme.copy(
-				characterArcs = theme.characterArcs
+				characterThematicValues = theme.characterThematicValues
 					.minus(characterId)
-					.plus(characterId to (theme.characterArcs.getValue(characterId).markImplicit()))
+					.plus(characterId to arc.removeCharacterArc())
 			).excludeCharacters(listOf(characterId))
 
 			if (oldTheme !is Either.Right) return oldTheme as Either.Left

@@ -35,7 +35,7 @@ class ThemeTest {
 
 	inline fun given(state: () -> Either<*, Theme>): Theme {
 		val (theme) = state() as Either.Right
-		return Theme(theme.id, theme.projectId, theme.line, theme.characterArcs)
+		return Theme(theme.id, theme.projectId, theme.line, theme.characterThematicValues)
 	}
 
 	@Test
@@ -110,7 +110,7 @@ class ThemeTest {
 			)
 			assertEquals(
 				arcSectionTypeSet.filter { it.isRequired || it.usedInCharacterComp }.size,
-				characterArcs.getValue(testCharacters.first()).sections.size
+				characterThematicValues.getValue(testCharacters.first()).sections.size
 			)
 
 		}
@@ -163,7 +163,7 @@ class ThemeTest {
 		} `when` {
 			excludeCharacters(testCharacters)
 		} thenFailWith {
-			CannotExcludeCharactersWithExplicitlyCreatedArcs(
+			CannotExcludeCharactersWithACharacterArc(
 				listOf(testCharacters.first()),
 				testCharacters.drop(1)
 			)
@@ -198,12 +198,12 @@ class ThemeTest {
 		fun characterArcShouldBeCopiedToNewThemeWhenMoved() {
 			var characterArcInInitialTheme: CharacterArc? = null
 			operation {
-				characterArcInInitialTheme = characterArcs.getValue(testCharacters.first())
+				characterArcInInitialTheme = characterThematicValues.getValue(testCharacters.first()) as CharacterArc
 			} then {
 				val (_, newTheme) = this
 				assertEquals(
 					characterArcInInitialTheme!!.sections.size,
-					newTheme.characterArcs.getValue(testCharacters.first()).sections.size
+					newTheme.characterThematicValues.getValue(testCharacters.first()).sections.size
 				)
 			}
 		}
@@ -212,10 +212,10 @@ class ThemeTest {
 		fun copiedCharacterArcSectionsShouldBeNewEntities() {
 			var initialSetOfArcSectionIds: Set<CharacterArcSection.Id>? = null
 			operation {
-				initialSetOfArcSectionIds = characterArcs.getValue(testCharacters.first()).sections.map { it.id }.toSet()
+				initialSetOfArcSectionIds = characterThematicValues.getValue(testCharacters.first()).sections.map { it.id }.toSet()
 			} then {
 				val (_, newTheme) = this
-				newTheme.characterArcs.getValue(testCharacters.first()).sections.forEach {
+				newTheme.characterThematicValues.getValue(testCharacters.first()).sections.forEach {
 					assertFalse(initialSetOfArcSectionIds!!.contains(it.id))
 				}
 			}
