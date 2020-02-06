@@ -11,6 +11,7 @@ import com.soyle.studio.theme.events.*
 import com.soyle.studio.theme.valueobjects.CharacterArc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -169,58 +170,56 @@ class ThemeTest {
 		}
 	}
 
-	@Test
-	fun removingACharacterArcFromAThemeCreatesANewTheme() {
-		given {
-			Theme(Theme.Id(testId), UUID.randomUUID(), testLine, mapOf())
-				.includeCharacters(testCharacters)
-				.flatMap { it.createCharacterArc(testCharacters.first()) }
-		} `when` {
-			Theme.separateCharacterArcFromTheme(this, testCharacters.first())
-		} then {
-			assertEquals(
-				CharactersRemovedFromTheme(Theme.Id(testId), listOf(testCharacters.first())),
-				first.events.component1()
-			)
-			assertEquals(ThemeCreated(first.projectId, second.id), second.events.component1())
-			assertEquals(CharactersAddedToTheme(second.id, testCharacters.toSet()), second.events.component2())
-		}
-	}
+	@Nested
+	inner class SeparateCharacterArcFromTheme {
 
-	@Test
-	fun characterArcShouldBeCopiedToNewThemeWhenMoved() {
-		var characterArcInInitialTheme: CharacterArc? = null
-		given {
+		fun operation(onWhen: Theme.() -> Unit = {}) = given {
 			Theme(Theme.Id(testId), UUID.randomUUID(), testLine, mapOf())
 				.includeCharacters(testCharacters)
 				.flatMap { it.createCharacterArc(testCharacters.first()) }
 		} `when` {
-			characterArcInInitialTheme = characterArcs.getValue(testCharacters.first())
+			onWhen()
 			Theme.separateCharacterArcFromTheme(this, testCharacters.first())
-		} then {
-			val (_, newTheme) = this
-			assertEquals(
-				characterArcInInitialTheme!!.sections.size,
-				newTheme.characterArcs.getValue(testCharacters.first()).sections.size
-			)
 		}
-	}
 
-	@Test
-	fun copiedCharacterArcSectionsShouldBeNewEntities() {
-		var initialSetOfArcSectionIds: Set<CharacterArcSection.Id>? = null
-		given {
-			Theme(Theme.Id(testId), UUID.randomUUID(), testLine, mapOf())
-				.includeCharacters(testCharacters)
-				.flatMap { it.createCharacterArc(testCharacters.first()) }
-		} `when` {
-			initialSetOfArcSectionIds = characterArcs.getValue(testCharacters.first()).sections.map { it.id }.toSet()
-			Theme.separateCharacterArcFromTheme(this, testCharacters.first())
-		} then {
-			val (_, newTheme) = this
-			newTheme.characterArcs.getValue(testCharacters.first()).sections.forEach {
-				assertFalse(initialSetOfArcSectionIds!!.contains(it.id))
+		@Test
+		fun removingACharacterArcFromAThemeCreatesANewTheme() {
+			operation() then {
+				assertEquals(
+					CharactersRemovedFromTheme(Theme.Id(testId), listOf(testCharacters.first())),
+					first.events.component1()
+				)
+				assertEquals(ThemeCreated(first.projectId, second.id), second.events.component1())
+				assertEquals(CharactersAddedToTheme(second.id, testCharacters.toSet()), second.events.component2())
 			}
 		}
+
+		@Test
+		fun characterArcShouldBeCopiedToNewThemeWhenMoved() {
+			var characterArcInInitialTheme: CharacterArc? = null
+			operation {
+				characterArcInInitialTheme = characterArcs.getValue(testCharacters.first())
+			} then {
+				val (_, newTheme) = this
+				assertEquals(
+					characterArcInInitialTheme!!.sections.size,
+					newTheme.characterArcs.getValue(testCharacters.first()).sections.size
+				)
+			}
+		}
+
+		@Test
+		fun copiedCharacterArcSectionsShouldBeNewEntities() {
+			var initialSetOfArcSectionIds: Set<CharacterArcSection.Id>? = null
+			operation {
+				initialSetOfArcSectionIds = characterArcs.getValue(testCharacters.first()).sections.map { it.id }.toSet()
+			} then {
+				val (_, newTheme) = this
+				newTheme.characterArcs.getValue(testCharacters.first()).sections.forEach {
+					assertFalse(initialSetOfArcSectionIds!!.contains(it.id))
+				}
+			}
+		}
+
 	}
 }
