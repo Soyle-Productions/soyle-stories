@@ -139,7 +139,11 @@ class Theme private constructor(
 					it.copy(
 						characterArcs = it.characterArcs
 							.minus(characterId)
-							.plus(characterId to it.characterArcs.getValue(characterId).markCreated())
+							.plus(characterId to theme.characterArcs.getValue(characterId).let {
+								CharacterArc(it.explicitlyCreated, it.sections.map {
+									CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), it.type)
+								})
+							})
 					)
 				}
 		}
