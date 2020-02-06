@@ -1,5 +1,6 @@
 package com.soyle.studio.theme
 
+import arrow.core.Either
 import com.soyle.studio.theme.valueobjects.CharacterArcSectionType
 
 /**
@@ -19,8 +20,11 @@ private const val NotPsych = false
 private const val Single = false
 private const val Multi = true
 
-fun String.template(isRequired: Boolean, inComp: Boolean, isMoral: Boolean, isPsych: Boolean, multi: Boolean, vararg subsections: String) =
-	CharacterArcSectionType(this, isRequired, inComp, isMoral, isPsych, multi, subsections.toList())
+fun String.template(isRequired: Boolean, inComp: Boolean, isMoral: Boolean, isPsych: Boolean, multi: Boolean, vararg subsections: String): CharacterArcSectionType {
+	val (sectionType) =
+	CharacterArcSectionType.define(this, isRequired, inComp, isMoral, isPsych, multi, subsections.toList()) as Either.Right
+	return sectionType
+}
 
 val DefaultArcSectionSet = setOf(
 	"Psychological Weakness"                    .template(Optional, InComp, NotMoral, Psych, Single),

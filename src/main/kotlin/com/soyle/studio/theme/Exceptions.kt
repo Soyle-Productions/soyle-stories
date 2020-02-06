@@ -15,3 +15,6 @@ data class CannotExcludeCharactersWithExplicitlyCreatedArcs(
 )
 data class CannotSeparateCharacterArcNotInTheme(val characterId: UUID)
 data class CannotSeparateCharacterArcNotYetCreated(val characterId: UUID)
+
+object RequiredArcSectionTypesCannotAllowMultiple
+object ArcSectionTypesUsedInCharacterCompCannotAllowMultiple
