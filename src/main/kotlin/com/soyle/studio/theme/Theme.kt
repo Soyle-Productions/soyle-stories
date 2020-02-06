@@ -69,9 +69,24 @@ class Theme private constructor(
 	fun createCharacterArc(characterId: UUID): Either<*, Theme> {
 		val characterArc = characterArcs[characterId]
 			?: return CannotCreateCharacterArcForCharacterNotInTheme(characterId).left()
+		val newArcSections = arcSectionTypeSet.asSequence()
+			.filter { it.isRequired }
+			.filterNot { it.usedInCharacterComp }
+			.map {
+				CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), it)
+			}
+		val arcSectionCreationEvents = newArcSections
+			.map {
+				CharacterArcSectionCreated(id, characterId, it.id, it.type)
+			}
+
 		return copy(
-			characterArcs = characterArcs.minus(characterId).plus(characterId to characterArc.markCreated()),
-			events = events + CharacterArcCreated(id, characterId)
+			characterArcs = characterArcs.minus(characterId).plus(
+				characterId to characterArc.markCreated().addSections(
+					newArcSections.toList()
+				)
+			),
+			events = events + CharacterArcCreated(id, characterId) + arcSectionCreationEvents
 		).right()
 	}
 

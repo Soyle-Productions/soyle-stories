@@ -16,4 +16,5 @@ class CharacterArc(
         CharacterArc(true, sections)
     fun markImplicit(): CharacterArc =
         CharacterArc(false, sections)
+    fun addSections(sections: List<CharacterArcSection>) = CharacterArc(explicitlyCreated, this.sections + sections)
 }

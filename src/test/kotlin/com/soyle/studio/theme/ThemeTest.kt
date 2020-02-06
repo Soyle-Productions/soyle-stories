@@ -1,6 +1,7 @@
 package com.soyle.studio.theme
 
 import arrow.core.Either
+import arrow.core.extensions.sequence.foldable.size
 import arrow.core.flatMap
 import arrow.core.right
 import com.soyle.studio.common.`when`
@@ -84,8 +85,31 @@ class ThemeTest {
 		} then {
 			assertEquals(
 				CharacterArcCreated(Theme.Id(testId), testCharacters.first()),
-				events.single()
+				events.filterIsInstance<CharacterArcCreated>().single()
 			)
+		}
+	}
+
+	@Test
+	fun creatingACharacterArcShouldCreateRequiredArcSections() {
+		given {
+			Theme(Theme.Id(testId), UUID.randomUUID(), testLine, mapOf())
+				.includeCharacters(testCharacters)
+		} `when` {
+			createCharacterArc(testCharacters.first())
+		} then {
+			assertEquals(
+				arcSectionTypeSet.asSequence()
+					.filter { it.isRequired }
+					.filterNot { it.usedInCharacterComp } // these should have all been added already
+					.count(),
+				events.filterIsInstance<CharacterArcSectionCreated>().size
+			)
+			assertEquals(
+				arcSectionTypeSet.filter { it.isRequired || it.usedInCharacterComp }.size,
+				characterArcs.getValue(testCharacters.first()).sections.size
+			)
+
 		}
 	}
 
