@@ -1,6 +1,4 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
-}
+apply plugin: 'kotlin'
 
 group 'com.soyle.studio'
 version '0.1.0'
@@ -11,10 +9,6 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-
-    // will replace with github package dependency eventually.
-    implementation files("libs/soyle-studio-desktop-0.1.0.jar")
-
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 }

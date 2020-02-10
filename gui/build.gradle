@@ -1,0 +1,6 @@
+apply from: "$rootDir/kotlin-module.gradle"
+
+dependencies {
+    // will replace with github package dependency eventually.
+    implementation files("$rootDir/libs/soyle-studio-desktop-0.1.0.jar")
+}
