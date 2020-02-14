@@ -25,7 +25,13 @@ class Project private constructor(
 
 	constructor(id: Id, uri: URI, name: String) : this(id, uri, name, emptyList())
 
-	class Id(val uuid: UUID)
+	/*
+	 *
+	 * Class is now a data class to resolve #7
+	 * https://github.com/b-camphart/soyle-studio-core/issues/7
+	 *
+	 */
+	data class Id(val uuid: UUID)
 
 	fun rename(newName: String): Either<*, Project>
 	{
