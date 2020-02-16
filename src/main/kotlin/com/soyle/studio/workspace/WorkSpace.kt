@@ -25,7 +25,7 @@ class WorkSpace private constructor(
 
 	constructor(id: Id, openProjects: List<OpenProject>) : this(id, openProjects, emptyList())
 
-	fun addProject(projectId: Project.Id, projectName: String, projectURI: URI): Either<*, WorkSpace>
+	fun addProject(projectId: Project.Id, projectName: String, projectURI: URI): Either<ProjectAlreadyOpen, WorkSpace>
 	{
 		val openProject = openProjects.find { it.projectId == projectId }
 		if (openProject != null) {
@@ -34,7 +34,7 @@ class WorkSpace private constructor(
 		return WorkSpace(id, openProjects + OpenProject(projectId, projectName, projectURI), events + ProjectOpened(id, projectId)).right()
 	}
 
-	fun closeProject(projectId: Project.Id): Either<*, WorkSpace>
+	fun closeProject(projectId: Project.Id): Either<Nothing, WorkSpace>
 	{
 		val openProject = openProjects.find { it.projectId == projectId } ?: return this.right()
 		return WorkSpace(id, openProjects - openProject, events + ProjectClosed(id, projectId)).right()
