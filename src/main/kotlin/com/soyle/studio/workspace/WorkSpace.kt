@@ -34,9 +34,9 @@ class WorkSpace private constructor(
 		return WorkSpace(id, openProjects + OpenProject(projectId, projectName, projectURI), events + ProjectOpened(id, projectId)).right()
 	}
 
-	fun closeProject(projectId: Project.Id): Either<Nothing, WorkSpace>
+	fun closeProject(projectId: Project.Id): Either<ProjectIsNotOpen, WorkSpace>
 	{
-		val openProject = openProjects.find { it.projectId == projectId } ?: return this.right()
+		val openProject = openProjects.find { it.projectId == projectId } ?: return ProjectIsNotOpen(projectId).left()
 		return WorkSpace(id, openProjects - openProject, events + ProjectClosed(id, projectId)).right()
 	}
 
