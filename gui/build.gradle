@@ -1,0 +1,30 @@
+apply from: "$rootDir/kotlin-module.gradle"
+
+apply from: "$rootDir/local-repositories.gradle"
+
+dependencies {
+    implementation "com.soyle.stories:soyle-studio-core:0.1.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
+    testImplementation 'io.cucumber:cucumber-java8:5.5.0'
+    testImplementation 'io.cucumber:cucumber-junit:5.5.0'
+
+    implementation project(":application")
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.3.61"
+}
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+task cucumber() {
+    dependsOn assemble, compileTestJava
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--add-plugin', 'html:build/cucumber/html-report', '--glue', 'com.soyle.stories', 'src/test/resources/features', '--strict']
+        }
+    }
+}

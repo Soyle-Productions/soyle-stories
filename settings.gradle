@@ -1,1 +1,5 @@
 rootProject.name = 'soyle-studio-native-desktop'
+include ":application"
+include ":gui"
+include ":data"
+include ":infrastructure"
