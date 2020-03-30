@@ -1,6 +1,6 @@
 apply plugin: 'kotlin'
 
-group 'com.soyle.studio'
+group 'com.soyle.stories'
 version '0.1.0'
 
 repositories {
