@@ -20,12 +20,16 @@ class RemoveCharacterFromComparisonUnitTest {
     private lateinit var context: Context
     private var updatedTheme: Theme? = null
     private var deletedThemeId: Theme.Id? = null
+    private var deletedCharacterArcId: Pair<Theme.Id, Character.Id>? = null
     private var result: Any? = null
 
     @BeforeEach
     fun clear() {
         context = setupContext()
+        updatedTheme = null
+        deletedThemeId = null
         result = null
+        deletedCharacterArcId = null
     }
 
     @Test
@@ -79,7 +83,7 @@ class RemoveCharacterFromComparisonUnitTest {
     @Test
     fun `multiple characters`() {
         val otherCharacterId = UUID.randomUUID()
-        givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId, otherCharacterId), andMajorCharacter = otherCharacterId)
+        givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId, otherCharacterId), andMajorCharacterIds = listOf(otherCharacterId))
         whenUseCaseIsExecuted()
         val result = result as RemoveCharacterFromComparison.ResponseModel
         assertFalse(result.themeDeleted)
@@ -88,7 +92,7 @@ class RemoveCharacterFromComparisonUnitTest {
     @Test
     fun `multiple characters persisted`() {
         val otherCharacterId = UUID.randomUUID()
-        givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId, otherCharacterId), andMajorCharacter = otherCharacterId)
+        givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId, otherCharacterId), andMajorCharacterIds = listOf(otherCharacterId))
         whenUseCaseIsExecuted()
         val updatedTheme = updatedTheme!!
         assertNull(updatedTheme.getIncludedCharacterById(Character.Id(characterId)))
@@ -109,18 +113,26 @@ class RemoveCharacterFromComparisonUnitTest {
         assertNotNull(deletedThemeId)
     }
 
+    @Test
+    fun `remove character arc of major character`() {
+        val otherCharacterId = UUID.randomUUID()
+        givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId, otherCharacterId), andMajorCharacterIds = listOf(characterId, otherCharacterId))
+        whenUseCaseIsExecuted()
+        assertNotNull(deletedCharacterArcId)
+    }
+
     private fun givenNoThemes() = givenThemeWith()
-    private fun givenThemeWith(themeId: UUID? = null, andMajorCharacter: UUID? = null, vararg andCharacterIds: UUID) {
+    private fun givenThemeWith(themeId: UUID? = null, andMajorCharacterIds: List<UUID> = emptyList(), vararg andCharacterIds: UUID) {
         val theme = themeId?.let {
             val initialTheme = Theme(Theme.Id(themeId), "", emptyMap(), emptyMap())
             val themeWithCharacters = andCharacterIds.fold(initialTheme) { nextTheme, characterId ->
                 nextTheme.includeCharacter(Character(Character.Id(characterId), UUID.randomUUID(), "Bob"))
                     .fold({ throw it }, ::identity)
             }
-            andMajorCharacter?.let {
-                themeWithCharacters.promoteCharacter(themeWithCharacters.getMinorCharacterById(Character.Id(andMajorCharacter))!!)
+            andMajorCharacterIds.fold(themeWithCharacters) { nextTheme, characterId ->
+                nextTheme.promoteCharacter(nextTheme.getMinorCharacterById(Character.Id(characterId))!!)
                     .fold({ throw it }, ::identity)
-            } ?: themeWithCharacters
+            }
         }
         context = setupContext(
             initialThemes = listOfNotNull(theme),
@@ -129,6 +141,9 @@ class RemoveCharacterFromComparisonUnitTest {
             },
             deleteTheme = {
                 deletedThemeId = it.id
+            },
+            removeCharacterArc = { theme, character ->
+                deletedCharacterArcId = theme to character
             }
         )
     }
