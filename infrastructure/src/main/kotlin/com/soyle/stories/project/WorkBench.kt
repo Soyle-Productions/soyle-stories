@@ -108,8 +108,12 @@ class WorkBench : View() {
         openWindow(escapeClosesWindow = false, owner = null, block = false, resizable = true)?.apply {
             icons += SoyleStories.appIcon
             val primaryScreen = Screen.getScreensForRectangle(primaryStage.x, primaryStage.y, primaryStage.width, primaryStage.height)
-            x = primaryScreen.firstOrNull()?.visualBounds?.minX ?: x
-            y = primaryScreen.firstOrNull()?.visualBounds?.minY ?: y
+            primaryScreen.firstOrNull()?.visualBounds?.let {
+                x = it.minX
+                y = it.minY
+                width = it.width.times(0.8)
+                height = it.height.times(0.8)
+            }
             centerOnScreen()
             setOnCloseRequest {
                 model.projectViewModel.value?.let {
