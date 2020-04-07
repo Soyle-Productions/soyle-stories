@@ -8,16 +8,16 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.70"
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "13" // version issue here?
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "13" // version issue here?
 }
 
 test {
