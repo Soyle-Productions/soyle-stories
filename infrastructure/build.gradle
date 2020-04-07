@@ -26,7 +26,7 @@ javafx {
 def javaFXOptions = convention.findByType(JavaFXOptions.class) ?: convention.findPlugin(JavaFXOptions.class) ?: convention.getByType(JavaFXOptions.class)
 
 dependencies {
-    implementation "com.soyle.stories:soyle-studio-core:0.1.0"
+    implementation "com.soyle.stories:soyle-stories-core:0.1.0"
 
     implementation project(":application")
     implementation project(":data")
