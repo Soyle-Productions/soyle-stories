@@ -17,49 +17,51 @@ import tornadofx.runLater
  * Time: 3:24 PM
  */
 class ApplicationModel :
-    ItemViewModel<ProjectListViewModel>(),
-    ProjectListView {
+  ItemViewModel<ProjectListViewModel>(),
+  ProjectListView {
 
-    val isInvalidated = SimpleBooleanProperty(true)
-    val initializationMessage = SimpleStringProperty("")
-    val initializationProgress = SimpleDoubleProperty(0.0)
-    val isSplashScreenVisible = SimpleBooleanProperty(true)
-    val openProjectRequest = bind(ProjectListViewModel::openProjectRequest)
-    val isOpenProjectOptionsDialogOpen = bind(ProjectListViewModel::isOpenProjectOptionsDialogOpen)
-    val isWelcomeScreenVisible = bind(ProjectListViewModel::isWelcomeScreenVisible)
-    val openProjects = bindImmutableList(ProjectListViewModel::openProjects)
-    val isFailedProjectDialogVisible = bind(ProjectListViewModel::isFailedProjectDialogVisible)
-    val failedProjects = bindImmutableList(ProjectListViewModel::failedProjects)
+	val isInvalidated = SimpleBooleanProperty(true)
+	val initializationMessage = SimpleStringProperty("")
+	val initializationProgress = SimpleDoubleProperty(0.0)
+	val isSplashScreenVisible = SimpleBooleanProperty(true)
+	val openProjectRequest = bind(ProjectListViewModel::openProjectRequest)
+	val isOpenProjectOptionsDialogOpen = bind(ProjectListViewModel::isOpenProjectOptionsDialogOpen)
+	val isWelcomeScreenVisible = bind(ProjectListViewModel::isWelcomeScreenVisible)
+	val openProjects = bindImmutableList(ProjectListViewModel::openProjects)
+	val isFailedProjectDialogVisible = bind(ProjectListViewModel::isFailedProjectDialogVisible)
+	val failedProjects = bindImmutableList(ProjectListViewModel::failedProjects)
+    val startProjectFailure = bind(ProjectListViewModel::startProjectFailure)
 
-    val closingProject = bind(ProjectListViewModel::closeProjectRequest)
+	val closingProject = bind(ProjectListViewModel::closeProjectRequest)
 
-    private fun viewModel() = ProjectListViewModel(
-        isSplashScreenVisible.value,
-        isWelcomeScreenVisible.value,
-        openProjectRequest.value,
-        openProjects.value,
-        failedProjects.value,
-        closingProject.value
-    )
+	private fun viewModel() = ProjectListViewModel(
+	  isSplashScreenVisible.value,
+	  isWelcomeScreenVisible.value,
+	  openProjectRequest.value,
+	  openProjects.value,
+	  failedProjects.value,
+	  closingProject.value,
+      startProjectFailure.value
+	  )
 
-    override fun update(update: ProjectListViewModel?.() -> ProjectListViewModel) {
-        if (!Platform.isFxApplicationThread()) return runLater { update(update) }
-        val newItem = item?.let { viewModel() }
-        rebind { item = newItem.update() }
-        isSplashScreenVisible.set(this.item!!.isSplashScreenVisible)
-    }
+	override fun update(update: ProjectListViewModel?.() -> ProjectListViewModel) {
+		if (!Platform.isFxApplicationThread()) return runLater { update(update) }
+		val newItem = item?.let { viewModel() }
+		rebind { item = newItem.update() }
+		isSplashScreenVisible.set(this.item!!.isSplashScreenVisible)
+	}
 
-    override fun updateOrInvalidated(update: ProjectListViewModel.() -> ProjectListViewModel) {
-        if (!Platform.isFxApplicationThread()) return runLater { updateOrInvalidated(update) }
-        val currentItem = item ?: return invalidate()
-        rebind { item = currentItem.update() }
-    }
+	override fun updateOrInvalidated(update: ProjectListViewModel.() -> ProjectListViewModel) {
+		if (!Platform.isFxApplicationThread()) return runLater { updateOrInvalidated(update) }
+		val currentItem = item ?: return invalidate()
+		rebind { item = currentItem.update() }
+	}
 
-    fun invalidate() {
-        isInvalidated.set(true)
-    }
+	fun invalidate() {
+		isInvalidated.set(true)
+	}
 
-    companion object {
-        const val MAX_LOADING_VALUE = 1.0
-    }
+	companion object {
+		const val MAX_LOADING_VALUE = 1.0
+	}
 }
