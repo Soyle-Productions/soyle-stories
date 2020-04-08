@@ -14,6 +14,7 @@ import javafx.scene.control.skin.TextAreaSkin
 import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import tornadofx.*
 import kotlin.reflect.KProperty1
 
@@ -99,7 +100,9 @@ private fun <S> TableColumn<S, *>.calculateIndex(index: Int): Int
 
 fun <T> launchTask(block: suspend CoroutineScope.(FXTask<*>) -> T) = runAsync {
     runBlocking {
-        block(this@runAsync)
+        withTimeout(7000) {
+            block(this@runAsync)
+        }
     }
 }
 
