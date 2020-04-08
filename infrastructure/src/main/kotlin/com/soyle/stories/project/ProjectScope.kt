@@ -21,11 +21,8 @@ class ProjectScope(projectViewModel: ProjectFileViewModel) : Scope() {
     private fun loadLayout(): Task<*>
     {
         return launchTask {
-            println("async load layout")
             it.updateProgress(0.5, WorkBenchModel.MAX_LOADING_VALUE)
-            println("progress updated")
             it.updateMessage("Loading Layout")
-            println("message updated")
             layoutViewListener.loadLayoutForProject(projectId)
             it.updateProgress(WorkBenchModel.MAX_LOADING_VALUE, WorkBenchModel.MAX_LOADING_VALUE)
         }
@@ -33,10 +30,8 @@ class ProjectScope(projectViewModel: ProjectFileViewModel) : Scope() {
 
     init {
 
-        println("get project loading dialog")
         find<ProjectLoadingDialog>(scope = this)
 
-        println("create loading task")
         val loading = loadLayout()
 
         val model = find<WorkBenchModel>(scope = this)
