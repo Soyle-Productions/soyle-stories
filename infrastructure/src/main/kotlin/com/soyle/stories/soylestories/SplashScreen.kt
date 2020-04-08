@@ -79,7 +79,6 @@ class SplashScreen : Fragment() {
             centerOnScreen()
             isAlwaysOnTop = true
             model.isSplashScreenVisible.onChange {
-                println("isSplashScreenVisible: $it")
                 close()
             }
         }
