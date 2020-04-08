@@ -18,6 +18,3 @@ gradle-app.setting
 /gradlew
 /gradlew.bat
 /gradle/
-
-# Ignore local settings so they aren't updated for everyone
-local-repositories.gradle
