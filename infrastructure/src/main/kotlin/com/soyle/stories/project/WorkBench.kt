@@ -5,12 +5,10 @@ import com.soyle.stories.common.launchTask
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.modules.ApplicationComponent
 import com.soyle.stories.di.project.LayoutComponent
-import com.soyle.stories.project.layout.GroupSplitter
-import com.soyle.stories.project.layout.GroupSplitterViewModel
-import com.soyle.stories.project.layout.ToolGroup
-import com.soyle.stories.project.layout.ToolGroupViewModel
+import com.soyle.stories.project.layout.*
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.soylestories.SoyleStories
+import javafx.collections.ListChangeListener
 import javafx.scene.Parent
 import javafx.stage.Screen
 import kotlinx.coroutines.runBlocking
@@ -53,7 +51,7 @@ class WorkBench : View() {
             menu("View") { }
             menu("Tools") {
                 items.bind(model.staticTools) {
-                    checkmenuitem(messages[it.name]) {
+                    checkmenuitem(it.name) {
                         isSelected = it.isOpen
                         action {
                             launchTask { _ ->

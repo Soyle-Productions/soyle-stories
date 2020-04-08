@@ -40,7 +40,7 @@ class LayoutPresenter(
     {
         view.update {
             copy(
-                staticTools = staticTools.map { StaticToolViewModel(it.toolId.toString(), it.isOpen, it.javaClass.typeName) },
+                staticTools = staticTools.map { StaticToolViewModel(it.toolId.toString(), it.isOpen, it.toolTypeId.toPresentableToolName()!!) },
                 primaryWindow = activeWindows.find { it.isPrimary }!!.let(::toWindowViewModel),
                 secondaryWindows = activeWindows.filterNot { it.isPrimary }.map(::toWindowViewModel),
                 isValid = true

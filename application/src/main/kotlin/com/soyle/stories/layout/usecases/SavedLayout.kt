@@ -10,7 +10,7 @@ import java.util.*
  * Time: 11:17 PM
  */
 
-class StaticTool(val toolId: UUID, val isOpen: Boolean)
+class StaticTool(val toolId: UUID, val isOpen: Boolean, val toolTypeId: String)
 class ActiveWindow(val windowId: UUID, val isPrimary: Boolean, val child: ActiveWindowChild)
 
 sealed class ActiveWindowChild
@@ -43,4 +43,4 @@ fun Tool<*>.toActiveTool() = when (this) {
     is CharacterComparisonTool -> CharacterComparisonActiveTool(id.uuid, identifyingData.uuid, (associatedData as Character.Id).uuid)
 }
 
-fun Tool<*>.toStaticTool() = StaticTool(id.uuid, isOpen)
+fun Tool<*>.toStaticTool() = StaticTool(id.uuid, isOpen, type.toString())
