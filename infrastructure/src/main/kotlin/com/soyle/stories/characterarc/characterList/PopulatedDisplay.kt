@@ -2,6 +2,8 @@ package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.di.characterarc.CharacterArcComponent
+import javafx.scene.control.ButtonBar
+import javafx.scene.control.ButtonType
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
 import javafx.scene.layout.Priority
@@ -30,7 +32,16 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterTreeItemViewModel) {
-                    characterListViewListener.removeCharacter(selectedItem.id)
+                    confirm(
+                            header = "Delete ${selectedItem.name}?",
+                            content = "Are you sure you want to delete this character?",
+                            confirmButton = ButtonType("Delete", ButtonBar.ButtonData.APPLY),
+                            cancelButton = ButtonType.CANCEL,
+                            owner = currentStage,
+                            title = "Confirm"
+                    ) {
+                        characterListViewListener.removeCharacter(selectedItem.id)
+                    }
                 }
             }
         }
@@ -56,7 +67,16 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterArcItemViewModel) {
-                    characterListViewListener.removeCharacterArc(selectedItem.characterId, selectedItem.themeId)
+                    confirm(
+                            header = "Delete ${selectedItem.name}?",
+                            content = "Are you sure you want to delete this character arc?",
+                            confirmButton = ButtonType("Delete", ButtonBar.ButtonData.APPLY),
+                            cancelButton = ButtonType.CANCEL,
+                            owner = currentStage,
+                            title = "Confirm"
+                    ) {
+                        characterListViewListener.removeCharacterArc(selectedItem.characterId, selectedItem.themeId)
+                    }
                 }
             }
         }
