@@ -15,6 +15,7 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import javafx.util.StringConverter
+import kotlinx.coroutines.withContext
 import tornadofx.*
 import java.io.File
 
@@ -93,6 +94,11 @@ class StartProjectDialog : Fragment("Start New Project") {
                 action {
                     launchTask {
                         projectListViewListener.startNewProject(selectedDirectoryFile.value!!.absolutePath, projectName.value)
+                        runLater {
+                            if (model.value == null) {
+                                close()
+                            }
+                        }
                     }
                 }
             }
