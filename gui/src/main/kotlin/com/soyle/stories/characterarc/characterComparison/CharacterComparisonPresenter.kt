@@ -27,16 +27,16 @@ import java.util.*
  * Time: 9:13 AM
  */
 class CharacterComparisonPresenter(
-    private val view: CharacterComparisonView,
-    private val themeId: String,
-    eventBus: EventBus
+        private val view: CharacterComparisonView,
+        private val themeId: String,
+        eventBus: EventBus
 ) : CompareCharacters.OutputPort, ListAllCharacterArcs.OutputPort, BuildNewCharacter.OutputPort,
-    ChangeStoryFunction.OutputPort,
-    IncludeCharacterInComparison.OutputPort, PromoteMinorCharacter.OutputPort, DeleteLocalCharacterArc.OutputPort,
-    ChangeThematicSectionValue.OutputPort, RemoveCharacterFromLocalStory.OutputPort,
-    ChangeCentralMoralQuestion.OutputPort,
-    ChangeCharacterPropertyValue.OutputPort, ChangeCharacterPerspectivePropertyValue.OutputPort,
-    RemoveCharacterFromLocalComparison.OutputPort {
+        ChangeStoryFunction.OutputPort,
+        IncludeCharacterInComparison.OutputPort, PromoteMinorCharacter.OutputPort, DeleteLocalCharacterArc.OutputPort,
+        ChangeThematicSectionValue.OutputPort, RemoveCharacterFromLocalStory.OutputPort,
+        ChangeCentralMoralQuestion.OutputPort,
+        ChangeCharacterPropertyValue.OutputPort, ChangeCharacterPerspectivePropertyValue.OutputPort,
+        RemoveCharacterFromLocalComparison.OutputPort {
 
     init {
         eventBus.buildNewCharacter.addListener(this)
@@ -60,19 +60,28 @@ class CharacterComparisonPresenter(
         val comparisonItems = response.characterSummaries.values.map { summary ->
             val uuid = summary.id
             ComparisonItem(uuid.toString(), summary.name, uuid in majorCharacterIds, mapOf(
-                "Archetype(s)" to PropertyValue("Archetype", summary.archetypes, false)
+                    "Archetype(s)" to PropertyValue("Archetype", summary.archetypes, false)
             ) + response.comparisonSections.withIndex().associate {
                 it.value to summary.comparisonSections[it.index].let {
                     CharacterArcSectionValue(
-                        it.first.toString(),
-                        it.second
+                            it.first.toString(),
+                            it.second
                     )
                 }
             } + mapOf(
-                "Variation on Moral" to PropertyValue("VariationOnMoral", summary.variationOnMoral, false),
-                "Similarities to Hero" to PropertyValue("Similarities", summary.similaritiesToHero, true),
-                "Opponent Attack on Hero's Weakness" to PropertyValue("Attack", summary.attackAgainstHero, true)
-            ), summary.storyFunctions.map { it.name }.toSet()
+                    "Variation on Moral" to PropertyValue("VariationOnMoral", summary.variationOnMoral, false),
+                    "Similarities to Hero" to PropertyValue("Similarities", summary.similaritiesToHero, true),
+                    "Opponent Attack on Hero's Weakness" to PropertyValue("Attack", summary.attackAgainstHero, true)
+            ), summary.storyFunctions.map {
+                when (it) {
+                    CompareCharacters.StoryFunction.Hero -> "Hero"
+                    CompareCharacters.StoryFunction.Antagonist -> "Antagonist"
+                    CompareCharacters.StoryFunction.FakeAllyAntagonist -> "Fake-Ally Antagonist"
+                    CompareCharacters.StoryFunction.FakeAntagonistAlly -> "Fake-Antagonist Ally"
+                    CompareCharacters.StoryFunction.Ally -> "Ally"
+                    CompareCharacters.StoryFunction.Subplot -> "Subplot Character"
+                }
+            }.toSet()
             )
         }.sortedBy {
             val firstFunction = it.storyFunctions.firstOrNull()
@@ -87,39 +96,45 @@ class CharacterComparisonPresenter(
         val focusedItem = comparisonItems.find { it.characterId == response.focusedCharacterId.toString() }!!
         view.update {
             copy(
-                focusedCharacter = response.characterSummaries.forceGetById(response.focusedCharacterId)
-                    .toFocusCharacterOption(),
-                focusCharacterOptions = response.majorCharacterIds.map {
-                    response.characterSummaries.forceGetById(it).toFocusCharacterOption()
-                },
-                subTools = listOf(
-                    CompSubToolViewModel(
-                        "Comparisons",
-                        "Story Function",
-                        listOf("Archetype(s)") + response.comparisonSections,
-                        comparisonItems
+                    focusedCharacter = response.characterSummaries.forceGetById(response.focusedCharacterId)
+                            .toFocusCharacterOption(),
+                    focusCharacterOptions = response.majorCharacterIds.map {
+                        response.characterSummaries.forceGetById(it).toFocusCharacterOption()
+                    },
+                    subTools = listOf(
+                            CompSubToolViewModel(
+                                    "Comparisons",
+                                    "Story Function",
+                                    listOf("Archetype(s)") + response.comparisonSections,
+                                    comparisonItems,
+                                    listOf(
+                                            StoryFunctionOption("Antagonist"),
+                                            StoryFunctionOption("Ally"),
+                                            StoryFunctionOption("Fake-Ally Antagonist", "FakeAllyAntagonist"),
+                                            StoryFunctionOption("Fake-Antagonist Ally", "FakeAntagonistAlly")
+                                    )
+                            ),
+                            MoralProblemSubToolViewModel(
+                                    "Moral Problem",
+                                    response.centralQuestion,
+                                    listOf("Variation on Moral"),
+                                    comparisonItems
+                            ),
+                            CharacterChangeSubToolViewModel("Character Change",
+                                    focusedItem.compSections.getValue("Psychological Weakness"),
+                                    focusedItem.compSections.getValue("Moral Weakness"),
+                                    "",
+                                    focusedItem.compSections.getValue("Desire"),
+                                    listOf(
+                                            "Opponent Attack on Hero's Weakness",
+                                            "Values or Beliefs",
+                                            "Similarities to Hero"
+                                    ),
+                                    comparisonItems.filter { it.storyFunctions.contains("Antagonist") }
+                            )
                     ),
-                    MoralProblemSubToolViewModel(
-                        "Moral Problem",
-                        response.centralQuestion,
-                        listOf("Variation on Moral"),
-                        comparisonItems
-                    ),
-                    CharacterChangeSubToolViewModel("Character Change",
-                        focusedItem.compSections.getValue("Psychological Weakness"),
-                        focusedItem.compSections.getValue("Moral Weakness"),
-                        "",
-                        focusedItem.compSections.getValue("Desire"),
-                        listOf(
-                            "Opponent Attack on Hero's Weakness",
-                            "Values or Beliefs",
-                            "Similarities to Hero"
-                        ),
-                        comparisonItems.filter { it.storyFunctions.contains("Antagonist") }
-                    )
-                ),
-                availableCharactersToAdd = allCharacters.filterNot { it.characterId.toString() in includedCharacterIds }.map { CharacterItemViewModel(it.characterId.toString(), it.characterName) },
-                isInvalid = false
+                    availableCharactersToAdd = allCharacters.filterNot { it.characterId.toString() in includedCharacterIds }.map { CharacterItemViewModel(it.characterId.toString(), it.characterName) },
+                    isInvalid = false
             )
         }
     }
@@ -129,10 +144,10 @@ class CharacterComparisonPresenter(
             allCharacters = response.characters.keys.toList()
             val includedIds = subTools.getOrNull(0)?.items?.map { it.characterId }?.toSet() ?: setOf()
             copy(
-                availableCharactersToAdd = response.characters.keys.filterNot { it.characterId.toString() in includedIds }
-                    .map {
-                        CharacterItemViewModel(it.characterId.toString(), it.characterName)
-                    }
+                    availableCharactersToAdd = response.characters.keys.filterNot { it.characterId.toString() in includedIds }
+                            .map {
+                                CharacterItemViewModel(it.characterId.toString(), it.characterName)
+                            }
             )
         }
     }
@@ -142,10 +157,10 @@ class CharacterComparisonPresenter(
         view.update {
             if (subTools.getOrNull(0)?.items?.find { it.characterId == response.characterId.toString() } != null) return@update this
             copy(
-                availableCharactersToAdd = availableCharactersToAdd + CharacterItemViewModel(
-                    response.characterId.toString(),
-                    response.characterName
-                )
+                    availableCharactersToAdd = availableCharactersToAdd + CharacterItemViewModel(
+                            response.characterId.toString(),
+                            response.characterName
+                    )
             )
         }
     }
@@ -155,7 +170,7 @@ class CharacterComparisonPresenter(
         if (response.themeId.toString() != themeId) return
         view.update {
             copy(
-                isInvalid = true
+                    isInvalid = true
             )
         }
     }
@@ -170,7 +185,7 @@ class CharacterComparisonPresenter(
     override fun receivePromoteMinorCharacterResponse(response: PromoteMinorCharacter.ResponseModel) {
         view.update {
             copy(
-                isInvalid = true
+                    isInvalid = true
             )
         }
     }
@@ -181,7 +196,7 @@ class CharacterComparisonPresenter(
         if (response.themeId.toString() == themeId && !response.themeRemoved) {
             view.update {
                 copy(
-                    isInvalid = true
+                        isInvalid = true
                 )
             }
         }
@@ -201,7 +216,7 @@ class CharacterComparisonPresenter(
     override fun receiveChangeThematicSectionValueResponse(response: ChangeThematicSectionValue.ResponseModel) {
         view.update {
             copy(
-                isInvalid = true
+                    isInvalid = true
             )
         }
 
@@ -215,11 +230,11 @@ class CharacterComparisonPresenter(
         view.update {
             val focusOptions = focusCharacterOptions.filterNot { it.characterId == response.characterId.toString() }
             val focusedCharacter = focusedCharacter?.takeUnless { it.characterId == response.characterId.toString() }
-                ?: focusOptions.firstOrNull()
+                    ?: focusOptions.firstOrNull()
             copy(
-                focusedCharacter = focusedCharacter,
-                focusCharacterOptions = focusOptions,
-                isInvalid = true
+                    focusedCharacter = focusedCharacter,
+                    focusCharacterOptions = focusOptions,
+                    isInvalid = true
             )
         }
     }
@@ -232,7 +247,7 @@ class CharacterComparisonPresenter(
         if (UUID.fromString(themeId) != response.themeId) return
         view.update {
             copy(
-                isInvalid = true
+                    isInvalid = true
             )
         }
     }
@@ -241,7 +256,7 @@ class CharacterComparisonPresenter(
         if (themeId != response.themeId.toString()) return
         view.update {
             copy(
-                isInvalid = true
+                    isInvalid = true
             )
         }
     }
@@ -254,7 +269,7 @@ class CharacterComparisonPresenter(
         if (themeId != response.themeId.toString()) return
         view.update {
             copy(
-                isInvalid = true
+                    isInvalid = true
             )
         }
     }
@@ -266,7 +281,7 @@ class CharacterComparisonPresenter(
         if (themeId != response.themeId.toString()) return
         view.update {
             copy(
-                isInvalid = true
+                    isInvalid = true
             )
         }
     }
@@ -278,7 +293,7 @@ class CharacterComparisonPresenter(
         if (themeId != response.themeId.toString() || response.themeRemoved) return
         view.update {
             copy(
-                isInvalid = true
+                    isInvalid = true
             )
         }
     }
