@@ -1,6 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.70'
-    id 'maven-publish'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.71'
     id 'org.unbroken-dome.test-sets' version '2.2.1'
 }
 
@@ -12,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.71"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0-M2"
     implementation "io.arrow-kt:arrow-core:0.10.4"
     implementation "io.arrow-kt:arrow-core-data:0.10.4"
@@ -21,10 +20,10 @@ dependencies {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "14"
+    kotlinOptions.jvmTarget = "13"
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "14"
+    kotlinOptions.jvmTarget = "13"
 }
 
 test {
@@ -32,21 +31,3 @@ test {
 }
 
 check.dependsOn test
-
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/b-camphart/soyle-studio-core")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getProperty("USERNAME")
-                password = project.findProperty("gpr.password") ?: System.getProperty("PASSWORD")
-            }
-        }
-    }
-    publications {
-        gpr(MavenPublication) {
-            from(components.kotlin)
-        }
-    }
-}
