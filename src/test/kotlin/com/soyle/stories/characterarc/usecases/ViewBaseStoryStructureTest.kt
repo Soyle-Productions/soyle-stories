@@ -20,29 +20,9 @@ import java.util.*
  */
 class ViewBaseStoryStructureTest {
 
-    private fun given(themes: List<Theme>): (UUID, UUID) -> Either<Exception, com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure.ResponseModel> {
+    private fun given(themes: List<Theme>, values: Map<String, String> = mapOf()): (UUID, UUID) -> Either<Exception, com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure.ResponseModel> {
         val repo = object : com.soyle.stories.characterarc.repositories.ThemeRepository, CharacterArcSectionRepository {
             override suspend fun addNewTheme(theme: Theme) = Unit
-            suspend fun getCharacterArcByCharacterAndThemeId(
-                characterId: Character.Id,
-                themeId: Theme.Id
-            ): CharacterArc? = themes.find { it.id == themeId }?.getIncludedCharacterById(characterId)?.let {
-                val existingSections = it.thematicSections.map { it.template.characterArcTemplateSectionId }.toSet()
-                val newSections =
-                    CharacterArcTemplate.default().sections.filter { it.id !in existingSections }.map { template ->
-                        CharacterArcSection(
-                            CharacterArcSection.Id(
-                                UUID.randomUUID()
-                            ), it.id, themeId, template, ""
-                        )
-                    }
-                CharacterArc(
-                    it.id,
-                    CharacterArcTemplate.default(),
-                    themeId,
-                    "Name"
-                )
-            }
 
             override suspend fun getThemeById(themeId: Theme.Id): Theme? = themes.find { it.id == themeId }
             override suspend fun addNewCharacterArcSections(characterArcSections: List<CharacterArcSection>) {}
@@ -57,7 +37,7 @@ class ViewBaseStoryStructureTest {
                     CharacterArcSection(
                         CharacterArcSection.Id(
                             UUID.randomUUID()
-                        ), it.id, themeId, template, ""
+                        ), it.id, themeId, template, values[template.name] ?: ""
                     )
                 }
             } ?: emptyList()
@@ -175,11 +155,15 @@ class ViewBaseStoryStructureTest {
             .flatMap { it.promoteCharacter(it.getMinorCharacterById(character.id)!!) }
                 as Either.Right
                 ).b
+        val values = CharacterArcTemplate.default().sections.associate {
+            it.name to UUID.randomUUID().toString()
+        }
 
         val useCase = given(
             listOf(
                 theme
-            )
+            ),
+            values
         )
 
         @Test
@@ -187,6 +171,15 @@ class ViewBaseStoryStructureTest {
             val (baseStoryStructure) = useCase.invoke(characterUUID, themeUUID) as Either.Right
             val requiredSections = CharacterArcTemplate.default().sections.map { it.name }.toSet()
             assertEquals(requiredSections, baseStoryStructure.sections.map { it.templateName }.toSet())
+        }
+
+        @Test
+        fun storedValuesAreOutput() {
+            val (baseStoryStructure) = useCase.invoke(characterUUID, themeUUID) as Either.Right
+            val templateToValues = baseStoryStructure.sections.associate { it.templateName to it.value }
+            templateToValues.forEach { (templateName, value) ->
+                assertEquals(values[templateName] ?: "", value)
+            }
         }
 
     }
