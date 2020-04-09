@@ -110,6 +110,14 @@ class Theme(
         return similarities.right()
     }
 
+    fun withCharacterRenamed(character: CharacterInTheme, newName: String): Either<ThemeException, Theme>
+    {
+        verifyCharacterInTheme(character.id)?.let { return it.left() }
+        return copy(
+          includedCharacters = includedCharacters.minus(character.id).plus(character.id to character.changeName(newName))
+        ).right()
+    }
+
     fun changeSimilarities(
         characterA: Character.Id,
         characterB: Character.Id,

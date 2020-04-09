@@ -7,7 +7,7 @@ interface RenameCharacter {
 
 	suspend operator fun invoke(characterId: UUID, name: String, output: OutputPort)
 
-	class ResponseModel(val characterId: UUID, val newName: String)
+	class ResponseModel(val characterId: UUID, val newName: String, val affectedThemeIds: List<UUID>)
 
 	interface OutputPort {
 		fun receiveRenameCharacterFailure(failure: CharacterException)

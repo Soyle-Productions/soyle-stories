@@ -14,6 +14,7 @@ sealed class CharacterInTheme {
     abstract val variationOnMoral: String
     abstract val thematicSections: List<ThematicSection>
 
+    abstract fun changeName(name: String): CharacterInTheme
     abstract fun changeArchetype(archetype: String): CharacterInTheme
     abstract fun changeVariationOnMoral(variationOnMoral: String): CharacterInTheme
 
@@ -33,6 +34,10 @@ class MinorCharacter(
         variationOnMoral: String = this.variationOnMoral,
         thematicSections: List<ThematicSection> = this.thematicSections
     ) = MinorCharacter(id, name, archetype, variationOnMoral, thematicSections)
+
+    override fun changeName(name: String): MinorCharacter {
+        return copy(name = name)
+    }
 
     override fun changeArchetype(archetype: String): MinorCharacter {
         return copy(archetype = archetype)
@@ -60,6 +65,9 @@ class MajorCharacter(
         thematicSections: List<ThematicSection> = this.thematicSections,
         perspective: CharacterPerspective = this.perspective
     ) = MajorCharacter(id, name, archetype, variationOnMoral, thematicSections, perspective)
+
+    override fun changeName(name: String): MajorCharacter =
+      copy(name = name)
 
     fun perceiveCharacter(characterId: Character.Id): MajorCharacter =
         copy(perspective = perspective.perceiveCharacter(characterId))

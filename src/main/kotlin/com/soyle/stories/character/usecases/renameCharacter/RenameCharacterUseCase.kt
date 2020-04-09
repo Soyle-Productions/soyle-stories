@@ -1,14 +1,17 @@
 package com.soyle.stories.character.usecases.renameCharacter
 
+import arrow.core.identity
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.CharacterNameCannotBeBlank
 import com.soyle.stories.character.repositories.CharacterRepository
+import com.soyle.stories.character.repositories.ThemeRepository
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Theme
 import java.util.*
 
 class RenameCharacterUseCase(
-  private val characterRepository: CharacterRepository
+  private val characterRepository: CharacterRepository,
+  private val themeRepository: ThemeRepository
 ) : RenameCharacter {
 
 	override suspend fun invoke(characterId: UUID, name: String, output: RenameCharacter.OutputPort) {
@@ -22,9 +25,10 @@ class RenameCharacterUseCase(
 
 	private suspend fun renameCharacter(characterId: UUID, name: String): RenameCharacter.ResponseModel {
 		val character = getCharacter(characterId)
-		if (character.name == name) return RenameCharacter.ResponseModel(characterId, name)
-		rename(character, name)
-		return RenameCharacter.ResponseModel(characterId, name)
+		if (character.name == name) return RenameCharacter.ResponseModel(characterId, name, emptyList())
+		val themes = getThemesWithCharacter(character.id)
+		changeNameForAllInstancesOfCharacter(name, character, themes)
+		return RenameCharacter.ResponseModel(characterId, name, themes.map { it.id.uuid })
 	}
 
 	private suspend fun getCharacter(characterId: UUID): Character {
@@ -32,11 +36,40 @@ class RenameCharacterUseCase(
 		  throw CharacterDoesNotExist(characterId)
 	}
 
-	private suspend fun rename(character: Character, newName: String) {
+	private suspend fun getThemesWithCharacter(characterId: Character.Id): List<Theme>
+	{
+		return themeRepository.getThemesWithCharacterIncluded(characterId)
+	}
+
+	private suspend fun changeNameForAllInstancesOfCharacter(name: String, character: Character, themes: List<Theme>) {
+		foldCharacterRename(character, name)
+		renameCharacterInThemes(character, name)
+	}
+
+	private suspend fun foldCharacterRename(character: Character, newName: String) {
 		character.rename(newName).fold(
 		  { throw it },
 		  { characterRepository.updateCharacter(it) }
 		)
+	}
+
+	private suspend fun renameCharacterInThemes(character: Character, name: String)
+	{
+		val themes = themeRepository.getThemesWithCharacterIncluded(character.id)
+
+		if (themes.isEmpty()) return
+
+		val updatedThemes = themes.map { theme ->
+			theme.getIncludedCharacterById(character.id)?.let {
+				theme.withCharacterRenamed(it, name).fold(
+				  { throw it },
+				  ::identity
+				)
+			} ?: theme
+		}
+
+		themeRepository.updateThemes(updatedThemes)
+
 	}
 
 }
