@@ -29,6 +29,8 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllChara
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcsUseCase
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
+import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.common.ThreadTransformerImpl
@@ -152,6 +154,9 @@ class CharacterArcComponent : Component(), ScopedInstance {
     val renameCharacter: RenameCharacter by lazy {
         RenameCharacterUseCase(dataComponent.characterRepository, dataComponent.themeRepository)
     }
+    val renameCharacterArc: RenameCharacterArc by lazy {
+        RenameCharacterArcUseCase(dataComponent.characterRepository, dataComponent.themeRepository, dataComponent.characterArcRepository)
+    }
 
     val eventBus: EventBus by lazy {
         object : EventBus {
@@ -181,6 +186,8 @@ class CharacterArcComponent : Component(), ScopedInstance {
                 RemoveCharacterFromLocalComparisonNotifier()
             override val renameCharacter: Notifier<RenameCharacter.OutputPort> =
               RenameCharacterNotifier()
+            override val renameCharacterArc: Notifier<RenameCharacterArc.OutputPort> =
+              RenameCharacterArcNotifier()
         }
     }
 
@@ -221,6 +228,8 @@ class CharacterArcComponent : Component(), ScopedInstance {
         get() = eventBus.removeCharacterFromLocalComparison as RemoveCharacterFromLocalComparison.OutputPort
     val renameCharacterOutputPort: RenameCharacter.OutputPort
         get() = eventBus.renameCharacter as RenameCharacter.OutputPort
+    val renameCharacterArcOutputPort: RenameCharacterArc.OutputPort
+        get() = eventBus.renameCharacterArc as RenameCharacterArc.OutputPort
 
 
     val changeThematicSectionValueController = ChangeThematicSectionValueController(
@@ -239,7 +248,9 @@ class CharacterArcComponent : Component(), ScopedInstance {
             deleteLocalCharacterArc,
             deleteLocalCharacterArcOutputPort,
           renameCharacter,
-          renameCharacterOutputPort
+          renameCharacterOutputPort,
+          renameCharacterArc,
+          renameCharacterArcOutputPort
         )
     }
 

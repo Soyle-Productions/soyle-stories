@@ -97,7 +97,7 @@ internal class PopulatedDisplay : View() {
                 // rename item
                 when (oldValue) {
                     is CharacterTreeItemViewModel -> characterListViewListener.renameCharacter(oldValue.id, newName)
-                    is CharacterArcItemViewModel -> {}
+                    is CharacterArcItemViewModel -> characterListViewListener.renameCharacterArc(oldValue.characterId, oldValue.themeId, newName)
                 }
 
                 oldValue

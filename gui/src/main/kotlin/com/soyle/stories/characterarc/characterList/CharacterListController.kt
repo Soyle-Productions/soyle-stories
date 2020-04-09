@@ -9,6 +9,7 @@ import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.Remove
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import java.util.*
@@ -24,7 +25,9 @@ class CharacterListController(
     private val deleteCharacterArc: DeleteLocalCharacterArc,
     private val deleteCharacterArcOutputPort: DeleteLocalCharacterArc.OutputPort,
     private val renameCharacter: RenameCharacter,
-    private val renameCharacterOutputPort: RenameCharacter.OutputPort
+    private val renameCharacterOutputPort: RenameCharacter.OutputPort,
+    private val renameCharacterArc: RenameCharacterArc,
+    private val renameCharacterArcOutputPort: RenameCharacterArc.OutputPort
 ) : CharacterListViewListener {
 
     override fun getList() {
@@ -78,6 +81,19 @@ class CharacterListController(
                 UUID.fromString(themeId),
                 UUID.fromString(characterId),
                 deleteCharacterArcOutputPort
+            )
+        }
+    }
+
+    override fun renameCharacterArc(characterId: String, themeId: String, newName: String) {
+        threadTransformer.async {
+            renameCharacterArc.invoke(
+              RenameCharacterArc.RequestModel(
+                UUID.fromString(characterId),
+                UUID.fromString(themeId),
+                newName
+              ),
+              renameCharacterArcOutputPort
             )
         }
     }

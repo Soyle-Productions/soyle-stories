@@ -13,5 +13,6 @@ interface CharacterListViewListener {
     fun removeCharacter(characterId: String)
     fun removeCharacterArc(characterId: String, themeId: String)
     fun renameCharacter(characterId: String, newName: String)
+    fun renameCharacterArc(characterId: String, themeId: String, newName: String)
 
 }
