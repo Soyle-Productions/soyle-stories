@@ -36,6 +36,9 @@ class BuildNewCharacterTest {
 			override suspend fun addNewCharacter(character: Character) = addNewCharacter.invoke(character)
 			override suspend fun getCharacterById(characterId: Character.Id): Character? = null
 			override suspend fun deleteCharacterWithId(characterId: Character.Id) = Unit
+			override suspend fun updateCharacter(character: Character) {
+
+			}
 		}
 		val useCase =
             BuildNewCharacterUseCase(

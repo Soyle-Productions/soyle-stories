@@ -42,6 +42,10 @@ class RemoveCharacterFromStoryTest {
             override suspend fun deleteCharacterWithId(characterId: Character.Id) =
                 deleteCharacterWithId.invoke(characterId)
 
+            override suspend fun updateCharacter(character: Character) {
+
+            }
+
             override suspend fun getThemesWithCharacterIncluded(characterId: Character.Id): List<Theme> =
                 themes.filter {
                     it.containsCharacter(characterId)

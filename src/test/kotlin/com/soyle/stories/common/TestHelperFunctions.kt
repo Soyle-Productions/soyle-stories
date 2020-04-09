@@ -2,6 +2,7 @@ package com.soyle.stories.common
 
 import arrow.core.Either
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 
 /**
  * Created by Brendan
@@ -20,3 +21,5 @@ inline infix fun <A, B, T> Either<A, B>.thenFailWith(expectedFailure: () -> T) {
 	this as Either.Left
 	Assertions.assertEquals(expectedFailure(), a)
 }
+
+fun Any?.mustEqual(expected: Any?, message: () -> String = { "" }) = assertEquals(expected, this) { message() }

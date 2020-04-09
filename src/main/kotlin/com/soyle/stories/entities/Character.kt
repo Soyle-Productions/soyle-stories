@@ -19,7 +19,7 @@ class Character(
 ) : Entity<Character.Id> {
 
     init {
-        if (name.isBlank()) throw com.soyle.stories.character.CharacterNameCannotBeBlank
+        if (name.isBlank()) throw com.soyle.stories.character.CharacterNameCannotBeBlank(id.uuid)
     }
 
     fun rename(name: String): Either<com.soyle.stories.character.CharacterException, Character> {
