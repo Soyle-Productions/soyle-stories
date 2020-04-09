@@ -13,7 +13,8 @@ data class ProjectListViewModel(
     val openProjectRequest: ProjectFileViewModel?,
     val openProjects: List<ProjectFileViewModel>,
     val failedProjects: List<ProjectIssueViewModel>,
-    val closeProjectRequest: ProjectViewModel?
+    val closeProjectRequest: ProjectViewModel?,
+    val startProjectFailure: StartProjectFailureViewModel?
 ) {
     val isFailedProjectDialogVisible: Boolean
         get() = failedProjects.isNotEmpty()
@@ -28,4 +29,8 @@ class ProjectIssueViewModel(
     val name: String,
     val location: String,
     val additionalInformation: String = ""
+)
+class StartProjectFailureViewModel(
+  val failingField: String?,
+  val message: String
 )

@@ -168,7 +168,7 @@ class ComparisonSubTool : Fragment() {
                     } else {
                         button(itemProperty.stringBinding {
                             when (it?.storyFunctions?.size) {
-                                1 -> it.storyFunctions.first().toString()
+                                1 -> it.storyFunctions.first()
                                 0, null -> "[Choose]"
                                 else -> it.storyFunctions.toString()
                             }
@@ -179,26 +179,22 @@ class ComparisonSubTool : Fragment() {
                                 if (isHero) return@setOnMouseClicked
                                 storyFunctionMenu.apply {
                                     items.clear()
-                                    fun storyFunctionItem(storyFunction: String) {
-                                        checkmenuitem(storyFunction) {
+                                    compSubTool.value.storyFunctionOptions.forEach { (label, storyFunction) ->
+                                        checkmenuitem(label) {
                                             isSelected = storyFunctions.contains(storyFunction)
                                             action {
                                                 val characterId = itemProperty.value?.characterId ?: return@action
                                                 launchTask {
                                                     characterComparisonViewListener.setStoryFunction(
-                                                        scope.themeId,
-                                                        model.focusedCharacter.value.characterId,
-                                                        characterId,
-                                                        storyFunction
+                                                            scope.themeId,
+                                                            model.focusedCharacter.value.characterId,
+                                                            characterId,
+                                                            storyFunction
                                                     )
                                                 }
                                             }
                                         }
                                     }
-                                    storyFunctionItem("Antagonist")
-                                    storyFunctionItem("Ally")
-                                    storyFunctionItem("Fake-Ally Antagonist")
-                                    storyFunctionItem("Fake-Antagonist Ally")
                                 }.show(this, Side.BOTTOM, 0.0, 0.0)
                             }
                         }

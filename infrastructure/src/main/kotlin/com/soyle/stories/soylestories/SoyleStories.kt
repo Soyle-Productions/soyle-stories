@@ -14,6 +14,10 @@ import kotlinx.coroutines.javafx.JavaFx
 import tornadofx.*
 import java.util.*
 
+fun main(args: Array<String>) {
+    launch<SoyleStories>(args)
+}
+
 /**
  * Created by Brendan
  * Date: 2/14/2020
@@ -90,8 +94,8 @@ class SoyleStories : App(WelcomeScreen::class, WizardStyles::class) {
     }
 
     companion object {
-        val appIcon = Image("com/soyle/stories/soylestories/soyle bronze.png")
-        val logo = Image("com/soyle/stories/soylestories/bronze_boy.png")
+        val appIcon = Image("com/soyle/stories/soylestories/icon.png")
+        val logo = Image("com/soyle/stories/soylestories/bronze logo.png")
 
         init {
             loadFont("/com/soyle/stories/soylestories/corbel/CORBEL.TTF", 14)!!

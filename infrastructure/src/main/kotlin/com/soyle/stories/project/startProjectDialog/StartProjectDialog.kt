@@ -2,22 +2,27 @@ package com.soyle.stories.project.startProjectDialog
 
 import com.soyle.stories.common.launchTask
 import com.soyle.stories.di.modules.ApplicationComponent
+import com.soyle.stories.project.startProjectDialog.Styles.Companion.errorState
+import com.soyle.stories.soylestories.ApplicationModel
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
+import javafx.scene.paint.Color
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import javafx.util.StringConverter
+import kotlinx.coroutines.withContext
 import tornadofx.*
 import java.io.File
 
 class StartProjectDialog : Fragment("Start New Project") {
 
     private val projectListViewListener = find<ApplicationComponent>().projectListViewListener
+    private val model = find<ApplicationModel>().startProjectFailure
 
     private val selectedDirectoryFile = SimpleObjectProperty<File?>(null)
     private val projectName = SimpleStringProperty("Untitled")
@@ -41,6 +46,7 @@ class StartProjectDialog : Fragment("Start New Project") {
                 labelContainer.alignment = Pos.CENTER_RIGHT
                 hbox(5) {
                     textfield {
+                        toggleClass(errorState, model.select { (it.failingField == "directory").toProperty() })
                         hgrow = Priority.ALWAYS
                         textProperty().bindBidirectional(selectedDirectoryFile, object : StringConverter<File?>() {
                             override fun fromString(p0: String?): File = File(p0 ?: "")
@@ -58,11 +64,20 @@ class StartProjectDialog : Fragment("Start New Project") {
             field("Project Name") {
                 labelContainer.alignment = Pos.CENTER_RIGHT
                 textfield {
+                    toggleClass(errorState, model.select { (it.failingField == "name").toProperty() })
                     textProperty().bindBidirectional(projectName)
                     focusedProperty().onChangeOnce {
                         if (it == true) selectAll()
                     }
                 }
+            }
+        }
+        label {
+            val messageProperty = model.select { it.message.toProperty() }
+            textProperty().bind(messageProperty)
+            visibleWhen { messageProperty.isNotBlank() }
+            style {
+                textFill = Color.RED
             }
         }
         hbox(5) {
@@ -79,6 +94,11 @@ class StartProjectDialog : Fragment("Start New Project") {
                 action {
                     launchTask {
                         projectListViewListener.startNewProject(selectedDirectoryFile.value!!.absolutePath, projectName.value)
+                        runLater {
+                            if (model.value == null) {
+                                close()
+                            }
+                        }
                     }
                 }
             }
@@ -98,4 +118,22 @@ fun Component.startProjectDialog(owner: Stage?): StartProjectDialog = find(Start
     )?.apply {
         centerOnScreen()
     }
+}
+
+class Styles : Stylesheet() {
+    companion object {
+        val errorState by cssclass()
+
+        init {
+            importStylesheet<Styles>()
+        }
+    }
+
+    init {
+        errorState {
+            borderColor += box(Color.RED)
+            borderWidth += box(1.px)
+        }
+    }
+
 }

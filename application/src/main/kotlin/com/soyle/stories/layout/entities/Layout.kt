@@ -18,7 +18,7 @@ class Layout(
         windows.flatMap { it.tools }
     }
     val staticTools: List<Tool<*>> by lazy {
-        tools.filter { it.type.canHaveNullData && it.identifyingData == null }
+        tools.filter { it.type.canHaveNullData && it.identifyingData is Project.Id }
     }
 
     init {

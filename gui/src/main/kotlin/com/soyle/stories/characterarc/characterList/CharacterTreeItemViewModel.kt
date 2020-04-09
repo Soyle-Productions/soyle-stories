@@ -5,6 +5,4 @@
  */
 package com.soyle.stories.characterarc.characterList
 
-data class CharacterTreeItemViewModel(val id: String, val name: String, val isExpanded: Boolean, val arcs: List<CharacterArcItemViewModel>) {
-    override fun toString(): String = name
-}
+data class CharacterTreeItemViewModel(val id: String, val name: String, val isExpanded: Boolean, val arcs: List<CharacterArcItemViewModel>)

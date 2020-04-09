@@ -5,6 +5,9 @@
  */
 package com.soyle.stories.characterarc.baseStoryStructure
 
+import com.soyle.stories.characterarc.characterComparison.CharacterComparison
+import com.soyle.stories.characterarc.characterComparison.CharacterComparisonScope
+import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.characterarc.BaseStoryStructureComponent
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleIntegerProperty
@@ -40,7 +43,7 @@ class BaseStoryStructure : View("Base Story Structure") {
         val field = field {
             textProperty.bind(section.stringBinding { it?.sectionTemplateName ?: "" })
             textfield {
-                section.stringBinding { it?.sectionValue ?: "" }.onChange {
+                section.stringBinding { it?.sectionValue ?: "" }.onChangeWithCurrent {
                     text = it ?: ""
                 }
                 focusedProperty().onChange { focused ->
@@ -55,16 +58,16 @@ class BaseStoryStructure : View("Base Story Structure") {
             if (it == null) field.removeFromParent()
         }
     }
-
-    override fun onUndock() {
-        FX.getComponents(scope).forEach { (_, scopedInstance) ->
-            (scopedInstance as? UIComponent)?.close()
-        }
-        scope.deregister()
-    }
-
 }
 
 fun TabPane.baseStoryStructureTab(projectScope: ProjectScope, characterId: String, themeId: String): Tab {
-    return tab(find<BaseStoryStructure>(scope = BaseStoryStructureScope(projectScope, characterId, themeId)))
+    val scope = BaseStoryStructureScope(projectScope, characterId, themeId)
+    val structure = find<BaseStoryStructure>(scope = scope)
+    val tab = tab(structure)
+    tab.tabPaneProperty().onChange {
+        if (it == null) {
+            scope.close()
+        }
+    }
+    return tab
 }
