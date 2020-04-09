@@ -27,7 +27,7 @@ class SplashScreen : Fragment() {
             AnchorPane.setBottomAnchor(this,0.0)
             isPreserveRatio = true
         }
-        label(this@SplashScreen::class.java.`package`?.implementationVersion ?: "DEVELOPMENT") {
+        label(messages["application.version"] ?: "DEVELOPMENT") {
             alignment = Pos.CENTER_RIGHT
             anchorpaneConstraints {
                 leftAnchor = 30.0

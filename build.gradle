@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.soyle.stories'
-version '0.1.0-SNAPSHOT 20w15a'
+version project.property("version")
 
 repositories {
     mavenCentral()

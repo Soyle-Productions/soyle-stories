@@ -1,6 +1,7 @@
 import org.openjfx.gradle.JavaFXModule
 import org.openjfx.gradle.JavaFXPlatform
 import org.openjfx.gradle.JavaFXOptions
+import org.apache.tools.ant.filters.*
 
 plugins {
     id 'java'
@@ -69,6 +70,12 @@ runtime {
 
 application {
     mainClassName = 'com.soyle.stories.soylestories.SoyleStoriesKt'
+}
+
+processResources {
+    filesMatching("**/*.properties") {
+        filter(ReplaceTokens, tokens: ["application.version": project.parent.property("version")], beginToken: '@', endToken: '@')
+    }
 }
 
 tasks.withType(CreateStartScripts.class).each {script ->
