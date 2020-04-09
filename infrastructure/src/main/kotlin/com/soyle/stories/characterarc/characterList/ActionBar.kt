@@ -41,8 +41,10 @@ internal class ActionBar : View() {
             enableWhen { model.selectedItem.isNotNull }
             action {
                 when (val selectedItem = model.selectedItem.value) {
-                    is CharacterTreeItemViewModel -> characterListViewListener.removeCharacter(selectedItem.id)
-                    is CharacterArcItemViewModel -> characterListViewListener.removeCharacterArc(selectedItem.characterId, selectedItem.themeId)
+                    is CharacterTreeItemViewModel ->
+                        confirmDeleteCharacter(selectedItem.id, selectedItem.name, characterListViewListener)
+                    is CharacterArcItemViewModel ->
+                        confirmDeleteCharacterArc(selectedItem.characterId, selectedItem.themeId, selectedItem.name, characterListViewListener)
                 }
             }
             isMnemonicParsing = false

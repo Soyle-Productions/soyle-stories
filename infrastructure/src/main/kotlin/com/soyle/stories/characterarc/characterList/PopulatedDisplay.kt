@@ -1,12 +1,13 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
+import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.characterarc.CharacterArcComponent
-import javafx.scene.control.ButtonBar
-import javafx.scene.control.ButtonType
-import javafx.scene.control.ContextMenu
-import javafx.scene.control.TreeItem
+import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.control.*
+import javafx.scene.control.cell.TextFieldTreeCell
 import javafx.scene.layout.Priority
+import javafx.util.StringConverter
 import tornadofx.*
 
 /**
@@ -17,9 +18,19 @@ import tornadofx.*
 internal class PopulatedDisplay : View() {
 
     private val model by inject<CharacterListModel>()
+    private var treeView: TreeView<Any?> by singleAssign()
     private val characterListViewListener = find<CharacterArcComponent>().characterListViewListener
 
     private val characterContextMenu = ContextMenu().apply {
+        item("Rename") {
+            action {
+                val selectedItem = model.selectedItem.value
+                val selectedTreeItem = treeView.selectionModel.selectedItems.singleOrNull() ?: return@action
+                if (selectedItem is CharacterTreeItemViewModel && selectedTreeItem.value == selectedItem) {
+                    treeView.edit(selectedTreeItem)
+                }
+            }
+        }
         item("New Character Arc") {
             action {
                 val selectedItem = model.selectedItem.value
@@ -32,21 +43,21 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterTreeItemViewModel) {
-                    confirm(
-                            header = "Delete ${selectedItem.name}?",
-                            content = "Are you sure you want to delete this character?",
-                            confirmButton = ButtonType("Delete", ButtonBar.ButtonData.APPLY),
-                            cancelButton = ButtonType.CANCEL,
-                            owner = currentStage,
-                            title = "Confirm"
-                    ) {
-                        characterListViewListener.removeCharacter(selectedItem.id)
-                    }
+                    confirmDeleteCharacter(selectedItem.id, selectedItem.name, characterListViewListener)
                 }
             }
         }
     }
     private val characterArcContextMenu = ContextMenu().apply {
+        item("Rename") {
+            action {
+                val selectedItem = model.selectedItem.value
+                val selectedTreeItem = treeView.selectionModel.selectedItems.singleOrNull() ?: return@action
+                if (selectedItem is CharacterArcItemViewModel && selectedTreeItem.value == selectedItem) {
+                    treeView.edit(selectedTreeItem)
+                }
+            }
+        }
         item("Base Story Structure") {
             action {
                 val selectedItem = model.selectedItem.value
@@ -67,16 +78,7 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterArcItemViewModel) {
-                    confirm(
-                            header = "Delete ${selectedItem.name}?",
-                            content = "Are you sure you want to delete this character arc?",
-                            confirmButton = ButtonType("Delete", ButtonBar.ButtonData.APPLY),
-                            cancelButton = ButtonType.CANCEL,
-                            owner = currentStage,
-                            title = "Confirm"
-                    ) {
-                        characterListViewListener.removeCharacterArc(selectedItem.characterId, selectedItem.themeId)
-                    }
+                    confirmDeleteCharacterArc(selectedItem.characterId, selectedItem.themeId, selectedItem.name, characterListViewListener)
                 }
             }
         }
@@ -88,9 +90,18 @@ internal class PopulatedDisplay : View() {
         minWidth = 200.0
         minHeight = 100.0
         vgrow = Priority.ALWAYS
-        treeview<Any?>(TreeItem(null)) {
+        this@PopulatedDisplay.treeView = treeview<Any?>(TreeItem(null)) {
             isShowRoot = false
             vgrow = Priority.ALWAYS
+            makeEditable { newName, oldValue ->
+                // rename item
+                when (oldValue) {
+                    is CharacterTreeItemViewModel -> characterListViewListener.renameCharacter(oldValue.id, newName)
+                    is CharacterArcItemViewModel -> {}
+                }
+
+                oldValue
+            }
             bindSelected(model.selectedItem)
             model.characterTreeItems.set(root.children)
             model.selectedItem.onChange {
@@ -98,6 +109,13 @@ internal class PopulatedDisplay : View() {
                     is CharacterTreeItemViewModel -> characterContextMenu
                     is CharacterArcItemViewModel -> characterArcContextMenu
                     else -> null
+                }
+            }
+            cellFormat {
+                text = when (it) {
+                    is CharacterTreeItemViewModel -> it.name
+                    is CharacterArcItemViewModel -> it.name
+                    else -> throw IllegalArgumentException("Invalid value type")
                 }
             }
             populate { parentItem: TreeItem<Any?> ->
@@ -114,7 +132,6 @@ internal class PopulatedDisplay : View() {
                 }
             }
             onDoubleClick {
-
             }
         }
         this += find<ActionBar>()
