@@ -38,6 +38,10 @@ class ListAllCharacterArcsTest {
                 characterId: Character.Id,
                 themeId: Theme.Id
 			): CharacterArc? = null
+
+			override suspend fun updateCharacterArc(characterArc: CharacterArc) {
+
+			}
 		}
 		val output = object : com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs.OutputPort {
 			var result: Either<*, com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs.ResponseModel>? = null

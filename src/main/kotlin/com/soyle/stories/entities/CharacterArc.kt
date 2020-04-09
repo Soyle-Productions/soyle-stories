@@ -15,6 +15,12 @@ class CharacterArc(
     val name: String
 ) {
 
+    private fun copy(
+      name: String = this.name
+    ) = CharacterArc(characterId, template, themeId, name)
+
+    fun withNewName(name: String) = copy(name = name)
+
     companion object {
 
         fun planNewCharacterArc(characterId: Character.Id, themeId: Theme.Id, name: String): Either<*, CharacterArc> {

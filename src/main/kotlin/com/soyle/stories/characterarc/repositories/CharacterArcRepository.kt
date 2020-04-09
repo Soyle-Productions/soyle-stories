@@ -14,4 +14,5 @@ interface CharacterArcRepository {
     suspend fun listAllCharacterArcsInProject(projectId: Project.Id): List<CharacterArc>
     suspend fun addNewCharacterArc(characterArc: CharacterArc)
     suspend fun getCharacterArcByCharacterAndThemeId(characterId: Character.Id, themeId: Theme.Id): CharacterArc?
+    suspend fun updateCharacterArc(characterArc: CharacterArc)
 }

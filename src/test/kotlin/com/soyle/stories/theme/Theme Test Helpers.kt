@@ -20,6 +20,10 @@ import java.util.*
 
 fun takeNoteOfTheme() = (Theme.takeNoteOf() as Either.Right).b
 
+fun takeNoteOfTheme(expectedId: UUID) = takeNoteOfTheme().let {
+	Theme(Theme.Id(expectedId), it.centralMoralQuestion, it.characters.associateBy { it.id }, it.similaritiesBetweenCharacters)
+}
+
 val newCharacter = Character(
     Character.Id(UUID.randomUUID()), UUID.randomUUID(), "Name"
 )
