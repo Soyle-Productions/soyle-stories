@@ -3,6 +3,7 @@ package com.soyle.stories.characterarc.characterList
 import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.LocalCharacterArcException
 import com.soyle.stories.characterarc.eventbus.EventBus
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
@@ -24,7 +25,8 @@ class CharacterListPresenter(
     private val view: CharacterListView,
     eventBus: EventBus
 ) : ListAllCharacterArcs.OutputPort, BuildNewCharacter.OutputPort, PlanNewCharacterArc.OutputPort,
-    PromoteMinorCharacter.OutputPort, DeleteLocalCharacterArc.OutputPort, RemoveCharacterFromLocalStory.OutputPort {
+    PromoteMinorCharacter.OutputPort, DeleteLocalCharacterArc.OutputPort, RemoveCharacterFromLocalStory.OutputPort,
+RenameCharacter.OutputPort {
 
     init {
         eventBus.buildNewCharacter.addListener(this)
@@ -32,6 +34,7 @@ class CharacterListPresenter(
         eventBus.promoteMinorCharacter.addListener(this)
         eventBus.deleteLocalCharacterArc.addListener(this)
         eventBus.removeCharacterFromStory.addListener(this)
+        eventBus.renameCharacter.addListener(this)
     }
 
     override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
@@ -148,10 +151,31 @@ class CharacterListPresenter(
         }
     }
 
+    override fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {
+        threadTransformer.gui {
+            val viewModel = view.getViewModel()
+              ?: return@gui view.invalidate()
+
+            val characterItem = viewModel.characters.find { it.id == response.characterId.toString() }
+              ?: return@gui
+
+            view.displayNewViewModel(
+              viewModel.copy(
+                characters = viewModel.characters.minus(characterItem).plus(
+                  characterItem.copy(
+                    name = response.newName
+                  )
+                ).sortedBy { it.name }
+              )
+            )
+        }
+    }
+
     override fun receiveBuildNewCharacterFailure(failure: CharacterException) {}
     override fun receivePlanNewCharacterArcFailure(failure: Exception) {}
     override fun receivePromoteMinorCharacterFailure(failure: ThemeException) {}
     override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {}
     override fun receiveRemoveCharacterFromLocalStoryFailure(failure: CharacterException) {}
+    override fun receiveRenameCharacterFailure(failure: CharacterException) {}
 
 }

@@ -7,6 +7,7 @@ package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.eventbus.Notifier
@@ -33,5 +34,6 @@ interface EventBus {
     val changeCharacterPropertyValue: Notifier<ChangeCharacterPropertyValue.OutputPort>
     val changeCharacterPerspectivePropertyValue: Notifier<ChangeCharacterPerspectivePropertyValue.OutputPort>
     val removeCharacterFromLocalComparison: Notifier<RemoveCharacterFromLocalComparison.OutputPort>
+    val renameCharacter: Notifier<RenameCharacter.OutputPort>
 
 }

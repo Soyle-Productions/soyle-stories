@@ -47,8 +47,12 @@ class WorkBench : View() {
                     }*/
                 }
             }
-            menu("Edit") { }
-            menu("View") { }
+            menu("Edit") {
+                isDisable = true
+            }
+            menu("View") {
+                isDisable = true
+            }
             menu("Tools") {
                 items.bind(model.staticTools) {
                     checkmenuitem(it.name) {

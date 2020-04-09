@@ -6,6 +6,7 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.gui.ThreadTransformer
@@ -21,7 +22,9 @@ class CharacterListController(
     private val removeCharacterFromStory: RemoveCharacterFromLocalStory,
     private val removeCharacterFromStoryOutputPort: RemoveCharacterFromLocalStory.OutputPort,
     private val deleteCharacterArc: DeleteLocalCharacterArc,
-    private val deleteCharacterArcOutputPort: DeleteLocalCharacterArc.OutputPort
+    private val deleteCharacterArcOutputPort: DeleteLocalCharacterArc.OutputPort,
+    private val renameCharacter: RenameCharacter,
+    private val renameCharacterOutputPort: RenameCharacter.OutputPort
 ) : CharacterListViewListener {
 
     override fun getList() {
@@ -50,6 +53,16 @@ class CharacterListController(
         }
     }
 
+    override fun renameCharacter(characterId: String, newName: String) {
+        threadTransformer.async {
+            renameCharacter.invoke(
+              UUID.fromString(characterId),
+              newName,
+              renameCharacterOutputPort
+            )
+        }
+    }
+
     override fun removeCharacter(characterId: String) {
         threadTransformer.async {
             removeCharacterFromStory.invoke(
@@ -68,5 +81,4 @@ class CharacterListController(
             )
         }
     }
-
 }

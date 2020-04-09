@@ -147,6 +147,10 @@ class CharacterRepositoryDouble : CharacterRepository, com.soyle.stories.charact
     override suspend fun deleteCharacterWithId(characterId: Character.Id) {
         characters.remove(characterId)
     }
+
+    override suspend fun updateCharacter(character: Character) {
+        characters[character.id] = character
+    }
 }
 class ThemeRepositoryDouble : ThemeRepository, com.soyle.stories.theme.repositories.ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository {
     val themes = mutableMapOf<Theme.Id, Theme>()

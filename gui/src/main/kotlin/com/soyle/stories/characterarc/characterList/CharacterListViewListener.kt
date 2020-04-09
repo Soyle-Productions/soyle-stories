@@ -12,5 +12,6 @@ interface CharacterListViewListener {
     fun openCharacterComparison(characterId: String, themeId: String)
     fun removeCharacter(characterId: String)
     fun removeCharacterArc(characterId: String, themeId: String)
+    fun renameCharacter(characterId: String, newName: String)
 
 }
