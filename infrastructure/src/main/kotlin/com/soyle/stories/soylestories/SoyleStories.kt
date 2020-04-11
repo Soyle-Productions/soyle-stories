@@ -6,6 +6,8 @@ import com.soyle.stories.di.modules.ApplicationComponent
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
+import com.soyle.stories.soylestories.confirmExitDialog.ConfirmExitDialog
+import com.soyle.stories.soylestories.welcomeScreen.WelcomeScreen
 import javafx.collections.ObservableList
 import javafx.scene.image.Image
 import javafx.stage.Stage
