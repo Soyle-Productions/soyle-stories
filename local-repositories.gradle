@@ -1,7 +1,7 @@
 repositories {
     flatDir {
         // add absolute paths to local directories containing soyle-stories-core
-        dir 'D:\\Brendan\\Documents\\soyle\\soyle stories\\soyle-stories-core\\build\\libs'
+        dir ''
 
     }
 }
