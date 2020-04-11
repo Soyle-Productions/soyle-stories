@@ -9,7 +9,6 @@ import com.soyle.stories.common.hideScrollbars
 import com.soyle.stories.common.launchTask
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.rowCountProperty
-import com.soyle.stories.di.characterarc.CharacterComparisonComponent
 import javafx.beans.property.Property
 import javafx.geometry.HPos
 import javafx.geometry.Pos
@@ -168,7 +167,7 @@ class ComparisonSubTool : Fragment() {
                     } else {
                         button(itemProperty.stringBinding {
                             when (it?.storyFunctions?.size) {
-                                1 -> it.storyFunctions.first().toString()
+                                1 -> it.storyFunctions.first()
                                 0, null -> "[Choose]"
                                 else -> it.storyFunctions.toString()
                             }
@@ -179,26 +178,21 @@ class ComparisonSubTool : Fragment() {
                                 if (isHero) return@setOnMouseClicked
                                 storyFunctionMenu.apply {
                                     items.clear()
-                                    fun storyFunctionItem(storyFunction: String) {
-                                        checkmenuitem(storyFunction) {
+                                    compSubTool.value.storyFunctionOptions.forEach { (label, storyFunction) ->
+                                        checkmenuitem(label) {
                                             isSelected = storyFunctions.contains(storyFunction)
                                             action {
                                                 val characterId = itemProperty.value?.characterId ?: return@action
                                                 launchTask {
                                                     characterComparisonViewListener.setStoryFunction(
-                                                        scope.themeId,
-                                                        model.focusedCharacter.value.characterId,
-                                                        characterId,
-                                                        storyFunction
+                                                            model.focusedCharacter.value.characterId,
+                                                            characterId,
+                                                            storyFunction
                                                     )
                                                 }
                                             }
                                         }
                                     }
-                                    storyFunctionItem("Antagonist")
-                                    storyFunctionItem("Ally")
-                                    storyFunctionItem("Fake-Ally Antagonist")
-                                    storyFunctionItem("Fake-Antagonist Ally")
                                 }.show(this, Side.BOTTOM, 0.0, 0.0)
                             }
                         }
@@ -233,12 +227,10 @@ class ComparisonSubTool : Fragment() {
                             runBlocking {
                                 if (item.isMajorCharacter) {
                                     characterComparisonViewListener.demoteCharacter(
-                                        scope.themeId,
                                         item.characterId
                                     )
                                 } else {
                                     characterComparisonViewListener.promoteCharacter(
-                                        scope.themeId,
                                         item.characterId
                                     )
                                 }
@@ -253,7 +245,6 @@ class ComparisonSubTool : Fragment() {
                     action {
                         launchTask {
                             characterComparisonViewListener.removeCharacterFromComparison(
-                                scope.themeId,
                                 itemProperty.value.characterId
                             )
                         }
@@ -304,7 +295,6 @@ class ComparisonSubTool : Fragment() {
                         when (sectionValue) {
                             is PropertyValue -> if (sectionValue.isShared) {
                                 characterComparisonViewListener.changeSharedPropertyValue(
-                                    scope.themeId,
                                     model.focusedCharacter.value.characterId,
                                     itemProperty.value.characterId,
                                     sectionValue.propertyName,
@@ -312,7 +302,6 @@ class ComparisonSubTool : Fragment() {
                                 )
                             } else {
                                 characterComparisonViewListener.changeCharacterPropertyValue(
-                                    scope.themeId,
                                     itemProperty.value.characterId,
                                     sectionValue.propertyName,
                                     text
