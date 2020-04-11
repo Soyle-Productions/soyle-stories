@@ -5,12 +5,10 @@ import com.soyle.stories.common.launchTask
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.modules.ApplicationComponent
 import com.soyle.stories.di.project.LayoutComponent
-import com.soyle.stories.project.layout.GroupSplitter
-import com.soyle.stories.project.layout.GroupSplitterViewModel
-import com.soyle.stories.project.layout.ToolGroup
-import com.soyle.stories.project.layout.ToolGroupViewModel
+import com.soyle.stories.project.layout.*
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.soylestories.SoyleStories
+import javafx.collections.ListChangeListener
 import javafx.scene.Parent
 import javafx.stage.Screen
 import kotlinx.coroutines.runBlocking
@@ -49,11 +47,15 @@ class WorkBench : View() {
                     }*/
                 }
             }
-            menu("Edit") { }
-            menu("View") { }
+            menu("Edit") {
+                isDisable = true
+            }
+            menu("View") {
+                isDisable = true
+            }
             menu("Tools") {
                 items.bind(model.staticTools) {
-                    checkmenuitem(messages[it.name]) {
+                    checkmenuitem(it.name) {
                         isSelected = it.isOpen
                         action {
                             launchTask { _ ->
@@ -108,8 +110,12 @@ class WorkBench : View() {
         openWindow(escapeClosesWindow = false, owner = null, block = false, resizable = true)?.apply {
             icons += SoyleStories.appIcon
             val primaryScreen = Screen.getScreensForRectangle(primaryStage.x, primaryStage.y, primaryStage.width, primaryStage.height)
-            x = primaryScreen.firstOrNull()?.visualBounds?.minX ?: x
-            y = primaryScreen.firstOrNull()?.visualBounds?.minY ?: y
+            primaryScreen.firstOrNull()?.visualBounds?.let {
+                x = it.minX
+                y = it.minY
+                width = it.width.times(0.8)
+                height = it.height.times(0.8)
+            }
             centerOnScreen()
             setOnCloseRequest {
                 model.projectViewModel.value?.let {

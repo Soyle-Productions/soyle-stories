@@ -21,8 +21,13 @@ data class CompSubToolViewModel(
     override val label: String,
     val storyFunctionSectionLabel: String,
     override val sections: List<String>,
-    override val items: List<ComparisonItem>
+    override val items: List<ComparisonItem>,
+    val storyFunctionOptions: List<StoryFunctionOption>
 ) : SubToolViewModel()
+
+data class StoryFunctionOption(val label: String, val storyFunction: String) {
+    constructor(label: String) : this(label, label)
+}
 
 data class MoralProblemSubToolViewModel(
     override  val label: String,

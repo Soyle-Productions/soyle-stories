@@ -6,8 +6,10 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import java.util.*
@@ -21,7 +23,11 @@ class CharacterListController(
     private val removeCharacterFromStory: RemoveCharacterFromLocalStory,
     private val removeCharacterFromStoryOutputPort: RemoveCharacterFromLocalStory.OutputPort,
     private val deleteCharacterArc: DeleteLocalCharacterArc,
-    private val deleteCharacterArcOutputPort: DeleteLocalCharacterArc.OutputPort
+    private val deleteCharacterArcOutputPort: DeleteLocalCharacterArc.OutputPort,
+    private val renameCharacter: RenameCharacter,
+    private val renameCharacterOutputPort: RenameCharacter.OutputPort,
+    private val renameCharacterArc: RenameCharacterArc,
+    private val renameCharacterArcOutputPort: RenameCharacterArc.OutputPort
 ) : CharacterListViewListener {
 
     override fun getList() {
@@ -50,6 +56,16 @@ class CharacterListController(
         }
     }
 
+    override fun renameCharacter(characterId: String, newName: String) {
+        threadTransformer.async {
+            renameCharacter.invoke(
+              UUID.fromString(characterId),
+              newName,
+              renameCharacterOutputPort
+            )
+        }
+    }
+
     override fun removeCharacter(characterId: String) {
         threadTransformer.async {
             removeCharacterFromStory.invoke(
@@ -69,4 +85,16 @@ class CharacterListController(
         }
     }
 
+    override fun renameCharacterArc(characterId: String, themeId: String, newName: String) {
+        threadTransformer.async {
+            renameCharacterArc.invoke(
+              RenameCharacterArc.RequestModel(
+                UUID.fromString(characterId),
+                UUID.fromString(themeId),
+                newName
+              ),
+              renameCharacterArcOutputPort
+            )
+        }
+    }
 }

@@ -10,14 +10,16 @@ import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterU
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStoryUseCase
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
+import com.soyle.stories.characterarc.characterList.CharacterListController
+import com.soyle.stories.characterarc.characterList.CharacterListModel
+import com.soyle.stories.characterarc.characterList.CharacterListPresenter
+import com.soyle.stories.characterarc.characterList.CharacterListViewListener
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogController
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.eventbus.*
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
-import com.soyle.stories.characterarc.usecaseControllers.*
+import com.soyle.stories.characterarc.usecaseControllers.ChangeThematicSectionValueController
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArcUseCase
@@ -25,12 +27,11 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllChara
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcsUseCase
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
-import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.common.ThreadTransformerImpl
 import com.soyle.stories.di.modules.DataComponent
+import com.soyle.stories.di.project.LayoutComponent
 import com.soyle.stories.entities.Project
 import com.soyle.stories.eventbus.Notifier
 import com.soyle.stories.project.ProjectScope
@@ -64,93 +65,87 @@ class CharacterArcComponent : Component(), ScopedInstance {
 	override val scope: ProjectScope = super.scope as ProjectScope
 	private val dataComponent: DataComponent by inject(overrideScope = FX.defaultScope)
 
-	val listAllCharacterArcs: ListAllCharacterArcs by lazy {
-		ListAllCharacterArcsUseCase(
-		  scope.projectId,
-		  dataComponent.characterRepository,
-		  dataComponent.characterArcRepository
-		)
-	}
-	val buildNewCharacter: BuildNewCharacter by lazy {
-		BuildNewCharacterUseCase(Project.Id(scope.projectId), dataComponent.characterRepository)
-	}
-	val planCharacterArc: PlanNewCharacterArc by lazy {
-		PlanNewCharacterArcUseCase(
-		  dataComponent.characterRepository,
-		  dataComponent.themeRepository,
-		  dataComponent.characterArcSectionRepository,
-		  promoteMinorCharacter
-		)
-	}
-	val viewBaseStoryStructure: ViewBaseStoryStructure by lazy {
-		ViewBaseStoryStructureUseCase(dataComponent.themeRepository, dataComponent.characterArcSectionRepository)
-	}
-	val compareCharacters: CompareCharacters by lazy {
-		CompareCharactersUseCase(dataComponent.context)
-	}
-	val includeCharacterInComparison: IncludeCharacterInComparison by lazy {
-		IncludeCharacterInComparisonUseCase(
-		  dataComponent.characterRepository,
-		  dataComponent.themeRepository,
-		  dataComponent.characterArcSectionRepository
-		)
-	}
-	val promoteMinorCharacter: PromoteMinorCharacter by lazy {
-		PromoteMinorCharacterUseCase(
-		  dataComponent.themeRepository,
-		  dataComponent.characterArcRepository,
-		  dataComponent.characterArcSectionRepository
-		)
-	}
-	val demoteMajorCharacter: DemoteMajorCharacter by lazy {
-		DemoteMajorCharacterUseCase(dataComponent.context)
-	}
-	val removeCharacterFromLocalStory: RemoveCharacterFromLocalStory by lazy {
-		RemoveCharacterFromLocalStoryUseCase(
-		  scope.projectId,
-		  dataComponent.context,
-		  RemoveCharacterFromStoryUseCase(
-			dataComponent.characterRepository,
-			dataComponent.themeRepository,
-			dataComponent.characterArcSectionRepository
-		  )
-		)
-	}
-	val deleteLocalCharacterArc: DeleteLocalCharacterArc by lazy {
-		DeleteLocalCharacterArcUseCase(
-		  scope.projectId,
-		  DeleteCharacterArcUseCase(demoteMajorCharacter),
-		  dataComponent.context
-		)
-	}
-	val changeThematicSectionValue: ChangeThematicSectionValue by lazy {
-		ChangeThematicSectionValueUseCase(dataComponent.characterArcSectionRepository)
-	}
-	val changeStoryFunction: ChangeStoryFunction by lazy {
-		ChangeStoryFunctionUseCase(dataComponent.context)
-	}
-	val changeCentralMoralQuestion: ChangeCentralMoralQuestion by lazy {
-		ChangeCentralMoralQuestionUseCase(dataComponent.context)
-	}
-	val changeCharacterPropertyValue: ChangeCharacterPropertyValue by lazy {
-		ChangeCharacterPropertyValueUseCase(dataComponent.context)
-	}
-	val changeCharacterPerspectivePropertyValue: ChangeCharacterPerspectivePropertyValue by lazy {
-		ChangeCharacterPerspectivePropertyValueUseCase(dataComponent.context)
-	}
-	val removeCharacterFromLocalComparison: RemoveCharacterFromLocalComparison by lazy {
-		RemoveCharacterFromLocalComparisonUseCase(
-		  scope.projectId,
-		  RemoveCharacterFromComparisonUseCase(dataComponent.context),
-		  dataComponent.context
-		)
-	}
-	val renameCharacter: RenameCharacter by lazy {
-		RenameCharacterUseCase(dataComponent.characterRepository, dataComponent.themeRepository)
-	}
-	val renameCharacterArc: RenameCharacterArc by lazy {
-		RenameCharacterArcUseCase(dataComponent.characterRepository, dataComponent.themeRepository, dataComponent.characterArcRepository)
-	}
+    val listAllCharacterArcs: ListAllCharacterArcs by lazy {
+        ListAllCharacterArcsUseCase(
+            scope.projectId,
+            dataComponent.characterRepository,
+            dataComponent.characterArcRepository
+        )
+    }
+    val buildNewCharacter: BuildNewCharacter by lazy {
+        BuildNewCharacterUseCase(Project.Id(scope.projectId), dataComponent.characterRepository)
+    }
+    val planCharacterArc: PlanNewCharacterArc by lazy {
+        PlanNewCharacterArcUseCase(
+            dataComponent.characterRepository,
+            dataComponent.themeRepository,
+            dataComponent.characterArcSectionRepository,
+            promoteMinorCharacter
+        )
+    }
+    val viewBaseStoryStructure: ViewBaseStoryStructure by lazy {
+        ViewBaseStoryStructureUseCase(dataComponent.themeRepository, dataComponent.characterArcSectionRepository)
+    }
+    val compareCharacters: CompareCharacters by lazy {
+        CompareCharactersUseCase(dataComponent.context)
+    }
+    val includeCharacterInComparison: IncludeCharacterInComparison by lazy {
+        IncludeCharacterInComparisonUseCase(
+            dataComponent.characterRepository,
+            dataComponent.themeRepository,
+            dataComponent.characterArcSectionRepository
+        )
+    }
+    val promoteMinorCharacter: PromoteMinorCharacter by lazy {
+        PromoteMinorCharacterUseCase(
+            dataComponent.themeRepository,
+            dataComponent.characterArcRepository,
+            dataComponent.characterArcSectionRepository
+        )
+    }
+    val demoteMajorCharacter: DemoteMajorCharacter by lazy {
+        DemoteMajorCharacterUseCase(dataComponent.context)
+    }
+    val removeCharacterFromLocalStory: RemoveCharacterFromLocalStory by lazy {
+        RemoveCharacterFromLocalStoryUseCase(
+            scope.projectId,
+            dataComponent.context,
+            RemoveCharacterFromStoryUseCase(
+                dataComponent.characterRepository,
+                dataComponent.themeRepository,
+                dataComponent.characterArcSectionRepository
+            )
+        )
+    }
+    val deleteLocalCharacterArc: DeleteLocalCharacterArc by lazy {
+        DeleteLocalCharacterArcUseCase(
+            scope.projectId,
+            DeleteCharacterArcUseCase(demoteMajorCharacter),
+            dataComponent.context
+        )
+    }
+    val changeThematicSectionValue: ChangeThematicSectionValue by lazy {
+        ChangeThematicSectionValueUseCase(dataComponent.characterArcSectionRepository)
+    }
+    val changeStoryFunction: ChangeStoryFunction by lazy {
+        ChangeStoryFunctionUseCase(dataComponent.context)
+    }
+    val changeCentralMoralQuestion: ChangeCentralMoralQuestion by lazy {
+        ChangeCentralMoralQuestionUseCase(dataComponent.context)
+    }
+    val changeCharacterPropertyValue: ChangeCharacterPropertyValue by lazy {
+        ChangeCharacterPropertyValueUseCase(dataComponent.context)
+    }
+    val changeCharacterPerspectivePropertyValue: ChangeCharacterPerspectivePropertyValue by lazy {
+        ChangeCharacterPerspectivePropertyValueUseCase(dataComponent.context)
+    }
+    val removeCharacterFromLocalComparison: RemoveCharacterFromLocalComparison by lazy {
+        RemoveCharacterFromLocalComparisonUseCase(
+            scope.projectId,
+            RemoveCharacterFromComparisonUseCase(dataComponent.context),
+            dataComponent.context
+        )
+    }
 
 	val characterArcEvents: CharacterArcEvents by lazy {
 		object : CharacterArcEvents {

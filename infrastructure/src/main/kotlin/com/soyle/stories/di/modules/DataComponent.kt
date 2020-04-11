@@ -132,6 +132,10 @@ class CharacterArcRepositoryDouble : CharacterArcRepository, com.soyle.stories.t
     override suspend fun removeCharacterArc(themeId: Theme.Id, characterId: Character.Id) {
         characterArcs.remove(characterId to themeId)
     }
+
+    override suspend fun updateCharacterArc(characterArc: CharacterArc) {
+        characterArcs[characterArc.characterId to characterArc.themeId] = characterArc
+    }
 }
 
 class CharacterRepositoryDouble : CharacterRepository, com.soyle.stories.character.repositories.CharacterRepository, com.soyle.stories.theme.repositories.CharacterRepository {
@@ -146,6 +150,10 @@ class CharacterRepositoryDouble : CharacterRepository, com.soyle.stories.charact
 
     override suspend fun deleteCharacterWithId(characterId: Character.Id) {
         characters.remove(characterId)
+    }
+
+    override suspend fun updateCharacter(character: Character) {
+        characters[character.id] = character
     }
 }
 class ThemeRepositoryDouble : ThemeRepository, com.soyle.stories.theme.repositories.ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository {

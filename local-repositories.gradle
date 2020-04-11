@@ -1,0 +1,7 @@
+repositories {
+    flatDir {
+        // add absolute paths to local directories containing soyle-stories-core
+        dir ''
+
+    }
+}

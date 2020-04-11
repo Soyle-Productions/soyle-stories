@@ -17,7 +17,7 @@ object ThreadTransformerImpl : ThreadTransformer {
     override fun async(task: suspend CoroutineScope.() -> Unit) {
         runAsync {
             runBlocking {
-                withTimeout(5000) {
+                withTimeout(7000) {
                     task()
                 }
             }

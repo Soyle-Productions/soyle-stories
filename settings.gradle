@@ -1,4 +1,4 @@
-rootProject.name = 'soyle-studio-native-desktop'
+rootProject.name = 'soyle-stories-desktop'
 include ":application"
 include ":gui"
 include ":data"

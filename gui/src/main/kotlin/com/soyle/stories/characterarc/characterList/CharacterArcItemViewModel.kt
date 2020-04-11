@@ -5,6 +5,4 @@
  */
 package com.soyle.stories.characterarc.characterList
 
-class CharacterArcItemViewModel(val characterId: String, val themeId: String, val name: String) {
-    override fun toString(): String = name
-}
+data class CharacterArcItemViewModel(val characterId: String, val themeId: String, val name: String)
