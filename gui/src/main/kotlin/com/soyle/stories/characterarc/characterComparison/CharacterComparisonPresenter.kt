@@ -1,24 +1,12 @@
 package com.soyle.stories.characterarc.characterComparison
 
-import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
-import com.soyle.stories.characterarc.LocalCharacterArcException
-import com.soyle.stories.characterarc.eventbus.EventBus
-import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
+import com.soyle.stories.characterarc.characterComparison.presenters.*
+import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
-import com.soyle.stories.theme.LocalThemeException
+import com.soyle.stories.eventbus.listensTo
 import com.soyle.stories.theme.ThemeException
-import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
-import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
-import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
-import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
-import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromLocalComparison
 import java.util.*
 
 /**
@@ -27,263 +15,210 @@ import java.util.*
  * Time: 9:13 AM
  */
 class CharacterComparisonPresenter(
-    private val view: CharacterComparisonView,
-    private val themeId: String,
-    eventBus: EventBus
-) : CompareCharacters.OutputPort, ListAllCharacterArcs.OutputPort, BuildNewCharacter.OutputPort,
-    ChangeStoryFunction.OutputPort,
-    IncludeCharacterInComparison.OutputPort, PromoteMinorCharacter.OutputPort, DeleteLocalCharacterArc.OutputPort,
-    ChangeThematicSectionValue.OutputPort, RemoveCharacterFromLocalStory.OutputPort,
-    ChangeCentralMoralQuestion.OutputPort,
-    ChangeCharacterPropertyValue.OutputPort, ChangeCharacterPerspectivePropertyValue.OutputPort,
-    RemoveCharacterFromLocalComparison.OutputPort {
+  private val view: CharacterComparisonView,
+  themeId: String,
+  characterArcEvents: CharacterArcEvents
+) : CompareCharacters.OutputPort, ListAllCharacterArcs.OutputPort {
 
-    init {
-        eventBus.buildNewCharacter.addListener(this)
-        eventBus.includeCharacterInComparison.addListener(this)
-        eventBus.promoteMinorCharacter.addListener(this)
-        eventBus.deleteLocalCharacterArc.addListener(this)
-        eventBus.removeCharacterFromStory.addListener(this)
-        eventBus.changeStoryFunction.addListener(this)
-        eventBus.changeThematicSectionValue.addListener(this)
-        eventBus.changeCentralMoralQuestion.addListener(this)
-        eventBus.changeCharacterPropertyValue.addListener(this)
-        eventBus.changeCharacterPerspectivePropertyValue.addListener(this)
-        eventBus.removeCharacterFromLocalComparison.addListener(this)
-    }
+	private val themeId: UUID = UUID.fromString(themeId)
 
-    private var allCharacters: List<CharacterItem> = emptyList()
+	/*
+	hold them in a property because notifiers use weak references
+	to listeners and these presenters should be held to the life
+	cycle of this character comparison presenter.
+	 */
+	private val subPresenters: List<Any>
 
-    override fun receiveCharacterComparison(response: CompareCharacters.ResponseModel) {
-        val majorCharacterIds = response.majorCharacterIds.toSet()
-        val includedCharacterIds = response.characterSummaries.ids.map { it.toString() }.toSet()
-        val comparisonItems = response.characterSummaries.values.map { summary ->
-            val uuid = summary.id
-            ComparisonItem(uuid.toString(), summary.name, uuid in majorCharacterIds, mapOf(
-                "Archetype(s)" to PropertyValue("Archetype", summary.archetypes, false)
-            ) + response.comparisonSections.withIndex().associate {
-                it.value to summary.comparisonSections[it.index].let {
-                    CharacterArcSectionValue(
-                        it.first.toString(),
-                        it.second
-                    )
-                }
-            } + mapOf(
-                "Variation on Moral" to PropertyValue("VariationOnMoral", summary.variationOnMoral, false),
-                "Similarities to Hero" to PropertyValue("Similarities", summary.similaritiesToHero, true),
-                "Opponent Attack on Hero's Weakness" to PropertyValue("Attack", summary.attackAgainstHero, true)
-            ), summary.storyFunctions.map { it.name }.toSet()
-            )
-        }.sortedBy {
-            val firstFunction = it.storyFunctions.firstOrNull()
-            when (firstFunction) {
-                "Hero" -> 0
-                "Antagonist" -> 1
-                "Ally" -> 2
-                null -> 4
-                else -> 3
-            }
-        }
-        val focusedItem = comparisonItems.find { it.characterId == response.focusedCharacterId.toString() }!!
-        view.update {
-            copy(
-                focusedCharacter = response.characterSummaries.forceGetById(response.focusedCharacterId)
-                    .toFocusCharacterOption(),
-                focusCharacterOptions = response.majorCharacterIds.map {
-                    response.characterSummaries.forceGetById(it).toFocusCharacterOption()
-                },
-                subTools = listOf(
-                    CompSubToolViewModel(
-                        "Comparisons",
-                        "Story Function",
-                        listOf("Archetype(s)") + response.comparisonSections,
-                        comparisonItems
-                    ),
-                    MoralProblemSubToolViewModel(
-                        "Moral Problem",
-                        response.centralQuestion,
-                        listOf("Variation on Moral"),
-                        comparisonItems
-                    ),
-                    CharacterChangeSubToolViewModel("Character Change",
-                        focusedItem.compSections.getValue("Psychological Weakness"),
-                        focusedItem.compSections.getValue("Moral Weakness"),
-                        "",
-                        focusedItem.compSections.getValue("Desire"),
-                        listOf(
-                            "Opponent Attack on Hero's Weakness",
-                            "Values or Beliefs",
-                            "Similarities to Hero"
-                        ),
-                        comparisonItems.filter { it.storyFunctions.contains("Antagonist") }
-                    )
-                ),
-                availableCharactersToAdd = allCharacters.filterNot { it.characterId.toString() in includedCharacterIds }.map { CharacterItemViewModel(it.characterId.toString(), it.characterName) },
-                isInvalid = false
-            )
-        }
-    }
+	init {
+		val themeUUID = this.themeId
+		with(characterArcEvents) {
+			subPresenters = listOf(
+			  BuildNewCharacterPresenter(view) listensTo buildNewCharacter,
+			  IncludeCharacterInComparisonPresenter(themeUUID, view) listensTo includeCharacterInComparison,
+			  PromoteMinorCharacterPresenter(themeUUID, view) listensTo promoteMinorCharacter,
+			  DeleteLocalCharacterArcPresenter(themeUUID, view) listensTo deleteLocalCharacterArc,
+			  RemoveCharacterFromLocalStoryPresenter(themeUUID, view) listensTo removeCharacterFromStory,
+			  ChangeStoryFunctionPresenter(themeUUID, view) listensTo changeStoryFunction,
+			  ChangeThematicSectionValuePresenter(view) listensTo changeThematicSectionValue,
+			  ChangeCentralMoralQuestionPresenter(themeUUID, view) listensTo changeCentralMoralQuestion,
+			  ChangeCharacterPropertyValuePresenter(themeUUID, view) listensTo changeCharacterPropertyValue,
+			  ChangeCharacterPerspectivePropertyValuePresenter(themeUUID, view) listensTo changeCharacterPerspectivePropertyValue,
+			  RemoveCharacterFromLocalComparisonPresenter(themeUUID, view) listensTo removeCharacterFromLocalComparison,
+			  RenameCharacterPresenter(themeUUID, view) listensTo renameCharacter
+			)
+		}
+	}
 
-    override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
-        view.update {
-            allCharacters = response.characters.keys.toList()
-            val includedIds = subTools.getOrNull(0)?.items?.map { it.characterId }?.toSet() ?: setOf()
-            copy(
-                availableCharactersToAdd = response.characters.keys.filterNot { it.characterId.toString() in includedIds }
-                    .map {
-                        CharacterItemViewModel(it.characterId.toString(), it.characterName)
-                    }
-            )
-        }
-    }
+	private var allCharacters: List<CharacterItem> = emptyList()
 
-    override fun receiveBuildNewCharacterFailure(failure: CharacterException) {}
-    override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
-        view.update {
-            if (subTools.getOrNull(0)?.items?.find { it.characterId == response.characterId.toString() } != null) return@update this
-            copy(
-                availableCharactersToAdd = availableCharactersToAdd + CharacterItemViewModel(
-                    response.characterId.toString(),
-                    response.characterName
-                )
-            )
-        }
-    }
+	override fun receiveCharacterComparison(response: CompareCharacters.ResponseModel) {
+		view.update {
+			copy(
+			  focusedCharacter = createFocusedCharacter(response),
+			  focusCharacterOptions = collectMajorCharacters(response),
+			  subTools = createSubTools(response),
+			  availableCharactersToAdd = collectCharactersNotAlreadyIncluded(response),
+			  isInvalid = false
+			)
+		}
+	}
 
-    override fun receiveIncludeCharacterInComparisonFailure(failure: Exception) {}
-    override fun receiveIncludeCharacterInComparisonResponse(response: IncludeCharacterInComparison.ResponseModel) {
-        if (response.themeId.toString() != themeId) return
-        view.update {
-            copy(
-                isInvalid = true
-            )
-        }
-    }
+	override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
+		view.update {
+			allCharacters = response.characters.keys.toList()
+			val includedIds = subTools.getOrNull(0)?.items?.map { it.characterId }?.toSet() ?: setOf()
+			copy(
+			  availableCharactersToAdd = response.characters.keys.filterNot { it.characterId.toString() in includedIds }
+				.map {
+					CharacterItemViewModel(it.characterId.toString(), it.characterName)
+				}
+			)
+		}
+	}
 
-    override fun receivePromoteMinorCharacterFailure(failure: ThemeException) {
-        if (failure.themeId.toString() == themeId) {
-            view.update { this }
-            throw failure
-        }
-    }
+	private fun createFocusedCharacter(response: CompareCharacters.ResponseModel): FocusCharacterOption? {
+		return response.characterSummaries
+		  .forceGetById(response.focusedCharacterId)
+		  .toFocusCharacterOption()
+	}
 
-    override fun receivePromoteMinorCharacterResponse(response: PromoteMinorCharacter.ResponseModel) {
-        view.update {
-            copy(
-                isInvalid = true
-            )
-        }
-    }
+	private fun collectMajorCharacters(response: CompareCharacters.ResponseModel): List<FocusCharacterOption> {
+		return response.majorCharacterIds
+		  .asSequence()
+		  .map(response.characterSummaries::forceGetById)
+		  .map { it.toFocusCharacterOption() }
+		  .toList()
+	}
 
-    override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {}
+	private fun collectCharactersNotAlreadyIncluded(response: CompareCharacters.ResponseModel): List<CharacterItemViewModel> {
+		val includedCharacterIds = response.characterSummaries.ids.map { it.toString() }.toSet()
 
-    override fun receiveDeleteLocalCharacterArcResponse(response: DeleteLocalCharacterArc.ResponseModel) {
-        if (response.themeId.toString() == themeId && !response.themeRemoved) {
-            view.update {
-                copy(
-                    isInvalid = true
-                )
-            }
-        }
-    }
+		return allCharacters
+		  .filterNot { it.characterId.toString() in includedCharacterIds }
+		  .map { CharacterItemViewModel(it.characterId.toString(), it.characterName) }
+	}
 
-    private fun CompareCharacters.CharacterComparisonSummary.toFocusCharacterOption(): FocusCharacterOption {
-        return FocusCharacterOption(id.toString(), name)
-    }
+	private fun createSubTools(response: CompareCharacters.ResponseModel): List<SubToolViewModel> {
+		val comparisonItems = response.characterSummaries.values
+		  .let(::sortSummariesByStoryFunction)
+		  .let { mapCharacterSummariesToComparisonItems(it, response) }
 
-    override fun receiveCompareCharactersFailure(error: ThemeException) {
-        throw error
-    }
+		return listOf(
+		  createComparisonSubTool(response, comparisonItems),
+		  createMoralProblemSubTool(response, comparisonItems),
+		  createCharacterChangeSubTool(response, comparisonItems)
+		)
+	}
 
-    override fun receiveChangeThematicSectionValueFailure(failure: Exception) {
-    }
+	private fun sortSummariesByStoryFunction(summaries: Collection<CompareCharacters.CharacterComparisonSummary>): List<CompareCharacters.CharacterComparisonSummary>
+	{
+		return summaries.sortedBy {
+			when (it.storyFunctions.firstOrNull()) {
+				CompareCharacters.StoryFunction.Hero -> 0
+				CompareCharacters.StoryFunction.Antagonist -> 1
+				CompareCharacters.StoryFunction.Ally -> 2
+				CompareCharacters.StoryFunction.FakeAllyAntagonist -> 3
+				CompareCharacters.StoryFunction.FakeAntagonistAlly -> 3
+				CompareCharacters.StoryFunction.Subplot -> 3
+				null -> 4
+			}
+		}
+	}
 
-    override fun receiveChangeThematicSectionValueResponse(response: ChangeThematicSectionValue.ResponseModel) {
-        view.update {
-            copy(
-                isInvalid = true
-            )
-        }
+	private fun mapCharacterSummariesToComparisonItems(summaries: List<CompareCharacters.CharacterComparisonSummary>, response: CompareCharacters.ResponseModel): List<ComparisonItem> {
+		val majorCharacterIds = response.majorCharacterIds.toSet()
+		return summaries.map {
+			convertCharacterCompSummaryToViewModel(it, majorCharacterIds, response.comparisonSections)
+		}
+	}
 
-    }
+	private fun convertCharacterCompSummaryToViewModel(summary: CompareCharacters.CharacterComparisonSummary, majorCharacterIds: Set<UUID>, comparisonSections: List<String>): ComparisonItem {
+		val uuid = summary.id
+		return ComparisonItem(
+		  uuid.toString(),
+		  summary.name,
+		  uuid in majorCharacterIds,
+		  getComparisonSections(summary, comparisonSections),
+		  summary.storyFunctions.map(::getStoryFunctionLabel).toSet()
+		)
+	}
 
-    override fun receiveRemoveCharacterFromLocalStoryFailure(failure: CharacterException) {
-    }
+	private fun getStoryFunctionLabel(it: CompareCharacters.StoryFunction): String {
+		return when (it) {
+			CompareCharacters.StoryFunction.Hero -> "Hero"
+			CompareCharacters.StoryFunction.Antagonist -> "Antagonist"
+			CompareCharacters.StoryFunction.FakeAllyAntagonist -> "Fake-Ally Antagonist"
+			CompareCharacters.StoryFunction.FakeAntagonistAlly -> "Fake-Antagonist Ally"
+			CompareCharacters.StoryFunction.Ally -> "Ally"
+			CompareCharacters.StoryFunction.Subplot -> "Subplot Character"
+		}
+	}
 
-    override fun receiveRemoveCharacterFromLocalStoryResponse(response: RemoveCharacterFromLocalStory.ResponseModel) {
-        if (UUID.fromString(themeId) !in response.updatedThemes) return
-        view.update {
-            val focusOptions = focusCharacterOptions.filterNot { it.characterId == response.characterId.toString() }
-            val focusedCharacter = focusedCharacter?.takeUnless { it.characterId == response.characterId.toString() }
-                ?: focusOptions.firstOrNull()
-            copy(
-                focusedCharacter = focusedCharacter,
-                focusCharacterOptions = focusOptions,
-                isInvalid = true
-            )
-        }
-    }
+	private fun getComparisonSections(summary: CompareCharacters.CharacterComparisonSummary, comparisonSections: List<String>): Map<String, SectionValue> {
+		return mapOf(
+		  "Archetype(s)" to PropertyValue("Archetype", summary.archetypes, false),
+		  *comparisonSections.withIndex().map {
+			  it.value to summary.comparisonSections[it.index].let {
+				  CharacterArcSectionValue(
+					it.first.toString(),
+					it.second
+				  )
+			  }
+		  }.toTypedArray(),
+		  "Variation on Moral" to PropertyValue("VariationOnMoral", summary.variationOnMoral, false),
+		  "Similarities to Hero" to PropertyValue("Similarities", summary.similaritiesToHero, true),
+		  "Opponent Attack on Hero's Weakness" to PropertyValue("Attack", summary.attackAgainstHero, true)
+		)
+	}
 
-    override fun receiveChangeStoryFunctionFailure(failure: Exception) {
+	private fun createComparisonSubTool(response: CompareCharacters.ResponseModel, comparisonItems: List<ComparisonItem>): CompSubToolViewModel {
+		return CompSubToolViewModel(
+		  label = "Comparisons",
+		  storyFunctionSectionLabel = "Story Function",
+		  sections = listOf("Archetype(s)") + response.comparisonSections,
+		  items = comparisonItems,
+		  storyFunctionOptions = listOf(
+			StoryFunctionOption("Antagonist"),
+			StoryFunctionOption("Ally"),
+			StoryFunctionOption("Fake-Ally Antagonist", "FakeAllyAntagonist"),
+			StoryFunctionOption("Fake-Antagonist Ally", "FakeAntagonistAlly")
+		  )
+		)
+	}
 
-    }
+	private fun createMoralProblemSubTool(response: CompareCharacters.ResponseModel, comparisonItems: List<ComparisonItem>): MoralProblemSubToolViewModel {
+		return MoralProblemSubToolViewModel(
+		  label = "Moral Problem",
+		  centralMoralQuestion = response.centralQuestion,
+		  sections = listOf("Variation on Moral"),
+		  items = comparisonItems
+		)
+	}
 
-    override fun receiveChangeStoryFunctionResponse(response: ChangeStoryFunction.ResponseModel) {
-        if (UUID.fromString(themeId) != response.themeId) return
-        view.update {
-            copy(
-                isInvalid = true
-            )
-        }
-    }
+	private fun createCharacterChangeSubTool(response: CompareCharacters.ResponseModel, comparisonItems: List<ComparisonItem>): CharacterChangeSubToolViewModel {
+		val focusedItem = comparisonItems.find { it.characterId == response.focusedCharacterId.toString() }!!
 
-    override fun receiveChangeCentralMoralQuestionResponse(response: ChangeCentralMoralQuestion.ResponseModel) {
-        if (themeId != response.themeId.toString()) return
-        view.update {
-            copy(
-                isInvalid = true
-            )
-        }
-    }
+		return CharacterChangeSubToolViewModel(
+		  label = "Character Change",
+		  psychWeakness = focusedItem.compSections.getValue("Psychological Weakness"),
+		  moralWeakness = focusedItem.compSections.getValue("Moral Weakness"),
+		  change = "",
+		  desire = focusedItem.compSections.getValue("Desire"),
+		  sections = listOf(
+			"Opponent Attack on Hero's Weakness",
+			"Values or Beliefs",
+			"Similarities to Hero"
+		  ),
+		  items = comparisonItems.filter { it.storyFunctions.contains("Antagonist") }
+		)
+	}
 
-    override fun receiveChangeCentralMoralQuestionFailure(failure: ThemeException) {
+	private fun CompareCharacters.CharacterComparisonSummary.toFocusCharacterOption(): FocusCharacterOption {
+		return FocusCharacterOption(id.toString(), name)
+	}
 
-    }
+	override fun receiveCompareCharactersFailure(error: ThemeException) {
+		throw error
+	}
 
-    override fun receiveChangeCharacterPerspectivePropertyValueResponse(response: ChangeCharacterPerspectivePropertyValue.ResponseModel) {
-        if (themeId != response.themeId.toString()) return
-        view.update {
-            copy(
-                isInvalid = true
-            )
-        }
-    }
-
-    override fun receiveChangeCharacterPerspectivePropertyValueFailure(failure: ThemeException) {
-    }
-
-    override fun receiveChangeCharacterPropertyValueResponse(response: ChangeCharacterPropertyValue.ResponseModel) {
-        if (themeId != response.themeId.toString()) return
-        view.update {
-            copy(
-                isInvalid = true
-            )
-        }
-    }
-
-    override fun receiveChangeCharacterPropertyValueFailure(failure: ThemeException) {
-    }
-
-    override fun receiveRemoveCharacterFromLocalComparisonResponse(response: RemoveCharacterFromLocalComparison.ResponseModel) {
-        if (themeId != response.themeId.toString() || response.themeRemoved) return
-        view.update {
-            copy(
-                isInvalid = true
-            )
-        }
-    }
-
-    override fun receiveRemoveCharacterFromLocalComparisonFailure(failure: LocalThemeException) {
-
-    }
 }
