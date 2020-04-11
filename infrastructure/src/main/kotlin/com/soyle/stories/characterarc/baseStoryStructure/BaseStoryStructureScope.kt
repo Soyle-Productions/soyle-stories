@@ -5,22 +5,27 @@
  */
 package com.soyle.stories.characterarc.baseStoryStructure
 
-import com.soyle.stories.di.characterarc.BaseStoryStructureComponent
 import com.soyle.stories.project.ProjectScope
-import kotlinx.coroutines.runBlocking
-import tornadofx.Scope
-import tornadofx.find
-import tornadofx.runAsync
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.event.EventTarget
+import tornadofx.*
 
 class BaseStoryStructureScope(val projectScope: ProjectScope, val characterId: String, val themeId: String) : Scope() {
 
-    init {
-        val baseStoryStructureViewListener = find<BaseStoryStructureComponent>(scope = this).baseStoryStructureViewListener
-        runAsync {
-            runBlocking {
-                baseStoryStructureViewListener.getBaseStoryStructure()
-            }
+    private val isClosedProperty = SimpleBooleanProperty(false)
+    private var isClosed
+        get() = isClosedProperty.get()
+        set(value) {
+            if (isClosedProperty.value) return
+            isClosedProperty.set(value)
         }
+
+    fun close() {
+        FX.getComponents(this).values.forEach {
+            if (it is EventTarget) it.removeFromParent()
+        }
+        isClosed = true
+        deregister()
     }
 
 }
