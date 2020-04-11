@@ -11,7 +11,6 @@ import tornadofx.*
  */
 class CharacterList : View("Characters") {
 
-
     override val root = stackpane {
         hgrow = Priority.SOMETIMES
         vgrow = Priority.ALWAYS
@@ -20,7 +19,7 @@ class CharacterList : View("Characters") {
     }
 
     init {
-        val characterListViewListener = find<CharacterArcComponent>().characterListViewListener
+        val characterListViewListener = find<CharacterListComponent>().characterListViewListener
         val model = find<CharacterListModel>()
         model.invalid.onChange {
             if (it) characterListViewListener.getList()

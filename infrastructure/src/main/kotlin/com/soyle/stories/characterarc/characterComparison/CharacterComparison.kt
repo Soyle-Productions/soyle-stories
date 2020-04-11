@@ -1,7 +1,6 @@
 package com.soyle.stories.characterarc.characterComparison
 
 import com.soyle.stories.common.onChangeUntil
-import com.soyle.stories.di.characterarc.CharacterComparisonComponent
 import com.soyle.stories.di.project.LayoutComponent
 import com.soyle.stories.project.ProjectScope
 import javafx.collections.ObservableList
@@ -64,7 +63,7 @@ class CharacterComparison : View("Character Comparison") {
                         val selectedItem = selectionModel.selectedItem ?: return@setOnAction
                         runAsync {
                             runBlocking {
-                                characterComparisonViewListener.getCharacterComparison(scope.themeId, selectedItem.characterId)
+                                characterComparisonViewListener.getCharacterComparison(selectedItem.characterId)
                             }
                         }
                     }
@@ -116,7 +115,7 @@ class CharacterComparison : View("Character Comparison") {
                     action {
                         runAsync {
                             runBlocking {
-                                characterComparisonViewListener.addCharacterToComparison(scope.themeId, it.characterId)
+                                characterComparisonViewListener.addCharacterToComparison(it.characterId)
                             }
                         }
                     }

@@ -7,7 +7,6 @@ package com.soyle.stories.characterarc.characterComparison
 
 import com.soyle.stories.common.launchTask
 import com.soyle.stories.common.wrapEditable
-import com.soyle.stories.di.characterarc.CharacterComparisonComponent
 import javafx.beans.property.Property
 import javafx.geometry.Orientation
 import javafx.scene.Parent
@@ -40,7 +39,7 @@ class MoralProblemSubTool : Fragment() {
                             val text = text
                             if (text != currentQuestion) {
                                 launchTask {
-                                    characterComparisonViewListener.updateCentralMoralQuestion(scope.themeId, text)
+                                    characterComparisonViewListener.updateCentralMoralQuestion(text)
                                 }
                             }
                         }
@@ -76,8 +75,8 @@ class MoralProblemSubTool : Fragment() {
                                             when (sectionValue) {
                                                 is CharacterArcSectionValue -> characterComparisonViewListener.updateValue(sectionValue.sectionId, newValue as String)
                                                 is PropertyValue -> when {
-                                                    sectionValue.isShared -> characterComparisonViewListener.changeSharedPropertyValue(scope.themeId, model.focusedCharacter.value.characterId, rowValue.characterId, sectionValue.propertyName, newValue as String)
-                                                    else -> characterComparisonViewListener.changeCharacterPropertyValue(scope.themeId, rowValue.characterId, sectionValue.propertyName, newValue as String)
+                                                    sectionValue.isShared -> characterComparisonViewListener.changeSharedPropertyValue(model.focusedCharacter.value.characterId, rowValue.characterId, sectionValue.propertyName, newValue as String)
+                                                    else -> characterComparisonViewListener.changeCharacterPropertyValue(rowValue.characterId, sectionValue.propertyName, newValue as String)
                                                 }
                                             }
                                         }

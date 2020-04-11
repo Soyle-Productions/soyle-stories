@@ -5,10 +5,7 @@
  */
 package com.soyle.stories.characterarc.baseStoryStructure
 
-import com.soyle.stories.characterarc.characterComparison.CharacterComparison
-import com.soyle.stories.characterarc.characterComparison.CharacterComparisonScope
 import com.soyle.stories.common.onChangeWithCurrent
-import com.soyle.stories.di.characterarc.BaseStoryStructureComponent
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.geometry.Orientation

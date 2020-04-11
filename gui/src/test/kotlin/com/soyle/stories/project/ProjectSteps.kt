@@ -1,15 +1,18 @@
 package com.soyle.stories.project
 
 import com.soyle.stories.entities.Project
+import com.soyle.stories.eventbus.Notifier
 import com.soyle.stories.project.UserInterfaceInputState.Field
 import com.soyle.stories.project.doubles.InMemoryFileRepository
 import com.soyle.stories.project.doubles.InMemoryWorkspaceRepository
 import com.soyle.stories.project.drivers.UserDriver
 import com.soyle.stories.project.eventbus.OpenProjectNotifier
+import com.soyle.stories.project.eventbus.ProjectEvents
 import com.soyle.stories.project.eventbus.RequestCloseProjectNotifier
 import com.soyle.stories.project.eventbus.StartNewProjectNotifier
 import com.soyle.stories.project.projectList.*
 import com.soyle.stories.project.usecases.startNewProject.StartNewProjectUseCase
+import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProject
 import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProjectUseCase
 import com.soyle.stories.workspace.entities.Workspace
 import com.soyle.stories.workspace.repositories.FileRepository
@@ -17,7 +20,9 @@ import com.soyle.stories.workspace.repositories.ProjectRepository
 import com.soyle.stories.workspace.repositories.WorkspaceRepository
 import com.soyle.stories.workspace.usecases.closeProject.CloseProjectUseCase
 import com.soyle.stories.workspace.usecases.listOpenProjects.ListOpenProjectsUseCase
+import com.soyle.stories.workspace.usecases.openProject.OpenProject
 import com.soyle.stories.workspace.usecases.openProject.OpenProjectUseCase
+import com.soyle.stories.workspace.usecases.requestCloseProject.RequestCloseProject
 import com.soyle.stories.workspace.usecases.requestCloseProject.RequestCloseProjectUseCase
 import com.soyle.stories.workspace.valueobjects.ProjectFile
 import io.cucumber.java8.En
@@ -262,9 +267,14 @@ class ProjectModule(
     private val startNewProjectNotifier = StartNewProjectNotifier(openProjectNotifier)
     private val projectListPresenter = ProjectListPresenter(
         projectListView,
-        openProjectNotifier,
-        closeProjectNotifier,
-        startNewProjectNotifier
+      object : ProjectEvents {
+          override val closeProject: Notifier<RequestCloseProject.OutputPort>
+              get() = closeProjectNotifier
+          override val openProject: Notifier<OpenProject.OutputPort>
+              get() = openProjectNotifier
+          override val startNewProject: Notifier<StartNewLocalProject.OutputPort>
+              get() = startNewProjectNotifier
+      }
     )
     private val closeProject = CloseProjectUseCase(
         RepositoryState.SYSTEM_USER_ID,

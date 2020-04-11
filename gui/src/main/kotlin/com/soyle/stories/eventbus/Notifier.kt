@@ -39,3 +39,8 @@ abstract class Notifier<Listener : Any> {
     }
 
 }
+
+infix fun <T : Any> T.listensTo(notifier: Notifier<T>): T {
+    notifier.addListener(this)
+    return this
+}

@@ -21,7 +21,7 @@ import tornadofx.*
 internal class EmptyDisplay : View() {
 
     private val model by inject<CharacterListModel>()
-    private val characterListViewListener = find<CharacterArcComponent>().characterListViewListener
+    private val characterListViewListener = find<CharacterListComponent>().characterListViewListener
 
     override val root = gridpane {
         hiddenWhen { model.hasCharacters  }

@@ -6,7 +6,6 @@
 package com.soyle.stories.characterarc.characterComparison
 
 import com.soyle.stories.common.onChangeUntil
-import com.soyle.stories.di.characterarc.CharacterComparisonComponent
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventTarget
@@ -39,7 +38,7 @@ class CharacterComparisonScope(val projectScope: ProjectScope, val themeId: Stri
     private fun getCharacterComparison(characterId: String) {
         runAsync {
             runBlocking {
-                characterComparisonViewListener.getCharacterComparison(themeId, characterId)
+                characterComparisonViewListener.getCharacterComparison(characterId)
             }
         }
     }

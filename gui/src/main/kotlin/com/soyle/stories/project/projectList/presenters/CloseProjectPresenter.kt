@@ -1,5 +1,7 @@
-package com.soyle.stories.project.projectList
+package com.soyle.stories.project.projectList.presenters
 
+import com.soyle.stories.project.projectList.ProjectListView
+import com.soyle.stories.project.projectList.ProjectViewModel
 import com.soyle.stories.workspace.usecases.closeProject.CloseProject
 import com.soyle.stories.workspace.usecases.requestCloseProject.RequestCloseProject
 
@@ -12,6 +14,7 @@ internal class CloseProjectPresenter(
     }
 
     override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
+
         view.updateOrInvalidated {
             val openProjectList = openProjects.filterNot { it.projectId == response.projectId }
             copy(

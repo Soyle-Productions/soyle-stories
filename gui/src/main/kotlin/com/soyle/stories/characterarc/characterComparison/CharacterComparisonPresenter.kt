@@ -1,12 +1,11 @@
 package com.soyle.stories.characterarc.characterComparison
 
-import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.characterarc.LocalCharacterArcException
-import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.characterComparison.presenters.*
+import com.soyle.stories.characterarc.characterComparison.presenters.BuildNewCharacterPresenter
+import com.soyle.stories.characterarc.characterComparison.presenters.DeleteLocalCharacterArcPresenter
+import com.soyle.stories.characterarc.characterComparison.presenters.IncludeCharacterInComparisonPresenter
+import com.soyle.stories.characterarc.characterComparison.presenters.PromoteMinorCharacterPresenter
+import com.soyle.stories.characterarc.characterComparison.presenters.RemoveCharacterFromLocalStoryPresenter
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs

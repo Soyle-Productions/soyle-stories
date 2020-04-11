@@ -15,7 +15,7 @@ import tornadofx.*
 internal class ActionBar : View() {
 
     private val model by inject<CharacterListModel>()
-    private val characterListViewListener = find<CharacterArcComponent>().characterListViewListener
+    private val characterListViewListener = find<CharacterListComponent>().characterListViewListener
 
     override val root = hbox(alignment = Pos.CENTER, spacing = 10.0) {
         isFillHeight = false

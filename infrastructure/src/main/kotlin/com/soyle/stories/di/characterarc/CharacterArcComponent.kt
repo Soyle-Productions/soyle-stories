@@ -10,6 +10,8 @@ import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterU
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStoryUseCase
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
 import com.soyle.stories.characterarc.characterList.CharacterListController
 import com.soyle.stories.characterarc.characterList.CharacterListModel
 import com.soyle.stories.characterarc.characterList.CharacterListPresenter
@@ -19,7 +21,7 @@ import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialo
 import com.soyle.stories.characterarc.eventbus.*
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
-import com.soyle.stories.characterarc.usecaseControllers.ChangeThematicSectionValueController
+import com.soyle.stories.characterarc.usecaseControllers.*
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArcUseCase
@@ -27,6 +29,8 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllChara
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcsUseCase
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
+import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.common.ThreadTransformerImpl
@@ -146,6 +150,16 @@ class CharacterArcComponent : Component(), ScopedInstance {
             dataComponent.context
         )
     }
+	val renameCharacter: RenameCharacter by lazy {
+		RenameCharacterUseCase(
+		  dataComponent.characterRepository, dataComponent.themeRepository
+		)
+	}
+	val renameCharacterArc: RenameCharacterArc by lazy {
+		RenameCharacterArcUseCase(
+		  dataComponent.characterRepository, dataComponent.themeRepository, dataComponent.characterArcRepository
+		)
+	}
 
 	val characterArcEvents: CharacterArcEvents by lazy {
 		object : CharacterArcEvents {

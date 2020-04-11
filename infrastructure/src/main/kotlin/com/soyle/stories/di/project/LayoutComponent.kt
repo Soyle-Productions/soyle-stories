@@ -72,9 +72,9 @@ class LayoutComponent : Component(), ScopedInstance {
             toggleToolOpenedNotifier,
             openToolNotifier,
             closeToolNotifier,
-            characterArcComponent.eventBus.removeCharacterFromStory,
-            characterArcComponent.eventBus.deleteLocalCharacterArc,
-            characterArcComponent.eventBus.removeCharacterFromLocalComparison
+            characterArcComponent.characterArcEvents.removeCharacterFromStory,
+            characterArcComponent.characterArcEvents.deleteLocalCharacterArc,
+            characterArcComponent.characterArcEvents.removeCharacterFromLocalComparison
         )
     }
 

@@ -7,7 +7,6 @@ package com.soyle.stories.characterarc.characterComparison
 
 import com.soyle.stories.common.launchTask
 import com.soyle.stories.common.wrapEditable
-import com.soyle.stories.di.characterarc.CharacterComparisonComponent
 import javafx.beans.property.Property
 import javafx.geometry.Orientation
 import javafx.scene.Parent
@@ -111,7 +110,7 @@ class CharacterChangeSubTool : Fragment() {
                             is PropertyValue -> if (sectionValue.isShared) {
                                 // intentionally left blank.  These text fields can only relate to properties on the focus character.
                             } else {
-                                characterComparisonViewListener.changeCharacterPropertyValue(scope.themeId, model.focusedCharacter.value.characterId, sectionValue.propertyName, text)
+                                characterComparisonViewListener.changeCharacterPropertyValue(model.focusedCharacter.value.characterId, sectionValue.propertyName, text)
                             }
                             is CharacterArcSectionValue -> characterComparisonViewListener.updateValue(
                                 sectionValue.sectionId,

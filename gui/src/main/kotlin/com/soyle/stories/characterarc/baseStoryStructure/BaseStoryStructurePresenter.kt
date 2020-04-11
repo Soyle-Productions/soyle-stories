@@ -1,7 +1,9 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
-import com.soyle.stories.characterarc.eventbus.EventBus
+import com.soyle.stories.characterarc.baseStoryStructure.presenters.ChangeThematicSectionValuePresenter
+import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.eventbus.listensTo
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
 
 /**
@@ -10,15 +12,15 @@ import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThemati
  * Time: 10:34 PM
  */
 class BaseStoryStructurePresenter(
-    private val view: BaseStoryStructureView,
-    eventBus: EventBus
+  private val view: BaseStoryStructureView,
+  characterArcEvents: CharacterArcEvents
 ) : ViewBaseStoryStructure.OutputPort {
 
     private val changeThematicSectionValueOutputPort: ChangeThematicSectionValue.OutputPort =
-        ChangeThematicSectionValuePresenter(view)
+      ChangeThematicSectionValuePresenter(view)
 
     init {
-        eventBus.changeThematicSectionValue.addListener(changeThematicSectionValueOutputPort)
+        changeThematicSectionValueOutputPort listensTo characterArcEvents.changeThematicSectionValue
     }
 
     override fun receiveViewBaseStoryStructureResponse(response: ViewBaseStoryStructure.ResponseModel) {

@@ -3,10 +3,10 @@
  * Date: 3/2/2020
  * Time: 5:56 PM
  */
-package com.soyle.stories.di.characterarc
+package com.soyle.stories.characterarc.baseStoryStructure
 
-import com.soyle.stories.characterarc.baseStoryStructure.*
 import com.soyle.stories.common.ThreadTransformerImpl
+import com.soyle.stories.di.characterarc.CharacterArcComponent
 import tornadofx.Component
 import tornadofx.ScopedInstance
 import tornadofx.find
@@ -16,12 +16,12 @@ class BaseStoryStructureComponent : Component(), ScopedInstance {
     override val scope: BaseStoryStructureScope = super.scope as BaseStoryStructureScope
     private val characterArcComponent = find<CharacterArcComponent>(scope = scope.projectScope)
 
-    val viewBaseStoryStructureController = ViewBaseStoryStructureController(
+    private val viewBaseStoryStructureController = ViewBaseStoryStructureController(
         ThreadTransformerImpl,
         characterArcComponent.viewBaseStoryStructure,
         BaseStoryStructurePresenter(
             find<BaseStoryStructureModel>(),
-            characterArcComponent.eventBus
+            characterArcComponent.characterArcEvents
         )
     )
 
