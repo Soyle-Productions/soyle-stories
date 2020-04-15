@@ -39,7 +39,7 @@ class PlanNewCharacterArcUseCase(
                     CharacterArcSection(
                         CharacterArcSection.Id(
                             UUID.randomUUID()
-                        ), character.id, theme.id, it.asCharacterArcTemplateSection(), ""
+                        ), character.id, theme.id, it.asCharacterArcTemplateSection(), null, ""
                     )
                 }
             }.flatMap { (theme, initialSections) ->

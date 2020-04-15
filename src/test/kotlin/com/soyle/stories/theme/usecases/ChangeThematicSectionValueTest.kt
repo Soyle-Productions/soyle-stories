@@ -108,6 +108,7 @@ class ChangeThematicSectionValueTest {
 						UUID.randomUUID()
 					), ""
 				),
+			  null,
 				""
 			)
 		)

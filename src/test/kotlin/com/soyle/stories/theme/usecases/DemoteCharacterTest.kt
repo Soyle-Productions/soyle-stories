@@ -197,7 +197,7 @@ class DemoteCharacterTest {
 
             val context = setupContext(
                 initialThemes = initialThemes,
-                initialCharacterArcSections = initialThemes.flatMap { it.characters.flatMap { it.thematicSections.map { it.asCharacterArcSection() } } },
+                initialCharacterArcSections = initialThemes.flatMap { it.characters.flatMap { it.thematicSections.map { it.asCharacterArcSection(null) } } },
                 removeCharacterArc = { themeId: Theme.Id, characterId: Character.Id ->
                     removedCharacterArc = themeId.uuid to characterId.uuid
                 },

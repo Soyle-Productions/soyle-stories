@@ -28,7 +28,7 @@ class CompareCharactersTest {
 	fun given(themes: List<Theme>): (UUID, UUID) -> Either<ThemeException, CompareCharacters.ResponseModel> {
 		val context = setupContext(
 			initialThemes = themes,
-			initialCharacterArcSections = themes.flatMap { it.characters.flatMap { it.thematicSections.map { it.asCharacterArcSection() } } }
+			initialCharacterArcSections = themes.flatMap { it.characters.flatMap { it.thematicSections.map { it.asCharacterArcSection(null) } } }
 		)
 		return { themeId, focusCharacterId ->
 			val outputPort = object : CompareCharacters.OutputPort {
