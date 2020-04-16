@@ -1,3 +1,4 @@
+@application
 Feature: Startup
   Application displays different screens based on previously opened projects
 

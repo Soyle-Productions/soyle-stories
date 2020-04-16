@@ -5,10 +5,13 @@ import com.soyle.stories.common.launchTask
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.modules.ApplicationComponent
 import com.soyle.stories.di.project.LayoutComponent
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialogModel
+import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogModel
+import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.project.layout.*
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.soylestories.SoyleStories
-import javafx.collections.ListChangeListener
 import javafx.scene.Parent
 import javafx.stage.Screen
 import kotlinx.coroutines.runBlocking
@@ -37,6 +40,9 @@ class WorkBench : View() {
                     separator()
                     item("Character") {
                         action { createCharacterDialog(currentStage) }
+                    }
+                    item("Location") {
+                        action { layoutViewListener.openDialog(Dialog.CreateLocation) }
                     }/*
                     item("Plot Point") {
                         // action { controller.createPlotPoint() }
@@ -102,6 +108,16 @@ class WorkBench : View() {
         model.loadingProgress.onChangeUntil({ it is Double && it >= WorkBenchModel.MAX_LOADING_VALUE }) {
             if (it is Double && it >= WorkBenchModel.MAX_LOADING_VALUE) {
                 createWindow()
+            }
+        }
+        find<CreateLocationDialogModel>().isOpen.onChange {
+            if (it == true) {
+                createLocationDialog(this.currentStage)
+            }
+        }
+        find<DeleteLocationDialogModel>().isOpen.onChange {
+            if (it) {
+                deleteLocationDialog()
             }
         }
     }

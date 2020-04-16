@@ -26,6 +26,7 @@ sealed class ActiveTool {
     abstract val toolId: UUID
 }
 class CharacterListActiveTool(override val toolId: UUID) : ActiveTool()
+class LocationListActiveTool(override val toolId: UUID) : ActiveTool()
 class BaseStoryStructureActiveTool(override val toolId: UUID, val characterId: UUID, val themeId: UUID) : ActiveTool()
 class CharacterComparisonActiveTool(override val toolId: UUID, val characterId: UUID, val themeId: UUID) : ActiveTool()
 
@@ -39,6 +40,7 @@ fun Window.WindowChild.toActiveWindowChild(): ActiveWindowChild = when (this) {
 
 fun Tool<*>.toActiveTool() = when (this) {
     is CharacterListTool -> CharacterListActiveTool(id.uuid)
+    is LocationListTool -> LocationListActiveTool(id.uuid)
     is BaseStoryStructureTool -> BaseStoryStructureActiveTool(id.uuid, identifyingData.second.uuid, identifyingData.first.uuid)
     is CharacterComparisonTool -> CharacterComparisonActiveTool(id.uuid, identifyingData.uuid, (associatedData as Character.Id).uuid)
 }

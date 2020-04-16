@@ -1,3 +1,4 @@
+@application
 Feature: Start New Project
   The storyteller can start a new project from the welcome screen or any project window
 
@@ -12,10 +13,10 @@ Feature: Start New Project
     Given Welcome screen has been opened
     When User starts a new project
     Then Created project should be open
-      But Welcome screen should not be open
+    But Welcome screen should not be open
 
   Scenario: Start new project while project is open
     Given One project has been opened
     When User starts a new project
     Then Open project option dialog should be open
-      But Created project should not be open
+    But Created project should not be open

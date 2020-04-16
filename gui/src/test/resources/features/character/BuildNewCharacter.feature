@@ -1,3 +1,5 @@
+@character
+	@excluded
 Feature: BuildNewCharacter
 	Authors can create new characters at any point during the writing process
 

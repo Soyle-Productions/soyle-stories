@@ -2,7 +2,7 @@ apply from: "$rootDir/kotlin-module.gradle"
 apply from: "$rootDir/local-repositories.gradle"
 
 dependencies {
-    implementation "com.soyle.stories:soyle-stories-core:0.1.0"
+    implementation "com.soyle.stories:soyle-stories-core:0.1.0-SNAPSHOT 20w16a"
 
     implementation "io.arrow-kt:arrow-core:0.10.4"
     implementation "io.arrow-kt:arrow-core-data:0.10.4"

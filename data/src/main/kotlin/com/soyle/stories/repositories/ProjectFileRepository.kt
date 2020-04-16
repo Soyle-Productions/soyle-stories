@@ -8,18 +8,6 @@ import java.io.File
 
 class ProjectFileRepository : ProjectRepository, com.soyle.stories.project.repositories.ProjectRepository, FileRepository {
 
-    companion object {
-        private var singleton: ProjectFileRepository? = null
-            set(value) {
-                if (field != null) error("only one project file repo allowed per application")
-                field = value
-            }
-    }
-
-    init {
-        singleton = this
-    }
-
     private val fileSystem: Map<String, MutableSet<String>> = mapOf(
         "directories" to mutableSetOf(),
         "files" to mutableSetOf()
