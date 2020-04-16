@@ -37,7 +37,7 @@ class ViewBaseStoryStructureTest {
                     CharacterArcSection(
                         CharacterArcSection.Id(
                             UUID.randomUUID()
-                        ), it.id, themeId, template, values[template.name] ?: ""
+                        ), it.id, themeId, template, null, values[template.name] ?: ""
                     )
                 }
             } ?: emptyList()

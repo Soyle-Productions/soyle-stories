@@ -2,10 +2,7 @@ package com.soyle.stories.theme
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.CharacterArcTemplate
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.MinorCharacter
 import com.soyle.stories.entities.theme.ThematicSection
 import com.soyle.stories.entities.theme.ThematicTemplate
@@ -45,15 +42,16 @@ fun Theme.includeCharacter(character: Character) = includeCharacter(character, t
 	CharacterArcSection(
 		CharacterArcSection.Id(
 			UUID.randomUUID()
-		), character.id, id, it.asCharacterArcTemplateSection(), ""
+		), character.id, id, it.asCharacterArcTemplateSection(), null, ""
 	)
 })
 
-fun ThematicSection.asCharacterArcSection() = CharacterArcSection(
+fun ThematicSection.asCharacterArcSection(linkedLocation: Location.Id?) = CharacterArcSection(
 	characterArcSectionId,
 	characterId,
 	themeId,
 	template.asCharacterArcTemplateSection(),
+  linkedLocation,
 	""
 )
 
@@ -66,6 +64,6 @@ fun Theme.promoteCharacter(minorCharacter: MinorCharacter) = promoteCharacter(mi
 	CharacterArcSection(
 		CharacterArcSection.Id(
 			UUID.randomUUID()
-		), minorCharacter.id, id, it, ""
+		), minorCharacter.id, id, it, null, ""
 	)
 })

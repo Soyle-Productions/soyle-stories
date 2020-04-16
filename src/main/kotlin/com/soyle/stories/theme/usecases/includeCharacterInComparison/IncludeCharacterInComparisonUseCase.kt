@@ -75,6 +75,7 @@ class IncludeCharacterInComparisonUseCase(
             CharacterArcSection(
                 CharacterArcSection.Id(UUID.randomUUID()),
                 character.id, theme.id, it.asCharacterArcTemplateSection(),
+              null,
                 ""
             )
         }

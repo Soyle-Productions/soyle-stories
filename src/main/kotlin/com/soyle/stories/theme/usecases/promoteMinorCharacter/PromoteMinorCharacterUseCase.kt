@@ -65,6 +65,7 @@ class PromoteMinorCharacterUseCase(
                 CharacterArcSection(
                     CharacterArcSection.Id(UUID.randomUUID()),
                     characterInTheme.id, theme.id, it,
+                  null,
                     ""
                 )
             }
