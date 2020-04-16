@@ -8,6 +8,8 @@ package com.soyle.stories.common
 import com.soyle.stories.gui.ThreadTransformer
 import javafx.application.Platform
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import tornadofx.runAsync
@@ -25,7 +27,7 @@ object ThreadTransformerImpl : ThreadTransformer {
     }
 
     override fun gui(update: suspend CoroutineScope.() -> Unit) {
-        if (! Platform.isFxApplicationThread()) runLater { gui(update) }
+        if (! Platform.isFxApplicationThread()) return runLater { gui(update) }
         runBlocking {
             update()
         }

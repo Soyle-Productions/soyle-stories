@@ -5,6 +5,7 @@ import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpened
 import java.util.*
+import kotlin.reflect.KClass
 
 /**
  * Created by Brendan
@@ -18,7 +19,8 @@ class LayoutController(
     private val toggleToolOpened: ToggleToolOpened,
     private val toggleToolOpenedOutputPort: ToggleToolOpened.OutputPort,
     private val closeTool: CloseTool,
-    private val closeToolOutputPort: CloseTool.OutputPort
+    private val closeToolOutputPort: CloseTool.OutputPort,
+    private val layoutPresenter: LayoutPresenter
 ) : LayoutViewListener {
 
     override suspend fun loadLayoutForProject(projectId: UUID) {
@@ -33,5 +35,13 @@ class LayoutController(
         threadTransformer.async {
             closeTool.invoke(UUID.fromString(toolId), closeToolOutputPort)
         }
+    }
+
+    override fun openDialog(dialog: Dialog) {
+        layoutPresenter.displayDialog(dialog)
+    }
+
+    override fun closeDialog(dialog: KClass<out Dialog>) {
+        layoutPresenter.removeDialog(dialog)
     }
 }

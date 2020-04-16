@@ -2,6 +2,7 @@ package com.soyle.stories.di.project
 
 import com.soyle.stories.common.ThreadTransformerImpl
 import com.soyle.stories.di.characterarc.CharacterArcComponent
+import com.soyle.stories.di.location.LocationComponent
 import com.soyle.stories.di.modules.DataComponent
 import com.soyle.stories.entities.Project
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
@@ -36,6 +37,7 @@ class LayoutComponent : Component(), ScopedInstance {
 
     private val dataComponent: DataComponent by inject(overrideScope = FX.defaultScope)
     private val characterArcComponent: CharacterArcComponent by inject()
+    private val locationComponent: LocationComponent by inject()
 
     val getSavedLayout: GetSavedLayout by lazy {
         GetSavedLayoutUseCase(dataComponent.layoutRepository)
@@ -74,7 +76,8 @@ class LayoutComponent : Component(), ScopedInstance {
             closeToolNotifier,
             characterArcComponent.characterArcEvents.removeCharacterFromStory,
             characterArcComponent.characterArcEvents.deleteLocalCharacterArc,
-            characterArcComponent.characterArcEvents.removeCharacterFromLocalComparison
+            characterArcComponent.characterArcEvents.removeCharacterFromLocalComparison,
+          locationComponent.locationEvents
         )
     }
 
@@ -92,7 +95,6 @@ class LayoutComponent : Component(), ScopedInstance {
         get() = closeToolNotifier
 
     val layoutViewListener: LayoutViewListener by lazy {
-        layoutPresenter
         LayoutController(
             ThreadTransformerImpl,
             getSavedLayout,
@@ -100,7 +102,8 @@ class LayoutComponent : Component(), ScopedInstance {
             toggleToolOpened,
             toggleToolOpenedOutputPort,
             closeTool,
-            closeToolOutputPort
+            closeToolOutputPort,
+          layoutPresenter
         )
     }
 

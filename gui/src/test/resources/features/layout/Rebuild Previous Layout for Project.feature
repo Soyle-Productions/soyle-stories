@@ -1,3 +1,5 @@
+@layout
+@excluded
 Feature: Rebuild Previous Layout for Project
 	User re-opens a project, the system also loads the layout saved for that project so they can pick up exactly where
 	they left off.

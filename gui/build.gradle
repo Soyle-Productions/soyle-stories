@@ -1,12 +1,21 @@
 apply from: "$rootDir/kotlin-module.gradle"
-
 apply from: "$rootDir/local-repositories.gradle"
 
+repositories {
+    jcenter()
+}
+
 dependencies {
-    implementation "com.soyle.stories:soyle-stories-core:0.1.0"
+    implementation "com.soyle.stories:soyle-stories-core:0.1.0-SNAPSHOT 20w16a"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
     testImplementation 'io.cucumber:cucumber-java8:5.5.0'
     testImplementation 'io.cucumber:cucumber-junit:5.5.0'
+    testImplementation 'org.assertj:assertj-core:3.15.0'
+
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.11.0'
+    testImplementation 'io.github.prashant-ramcharan:courgette-jvm:4.6.0'
+    testImplementation 'io.github.prashant-ramcharan:webdriver-binary-downloader:1.2.2'
+    testImplementation project(":data")
 
     implementation project(":application")
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.3.61"
@@ -27,4 +36,13 @@ task cucumber() {
             args = ['--plugin', 'pretty', '--add-plugin', 'html:build/cucumber/html-report', '--glue', 'com.soyle.stories', 'src/test/resources/features', '--strict']
         }
     }
+}
+
+tasks.withType(Test) {
+    systemProperties.remove("java.endorsed.dirs")
+}
+
+task runFeaturesUsingJUnit(type: Test) {
+    include '**/suites/junit/FeatureSuite.class'
+    outputs.upToDateWhen { false }
 }

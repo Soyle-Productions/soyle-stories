@@ -4,6 +4,7 @@ import com.soyle.stories.workspace.entities.Workspace
 import com.soyle.stories.workspace.repositories.WorkspaceRepository
 
 class WorkspaceRepositoryImpl : WorkspaceRepository {
+
     val workspaces = mutableMapOf<String, Workspace>()
 
     override suspend fun addNewWorkspace(workspace: Workspace) {

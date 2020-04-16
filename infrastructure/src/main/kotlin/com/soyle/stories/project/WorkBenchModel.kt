@@ -1,6 +1,8 @@
 package com.soyle.stories.project
 
 import com.soyle.stories.common.bindImmutableList
+import com.soyle.stories.common.bindImmutableMap
+import com.soyle.stories.common.bindImmutableSet
 import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewModel
 import com.soyle.stories.project.projectList.ProjectFileViewModel
@@ -27,6 +29,8 @@ class WorkBenchModel : ItemViewModel<LayoutViewModel>(LayoutViewModel()), Layout
 
     val primaryWindow = bind { item.primaryWindow?.toProperty() } as SimpleObjectProperty
     val staticTools = bindImmutableList(LayoutViewModel::staticTools)
+
+    val openDialogs = bindImmutableMap(LayoutViewModel::openDialogs)
 
     override fun update(update: LayoutViewModel.() -> LayoutViewModel) {
         if (! Platform.isFxApplicationThread()) return runLater { update(update) }

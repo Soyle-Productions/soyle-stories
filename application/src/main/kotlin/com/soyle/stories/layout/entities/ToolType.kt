@@ -8,7 +8,8 @@ package com.soyle.stories.layout.entities
 enum class ToolType(val canHaveNullData: Boolean) {
     CharacterList(true),
     BaseStoryStructure(false),
-    CharacterComparison(false)/*,
+    CharacterComparison(false),
+    LocationList(true)/*,
     Timeline(true),
     NoteList(true),
     SceneList(true),

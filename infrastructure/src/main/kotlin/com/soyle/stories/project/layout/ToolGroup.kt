@@ -5,6 +5,7 @@ import com.soyle.stories.characterarc.characterComparison.characterComparisonTab
 import com.soyle.stories.characterarc.characterList.CharacterList
 import com.soyle.stories.common.launchTask
 import com.soyle.stories.di.project.LayoutComponent
+import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
@@ -53,6 +54,7 @@ class ToolGroup : WindowChild() {
                     tabMap.getOrPut(tool.toolId) {
                         when (tool) {
                             is CharacterListToolViewModel -> tab<CharacterList>()
+                            is LocationListToolViewModel -> tab<LocationList>()
                             is BaseStoryStructureToolViewModel -> baseStoryStructureTab(scope, tool.characterId, tool.themeId)
                             is CharacterComparisonToolViewModel -> characterComparisonTab(scope, tool.themeId, tool.characterId)/*
                             ToolType.Timeline -> Tab("").also { tabs.add(it) }

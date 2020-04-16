@@ -27,7 +27,7 @@ javafx {
 def javaFXOptions = convention.findByType(JavaFXOptions.class) ?: convention.findPlugin(JavaFXOptions.class) ?: convention.getByType(JavaFXOptions.class)
 
 dependencies {
-    implementation "com.soyle.stories:soyle-stories-core:0.1.0"
+    implementation "com.soyle.stories:soyle-stories-core:0.1.0-SNAPSHOT 20w16a"
 
     implementation project(":application")
     implementation project(":data")
@@ -43,6 +43,9 @@ dependencies {
     implementation "de.jensd:fontawesomefx-fontawesome:4.7.0-11"
     implementation "de.jensd:fontawesomefx-materialicons:2.2.0-11"
     implementation "de.jensd:fontawesomefx-emojione:2.2.7-11"
+
+    testImplementation "org.testfx:testfx-core:4.0.16-alpha"
+    testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
 
     JavaFXPlatform.values().each { platform ->
         def cfg = configurations.create("javafx_" + platform.classifier)

@@ -3,6 +3,8 @@ package com.soyle.stories.common
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.binding.IntegerBinding
 import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleMapProperty
+import javafx.beans.property.SimpleSetProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Bounds
@@ -53,6 +55,12 @@ fun <T : Any> ObservableValue<T>.onChangeWithCurrent(op: (T?) -> Unit) {
 
 fun <T, R, L : List<R>> ItemViewModel<T>.bindImmutableList(property: KProperty1<T, L>): SimpleListProperty<R> =
   bind { item?.let(property)?.toObservable().toProperty() } as SimpleListProperty<R>
+
+fun <T, R, L : Set<R>> ItemViewModel<T>.bindImmutableSet(property: KProperty1<T, L>): SimpleSetProperty<R> =
+  bind { item?.let(property)?.toObservable().toProperty() } as SimpleSetProperty<R>
+
+fun <T, R, S, L : Map<R, S>> ItemViewModel<T>.bindImmutableMap(property: KProperty1<T, L>): SimpleMapProperty<R, S> =
+  bind { item?.let(property)?.toObservable().toProperty() } as SimpleMapProperty<R, S>
 
 fun <S> TableColumn<S, *>.setStaticColumnIndex(index: Int) {
 	var preventLoop = false
