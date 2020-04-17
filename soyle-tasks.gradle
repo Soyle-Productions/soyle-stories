@@ -1,0 +1,80 @@
+task useCasesUnitTest() {
+    group = "Soyle Tasks"
+    description = "Run all unit tests in the application layer"
+
+    configure {
+        dependsOn(":application:test")
+    }
+}
+task useCasesTest {
+    group = "Soyle Tasks"
+    description = "Run unit tests and any integration tests in the application layer"
+
+    configure {
+        dependsOn(useCasesUnitTest)
+    }
+}
+task adaptersUnitTest {
+    group = "Soyle Tasks"
+    description = "Run all unit tests in the gui layer"
+
+    configure {
+        dependsOn(":gui:test")
+    }
+}
+task adaptersTest {
+    group = "Soyle Tasks"
+    description = "Run all unit tests and any integration tests in the gui layer"
+
+    configure {
+        dependsOn(adaptersUnitTest)
+    }
+}
+task javafxUnitTest {
+    group = "Soyle Tasks"
+    description = "Run all unit tests in the infrastructure layer"
+
+    configure {
+        dependsOn(":infrastructure:test")
+    }
+}
+task javafxTest {
+    group = "Soyle Tasks"
+    description = "Run all unit tests and any integration tests in the infrastructure layer"
+
+    configure {
+        dependsOn(javafxUnitTest)
+    }
+}
+task fullTest {
+    group = "Soyle Tasks"
+    description = "Run all tests in all layers and run UAT tests"
+
+    configure {
+        dependsOn(useCasesTest, adaptersTest, javafxTest, ":infrastructure:cucumber")
+    }
+}
+task fullTestReport {
+    group = "Soyle Tasks"
+    description = "Run all tests in all layers and run UAT tests"
+
+    configure {
+        dependsOn(useCasesTest, adaptersTest, javafxTest, ":infrastructure:runFeaturesUsingJUnit")
+    }
+}
+task run {
+    group = "Soyle Tasks"
+    description = "Start the application in the IDE"
+
+    configure {
+        dependsOn(":infrastructure:runShadow")
+    }
+}
+task buildAndPackage {
+    group = "Soyle Tasks"
+    description = "Create runtime images for all three platforms"
+
+    configure {
+        dependsOn(fullTestReport, ":infrastructure:runtimeZip")
+    }
+}
