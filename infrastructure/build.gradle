@@ -27,7 +27,7 @@ javafx {
 def javaFXOptions = convention.findByType(JavaFXOptions.class) ?: convention.findPlugin(JavaFXOptions.class) ?: convention.getByType(JavaFXOptions.class)
 
 dependencies {
-    implementation "com.soyle.stories:soyle-stories-core:0.1.0-SNAPSHOT 20w16a"
+    implementation libraries.soyle_stories_core
 
     implementation project(":application")
     implementation project(":data")
@@ -62,7 +62,7 @@ dependencies {
         def cfg = configurations.create("javafx_" + platform.classifier)
         JavaFXModule.getJavaFXModules(javaFXOptions.modules).each { m ->
             project.getDependencies().add(cfg.name,
-                    String.format("org.openjfx:%s:%s:%s", m.getArtifactName(), javaFXOptions.version, platform.classifier));
+                    String.format("org.openjfx:%s:%s:%s", m.getArtifactName(), javaFXOptions.version, platform.classifier))
         }
     }
 }
