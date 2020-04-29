@@ -3,6 +3,7 @@ plugins {
 }
 
 apply from: "soyle-tasks.gradle"
+apply from: "dependencies.gradle"
 
 group 'com.soyle.stories'
 version project.property("version")

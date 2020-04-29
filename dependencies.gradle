@@ -1,0 +1,4 @@
+project.ext.libraries = [
+        soyle_stories_core: "com.soyle.stories:soyle-stories-core:0.1.3-alpha",
+
+]
