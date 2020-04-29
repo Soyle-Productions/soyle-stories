@@ -9,5 +9,5 @@ dependencies {
 
     implementation libraries.coroutines
 
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"
+    testImplementation libraries.junitParam
 }

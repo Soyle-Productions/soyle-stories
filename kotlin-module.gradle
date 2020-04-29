@@ -9,8 +9,8 @@ repositories {
 
 dependencies {
     implementation libraries.kotlin
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    testImplementation libraries.junit
+    testRuntimeOnly libraries.junitEngine
 }
 
 compileKotlin {
