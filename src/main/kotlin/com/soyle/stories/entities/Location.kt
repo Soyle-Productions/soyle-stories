@@ -11,10 +11,12 @@ class Location(
 ) : Entity<Location.Id> {
 
 	private fun copy(
-	  name: String = this.name
+	  name: String = this.name,
+	  description: String = this.description
 	) = Location(id, projectId, name, description)
 
 	fun withName(name: String) = copy(name = name)
+	fun withDescription(description: String) = copy(description = description)
 
 	data class Id(val uuid: UUID = UUID.randomUUID())
 
