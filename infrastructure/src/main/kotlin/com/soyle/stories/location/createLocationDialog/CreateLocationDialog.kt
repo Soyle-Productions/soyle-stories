@@ -1,8 +1,7 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.common.launchTask
 import com.soyle.stories.common.onChangeUntil
-import com.soyle.stories.di.project.LayoutComponent
+import com.soyle.stories.di.resolve
 import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.LayoutViewListener
 import javafx.beans.property.SimpleStringProperty
@@ -12,30 +11,25 @@ import javafx.stage.Stage
 import javafx.stage.StageStyle
 import tornadofx.*
 
-class CreateLocationDialog : Fragment("New Location") {
+class CreateLocationDialog : View("New Location") {
 
 	private val model = find<CreateLocationDialogModel>()
-	private val createLocationDialogViewListener: CreateLocationDialogViewListener = find<CreateLocationDialogComponent>().createLocationDialogViewListener
-	private val layoutViewListener: LayoutViewListener = find<LayoutComponent>().layoutViewListener
+	private val createLocationDialogViewListener: CreateLocationDialogViewListener = resolve()
+	private val layoutViewListener: LayoutViewListener = resolve()
 
-	private val name = SimpleStringProperty("")
-	private val description = SimpleStringProperty("")
+	val name = SimpleStringProperty("")
+	val description = SimpleStringProperty("")
 
 	override val root = form {
 		fieldset {
 			field("Name") {
 				textfield {
+					id = "name"
 					name.bind(textProperty())
 					requestFocus()
 					onAction = EventHandler {
 						it.consume()
-						if (name.value.isEmpty())
-						{
-							return@EventHandler
-						}
-						launchTask {
-							createLocationDialogViewListener.createLocation(name.value, description.value)
-						}
+						createLocationDialogViewListener.createLocation(name.value, description.value)
 					}
 				}
 			}
@@ -45,16 +39,20 @@ class CreateLocationDialog : Fragment("New Location") {
 				}
 			}
 			field {
-				text(model.errorMessage)
+				text(model.errorMessage) {
+					id = "errorMessage"
+				}
 			}
 		}
 		hbox {
 			button("Create") {
+				id = "createLocation"
 				action {
 					createLocationDialogViewListener.createLocation(name.value, description.value)
 				}
 			}
 			button("Cancel") {
+				id = "cancel"
 				action {
 					close()
 				}
@@ -63,6 +61,7 @@ class CreateLocationDialog : Fragment("New Location") {
 	}
 
 	override fun onUndock() {
+		FX.getComponents(scope).remove(CreateLocationDialog::class)
 		layoutViewListener.closeDialog(Dialog.CreateLocation::class)
 	}
 
@@ -70,6 +69,7 @@ class CreateLocationDialog : Fragment("New Location") {
 		model.isOpen.onChangeUntil({ it != true }) {
 			if (it != true) close()
 		}
+		createLocationDialogViewListener.getValidState()
 	}
 }
 

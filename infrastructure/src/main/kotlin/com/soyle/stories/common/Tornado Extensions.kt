@@ -1,5 +1,9 @@
 package com.soyle.stories.common
 
+import com.soyle.stories.di.DI
+import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.binding.IntegerBinding
 import javafx.beans.property.SimpleListProperty
@@ -12,8 +16,6 @@ import javafx.scene.control.*
 import javafx.scene.control.skin.TextAreaSkin
 import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import tornadofx.*
 import kotlin.reflect.KProperty1
 
@@ -102,13 +104,10 @@ private fun <S> TableColumn<S, *>.calculateIndex(index: Int): Int {
 	}
 }
 
-fun <T> launchTask(block: suspend CoroutineScope.(FXTask<*>) -> T) = runAsync {
-	runBlocking {
-		withTimeout(7000) {
-			block(this@runAsync)
-		}
-	}
+fun <T> async(scope: ApplicationScope, block: suspend CoroutineScope.() -> T) {
+	DI.resolve<ThreadTransformer>(scope).async { block() }
 }
+inline fun <T> async(scope: ProjectScope, noinline block: suspend CoroutineScope.() -> T) = async(scope.applicationScope, block)
 
 private val TextAreaHiddenScrollBarsKey = "com.soyle.stories.hiddenScrollBars"
 
@@ -182,12 +181,19 @@ val TextArea.rowCountProperty
 val TextArea.rowCount
 	get() = rowCountProperty.get()
 
+val TreeView<*>.isEditing: Boolean
+	get() = editingItem != null
+
+val <T> TreeView<T>.editingCell: TreeCell<T>?
+	get() = properties.getOrDefault("com.soyle.stories.treeView.editingCell", null) as? TreeCell<T>
 
 fun <T> TreeView<T>.makeEditable(convertFromString: TreeCell<T>.(String, T?) -> T) {
+	val self = this
 	isEditable = true
 	properties["tornadofx.editSupport"] = fun TreeCell<T>.(eventType: EditEventType, value: T?) {
 		graphic = when (eventType) {
 			EditEventType.StartEdit -> {
+				self.properties["com.soyle.stories.treeView.editingCell"] = this
 				val rollbackText = text
 				properties["com.soyle.stories.rollbackText"] = rollbackText
 				text = null
@@ -200,10 +206,12 @@ fun <T> TreeView<T>.makeEditable(convertFromString: TreeCell<T>.(String, T?) -> 
 				}
 			}
 			EditEventType.CancelEdit -> {
+				self.properties.remove("com.soyle.stories.treeView.editingCell", this)
 				text = properties["com.soyle.stories.rollbackText"] as? String ?: ""
 				null
 			}
 			EditEventType.CommitEdit -> {
+				self.properties.remove("com.soyle.stories.treeView.editingCell", this)
 				text = (graphic as? TextField)?.text ?: (properties["com.soyle.stories.rollbackText"] as? String) ?: ""
 				null
 			}

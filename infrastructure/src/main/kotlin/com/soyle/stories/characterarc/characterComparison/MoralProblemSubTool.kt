@@ -5,8 +5,9 @@
  */
 package com.soyle.stories.characterarc.characterComparison
 
-import com.soyle.stories.common.launchTask
+import com.soyle.stories.common.async
 import com.soyle.stories.common.wrapEditable
+import com.soyle.stories.di.resolve
 import javafx.beans.property.Property
 import javafx.geometry.Orientation
 import javafx.scene.Parent
@@ -16,8 +17,7 @@ class MoralProblemSubTool : Fragment() {
 
     override val scope = super.scope as CharacterComparisonScope
     val model = find<CharacterComparisonModel>()
-    val characterComparisonViewListener: CharacterComparisonViewListener =
-        find<CharacterComparisonComponent>().characterComparisonViewListener
+    val characterComparisonViewListener: CharacterComparisonViewListener = resolve<CharacterComparisonViewListener>()
 
     private val moralProblemSubTool: Property<MoralProblemSubToolViewModel> =
         model.subTools.select { (it?.getOrNull(1) as? MoralProblemSubToolViewModel).toProperty() }
@@ -38,7 +38,7 @@ class MoralProblemSubTool : Fragment() {
                             val currentQuestion = moralProblemSubTool.value?.centralMoralQuestion ?: return@onChange
                             val text = text
                             if (text != currentQuestion) {
-                                launchTask {
+                                async(scope.projectScope) {
                                     characterComparisonViewListener.updateCentralMoralQuestion(text)
                                 }
                             }
@@ -71,7 +71,7 @@ class MoralProblemSubTool : Fragment() {
                                     println("Edit commit: $newValue, $oldValue")
                                     if (newValue != oldValue) {
                                         val sectionValue = it.compSections.getValue(columnName)
-                                        launchTask {
+                                        async(scope.projectScope) {
                                             when (sectionValue) {
                                                 is CharacterArcSectionValue -> characterComparisonViewListener.updateValue(sectionValue.sectionId, newValue as String)
                                                 is PropertyValue -> when {

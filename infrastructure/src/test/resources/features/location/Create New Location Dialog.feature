@@ -55,3 +55,10 @@ Feature: Create New Location Dialog
     And The user has entered a valid location name
     When The user clicks the Create button
     Then The create new location dialog should be closed
+
+  Scenario: Creating multiple locations
+    Given The create new location dialog has been opened
+    And The user has entered a valid location name
+    When The user clicks the Create button
+    And The create new location dialog is reopened
+    Then the location name field should be blank

@@ -46,12 +46,20 @@ task javafxTest {
         dependsOn(javafxUnitTest)
     }
 }
+task UATTests {
+    group = "Soyle Tasks"
+    description = "UAT tests in infrastructure layer"
+
+    configure {
+        dependsOn(":infrastructure:cucumber")
+    }
+}
 task fullTest {
     group = "Soyle Tasks"
     description = "Run all tests in all layers and run UAT tests"
 
     configure {
-        dependsOn(useCasesTest, adaptersTest, javafxTest, ":infrastructure:cucumber")
+        dependsOn(useCasesTest, adaptersTest, javafxTest, UATTests)
     }
 }
 task fullTestReport {

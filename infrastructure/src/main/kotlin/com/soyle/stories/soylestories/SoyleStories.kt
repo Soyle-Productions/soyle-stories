@@ -1,22 +1,31 @@
 package com.soyle.stories.soylestories
 
-import com.soyle.stories.common.launchTask
-import com.soyle.stories.common.onChangeWithCurrent
-import com.soyle.stories.di.modules.ApplicationComponent
-import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.projectList.ProjectFileViewModel
+import com.soyle.stories.common.async
+import com.soyle.stories.di.DI
+import com.soyle.stories.di.characterarc.CharacterArcModule
+import com.soyle.stories.di.layout.LayoutModule
+import com.soyle.stories.di.location.LocationModule
+import com.soyle.stories.di.modules.ApplicationModule
+import com.soyle.stories.di.modules.DataModule
+import com.soyle.stories.di.project.ProjectModule
+import com.soyle.stories.project.WorkBench
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.soylestories.confirmExitDialog.ConfirmExitDialog
 import com.soyle.stories.soylestories.welcomeScreen.WelcomeScreen
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.image.Image
 import javafx.stage.Stage
-import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
 import tornadofx.*
-import java.util.*
 
 fun main(args: Array<String>) {
+    ApplicationModule
+    DataModule
+    ProjectModule
+    LayoutModule
+    LocationModule
+    CharacterArcModule
+
     launch<SoyleStories>(args)
 }
 
@@ -27,71 +36,33 @@ fun main(args: Array<String>) {
  */
 class SoyleStories : App(WelcomeScreen::class, WizardStyles::class) {
 
-    private val coroutineScope = CoroutineScope(
-        Job() + Dispatchers.JavaFx
-    )
+    private val appScope = ApplicationScope()
+    override var scope: Scope = appScope
 
-    private val projectListViewListener: ProjectListViewListener
-        get() = find<ApplicationComponent>().projectListViewListener
+    private val applicationModel = find<ApplicationModel>(appScope)
+    private val projectListViewListener: ProjectListViewListener by DI.resolveLater(appScope)
 
-    private val applicationModel = find<ApplicationModel>()
-
-    private val projectScopes = mutableMapOf<UUID, ProjectScope>()
+    val projectViews: ObservableList<WorkBench> = FXCollections.observableArrayList()
 
     override fun shouldShowPrimaryStage(): Boolean = false
 
     override fun start(stage: Stage) {
+
         super.start(stage)
 
         stage.icons += appIcon
 
-        find<SplashScreen>()
-        find<FailedProjectsDialog>()
-        find<ConfirmExitDialog>()
-        find<OpenProjectOptionDialog>()
+        find<SplashScreen>(appScope)
+        find<FailedProjectsDialog>(appScope)
+        find<ConfirmExitDialog>(appScope)
+        find<OpenProjectOptionDialog>(appScope)
 
-        applicationModel.isInvalidated.onChangeWithCurrent {
-            if (it != false) {
-                val loadTask = launchTask { task ->
-                    task.updateProgress(0.0, 100.0)
-                    listOf(
-                        "Getting started",
-                        "Hold on, making a sandwich",
-                        "Ok, I'm back... what were we doing?",
-                        "Oh yeah, preparing everything else..."
-                    ).forEachIndexed { index, s ->
-                        task.updateProgress(index * 25.0, 100.0)
-                        task.updateMessage(s)
-                        delay(1250)
-                    }
-                    projectListViewListener.startApplicationWithParameters(parameters.raw)
-                    withContext(Dispatchers.JavaFx) {
-                        applicationModel.openProjects.onChangeWithCurrent { _: ObservableList<ProjectFileViewModel>? ->
-                            updateProjectScopes()
-                        }
-                    }
-                }
-                applicationModel.initializationMessage.cleanBind(loadTask.messageProperty())
-                applicationModel.initializationProgress.cleanBind(loadTask.progressProperty())
-            }
+        async(appScope) {
+            projectListViewListener.startApplicationWithParameters(parameters.raw)
         }
 
-
-    }
-
-    private fun updateProjectScopes() {
-        val projectIds = applicationModel.openProjects.asSequence().map { it.projectId }.toSet()
-        applicationModel.openProjects.forEach {
-            projectScopes.getOrPut(it.projectId) { ProjectScope(it) }
-        }
-        projectScopes.entries.removeIf {
-            if (it.key !in projectIds) {
-                FX.getComponents(it.value).forEach { (_, scopedInstance) ->
-                    (scopedInstance as? UIComponent)?.close()
-                }
-                it.value.deregister()
-                true
-            } else false
+        projectViews.bind(appScope.projectScopesProperty) {
+            find(scope = it)
         }
     }
 

@@ -1,9 +1,11 @@
 package com.soyle.stories.project.startProjectDialog
 
-import com.soyle.stories.common.launchTask
-import com.soyle.stories.di.modules.ApplicationComponent
+import com.soyle.stories.common.async
+import com.soyle.stories.di.resolve
+import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.Styles.Companion.errorState
 import com.soyle.stories.soylestories.ApplicationModel
+import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -15,13 +17,14 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import javafx.util.StringConverter
-import kotlinx.coroutines.withContext
 import tornadofx.*
 import java.io.File
 
-class StartProjectDialog : Fragment("Start New Project") {
+class StartProjectDialog : View("Start New Project") {
 
-    private val projectListViewListener = find<ApplicationComponent>().projectListViewListener
+    override val scope: ApplicationScope = super.scope as ApplicationScope
+
+    private val projectListViewListener: ProjectListViewListener = resolve()
     private val model = find<ApplicationModel>().startProjectFailure
 
     private val selectedDirectoryFile = SimpleObjectProperty<File?>(null)
@@ -92,7 +95,7 @@ class StartProjectDialog : Fragment("Start New Project") {
                 enableWhen { isValid }
                 isDefaultButton = true
                 action {
-                    launchTask {
+                    async(scope) {
                         projectListViewListener.startNewProject(selectedDirectoryFile.value!!.absolutePath, projectName.value)
                         runLater {
                             if (model.value == null) {
@@ -107,7 +110,7 @@ class StartProjectDialog : Fragment("Start New Project") {
 
 }
 
-fun Component.startProjectDialog(owner: Stage?): StartProjectDialog = find(StartProjectDialog::class, scope = FX.defaultScope).apply {
+fun Component.startProjectDialog(scope: ApplicationScope, owner: Stage?): StartProjectDialog = find(StartProjectDialog::class, scope = scope).apply {
     openModal(
         stageStyle = StageStyle.UTILITY,
         modality = Modality.APPLICATION_MODAL,

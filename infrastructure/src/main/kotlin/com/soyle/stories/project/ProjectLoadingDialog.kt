@@ -1,5 +1,6 @@
 package com.soyle.stories.project
 
+import com.soyle.stories.common.onChangeUntil
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
 import javafx.stage.Modality
@@ -11,7 +12,7 @@ import tornadofx.*
  * Date: 2/14/2020
  * Time: 9:11 PM
  */
-class ProjectLoadingDialog : Fragment() {
+class ProjectLoadingDialog : View() {
 
     private val model = find<WorkBenchModel>()
 
@@ -49,6 +50,9 @@ class ProjectLoadingDialog : Fragment() {
         )?.apply {
             centerOnScreen()
             isAlwaysOnTop = true
+            model.isValidLayout.onChangeUntil(this.showingProperty().not()) {
+                if (it == true) close()
+            }
         }
     }
 

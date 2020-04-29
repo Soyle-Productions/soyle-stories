@@ -6,29 +6,26 @@
 package com.soyle.stories.common
 
 import com.soyle.stories.gui.ThreadTransformer
-import javafx.application.Platform
+import com.soyle.stories.soylestories.ApplicationScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
-import tornadofx.runAsync
-import tornadofx.runLater
 
-object ThreadTransformerImpl : ThreadTransformer {
+
+class AsyncThreadTransformer(val applicationScope: ApplicationScope) : ThreadTransformer {
     override fun async(task: suspend CoroutineScope.() -> Unit) {
-        runAsync {
-            runBlocking {
-                withTimeout(7000) {
-                    task()
-                }
+        applicationScope.launch {
+            println("launched async task in ${Thread.currentThread().name}")
+            withTimeout(7000) {
+                task()
             }
         }
     }
 
     override fun gui(update: suspend CoroutineScope.() -> Unit) {
-        if (! Platform.isFxApplicationThread()) return runLater { gui(update) }
-        runBlocking {
+        applicationScope.launch(Dispatchers.JavaFx) {
             update()
         }
     }

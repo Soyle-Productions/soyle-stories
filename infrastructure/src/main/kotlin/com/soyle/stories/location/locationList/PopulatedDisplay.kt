@@ -1,11 +1,12 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.common.makeEditable
-import com.soyle.stories.di.characterarc.CharacterArcComponent
-import com.soyle.stories.di.project.LayoutComponent
+import com.soyle.stories.di.resolve
 import com.soyle.stories.project.layout.Dialog
-import javafx.scene.control.*
+import com.soyle.stories.project.layout.LayoutViewListener
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -18,11 +19,22 @@ internal class PopulatedDisplay : View() {
 
     private val model by inject<LocationListModel>()
     private var treeView: TreeView<LocationItemViewModel?> by singleAssign()
-    private val locationListViewListener = find<LocationListComponent>().locationListViewListener
-    private val layoutViewListener = find<LayoutComponent>().layoutViewListener
+    private val locationListViewListener: LocationListViewListener = resolve()
+    private val layoutViewListener: LayoutViewListener = resolve()
 
     private val characterContextMenu = ContextMenu().apply {
+        id = "locationContextMenu"
+        item("Open") {
+            id = "open"
+            action {
+                val selectedItem = model.selectedItem.value
+                if (selectedItem is LocationItemViewModel) {
+                    locationListViewListener.openLocationDetails(selectedItem.id)
+                }
+            }
+        }
         item("Rename") {
+            id = "rename"
             action {
                 val selectedItem = model.selectedItem.value
                 val selectedTreeItem = treeView.selectionModel.selectedItems.singleOrNull() ?: return@action
@@ -32,6 +44,7 @@ internal class PopulatedDisplay : View() {
             }
         }
         item("Delete") {
+            id = "delete"
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is LocationItemViewModel) {
@@ -58,7 +71,8 @@ internal class PopulatedDisplay : View() {
 
                 oldValue
             }
-            bindSelected(model.selectedItem)
+            selectionModel.selectedItemProperty().onChange { model.selectedItem.value = it?.value }
+            model.selectedItem.onChange { newSelection -> selectionModel.select(root.children.find { it.value?.id == newSelection?.id }) }
             model.selectedItem.onChange {
                 contextMenu = when (it) {
                     is LocationItemViewModel -> characterContextMenu

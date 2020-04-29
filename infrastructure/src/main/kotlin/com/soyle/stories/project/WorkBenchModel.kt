@@ -2,18 +2,16 @@ package com.soyle.stories.project
 
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.common.bindImmutableMap
-import com.soyle.stories.common.bindImmutableSet
+import com.soyle.stories.di.resolveLater
+import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewModel
 import com.soyle.stories.project.projectList.ProjectFileViewModel
-import javafx.application.Platform
+import com.soyle.stories.soylestories.ApplicationModel
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.ItemViewModel
-import tornadofx.rebind
-import tornadofx.runLater
-import tornadofx.toProperty
+import tornadofx.*
 
 /**
  * Created by Brendan
@@ -22,9 +20,15 @@ import tornadofx.toProperty
  */
 class WorkBenchModel : ItemViewModel<LayoutViewModel>(LayoutViewModel()), LayoutView {
 
+    override val scope: ProjectScope = super.scope as ProjectScope
+
+    val isOpen = find<ApplicationModel>(scope = scope.applicationScope).openProjects.select {
+        (it.find { it.projectId == scope.projectId } != null).toProperty()
+    }
+
     val loadingProgress = SimpleDoubleProperty(0.0)
     val loadingMessage = SimpleStringProperty("")
-    val projectViewModel = SimpleObjectProperty<ProjectFileViewModel?>(null)
+    val projectViewModel = SimpleObjectProperty<ProjectFileViewModel?>(scope.projectViewModel)
     val isValidLayout = bind(LayoutViewModel::isValid)
 
     val primaryWindow = bind { item.primaryWindow?.toProperty() } as SimpleObjectProperty
@@ -32,9 +36,12 @@ class WorkBenchModel : ItemViewModel<LayoutViewModel>(LayoutViewModel()), Layout
 
     val openDialogs = bindImmutableMap(LayoutViewModel::openDialogs)
 
+    private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)
+
     override fun update(update: LayoutViewModel.() -> LayoutViewModel) {
-        if (! Platform.isFxApplicationThread()) return runLater { update(update) }
-        rebind { item = item.update() }
+        threadTransformer.gui {
+            rebind { item = item.update() }
+        }
     }
 
     companion object {

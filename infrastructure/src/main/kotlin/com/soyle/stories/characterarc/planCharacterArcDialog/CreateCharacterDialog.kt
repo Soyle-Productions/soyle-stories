@@ -1,6 +1,8 @@
 package com.soyle.stories.characterarc.planCharacterArcDialog
 
-import com.soyle.stories.di.characterarc.CharacterArcComponent
+import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
+import com.soyle.stories.di.characterarc.CharacterArcModule
+import com.soyle.stories.di.resolve
 import javafx.event.EventHandler
 import javafx.stage.Modality
 import javafx.stage.Stage
@@ -13,7 +15,7 @@ import tornadofx.textfield
 
 class PlanCharacterArcDialog : Fragment("New Character Arc") {
 
-    val planCharacterArcDialogViewListener = find<CharacterArcComponent>().planCharacterArcDialogViewListener
+    val planCharacterArcDialogViewListener = resolve<PlanCharacterArcDialogViewListener>()
     var characterId: String = ""
 
     override val root = form {

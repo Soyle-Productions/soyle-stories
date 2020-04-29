@@ -2,6 +2,7 @@ package com.soyle.stories.layout.entities
 
 import com.soyle.stories.common.Entity
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import java.util.*
@@ -54,4 +55,13 @@ class CharacterComparisonTool(id: Tool.Id, themeId: Theme.Id, characterId: Chara
 
     override fun close(): Tool<Theme.Id> =
         CharacterComparisonTool(id, identifyingData, associatedData as Character.Id?, false)
+}
+
+class LocationDetailsTool(id: Id, locationId: Location.Id, isOpen: Boolean) :
+  Tool<Location.Id>(id, locationId, isOpen, ToolType.LocationDetails) {
+    override fun open(): Tool<Location.Id> =
+      LocationDetailsTool(id, identifyingData, true)
+
+    override fun close(): Tool<Location.Id> =
+      LocationDetailsTool(id, identifyingData, false)
 }

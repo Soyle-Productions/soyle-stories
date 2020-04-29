@@ -1,6 +1,7 @@
 package com.soyle.stories.location.locationList
 
 import com.soyle.stories.common.onChangeWithCurrent
+import com.soyle.stories.di.resolve
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -14,7 +15,7 @@ class LocationList : View("Locations") {
 	}
 
 	init {
-		val locationListViewListener = find<LocationListComponent>().locationListViewListener
+		val locationListViewListener: LocationListViewListener = resolve()
 		val model = find<LocationListModel>()
 		model.isInvalid.onChangeWithCurrent {
 			if (it != false) {

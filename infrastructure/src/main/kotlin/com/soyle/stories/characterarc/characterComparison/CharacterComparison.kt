@@ -1,8 +1,9 @@
 package com.soyle.stories.characterarc.characterComparison
 
 import com.soyle.stories.common.onChangeUntil
-import com.soyle.stories.di.project.LayoutComponent
+import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.layout.LayoutViewListener
 import javafx.collections.ObservableList
 import javafx.geometry.Side
 import javafx.scene.control.ContextMenu
@@ -15,9 +16,8 @@ class CharacterComparison : View("Character Comparison") {
 
     override val scope = super.scope as CharacterComparisonScope
     val model = find<CharacterComparisonModel>()
-    val characterComparisonViewListener: CharacterComparisonViewListener =
-        find<CharacterComparisonComponent>().characterComparisonViewListener
-    val layoutViewListener = find<LayoutComponent>(scope = scope.projectScope).layoutViewListener
+    val characterComparisonViewListener: CharacterComparisonViewListener = resolve()
+    val layoutViewListener = resolve<LayoutViewListener>(scope.projectScope)
 
     init {
         model.subTools.onChangeUntil({ !it.isNullOrEmpty() }) {

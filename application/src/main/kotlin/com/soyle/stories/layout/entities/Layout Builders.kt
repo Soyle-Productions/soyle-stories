@@ -93,6 +93,7 @@ inline fun MutableList<Tool<*>>.openTool(type: ToolType, associatedData: Map<Str
         ToolType.BaseStoryStructure -> BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), associatedData["themeId"] as Theme.Id, associatedData["characterId"] as Character.Id, true)
         ToolType.CharacterList -> CharacterListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, true)
         ToolType.LocationList -> LocationListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, true)
+        else -> error("unsupported tool type $type")
     }
     this += tool
     return tool
@@ -104,7 +105,8 @@ inline fun MutableList<Tool<*>>.tool(type: ToolType, associatedData: Map<String,
         ToolType.BaseStoryStructure -> BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), associatedData["themeId"] as Theme.Id, associatedData["characterId"] as Character.Id, false)
         ToolType.CharacterList -> CharacterListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, false)
         ToolType.LocationList -> LocationListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, false)
-    }
+        else -> error("unsupported tool type $type")
+   }
     this += tool
     return tool
 }

@@ -9,6 +9,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.layout.LayoutDoesNotExist
@@ -17,10 +18,11 @@ import com.soyle.stories.layout.entities.*
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import com.soyle.stories.layout.usecases.openTool.OpenToolUseCase
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.reflect.KClass
 
 class OpenToolTest {
 
@@ -195,6 +197,80 @@ class OpenToolTest {
 
             }
 
+        }
+
+    }
+
+    @Nested
+    inner class SupportedToolTypes {
+
+        val layout: Layout = layout(projectId, Layout.Id(UUID.randomUUID())) {
+            window {
+                primaryStack {}
+            }
+        }
+
+        fun <T : Tool<*>, R : ActiveTool> testType(request: OpenTool.RequestModel, toolClass: KClass<T>, findType: (T) -> Boolean, activeClass: KClass<R>, findActive: (R) -> Boolean) {
+            var savedLayout: Layout? = null
+            val (result) = given(layouts = listOf(layout), saveLayout = {
+                savedLayout = it
+            }).invoke(request) as Either.Right
+            val openedTool = (savedLayout!!.tools
+              .filter { it.isOpen }
+              .filter { toolClass.isInstance(it) } as List<T>)
+              .find(findType)
+            assertNotNull(openedTool)
+            result as OpenTool.ResponseModel
+            val toolsMatchingSaved = result.affectedToolGroup.tools.filter { it.toolId == openedTool!!.id.uuid }
+            assertTrue(toolsMatchingSaved.isNotEmpty(), "No active tools matching tool id")
+            val toolsAsActiveClass = (toolsMatchingSaved.filter { activeClass.isInstance(it) } as List<R>)
+            assertTrue(toolsAsActiveClass.isNotEmpty(), "No active tools of expected type $activeClass")
+            val activeTool = toolsAsActiveClass.find(findActive)
+            assertNotNull(activeTool)
+        }
+
+        @Test
+        fun `base story structure`() {
+            val request = OpenTool.RequestModel.BaseStoryStructure(UUID.randomUUID(), UUID.randomUUID())
+            testType(
+              request,
+              BaseStoryStructureTool::class,
+              {
+                  it.identifyingData == Theme.Id(request.themeId) to Character.Id(request.characterId)
+              },
+              BaseStoryStructureActiveTool::class,
+              {
+                  it.characterId == request.characterId && it.themeId == request.themeId
+              }
+            )
+        }
+
+        @Test
+        fun `character comparison`() {
+            val request = OpenTool.RequestModel.CharacterComparison(UUID.randomUUID(), UUID.randomUUID())
+            testType(
+              request,
+              CharacterComparisonTool::class,
+              {
+                  it.identifyingData == Theme.Id(request.themeId) && it.associatedData == Character.Id(request.characterId)
+              },
+              CharacterComparisonActiveTool::class,
+              {
+                  it.characterId == request.characterId && it.themeId == request.themeId
+              }
+            )
+        }
+
+        @Test
+        fun `location details`() {
+            val request = OpenTool.RequestModel.LocationDetails(UUID.randomUUID())
+            testType(
+              request,
+              LocationDetailsTool::class,
+              { it.identifyingData == Location.Id(request.locationId) },
+              LocationDetailsActiveTool::class,
+              { it.locationId == request.locationId }
+            )
         }
 
     }

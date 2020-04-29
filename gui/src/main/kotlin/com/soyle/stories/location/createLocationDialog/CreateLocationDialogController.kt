@@ -2,7 +2,6 @@ package com.soyle.stories.location.createLocationDialog
 
 import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.location.controllers.CreateNewLocationController
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 
 class CreateLocationDialogController(
   private val threadTransformer: ThreadTransformer,

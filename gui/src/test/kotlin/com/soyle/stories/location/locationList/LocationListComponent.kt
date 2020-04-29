@@ -2,7 +2,7 @@ package com.soyle.stories.location.locationList
 
 import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.location.LocationComponent
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.project.layout.openTool.OpenToolController
 
 class LocationListComponent(
   threadTransformer: ThreadTransformer,
@@ -18,7 +18,11 @@ class LocationListComponent(
 			locationListView(),
 			locationComponent.locationEvents
 		  ),
-		  locationComponent.renameLocationController
+		  locationComponent.renameLocationController,
+		  object : OpenToolController {
+			  override fun openLocationDetailsTool(locationId: String) {
+			  }
+		  }
 		)
 	}
 }

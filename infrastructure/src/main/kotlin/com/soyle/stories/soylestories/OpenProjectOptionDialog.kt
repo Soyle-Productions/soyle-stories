@@ -1,8 +1,8 @@
 package com.soyle.stories.soylestories
 
-import com.soyle.stories.common.launchTask
-import com.soyle.stories.di.modules.ApplicationComponent
-import com.soyle.stories.project.projectList.ProjectFileViewModel
+import com.soyle.stories.common.async
+import com.soyle.stories.di.resolve
+import com.soyle.stories.project.projectList.ProjectListViewListener
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.stage.Modality
@@ -12,8 +12,10 @@ import tornadofx.*
 
 class OpenProjectOptionDialog : View("Open Project Options") {
 
+	override val scope: ApplicationScope = super.scope as ApplicationScope
+
 	private val model = find<ApplicationModel>()
-	private val projectListViewListener = find<ApplicationComponent>().projectListViewListener
+	private val projectListViewListener = resolve<ProjectListViewListener>()
 
 	override val root: Parent = vbox {
 		label("How would you like to open the project?")
@@ -21,7 +23,7 @@ class OpenProjectOptionDialog : View("Open Project Options") {
 			button("This Window") {
 				action {
 					val projectLocation = model.openProjectRequest.value!!.location
-					launchTask {
+					async(scope) {
 						projectListViewListener.replaceCurrentProject(projectLocation)
 					}
 				}
@@ -29,7 +31,7 @@ class OpenProjectOptionDialog : View("Open Project Options") {
 			button("New Window") {
 				action {
 					val projectLocation = model.openProjectRequest.value!!.location
-					launchTask {
+					async(scope) {
 						projectListViewListener.forceOpenProject(projectLocation)
 					}
 				}

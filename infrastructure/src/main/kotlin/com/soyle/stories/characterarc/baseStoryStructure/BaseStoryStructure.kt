@@ -6,6 +6,7 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.common.onChangeWithCurrent
+import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.geometry.Orientation
@@ -18,7 +19,7 @@ class BaseStoryStructure : View("Base Story Structure") {
 
     override val scope = super.scope as BaseStoryStructureScope
     val model = find<BaseStoryStructureModel>()
-    private val baseStoryStructureViewListener = find<BaseStoryStructureComponent>().baseStoryStructureViewListener
+    private val baseStoryStructureViewListener = resolve<BaseStoryStructureViewListener>()
 
     override val root: Parent = form {
         fieldset(labelPosition = Orientation.VERTICAL) {
