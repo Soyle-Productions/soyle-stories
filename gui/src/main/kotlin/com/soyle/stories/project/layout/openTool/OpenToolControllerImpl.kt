@@ -17,4 +17,13 @@ class OpenToolControllerImpl(
 			), openToolOutputPort)
 		}
 	}
+
+	override fun openBaseStoryStructureTool(themeId: String, characterId: String) {
+		threadTransformer.async {
+			openTool.invoke(OpenTool.RequestModel.BaseStoryStructure(
+			  UUID.fromString(characterId),
+			  UUID.fromString(themeId)
+			), openToolOutputPort)
+		}
+	}
 }

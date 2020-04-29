@@ -56,7 +56,7 @@ class ToolGroup : WindowChild() {
                         when (tool) {
                             is CharacterListToolViewModel -> tab<CharacterList>()
                             is LocationListToolViewModel -> tab<LocationList>()
-                            is BaseStoryStructureToolViewModel -> baseStoryStructureTab(scope, tool.characterId, tool.themeId)
+                            is BaseStoryStructureToolViewModel -> baseStoryStructureTab(scope, tool)
                             is CharacterComparisonToolViewModel -> characterComparisonTab(scope, tool.themeId, tool.characterId)
                             is LocationDetailsToolViewModel -> locationDetailsTab(scope, tool)/*
                             ToolType.Timeline -> Tab("").also { tabs.add(it) }

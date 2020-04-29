@@ -82,6 +82,20 @@ object LocationSteps : ApplicationTest() {
 		whenLocationIsCreated(double)
 	}
 
+	fun setNoLocationsCreated(double: SoyleStoriesTestDouble)
+	{
+		ProjectSteps.givenProjectHasBeenOpened(double)
+		val scope = ProjectSteps.getProjectScope(double)!!
+		val locations = getLocationsCreated(double)
+		interact {
+			async(scope.applicationScope) {
+				locations.forEach {
+					DI.resolve<DeleteLocationController>(scope).deleteLocation(it.id.uuid.toString())
+				}
+			}
+		}
+	}
+
 	fun getLocationsCreated(double: SoyleStoriesTestDouble): List<Location>
 	{
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return emptyList()
@@ -116,6 +130,14 @@ object LocationSteps : ApplicationTest() {
 			}
 		}
 		assertThat(getNumberOfLocationsCreated(double)).isGreaterThanOrEqualTo(number)
+	}
+
+	fun givenNoLocationsHaveBeenCreated(double: SoyleStoriesTestDouble) {
+		val numberOfLocationsCreated = getNumberOfLocationsCreated(double)
+		if (numberOfLocationsCreated > 0) {
+			setNoLocationsCreated(double)
+		}
+		assertThat(getNumberOfLocationsCreated(double)).isEqualTo(0)
 	}
 
 	// create new location dialog open

@@ -1,5 +1,7 @@
 package com.soyle.stories
 
+import com.soyle.stories.character.CharacterArcSteps
+import com.soyle.stories.character.CharacterSteps
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.location.LocationSteps
@@ -101,6 +103,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("the user has entered {string} into the description field") { string: String ->
 			LocationSteps.givenLocationDetailsToolHasDescriptionOf(double, targetLocation!!.id.uuid, string)
 		}
+		Given("a Character has been created") {
+			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, 1)
+		}
+		Given("a Character Arc has been created") {
+			CharacterArcSteps.givenANumberOfCharacterArcsHaveBeenCreated(double, 1)
+		}
+		Given("no Locations have been created") {
+			LocationSteps.givenNoLocationsHaveBeenCreated(double)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -166,6 +177,10 @@ class SoyleUATSteps : En, ApplicationTest() {
 			LocationSteps.whenLocationDetailsToolIsOpened(double, targetLocation!!.id.uuid)
 			assertTrue(LocationSteps.isLocationDetailsToolOpen(double, targetLocation!!.id.uuid))
 		}
+		When("the Base Story Structure Tool is opened") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			CharacterArcSteps.whenBaseStoryStructureToolIsOpened(double, characterArc.themeId, characterArc.characterId)
+		}
 
 
 		Then("The Location List Tool should show a special empty message") {
@@ -224,6 +239,10 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the confirm delete location dialog should show the location name") {
 			assertTrue(LocationSteps.isConfirmDeleteLocationDialogLocationDisplayingNameOf(double, targetLocation!!))
+		}
+		Then("the Character Arc Section Location dropdown in the Base Story Structure Tool should be disabled") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			assertTrue(CharacterArcSteps.isLocationDropdownDisabledInBaseStoryStructureTool(double, characterArc.themeId, characterArc.characterId))
 		}
 
 

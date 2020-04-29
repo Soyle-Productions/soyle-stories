@@ -23,6 +23,10 @@ class LocationListControllerUnitTest {
 		override fun openLocationDetailsTool(locationId: String) {
 			openToolLocationId = locationId
 		}
+
+		override fun openBaseStoryStructureTool(themeId: String, characterId: String) {
+
+		}
 	}
 
 	@Test

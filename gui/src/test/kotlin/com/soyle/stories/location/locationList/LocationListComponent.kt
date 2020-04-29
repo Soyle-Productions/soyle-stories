@@ -22,6 +22,10 @@ class LocationListComponent(
 		  object : OpenToolController {
 			  override fun openLocationDetailsTool(locationId: String) {
 			  }
+
+			  override fun openBaseStoryStructureTool(themeId: String, characterId: String) {
+
+			  }
 		  }
 		)
 	}
