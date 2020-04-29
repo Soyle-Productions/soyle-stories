@@ -1,4 +1,8 @@
-project.ext.libraries = [
-        soyle_stories_core: "com.soyle.stories:soyle-stories-core:0.1.3-alpha",
 
+
+project.ext.libraries = [
+        kotlin: "org.jetbrains.kotlin:kotlin-stdlib:1.3.71",
+        reflectionKt: "org.jetbrains.kotlin:kotlin-reflect:1.3.71",
+        coroutines: "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3",
+        soyle_stories_core: "com.soyle.stories:soyle-stories-core:0.1.3-alpha"
 ]
