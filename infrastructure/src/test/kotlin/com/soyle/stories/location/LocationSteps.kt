@@ -1,5 +1,6 @@
 package com.soyle.stories.location
 
+import com.soyle.stories.UATLogger
 import com.soyle.stories.common.async
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.common.isEditing
@@ -14,15 +15,19 @@ import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.location.locationDetails.LocationDetails
 import com.soyle.stories.location.locationDetails.LocationDetailsScope
 import com.soyle.stories.location.locationList.*
+import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBenchModel
 import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.LayoutViewListener
+import com.soyle.stories.project.layout.openTool.OpenToolController
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.ActionEvent
+import javafx.event.Event
+import javafx.event.EventType
 import javafx.geometry.Side
 import javafx.scene.Node
 import javafx.scene.control.*
@@ -143,16 +148,24 @@ object LocationSteps : ApplicationTest() {
 	fun setLocationDetailsToolOpened(double: SoyleStoriesTestDouble, locationId: UUID)
 	{
 		givenNumberOfLocationsHaveBeenCreated(double, 1)
-		val scope = ProjectSteps.getProjectScope(double)!!
-		scope.get<LocationListViewListener>().openLocationDetails(locationId.toString())
+		whenLocationDetailsToolIsOpened(double, locationId)
 	}
 
 	fun getOpenedLocationDetailsTool(double: SoyleStoriesTestDouble, locationId: UUID): LocationDetails?
 	{
-		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
+		val projectScope = ProjectSteps.getProjectScope(double) ?: return (null).also { UATLogger.log("Project not yet opened") }
 		val scope = projectScope.toolScopes.find { it is LocationDetailsScope && it.locationId == locationId.toString() }
-		  ?: return null
-		return findComponentsInScope<LocationDetails>(scope).singleOrNull()?.takeIf { it.currentStage?.isShowing == true }
+		  ?: return (null).also { UATLogger.log("No LocationDetailsScope with id $locationId") }
+		val component = findComponentsInScope<LocationDetails>(scope).singleOrNull() ?: return (null).also { UATLogger.log("Location Details component not found in scope") }
+		return component.takeIf { it.currentStage?.isShowing == true } ?: (null).also { UATLogger.log("Location Details component not visible") }
+	}
+
+	fun whenLocationDetailsToolIsOpened(double: SoyleStoriesTestDouble, locationId: UUID)
+	{
+		val scope = ProjectSteps.getProjectScope(double)!!
+		interact {
+			scope.get<OpenToolController>().openLocationDetailsTool(locationId.toString())
+		}
 	}
 
 	fun isLocationDetailsToolOpen(double: SoyleStoriesTestDouble, locationId: UUID) = getOpenedLocationDetailsTool(double, locationId) != null
@@ -548,5 +561,75 @@ object LocationSteps : ApplicationTest() {
 			}
 		}
 		return selectedItem?.value?.name?.equals(storedLocation?.name) ?: false
+	}
+
+	fun setLocationDescriptionTo(double: SoyleStoriesTestDouble, locationId: UUID, description: String)
+	{
+		givenNumberOfLocationsHaveBeenCreated(double, 1)
+		val scope = ProjectSteps.getProjectScope(double) ?: error("project not yet opened")
+		val controller = scope.get<ReDescribeLocationController>()
+		controller.reDescribeLocation(locationId.toString(), description)
+	}
+
+	fun isLocationDescriptionSameAs(double: SoyleStoriesTestDouble, locationId: UUID, description: String): Boolean
+	{
+		val scope = ProjectSteps.getProjectScope(double) ?: return false
+		val locationRepo = scope.get<LocationRepository>()
+		val storedLocation = runBlocking {
+			locationRepo.getLocationById(Location.Id(locationId))
+		} ?: return false
+		return storedLocation.description == description
+	}
+
+	fun givenLocationHasDescription(double: SoyleStoriesTestDouble, locationId: UUID, description: String)
+	{
+		if (! isLocationDescriptionSameAs(double, locationId, description)) {
+			setLocationDescriptionTo(double, locationId, description)
+		}
+		assertTrue(isLocationDescriptionSameAs(double, locationId, description))
+	}
+
+	fun setDescriptionInLocationDetailsToolEqualTo(double: SoyleStoriesTestDouble, locationId: UUID, description: String)
+	{
+		givenLocationDetailsToolHasBeenOpened(double, locationId)
+		val tool = getOpenedLocationDetailsTool(double, locationId)!!
+		interact {
+			from(tool.root).lookup("#description").queryTextInputControl()?.let {
+				it.requestFocus()
+				it.text = description
+			}
+		}
+	}
+
+	fun getDescriptionInLocationDetailsTool(double: SoyleStoriesTestDouble, locationId: UUID): String?
+	{
+		val tool = getOpenedLocationDetailsTool(double, locationId) ?: return (null).also { UATLogger.log("no open location details tool for $locationId") }
+		var textArea: TextInputControl? = null
+		interact {
+			textArea = from(tool.root).lookup("#description").queryTextInputControl()
+		}
+		return textArea?.text ?: (null).also { UATLogger.log("no text input control found in $tool") }
+	}
+
+	fun isDescriptionInLocationDetailsToolEqualTo(double: SoyleStoriesTestDouble, locationId: UUID, description: String): Boolean
+	{
+		return getDescriptionInLocationDetailsTool(double, locationId) == description
+	}
+
+	fun givenLocationDetailsToolHasDescriptionOf(double: SoyleStoriesTestDouble, locationId: UUID, description: String)
+	{
+		if (! isDescriptionInLocationDetailsToolEqualTo(double, locationId, description)) {
+			setDescriptionInLocationDetailsToolEqualTo(double, locationId, description)
+		}
+		assertTrue(isDescriptionInLocationDetailsToolEqualTo(double, locationId, description))
+	}
+
+	fun whenLocationDetailsToolIsClosed(double: SoyleStoriesTestDouble, locationId: UUID)
+	{
+		val tool = getOpenedLocationDetailsTool(double, locationId)!!
+		interact {
+			tool.owningTab?.tabPane?.requestFocus()
+			tool.owningTab?.onCloseRequest?.handle(Event(EventType("close")))
+		}
 	}
 }

@@ -1,3 +1,5 @@
+import java.io.File
+
 task useCasesUnitTest() {
     group = "Soyle Tasks"
     description = "Run all unit tests in the application layer"
@@ -83,6 +85,6 @@ task buildAndPackage {
     description = "Create runtime images for all three platforms"
 
     configure {
-        dependsOn(fullTestReport, ":infrastructure:runtimeZip")
+        dependsOn(":infrastructure:clean", fullTestReport, ":infrastructure:runtimeZip")
     }
 }

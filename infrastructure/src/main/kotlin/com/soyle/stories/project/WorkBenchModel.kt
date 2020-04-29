@@ -40,7 +40,7 @@ class WorkBenchModel : ItemViewModel<LayoutViewModel>(LayoutViewModel()), Layout
 
     override fun update(update: LayoutViewModel.() -> LayoutViewModel) {
         threadTransformer.gui {
-            rebind { item = item.update() }
+            this@WorkBenchModel.rebind { item = item.update() }
         }
     }
 

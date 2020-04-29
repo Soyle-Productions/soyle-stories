@@ -20,6 +20,7 @@ class LocationDetails : View() {
 			field {
 				textProperty.bind(model.descriptionLabel)
 				textarea {
+					id = "description"
 					model.description.onChange { text = it ?: "" }
 					focusedProperty().onChange {
 						if (! it) {

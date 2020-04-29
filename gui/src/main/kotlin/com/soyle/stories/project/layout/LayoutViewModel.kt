@@ -26,6 +26,10 @@ class GroupSplitterViewModel(val splitterId: String, val orientation: Boolean, v
 class ToolGroupViewModel(val groupId: String, val focusedToolId: String?, val tools: List<ToolViewModel>) : WindowChildViewModel() {
     override val id: String
         get() = groupId
+
+    override fun toString(): String {
+        return "${super.toString()}(groupId = $groupId, focusedToolId = $focusedToolId, tools = $tools)"
+    }
 }
 class StaticToolViewModel(val toolId: String, val isOpen: Boolean, val name: String)
 sealed class ToolViewModel {

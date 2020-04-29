@@ -1,11 +1,21 @@
 package com.soyle.stories.location.locationDetails
 
+import com.soyle.stories.eventbus.listensTo
 import com.soyle.stories.location.LocationException
+import com.soyle.stories.location.events.LocationEvents
+import com.soyle.stories.location.locationDetails.presenters.ReDescribeLocationPresenter
 import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetails
 
 class LocationDetailsPresenter(
-  private val view: LocationDetailsView
+  locationId: String,
+  private val view: LocationDetailsView,
+  locationEvents: LocationEvents
 ) : GetLocationDetails.OutputPort {
+
+	private val subPresenters = listOf(
+	  ReDescribeLocationPresenter(locationId, view) listensTo locationEvents.reDescribeLocation
+	)
+
 
 	override fun receiveGetLocationDetailsResponse(response: GetLocationDetails.ResponseModel) {
 		view.update {

@@ -22,7 +22,7 @@ internal class PopulatedDisplay : View() {
     private val locationListViewListener: LocationListViewListener = resolve()
     private val layoutViewListener: LayoutViewListener = resolve()
 
-    private val characterContextMenu = ContextMenu().apply {
+    private val locationContextMenu = ContextMenu().apply {
         id = "locationContextMenu"
         item("Open") {
             id = "open"
@@ -75,7 +75,7 @@ internal class PopulatedDisplay : View() {
             model.selectedItem.onChange { newSelection -> selectionModel.select(root.children.find { it.value?.id == newSelection?.id }) }
             model.selectedItem.onChange {
                 contextMenu = when (it) {
-                    is LocationItemViewModel -> characterContextMenu
+                    is LocationItemViewModel -> locationContextMenu
                     else -> null
                 }
             }

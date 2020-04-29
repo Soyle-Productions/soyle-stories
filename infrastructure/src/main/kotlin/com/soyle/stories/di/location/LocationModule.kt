@@ -12,6 +12,9 @@ import com.soyle.stories.location.events.CreateNewLocationNotifier
 import com.soyle.stories.location.events.DeleteLocationNotifier
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.events.RenameLocationNotifier
+import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
+import com.soyle.stories.location.redescribeLocation.ReDescribeLocationControllerImpl
+import com.soyle.stories.location.redescribeLocation.ReDescribeLocationNotifier
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocationUseCase
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
@@ -20,6 +23,8 @@ import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetails
 import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetailsUseCase
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocationsUseCase
+import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
+import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocationUseCase
 import com.soyle.stories.location.usecases.renameLocation.RenameLocation
 import com.soyle.stories.location.usecases.renameLocation.RenameLocationUseCase
 import com.soyle.stories.project.ProjectScope
@@ -42,6 +47,9 @@ object LocationModule {
 		provide<GetLocationDetails> {
 			GetLocationDetailsUseCase(get())
 		}
+		provide<ReDescribeLocation> {
+			ReDescribeLocationUseCase(get())
+		}
 	}
 
 	private fun InScope<ProjectScope>.events() {
@@ -54,12 +62,16 @@ object LocationModule {
 		provide(RenameLocation.OutputPort::class) {
 			RenameLocationNotifier()
 		}
+		provide(ReDescribeLocation.OutputPort::class) {
+			ReDescribeLocationNotifier()
+		}
 
 		provide<LocationEvents> {
 			object : LocationEvents {
 				override val createNewLocation: Notifier<CreateNewLocation.OutputPort> by DI.resolveLater<CreateNewLocationNotifier>(this@provide)
 				override val deleteLocation: Notifier<DeleteLocation.OutputPort> by DI.resolveLater<DeleteLocationNotifier>(this@provide)
 				override val renameLocation: Notifier<RenameLocation.OutputPort> by DI.resolveLater<RenameLocationNotifier>(this@provide)
+				override val reDescribeLocation: Notifier<ReDescribeLocation.OutputPort> by DI.resolveLater<ReDescribeLocationNotifier>(this@provide)
 			}
 		}
 	}
@@ -73,6 +85,9 @@ object LocationModule {
 		}
 		provide {
 			RenameLocationController(get(), get())
+		}
+		provide<ReDescribeLocationController> {
+			ReDescribeLocationControllerImpl(applicationScope.get(), get(), get())
 		}
 	}
 

@@ -5,13 +5,11 @@ import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
-import io.cucumber.java8.PendingException
 import io.cucumber.java8.Scenario
 import javafx.scene.Node
 import javafx.scene.input.KeyCode
 import javafx.stage.Window
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
 
@@ -94,8 +92,13 @@ class SoyleUATSteps : En, ApplicationTest() {
 			targetLocation = LocationSteps.getLocationsCreated(double).first()
 			LocationSteps.givenLocationDetailsToolHasBeenOpened(double, targetLocation!!.id.uuid)
 		}
-		Given("the target Location has a description of {string}") { string: String? -> throw PendingException() }
-		Given("the user has entered {string} into the description field") { string: String? -> throw PendingException() }
+		Given("the target Location has a description of {string}") { string: String ->
+			LocationSteps.givenLocationHasDescription(double, targetLocation!!.id.uuid, string)
+			targetLocation = LocationSteps.getLocationsCreated(double).first()
+		}
+		Given("the user has entered {string} into the description field") { string: String ->
+			LocationSteps.givenLocationDetailsToolHasDescriptionOf(double, targetLocation!!.id.uuid, string)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -153,8 +156,14 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("the user clicks the location list tool right-click menu open button") {
 			LocationSteps.whenLocationListToolRightClickMenuButtonIsClicked(double, "open")
 		}
-		When("the user closes the Location Details Tool") { throw PendingException() }
-		When("the Location Details Tool is reopened with the same Location") { throw PendingException() }
+		When("the user closes the Location Details Tool") {
+			LocationSteps.whenLocationDetailsToolIsClosed(double, targetLocation!!.id.uuid)
+			assertFalse(LocationSteps.isLocationDetailsToolOpen(double, targetLocation!!.id.uuid))
+		}
+		When("the Location Details Tool is reopened with the same Location") {
+			LocationSteps.whenLocationDetailsToolIsOpened(double, targetLocation!!.id.uuid)
+			assertTrue(LocationSteps.isLocationDetailsToolOpen(double, targetLocation!!.id.uuid))
+		}
 
 
 		Then("The Location List Tool should show a special empty message") {
@@ -205,7 +214,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Then("the Location Details Tool should be open") {
 			assertTrue(LocationSteps.isLocationDetailsToolOpen(double, targetLocation!!.id.uuid))
 		}
-		Then("the description field text should be {string}") { string: String? -> throw PendingException() }
+		Then("the description field text should be {string}") { string: String ->
+			assertEquals(string, LocationSteps.getDescriptionInLocationDetailsTool(double, targetLocation!!.id.uuid))
+		}
 
 
 		After { _: Scenario ->

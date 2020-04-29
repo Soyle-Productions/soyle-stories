@@ -14,8 +14,11 @@ object LocationDetailsModule {
 				  locationId,
 				  projectScope.get(),
 				  LocationDetailsPresenter(
-					get<LocationDetailsModel>()
-				  )
+					locationId,
+					get<LocationDetailsModel>(),
+					projectScope.get()
+				  ),
+				  projectScope.get()
 				)
 			}
 
