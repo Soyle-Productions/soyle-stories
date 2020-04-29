@@ -12,6 +12,7 @@ import com.soyle.stories.location.LocationSteps.interact
 import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.DeleteLocationController
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
+import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.location.locationDetails.LocationDetails
 import com.soyle.stories.location.locationDetails.LocationDetailsScope
 import com.soyle.stories.location.locationList.*
@@ -20,7 +21,6 @@ import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBenchModel
 import com.soyle.stories.project.layout.Dialog
-import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.openTool.OpenToolController
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -33,6 +33,7 @@ import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.input.MouseButton
 import javafx.scene.text.Text
+import javafx.stage.Window
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -177,18 +178,6 @@ object LocationSteps : ApplicationTest() {
 		assertTrue(isLocationDetailsToolOpen(double, locationId))
 	}
 
-
-	fun isLocationSelectedInLocationListTool(double: SoyleStoriesTestDouble): Boolean {
-		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
-		val locationList = findComponentsInScope<LocationList>(projectScope).singleOrNull() ?: return false
-		var selected = false
-		interact {
-			selected = (locationList.root.lookup(".tree-view") as TreeView<*>)
-			  .selectionModel.selectedItem != null
-		}
-		return selected
-	}
-
 	fun setLocationSelectedInLocaitonListTool(double: SoyleStoriesTestDouble) {
 		givenNumberOfLocationsHaveBeenCreated(double, 1)
 		givenLocationListToolHasBeenOpened(double)
@@ -198,6 +187,21 @@ object LocationSteps : ApplicationTest() {
 			(find<LocationList>(scope).root.lookup(".tree-view") as TreeView<*>)
 			  .selectFirst()
 		}
+	}
+
+	fun getLocationSelectedInLocationListTool(double: SoyleStoriesTestDouble): LocationItemViewModel? {
+		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
+		val locationList = findComponentsInScope<LocationList>(projectScope).singleOrNull() ?: return null
+		var selected: LocationItemViewModel? = null
+		interact {
+			selected = (locationList.root.lookup(".tree-view") as TreeView<*>)
+			  .selectionModel.selectedItem?.value as? LocationItemViewModel
+		}
+		return selected
+	}
+
+	fun isLocationSelectedInLocationListTool(double: SoyleStoriesTestDouble): Boolean {
+		return getLocationSelectedInLocationListTool(double) != null
 	}
 
 	fun givenLocationIsSelectedInLocationListTool(double: SoyleStoriesTestDouble) {
@@ -426,17 +430,22 @@ object LocationSteps : ApplicationTest() {
 		}
 	}
 
-	fun confirmDeleteLocationDialogIsOpen(double: SoyleStoriesTestDouble): Boolean {
-		ProjectSteps.getProjectScope(double) ?: return false
-		var isOpen = false
+	fun isConfirmDeleteLocationDialogOpen(double: SoyleStoriesTestDouble): Boolean {
+		return getOpenConfirmDeleteLocationDialog(double) != null
+	}
+
+	fun getOpenConfirmDeleteLocationDialog(double: SoyleStoriesTestDouble): Window?
+	{
+		ProjectSteps.getProjectScope(double) ?: return null
+		var window: Window? = null
 		interact {
 			val windows = robotContext().windowFinder.listTargetWindows()
-			isOpen = windows.find {
+			window = windows.find {
 				val styleClass = it.scene?.root?.styleClass ?: return@find false
 				styleClass.contains("alert") && styleClass.contains("confirmation")
-			} != null
+			}
 		}
-		return isOpen
+		return window
 	}
 
 	fun openConfirmDeleteLocationDialog(double: SoyleStoriesTestDouble) {
@@ -447,7 +456,7 @@ object LocationSteps : ApplicationTest() {
 			val location = runBlocking {
 				repo.getAllLocationsInProject(Project.Id(scope.projectId)).first()
 			}
-			scope.get<LayoutViewListener>().openDialog(Dialog.DeleteLocation(location.id.uuid.toString(), location.name))
+			deleteLocationDialog(scope, LocationItemViewModel(location.id.uuid.toString(), location.name))
 		}
 	}
 
@@ -469,10 +478,10 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun givenConfirmDeleteDialogHasBeenOpened(double: SoyleStoriesTestDouble) {
-		if (! confirmDeleteLocationDialogIsOpen(double)) {
+		if (! isConfirmDeleteLocationDialogOpen(double)) {
 			openConfirmDeleteLocationDialog(double)
 		}
-		assertTrue(confirmDeleteLocationDialogIsOpen(double))
+		assertTrue(isConfirmDeleteLocationDialogOpen(double))
 	}
 
 	fun whenCreateLocationDialogIsOpened(double: SoyleStoriesTestDouble) {
@@ -631,5 +640,12 @@ object LocationSteps : ApplicationTest() {
 			tool.owningTab?.tabPane?.requestFocus()
 			tool.owningTab?.onCloseRequest?.handle(Event(EventType("close")))
 		}
+	}
+
+	fun isConfirmDeleteLocationDialogLocationDisplayingNameOf(double: SoyleStoriesTestDouble, location: Location): Boolean
+	{
+		val window = getOpenConfirmDeleteLocationDialog(double) ?: return false
+		val dialog = window.scene.root as? DialogPane ?: return false
+		return dialog.headerText.contains(location.name)
 	}
 }

@@ -8,8 +8,6 @@ import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialogModel
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
-import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogModel
-import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
@@ -132,11 +130,6 @@ class WorkBench : View() {
         find<CreateLocationDialogModel>().isOpen.onChange {
             if (it == true) {
                 createLocationDialog(this.currentStage)
-            }
-        }
-        find<DeleteLocationDialogModel>().isOpen.onChange {
-            if (it) {
-                deleteLocationDialog(scope)
             }
         }
 

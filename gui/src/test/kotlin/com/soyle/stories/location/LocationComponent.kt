@@ -8,12 +8,14 @@ import com.soyle.stories.location.events.CreateNewLocationNotifier
 import com.soyle.stories.location.events.DeleteLocationNotifier
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.events.RenameLocationNotifier
+import com.soyle.stories.location.redescribeLocation.ReDescribeLocationNotifier
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocationUseCase
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocationUseCase
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocationsUseCase
+import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
 import com.soyle.stories.location.usecases.renameLocation.RenameLocation
 import com.soyle.stories.location.usecases.renameLocation.RenameLocationUseCase
 import com.soyle.stories.soylestories.DataComponent
@@ -54,6 +56,9 @@ class LocationComponent(
 	private val renameLocationNotifier by lazy {
 		RenameLocationNotifier()
 	}
+	private val reDescribeLocationNotifier by lazy {
+		ReDescribeLocationNotifier()
+	}
 
 	val locationEvents: LocationEvents = object : LocationEvents {
 		override val createNewLocation: Notifier<CreateNewLocation.OutputPort>
@@ -62,6 +67,8 @@ class LocationComponent(
 			get() = deleteLocationNotifier
 		override val renameLocation: Notifier<RenameLocation.OutputPort>
 			get() = renameLocationNotifier
+		override val reDescribeLocation: Notifier<ReDescribeLocation.OutputPort>
+			get() = reDescribeLocationNotifier
 	}
 
 	val createNewLocationController by lazy {

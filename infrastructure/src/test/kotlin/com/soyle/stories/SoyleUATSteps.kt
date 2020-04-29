@@ -1,6 +1,7 @@
 package com.soyle.stories
 
 import com.soyle.stories.entities.Location
+import com.soyle.stories.entities.Project
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -12,6 +13,7 @@ import javafx.stage.Window
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
+import java.util.*
 
 class SoyleUATSteps : En, ApplicationTest() {
 
@@ -188,10 +190,13 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertFalse(LocationSteps.isCreateNewLocationDialogOpen(double))
 		}
 		Then("the confirm delete location dialog should be opened") {
-			assertTrue(LocationSteps.confirmDeleteLocationDialogIsOpen(double))
+			assertTrue(LocationSteps.isConfirmDeleteLocationDialogOpen(double))
+			targetLocation = LocationSteps.getLocationSelectedInLocationListTool(double)!!.let {
+				Location(Location.Id(UUID.fromString(it.id)), Project.Id(UUID.randomUUID()), it.name, "")
+			}
 		}
 		Then("the delete location dialog should be closed") {
-			assertFalse(LocationSteps.confirmDeleteLocationDialogIsOpen(double))
+			assertFalse(LocationSteps.isConfirmDeleteLocationDialogOpen(double))
 		}
 		Then("the location's name should be replaced by an input box") {
 			assertTrue(LocationSteps.locationListToolShowsInputBoxForSelectedItem(double))
@@ -216,6 +221,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the description field text should be {string}") { string: String ->
 			assertEquals(string, LocationSteps.getDescriptionInLocationDetailsTool(double, targetLocation!!.id.uuid))
+		}
+		Then("the confirm delete location dialog should show the location name") {
+			assertTrue(LocationSteps.isConfirmDeleteLocationDialogLocationDisplayingNameOf(double, targetLocation!!))
 		}
 
 

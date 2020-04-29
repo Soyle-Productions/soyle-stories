@@ -2,7 +2,8 @@ package com.soyle.stories.location.locationList
 
 import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.resolve
-import com.soyle.stories.project.layout.Dialog
+import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.LayoutViewListener
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
@@ -16,6 +17,8 @@ import tornadofx.*
  * Time: 9:59 AM
  */
 internal class PopulatedDisplay : View() {
+
+    override val scope: ProjectScope = super.scope as ProjectScope
 
     private val model by inject<LocationListModel>()
     private var treeView: TreeView<LocationItemViewModel?> by singleAssign()
@@ -48,7 +51,7 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is LocationItemViewModel) {
-                    layoutViewListener.openDialog(Dialog.DeleteLocation(selectedItem.id, selectedItem.name))
+                    deleteLocationDialog(scope, selectedItem)
                 }
             }
         }

@@ -9,12 +9,14 @@ Feature: Delete Location
     And the location right-click menu is open
     When the user clicks the location list tool right-click menu delete button
     Then the confirm delete location dialog should be opened
+    And the confirm delete location dialog should show the location name
 
   Scenario: Populated Location List + button
     Given The Location List Tool has been opened
     And a location has been selected
     When the user clicks the location list tool delete button
     Then the confirm delete location dialog should be opened
+    And the confirm delete location dialog should show the location name
 
   Scenario: Confirm Delete Dialog
     Given the delete location dialog has been opened
