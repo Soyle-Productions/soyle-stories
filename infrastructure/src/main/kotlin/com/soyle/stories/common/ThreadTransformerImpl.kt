@@ -17,7 +17,6 @@ import kotlinx.coroutines.withTimeout
 class AsyncThreadTransformer(val applicationScope: ApplicationScope) : ThreadTransformer {
     override fun async(task: suspend CoroutineScope.() -> Unit) {
         applicationScope.launch {
-            println("launched async task in ${Thread.currentThread().name}")
             withTimeout(7000) {
                 task()
             }
