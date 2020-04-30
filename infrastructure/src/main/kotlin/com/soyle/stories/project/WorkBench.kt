@@ -158,6 +158,9 @@ class WorkBench : View() {
                 }
                 it.consume()
             }
+            model.isOpen.onChangeUntil({ it != true }) {
+                if (it != true) close()
+            }
         }
     }
 

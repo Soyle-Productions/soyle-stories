@@ -7,11 +7,12 @@ import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewModel
 import com.soyle.stories.project.projectList.ProjectFileViewModel
-import com.soyle.stories.soylestories.ApplicationModel
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.*
+import tornadofx.ItemViewModel
+import tornadofx.rebind
+import tornadofx.toProperty
 
 /**
  * Created by Brendan
@@ -22,9 +23,7 @@ class WorkBenchModel : ItemViewModel<LayoutViewModel>(LayoutViewModel()), Layout
 
     override val scope: ProjectScope = super.scope as ProjectScope
 
-    val isOpen = find<ApplicationModel>(scope = scope.applicationScope).openProjects.select {
-        (it.find { it.projectId == scope.projectId } != null).toProperty()
-    }
+    val isOpen = scope.isRegistered
 
     val loadingProgress = SimpleDoubleProperty(0.0)
     val loadingMessage = SimpleStringProperty("")
