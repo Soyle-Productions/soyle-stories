@@ -8,6 +8,7 @@ import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialogModel
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
@@ -49,7 +50,7 @@ class WorkBench : View() {
                     item("Location") {
                         id = "file_new_location"
                         action {
-                            createLocationDialog(currentStage)
+                            layoutViewListener.openDialog(Dialog.CreateLocation)
                         }
                     }/*
                     item("Plot Point") {
