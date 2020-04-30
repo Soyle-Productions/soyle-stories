@@ -6,8 +6,10 @@ import com.soyle.stories.common.editingCell
 import com.soyle.stories.common.isEditing
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.location.LocationSteps.interact
 import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.DeleteLocationController
@@ -16,7 +18,10 @@ import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationDetails.LocationDetails
 import com.soyle.stories.location.locationDetails.LocationDetailsScope
-import com.soyle.stories.location.locationList.*
+import com.soyle.stories.location.locationList.ActionBar
+import com.soyle.stories.location.locationList.EmptyDisplay
+import com.soyle.stories.location.locationList.LocationList
+import com.soyle.stories.location.locationList.PopulatedDisplay
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectSteps

@@ -102,6 +102,11 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val arc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.givenBaseStoryStructureToolHasBeenOpened(double, arc.themeId, arc.characterId)
 		}
+		Given("the Character Arc Section Location dropdown menu has been opened") {
+			CharacterArcSteps.givenANumberOfCharacterArcsHaveBeenCreated(double, 1)
+			val arc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			CharacterArcSteps.givenCharacterArcSectionLocationDropDownMenuHasBeenOpened(double, arc.themeId, arc.characterId)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -172,6 +177,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("the Character Arc Section Location dropdown is clicked") {
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.whenCharacterArcSectionLocationDropDownIsClicked(double, characterArc.themeId, characterArc.characterId)
+		}
+		When("a Location in the Character Arc Section Location dropdown menu is selected") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			val location = LocationSteps.getLocationsCreated(double).first()
+			CharacterArcSteps.whenLocationInCharacterArcSectionLocationDropdownIsSelected(double, characterArc.themeId, characterArc.characterId, location)
+		}
+		When("the user clicks outside the Character Arc Section Location dropdown menu") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			CharacterArcSteps.whenCharacterArcSectionLocationDropDownLosesFocus(double, characterArc.themeId, characterArc.characterId)
 		}
 
 
@@ -245,6 +259,17 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val locations = LocationSteps.getLocationsCreated(double)
 			CharacterArcSteps.isCharacterArcSectionLocationOpenWithAllLocations(double, characterArc.themeId, characterArc.characterId, locations)
 			  .let(::assertTrue)
+		}
+		Then("the Character Arc Section Location dropdown should show the selected Location name") {
+			val arc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			val location = LocationSteps.getLocationsCreated(double).first()
+			CharacterArcSteps.isCharacterArcSectionLocationDropdownDisplayingLocation(double, arc.themeId, arc.characterId, location)
+			  .let(::assertTrue)
+		}
+		Then("the Character Arc Section Location dropdown menu should be closed") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			CharacterArcSteps.isCharacterArcSectionLocationOpen(double, characterArc.themeId, characterArc.characterId)
+			  .let(::assertFalse)
 		}
 
 

@@ -100,15 +100,22 @@ object CharacterArcSteps : ApplicationTest() {
 		return comboBoxes.isNotEmpty() && comboBoxes.all { it.isDisabled }
 	}
 
+	fun setCharacterArcSectionLocationOpen(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
+	) {
+		givenBaseStoryStructureToolHasBeenOpened(double, themeId, characterId)
+		whenCharacterArcSectionLocationDropDownIsClicked(double, themeId, characterId)
+	}
+
 	fun getOpenCharacterArcSectionLocationDropDown(
 	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
-	): ComboBox<*>?
+	): ComboBox<LocationItemViewModel>?
 	{
 		val baseStoryStructure = getOpenBaseStoryStructureTool(double, themeId, characterId)
 		  ?: return null
-		var comboBox: ComboBox<*>? = null
+		var comboBox: ComboBox<LocationItemViewModel>? = null
 		interact {
-			val comboBoxes = from(baseStoryStructure.root).lookup(".location-select").queryAll<ComboBox<*>>()
+			val comboBoxes = from(baseStoryStructure.root).lookup(".location-select").queryAll<ComboBox<LocationItemViewModel>>()
 			comboBox = comboBoxes.find { it.isShowing }
 		}
 		return comboBox
@@ -125,6 +132,12 @@ object CharacterArcSteps : ApplicationTest() {
 		}
 	}
 
+	fun isCharacterArcSectionLocationOpen(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
+	): Boolean {
+		return getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId) != null
+	}
+
 	fun isCharacterArcSectionLocationOpenWithAllLocations(
 	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id, locations: List<Location>
 	): Boolean
@@ -132,9 +145,47 @@ object CharacterArcSteps : ApplicationTest() {
 		val openComboBox = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
 		  ?: return false
 		val locationMap = locations.associateBy { it.id.uuid.toString() }
-		val locationItems = openComboBox.items.filterIsInstance<LocationItemViewModel>()
+		val locationItems = openComboBox.items.toList()
 		return locationItems.map { it.id }.toSet() == locationMap.keys && locationItems.all {
 			it.name == locationMap.getValue(it.id).name
 		}
+	}
+
+	fun givenCharacterArcSectionLocationDropDownMenuHasBeenOpened(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
+	) {
+		if (! isCharacterArcSectionLocationOpen(double, themeId, characterId)) {
+			setCharacterArcSectionLocationOpen(double, themeId, characterId)
+		}
+		assertTrue(isCharacterArcSectionLocationOpen(double, themeId, characterId))
+	}
+
+	fun whenLocationInCharacterArcSectionLocationDropdownIsSelected(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id, location: Location
+	) {
+		val openComboBox = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		  ?: error("Character Arc Section Location Dropdown not yet open")
+		interact {
+			clickOn(location.name, MouseButton.PRIMARY)
+		}
+	}
+
+	fun whenCharacterArcSectionLocationDropDownLosesFocus(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
+	) {
+		val openComboBox = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		  ?: error("Character Arc Section Location Dropdown not yet open")
+		interact {
+			from(openComboBox.scene.root).lookup(".text-field").queryTextInputControl().requestFocus()
+		}
+	}
+
+	fun isCharacterArcSectionLocationDropdownDisplayingLocation(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id, location: Location
+	): Boolean
+	{
+		val openComboBox = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		  ?: return false
+		return openComboBox.buttonCell.text == location.name
 	}
 }
