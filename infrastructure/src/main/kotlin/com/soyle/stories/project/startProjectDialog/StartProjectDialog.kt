@@ -43,6 +43,11 @@ class StartProjectDialog : View("Start New Project") {
         })
     }
 
+    fun reset() {
+        projectName.value = "Untitled"
+        selectedDirectoryFile.value = null
+    }
+
     override val root: Parent = form {
         fieldset {
             field("Directory") {
@@ -111,6 +116,7 @@ class StartProjectDialog : View("Start New Project") {
 }
 
 fun Component.startProjectDialog(scope: ApplicationScope, owner: Stage?): StartProjectDialog = find(StartProjectDialog::class, scope = scope).apply {
+    reset()
     openModal(
         stageStyle = StageStyle.UTILITY,
         modality = Modality.APPLICATION_MODAL,
