@@ -25,7 +25,6 @@ class ConfirmExitDialog : Fragment() {
 
     init {
         model.closingProject.onChange {
-            println("$this closingProject: $it")
             if (it != null) {
                 alert(
                   type = Alert.AlertType.CONFIRMATION,
