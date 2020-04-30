@@ -9,9 +9,7 @@ import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
-import javafx.scene.Node
 import javafx.scene.input.KeyCode
-import javafx.stage.Window
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
@@ -24,22 +22,6 @@ class SoyleUATSteps : En, ApplicationTest() {
 	private var targetLocation: Location? = null
 	private var recentlyCreatedLocationName: String = ""
 	private var deletedLocation: Location? = null
-
-	private fun printCurrentFocus(): Window? {
-		val window = targetWindow()
-		val nodeHierarchy = mutableListOf<Node>()
-		var curNode = window?.scene?.focusOwner
-		while (curNode != null) {
-			nodeHierarchy.add(curNode)
-			curNode = curNode.parent
-		}
-		println("current focus:")
-		nodeHierarchy.asReversed().fold("") { padding, node ->
-			println("$padding$node")
-			"$padding  "
-		}
-		return window
-	}
 
 	init {
 		Given("A project has been opened") {
@@ -112,6 +94,14 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("no Locations have been created") {
 			LocationSteps.givenNoLocationsHaveBeenCreated(double)
 		}
+		Given("at least one Location has been created") {
+			LocationSteps.givenNumberOfLocationsHaveBeenCreated(double, 1)
+		}
+		Given("the Base Story Structure Tool has been opened") {
+			CharacterArcSteps.givenANumberOfCharacterArcsHaveBeenCreated(double, 1)
+			val arc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			CharacterArcSteps.givenBaseStoryStructureToolHasBeenOpened(double, arc.themeId, arc.characterId)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -171,15 +161,17 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("the user closes the Location Details Tool") {
 			LocationSteps.whenLocationDetailsToolIsClosed(double, targetLocation!!.id.uuid)
-			assertFalse(LocationSteps.isLocationDetailsToolOpen(double, targetLocation!!.id.uuid))
 		}
 		When("the Location Details Tool is reopened with the same Location") {
 			LocationSteps.whenLocationDetailsToolIsOpened(double, targetLocation!!.id.uuid)
-			assertTrue(LocationSteps.isLocationDetailsToolOpen(double, targetLocation!!.id.uuid))
 		}
 		When("the Base Story Structure Tool is opened") {
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.whenBaseStoryStructureToolIsOpened(double, characterArc.themeId, characterArc.characterId)
+		}
+		When("the Character Arc Section Location dropdown is clicked") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			CharacterArcSteps.whenCharacterArcSectionLocationDropDownIsClicked(double, characterArc.themeId, characterArc.characterId)
 		}
 
 
@@ -243,6 +235,16 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Then("the Character Arc Section Location dropdown in the Base Story Structure Tool should be disabled") {
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			assertTrue(CharacterArcSteps.isLocationDropdownDisabledInBaseStoryStructureTool(double, characterArc.themeId, characterArc.characterId))
+		}
+		Then("the Character Arc Section Location dropdown in the Base Story Structure Tool should not be disabled") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			assertFalse(CharacterArcSteps.isLocationDropdownDisabledInBaseStoryStructureTool(double, characterArc.themeId, characterArc.characterId))
+		}
+		Then("all Locations should be listed in the Character Arc Section Location dropdown menu") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			val locations = LocationSteps.getLocationsCreated(double)
+			CharacterArcSteps.isCharacterArcSectionLocationOpenWithAllLocations(double, characterArc.themeId, characterArc.characterId, locations)
+			  .let(::assertTrue)
 		}
 
 
