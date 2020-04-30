@@ -1,5 +1,7 @@
 package com.soyle.stories.location.locationList
 
+import com.soyle.stories.location.items.LocationItemViewModel
+
 class LocationListViewModelWrapper : LocationListView {
 
 	private var viewModel: LocationListViewModel? = null

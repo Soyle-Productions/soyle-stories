@@ -3,6 +3,7 @@ package com.soyle.stories.location.locationList
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.resolveLater
 import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty

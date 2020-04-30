@@ -2,7 +2,7 @@ package com.soyle.stories.location.deleteLocationDialog
 
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
-import com.soyle.stories.location.locationList.LocationItemViewModel
+import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import javafx.scene.control.Alert

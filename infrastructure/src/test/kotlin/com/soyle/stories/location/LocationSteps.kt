@@ -13,6 +13,7 @@ import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.DeleteLocationController
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
+import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationDetails.LocationDetails
 import com.soyle.stories.location.locationDetails.LocationDetailsScope
 import com.soyle.stories.location.locationList.*

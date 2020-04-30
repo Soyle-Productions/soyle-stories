@@ -2,7 +2,7 @@ package com.soyle.stories.location
 
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
-import com.soyle.stories.location.locationList.LocationItemViewModel
+import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.location.locationList.LocationListModel
 import com.soyle.stories.location.locationList.LocationListViewListener
