@@ -1,5 +1,7 @@
 package com.soyle.stories.location.locationDetails
 
+import com.soyle.stories.common.hideScrollbars
+import com.soyle.stories.common.rowCountProperty
 import com.soyle.stories.di.resolveLater
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.LocationDetailsToolViewModel
@@ -7,6 +9,7 @@ import javafx.geometry.Orientation
 import javafx.scene.Parent
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import javafx.scene.layout.Region
 import tornadofx.*
 
 class LocationDetails : View() {
@@ -21,6 +24,11 @@ class LocationDetails : View() {
 				textProperty.bind(model.descriptionLabel)
 				textarea {
 					id = "description"
+					isWrapText = true
+					minWidth = Region.USE_COMPUTED_SIZE
+					fitToParentWidth()
+					hideScrollbars()
+					prefRowCountProperty().bind(rowCountProperty)
 					model.description.onChange { text = it ?: "" }
 					focusedProperty().onChange {
 						if (! it) {
