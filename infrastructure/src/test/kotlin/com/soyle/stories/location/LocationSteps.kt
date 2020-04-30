@@ -660,7 +660,7 @@ object LocationSteps : ApplicationTest() {
 		val tool = getOpenedLocationDetailsTool(double, locationId)!!
 		interact {
 			tool.owningTab?.tabPane?.requestFocus()
-			tool.owningTab?.onCloseRequest?.handle(Event(EventType("close")))
+			tool.owningTab?.onCloseRequest?.handle(Event(EventType.ROOT))
 		}
 	}
 
