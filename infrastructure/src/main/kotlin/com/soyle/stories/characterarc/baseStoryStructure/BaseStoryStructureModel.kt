@@ -10,10 +10,13 @@ import javafx.application.Platform
 import tornadofx.ItemViewModel
 import tornadofx.rebind
 import tornadofx.runLater
+import tornadofx.toProperty
 
-class BaseStoryStructureModel : ItemViewModel<BaseStoryStructureViewModel>(BaseStoryStructureViewModel(emptyList())), BaseStoryStructureView {
+class BaseStoryStructureModel : ItemViewModel<BaseStoryStructureViewModel>(BaseStoryStructureViewModel()), BaseStoryStructureView {
 
     val sections = bindImmutableList(BaseStoryStructureViewModel::sections)
+    val availableLocations = bindImmutableList(BaseStoryStructureViewModel::availableLocations)
+    val locationsAvailable = bind { item.availableLocations.isNotEmpty().toProperty() }
 
     override fun update(update: BaseStoryStructureViewModel.() -> BaseStoryStructureViewModel) {
         if (! Platform.isFxApplicationThread()) return runLater { update(update) }

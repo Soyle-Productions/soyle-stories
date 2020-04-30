@@ -7,6 +7,7 @@ package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.resolve
+import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.BaseStoryStructureToolViewModel
 import javafx.beans.property.SimpleIntegerProperty
@@ -63,9 +64,13 @@ class BaseStoryStructure : View("Base Story Structure") {
             }
             field("Linked Location") {
                 hgrow = Priority.SOMETIMES
-                combobox<Any> {
-                    this.addClass("location-select")
-                    disableProperty().set(true)
+                combobox<LocationItemViewModel> {
+                    itemsProperty().bind(model.availableLocations)
+                    cellFormat {
+                        text = it.name
+                    }
+                    addClass("location-select")
+                    enableWhen { model.locationsAvailable }
                     fitToParentWidth()
                 }
             }

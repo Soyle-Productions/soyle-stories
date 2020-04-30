@@ -6,8 +6,10 @@
 package com.soyle.stories.di.characterarc
 
 import com.soyle.stories.characterarc.baseStoryStructure.*
+import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 
 internal object BaseStoryStructureModule {
 
@@ -15,21 +17,29 @@ internal object BaseStoryStructureModule {
 
         scoped<BaseStoryStructureScope> {
 
+            provide(ViewBaseStoryStructure.OutputPort::class, ListAllLocations.OutputPort::class) {
+                BaseStoryStructurePresenter(
+                  get<BaseStoryStructureModel>(),
+                  projectScope.get(),
+                  projectScope.get()
+                )
+            }
+
             provide {
                 ViewBaseStoryStructureController(
                   projectScope.applicationScope.get(),
                   projectScope.get(),
-                  BaseStoryStructurePresenter(
-                    get<BaseStoryStructureModel>(),
-                    projectScope.get()
-                  )
+                  get()
                 )
             }
 
             provide<BaseStoryStructureViewListener> {
                 BaseStoryStructureController(
+                  projectScope.applicationScope.get(),
                   themeId,
                   characterId,
+                  projectScope.get(),
+                  get(),
                   get(),
                   projectScope.get()
                 )
