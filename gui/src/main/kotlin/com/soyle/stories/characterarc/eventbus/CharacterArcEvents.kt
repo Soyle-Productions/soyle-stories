@@ -12,6 +12,7 @@ import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLoc
 import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.eventbus.Notifier
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
@@ -39,5 +40,6 @@ interface CharacterArcEvents {
     val renameCharacter: Notifier<RenameCharacter.OutputPort>
     val renameCharacterArc: Notifier<RenameCharacterArc.OutputPort>
     val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort>
+    val unlinkLocationToCharacterArcSection: Notifier<UnlinkLocationFromCharacterArcSection.OutputPort>
 
 }
