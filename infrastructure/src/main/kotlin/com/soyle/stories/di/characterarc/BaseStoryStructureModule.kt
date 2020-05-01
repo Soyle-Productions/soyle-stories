@@ -42,6 +42,7 @@ internal object BaseStoryStructureModule {
                   get(),
                   get(),
                   projectScope.get(),
+                  projectScope.get(),
                   projectScope.get()
                 )
             }

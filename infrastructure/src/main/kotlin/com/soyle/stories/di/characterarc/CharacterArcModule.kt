@@ -21,6 +21,9 @@ import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLoca
 import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
+import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionController
+import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionControllerImpl
+import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.usecaseControllers.*
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
@@ -33,6 +36,8 @@ import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharac
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
+import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionUseCase
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.di.InScope
@@ -127,6 +132,9 @@ object CharacterArcModule {
 		provide<LinkLocationToCharacterArcSection> {
 			LinkLocationToCharacterArcSectionUseCase(get(), get())
 		}
+		provide<UnlinkLocationFromCharacterArcSection> {
+			UnlinkLocationFromCharacterArcSectionUseCase(get())
+		}
 	}
 
 	private fun InScope<ProjectScope>.events() {
@@ -162,6 +170,8 @@ object CharacterArcModule {
 				  RenameCharacterArcNotifier()
 				override val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort> =
 				  LinkLocationToCharacterArcSectionNotifier()
+				override val unlinkLocationFromCharacterArcSection: Notifier<UnlinkLocationFromCharacterArcSection.OutputPort> =
+				  UnlinkLocationFromCharacterArcSectionNotifier()
 			}
 		}
 
@@ -180,12 +190,14 @@ object CharacterArcModule {
 		provide(RenameCharacter.OutputPort::class) { get<CharacterArcEvents>().renameCharacter as RenameCharacterNotifier }
 		provide(RenameCharacterArc.OutputPort::class) { get<CharacterArcEvents>().renameCharacterArc as RenameCharacterArcNotifier }
 		provide(LinkLocationToCharacterArcSection.OutputPort::class) { get<CharacterArcEvents>().linkLocationToCharacterArcSection as LinkLocationToCharacterArcSectionNotifier }
+		provide(UnlinkLocationFromCharacterArcSection.OutputPort::class) { get<CharacterArcEvents>().unlinkLocationFromCharacterArcSection as UnlinkLocationFromCharacterArcSectionNotifier }
 	}
 
 	private fun InScope<ProjectScope>.controllers() {
 
 		provide { ChangeThematicSectionValueController(applicationScope.get(), get(), get()) }
 		provide<LinkLocationToCharacterArcSectionController> { LinkLocationToCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
+		provide<UnlinkLocationFromCharacterArcSectionController> { UnlinkLocationFromCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
 
 	}
 

@@ -101,6 +101,10 @@ class BaseStoryStructureUnitTest : ApplicationTest() {
 					override fun linkLocation(sectionId: String, locationId: String) {
 						linkLocationCall = sectionId to locationId
 					}
+
+					override fun unlinkLocation(sectionId: String) {
+
+					}
 				}
 			}
 		}
