@@ -1,6 +1,7 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionController
+import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionController
 import com.soyle.stories.characterarc.usecaseControllers.ChangeThematicSectionValueController
 import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
@@ -13,7 +14,8 @@ class BaseStoryStructureController(
   private val listAllLocationsOutputPort: ListAllLocations.OutputPort,
   private val viewBaseStoryStructureController: ViewBaseStoryStructureController,
   private val changeThematicSectionValueController: ChangeThematicSectionValueController,
-  private val linkLocationToCharacterArcSectionController: LinkLocationToCharacterArcSectionController
+  private val linkLocationToCharacterArcSectionController: LinkLocationToCharacterArcSectionController,
+  private val unlinkLocationToCharacterArcSectionController: UnlinkLocationFromCharacterArcSectionController
 ) : BaseStoryStructureViewListener {
 
 	override fun getBaseStoryStructure() {
@@ -31,4 +33,7 @@ class BaseStoryStructureController(
         linkLocationToCharacterArcSectionController.linkLocation(sectionId, locationId)
 	}
 
+	override fun unlinkLocation(sectionId: String) {
+		unlinkLocationToCharacterArcSectionController.unlinkLocationFromCharacterArcSection(sectionId)
+	}
 }
