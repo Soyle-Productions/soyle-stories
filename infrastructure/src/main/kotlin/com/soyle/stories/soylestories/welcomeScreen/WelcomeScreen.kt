@@ -1,8 +1,9 @@
 package com.soyle.stories.soylestories.welcomeScreen
 
 import com.soyle.stories.common.onChangeWithCurrent
-import com.soyle.stories.di.modules.ApplicationComponent
+import com.soyle.stories.di.resolve
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
+import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
@@ -14,7 +15,9 @@ import tornadofx.*
 
 class WelcomeScreen : View() {
 
-    private val welcomeScreenViewListener = find<ApplicationComponent>().welcomeScreenViewListener
+    override val scope: ApplicationScope = super.scope as ApplicationScope
+
+    private val welcomeScreenViewListener = resolve<WelcomeScreenViewListener>()
     private val model = find<WelcomeScreenModel>()
 
     override val root: Parent = vbox(alignment = Pos.CENTER, spacing = 40) {
@@ -34,12 +37,13 @@ class WelcomeScreen : View() {
         }
         vbox(alignment = Pos.CENTER_LEFT, spacing = 10) {
             button(model.createNewProjectButton) {
+                id = "createNewProject"
                 graphic = MaterialIconView(MaterialIcon.CREATE_NEW_FOLDER, "14").apply {
                     addClass(WelcomeScreenStyles.welcomeButtonGraphic)
                 }
                 addClass(WelcomeScreenStyles.welcomeButton)
                 action {
-                    startProjectDialog(currentStage)
+                    startProjectDialog(scope, currentStage)
                 }
             }
             button(model.openProjectButton) {

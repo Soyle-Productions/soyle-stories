@@ -14,7 +14,7 @@ import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpenedUseCas
 import com.soyle.stories.location.LocationComponent
 import com.soyle.stories.project.eventbus.CloseToolNotifier
 import com.soyle.stories.project.eventbus.GetSavedLayoutNotifier
-import com.soyle.stories.project.eventbus.OpenToolNotifier
+import com.soyle.stories.project.layout.openTool.OpenToolNotifier
 import com.soyle.stories.project.eventbus.ToggleToolOpenedNotifier
 import com.soyle.stories.project.layout.LayoutController
 import com.soyle.stories.project.layout.LayoutPresenter

@@ -1,9 +1,8 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
-import com.soyle.stories.di.characterarc.CharacterArcComponent
-import com.soyle.stories.di.project.LayoutComponent
+import com.soyle.stories.di.resolve
 import com.soyle.stories.project.layout.Dialog
+import com.soyle.stories.project.layout.LayoutViewListener
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -23,8 +22,8 @@ import tornadofx.*
 internal class EmptyDisplay : View() {
 
     private val model by inject<LocationListModel>()
-    private val locationListViewListener = find<LocationListComponent>().locationListViewListener
-    private val layoutViewListener = find<LayoutComponent>().layoutViewListener
+    private val locationListViewListener: LocationListViewListener = resolve()
+    private val layoutViewListener: LayoutViewListener = resolve()
 
     override val root = gridpane {
         hiddenWhen { model.hasLocations  }
@@ -49,6 +48,7 @@ internal class EmptyDisplay : View() {
             GridPane.setMargin(this, Insets(0.0, 0.0, 5.0, 0.0))
         }
         button("Create a Location") {
+            id = "emptyDisplay_createLocation"
             alignment = Pos.CENTER
             isMnemonicParsing = false
             GridPane.setHalignment(this, HPos.CENTER)

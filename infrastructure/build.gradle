@@ -27,7 +27,7 @@ javafx {
 def javaFXOptions = convention.findByType(JavaFXOptions.class) ?: convention.findPlugin(JavaFXOptions.class) ?: convention.getByType(JavaFXOptions.class)
 
 dependencies {
-    implementation "com.soyle.stories:soyle-stories-core:0.1.0-SNAPSHOT 20w16a"
+    implementation libraries.soyle_stories_core
 
     implementation project(":application")
     implementation project(":data")
@@ -35,7 +35,7 @@ dependencies {
     implementation "no.tornado:tornadofx:1.7.19", {
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
+    implementation libraries.coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.3.3"
 
     implementation "de.jensd:fontawesomefx-commons:11.0"
@@ -44,14 +44,25 @@ dependencies {
     implementation "de.jensd:fontawesomefx-materialicons:2.2.0-11"
     implementation "de.jensd:fontawesomefx-emojione:2.2.7-11"
 
+    testImplementation 'io.cucumber:cucumber-java8:5.5.0'
+    testImplementation 'io.cucumber:cucumber-junit:5.5.0'
+    testImplementation 'org.assertj:assertj-core:3.15.0'
+
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.11.0'
+    testImplementation 'io.github.prashant-ramcharan:courgette-jvm:4.6.0'
+    testImplementation 'io.github.prashant-ramcharan:webdriver-binary-downloader:1.2.2'
+
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
+    testImplementation 'org.testfx:openjfx-monocle:jdk-12.0.1+2'
+
+    testImplementation libraries.reflectionKt
 
     JavaFXPlatform.values().each { platform ->
         def cfg = configurations.create("javafx_" + platform.classifier)
         JavaFXModule.getJavaFXModules(javaFXOptions.modules).each { m ->
             project.getDependencies().add(cfg.name,
-                    String.format("org.openjfx:%s:%s:%s", m.getArtifactName(), javaFXOptions.version, platform.classifier));
+                    String.format("org.openjfx:%s:%s:%s", m.getArtifactName(), javaFXOptions.version, platform.classifier))
         }
     }
 }
@@ -97,4 +108,30 @@ tasks["runtime"].doLast {
             }
         }
     }
+}
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
+
+task cucumber() {
+    dependsOn assemble, compileTestJava
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--add-plugin', 'html:build/cucumber/html-report', '--glue', 'com.soyle.stories', 'src/test/resources/features', '--strict']
+        }
+    }
+}
+
+tasks.withType(Test) {
+    systemProperties.remove("java.endorsed.dirs")
+}
+
+task runFeaturesUsingJUnit(type: Test) {
+    include '**/suites/junit/FeatureSuite.class'
+    outputs.upToDateWhen { false }
 }

@@ -5,8 +5,10 @@ import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.Remove
 import com.soyle.stories.characterarc.LocalCharacterArcException
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.eventbus.listensTo
 import com.soyle.stories.layout.LayoutException
-import com.soyle.stories.layout.usecases.*
+import com.soyle.stories.layout.usecases.ActiveWindow
+import com.soyle.stories.layout.usecases.StaticTool
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.openTool.OpenTool
@@ -15,9 +17,9 @@ import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
+import com.soyle.stories.project.layout.openTool.OpenToolPresenter
 import com.soyle.stories.theme.LocalThemeException
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromLocalComparison
-import java.util.*
 import kotlin.reflect.KClass
 
 class LayoutPresenter(
@@ -30,12 +32,15 @@ class LayoutPresenter(
   deleteLocalCharacterArcNotifier: Notifier<DeleteLocalCharacterArc.OutputPort>,
   removeCharacterFromComparisonNotifier: Notifier<RemoveCharacterFromLocalComparison.OutputPort>,
   locationEvents: LocationEvents
-) : GetSavedLayout.OutputPort, ToggleToolOpened.OutputPort, OpenTool.OutputPort, CloseTool.OutputPort, RemoveCharacterFromLocalStory.OutputPort, DeleteLocalCharacterArc.OutputPort, RemoveCharacterFromLocalComparison.OutputPort, CreateNewLocation.OutputPort, DeleteLocation.OutputPort {
+) : GetSavedLayout.OutputPort, ToggleToolOpened.OutputPort, CloseTool.OutputPort, RemoveCharacterFromLocalStory.OutputPort, DeleteLocalCharacterArc.OutputPort, RemoveCharacterFromLocalComparison.OutputPort, CreateNewLocation.OutputPort, DeleteLocation.OutputPort {
+
+	private val subPresenters = listOf(
+	  OpenToolPresenter(view) listensTo openToolNotifier
+	)
 
 	init {
 		getSavedLayoutNotifier.addListener(this)
 		toggleToolOpenedNotifier.addListener(this)
-		openToolNotifier.addListener(this)
 		closeToolNotifier.addListener(this)
 		removeCharacterNotifier.addListener(this)
 		deleteLocalCharacterArcNotifier.addListener(this)
@@ -61,26 +66,6 @@ class LayoutPresenter(
 
 	override fun receiveToggleToolOpenedResponse(response: ToggleToolOpened.ResponseModel) {
 		pushLayout(response.windows, response.staticTools)
-	}
-
-	override fun receiveOpenToolFailure(failure: Exception) {}
-
-	override fun receiveOpenToolResponse(response: OpenTool.ResponseModel) {
-		view.update {
-
-			val windows = (secondaryWindows + primaryWindow!!)
-			val window = windows.find { it.containsGroup(response.affectedToolGroup.groupId) }
-
-			when (window) {
-				null -> this
-				primaryWindow -> copy(
-				  primaryWindow = window.updateGroup(response.affectedToolGroup)
-				)
-				else -> copy(
-				  secondaryWindows = secondaryWindows.filterNot { it.id == window.id } + window.updateGroup(response.affectedToolGroup)
-				)
-			}
-		}
 	}
 
 	override fun receiveCloseToolResponse(response: CloseTool.ResponseModel) {
@@ -166,50 +151,5 @@ class LayoutPresenter(
 
 	override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {
 
-	}
-
-	private fun WindowViewModel.containsGroup(groupId: UUID): Boolean {
-		return child.containsGroup(groupId)
-	}
-
-	private fun WindowChildViewModel.containsGroup(groupId: UUID): Boolean {
-		return when (this) {
-			is GroupSplitterViewModel -> children.find { it.second.containsGroup(groupId) } != null
-			is ToolGroupViewModel -> id == groupId.toString()
-		}
-	}
-
-	private fun WindowViewModel.updateGroup(group: ActiveToolGroup): WindowViewModel {
-		return WindowViewModel(id, child.updateGroup(group))
-	}
-
-	private fun WindowChildViewModel.updateGroup(group: ActiveToolGroup): WindowChildViewModel = when (this) {
-		is GroupSplitterViewModel -> if (!containsGroup(group.groupId)) this else {
-			GroupSplitterViewModel(splitterId, orientation, children.map {
-				it.copy(second = it.second.updateGroup(group))
-			})
-		}
-		is ToolGroupViewModel -> if (!containsGroup(group.groupId)) this else {
-			ToolGroupViewModel(groupId, group.focusedToolId?.toString(), group.tools.map {
-				it.toToolViewModel()
-			})
-		}
-	}
-
-	private fun toWindowViewModel(window: ActiveWindow) = WindowViewModel(window.windowId.toString(), toChildViewModel(window.child))
-	private fun toChildViewModel(windowChild: ActiveWindowChild): WindowChildViewModel = when (windowChild) {
-		is ActiveToolGroupSplitter -> GroupSplitterViewModel(
-		  windowChild.splitterId.toString(),
-		  windowChild.orientation,
-		  windowChild.children.map { it.first to toChildViewModel(it.second) })
-		is ActiveToolGroup -> ToolGroupViewModel(windowChild.groupId.toString(), windowChild.focusedToolId?.toString(), windowChild.tools.map { it.toToolViewModel() })
-		else -> error("Unexpected window child $this")
-	}
-
-	private fun ActiveTool.toToolViewModel(): ToolViewModel = when (this) {
-		is CharacterListActiveTool -> CharacterListToolViewModel(toolId.toString())
-		is LocationListActiveTool -> LocationListToolViewModel(toolId.toString())
-		is BaseStoryStructureActiveTool -> BaseStoryStructureToolViewModel(toolId.toString(), characterId.toString(), themeId.toString())
-		is CharacterComparisonActiveTool -> CharacterComparisonToolViewModel(toolId.toString(), characterId.toString(), themeId.toString())
 	}
 }

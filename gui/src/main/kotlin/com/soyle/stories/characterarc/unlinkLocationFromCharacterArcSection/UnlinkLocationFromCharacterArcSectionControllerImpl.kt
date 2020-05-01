@@ -1,0 +1,19 @@
+package com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection
+
+import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.gui.ThreadTransformer
+import java.util.*
+
+class UnlinkLocationFromCharacterArcSectionControllerImpl(
+  private val threadTransformer: ThreadTransformer,
+  private val unlinkLocationFromCharacterArcSection: UnlinkLocationFromCharacterArcSection,
+  private val unlinkLocationFromCharacterArcSectionOutputPort: UnlinkLocationFromCharacterArcSection.OutputPort
+) : UnlinkLocationFromCharacterArcSectionController {
+
+	override fun unlinkLocationFromCharacterArcSection(sectionId: String) {
+		val characterArcSectionId = UUID.fromString(sectionId)
+		threadTransformer.async {
+			unlinkLocationFromCharacterArcSection.invoke(characterArcSectionId, unlinkLocationFromCharacterArcSectionOutputPort)
+		}
+	}
+}

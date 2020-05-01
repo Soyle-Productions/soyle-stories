@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
  */
 interface LayoutViewListener {
 
-    suspend fun loadLayoutForProject(projectId: UUID)
+    fun loadLayoutForProject(projectId: UUID)
     suspend fun toggleToolOpen(toolId: String)
     suspend fun closeTool(toolId: String)
     fun openDialog(dialog: Dialog)

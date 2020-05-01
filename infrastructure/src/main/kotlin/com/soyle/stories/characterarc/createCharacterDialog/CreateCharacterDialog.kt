@@ -1,6 +1,8 @@
 package com.soyle.stories.characterarc.createCharacterDialog
 
-import com.soyle.stories.di.characterarc.CharacterArcComponent
+import com.soyle.stories.characterarc.characterList.CharacterListViewListener
+import com.soyle.stories.di.characterarc.CharacterArcModule
+import com.soyle.stories.di.resolve
 import javafx.event.EventHandler
 import javafx.stage.Modality
 import javafx.stage.Stage
@@ -13,7 +15,7 @@ import tornadofx.textfield
 
 class CreateCharacterDialog : Fragment("New Character") {
 
-    val createCharacterDialogViewListener = find<CharacterArcComponent>().createCharacterDialogViewListener
+    val createCharacterDialogViewListener = resolve<CreateCharacterDialogViewListener>()
 
     override val root = form {
         textfield {

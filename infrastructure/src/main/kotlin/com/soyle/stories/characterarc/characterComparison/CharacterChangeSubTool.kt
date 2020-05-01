@@ -5,8 +5,9 @@
  */
 package com.soyle.stories.characterarc.characterComparison
 
-import com.soyle.stories.common.launchTask
+import com.soyle.stories.common.async
 import com.soyle.stories.common.wrapEditable
+import com.soyle.stories.di.resolve
 import javafx.beans.property.Property
 import javafx.geometry.Orientation
 import javafx.scene.Parent
@@ -17,8 +18,7 @@ class CharacterChangeSubTool : Fragment() {
 
     override val scope = super.scope as CharacterComparisonScope
     val model = find<CharacterComparisonModel>()
-    val characterComparisonViewListener: CharacterComparisonViewListener =
-        find<CharacterComparisonComponent>().characterComparisonViewListener
+    val characterComparisonViewListener: CharacterComparisonViewListener = resolve()
 
     private val characterChangeTool: Property<CharacterChangeSubToolViewModel> =
         model.subTools.select { (it.getOrNull(2) as? CharacterChangeSubToolViewModel).toProperty() }
@@ -105,7 +105,7 @@ class CharacterChangeSubTool : Fragment() {
             focusedProperty().onChange { focused ->
                 val sectionValue = characterChangeTool.value?.prop() ?: return@onChange
                 if (! focused && text != sectionValue.value) {
-                    launchTask {
+                    async(scope.projectScope) {
                         when (sectionValue) {
                             is PropertyValue -> if (sectionValue.isShared) {
                                 // intentionally left blank.  These text fields can only relate to properties on the focus character.

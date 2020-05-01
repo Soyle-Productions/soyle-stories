@@ -6,6 +6,7 @@
 package com.soyle.stories.characterarc.characterComparison
 
 import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.di.DI.resolve
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventTarget
@@ -15,7 +16,7 @@ import tornadofx.*
 class CharacterComparisonScope(val projectScope: ProjectScope, val themeId: String, characterId: String) : Scope() {
 
     private val model = find<CharacterComparisonModel>(scope = this)
-    private val characterComparisonViewListener = find<CharacterComparisonComponent>(scope = this).characterComparisonViewListener
+    private val characterComparisonViewListener = resolve<CharacterComparisonViewListener>(scope = this)
 
     private val isClosedProperty = SimpleBooleanProperty(false)
     private var isClosed

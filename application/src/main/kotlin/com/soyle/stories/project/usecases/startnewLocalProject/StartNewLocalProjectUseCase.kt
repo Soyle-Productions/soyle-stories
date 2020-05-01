@@ -23,6 +23,8 @@ class StartNewLocalProjectUseCase(
             return output.receiveStartNewLocalProjectFailure(l)
         } catch (p: ProjectException) {
             return output.receiveOpenProjectFailure(p)
+        } catch (t: Throwable) {
+            throw t
         }
         output.receiveOpenProjectResponse(response)
     }
@@ -42,7 +44,7 @@ class StartNewLocalProjectUseCase(
 
     private suspend fun startNewProject(projectName: String): StartNewProject.ResponseModel {
         return suspendCancellableCoroutine { continuation ->
-            runBlocking(continuation.context) {
+            runBlocking {
                 startNewProjectUseCase.invoke(projectName, StartNewProjectOutputContinuation(continuation))
                 continuation.cancel(NeverStartedNewProject())
             }
@@ -66,7 +68,7 @@ class StartNewLocalProjectUseCase(
 
     private suspend fun tryToOpenProjectAtLocation(projectLocation: String): OpenProject.ResponseModel {
         return suspendCancellableCoroutine<OpenProject.ResponseModel> { continuation ->
-            runBlocking(continuation.context) {
+            runBlocking {
                 openProjectUseCase.invoke(projectLocation, OpenProjectOutputContinuation(continuation))
                 continuation.cancel(NeverOpenedProject())
             }

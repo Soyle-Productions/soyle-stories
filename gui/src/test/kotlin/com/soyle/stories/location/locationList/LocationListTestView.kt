@@ -1,8 +1,8 @@
 package com.soyle.stories.location.locationList
 
+import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.LayoutViewListener
-import kotlinx.coroutines.runBlocking
 
 class LocationListTestView(
   private val locationListViewListener: LocationListViewListener,

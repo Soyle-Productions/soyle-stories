@@ -1,0 +1,6 @@
+package com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection
+
+interface UnlinkLocationFromCharacterArcSectionController {
+
+	fun unlinkLocationFromCharacterArcSection(sectionId: String)
+}

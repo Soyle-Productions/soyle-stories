@@ -1,6 +1,6 @@
 package com.soyle.stories.project
 
-import com.soyle.stories.di.modules.ApplicationComponent
+import com.soyle.stories.di.resolveLater
 import com.soyle.stories.project.projectList.ProjectIssueViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
@@ -16,9 +16,7 @@ import tornadofx.*
  */
 class FailedProject : ListCellFragment<ProjectIssueViewModel>() {
 
-    private val projectListViewListener: ProjectListViewListener by lazy {
-        find<ApplicationComponent>().projectListViewListener
-    }
+    private val projectListViewListener: ProjectListViewListener by resolveLater()
 
     override val root = vbox {
         hbox {

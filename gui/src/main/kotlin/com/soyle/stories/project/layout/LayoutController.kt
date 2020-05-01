@@ -23,8 +23,10 @@ class LayoutController(
     private val layoutPresenter: LayoutPresenter
 ) : LayoutViewListener {
 
-    override suspend fun loadLayoutForProject(projectId: UUID) {
-        getSavedLayout.invoke(projectId, getSavedLayoutOutputPort)
+    override fun loadLayoutForProject(projectId: UUID) {
+        threadTransformer.async {
+            getSavedLayout.invoke(projectId, getSavedLayoutOutputPort)
+        }
     }
 
     override suspend fun toggleToolOpen(toolId: String) {

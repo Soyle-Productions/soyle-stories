@@ -2,8 +2,10 @@ package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.common.makeEditable
-import com.soyle.stories.di.characterarc.CharacterArcComponent
-import javafx.scene.control.*
+import com.soyle.stories.di.resolve
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -16,7 +18,7 @@ internal class PopulatedDisplay : View() {
 
     private val model by inject<CharacterListModel>()
     private var treeView: TreeView<Any?> by singleAssign()
-    private val characterListViewListener = find<CharacterListComponent>().characterListViewListener
+    private val characterListViewListener = resolve<CharacterListViewListener>()
 
     private val characterContextMenu = ContextMenu().apply {
         item("Rename") {

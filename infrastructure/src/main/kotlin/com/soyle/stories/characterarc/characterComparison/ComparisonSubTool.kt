@@ -5,10 +5,11 @@
  */
 package com.soyle.stories.characterarc.characterComparison
 
+import com.soyle.stories.common.async
 import com.soyle.stories.common.hideScrollbars
-import com.soyle.stories.common.launchTask
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.rowCountProperty
+import com.soyle.stories.di.resolve
 import javafx.beans.property.Property
 import javafx.geometry.HPos
 import javafx.geometry.Pos
@@ -32,8 +33,7 @@ class ComparisonSubTool : Fragment() {
 
     override val scope = super.scope as CharacterComparisonScope
     val model = find<CharacterComparisonModel>()
-    val characterComparisonViewListener: CharacterComparisonViewListener =
-        find<CharacterComparisonComponent>().characterComparisonViewListener
+    val characterComparisonViewListener: CharacterComparisonViewListener = resolve<CharacterComparisonViewListener>()
 
     private val compSubTool: Property<CompSubToolViewModel> =
         model.subTools.select { (it.firstOrNull() as? CompSubToolViewModel).toProperty() }
@@ -183,7 +183,7 @@ class ComparisonSubTool : Fragment() {
                                             isSelected = storyFunctions.contains(storyFunction)
                                             action {
                                                 val characterId = itemProperty.value?.characterId ?: return@action
-                                                launchTask {
+                                                async(scope.projectScope) {
                                                     characterComparisonViewListener.setStoryFunction(
                                                             model.focusedCharacter.value.characterId,
                                                             characterId,
@@ -243,7 +243,7 @@ class ComparisonSubTool : Fragment() {
                 button("Remove") {
                     usePrefWidth = true
                     action {
-                        launchTask {
+                        async(scope.projectScope) {
                             characterComparisonViewListener.removeCharacterFromComparison(
                                 itemProperty.value.characterId
                             )
@@ -290,8 +290,7 @@ class ComparisonSubTool : Fragment() {
             focusedProperty().onChange {
                 val sectionValue = sectionValueProperty.value ?: return@onChange
                 if (!it && sectionValue.value != text) {
-                    isDisable = true
-                    launchTask {
+                    async(scope.projectScope) {
                         when (sectionValue) {
                             is PropertyValue -> if (sectionValue.isShared) {
                                 characterComparisonViewListener.changeSharedPropertyValue(
@@ -312,8 +311,6 @@ class ComparisonSubTool : Fragment() {
                                 text
                             )
                         }
-                    } ui {
-                        isDisable = false
                     }
                 }
             }

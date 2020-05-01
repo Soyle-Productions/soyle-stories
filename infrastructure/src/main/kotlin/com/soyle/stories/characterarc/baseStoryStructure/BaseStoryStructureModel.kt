@@ -6,17 +6,31 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.common.bindImmutableList
-import javafx.application.Platform
+import com.soyle.stories.di.resolveLater
+import com.soyle.stories.gui.ThreadTransformer
 import tornadofx.ItemViewModel
 import tornadofx.rebind
-import tornadofx.runLater
+import tornadofx.toProperty
 
-class BaseStoryStructureModel : ItemViewModel<BaseStoryStructureViewModel>(BaseStoryStructureViewModel(emptyList())), BaseStoryStructureView {
+class BaseStoryStructureModel : ItemViewModel<BaseStoryStructureViewModel>(), BaseStoryStructureView {
+
+    override val scope: BaseStoryStructureScope = super.scope as BaseStoryStructureScope
 
     val sections = bindImmutableList(BaseStoryStructureViewModel::sections)
+    val availableLocations = bindImmutableList(BaseStoryStructureViewModel::availableLocations)
+    val locationsAvailable = bind { item?.availableLocations?.isNotEmpty().toProperty() }
 
-    override fun update(update: BaseStoryStructureViewModel.() -> BaseStoryStructureViewModel) {
-        if (! Platform.isFxApplicationThread()) return runLater { update(update) }
-        rebind { item = item.update() }
+    private val threadTransformer: ThreadTransformer by resolveLater(scope.projectScope.applicationScope)
+
+    override fun update(update: BaseStoryStructureViewModel?.() -> BaseStoryStructureViewModel) {
+        threadTransformer.gui {
+            rebind { item = item.update() }
+        }
+    }
+
+    override fun updateOrInvalidated(update: BaseStoryStructureViewModel.() -> BaseStoryStructureViewModel) {
+        threadTransformer.gui {
+            rebind { item = item?.update() }
+        }
     }
 }

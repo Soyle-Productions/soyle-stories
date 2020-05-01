@@ -1,13 +1,15 @@
 package com.soyle.stories.soylestories.confirmExitDialog
 
 import com.soyle.stories.common.onChangeWithCurrent
-import com.soyle.stories.di.modules.ApplicationComponent
-import com.soyle.stories.soylestories.ApplicationModel
+import com.soyle.stories.di.resolve
 import javafx.application.Platform
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.ButtonType
-import tornadofx.*
+import tornadofx.Fragment
+import tornadofx.alert
+import tornadofx.onChange
+import tornadofx.region
 
 /**
  * Created by Brendan
@@ -17,7 +19,7 @@ import tornadofx.*
 class ConfirmExitDialog : Fragment() {
 
     private val model = find<ConfirmExitDialogModel>()
-    private val viewListener: ConfirmExitDialogViewListener = find<ApplicationComponent>().confirmExitDialogViewListener
+    private val viewListener: ConfirmExitDialogViewListener = resolve()
 
     override val root = region()
 

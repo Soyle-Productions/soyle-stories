@@ -35,13 +35,6 @@ fun <T : Any> find(type: KClass<T>): T {
 	return scopedComponents[type] as T
 }
 
-inline fun <reified T : Any> inject(): ReadOnlyProperty<Any, T> = inject(T::class)
-fun <R, T : Any> inject(kClass: KClass<T>): ReadOnlyProperty<R, T> = InjectedDelegate(kClass)
-
-class InjectedDelegate<in R, out T : Any>(kClass: KClass<T>) : ReadOnlyProperty<R, T> {
-	private val value: T by lazy {
-		find(kClass)
-	}
-
-	override fun getValue(thisRef: R, property: KProperty<*>): T = value
+inline fun <reified T : Any> inject() = lazy {
+	find<T>()
 }

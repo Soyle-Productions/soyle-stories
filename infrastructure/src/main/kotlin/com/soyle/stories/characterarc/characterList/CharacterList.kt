@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.di.characterarc.CharacterArcComponent
+import com.soyle.stories.di.resolve
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -19,7 +19,7 @@ class CharacterList : View("Characters") {
     }
 
     init {
-        val characterListViewListener = find<CharacterListComponent>().characterListViewListener
+        val characterListViewListener = resolve<CharacterListViewListener>()
         val model = find<CharacterListModel>()
         model.invalid.onChange {
             if (it) characterListViewListener.getList()

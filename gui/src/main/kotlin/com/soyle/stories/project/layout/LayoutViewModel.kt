@@ -26,6 +26,10 @@ class GroupSplitterViewModel(val splitterId: String, val orientation: Boolean, v
 class ToolGroupViewModel(val groupId: String, val focusedToolId: String?, val tools: List<ToolViewModel>) : WindowChildViewModel() {
     override val id: String
         get() = groupId
+
+    override fun toString(): String {
+        return "${super.toString()}(groupId = $groupId, focusedToolId = $focusedToolId, tools = $tools)"
+    }
 }
 class StaticToolViewModel(val toolId: String, val isOpen: Boolean, val name: String)
 sealed class ToolViewModel {
@@ -35,6 +39,7 @@ class CharacterListToolViewModel(override val toolId: String) : ToolViewModel()
 class LocationListToolViewModel(override val toolId: String) : ToolViewModel()
 class BaseStoryStructureToolViewModel(override val toolId: String, val characterId: String, val themeId: String) : ToolViewModel()
 class CharacterComparisonToolViewModel(override val toolId: String, val themeId: String, val characterId: String) : ToolViewModel()
+class LocationDetailsToolViewModel(override val toolId: String, val locationId: String) : ToolViewModel()
 
 sealed class Dialog {
     object CreateCharacter : Dialog()

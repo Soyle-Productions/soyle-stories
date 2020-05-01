@@ -1,8 +1,9 @@
 package com.soyle.stories.location.locationList
 
 import com.soyle.stories.eventbus.listensTo
-import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.LocationException
+import com.soyle.stories.location.events.LocationEvents
+import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
@@ -51,9 +52,7 @@ class LocationListPresenter(
 
 	override fun receiveListAllLocationsResponse(response: ListAllLocations.ResponseModel) {
 		view.update {
-			LocationListViewModel((response.locations.map {
-				LocationItemViewModel(it.id.toString(), it.locationName)
-			}).sortedBy { it.name })
+			LocationListViewModel((response.locations.map(::LocationItemViewModel)).sortedBy { it.name })
 		}
 	}
 }

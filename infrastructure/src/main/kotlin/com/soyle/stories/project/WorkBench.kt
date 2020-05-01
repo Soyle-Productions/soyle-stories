@@ -1,20 +1,22 @@
 package com.soyle.stories.project
 
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
-import com.soyle.stories.common.launchTask
+import com.soyle.stories.common.async
 import com.soyle.stories.common.onChangeUntil
-import com.soyle.stories.di.modules.ApplicationComponent
-import com.soyle.stories.di.project.LayoutComponent
+import com.soyle.stories.di.resolve
+import com.soyle.stories.layout.GroupSplitter
+import com.soyle.stories.layout.ToolGroup
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialogModel
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
-import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogModel
-import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
-import com.soyle.stories.project.layout.*
+import com.soyle.stories.project.layout.Dialog
+import com.soyle.stories.project.layout.GroupSplitterViewModel
+import com.soyle.stories.project.layout.LayoutViewListener
+import com.soyle.stories.project.layout.ToolGroupViewModel
+import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.soylestories.SoyleStories
 import javafx.scene.Parent
 import javafx.stage.Screen
-import kotlinx.coroutines.runBlocking
 import tornadofx.*
 
 /**
@@ -26,23 +28,30 @@ class WorkBench : View() {
 
     override val scope: ProjectScope = super.scope as ProjectScope
 
-    private val projectViewListener = find<ApplicationComponent>(scope = FX.defaultScope).projectListViewListener
-    private val layoutViewListener = find<LayoutComponent>().layoutViewListener
-    private val model = find<WorkBenchModel>()
+    private val projectViewListener = resolve<ProjectListViewListener>(scope = scope.applicationScope)
+    private val layoutViewListener = resolve<LayoutViewListener>()
+    private val model = resolve<WorkBenchModel>()
 
     override val root: Parent = borderpane {
         top = menubar {
             menu("File") {
+                id = "file"
                 menu("New", "Shortcut+N") {
+                    id = "file_new"
                     item("Project") {
-                        action { startProjectDialog(currentStage) }
+                        id = "file_new_project"
+                        action { startProjectDialog(scope.applicationScope, currentStage) }
                     }
                     separator()
                     item("Character") {
+                        id = "file_new_character"
                         action { createCharacterDialog(currentStage) }
                     }
                     item("Location") {
-                        action { layoutViewListener.openDialog(Dialog.CreateLocation) }
+                        id = "file_new_location"
+                        action {
+                            layoutViewListener.openDialog(Dialog.CreateLocation)
+                        }
                     }/*
                     item("Plot Point") {
                         // action { controller.createPlotPoint() }
@@ -60,11 +69,13 @@ class WorkBench : View() {
                 isDisable = true
             }
             menu("Tools") {
+                id = "tools"
                 items.bind(model.staticTools) {
                     checkmenuitem(it.name) {
+                        id = "tools_${it.name}"
                         isSelected = it.isOpen
                         action {
-                            launchTask { _ ->
+                            async(scope) {
                                 layoutViewListener.toggleToolOpen(it.toolId)
                             }
                         }
@@ -100,14 +111,21 @@ class WorkBench : View() {
     }
 
     init {
+        find<ProjectLoadingDialog>()
+
         titleProperty.bind(model.projectViewModel.stringBinding {
             it?.run {
                 "$name [$location]"
             }
         })
-        model.loadingProgress.onChangeUntil({ it is Double && it >= WorkBenchModel.MAX_LOADING_VALUE }) {
-            if (it is Double && it >= WorkBenchModel.MAX_LOADING_VALUE) {
+        model.isValidLayout.onChangeUntil({ it == true }) {
+            if (it == true) {
                 createWindow()
+                model.isValidLayout.onChange {
+                    if (it != true) {
+                        layoutViewListener.loadLayoutForProject(scope.projectId)
+                    }
+                }
             }
         }
         find<CreateLocationDialogModel>().isOpen.onChange {
@@ -115,17 +133,16 @@ class WorkBench : View() {
                 createLocationDialog(this.currentStage)
             }
         }
-        find<DeleteLocationDialogModel>().isOpen.onChange {
-            if (it) {
-                deleteLocationDialog()
-            }
-        }
+
+        // moved below model listeners because, if it returns immediately, the listeners aren't attached in time and
+        // miss the first update.
+        layoutViewListener.loadLayoutForProject(scope.projectId)
     }
 
     private fun createWindow() {
         openWindow(escapeClosesWindow = false, owner = null, block = false, resizable = true)?.apply {
             icons += SoyleStories.appIcon
-            val primaryScreen = Screen.getScreensForRectangle(primaryStage.x, primaryStage.y, primaryStage.width, primaryStage.height)
+            val primaryScreen = Screen.getScreensForRectangle(this.x, this.y, this.width, this.height)
             primaryScreen.firstOrNull()?.visualBounds?.let {
                 x = it.minX
                 y = it.minY
@@ -135,11 +152,14 @@ class WorkBench : View() {
             centerOnScreen()
             setOnCloseRequest {
                 model.projectViewModel.value?.let {
-                    runBlocking {
+                    async(scope.applicationScope) {
                         projectViewListener.requestCloseProject(it.projectId)
                     }
                 }
                 it.consume()
+            }
+            model.isOpen.onChangeUntil({ it != true }) {
+                if (it != true) close()
             }
         }
     }

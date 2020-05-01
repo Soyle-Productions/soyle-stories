@@ -1,7 +1,8 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
-import com.soyle.stories.di.characterarc.CharacterArcComponent
+import com.soyle.stories.di.characterarc.CharacterListModule
+import com.soyle.stories.di.resolve
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -21,7 +22,7 @@ import tornadofx.*
 internal class EmptyDisplay : View() {
 
     private val model by inject<CharacterListModel>()
-    private val characterListViewListener = find<CharacterListComponent>().characterListViewListener
+    private val characterListViewListener = resolve<CharacterListViewListener>()
 
     override val root = gridpane {
         hiddenWhen { model.hasCharacters  }

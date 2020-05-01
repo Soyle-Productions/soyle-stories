@@ -1,20 +1,18 @@
 package com.soyle.stories.location.locationList
 
 import com.soyle.stories.eventbus.Notifier
-import com.soyle.stories.location.events.CreateNewLocationNotifier
 import com.soyle.stories.location.events.LocationEvents
+import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.location.usecases.listAllLocations.LocationItem
+import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
 import com.soyle.stories.location.usecases.renameLocation.RenameLocation
-import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Condition
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
-import java.util.function.Predicate
 
 class LocationListPresenterUnitTest {
 
@@ -99,10 +97,12 @@ class LocationListPresenterUnitTest {
 	private fun createLocationNotifier() = object : Notifier<CreateNewLocation.OutputPort>() {}
 	private fun deleteLocationNotifier() = object : Notifier<DeleteLocation.OutputPort>() {}
 	private fun renameLocationNotifier() = object : Notifier<RenameLocation.OutputPort>() {}
+	private fun reDescribeLocation() = object : Notifier<ReDescribeLocation.OutputPort>() {}
 	private fun getPresenter(
 	  createNewLocation: Notifier<CreateNewLocation.OutputPort> = createLocationNotifier(),
 	  deleteLocation: Notifier<DeleteLocation.OutputPort> = deleteLocationNotifier(),
-	  renameLocation: Notifier<RenameLocation.OutputPort> = renameLocationNotifier()
+	  renameLocation: Notifier<RenameLocation.OutputPort> = renameLocationNotifier(),
+	  reDescribeLocation: Notifier<ReDescribeLocation.OutputPort> = reDescribeLocation()
 	) = LocationListPresenter(object : LocationListView {
 		override fun update(update: LocationListViewModel?.() -> LocationListViewModel) {
 			viewModel = viewModel.update()
@@ -114,6 +114,7 @@ class LocationListPresenterUnitTest {
 		override val createNewLocation: Notifier<CreateNewLocation.OutputPort> = createNewLocation
 		override val deleteLocation: Notifier<DeleteLocation.OutputPort> = deleteLocation
 		override val renameLocation: Notifier<RenameLocation.OutputPort> = renameLocation
+		override val reDescribeLocation: Notifier<ReDescribeLocation.OutputPort> = reDescribeLocation
 	})
 
 	private fun assertLocationsProperlyMappedFrom(source: List<LocationItem>) {

@@ -7,6 +7,7 @@ package com.soyle.stories.layout.usecases.openTool
 
 import arrow.core.Either
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.layout.LayoutDoesNotExist
@@ -29,10 +30,14 @@ class OpenToolUseCase(
         val toolType = when (requestModel) {
             is OpenTool.RequestModel.BaseStoryStructure -> ToolType.BaseStoryStructure
             is OpenTool.RequestModel.CharacterComparison -> ToolType.CharacterComparison
+            is OpenTool.RequestModel.LocationDetails -> ToolType.LocationDetails
+            else -> error("unsupported request model")
         }
         val identifyingData: Any? = when (requestModel) {
             is OpenTool.RequestModel.BaseStoryStructure -> (Theme.Id(requestModel.themeId) to Character.Id(requestModel.characterId))
             is OpenTool.RequestModel.CharacterComparison -> Theme.Id(requestModel.themeId)
+            is OpenTool.RequestModel.LocationDetails -> Location.Id(requestModel.locationId)
+            else -> error("unsupported request model")
         }
         val existingTool = layout.tools.find {
             it.type == toolType && it.identifyingData == identifyingData
@@ -40,6 +45,8 @@ class OpenToolUseCase(
         val tool: Tool<*> = existingTool ?: when (requestModel) {
             is OpenTool.RequestModel.BaseStoryStructure -> BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), Theme.Id(requestModel.themeId), Character.Id(requestModel.characterId), true)
             is OpenTool.RequestModel.CharacterComparison -> CharacterComparisonTool(Tool.Id(UUID.randomUUID()), Theme.Id(requestModel.themeId), Character.Id(requestModel.characterId), true)
+            is OpenTool.RequestModel.LocationDetails -> LocationDetailsTool(Tool.Id(UUID.randomUUID()), identifyingData as Location.Id, true)
+            else -> error("unsupported request model")
         }
         val exists: Boolean = existingTool != null
 
