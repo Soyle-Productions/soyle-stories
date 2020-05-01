@@ -1,5 +1,6 @@
 package com.soyle.stories.characterarc.usecases.viewBaseStoryStructure
 
+import com.soyle.stories.characterarc.repositories.ThemeRepository
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.CharacterInTheme
@@ -16,8 +17,8 @@ import java.util.*
  * Time: 10:49 AM
  */
 class ViewBaseStoryStructureUseCase(
-    private val themeRepository: com.soyle.stories.characterarc.repositories.ThemeRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+  private val themeRepository: ThemeRepository,
+  private val characterArcSectionRepository: CharacterArcSectionRepository
 ) : ViewBaseStoryStructure {
 
     override suspend fun invoke(
@@ -43,7 +44,8 @@ class ViewBaseStoryStructureUseCase(
                     it.id.uuid,
                     it.value,
                     it.template.name,
-                    mapOf()
+                    mapOf(),
+                  it.linkedLocation?.uuid
                 )
             }
         ).let(outputPort::receiveViewBaseStoryStructureResponse)

@@ -25,7 +25,8 @@ interface ViewBaseStoryStructure {
         val arcSectionId: UUID,
         val value: String,
         val templateName: String,
-        val subSections: Map<String, String>
+        val subSections: Map<String, String>,
+        val linkedLocation: UUID?
     )
 
     interface OutputPort {
