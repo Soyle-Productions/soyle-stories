@@ -15,6 +15,7 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.ActionEvent
 import javafx.scene.control.Button
+import javafx.scene.control.CheckMenuItem
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -224,7 +225,9 @@ object CharacterArcSteps : ApplicationTest() {
 	{
 		ProjectSteps.givenProjectHasBeenOpened(double)
 		val scope = ProjectSteps.getProjectScope(double)!!
-		scope.get<LinkLocationToCharacterArcSectionController>().linkLocation(sectionId.uuid.toString(), locationId.uuid.toString())
+		interact {
+			scope.get<LinkLocationToCharacterArcSectionController>().linkLocation(sectionId.uuid.toString(), locationId.uuid.toString())
+		}
 	}
 
 	fun isCharacterArcSectionLinkedToLocation(double: SoyleStoriesTestDouble, sectionId: CharacterArcSection.Id, locationId: Location.Id): Boolean
@@ -244,14 +247,14 @@ object CharacterArcSteps : ApplicationTest() {
 		assertTrue(isCharacterArcSectionLinkedToLocation(double, section, location))
 	}
 
-	fun whenUnlinkInCharacterArcSectionLocationDropdownIsSelected(
+	fun whenSelectedLocationInCharacterArcSectionLocationDropdownIsDeselected(
 	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
 	) {
 		val openLocationSelection = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
 		  ?: error("Character Arc Section Location Dropdown not yet open")
 		interact {
-			val locationItem = openLocationSelection.contextMenu.items.find { it.text == "Unlink" }
-			  ?: error("no unlink item")
+			val locationItem = openLocationSelection.contextMenu.items.find { it is CheckMenuItem && it.isSelected }
+			  ?: error("no selected item")
 			val onAction = locationItem.onAction
 			  ?: error("no registered action for menu item")
 			onAction.handle(ActionEvent())

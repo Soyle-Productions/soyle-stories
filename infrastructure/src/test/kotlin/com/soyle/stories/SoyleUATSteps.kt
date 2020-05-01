@@ -110,8 +110,8 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Given("a Character Arc Section has a linked Location") {
 			CharacterArcSteps.givenANumberOfCharacterArcsHaveBeenCreated(double, 1)
-			val character = CharacterSteps.getCharactersCreated(double).first()
-			val section = CharacterArcSteps.getCharacterArcSectionsForCharacter(double, character.id).first()
+			val arc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			val section = CharacterArcSteps.getCharacterArcSectionsForCharacter(double, arc.characterId).find { it.template.isRequired }!!
 			LocationSteps.givenNumberOfLocationsHaveBeenCreated(double, 1)
 			val location = LocationSteps.getLocationsCreated(double).first()
 			CharacterArcSteps.givenCharacterArcSectionHasALinkedLocation(double, section.id, location.id)
@@ -196,9 +196,11 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.whenCharacterArcSectionLocationDropDownLosesFocus(double, characterArc.themeId, characterArc.characterId)
 		}
-		When("the Unlink option in Character Arc Section Location Dropdown is selected") {
+		When("the selected Location in in Character Arc Section Location Dropdown is deselected") {
+			UATLogger.silent = false
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
-			CharacterArcSteps.whenUnlinkInCharacterArcSectionLocationDropdownIsSelected(double, characterArc.themeId, characterArc.characterId)
+			CharacterArcSteps.whenSelectedLocationInCharacterArcSectionLocationDropdownIsDeselected(double, characterArc.themeId, characterArc.characterId)
+			UATLogger.silent = true
 		}
 
 

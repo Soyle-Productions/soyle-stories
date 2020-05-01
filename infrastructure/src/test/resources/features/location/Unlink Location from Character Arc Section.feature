@@ -6,5 +6,5 @@ Feature: Unlink Location from Character Arc Section
 
   Scenario: Selecting Unlink option in Character Arc Section Location Dropdown
     Given the Character Arc Section Location dropdown menu has been opened
-    When the Unlink option in Character Arc Section Location Dropdown is selected
+    When the selected Location in in Character Arc Section Location Dropdown is deselected
     Then the Character Arc Section Location dropdown should show an empty state
