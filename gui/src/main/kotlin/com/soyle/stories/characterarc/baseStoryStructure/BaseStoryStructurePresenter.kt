@@ -1,9 +1,6 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
-import com.soyle.stories.characterarc.baseStoryStructure.presenters.ChangeThematicSectionValuePresenter
-import com.soyle.stories.characterarc.baseStoryStructure.presenters.CreateNewLocationPresenter
-import com.soyle.stories.characterarc.baseStoryStructure.presenters.DeleteLocationPresenter
-import com.soyle.stories.characterarc.baseStoryStructure.presenters.LinkLocationToCharacterArcSectionPresenter
+import com.soyle.stories.characterarc.baseStoryStructure.presenters.*
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.eventbus.listensTo
@@ -21,7 +18,8 @@ class BaseStoryStructurePresenter(
       ChangeThematicSectionValuePresenter(view) listensTo characterArcEvents.changeThematicSectionValue,
       DeleteLocationPresenter(view) listensTo locationEvents.deleteLocation,
       CreateNewLocationPresenter(view) listensTo locationEvents.createNewLocation,
-      LinkLocationToCharacterArcSectionPresenter(view) listensTo characterArcEvents.linkLocationToCharacterArcSection
+      LinkLocationToCharacterArcSectionPresenter(view) listensTo characterArcEvents.linkLocationToCharacterArcSection,
+      UnlinkLocationFromCharacterArcSectionPresenter(view) listensTo characterArcEvents.unlinkLocationFromCharacterArcSection
     )
 
     override fun receiveViewBaseStoryStructureResponse(response: ViewBaseStoryStructure.ResponseModel) {

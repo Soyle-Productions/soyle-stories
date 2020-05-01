@@ -40,6 +40,6 @@ interface CharacterArcEvents {
     val renameCharacter: Notifier<RenameCharacter.OutputPort>
     val renameCharacterArc: Notifier<RenameCharacterArc.OutputPort>
     val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort>
-    val unlinkLocationToCharacterArcSection: Notifier<UnlinkLocationFromCharacterArcSection.OutputPort>
+    val unlinkLocationFromCharacterArcSection: Notifier<UnlinkLocationFromCharacterArcSection.OutputPort>
 
 }
