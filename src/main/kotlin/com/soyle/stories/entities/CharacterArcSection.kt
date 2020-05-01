@@ -22,6 +22,7 @@ class CharacterArcSection(
 	) = CharacterArcSection(id, characterId, themeId, template, linkedLocation, value)
 
 	fun changeValue(value: String) = copy(value = value)
+	fun withLinkedLocation(locationId: Location.Id) = copy(linkedLocation = locationId)
 	fun withoutLinkedLocation() = copy(linkedLocation = null)
 
 	data class Id(val uuid: UUID)
