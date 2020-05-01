@@ -48,9 +48,6 @@ class BaseStoryStructure : View("Base Story Structure") {
     private val linkedLocationContextMenuSection: SimpleObjectProperty<StoryStructureSectionViewModel?> = SimpleObjectProperty(null)
     private val linkedLocationContextMenu = ContextMenu().apply {
         isAutoHide = true
-        setOnAutoHide {
-            println("linkedLocationContextMenu lost focus")
-        }
         items.bind(model.availableLocations) {
             checkmenuitem(it.name) {
                 id = it.id
@@ -60,6 +57,11 @@ class BaseStoryStructure : View("Base Story Structure") {
                 action {
                     val section = linkedLocationContextMenuSection.get()
                     val sectionId = section?.sectionId ?: return@action
+                    if (section.linkedLocation?.id == it.id) {
+                        baseStoryStructureViewListener.unlinkLocation(sectionId)
+                        this@apply.hide()
+                        return@action
+                    }
                     val locationId = it?.id ?: return@action
                     baseStoryStructureViewListener.linkLocation(sectionId, locationId)
                     this@apply.hide()
