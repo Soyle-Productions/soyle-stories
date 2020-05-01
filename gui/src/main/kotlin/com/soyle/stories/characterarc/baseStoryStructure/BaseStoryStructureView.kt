@@ -7,5 +7,4 @@ import com.soyle.stories.gui.View
  * Date: 2/9/2020
  * Time: 11:20 PM
  */
-interface BaseStoryStructureView : View<BaseStoryStructureViewModel> {
-}
+interface BaseStoryStructureView : View.Nullable<BaseStoryStructureViewModel>

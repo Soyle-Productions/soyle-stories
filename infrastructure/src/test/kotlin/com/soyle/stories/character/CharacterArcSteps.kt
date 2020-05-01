@@ -1,5 +1,6 @@
 package com.soyle.stories.character
 
+import com.soyle.stories.UATLogger
 import com.soyle.stories.character.CharacterArcSteps.interact
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructure
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureScope
@@ -7,13 +8,12 @@ import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDia
 import com.soyle.stories.characterarc.repositories.CharacterArcRepository
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.*
-import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.layout.openTool.OpenToolController
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
-import javafx.scene.control.ComboBox
-import javafx.scene.input.MouseButton
+import javafx.event.ActionEvent
+import javafx.scene.control.Button
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -93,7 +93,7 @@ object CharacterArcSteps : ApplicationTest() {
 	): Boolean
 	{
 		val baseStoryStructure = getOpenBaseStoryStructureTool(double, themeId, characterId) ?: return false
-		var comboBoxes: Set<ComboBox<*>> = emptySet()
+		var comboBoxes: Set<Button> = emptySet()
 		interact {
 			comboBoxes = from(baseStoryStructure.root).lookup(".location-select").queryAll()
 		}
@@ -107,18 +107,32 @@ object CharacterArcSteps : ApplicationTest() {
 		whenCharacterArcSectionLocationDropDownIsClicked(double, themeId, characterId)
 	}
 
-	fun getOpenCharacterArcSectionLocationDropDown(
+	fun getCharacterArcSectionLocationDropDown(
 	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
-	): ComboBox<LocationItemViewModel>?
+	): Button?
 	{
 		val baseStoryStructure = getOpenBaseStoryStructureTool(double, themeId, characterId)
 		  ?: return null
-		var comboBox: ComboBox<LocationItemViewModel>? = null
+		var locationSelection: Button? = null
 		interact {
-			val comboBoxes = from(baseStoryStructure.root).lookup(".location-select").queryAll<ComboBox<LocationItemViewModel>>()
-			comboBox = comboBoxes.find { it.isShowing }
+			val locationSelections = from(baseStoryStructure.root).lookup(".location-select").queryAll<Button>()
+			locationSelection = locationSelections.firstOrNull()
 		}
-		return comboBox
+		return locationSelection
+	}
+
+	fun getOpenCharacterArcSectionLocationDropDown(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
+	): Button?
+	{
+		val baseStoryStructure = getOpenBaseStoryStructureTool(double, themeId, characterId)
+		  ?: return null
+		var locationSelection: Button? = null
+		interact {
+			val locationSelections = from(baseStoryStructure.root).lookup(".location-select").queryAll<Button>()
+			locationSelection = locationSelections.find { it.contextMenu?.isShowing ?: false }
+		}
+		return locationSelection
 	}
 
 	fun whenCharacterArcSectionLocationDropDownIsClicked(
@@ -127,8 +141,8 @@ object CharacterArcSteps : ApplicationTest() {
 		val baseStoryStructure = getOpenBaseStoryStructureTool(double, themeId, characterId)
 		  ?: error("base story structure tool not yet opened for $themeId and $characterId")
 		interact {
-			val comboBoxes = from(baseStoryStructure.root).lookup(".location-select").queryAll<ComboBox<*>>()
-			clickOn(comboBoxes.first(), MouseButton.PRIMARY)
+			val comboBoxes = from(baseStoryStructure.root).lookup(".location-select").queryAll<Button>()
+			comboBoxes.first().onAction.handle(ActionEvent())
 		}
 	}
 
@@ -142,13 +156,17 @@ object CharacterArcSteps : ApplicationTest() {
 	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id, locations: List<Location>
 	): Boolean
 	{
-		val openComboBox = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
-		  ?: return false
+		val openLocationSelection = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		  ?: return (false).also { UATLogger.log("no open location selection") }
 		val locationMap = locations.associateBy { it.id.uuid.toString() }
-		val locationItems = openComboBox.items.toList()
-		return locationItems.map { it.id }.toSet() == locationMap.keys && locationItems.all {
-			it.name == locationMap.getValue(it.id).name
+		val locationItems = openLocationSelection.contextMenu.items.toList()
+		val hasAllLocations = locationItems.map { it.id }.toSet() == locationMap.keys
+		if (! hasAllLocations) return (false).also { UATLogger.log("not all locations included") }
+		val allLocationsMatchNames = locationItems.all {
+			it.text == locationMap.getValue(it.id).name
 		}
+		if (! allLocationsMatchNames) return (false).also { UATLogger.log("not all locations have correct name") }
+		return hasAllLocations && allLocationsMatchNames
 	}
 
 	fun givenCharacterArcSectionLocationDropDownMenuHasBeenOpened(
@@ -163,20 +181,24 @@ object CharacterArcSteps : ApplicationTest() {
 	fun whenLocationInCharacterArcSectionLocationDropdownIsSelected(
 	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id, location: Location
 	) {
-		val openComboBox = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		val openLocationSelection = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
 		  ?: error("Character Arc Section Location Dropdown not yet open")
 		interact {
-			clickOn(location.name, MouseButton.PRIMARY)
+			val locationItem = openLocationSelection.contextMenu.items.find { it.text == location.name }
+			  ?: error("no item with text matching location name")
+			val onAction = locationItem.onAction
+			  ?: error("no registered action for menu item")
+			onAction.handle(ActionEvent())
 		}
 	}
 
 	fun whenCharacterArcSectionLocationDropDownLosesFocus(
 	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
 	) {
-		val openComboBox = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		val openLocationSelection = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
 		  ?: error("Character Arc Section Location Dropdown not yet open")
 		interact {
-			from(openComboBox.scene.root).lookup(".text-field").queryTextInputControl().requestFocus()
+			openLocationSelection.contextMenu?.hide()
 		}
 	}
 
@@ -184,8 +206,8 @@ object CharacterArcSteps : ApplicationTest() {
 	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id, location: Location
 	): Boolean
 	{
-		val openComboBox = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
-		  ?: return false
-		return openComboBox.buttonCell.text == location.name
+		val openLocationSelection = getCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		  ?: return (false).also { UATLogger.log("Character Arc Section Location Dropdown not yet open") }
+		return openLocationSelection.text == location.name
 	}
 }

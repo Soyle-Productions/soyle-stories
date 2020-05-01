@@ -184,8 +184,10 @@ class SoyleUATSteps : En, ApplicationTest() {
 			CharacterArcSteps.whenLocationInCharacterArcSectionLocationDropdownIsSelected(double, characterArc.themeId, characterArc.characterId, location)
 		}
 		When("the user clicks outside the Character Arc Section Location dropdown menu") {
+			UATLogger.silent = false
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.whenCharacterArcSectionLocationDropDownLosesFocus(double, characterArc.themeId, characterArc.characterId)
+			UATLogger.silent = true
 		}
 
 
@@ -255,16 +257,20 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertFalse(CharacterArcSteps.isLocationDropdownDisabledInBaseStoryStructureTool(double, characterArc.themeId, characterArc.characterId))
 		}
 		Then("all Locations should be listed in the Character Arc Section Location dropdown menu") {
+			UATLogger.silent = false
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			val locations = LocationSteps.getLocationsCreated(double)
 			CharacterArcSteps.isCharacterArcSectionLocationOpenWithAllLocations(double, characterArc.themeId, characterArc.characterId, locations)
 			  .let(::assertTrue)
+			UATLogger.silent = true
 		}
 		Then("the Character Arc Section Location dropdown should show the selected Location name") {
+			UATLogger.silent = false
 			val arc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			val location = LocationSteps.getLocationsCreated(double).first()
 			CharacterArcSteps.isCharacterArcSectionLocationDropdownDisplayingLocation(double, arc.themeId, arc.characterId, location)
 			  .let(::assertTrue)
+			UATLogger.silent = true
 		}
 		Then("the Character Arc Section Location dropdown menu should be closed") {
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()

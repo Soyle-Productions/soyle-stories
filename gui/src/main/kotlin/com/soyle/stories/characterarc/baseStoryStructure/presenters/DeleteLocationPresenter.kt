@@ -9,8 +9,8 @@ class DeleteLocationPresenter(
 ) : DeleteLocation.OutputPort {
 
 	override fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
-		view.update {
-			copy(
+		view.updateOrInvalidated {
+			withLocations(
 			  availableLocations = availableLocations.filterNot { it.id == response.locationId.toString() }
 			)
 		}

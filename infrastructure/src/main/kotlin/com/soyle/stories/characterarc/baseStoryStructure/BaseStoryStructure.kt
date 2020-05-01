@@ -7,12 +7,14 @@ package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.resolve
-import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.BaseStoryStructureToolViewModel
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Orientation
+import javafx.geometry.Side
 import javafx.scene.Parent
+import javafx.scene.control.ContextMenu
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
@@ -43,8 +45,31 @@ class BaseStoryStructure : View("Base Story Structure") {
         baseStoryStructureViewListener.getBaseStoryStructure()
     }
 
+    private val linkedLocationContextMenuSection: SimpleObjectProperty<StoryStructureSectionViewModel?> = SimpleObjectProperty(null)
+    private val linkedLocationContextMenu = ContextMenu().apply {
+        isAutoHide = true
+        setOnAutoHide {
+            println("linkedLocationContextMenu lost focus")
+        }
+        items.bind(model.availableLocations) {
+            checkmenuitem(it.name) {
+                id = it.id
+                linkedLocationContextMenuSection.select { section -> (section?.linkedLocation?.id == it.id).toProperty() }.onChange {
+                    isSelected = it == true
+                }
+                action {
+                    val section = linkedLocationContextMenuSection.get()
+                    val sectionId = section?.sectionId ?: return@action
+                    val locationId = it?.id ?: return@action
+                    baseStoryStructureViewListener.linkLocation(sectionId, locationId)
+                    this@apply.hide()
+                }
+            }
+        }
+    }
+
     private fun Fieldset.addStoryStructureItem(index: Int) {
-        val section = model.sections.select { it.getOrNull(index).toProperty() }
+        val section = model.sections.select { it.getOrNull(index).toProperty() } as SimpleObjectProperty
         val itemRoot = hbox(spacing = 5.0) {
             field {
                 hgrow = Priority.ALWAYS
@@ -55,7 +80,7 @@ class BaseStoryStructure : View("Base Story Structure") {
                         text = it ?: ""
                     }
                     focusedProperty().onChange { focused ->
-                        val sectionValue = section.value?.sectionValue ?: return@onChange
+                        val sectionValue = section.get()?.sectionValue ?: return@onChange
                         if (!focused && text != sectionValue) {
                             baseStoryStructureViewListener.changeSectionValue(section.value!!.sectionId, text)
                         }
@@ -64,14 +89,16 @@ class BaseStoryStructure : View("Base Story Structure") {
             }
             field("Linked Location") {
                 hgrow = Priority.SOMETIMES
-                combobox<LocationItemViewModel> {
-                    itemsProperty().bind(model.availableLocations)
-                    cellFormat {
-                        text = it.name
-                    }
+                button {
+                    textProperty().bind(section.select { (it.linkedLocation?.name ?: "[link]").toProperty() })
                     addClass("location-select")
                     enableWhen { model.locationsAvailable }
                     fitToParentWidth()
+                    action {
+                        contextMenu = linkedLocationContextMenu
+                        linkedLocationContextMenuSection.set(section.get())
+                        contextMenu.show(this, Side.BOTTOM, 0.0, 0.0)
+                    }
                 }
             }
         }

@@ -9,5 +9,6 @@ interface BaseStoryStructureViewListener {
 
     fun getBaseStoryStructure()
     fun changeSectionValue(sectionId: String, value: String)
+    fun linkLocation(sectionId: String, locationId: String)
 
 }

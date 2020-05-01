@@ -10,8 +10,8 @@ class CreateNewLocationPresenter(
 ) : CreateNewLocation.OutputPort {
 
 	override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
-		view.update {
-			copy(
+		view.updateOrInvalidated {
+			withLocations(
 			  availableLocations = availableLocations + LocationItemViewModel(response.locationId.toString(), response.locationName)
 			)
 		}

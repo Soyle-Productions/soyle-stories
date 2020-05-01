@@ -3,6 +3,7 @@ package com.soyle.stories.characterarc.baseStoryStructure
 import com.soyle.stories.characterarc.baseStoryStructure.presenters.ChangeThematicSectionValuePresenter
 import com.soyle.stories.characterarc.baseStoryStructure.presenters.CreateNewLocationPresenter
 import com.soyle.stories.characterarc.baseStoryStructure.presenters.DeleteLocationPresenter
+import com.soyle.stories.characterarc.baseStoryStructure.presenters.LinkLocationToCharacterArcSectionPresenter
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.eventbus.listensTo
@@ -19,30 +20,57 @@ class BaseStoryStructurePresenter(
     private val subPresenters = listOf(
       ChangeThematicSectionValuePresenter(view) listensTo characterArcEvents.changeThematicSectionValue,
       DeleteLocationPresenter(view) listensTo locationEvents.deleteLocation,
-      CreateNewLocationPresenter(view) listensTo locationEvents.createNewLocation
+      CreateNewLocationPresenter(view) listensTo locationEvents.createNewLocation,
+      LinkLocationToCharacterArcSectionPresenter(view) listensTo characterArcEvents.linkLocationToCharacterArcSection
     )
 
     override fun receiveViewBaseStoryStructureResponse(response: ViewBaseStoryStructure.ResponseModel) {
         view.update {
-            copy(
-              sections = response.sections.map {
-                  StoryStructureSectionViewModel(
-                    it.templateName,
-                    it.arcSectionId.toString(),
-                    it.value,
-                    it.subSections.map { (subSectionName, value) ->
-                        SubSectionViewModel(it.templateName, it.arcSectionId.toString(), subSectionName, value)
-                    })
-              }
-            )
+            val locationMap = this?.availableLocations?.associateBy { it.id } ?: emptyMap()
+            when (this) {
+                null -> PartialWithSections(
+                  response.sections.map {
+                      StoryStructureSectionViewModel(
+                        it.templateName,
+                        it.arcSectionId.toString(),
+                        it.value,
+                        it.subSections.map { (subSectionName, value) ->
+                            SubSectionViewModel(it.templateName, it.arcSectionId.toString(), subSectionName, value)
+                        },
+                        null
+                      )
+                  },
+                  response.sections.associate { it.arcSectionId.toString() to it.linkedLocation?.toString() }
+                )
+                else ->  withSections(
+                  response.sections.map {
+                      StoryStructureSectionViewModel(
+                        it.templateName,
+                        it.arcSectionId.toString(),
+                        it.value,
+                        it.subSections.map { (subSectionName, value) ->
+                            SubSectionViewModel(it.templateName, it.arcSectionId.toString(), subSectionName, value)
+                        },
+                        it.linkedLocation?.let {
+                            locationMap[it.toString()]
+                        }
+                      )
+                  }
+                )
+            }
         }
     }
 
     override fun receiveListAllLocationsResponse(response: ListAllLocations.ResponseModel) {
         view.update {
-            copy(
-              availableLocations = response.locations.map(::LocationItemViewModel)
-            )
+            when (this) {
+                null -> PartialWithLocations(
+                  response.locations.map(::LocationItemViewModel)
+                )
+                else -> withLocations(
+                  response.locations.map(::LocationItemViewModel)
+                )
+            }
         }
     }
 

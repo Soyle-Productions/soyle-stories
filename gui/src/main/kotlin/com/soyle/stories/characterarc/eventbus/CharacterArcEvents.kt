@@ -9,6 +9,7 @@ import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
+import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.eventbus.Notifier
@@ -37,5 +38,6 @@ interface CharacterArcEvents {
     val removeCharacterFromLocalComparison: Notifier<RemoveCharacterFromLocalComparison.OutputPort>
     val renameCharacter: Notifier<RenameCharacter.OutputPort>
     val renameCharacterArc: Notifier<RenameCharacterArc.OutputPort>
+    val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort>
 
 }

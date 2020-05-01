@@ -16,12 +16,17 @@ import com.soyle.stories.characterarc.characterComparison.CharacterComparisonSco
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogController
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.eventbus.*
+import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionController
+import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionControllerImpl
+import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
 import com.soyle.stories.characterarc.usecaseControllers.*
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArcUseCase
+import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
+import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionUseCase
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcsUseCase
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
@@ -119,6 +124,9 @@ object CharacterArcModule {
 		provide<RenameCharacterArc> {
 			RenameCharacterArcUseCase(get(), get(), get())
 		}
+		provide<LinkLocationToCharacterArcSection> {
+			LinkLocationToCharacterArcSectionUseCase(get(), get())
+		}
 	}
 
 	private fun InScope<ProjectScope>.events() {
@@ -152,6 +160,8 @@ object CharacterArcModule {
 				  RenameCharacterNotifier()
 				override val renameCharacterArc: Notifier<RenameCharacterArc.OutputPort> =
 				  RenameCharacterArcNotifier()
+				override val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort> =
+				  LinkLocationToCharacterArcSectionNotifier()
 			}
 		}
 
@@ -169,11 +179,13 @@ object CharacterArcModule {
 		provide(RemoveCharacterFromLocalComparison.OutputPort::class) { get<CharacterArcEvents>().removeCharacterFromLocalComparison as RemoveCharacterFromLocalComparisonNotifier }
 		provide(RenameCharacter.OutputPort::class) { get<CharacterArcEvents>().renameCharacter as RenameCharacterNotifier }
 		provide(RenameCharacterArc.OutputPort::class) { get<CharacterArcEvents>().renameCharacterArc as RenameCharacterArcNotifier }
+		provide(LinkLocationToCharacterArcSection.OutputPort::class) { get<CharacterArcEvents>().linkLocationToCharacterArcSection as LinkLocationToCharacterArcSectionNotifier }
 	}
 
 	private fun InScope<ProjectScope>.controllers() {
 
 		provide { ChangeThematicSectionValueController(applicationScope.get(), get(), get()) }
+		provide<LinkLocationToCharacterArcSectionController> { LinkLocationToCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
 
 	}
 
