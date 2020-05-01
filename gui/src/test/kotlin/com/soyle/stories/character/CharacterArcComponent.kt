@@ -10,12 +10,14 @@ import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCa
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogController
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.eventbus.*
+import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
 import com.soyle.stories.characterarc.usecaseControllers.*
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArcUseCase
+import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcsUseCase
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
@@ -178,6 +180,8 @@ class CharacterArcComponent(
 			  RenameCharacterNotifier()
 			override val renameCharacterArc: Notifier<RenameCharacterArc.OutputPort> =
 			  RenameCharacterArcNotifier()
+			override val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort> =
+			  LinkLocationToCharacterArcSectionNotifier()
 		}
 	}
 

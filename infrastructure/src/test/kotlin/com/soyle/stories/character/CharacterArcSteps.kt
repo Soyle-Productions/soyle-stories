@@ -4,6 +4,7 @@ import com.soyle.stories.UATLogger
 import com.soyle.stories.character.CharacterArcSteps.interact
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructure
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureScope
+import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
 import com.soyle.stories.characterarc.repositories.CharacterArcRepository
 import com.soyle.stories.di.get
@@ -50,6 +51,14 @@ object CharacterArcSteps : ApplicationTest() {
 			setNumberOfCharacterArcsCreated(double, atLeast)
 		}
 		Assertions.assertTrue(getNumberOfCharacterArcsCreated(double) >= atLeast)
+	}
+
+	fun getCharacterArcSectionsForCharacter(double: SoyleStoriesTestDouble, characterId: Character.Id): List<CharacterArcSection>
+	{
+		val scope = ProjectSteps.getProjectScope(double) ?: return emptyList()
+		return runBlocking {
+			scope.get<com.soyle.stories.theme.repositories.CharacterArcSectionRepository>().getCharacterArcSectionsForCharacter(characterId)
+		}
 	}
 
 	fun setBaseStoryStructureToolOpen(double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id)
@@ -209,5 +218,52 @@ object CharacterArcSteps : ApplicationTest() {
 		val openLocationSelection = getCharacterArcSectionLocationDropDown(double, themeId, characterId)
 		  ?: return (false).also { UATLogger.log("Character Arc Section Location Dropdown not yet open") }
 		return openLocationSelection.text == location.name
+	}
+
+	fun setCharacterArcSectionLinkedToLocation(double: SoyleStoriesTestDouble, sectionId: CharacterArcSection.Id, locationId: Location.Id)
+	{
+		ProjectSteps.givenProjectHasBeenOpened(double)
+		val scope = ProjectSteps.getProjectScope(double)!!
+		scope.get<LinkLocationToCharacterArcSectionController>().linkLocation(sectionId.uuid.toString(), locationId.uuid.toString())
+	}
+
+	fun isCharacterArcSectionLinkedToLocation(double: SoyleStoriesTestDouble, sectionId: CharacterArcSection.Id, locationId: Location.Id): Boolean
+	{
+		val scope = ProjectSteps.getProjectScope(double) ?: return false
+		var section: CharacterArcSection? = null
+		runBlocking {
+			section = scope.get<com.soyle.stories.theme.repositories.CharacterArcSectionRepository>().getCharacterArcSectionById(sectionId)
+		}
+		return section?.linkedLocation == locationId
+	}
+
+	fun givenCharacterArcSectionHasALinkedLocation(double: SoyleStoriesTestDouble, section: CharacterArcSection.Id, location: Location.Id) {
+		if (! isCharacterArcSectionLinkedToLocation(double, section, location)) {
+			setCharacterArcSectionLinkedToLocation(double, section, location)
+		}
+		assertTrue(isCharacterArcSectionLinkedToLocation(double, section, location))
+	}
+
+	fun whenUnlinkInCharacterArcSectionLocationDropdownIsSelected(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
+	) {
+		val openLocationSelection = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		  ?: error("Character Arc Section Location Dropdown not yet open")
+		interact {
+			val locationItem = openLocationSelection.contextMenu.items.find { it.text == "Unlink" }
+			  ?: error("no unlink item")
+			val onAction = locationItem.onAction
+			  ?: error("no registered action for menu item")
+			onAction.handle(ActionEvent())
+		}
+	}
+
+	fun isCharacterArcSectionLocationDropdownDisplayingEmptyState(
+	  double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id
+	): Boolean
+	{
+		val openLocationSelection = getCharacterArcSectionLocationDropDown(double, themeId, characterId)
+		  ?: return (false).also { UATLogger.log("Character Arc Section Location Dropdown not yet open") }
+		return openLocationSelection.text == "[link]"
 	}
 }

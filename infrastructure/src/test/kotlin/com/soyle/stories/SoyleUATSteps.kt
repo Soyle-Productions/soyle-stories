@@ -10,6 +10,7 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
 import javafx.scene.input.KeyCode
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
@@ -107,6 +108,14 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val arc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.givenCharacterArcSectionLocationDropDownMenuHasBeenOpened(double, arc.themeId, arc.characterId)
 		}
+		Given("a Character Arc Section has a linked Location") {
+			CharacterArcSteps.givenANumberOfCharacterArcsHaveBeenCreated(double, 1)
+			val character = CharacterSteps.getCharactersCreated(double).first()
+			val section = CharacterArcSteps.getCharacterArcSectionsForCharacter(double, character.id).first()
+			LocationSteps.givenNumberOfLocationsHaveBeenCreated(double, 1)
+			val location = LocationSteps.getLocationsCreated(double).first()
+			CharacterArcSteps.givenCharacterArcSectionHasALinkedLocation(double, section.id, location.id)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -184,10 +193,12 @@ class SoyleUATSteps : En, ApplicationTest() {
 			CharacterArcSteps.whenLocationInCharacterArcSectionLocationDropdownIsSelected(double, characterArc.themeId, characterArc.characterId, location)
 		}
 		When("the user clicks outside the Character Arc Section Location dropdown menu") {
-			UATLogger.silent = false
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.whenCharacterArcSectionLocationDropDownLosesFocus(double, characterArc.themeId, characterArc.characterId)
-			UATLogger.silent = true
+		}
+		When("the Unlink option in Character Arc Section Location Dropdown is selected") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			CharacterArcSteps.whenUnlinkInCharacterArcSectionLocationDropdownIsSelected(double, characterArc.themeId, characterArc.characterId)
 		}
 
 
@@ -257,25 +268,26 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertFalse(CharacterArcSteps.isLocationDropdownDisabledInBaseStoryStructureTool(double, characterArc.themeId, characterArc.characterId))
 		}
 		Then("all Locations should be listed in the Character Arc Section Location dropdown menu") {
-			UATLogger.silent = false
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			val locations = LocationSteps.getLocationsCreated(double)
 			CharacterArcSteps.isCharacterArcSectionLocationOpenWithAllLocations(double, characterArc.themeId, characterArc.characterId, locations)
 			  .let(::assertTrue)
-			UATLogger.silent = true
 		}
 		Then("the Character Arc Section Location dropdown should show the selected Location name") {
-			UATLogger.silent = false
 			val arc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			val location = LocationSteps.getLocationsCreated(double).first()
 			CharacterArcSteps.isCharacterArcSectionLocationDropdownDisplayingLocation(double, arc.themeId, arc.characterId, location)
 			  .let(::assertTrue)
-			UATLogger.silent = true
 		}
 		Then("the Character Arc Section Location dropdown menu should be closed") {
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.isCharacterArcSectionLocationOpen(double, characterArc.themeId, characterArc.characterId)
 			  .let(::assertFalse)
+		}
+		Then("the Character Arc Section Location dropdown should show an empty state") {
+			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
+			CharacterArcSteps.isCharacterArcSectionLocationDropdownDisplayingEmptyState(double, characterArc.themeId, characterArc.characterId)
+			  .let(Assertions::assertTrue)
 		}
 
 
