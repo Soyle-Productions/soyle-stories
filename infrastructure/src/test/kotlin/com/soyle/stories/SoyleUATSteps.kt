@@ -2,6 +2,7 @@ package com.soyle.stories
 
 import com.soyle.stories.character.CharacterArcSteps
 import com.soyle.stories.character.CharacterSteps
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.location.LocationSteps
@@ -23,6 +24,8 @@ class SoyleUATSteps : En, ApplicationTest() {
 	private var targetLocation: Location? = null
 	private var recentlyCreatedLocationName: String = ""
 	private var deletedLocation: Location? = null
+
+	private var recentlyCreatedCharacter: Character? = null
 
 	init {
 		Given("A project has been opened") {
@@ -119,6 +122,10 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("{int} Characters have been created") { int1: Int ->
 			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, int1)
 		}
+		Given("The Character List Tool has been opened") {
+			// LocationListDriver.givenHasBeenOpened(double)
+			CharacterSteps.givenCharacterListToolHasBeenOpened(double)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -207,6 +214,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("The Character List Tool is opened") {
 			CharacterSteps.whenCharacterListToolIsOpened(double)
+		}
+		When("A new Character is created") {
+			recentlyCreatedCharacter = CharacterSteps.whenCharacterIsCreated(double)
 		}
 
 
@@ -302,6 +312,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("The Character List Tool should show all {int} Characters") { characterCount: Int ->
 			assertTrue(CharacterSteps.isCharacterListToolShowingNumberOfCharacters(double, characterCount))
+		}
+		Then("The Character List Tool should show the new Character") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingCharacter(double, recentlyCreatedCharacter!!))
 		}
 
 
