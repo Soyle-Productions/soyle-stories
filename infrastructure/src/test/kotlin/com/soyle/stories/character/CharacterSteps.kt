@@ -250,6 +250,21 @@ object CharacterSteps : ApplicationTest() {
 		}
 	}
 
+	fun setCharacterListToolShowingInputBoxForSelectedItem(double: SoyleStoriesTestDouble)
+	{
+		givenCharacterIsSelectedInCharacterListTool(double)
+
+		val scope = ProjectSteps.getProjectScope(double)!!
+		interact {
+			val characterList = scope.get<CharacterList>()
+			characterList.owningTab?.let {
+				it.tabPane.selectionModel.select(it)
+			}
+			val treeView = from(characterList.root).lookup(".tree-view").query<TreeView<*>>() as TreeView<Any?>
+			treeView.edit(treeView.selectionModel.selectedItem)
+		}
+	}
+
 	fun getCharacterListToolInputBox(double: SoyleStoriesTestDouble): TextField?
 	{
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
@@ -270,5 +285,47 @@ object CharacterSteps : ApplicationTest() {
 		val selectedItem = getCharacterSelectedInCharacterListTool(double)
 		val itemGraphic: TextField? = getCharacterListToolInputBox(double)
 		return itemGraphic?.text?.equals(selectedItem?.name) ?: false
+	}
+
+	fun givenCharacterListToolShowingInputBoxForSelectedItem(double: SoyleStoriesTestDouble)
+	{
+		if (! isCharacterListToolShowingInputBoxForSelectedItem(double))
+		{
+			setCharacterListToolShowingInputBoxForSelectedItem(double)
+		}
+		assertTrue(isCharacterListToolShowingInputBoxForSelectedItem(double))
+	}
+
+	fun setValidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double: SoyleStoriesTestDouble)
+	{
+		givenCharacterListToolShowingInputBoxForSelectedItem(double)
+		val inputBox = getCharacterListToolInputBox(double)!!
+		inputBox.text = "New Valid Character Name"
+	}
+
+	fun isValidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double: SoyleStoriesTestDouble): Boolean
+	{
+		val inputBox = getCharacterListToolInputBox(double) ?: return false
+		return inputBox.text.isNotBlank()
+	}
+
+	fun givenValidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double: SoyleStoriesTestDouble)
+	{
+		if (! isValidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double))
+		{
+			setValidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double)
+		}
+		assertTrue(isValidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double))
+	}
+
+	fun isCharacterListToolShowingNameStoredForSelectedItem(double: SoyleStoriesTestDouble): Boolean
+	{
+		val selectedItem = getCharacterSelectedInCharacterListTool(double) ?: return false
+		val scope = ProjectSteps.getProjectScope(double) ?: return false
+		var storedItem: Character? = null
+		async(scope.applicationScope) {
+			storedItem = scope.get<CharacterRepository>().getCharacterById(Character.Id(UUID.fromString(selectedItem.id)))
+		}
+		return selectedItem.name == storedItem!!.name
 	}
 }

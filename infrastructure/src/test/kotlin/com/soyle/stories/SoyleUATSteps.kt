@@ -139,6 +139,12 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("a Character has been selected") {
 			CharacterSteps.givenCharacterIsSelectedInCharacterListTool(double)
 		}
+		Given("the Character rename input box is visible") {
+			CharacterSteps.givenCharacterListToolShowingInputBoxForSelectedItem(double)
+		}
+		Given("the user has entered a valid Character name") {
+			CharacterSteps.givenValidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -358,6 +364,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Character rename input box should contain the Character's name") {
 			assertTrue(CharacterSteps.isCharacterListToolRenameInputBoxContainingSelectedItemName(double))
+		}
+		Then("the Character rename input box should be replaced by the Character name") {
+			assertFalse(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+		}
+		Then("the Character name should be the new name") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingNameStoredForSelectedItem(double))
+		}
+		Then("the Character name should be the original name") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingNameStoredForSelectedItem(double))
 		}
 
 

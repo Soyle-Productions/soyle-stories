@@ -62,7 +62,7 @@ Feature: Character List Tool
 
   Scenario: Enter New Name in Input Box
     Given the Character rename input box is visible
-    And the user has entered a valid name
+    And the user has entered a valid Character name
     When The user presses the Enter key
     Then the Character rename input box should be replaced by the Character name
     And the Character name should be the new name
