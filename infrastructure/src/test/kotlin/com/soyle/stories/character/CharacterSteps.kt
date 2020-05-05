@@ -1,12 +1,11 @@
 package com.soyle.stories.character
 
 import com.soyle.stories.character.CharacterSteps.interact
-import com.soyle.stories.characterarc.characterList.CharacterList
-import com.soyle.stories.characterarc.characterList.CharacterTreeItemViewModel
-import com.soyle.stories.characterarc.characterList.EmptyDisplay
-import com.soyle.stories.characterarc.characterList.PopulatedDisplay
+import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.repositories.CharacterRepository
+import com.soyle.stories.common.async
+import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -134,6 +133,19 @@ object CharacterSteps : ApplicationTest() {
 			  .find { it.id == character.id.uuid.toString() }
 		}
 		return populatedDisplayIsVisible && characterItemViewModel != null
+	}
+
+	fun whenCharacterIsDeleted(double: SoyleStoriesTestDouble): Character
+	{
+		val scope = ProjectSteps.getProjectScope(double)!!
+		var firstCharacter: Character? = null
+		interact {
+			async(scope.applicationScope) {
+				firstCharacter = DI.resolve<CharacterRepository>(scope).listCharactersInProject(Project.Id(scope.projectId)).first()
+				DI.resolve<CharacterListViewListener>(scope).removeCharacter(firstCharacter!!.id.uuid.toString())
+			}
+		}
+		return firstCharacter!!
 	}
 
 }

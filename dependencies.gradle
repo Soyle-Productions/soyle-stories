@@ -12,6 +12,9 @@ project.ext.libraries = [
         junitEngine: "org.junit.jupiter:junit-jupiter-engine:${junitVersion}",
         junitParam: "org.junit.jupiter:junit-jupiter-params:${junitVersion}",
 
+
+        assertj: 'org.assertj:assertj-core:3.15.0',
+
         // soyle stories
         soyle_stories_core: "com.soyle.stories:soyle-stories-core:${project.version}"
 ]

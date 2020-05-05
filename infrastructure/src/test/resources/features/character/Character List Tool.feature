@@ -30,7 +30,7 @@ Feature: Character List Tool
 
   Scenario Outline: Update when Characters are deleted
     Given The Character List Tool has been opened
-    And <number> Character have been created
+    And <number> Characters have been created
     When A Character is deleted
     Then The Character List Tool should not show the deleted Character
 

@@ -46,7 +46,7 @@ dependencies {
 
     testImplementation 'io.cucumber:cucumber-java8:5.5.0'
     testImplementation 'io.cucumber:cucumber-junit:5.5.0'
-    testImplementation 'org.assertj:assertj-core:3.15.0'
+    testImplementation libraries.assertj
 
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.11.0'
     testImplementation 'io.github.prashant-ramcharan:courgette-jvm:4.6.0'

@@ -26,6 +26,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 	private var deletedLocation: Location? = null
 
 	private var recentlyCreatedCharacter: Character? = null
+	private var deletedCharacter: Character? = null
 
 	init {
 		Given("A project has been opened") {
@@ -218,6 +219,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("A new Character is created") {
 			recentlyCreatedCharacter = CharacterSteps.whenCharacterIsCreated(double)
 		}
+		When("A Character is deleted") {
+			deletedCharacter = CharacterSteps.whenCharacterIsDeleted(double)
+		}
 
 
 		Then("The Location List Tool should show a special empty message") {
@@ -315,6 +319,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("The Character List Tool should show the new Character") {
 			assertTrue(CharacterSteps.isCharacterListToolShowingCharacter(double, recentlyCreatedCharacter!!))
+		}
+		Then("The Character List Tool should not show the deleted Character") {
+			assertFalse(CharacterSteps.isCharacterListToolShowingCharacter(double, deletedCharacter!!))
 		}
 
 
