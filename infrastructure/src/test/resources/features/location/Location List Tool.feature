@@ -38,3 +38,17 @@ Feature: Location List Tool
     Examples:
       | number |
       | 2      |
+
+  Scenario: Click Away after Rename
+    Given the Location rename input box is visible
+    And the user has entered a valid name
+    When The user clicks away from the input box
+    Then the Location rename input box should be replaced by the Location name
+    And the Location name should be the new name
+
+  Scenario: Click Away without Rename
+    Given the Location rename input box is visible
+    When The user clicks away from the input box
+    Then the Location rename input box should be replaced by the Location name
+    And the Location name should be the original name
+
