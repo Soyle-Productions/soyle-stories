@@ -202,6 +202,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 			CharacterArcSteps.whenSelectedLocationInCharacterArcSectionLocationDropdownIsDeselected(double, characterArc.themeId, characterArc.characterId)
 			UATLogger.silent = true
 		}
+		When("The Character List Tool is opened") {
+			CharacterSteps.whenCharacterListToolIsOpened(double)
+		}
 
 
 		Then("The Location List Tool should show a special empty message") {
@@ -290,6 +293,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.isCharacterArcSectionLocationDropdownDisplayingEmptyState(double, characterArc.themeId, characterArc.characterId)
 			  .let(Assertions::assertTrue)
+		}
+		Then("The Character List Tool should show a special empty message") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingEmptyMessage(double))
 		}
 
 
