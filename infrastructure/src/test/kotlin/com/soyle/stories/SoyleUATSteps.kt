@@ -240,6 +240,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("the user clicks the Character List Tool delete button") {
 			CharacterSteps.whenCharacterListToolActionBarDeleteButtonIsClicked(double)
 		}
+		When("the user clicks the Character List Tool right-click menu Rename button") {
+			CharacterSteps.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "rename")
+		}
 
 
 		Then("The Location List Tool should show a special empty message") {
@@ -349,6 +352,12 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Confirm Delete Character Dialog should show the Character name") {
 			assertTrue(CharacterSteps.isConfirmDeleteCharacterDialogDisplayingNameOf(double, targetObject as Character))
+		}
+		Then("the Character's name should be replaced by an input box") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+		}
+		Then("the Character rename input box should contain the Character's name") {
+			assertTrue(CharacterSteps.isCharacterListToolRenameInputBoxContainingSelectedItemName(double))
 		}
 
 

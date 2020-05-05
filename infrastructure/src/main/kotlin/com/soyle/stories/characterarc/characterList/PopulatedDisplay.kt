@@ -22,6 +22,7 @@ internal class PopulatedDisplay : View() {
 
     private val characterContextMenu = ContextMenu().apply {
         item("Rename") {
+            id = "rename"
             action {
                 val selectedItem = model.selectedItem.value
                 val selectedTreeItem = treeView.selectionModel.selectedItems.singleOrNull() ?: return@action

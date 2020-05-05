@@ -5,6 +5,7 @@ import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.repositories.CharacterRepository
 import com.soyle.stories.common.async
+import com.soyle.stories.common.editingCell
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
@@ -14,8 +15,10 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.ActionEvent
 import javafx.geometry.Side
+import javafx.scene.Node
 import javafx.scene.control.DialogPane
 import javafx.scene.control.MenuItem
+import javafx.scene.control.TextField
 import javafx.scene.control.TreeView
 import javafx.stage.Window
 import kotlinx.coroutines.runBlocking
@@ -247,4 +250,25 @@ object CharacterSteps : ApplicationTest() {
 		}
 	}
 
+	fun getCharacterListToolInputBox(double: SoyleStoriesTestDouble): TextField?
+	{
+		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
+		val characterList = findComponentsInScope<CharacterList>(projectScope).singleOrNull() ?: return null
+		var graphic: Node? = null
+		interact {
+			graphic = from(characterList.root).lookup(".tree-view").query<TreeView<*>>().editingCell?.graphic
+		}
+		return graphic as? TextField
+	}
+
+	fun isCharacterListToolShowingInputBoxForSelectedItem(double: SoyleStoriesTestDouble): Boolean
+	{
+		return getCharacterListToolInputBox(double) != null
+	}
+
+	fun isCharacterListToolRenameInputBoxContainingSelectedItemName(double: SoyleStoriesTestDouble): Boolean {
+		val selectedItem = getCharacterSelectedInCharacterListTool(double)
+		val itemGraphic: TextField? = getCharacterListToolInputBox(double)
+		return itemGraphic?.text?.equals(selectedItem?.name) ?: false
+	}
 }

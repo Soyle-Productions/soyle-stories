@@ -55,7 +55,7 @@ Feature: Character List Tool
     And the Confirm Delete Character Dialog should show the Character name
 
   Scenario: Renaming inside Character List Tool creates input box
-    Given the Character right-click menu is open
+    Given the Character right-click menu has been opened
     When the user clicks the Character List Tool right-click menu Rename button
     Then the Character's name should be replaced by an input box
     And the Character rename input box should contain the Character's name
