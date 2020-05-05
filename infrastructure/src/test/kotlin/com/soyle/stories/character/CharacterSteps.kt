@@ -239,4 +239,12 @@ object CharacterSteps : ApplicationTest() {
 		return dialog.headerText.contains(character.name)
 	}
 
+	fun whenCharacterListToolActionBarDeleteButtonIsClicked(double: SoyleStoriesTestDouble)
+	{
+		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
+		interact {
+			from(projectScope.get<ActionBar>().root).lookup("#actionBar_deleteLocation").queryButton().onAction.handle(ActionEvent())
+		}
+	}
+
 }

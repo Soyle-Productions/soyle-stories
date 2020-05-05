@@ -2,7 +2,6 @@ package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
-import com.soyle.stories.di.characterarc.CharacterListModule
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
 import javafx.geometry.Insets
@@ -40,6 +39,7 @@ internal class ActionBar : View() {
             isMnemonicParsing = false
         }
         button("Delete") {
+            id = "actionBar_deleteLocation"
             enableWhen { model.selectedItem.isNotNull }
             action {
                 when (val selectedItem = model.selectedItem.value) {

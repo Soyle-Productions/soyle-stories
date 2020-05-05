@@ -136,6 +136,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 			CharacterSteps.givenCharacterListToolCharacterContextMenuHasBeenOpened(double)
 			//targetLocation = LocationSteps.getLocationsCreated(double).first()
 		}
+		Given("a Character has been selected") {
+			CharacterSteps.givenCharacterIsSelectedInCharacterListTool(double)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -233,6 +236,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("the user clicks the Character List Tool right-click menu delete button") {
 			CharacterSteps.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "delete")
+		}
+		When("the user clicks the Character List Tool delete button") {
+			CharacterSteps.whenCharacterListToolActionBarDeleteButtonIsClicked(double)
 		}
 
 
