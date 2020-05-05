@@ -10,7 +10,7 @@ Feature: Character List Tool
     When The Character List Tool is opened
     Then The Character List Tool should show a special empty message
 
-  Scenario Outline: Character List Tool shows correct number of scenes
+  Scenario Outline: Character List Tool shows correct number of Characters
     Given <number> Characters have been created
     When The Character List Tool is opened
     Then The Character List Tool should show all <number> Characters

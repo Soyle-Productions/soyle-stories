@@ -2,6 +2,7 @@ package com.soyle.stories.character
 
 import com.soyle.stories.character.CharacterSteps.interact
 import com.soyle.stories.characterarc.characterList.EmptyDisplay
+import com.soyle.stories.characterarc.characterList.PopulatedDisplay
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.repositories.CharacterRepository
 import com.soyle.stories.di.get
@@ -10,6 +11,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import javafx.scene.control.MenuItem
+import javafx.scene.control.TreeView
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
@@ -64,6 +66,20 @@ object CharacterSteps : ApplicationTest() {
 			}
 		}
 		return emptyDisplayIsVisible
+	}
+
+	fun isCharacterListToolShowingNumberOfCharacters(double: SoyleStoriesTestDouble, characterCount: Int): Boolean
+	{
+		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
+		var populatedDisplayIsVisible = false
+		var characterListSize = 0
+		interact {
+			populatedDisplayIsVisible = projectScope.get<PopulatedDisplay>().let {
+				it.root.isVisible && it.currentStage != null
+			}
+			characterListSize = (projectScope.get<PopulatedDisplay>().root.lookup(".tree-view") as TreeView<*>).root.children.size
+		}
+		return populatedDisplayIsVisible && characterListSize == characterCount
 	}
 
 }

@@ -116,6 +116,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val location = LocationSteps.getLocationsCreated(double).first()
 			CharacterArcSteps.givenCharacterArcSectionHasALinkedLocation(double, section.id, location.id)
 		}
+		Given("{int} Characters have been created") { int1: Int ->
+			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, int1)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -296,6 +299,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("The Character List Tool should show a special empty message") {
 			assertTrue(CharacterSteps.isCharacterListToolShowingEmptyMessage(double))
+		}
+		Then("The Character List Tool should show all {int} Characters") { characterCount: Int ->
+			assertTrue(CharacterSteps.isCharacterListToolShowingNumberOfCharacters(double, characterCount))
 		}
 
 
