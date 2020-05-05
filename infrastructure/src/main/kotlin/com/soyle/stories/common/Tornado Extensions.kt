@@ -191,18 +191,28 @@ fun <T> TreeView<T>.makeEditable(convertFromString: TreeCell<T>.(String, T?) -> 
 	val self = this
 	isEditable = true
 	properties["tornadofx.editSupport"] = fun TreeCell<T>.(eventType: EditEventType, value: T?) {
+		val cell = this
 		graphic = when (eventType) {
 			EditEventType.StartEdit -> {
 				self.properties["com.soyle.stories.treeView.editingCell"] = this
 				val rollbackText = text
 				properties["com.soyle.stories.rollbackText"] = rollbackText
 				text = null
-				textfield(rollbackText).also {
-					it.requestFocus()
-					it.selectAll()
-					it.action {
-						commitEdit(convertFromString.invoke(this, it.text, item))
+				textfield(rollbackText) {
+					action {
+						commitEdit(convertFromString.invoke(cell, text, item))
 					}
+					focusedProperty().onChange {
+						if (! it) {
+							if (text != rollbackText) {
+								commitEdit(convertFromString.invoke(cell, text, item))
+							} else {
+								cell.cancelEdit()
+							}
+						}
+					}
+					requestFocus()
+					selectAll()
 				}
 			}
 			EditEventType.CancelEdit -> {

@@ -100,6 +100,14 @@ object ProjectSteps : ApplicationTest() {
 		}
 	}
 
+	fun whenUserClicksAway(double: SoyleStoriesTestDouble)
+	{
+		val scope = getProjectScope(double)!!
+		interact {
+			scope.get<WorkBench>().root.requestFocus()
+		}
+	}
+
 
 
 }

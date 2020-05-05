@@ -249,6 +249,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("the user clicks the Character List Tool right-click menu Rename button") {
 			CharacterSteps.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "rename")
 		}
+		When("The user clicks away from the input box") {
+			ProjectSteps.whenUserClicksAway(double)
+		}
 
 
 		Then("The Location List Tool should show a special empty message") {
