@@ -38,15 +38,15 @@ Feature: Character List Tool
       | number |
       | 2      |
 
-  Scenario: Populated Character List
+  Scenario: Delete Character by right-clicking
     Given The Character List Tool has been opened
     And A Character has been created
-    And the Character right-click menu is open
+    And the Character right-click menu has been opened
     When the user clicks the Character List Tool right-click menu delete button
     Then the Confirm Delete Character Dialog should be opened
     And the Confirm Delete Character Dialog should show the Character name
 
-  Scenario: Populated Character List + button
+  Scenario: Delete Character by Selecting and Clicking Button
     Given The Character List Tool has been opened
     And A Character has been created
     And a Character has been selected

@@ -12,17 +12,21 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
+import javafx.event.ActionEvent
+import javafx.geometry.Side
+import javafx.scene.control.DialogPane
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TreeView
+import javafx.stage.Window
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
+import tornadofx.selectFirst
 import java.util.*
 
 object CharacterSteps : ApplicationTest() {
 
-	fun setNumberOfCharactersCreated(double: SoyleStoriesTestDouble, atLeast: Int)
-	{
+	fun setNumberOfCharactersCreated(double: SoyleStoriesTestDouble, atLeast: Int) {
 		ProjectSteps.givenProjectHasBeenOpened(double)
 		val currentCount = getNumberOfCharactersCreated(double)
 		runBlocking {
@@ -32,8 +36,7 @@ object CharacterSteps : ApplicationTest() {
 		}
 	}
 
-	fun getCharactersCreated(double: SoyleStoriesTestDouble): List<Character>
-	{
+	fun getCharactersCreated(double: SoyleStoriesTestDouble): List<Character> {
 		val scope = ProjectSteps.getProjectScope(double) ?: return emptyList()
 		return runBlocking {
 			scope.get<CharacterRepository>().listCharactersInProject(Project.Id(scope.projectId))
@@ -42,8 +45,7 @@ object CharacterSteps : ApplicationTest() {
 
 	fun getNumberOfCharactersCreated(double: SoyleStoriesTestDouble): Int = getCharactersCreated(double).size
 
-	fun whenCharacterIsCreated(double: SoyleStoriesTestDouble): Character
-	{
+	fun whenCharacterIsCreated(double: SoyleStoriesTestDouble): Character {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val repo = scope.get<CharacterRepository>()
 		return runBlocking {
@@ -60,39 +62,33 @@ object CharacterSteps : ApplicationTest() {
 		assertTrue(getNumberOfCharactersCreated(double) >= atLeast)
 	}
 
-	fun setCharacterListToolOpen(double: SoyleStoriesTestDouble)
-	{
+	fun setCharacterListToolOpen(double: SoyleStoriesTestDouble) {
 		ProjectSteps.givenProjectHasBeenOpened(double)
 		whenCharacterListToolIsOpened(double)
 	}
 
-	fun getOpenCharacterListTool(double: SoyleStoriesTestDouble): CharacterList?
-	{
+	fun getOpenCharacterListTool(double: SoyleStoriesTestDouble): CharacterList? {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
 		return findComponentsInScope<CharacterList>(projectScope).singleOrNull()?.takeIf { it.currentStage?.isShowing == true }
 	}
 
 	fun isCharacterListToolOpen(double: SoyleStoriesTestDouble): Boolean = getOpenCharacterListTool(double) != null
 
-	fun whenCharacterListToolIsOpened(double: SoyleStoriesTestDouble)
-	{
+	fun whenCharacterListToolIsOpened(double: SoyleStoriesTestDouble) {
 		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Characters")!!
 		interact {
 			menuItem.fire()
 		}
 	}
 
-	fun givenCharacterListToolHasBeenOpened(double: SoyleStoriesTestDouble)
-	{
-		if (! isCharacterListToolOpen(double))
-		{
+	fun givenCharacterListToolHasBeenOpened(double: SoyleStoriesTestDouble) {
+		if (!isCharacterListToolOpen(double)) {
 			setCharacterListToolOpen(double)
 		}
 		assertTrue(isCharacterListToolOpen(double))
 	}
 
-	fun isCharacterListToolShowingEmptyMessage(double: SoyleStoriesTestDouble): Boolean
-	{
+	fun isCharacterListToolShowingEmptyMessage(double: SoyleStoriesTestDouble): Boolean {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
 		var emptyDisplayIsVisible = false
 		interact {
@@ -103,8 +99,7 @@ object CharacterSteps : ApplicationTest() {
 		return emptyDisplayIsVisible
 	}
 
-	fun isCharacterListToolShowingNumberOfCharacters(double: SoyleStoriesTestDouble, characterCount: Int): Boolean
-	{
+	fun isCharacterListToolShowingNumberOfCharacters(double: SoyleStoriesTestDouble, characterCount: Int): Boolean {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
 		var populatedDisplayIsVisible = false
 		var characterListSize = 0
@@ -117,8 +112,7 @@ object CharacterSteps : ApplicationTest() {
 		return populatedDisplayIsVisible && characterListSize == characterCount
 	}
 
-	fun isCharacterListToolShowingCharacter(double: SoyleStoriesTestDouble, character: Character): Boolean
-	{
+	fun isCharacterListToolShowingCharacter(double: SoyleStoriesTestDouble, character: Character): Boolean {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
 		var populatedDisplayIsVisible = false
 		var characterItemViewModel: CharacterTreeItemViewModel? = null
@@ -135,8 +129,7 @@ object CharacterSteps : ApplicationTest() {
 		return populatedDisplayIsVisible && characterItemViewModel != null
 	}
 
-	fun whenCharacterIsDeleted(double: SoyleStoriesTestDouble): Character
-	{
+	fun whenCharacterIsDeleted(double: SoyleStoriesTestDouble): Character {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		var firstCharacter: Character? = null
 		interact {
@@ -146,6 +139,104 @@ object CharacterSteps : ApplicationTest() {
 			}
 		}
 		return firstCharacter!!
+	}
+
+	fun setCharacterSelectedInCharacterListTool(double: SoyleStoriesTestDouble) {
+		givenANumberOfCharactersHaveBeenCreated(double, 1)
+		givenCharacterListToolHasBeenOpened(double)
+		val scope = ProjectSteps.getProjectScope(double)!!
+		interact {
+			from(scope.get<CharacterList>().root).lookup(".tree-view").query<TreeView<*>>().selectFirst()
+		}
+	}
+
+	fun getCharacterSelectedInCharacterListTool(double: SoyleStoriesTestDouble): CharacterTreeItemViewModel? {
+		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
+		val locationList = findComponentsInScope<CharacterList>(projectScope).singleOrNull() ?: return null
+		var selected: CharacterTreeItemViewModel? = null
+		interact {
+			selected = from(locationList.root).lookup(".tree-view").query<TreeView<*>>()
+			  .selectionModel.selectedItem?.value as? CharacterTreeItemViewModel
+		}
+		return selected
+	}
+
+	fun isCharacterSelectedInCharacterListTool(double: SoyleStoriesTestDouble): Boolean =
+	  getCharacterSelectedInCharacterListTool(double) != null
+
+	fun givenCharacterIsSelectedInCharacterListTool(double: SoyleStoriesTestDouble) {
+		if (!isCharacterSelectedInCharacterListTool(double)) {
+			setCharacterSelectedInCharacterListTool(double)
+		}
+		assertTrue(isCharacterSelectedInCharacterListTool(double))
+	}
+
+	fun setCharacterListToolCharacterContextMenuOpen(double: SoyleStoriesTestDouble) {
+		givenCharacterIsSelectedInCharacterListTool(double)
+		whenCharacterListToolCharacterContextMenuIsOpened(double)
+	}
+
+	fun isCharacterListToolCharacterContextMenuOpen(double: SoyleStoriesTestDouble): Boolean {
+		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
+		val characterList = findComponentsInScope<CharacterList>(projectScope).singleOrNull() ?: return false
+		var isOpen = false
+		interact {
+			val treeView = (characterList.root.lookup(".tree-view") as TreeView<*>)
+			isOpen = treeView.contextMenu?.isShowing ?: false
+		}
+		return isOpen
+	}
+
+	fun whenCharacterListToolCharacterContextMenuIsOpened(double: SoyleStoriesTestDouble) {
+		val scope = ProjectSteps.getProjectScope(double)!!
+		interact {
+			val treeView = (scope.get<CharacterList>().root.lookup(".tree-view") as TreeView<*>)
+			treeView.contextMenu!!.show(treeView, Side.TOP, 0.0, 0.0)
+		}
+	}
+
+	fun givenCharacterListToolCharacterContextMenuHasBeenOpened(double: SoyleStoriesTestDouble) {
+		if (!isCharacterListToolCharacterContextMenuOpen(double)) {
+			setCharacterListToolCharacterContextMenuOpen(double)
+		}
+		assertTrue(isCharacterListToolCharacterContextMenuOpen(double))
+	}
+
+	fun whenCharacterListToolCharacterContextMenuButtonIsClicked(double: SoyleStoriesTestDouble, menuItemId: String) {
+		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
+		val locationList = findComponentsInScope<CharacterList>(projectScope).single()
+		interact {
+			val treeView = from(locationList.root).lookup(".tree-view").query<TreeView<*>>()
+			val menuItem = treeView.contextMenu!!.items.find { it.id == menuItemId }
+			  ?: error("No menu item with id $menuItemId")
+			menuItem.onAction.handle(ActionEvent())
+		}
+	}
+
+	fun getOpenConfirmDeleteCharacterDialog(double: SoyleStoriesTestDouble): Window?
+	{
+		ProjectSteps.getProjectScope(double) ?: return null
+		var windows: List<Window> = emptyList()
+		interact {
+			windows = robotContext().windowFinder.listTargetWindows()
+		}
+		return windows.find {
+			val styleClass = it.scene?.root?.styleClass ?: return@find false
+
+			styleClass.contains("alert") && styleClass.contains("confirmation")
+		}
+	}
+
+	fun isConfirmDeleteCharacterDialogOpen(double: SoyleStoriesTestDouble): Boolean
+	{
+		return getOpenConfirmDeleteCharacterDialog(double) != null
+	}
+
+	fun isConfirmDeleteCharacterDialogDisplayingNameOf(double: SoyleStoriesTestDouble, character: Character): Boolean
+	{
+		val window = getOpenConfirmDeleteCharacterDialog(double) ?: return false
+		val dialog = window.scene.root as? DialogPane ?: return false
+		return dialog.headerText.contains(character.name)
 	}
 
 }

@@ -39,6 +39,7 @@ internal class PopulatedDisplay : View() {
             }
         }
         item("Delete") {
+            id = "delete"
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterTreeItemViewModel) {

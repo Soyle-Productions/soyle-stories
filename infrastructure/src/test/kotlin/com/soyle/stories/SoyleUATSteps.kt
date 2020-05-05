@@ -21,6 +21,8 @@ class SoyleUATSteps : En, ApplicationTest() {
 
 	private val double = SoyleStoriesTestDouble()
 
+	private var targetObject: Any? = null
+
 	private var targetLocation: Location? = null
 	private var recentlyCreatedLocationName: String = ""
 	private var deletedLocation: Location? = null
@@ -127,6 +129,13 @@ class SoyleUATSteps : En, ApplicationTest() {
 			// LocationListDriver.givenHasBeenOpened(double)
 			CharacterSteps.givenCharacterListToolHasBeenOpened(double)
 		}
+		Given("A Character has been created") {
+			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, 1)
+		}
+		Given("the Character right-click menu has been opened") {
+			CharacterSteps.givenCharacterListToolCharacterContextMenuHasBeenOpened(double)
+			//targetLocation = LocationSteps.getLocationsCreated(double).first()
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -221,6 +230,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("A Character is deleted") {
 			deletedCharacter = CharacterSteps.whenCharacterIsDeleted(double)
+		}
+		When("the user clicks the Character List Tool right-click menu delete button") {
+			CharacterSteps.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "delete")
 		}
 
 
@@ -322,6 +334,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("The Character List Tool should not show the deleted Character") {
 			assertFalse(CharacterSteps.isCharacterListToolShowingCharacter(double, deletedCharacter!!))
+		}
+		Then("the Confirm Delete Character Dialog should be opened") {
+			assertTrue(CharacterSteps.isConfirmDeleteCharacterDialogOpen(double))
+			targetObject = CharacterSteps.getCharacterSelectedInCharacterListTool(double)!!.let {
+				Character(Character.Id(UUID.fromString(it.id)), UUID.randomUUID(), it.name)
+			}
+		}
+		Then("the Confirm Delete Character Dialog should show the Character name") {
+			assertTrue(CharacterSteps.isConfirmDeleteCharacterDialogDisplayingNameOf(double, targetObject as Character))
 		}
 
 
