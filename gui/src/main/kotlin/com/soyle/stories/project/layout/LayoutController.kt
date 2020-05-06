@@ -40,6 +40,7 @@ class LayoutController(
     }
 
     override fun openDialog(dialog: Dialog) {
+
         layoutPresenter.displayDialog(dialog)
     }
 

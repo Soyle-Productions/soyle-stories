@@ -14,6 +14,7 @@ import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
+import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.soylestories.SoyleStories
 import javafx.scene.Parent
 import javafx.stage.Screen
@@ -31,18 +32,6 @@ class WorkBench : View() {
     private val projectViewListener = resolve<ProjectListViewListener>(scope = scope.applicationScope)
     private val layoutViewListener = resolve<LayoutViewListener>()
     private val model = resolve<WorkBenchModel>()
-
-    /*
-    data class ViewModel(
-        val menus: List<Menu>
-    )
-
-    open class MenuItem(val text: String, val isDisabled: Boolean = false, val isChecked: Boolean = false)
-    class Menu(text: String, isDisabled: Boolean = false, val items: List<MenuItem>) : MenuItem(text, isDisabled, false)
-
-
-    fun selectMenuItem("file", "new", "project")
-     */
 
     override val root: Parent = borderpane {
         top = menubar {
@@ -64,7 +53,12 @@ class WorkBench : View() {
                         action {
                             layoutViewListener.openDialog(Dialog.CreateLocation)
                         }
-                    }/*
+                    }
+                    item("Scene") {
+                        id = "file_new_scene"
+                        action { createSceneDialog(scope) }
+                    }
+                    /*
                     item("Plot Point") {
                         // action { controller.createPlotPoint() }
                     }

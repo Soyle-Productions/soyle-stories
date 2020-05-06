@@ -10,6 +10,7 @@ import com.soyle.stories.location.LocationListDriver
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBenchDriver
+import com.soyle.stories.scene.CreateSceneDialogDriver
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
@@ -465,6 +466,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 				"Project" -> false
 				"Character" -> CreateCharacterDialogDriver.isOpen(double)
 				"Location" -> LocationSteps.isCreateNewLocationDialogOpen(double)
+				"Scene" -> CreateSceneDialogDriver.isOpen(double)
 				else -> false
 			}
 			assertTrue(isOpen)
