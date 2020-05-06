@@ -22,6 +22,7 @@ import javafx.scene.control.TextField
 import javafx.scene.control.TreeView
 import javafx.stage.Window
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.decorators
@@ -90,6 +91,26 @@ object CharacterSteps : ApplicationTest() {
 			setCharacterListToolOpen(double)
 		}
 		assertTrue(isCharacterListToolOpen(double))
+	}
+
+	fun setCharacterListToolClosed(double: SoyleStoriesTestDouble)
+	{
+		ProjectSteps.givenProjectHasBeenOpened(double)
+		whenCharacterListToolIsClosed(double)
+	}
+
+	fun whenCharacterListToolIsClosed(double: SoyleStoriesTestDouble) {
+		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Characters")!!
+		interact {
+			menuItem.fire()
+		}
+	}
+
+	fun givenCharacterListToolHasBeenClosed(double: SoyleStoriesTestDouble) {
+		if (isCharacterListToolOpen(double)) {
+			setCharacterListToolClosed(double)
+		}
+		assertFalse(isCharacterListToolOpen(double))
 	}
 
 	fun isCharacterListToolShowingEmptyMessage(double: SoyleStoriesTestDouble): Boolean {

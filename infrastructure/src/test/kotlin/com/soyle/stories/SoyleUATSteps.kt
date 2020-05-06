@@ -176,6 +176,13 @@ class SoyleUATSteps : En, ApplicationTest() {
 				else -> error("no tool of type $toolName")
 			}
 		}
+		Given("the {string} tool has been closed") { toolName: String ->
+			when (toolName) {
+				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenClosed(double)
+				"Locations" -> LocationSteps.givenLocationListToolHasBeenClosed(double)
+				else -> error("no tool of type $toolName")
+			}
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -461,6 +468,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Tools Menu {string} option should be checked") { menuText: String ->
 			assertTrue(WorkBenchDriver.isMenuItemChecked(double, "tools", menuItemText = menuText))
+		}
+		Then("the Tools Menu {string} option should be unchecked") { menuText: String ->
+			assertFalse(WorkBenchDriver.isMenuItemChecked(double, "tools", menuItemText = menuText))
 		}
 
 
