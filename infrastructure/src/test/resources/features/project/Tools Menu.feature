@@ -1,7 +1,7 @@
 Feature: Tools Menu
 
   Background:
-    Given a project has been opened
+    Given A project has been opened
 
   Scenario Outline: Tool menu shows each project-level tool
     When the Tools Menu is opened
@@ -9,9 +9,9 @@ Feature: Tools Menu
 
     Examples:
       | item       |
-      | Characters |
-      | Locations  |
-      | Scenes     |
+      | "Characters" |
+      | "Locations"  |
+      | "Scenes"     |
 
   Scenario Outline: Open tools are checked
     Given the <option> tool has been opened
@@ -20,9 +20,9 @@ Feature: Tools Menu
 
     Examples:
       | option     |
-      | Characters |
-      | Locations  |
-      | Scenes     |
+      | "Characters" |
+      | "Locations"  |
+      | "Scenes"     |
 
   Scenario Outline: Closed tools are unchecked
     Given the <option> tool has been closed
@@ -31,9 +31,9 @@ Feature: Tools Menu
 
     Examples:
       | option     |
-      | Characters |
-      | Locations  |
-      | Scenes     |
+      | "Characters" |
+      | "Locations"  |
+      | "Scenes"     |
 
   Scenario Outline: Toggle tool open
     Given the <option> tool has been closed
@@ -43,9 +43,9 @@ Feature: Tools Menu
 
     Examples:
       | option     |
-      | Characters |
-      | Locations  |
-      | Scenes     |
+      | "Characters" |
+      | "Locations"  |
+      | "Scenes"     |
 
   Scenario Outline: Toggle tool closed
     Given the <option> tool has been opened
@@ -55,6 +55,6 @@ Feature: Tools Menu
 
     Examples:
       | option     |
-      | Characters |
-      | Locations  |
-      | Scenes     |
+      | "Characters" |
+      | "Locations"  |
+      | "Scenes"     |

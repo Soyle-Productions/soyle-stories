@@ -1,7 +1,7 @@
 Feature: File New Menu
 
   Background:
-    Given a project has been opened
+    Given A project has been opened
 
   Scenario Outline: File New Menu shows all domain concepts
     Given the File Menu has been opened
@@ -10,10 +10,10 @@ Feature: File New Menu
 
     Examples:
       | option    |
-      | Project   |
-      | Character |
-      | Location  |
-      | Scene     |
+      | "Project"   |
+      | "Character" |
+      | "Location"  |
+      | "Scene"     |
 
   Scenario Outline: File New Option opens creation dialog
     Given the File New Menu has been opened
@@ -22,7 +22,7 @@ Feature: File New Menu
 
     Examples:
       | option    |
-      | Project   |
-      | Character |
-      | Location  |
-      | Scene     |
+      | "Project"   |
+      | "Character" |
+      | "Location"  |
+      | "Scene"     |

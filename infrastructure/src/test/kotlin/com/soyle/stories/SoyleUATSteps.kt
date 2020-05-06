@@ -9,6 +9,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.location.LocationListDriver
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectSteps
+import com.soyle.stories.project.WorkBenchDriver
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
@@ -162,6 +163,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("the Location rename input box is visible") {
 			LocationListDriver.givenRenameInputBoxIsVisible(double)
 		}
+		Given("the File Menu has been opened") {
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "file")
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -273,6 +277,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 			interact {
 				press(KeyCode.ENTER).release(KeyCode.ENTER)
 			}
+		}
+		When("the File New Menu is opened") {
+			WorkBenchDriver.whenMenuIsOpened(double, "file", "file_new")
 		}
 
 
@@ -420,6 +427,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Character rename input box should show an error message") {
 			assertTrue(CharacterSteps.isCharacterListToolShowingErrorOnInputBoxForSelectedItem(double))
+		}
+		Then("the File New Menu should display {string}") { menuText: String ->
+			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "file", "file_new", menuItemText = menuText))
 		}
 
 
