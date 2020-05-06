@@ -488,6 +488,14 @@ class SoyleUATSteps : En, ApplicationTest() {
 			}
 			assertTrue(isOpen)
 		}
+		Then("the {string} tool should be closed") { toolName: String ->
+			val isOpen = when (toolName) {
+				"Characters" -> CharacterSteps.isCharacterListToolOpen(double)
+				"Locations" -> LocationSteps.isLocationListToolOpen(double)
+				else -> error("no registered tool with name $toolName")
+			}
+			assertFalse(isOpen)
+		}
 
 
 		After { _: Scenario ->
