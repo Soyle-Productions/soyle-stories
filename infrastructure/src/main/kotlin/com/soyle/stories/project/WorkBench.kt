@@ -1,17 +1,19 @@
 package com.soyle.stories.project
 
+import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.async
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
-import com.soyle.stories.di.resolveLater
 import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialogModel
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
+import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.soylestories.SoyleStories
 import javafx.scene.Parent
 import javafx.stage.Screen
@@ -28,7 +30,6 @@ class WorkBench : View() {
 
     private val projectViewListener = resolve<ProjectListViewListener>(scope = scope.applicationScope)
     private val layoutViewListener = resolve<LayoutViewListener>()
-    private val workBenchViewListener by resolveLater<WorkBenchViewListener>()
     private val model = resolve<WorkBenchModel>()
 
     override val root: Parent = borderpane {
@@ -39,20 +40,18 @@ class WorkBench : View() {
                     id = "file_new"
                     item("Project") {
                         id = "file_new_project"
-                        action { workBenchViewListener.createNewProject() }
+                        action { startProjectDialog(scope.applicationScope, currentStage) }
                     }
                     separator()
                     item("Character") {
                         id = "file_new_character"
-                        action { workBenchViewListener.createNewCharacter() }
+                        action { createCharacterDialog(scope) }
                     }
                     item("Location") {
                         id = "file_new_location"
-                        action { workBenchViewListener.createNewLocation() }
-                    }
-                    item("") {
-                        id = "file_new_scene"
-                        action { workBenchViewListener.createNewScene() }
+                        action {
+                            layoutViewListener.openDialog(Dialog.CreateLocation)
+                        }
                     }/*
                     item("Plot Point") {
                         // action { controller.createPlotPoint() }
