@@ -17,7 +17,7 @@ Feature: File New Menu
 
   Scenario Outline: File New Option opens creation dialog
     Given the File New Menu has been opened
-    When the <option> is selected
+    When the File New <option> option is selected
     Then the Create New <option> Dialog should be open
 
     Examples:

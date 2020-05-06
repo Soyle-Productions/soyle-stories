@@ -5,6 +5,7 @@ import com.soyle.stories.project.WorkBenchDriver.interact
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
+import javafx.scene.control.MenuItem
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
 
@@ -54,19 +55,33 @@ object WorkBenchDriver : ApplicationTest() {
 		}
 	}
 
-	fun givenMenuHasBeenOpened(double: SoyleStoriesTestDouble, menuId: String)
+	fun givenMenuHasBeenOpened(double: SoyleStoriesTestDouble, menuId: String, vararg menuIds: String)
 	{
-		if (! isMenuOpen(double, menuId))
+		if (! isMenuOpen(double, menuId, *menuIds))
 		{
-			setMenuOpen(double, menuId)
+			setMenuOpen(double, menuId, *menuIds)
 		}
-		assertTrue(isMenuOpen(double, menuId))
+		assertTrue(isMenuOpen(double, menuId, *menuIds))
+	}
+
+	fun getMenuItem(double: SoyleStoriesTestDouble, menuId: String, vararg menuIds: String, menuItemText: String): MenuItem?
+	{
+		val menu = getMenu(double, menuId, *menuIds) ?: return null
+		return menu.items.find { it.text == menuItemText }
 	}
 
 	fun isMenuItemVisible(double: SoyleStoriesTestDouble, menuId: String, vararg menuIds: String, menuItemText: String): Boolean
 	{
-		val menu = getMenu(double, menuId, *menuIds) ?: return false
-		val item = menu.items.find { it.text == menuItemText } ?: return false
+		val item = getMenuItem(double, menuId, *menuIds, menuItemText = menuItemText) ?: return false
 		return item.isVisible
+	}
+
+	fun whenMenuItemIsSelected(double: SoyleStoriesTestDouble, menuId: String, vararg menuIds: String, menuItemText: String)
+	{
+		whenMenuIsOpened(double, menuId, *menuIds)
+		val item = getMenuItem(double, menuId, *menuIds, menuItemText = menuItemText)!!
+		interact {
+			item.fire()
+		}
 	}
 }

@@ -166,6 +166,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("the File Menu has been opened") {
 			WorkBenchDriver.givenMenuHasBeenOpened(double, "file")
 		}
+		Given("the File New Menu has been opened") {
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "file", "file_new")
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -280,6 +283,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("the File New Menu is opened") {
 			WorkBenchDriver.whenMenuIsOpened(double, "file", "file_new")
+		}
+		When("the File New {string} option is selected") { menuItemText: String ->
+			WorkBenchDriver.whenMenuItemIsSelected(double, "file", "file_new", menuItemText = menuItemText)
 		}
 
 
@@ -430,6 +436,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the File New Menu should display {string}") { menuText: String ->
 			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "file", "file_new", menuItemText = menuText))
+		}
+		Then("the Create New {string} Dialog should be open") { domainObject: String ->
+			val isOpen = when (domainObject) {
+				"Project" -> false
+				"Character" -> CreateCharacterDialogDriver.isOpen(double)
+				"Location" -> LocationSteps.isCreateNewLocationDialogOpen(double)
+				else -> false
+			}
+			assertTrue(isOpen)
 		}
 
 
