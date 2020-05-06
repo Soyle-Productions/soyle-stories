@@ -85,3 +85,11 @@ Feature: Character List Tool
     When The user clicks away from the input box
     Then the Character rename input box should be replaced by the Character name
     And the Character name should be the original name
+
+  Scenario: Invalid Rename
+    Given the Character rename input box is visible
+    And the user has entered an invalid Character name
+    When the user commits the rename
+    Then the Character rename input box should be visible
+    And the Character rename input box should show an error message
+

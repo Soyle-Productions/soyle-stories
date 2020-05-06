@@ -147,6 +147,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("the user has entered a valid Character name") {
 			CharacterSteps.givenValidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double)
 		}
+		Given("the user has entered an invalid Character name") {
+			CharacterSteps.givenInvalidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double)
+		}
 		Given("the Create Character Dialog has been opened") {
 			CreateCharacterDialogDriver.givenHasBeenOpened(double)
 		}
@@ -265,6 +268,11 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("The user clicks away from the input box") {
 			ProjectSteps.whenUserClicksAway(double)
+		}
+		When("the user commits the rename") {
+			interact {
+				press(KeyCode.ENTER).release(KeyCode.ENTER)
+			}
 		}
 
 
@@ -406,6 +414,12 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Location name should be the original name") {
 			LocationListDriver.isLocationShowingStoredName(double)
+		}
+		Then("the Character rename input box should be visible") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+		}
+		Then("the Character rename input box should show an error message") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingErrorOnInputBoxForSelectedItem(double))
 		}
 
 

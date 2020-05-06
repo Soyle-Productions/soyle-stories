@@ -24,6 +24,7 @@ import javafx.stage.Window
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
+import tornadofx.decorators
 import tornadofx.selectFirst
 import java.util.*
 
@@ -318,6 +319,28 @@ object CharacterSteps : ApplicationTest() {
 		assertTrue(isValidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double))
 	}
 
+	fun setInvalidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double: SoyleStoriesTestDouble)
+	{
+		givenCharacterListToolShowingInputBoxForSelectedItem(double)
+		val inputBox = getCharacterListToolInputBox(double)!!
+		inputBox.text = ""
+	}
+
+	fun isInvalidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double: SoyleStoriesTestDouble): Boolean
+	{
+		val inputBox = getCharacterListToolInputBox(double) ?: return false
+		return inputBox.text.isBlank()
+	}
+
+	fun givenInvalidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double: SoyleStoriesTestDouble)
+	{
+		if (! isInvalidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double))
+		{
+			setInvalidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double)
+		}
+		assertTrue(isInvalidCharacterNameEnteredInCharacterListToolCharacterRenameInputBox(double))
+	}
+
 	fun isCharacterListToolShowingNameStoredForSelectedItem(double: SoyleStoriesTestDouble): Boolean
 	{
 		val selectedItem = getCharacterSelectedInCharacterListTool(double) ?: return false
@@ -327,5 +350,11 @@ object CharacterSteps : ApplicationTest() {
 			storedItem = scope.get<CharacterRepository>().getCharacterById(Character.Id(UUID.fromString(selectedItem.id)))
 		}
 		return selectedItem.name == storedItem!!.name
+	}
+
+	fun isCharacterListToolShowingErrorOnInputBoxForSelectedItem(double: SoyleStoriesTestDouble): Boolean
+	{
+		val inputBox = getCharacterListToolInputBox(double) ?: return false
+		return inputBox.decorators.isNotEmpty()
 	}
 }

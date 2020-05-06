@@ -187,7 +187,7 @@ val TreeView<*>.isEditing: Boolean
 val <T> TreeView<T>.editingCell: TreeCell<T>?
 	get() = properties.getOrDefault("com.soyle.stories.treeView.editingCell", null) as? TreeCell<T>
 
-fun <T> TreeView<T>.makeEditable(convertFromString: TreeCell<T>.(String, T?) -> T) {
+fun <T> TreeView<T>.makeEditable(valid: (String, T?) -> String? = { _, _ -> null }, convertFromString: TreeCell<T>.(String, T?) -> T) {
 	val self = this
 	isEditable = true
 	properties["tornadofx.editSupport"] = fun TreeCell<T>.(eventType: EditEventType, value: T?) {
@@ -199,13 +199,23 @@ fun <T> TreeView<T>.makeEditable(convertFromString: TreeCell<T>.(String, T?) -> 
 				properties["com.soyle.stories.rollbackText"] = rollbackText
 				text = null
 				textfield(rollbackText) {
+					fun commit() {
+						val errorMessage = valid(text, item)
+						if (errorMessage == null) {
+							cell.commitEdit(convertFromString.invoke(cell, text, item))
+						} else {
+							val errorDecorator = SimpleMessageDecorator(errorMessage, ValidationSeverity.Error)
+							decorators.toList().forEach { removeDecorator(it) }
+							addDecorator(errorDecorator)
+						}
+					}
 					action {
-						commitEdit(convertFromString.invoke(cell, text, item))
+						commit()
 					}
 					focusedProperty().onChange {
 						if (! it) {
 							if (text != rollbackText) {
-								commitEdit(convertFromString.invoke(cell, text, item))
+								commit()
 							} else {
 								cell.cancelEdit()
 							}

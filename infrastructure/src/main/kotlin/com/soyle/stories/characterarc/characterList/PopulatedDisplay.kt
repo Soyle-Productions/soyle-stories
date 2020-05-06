@@ -94,8 +94,13 @@ internal class PopulatedDisplay : View() {
         this@PopulatedDisplay.treeView = treeview<Any?>(TreeItem(null)) {
             isShowRoot = false
             vgrow = Priority.ALWAYS
-            makeEditable { newName, oldValue ->
-                // rename item
+            makeEditable({ newName, oldValue ->
+
+                if (newName.isBlank()) "Name cannot be blank"
+                else null
+
+            }) { newName, oldValue ->
+
                 when (oldValue) {
                     is CharacterTreeItemViewModel -> characterListViewListener.renameCharacter(oldValue.id, newName)
                     is CharacterArcItemViewModel -> characterListViewListener.renameCharacterArc(oldValue.characterId, oldValue.themeId, newName)

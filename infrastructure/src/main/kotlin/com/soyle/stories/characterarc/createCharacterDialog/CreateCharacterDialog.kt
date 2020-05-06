@@ -9,10 +9,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.stage.Modality
 import javafx.stage.StageStyle
-import tornadofx.Fragment
-import tornadofx.form
-import tornadofx.text
-import tornadofx.textfield
+import tornadofx.*
 
 class CreateCharacterDialog : Fragment("New Character") {
 
@@ -28,7 +25,9 @@ class CreateCharacterDialog : Fragment("New Character") {
                 it.consume()
                 if (text.isEmpty())
                 {
-                    errorMessage.set("Cannot create character with a blank name.")
+                    val errorDecorator = SimpleMessageDecorator("Name cannot be blank", ValidationSeverity.Error)
+                    decorators.toList().forEach { removeDecorator(it) }
+                    addDecorator(errorDecorator)
                     return@EventHandler
                 }
                 async(scope) {
@@ -36,9 +35,6 @@ class CreateCharacterDialog : Fragment("New Character") {
                 }
                 close()
             }
-        }
-        text(errorMessage) {
-            id = "error-message"
         }
     }
 

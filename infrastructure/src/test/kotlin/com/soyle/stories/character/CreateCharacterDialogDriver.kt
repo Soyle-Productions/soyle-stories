@@ -5,10 +5,9 @@ import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialo
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
-import javafx.scene.control.TextField
-import javafx.scene.text.Text
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
+import tornadofx.decorators
 import tornadofx.uiComponent
 
 object CreateCharacterDialogDriver : ApplicationTest() {
@@ -50,7 +49,7 @@ object CreateCharacterDialogDriver : ApplicationTest() {
 
 	fun isNameInputInvalid(double: SoyleStoriesTestDouble): Boolean {
 		val dialog = getIfOpen(double) ?: return false
-		val nameInput = from(dialog.root).lookup(".text-field").queryAll<TextField>().firstOrNull() ?: return false
+		val nameInput = from(dialog.root).lookup(".text-field").queryTextInputControl() ?: return false
 		return nameInput.text.isBlank()
 	}
 
@@ -63,8 +62,8 @@ object CreateCharacterDialogDriver : ApplicationTest() {
 
 	fun isErrorMessageShown(double: SoyleStoriesTestDouble): Boolean {
 		val dialog = getIfOpen(double) ?: return false
-		val nameInput = from(dialog.root).lookup("#error-message").queryAll<Text>().firstOrNull() ?: return false
-		return nameInput.text.isNotBlank()
+		val nameInput = from(dialog.root).lookup(".text-field").queryTextInputControl() ?: return false
+		return nameInput.decorators.isNotEmpty()
 	}
 
 	fun setNameInputValid(double: SoyleStoriesTestDouble) {
@@ -76,7 +75,7 @@ object CreateCharacterDialogDriver : ApplicationTest() {
 
 	fun isNameInputValid(double: SoyleStoriesTestDouble): Boolean {
 		val dialog = getIfOpen(double) ?: return false
-		val nameInput = from(dialog.root).lookup(".text-field").queryAll<TextField>().firstOrNull() ?: return false
+		val nameInput = from(dialog.root).lookup(".text-field").queryTextInputControl() ?: return false
 		return nameInput.text.isNotBlank()
 	}
 
