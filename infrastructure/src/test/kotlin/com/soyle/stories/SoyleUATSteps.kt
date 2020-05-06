@@ -6,6 +6,7 @@ import com.soyle.stories.character.CreateCharacterDialogDriver
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
+import com.soyle.stories.location.LocationListDriver
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -77,7 +78,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			// LocationListDriver.givenRenameInputBoxIsVisible(double)
 			LocationSteps.givenLocationRenameInputBoxIsVisible(double)
 		}
-		Given("the user has entered a valid name") {
+		Given("the user has entered a valid Location name") {
 			// LocationListDriver.givenValidNameHasBeenEnteredInRenameInputBox(double)
 			LocationSteps.givenUserHasEnteredValidLocationNameInRenameInputBox(double)
 		}
@@ -154,6 +155,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Given("the Create Character Dialog Name input has a valid Character Name") {
 			CreateCharacterDialogDriver.givenNameInputHasValidCharacterName(double)
+		}
+		Given("the Location rename input box is visible") {
+			LocationListDriver.givenRenameInputBoxIsVisible(double)
 		}
 
 
@@ -394,6 +398,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertFalse(CreateCharacterDialogDriver.isOpen(double))
 		}
 		Then("a new Character should be created") {}
+		Then("the Location rename input box should be replaced by the Location name") {
+			assertFalse(LocationListDriver.isRenameInputBoxVisible(double))
+		}
+		Then("the Location name should be the new name") {
+			LocationListDriver.isLocationShowingStoredName(double)
+		}
+		Then("the Location name should be the original name") {
+			LocationListDriver.isLocationShowingStoredName(double)
+		}
 
 
 		After { _: Scenario ->

@@ -41,7 +41,7 @@ Feature: Location List Tool
 
   Scenario: Click Away after Rename
     Given the Location rename input box is visible
-    And the user has entered a valid name
+    And the user has entered a valid Location name
     When The user clicks away from the input box
     Then the Location rename input box should be replaced by the Location name
     And the Location name should be the new name
