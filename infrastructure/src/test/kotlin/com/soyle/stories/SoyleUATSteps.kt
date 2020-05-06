@@ -187,6 +187,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("the Tools Menu has been opened") {
 			WorkBenchDriver.givenMenuHasBeenOpened(double, "tools")
 		}
+		Given("the Create Scene Dialog has been opened") {
+			CreateSceneDialogDriver.givenHasBeenOpened(double)
+		}
+		Given("the Create Scene Dialog Name input has an invalid Scene Name") {
+			CreateSceneDialogDriver.givenNameInputHasInvalidSceneName(double)
+		}
+		Given("the Create Scene Dialog Name input has a valid Scene Name") {
+			CreateSceneDialogDriver.givenNameInputHasValidSceneName(double)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -495,6 +504,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 				else -> error("no registered tool with name $toolName")
 			}
 			assertFalse(isOpen)
+		}
+		Then("an error message should be displayed in the Create Scene Dialog") {
+			assertTrue(CreateSceneDialogDriver.isErrorMessageShown(double))
+		}
+		Then("the Create Scene Dialog should be closed") {
+			assertFalse(CreateSceneDialogDriver.isOpen(double))
+		}
+		Then("a new Scene should be created") {
+			fail()
 		}
 
 
