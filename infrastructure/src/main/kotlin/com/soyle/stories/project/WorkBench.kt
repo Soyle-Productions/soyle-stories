@@ -1,19 +1,17 @@
 package com.soyle.stories.project
 
-import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.async
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
+import com.soyle.stories.di.resolveLater
 import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialogModel
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
-import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
-import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.soylestories.SoyleStories
 import javafx.scene.Parent
 import javafx.stage.Screen
@@ -30,7 +28,20 @@ class WorkBench : View() {
 
     private val projectViewListener = resolve<ProjectListViewListener>(scope = scope.applicationScope)
     private val layoutViewListener = resolve<LayoutViewListener>()
+    private val workBenchViewListener by resolveLater<WorkBenchViewListener>()
     private val model = resolve<WorkBenchModel>()
+
+    /*
+    data class ViewModel(
+        val menus: List<Menu>
+    )
+
+    open class MenuItem(val text: String, val isDisabled: Boolean = false, val isChecked: Boolean = false)
+    class Menu(text: String, isDisabled: Boolean = false, val items: List<MenuItem>) : MenuItem(text, isDisabled, false)
+
+
+    fun selectMenuItem("file", "new", "project")
+     */
 
     override val root: Parent = borderpane {
         top = menubar {
@@ -40,18 +51,20 @@ class WorkBench : View() {
                     id = "file_new"
                     item("Project") {
                         id = "file_new_project"
-                        action { startProjectDialog(scope.applicationScope, currentStage) }
+                        action { workBenchViewListener.createNewProject() }
                     }
                     separator()
                     item("Character") {
                         id = "file_new_character"
-                        action { createCharacterDialog(scope) }
+                        action { workBenchViewListener.createNewCharacter() }
                     }
                     item("Location") {
                         id = "file_new_location"
-                        action {
-                            layoutViewListener.openDialog(Dialog.CreateLocation)
-                        }
+                        action { workBenchViewListener.createNewLocation() }
+                    }
+                    item("") {
+                        id = "file_new_scene"
+                        action { workBenchViewListener.createNewScene() }
                     }/*
                     item("Plot Point") {
                         // action { controller.createPlotPoint() }
