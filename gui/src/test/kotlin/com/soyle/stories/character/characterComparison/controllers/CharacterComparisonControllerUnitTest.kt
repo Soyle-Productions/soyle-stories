@@ -5,7 +5,6 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllChara
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach

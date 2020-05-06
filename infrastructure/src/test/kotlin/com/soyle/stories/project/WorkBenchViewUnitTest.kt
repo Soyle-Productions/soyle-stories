@@ -8,10 +8,6 @@ import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.EventTarget
-import javafx.scene.Node
-import javafx.scene.Parent
-import javafx.scene.control.Menu
-import javafx.stage.Stage
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

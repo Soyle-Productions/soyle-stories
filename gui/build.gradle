@@ -8,6 +8,7 @@ repositories {
 dependencies {
     implementation libraries.soyle_stories_core
     implementation libraries.coroutines
+    testImplementation libraries.junit
     testImplementation libraries.assertj
     testImplementation project(":data")
 
