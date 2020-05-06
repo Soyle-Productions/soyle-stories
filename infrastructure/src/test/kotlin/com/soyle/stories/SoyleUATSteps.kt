@@ -152,6 +152,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("the Create Character Dialog Name input has an invalid Character Name") {
 			CreateCharacterDialogDriver.givenNameInputHasInvalidCharacterName(double)
 		}
+		Given("the Create Character Dialog Name input has a valid Character Name") {
+			CreateCharacterDialogDriver.givenNameInputHasValidCharacterName(double)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -387,6 +390,10 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Then("an error message should be displayed in the Create Character Dialog") {
 			assertTrue(CreateCharacterDialogDriver.isErrorMessageShown(double))
 		}
+		Then("the Create Character Dialog should be closed") {
+			assertFalse(CreateCharacterDialogDriver.isOpen(double))
+		}
+		Then("a new Character should be created") {}
 
 
 		After { _: Scenario ->
