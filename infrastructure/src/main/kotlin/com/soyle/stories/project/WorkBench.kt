@@ -32,6 +32,18 @@ class WorkBench : View() {
     private val layoutViewListener = resolve<LayoutViewListener>()
     private val model = resolve<WorkBenchModel>()
 
+    /*
+    data class ViewModel(
+        val menus: List<Menu>
+    )
+
+    open class MenuItem(val text: String, val isDisabled: Boolean = false, val isChecked: Boolean = false)
+    class Menu(text: String, isDisabled: Boolean = false, val items: List<MenuItem>) : MenuItem(text, isDisabled, false)
+
+
+    fun selectMenuItem("file", "new", "project")
+     */
+
     override val root: Parent = borderpane {
         top = menubar {
             menu("File") {

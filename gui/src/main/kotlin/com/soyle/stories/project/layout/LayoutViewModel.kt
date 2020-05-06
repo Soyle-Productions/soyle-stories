@@ -42,11 +42,9 @@ class CharacterComparisonToolViewModel(override val toolId: String, val themeId:
 class LocationDetailsToolViewModel(override val toolId: String, val locationId: String) : ToolViewModel()
 
 sealed class Dialog {
-    object CreateProject : Dialog()
     object CreateCharacter : Dialog()
     object CreateCharacterArc : Dialog()
     object CreateLocation : Dialog()
-    object CreateScene : Dialog()
 
     object DeleteCharacter : Dialog()
     object DeleteCharacterArc : Dialog()
