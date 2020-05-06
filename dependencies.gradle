@@ -16,5 +16,5 @@ project.ext.libraries = [
         assertj: 'org.assertj:assertj-core:3.15.0',
 
         // soyle stories
-        soyle_stories_core: "com.soyle.stories:soyle-stories-core:${project.version}"
+        soyle_stories_core: "com.soyle.stories:soyle-stories-core:0.1.6-alpha"
 ]

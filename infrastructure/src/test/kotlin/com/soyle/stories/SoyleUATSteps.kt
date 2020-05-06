@@ -287,6 +287,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("the File New {string} option is selected") { menuItemText: String ->
 			WorkBenchDriver.whenMenuItemIsSelected(double, "file", "file_new", menuItemText = menuItemText)
 		}
+		When("the Tools Menu is opened") {
+			WorkBenchDriver.whenMenuIsOpened(double, "tools")
+		}
 
 
 		Then("The Location List Tool should show a special empty message") {
@@ -445,6 +448,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 				else -> false
 			}
 			assertTrue(isOpen)
+		}
+		Then("the Tools Menu should display {string}") { menuText: String ->
+			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "tools", menuItemText = menuText))
 		}
 
 
