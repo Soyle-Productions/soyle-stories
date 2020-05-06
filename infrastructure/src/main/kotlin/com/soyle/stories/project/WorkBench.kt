@@ -45,7 +45,7 @@ class WorkBench : View() {
                     separator()
                     item("Character") {
                         id = "file_new_character"
-                        action { createCharacterDialog(currentStage) }
+                        action { createCharacterDialog(scope) }
                     }
                     item("Location") {
                         id = "file_new_location"

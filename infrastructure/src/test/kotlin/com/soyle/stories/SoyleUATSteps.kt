@@ -2,6 +2,7 @@ package com.soyle.stories
 
 import com.soyle.stories.character.CharacterArcSteps
 import com.soyle.stories.character.CharacterSteps
+import com.soyle.stories.character.CreateCharacterDialogDriver
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
@@ -144,6 +145,12 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Given("the user has entered a valid Character name") {
 			CharacterSteps.givenValidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double)
+		}
+		Given("the Create Character Dialog has been opened") {
+			CreateCharacterDialogDriver.givenHasBeenOpened(double)
+		}
+		Given("the Create Character Dialog Name input has an invalid Character Name") {
+			CreateCharacterDialogDriver.givenNameInputHasInvalidCharacterName(double)
 		}
 
 
@@ -376,6 +383,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Character name should be the original name") {
 			assertTrue(CharacterSteps.isCharacterListToolShowingNameStoredForSelectedItem(double))
+		}
+		Then("an error message should be displayed in the Create Character Dialog") {
+			assertTrue(CreateCharacterDialogDriver.isErrorMessageShown(double))
 		}
 
 
