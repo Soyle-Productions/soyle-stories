@@ -183,6 +183,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 				else -> error("no tool of type $toolName")
 			}
 		}
+		Given("the Tools Menu has been opened") {
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "tools")
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -303,6 +306,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("the Tools Menu is opened") {
 			WorkBenchDriver.whenMenuIsOpened(double, "tools")
+		}
+		When("the {string} tool item is selected") { menuItemText: String ->
+			WorkBenchDriver.whenMenuItemIsSelected(double, "tools", menuItemText = menuItemText)
 		}
 
 
@@ -471,6 +477,14 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Tools Menu {string} option should be unchecked") { menuText: String ->
 			assertFalse(WorkBenchDriver.isMenuItemChecked(double, "tools", menuItemText = menuText))
+		}
+		Then("the {string} tool should be open") { toolName: String ->
+			val isOpen = when (toolName) {
+				"Characters" -> CharacterSteps.isCharacterListToolOpen(double)
+				"Locations" -> LocationSteps.isLocationListToolOpen(double)
+				else -> false
+			}
+			assertTrue(isOpen)
 		}
 
 
