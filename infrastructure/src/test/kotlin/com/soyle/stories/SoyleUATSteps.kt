@@ -169,6 +169,13 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("the File New Menu has been opened") {
 			WorkBenchDriver.givenMenuHasBeenOpened(double, "file", "file_new")
 		}
+		Given("the {string} tool has been opened") { toolName: String ->
+			when (toolName) {
+				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenOpened(double)
+				"Locations" -> LocationSteps.givenLocationListToolHasBeenOpened(double)
+				else -> error("no tool of type $toolName")
+			}
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -451,6 +458,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Tools Menu should display {string}") { menuText: String ->
 			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "tools", menuItemText = menuText))
+		}
+		Then("the Tools Menu {string} option should be checked") { menuText: String ->
+			assertTrue(WorkBenchDriver.isMenuItemChecked(double, "tools", menuItemText = menuText))
 		}
 
 

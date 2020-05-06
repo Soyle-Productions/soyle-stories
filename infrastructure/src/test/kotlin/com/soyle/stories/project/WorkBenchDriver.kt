@@ -3,6 +3,7 @@ package com.soyle.stories.project
 import com.soyle.stories.di.get
 import com.soyle.stories.project.WorkBenchDriver.interact
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
+import javafx.scene.control.CheckMenuItem
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
@@ -83,5 +84,11 @@ object WorkBenchDriver : ApplicationTest() {
 		interact {
 			item.fire()
 		}
+	}
+
+	fun isMenuItemChecked(double: SoyleStoriesTestDouble, menuId: String, vararg menuIds: String, menuItemText: String): Boolean
+	{
+		val item = getMenuItem(double, menuId, *menuIds, menuItemText = menuItemText) ?: return false
+		return item.isVisible && item is CheckMenuItem && item.isSelected
 	}
 }
