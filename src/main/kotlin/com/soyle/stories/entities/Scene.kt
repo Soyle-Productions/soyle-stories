@@ -4,6 +4,7 @@ import java.util.*
 
 class Scene(
   val id: Id,
+  val projectId: Project.Id,
   val name: String
 ) {
 

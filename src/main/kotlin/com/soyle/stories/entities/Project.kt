@@ -27,7 +27,7 @@ class Project(
      * https://github.com/b-camphart/soyle-studio-core/issues/7
      *
      */
-    data class Id(val uuid: UUID)
+    data class Id(val uuid: UUID = UUID.randomUUID())
 
     fun rename(newName: String): Either<*, Project> {
         return try {

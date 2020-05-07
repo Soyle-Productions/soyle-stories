@@ -1,10 +1,11 @@
 package com.soyle.stories.scene.usecases
 
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.SceneNameCannotBeBlank
-import com.soyle.stories.scene.repositories.SceneRepository
+import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
 import kotlinx.coroutines.runBlocking
@@ -15,6 +16,7 @@ class CreateNewSceneUnitTest {
 
 	val localNameIsBlankMessage = "Scene name cannot be blank"
 
+	val projectId = Project.Id()
 	val validSceneName = "Valid Scene Name"
 
 	var savedScene: Scene? = null
@@ -36,11 +38,9 @@ class CreateNewSceneUnitTest {
 
 	private fun whenUseCaseIsExecuted(withName: String = "")
 	{
-		val useCase: CreateNewScene = CreateNewSceneUseCase(object : SceneRepository {
-			override suspend fun createNewScene(scene: Scene) {
-				savedScene = scene
-			}
-		})
+		val useCase: CreateNewScene = CreateNewSceneUseCase(projectId.uuid, SceneRepositoryDouble(onAddNewScene = {
+			savedScene = it
+		}))
 		runBlocking {
 			useCase.invoke(withName, object : Locale {
 				override val sceneNameCannotBeBlank: String = localNameIsBlankMessage
@@ -60,6 +60,7 @@ class CreateNewSceneUnitTest {
 	{
 		val savedScene = savedScene!!
 		assertEquals(validSceneName, savedScene.name)
+		assertEquals(projectId, savedScene.projectId)
 	}
 
 	private fun assertValidResponseModel(actual: Any?)
