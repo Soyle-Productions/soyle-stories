@@ -11,6 +11,7 @@ import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBenchDriver
 import com.soyle.stories.scene.CreateSceneDialogDriver
+import com.soyle.stories.scene.SceneSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
@@ -512,7 +513,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertFalse(CreateSceneDialogDriver.isOpen(double))
 		}
 		Then("a new Scene should be created") {
-			fail()
+			assertTrue(SceneSteps.getNumberOfCreatedScenes(double) >= 1)
 		}
 
 

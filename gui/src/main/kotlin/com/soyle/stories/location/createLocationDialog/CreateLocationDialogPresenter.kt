@@ -5,7 +5,7 @@ import com.soyle.stories.location.events.LocationEvents
 
 class CreateLocationDialogPresenter(
   private val view: CreateLocationDialogView,
-  private val locationEvents: LocationEvents
+  locationEvents: LocationEvents
 ) {
 
 	private val subPresenters = listOf(

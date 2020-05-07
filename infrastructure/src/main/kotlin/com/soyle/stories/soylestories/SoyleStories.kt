@@ -2,12 +2,7 @@ package com.soyle.stories.soylestories
 
 import com.soyle.stories.common.async
 import com.soyle.stories.di.DI
-import com.soyle.stories.di.characterarc.CharacterArcModule
-import com.soyle.stories.di.layout.LayoutModule
-import com.soyle.stories.di.location.LocationModule
-import com.soyle.stories.di.modules.ApplicationModule
-import com.soyle.stories.di.modules.DataModule
-import com.soyle.stories.di.project.ProjectModule
+import com.soyle.stories.di.configureDI
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.soylestories.confirmExitDialog.ConfirmExitDialog
@@ -19,13 +14,7 @@ import javafx.stage.Stage
 import tornadofx.*
 
 fun main(args: Array<String>) {
-    ApplicationModule
-    DataModule
-    ProjectModule
-    LayoutModule
-    LocationModule
-    CharacterArcModule
-
+    configureDI()
     launch<SoyleStories>(args)
 }
 

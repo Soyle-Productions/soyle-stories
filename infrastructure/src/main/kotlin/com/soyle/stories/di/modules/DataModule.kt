@@ -9,6 +9,7 @@ import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.repositories.ProjectRepository
 import com.soyle.stories.repositories.*
+import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.theme.Context
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
@@ -77,6 +78,10 @@ object DataModule {
 			  com.soyle.stories.layout.Context::class
 			) {
 				ContextDouble(this)
+			}
+
+			provide<SceneRepository> {
+				SceneRepositoryImpl()
 			}
 		}
 	}
