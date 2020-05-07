@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.SceneNameCannotBeBlank
 import com.soyle.stories.scene.repositories.SceneRepository
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.Test
 
 class CreateNewSceneUnitTest {
 
+	val localNameIsBlankMessage = "Scene name cannot be blank"
+
 	val validSceneName = "Valid Scene Name"
 
 	var savedScene: Scene? = null
@@ -21,6 +24,7 @@ class CreateNewSceneUnitTest {
 	fun `name cannot be blank`() {
 		whenUseCaseIsExecuted()
 		val result = result as SceneNameCannotBeBlank
+		assertEquals(localNameIsBlankMessage, result.localizedMessage)
 	}
 
 	@Test
@@ -38,7 +42,9 @@ class CreateNewSceneUnitTest {
 			}
 		})
 		runBlocking {
-			useCase.invoke(withName, object : CreateNewScene.OutputPort {
+			useCase.invoke(withName, object : Locale {
+				override val sceneNameCannotBeBlank: String = localNameIsBlankMessage
+			}, object : CreateNewScene.OutputPort {
 				override fun receiveCreateNewSceneFailure(failure: SceneException) {
 					result = failure
 				}

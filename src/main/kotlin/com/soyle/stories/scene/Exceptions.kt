@@ -1,4 +1,6 @@
 package com.soyle.stories.scene
 
-abstract class SceneException : Exception()
-object SceneNameCannotBeBlank : SceneException()
+interface SceneException
+class SceneNameCannotBeBlank(private val locale: Locale) : IllegalArgumentException(), SceneException {
+	override fun getLocalizedMessage(): String = locale.sceneNameCannotBeBlank
+}
