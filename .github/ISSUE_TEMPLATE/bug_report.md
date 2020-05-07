@@ -21,17 +21,20 @@ Thus the title is: The dialog is not open after clicking on the button.
 The description should contain the steps to reproduce the issue.  Think of this like writing a new UAT.  The difference is in how the steps are described and how many.  The steps should be all the 'Given' statements and a final 'When' statement with the expected result being the failing 'Then' statement.  However, do not use the 'Given' 'When' and 'Then' words.
 
 **Example:**
-Given a project has been opened
-And a Location has been created
-And the Location List Tool has been opened
-When a Location is right-clicked
-Then the Location right-click menu should be open
+If the UAT would be written like this:
 
-As the steps for the bug:
-1. Open a project
-2. Create a Location
-3. Open the Location List Tool
-4. Right-click the Location
+    Given a project has been opened
+    And a Location has been created
+    And the Location List Tool has been opened
+    When a Location is right-clicked
+    Then the Location right-click menu should be open
+
+Then the steps for filing the bug should look like this:
+
+    1. Open a project
+    2. Create a Location
+    3. Open the Location List Tool
+    4. Right-click the Location
 
 Expected Result: The Location right-click menu should be open
 Actual Result: The location right-click menu is not open
@@ -39,6 +42,7 @@ Actual Result: The location right-click menu is not open
 *delete everything above this line*
 ___
 **Steps to Reproduce**
+
 1.
 
 **Expected Result**
