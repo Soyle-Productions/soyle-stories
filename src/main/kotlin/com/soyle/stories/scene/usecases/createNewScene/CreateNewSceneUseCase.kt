@@ -4,8 +4,8 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneException
-import com.soyle.stories.scene.SceneNameCannotBeBlank
 import com.soyle.stories.scene.repositories.SceneRepository
+import com.soyle.stories.scene.usecases.validateSceneName
 import java.util.*
 
 class CreateNewSceneUseCase(
@@ -31,10 +31,6 @@ class CreateNewSceneUseCase(
 		val scene = Scene(Scene.Id(), projectId, name)
 		sceneRepository.createNewScene(scene)
 		return CreateNewScene.ResponseModel(scene.id.uuid, name)
-	}
-
-	private fun validateSceneName(name: String, locale: Locale) {
-		if (name.isBlank()) throw SceneNameCannotBeBlank(locale)
 	}
 
 }

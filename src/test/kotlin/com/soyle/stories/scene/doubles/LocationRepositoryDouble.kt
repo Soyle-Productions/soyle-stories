@@ -34,4 +34,13 @@ class SceneRepositoryDouble(
 	override suspend fun listAllScenesInProject(projectId: Project.Id): List<Scene> {
 		return scenes.values.filter { it.projectId == projectId }
 	}
+
+	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =
+	  scenes[sceneId]
+
+	override suspend fun updateScene(scene: Scene) {
+		log(scene)
+		onUpdateScene.invoke(scene)
+		scenes[scene.id] = scene
+	}
 }

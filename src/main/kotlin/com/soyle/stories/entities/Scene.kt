@@ -8,5 +8,13 @@ class Scene(
   val name: String
 ) {
 
-	class Id(val uuid: UUID = UUID.randomUUID())
+	private fun copy(
+	  name: String = this.name
+	) = Scene(id, projectId, name)
+
+	fun withName(newName: String) = copy(name = newName)
+
+	data class Id(val uuid: UUID = UUID.randomUUID()) {
+		override fun toString(): String = "Scene($uuid)"
+	}
 }

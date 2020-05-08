@@ -7,5 +7,7 @@ interface SceneRepository {
 
 	suspend fun createNewScene(scene: Scene)
 	suspend fun listAllScenesInProject(projectId: Project.Id): List<Scene>
+	suspend fun getSceneById(sceneId: Scene.Id): Scene?
+	suspend fun updateScene(scene: Scene)
 
 }
