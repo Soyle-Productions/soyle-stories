@@ -14,4 +14,11 @@ class SceneRepositoryImpl : SceneRepository {
 
 	override suspend fun listAllScenesInProject(projectId: Project.Id): List<Scene> =
 	  scenes.values.toList()
+
+	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =
+	  scenes[sceneId]
+
+	override suspend fun updateScene(scene: Scene) {
+		scenes[scene.id] = scene
+	}
 }
