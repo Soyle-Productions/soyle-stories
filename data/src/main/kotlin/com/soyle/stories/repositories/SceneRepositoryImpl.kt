@@ -21,4 +21,8 @@ class SceneRepositoryImpl : SceneRepository {
 	override suspend fun updateScene(scene: Scene) {
 		scenes[scene.id] = scene
 	}
+
+	override suspend fun removeScene(scene: Scene) {
+		scenes.remove(scene.id)
+	}
 }
