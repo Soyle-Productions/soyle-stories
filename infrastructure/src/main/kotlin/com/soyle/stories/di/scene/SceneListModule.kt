@@ -4,6 +4,7 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
+import com.soyle.stories.scene.renameScene.RenameSceneNotifier
 import com.soyle.stories.scene.sceneList.SceneListController
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneList.SceneListPresenter
@@ -19,8 +20,10 @@ object SceneListModule {
 				  get(),
 				  SceneListPresenter(
 					get<SceneListModel>(),
-					get<CreateNewSceneNotifier>()
-				  )
+					get<CreateNewSceneNotifier>(),
+					get<RenameSceneNotifier>()
+				  ),
+				  get()
 				)
 			}
 		}
