@@ -5,6 +5,7 @@ import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
+import com.soyle.stories.scene.deleteSceneDialog.deleteSceneDialog
 import com.soyle.stories.scene.items.SceneItemViewModel
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -88,11 +89,11 @@ class SceneList : View() {
 					isMnemonicParsing = false
 				}
 				button("Delete") {
-					id = "actionBar_deleteLocation"
+					id = "actionBar_deleteScene"
 					enableWhen { model.selectedItem.isNotNull }
 					action {
 						when (val selectedItem = model.selectedItem.value) {
-							is SceneItemViewModel -> {}
+							is SceneItemViewModel -> deleteSceneDialog(scope, selectedItem)
 						}
 					}
 					isMnemonicParsing = false
@@ -106,6 +107,14 @@ class SceneList : View() {
 			id = "rename"
 			action {
 				treeview.edit(treeview.selectionModel.selectedItem)
+			}
+		}
+		item("Delete") {
+			id = "delete"
+			action {
+				when (val selectedItem = model.selectedItem.value) {
+					is SceneItemViewModel -> deleteSceneDialog(scope, selectedItem)
+				}
 			}
 		}
 	}
