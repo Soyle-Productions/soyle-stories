@@ -43,4 +43,10 @@ class SceneRepositoryDouble(
 		onUpdateScene.invoke(scene)
 		scenes[scene.id] = scene
 	}
+
+	override suspend fun removeScene(scene: Scene) {
+		log(scene)
+		scenes.remove(scene.id)
+		onRemoveScene.invoke(scene)
+	}
 }

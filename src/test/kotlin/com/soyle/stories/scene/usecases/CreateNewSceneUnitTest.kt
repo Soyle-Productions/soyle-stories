@@ -2,9 +2,9 @@ package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
-import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.SceneNameCannotBeBlank
+import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
@@ -42,9 +42,7 @@ class CreateNewSceneUnitTest {
 			savedScene = it
 		}))
 		runBlocking {
-			useCase.invoke(withName, object : Locale {
-				override val sceneNameCannotBeBlank: String = localNameIsBlankMessage
-			}, object : CreateNewScene.OutputPort {
+			useCase.invoke(withName, LocaleDouble(), object : CreateNewScene.OutputPort {
 				override fun receiveCreateNewSceneFailure(failure: SceneException) {
 					result = failure
 				}
