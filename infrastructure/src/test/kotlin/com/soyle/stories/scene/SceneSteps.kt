@@ -6,6 +6,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
+import com.soyle.stories.scene.deleteScene.DeleteSceneController
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import kotlinx.coroutines.runBlocking
@@ -48,6 +49,17 @@ object SceneSteps {
 			setNumberOfCreatedScenes(double, count)
 		}
 		assertTrue(getNumberOfCreatedScenes(double) >= count)
+	}
+
+	fun whenSceneIsDeleted(double: SoyleStoriesTestDouble)
+	{
+		val scope = ProjectSteps.getProjectScope(double)!!
+		val controller = scope.get<DeleteSceneController>()
+		val repository = scope.get<SceneRepository>()
+		val sceneId = runBlocking {
+			repository.listAllScenesInProject(Project.Id(scope.projectId)).first().id
+		}
+		controller.deleteScene(sceneId.uuid.toString())
 	}
 
 }

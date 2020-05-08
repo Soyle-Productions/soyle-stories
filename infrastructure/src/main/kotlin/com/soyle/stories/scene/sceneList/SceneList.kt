@@ -81,7 +81,7 @@ class SceneList : View() {
 				isFillHeight = false
 				padding = Insets(5.0, 0.0, 5.0, 0.0)
 				button(model.createSceneButtonLabel) {
-					id = "actionBar_createScene"
+					id = "actionBar_create"
 					isDisable = false
 					action {
 						createSceneDialog(scope)
@@ -89,7 +89,7 @@ class SceneList : View() {
 					isMnemonicParsing = false
 				}
 				button("Delete") {
-					id = "actionBar_deleteScene"
+					id = "actionBar_delete"
 					enableWhen { model.selectedItem.isNotNull }
 					action {
 						when (val selectedItem = model.selectedItem.value) {

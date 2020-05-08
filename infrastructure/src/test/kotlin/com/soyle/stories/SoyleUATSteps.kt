@@ -9,9 +9,11 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.location.LocationListDriver
 import com.soyle.stories.location.LocationSteps
+import com.soyle.stories.project.CreateProjectDialogDriver
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBenchDriver
 import com.soyle.stories.scene.CreateSceneDialogDriver
+import com.soyle.stories.scene.DeleteSceneDialogDriver
 import com.soyle.stories.scene.SceneListDriver
 import com.soyle.stories.scene.SceneSteps
 import com.soyle.stories.scene.items.SceneItemViewModel
@@ -362,6 +364,19 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("the user clicks the Scene List Tool right-click menu Rename button") {
 			SceneListDriver.whenRightClickOptionIsClicked(double, "rename")
 		}
+		When("A Scene is deleted") {
+			val existingScenes = SceneSteps.getCreatedScenes(double)
+			SceneSteps.whenSceneIsDeleted(double)
+			targetObject = (existingScenes.toSet() - SceneSteps.getCreatedScenes(double).toSet()).single()
+		}
+		When("the user clicks the Scene List Tool right-click menu delete button") {
+			SceneListDriver.whenRightClickOptionIsClicked(double, "delete")
+			targetObject = SceneListDriver.getSelectedItem(double)
+		}
+		When("the user clicks the Scene List Tool delete button") {
+			SceneListDriver.whenBottomButtonIsClicked(double, "delete")
+			targetObject = SceneListDriver.getSelectedItem(double)
+		}
 
 
 		Then("The Location List Tool should show a special empty message") {
@@ -514,7 +529,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the Create New {string} Dialog should be open") { domainObject: String ->
 			val isOpen = when (domainObject) {
-				"Project" -> false
+				"Project" -> CreateProjectDialogDriver.isOpen(double)
 				"Character" -> CreateCharacterDialogDriver.isOpen(double)
 				"Location" -> LocationSteps.isCreateNewLocationDialogOpen(double)
 				"Scene" -> CreateSceneDialogDriver.isOpen(double)
@@ -577,18 +592,23 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertFalse(SceneListDriver.isRenameInputBoxVisible(double))
 		}
 		Then("the Scene name should be the new name") {
-			UATLogger.silent = false
-			println(SceneListDriver.getItems(double))
-			println(targetObject)
 			val item = SceneListDriver.getItems(double).find {
 				it.value!!.id == (targetObject as SceneItemViewModel).id
 			}
 			val matching = item!!.value!!.name == (targetObject as SceneItemViewModel).name
-			UATLogger.silent = true
 			assertFalse(matching)
 		}
 		Then("the Scene name should be the original name") {
 			assertTrue(SceneListDriver.isSelectedItemNameMatching(double, (targetObject as SceneItemViewModel).name))
+		}
+		Then("The Scene List Tool should not show the deleted Scene") {
+			assertFalse(SceneListDriver.isShowingScene(double, (targetObject as Scene)))
+		}
+		Then("the Confirm Delete Scene Dialog should be opened") {
+			assertTrue(DeleteSceneDialogDriver.isOpen(double))
+		}
+		Then("the Confirm Delete Scene Dialog should show the Scene name") {
+			assertTrue(DeleteSceneDialogDriver.isShowingNameOf(double, (targetObject as SceneItemViewModel)))
 		}
 
 		After { _: Scenario ->

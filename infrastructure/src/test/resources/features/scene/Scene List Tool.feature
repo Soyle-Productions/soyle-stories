@@ -45,15 +45,15 @@ Feature: Scene List Tool
     And the Scene right-click menu has been opened
     When the user clicks the Scene List Tool right-click menu delete button
     Then the Confirm Delete Scene Dialog should be opened
-    And the cConfirm Delete Scene Dialog should show the location name
+    And the Confirm Delete Scene Dialog should show the Scene name
 
   Scenario: Populated Scene List + button
     Given The Scene List Tool has been opened
     And A Scene has been created
     And a Scene has been selected
     When the user clicks the Scene List Tool delete button
-    Then the Confirm Delete Location Dialog should be opened
-    And the Confirm Delete Location Dialog should show the Scene name
+    Then the Confirm Delete Scene Dialog should be opened
+    And the Confirm Delete Scene Dialog should show the Scene name
 
   Scenario: Renaming inside Scene List Tool creates input box
     Given the Scene right-click menu has been opened

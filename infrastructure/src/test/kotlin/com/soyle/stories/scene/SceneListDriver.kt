@@ -15,6 +15,7 @@ import javafx.scene.control.MenuItem
 import javafx.scene.control.TextField
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
+import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
@@ -291,6 +292,14 @@ object SceneListDriver : ApplicationTest() {
 	{
 		val item = getSelectedItem(double) ?: return (false).also { UATLogger.log("no selected item") }
 		return item.name == testName
+	}
+
+	fun whenBottomButtonIsClicked(double: SoyleStoriesTestDouble, buttonId: String)
+	{
+		val list = getIfOpen(double) ?: error("scene list is not open")
+		interact {
+			clickOn(from(list.root).lookup("#actionBar_$buttonId").queryButton(), MouseButton.PRIMARY)
+		}
 	}
 
 }
