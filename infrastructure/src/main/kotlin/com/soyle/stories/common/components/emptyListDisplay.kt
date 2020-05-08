@@ -19,6 +19,7 @@ fun EventTarget.emptyListDisplay(
   callToActionLabelProperty: ObservableValue<String>,
   callToAction: () -> Unit
 ) = gridpane {
+	addClass("empty-display")
 	hiddenWhen { hiddenWhen  }
 	managedProperty().bind(visibleProperty())
 	minWidth = 200.0

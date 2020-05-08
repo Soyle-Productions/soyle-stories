@@ -6,6 +6,7 @@ import com.soyle.stories.character.CreateCharacterDialogDriver
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Scene
 import com.soyle.stories.location.LocationListDriver
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectSteps
@@ -184,7 +185,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			when (toolName) {
 				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenClosed(double)
 				"Locations" -> LocationSteps.givenLocationListToolHasBeenClosed(double)
-				"Scenes" -> SceneListDriver.givenHasBeenOpened(double)
+				"Scenes" -> SceneListDriver.givenHasBeenClosed(double)
 				else -> error("no tool of type $toolName")
 			}
 		}
@@ -199,6 +200,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Given("the Create Scene Dialog Name input has a valid Scene Name") {
 			CreateSceneDialogDriver.givenNameInputHasValidSceneName(double)
+		}
+		Given("{int} Scenes have been created") { count: Int ->
+			SceneSteps.givenNumberOfCreatedScenesIsAtLeast(double, count)
 		}
 
 
@@ -323,6 +327,13 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("the {string} tool item is selected") { menuItemText: String ->
 			WorkBenchDriver.whenMenuItemIsSelected(double, "tools", menuItemText = menuItemText)
+		}
+		When("The Scene List Tool is opened") {
+			SceneListDriver.whenOpened(double)
+		}
+		When("A new Scene is created") {
+			SceneSteps.whenSceneIsCreated(double)
+			targetObject = SceneSteps.getCreatedScenes(double).last()
 		}
 
 
@@ -519,6 +530,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("a new Scene should be created") {
 			assertTrue(SceneSteps.getNumberOfCreatedScenes(double) >= 1)
+		}
+		Then("The Scene List Tool should show a special empty message") {
+			assertTrue(SceneListDriver.isShowingEmptyMessage(double))
+		}
+		Then("The Scene List Tool should show all {int} scenes") { count: Int ->
+			SceneListDriver.isShowingNumberOfScenes(double, count)
+		}
+		Then("The Scene List Tool should show the new Scene") {
+			SceneListDriver.isShowingScene(double, targetObject as Scene)
 		}
 
 
