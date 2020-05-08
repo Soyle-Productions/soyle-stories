@@ -19,6 +19,7 @@ class SceneListModel : ItemViewModel<SceneListViewModel>(), View.Nullable<SceneL
 	val createSceneButtonLabel = bind(SceneListViewModel::createSceneButtonLabel)
 	val scenes = bindImmutableList(SceneListViewModel::scenes)
 	val hasScenes = bind(SceneListViewModel::hasScenes)
+	val renameSceneFailureMessage = bind(SceneListViewModel::renameSceneFailureMessage)
 
 	val selectedItem = SimpleObjectProperty<SceneItemViewModel?>(null)
 

@@ -14,6 +14,7 @@ import com.soyle.stories.project.WorkBenchDriver
 import com.soyle.stories.scene.CreateSceneDialogDriver
 import com.soyle.stories.scene.SceneListDriver
 import com.soyle.stories.scene.SceneSteps
+import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
@@ -204,6 +205,28 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("{int} Scenes have been created") { count: Int ->
 			SceneSteps.givenNumberOfCreatedScenesIsAtLeast(double, count)
 		}
+		Given("The Scene List Tool has been opened") {
+			SceneListDriver.givenHasBeenOpened(double)
+		}
+		Given("A Scene has been created") {
+			SceneSteps.givenNumberOfCreatedScenesIsAtLeast(double, 1)
+		}
+		Given("the Scene right-click menu has been opened") {
+			SceneListDriver.givenRightClickMenuHasBeenOpened(double)
+		}
+		Given("a Scene has been selected") {
+			SceneListDriver.givenASceneHasBeenSelected(double)
+		}
+		Given("the user has entered a valid Scene name") {
+			SceneListDriver.givenValidSceneNameHasBeenEntered(double)
+		}
+		Given("the Scene rename input box is visible") {
+			SceneListDriver.givenRenameInputBoxHasBeenVisible(double)
+			targetObject = SceneListDriver.getSelectedItem(double)
+		}
+		Given("The Scene List Tool tab has been selected") {
+			SceneListDriver.givenHasBeenVisible(double)
+		}
 
 
 		When("User selects the file->new->location menu option") {
@@ -285,10 +308,8 @@ class SoyleUATSteps : En, ApplicationTest() {
 			CharacterArcSteps.whenCharacterArcSectionLocationDropDownLosesFocus(double, characterArc.themeId, characterArc.characterId)
 		}
 		When("the selected Location in in Character Arc Section Location Dropdown is deselected") {
-			UATLogger.silent = false
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.whenSelectedLocationInCharacterArcSectionLocationDropdownIsDeselected(double, characterArc.themeId, characterArc.characterId)
-			UATLogger.silent = true
 		}
 		When("The Character List Tool is opened") {
 			CharacterSteps.whenCharacterListToolIsOpened(double)
@@ -329,11 +350,17 @@ class SoyleUATSteps : En, ApplicationTest() {
 			WorkBenchDriver.whenMenuItemIsSelected(double, "tools", menuItemText = menuItemText)
 		}
 		When("The Scene List Tool is opened") {
+			if (SceneListDriver.isOpen(double)) {
+				SceneListDriver.whenClosed(double)
+			}
 			SceneListDriver.whenOpened(double)
 		}
 		When("A new Scene is created") {
 			SceneSteps.whenSceneIsCreated(double)
 			targetObject = SceneSteps.getCreatedScenes(double).last()
+		}
+		When("the user clicks the Scene List Tool right-click menu Rename button") {
+			SceneListDriver.whenRightClickOptionIsClicked(double, "rename")
 		}
 
 
@@ -535,12 +562,34 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertTrue(SceneListDriver.isShowingEmptyMessage(double))
 		}
 		Then("The Scene List Tool should show all {int} scenes") { count: Int ->
-			SceneListDriver.isShowingNumberOfScenes(double, count)
+			assertTrue(SceneListDriver.isShowingNumberOfScenes(double, count))
 		}
 		Then("The Scene List Tool should show the new Scene") {
-			SceneListDriver.isShowingScene(double, targetObject as Scene)
+			assertTrue(SceneListDriver.isShowingScene(double, targetObject as Scene))
 		}
-
+		Then("the Scene's name should be replaced by an input box") {
+			assertTrue(SceneListDriver.isRenameInputBoxVisible(double))
+		}
+		Then("the Scene rename input box should contain the Scene's name") {
+			assertTrue(SceneListDriver.isRenameInputBoxShowingNameOfSelected(double))
+		}
+		Then("the Scene rename input box should be replaced by the Scene name") {
+			assertFalse(SceneListDriver.isRenameInputBoxVisible(double))
+		}
+		Then("the Scene name should be the new name") {
+			UATLogger.silent = false
+			println(SceneListDriver.getItems(double))
+			println(targetObject)
+			val item = SceneListDriver.getItems(double).find {
+				it.value!!.id == (targetObject as SceneItemViewModel).id
+			}
+			val matching = item!!.value!!.name == (targetObject as SceneItemViewModel).name
+			UATLogger.silent = true
+			assertFalse(matching)
+		}
+		Then("the Scene name should be the original name") {
+			assertTrue(SceneListDriver.isSelectedItemNameMatching(double, (targetObject as SceneItemViewModel).name))
+		}
 
 		After { _: Scenario ->
 			if (double.isStarted()) {

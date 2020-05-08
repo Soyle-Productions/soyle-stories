@@ -11,6 +11,7 @@ import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -21,6 +22,8 @@ class SceneList : View() {
 	private val model = resolve<SceneListModel>()
 
 	private val viewListener = resolve<SceneListViewListener>()
+
+	private lateinit var treeview: TreeView<SceneItemViewModel?>
 
 	override val root: Parent = stackpane {
 		hgrow = Priority.SOMETIMES
@@ -39,6 +42,7 @@ class SceneList : View() {
 			minHeight = 100.0
 			vgrow = Priority.ALWAYS
 			treeview<SceneItemViewModel?>(TreeItem(null)) {
+				this@SceneList.treeview = this
 				isShowRoot = false
 				vgrow = Priority.ALWAYS
 				makeEditable { newName, oldValue ->
@@ -98,7 +102,12 @@ class SceneList : View() {
 	}
 
 	private val sceneContextMenu = ContextMenu().apply {
-
+		item("Rename") {
+			id = "rename"
+			action {
+				treeview.edit(treeview.selectionModel.selectedItem)
+			}
+		}
 	}
 
 	init {

@@ -1,5 +1,6 @@
 package com.soyle.stories.scene
 
+import com.soyle.stories.UATLogger
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
@@ -15,11 +16,9 @@ object SceneSteps {
 
 	fun setNumberOfCreatedScenes(double: SoyleStoriesTestDouble, count: Int) {
 		ProjectSteps.givenProjectHasBeenOpened(double)
-		val scope = ProjectSteps.getProjectScope(double)!!
 		val createdCount = getNumberOfCreatedScenes(double)
-		val controller = scope.get<CreateNewSceneController>()
 		repeat(count - createdCount) {
-			controller.createNewScene("Unique Scene Name ${UUID.randomUUID()}")
+			whenSceneIsCreated(double)
 		}
 	}
 
@@ -43,6 +42,7 @@ object SceneSteps {
 
 	fun givenNumberOfCreatedScenesIsAtLeast(double: SoyleStoriesTestDouble, count: Int)
 	{
+		UATLogger.log("Given Number of Created Scenes is At Least $count")
 		if (getNumberOfCreatedScenes(double) < count)
 		{
 			setNumberOfCreatedScenes(double, count)

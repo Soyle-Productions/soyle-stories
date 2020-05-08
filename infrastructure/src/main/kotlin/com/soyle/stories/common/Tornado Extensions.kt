@@ -200,9 +200,9 @@ fun <T> TreeView<T>.makeEditable(valid: (String, T?) -> String? = { _, _ -> null
 				text = null
 				textfield(rollbackText) {
 					fun commit() {
-						val errorMessage = valid(text, item)
+						val errorMessage = valid(textProperty().get(), item)
 						if (errorMessage == null) {
-							cell.commitEdit(convertFromString.invoke(cell, text, item))
+							cell.commitEdit(convertFromString.invoke(cell, textProperty().get(), item))
 						} else {
 							val errorDecorator = SimpleMessageDecorator(errorMessage, ValidationSeverity.Error)
 							decorators.toList().forEach { removeDecorator(it) }
