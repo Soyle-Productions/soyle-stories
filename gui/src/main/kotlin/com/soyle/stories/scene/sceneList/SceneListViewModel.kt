@@ -6,7 +6,8 @@ data class SceneListViewModel(
   val toolTitle: String,
   val emptyLabel: String,
   val createSceneButtonLabel: String,
-  val scenes: List<SceneItemViewModel>
+  val scenes: List<SceneItemViewModel>,
+  val renameSceneFailureMessage: String?
 ) {
 	val hasScenes: Boolean
 		get() = scenes.isNotEmpty()
