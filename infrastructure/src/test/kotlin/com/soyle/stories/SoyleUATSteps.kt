@@ -11,6 +11,7 @@ import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBenchDriver
 import com.soyle.stories.scene.CreateSceneDialogDriver
+import com.soyle.stories.scene.SceneListDriver
 import com.soyle.stories.scene.SceneSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
@@ -175,6 +176,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			when (toolName) {
 				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenOpened(double)
 				"Locations" -> LocationSteps.givenLocationListToolHasBeenOpened(double)
+				"Scenes" -> SceneListDriver.givenHasBeenOpened(double)
 				else -> error("no tool of type $toolName")
 			}
 		}
@@ -182,6 +184,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			when (toolName) {
 				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenClosed(double)
 				"Locations" -> LocationSteps.givenLocationListToolHasBeenClosed(double)
+				"Scenes" -> SceneListDriver.givenHasBeenOpened(double)
 				else -> error("no tool of type $toolName")
 			}
 		}
@@ -494,6 +497,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val isOpen = when (toolName) {
 				"Characters" -> CharacterSteps.isCharacterListToolOpen(double)
 				"Locations" -> LocationSteps.isLocationListToolOpen(double)
+				"Scenes" -> SceneListDriver.isOpen(double)
 				else -> false
 			}
 			assertTrue(isOpen)
@@ -502,6 +506,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val isOpen = when (toolName) {
 				"Characters" -> CharacterSteps.isCharacterListToolOpen(double)
 				"Locations" -> LocationSteps.isLocationListToolOpen(double)
+				"Scenes" -> SceneListDriver.isOpen(double)
 				else -> error("no registered tool with name $toolName")
 			}
 			assertFalse(isOpen)

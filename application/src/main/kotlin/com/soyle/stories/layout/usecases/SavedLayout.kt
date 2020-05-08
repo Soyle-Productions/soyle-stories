@@ -27,6 +27,7 @@ sealed class ActiveTool {
 }
 class CharacterListActiveTool(override val toolId: UUID) : ActiveTool()
 class LocationListActiveTool(override val toolId: UUID) : ActiveTool()
+class SceneListActiveTool(override val toolId: UUID) : ActiveTool()
 class BaseStoryStructureActiveTool(override val toolId: UUID, val characterId: UUID, val themeId: UUID) : ActiveTool()
 class CharacterComparisonActiveTool(override val toolId: UUID, val characterId: UUID, val themeId: UUID) : ActiveTool()
 class LocationDetailsActiveTool(override val toolId: UUID, val locationId: UUID) : ActiveTool()
@@ -42,10 +43,10 @@ fun Window.WindowChild.toActiveWindowChild(): ActiveWindowChild = when (this) {
 fun Tool<*>.toActiveTool() = when (this) {
     is CharacterListTool -> CharacterListActiveTool(id.uuid)
     is LocationListTool -> LocationListActiveTool(id.uuid)
+    is SceneListTool -> SceneListActiveTool(id.uuid)
     is BaseStoryStructureTool -> BaseStoryStructureActiveTool(id.uuid, identifyingData.second.uuid, identifyingData.first.uuid)
     is CharacterComparisonTool -> CharacterComparisonActiveTool(id.uuid, (associatedData as Character.Id).uuid, identifyingData.uuid)
     is LocationDetailsTool -> LocationDetailsActiveTool(id.uuid, identifyingData.uuid)
-    else -> error("unexpected window child type $this")
 }
 
 fun Tool<*>.toStaticTool() = StaticTool(id.uuid, isOpen, type.toString())

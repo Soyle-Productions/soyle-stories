@@ -12,6 +12,8 @@ import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogViewList
 import com.soyle.stories.scene.createSceneDialog.CreateSceneDialogModel
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
+import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
+import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenesUseCase
 
 object SceneModule {
 
@@ -21,6 +23,13 @@ object SceneModule {
 
 			provide<CreateNewScene> {
 				CreateNewSceneUseCase(
+				  projectId,
+				  get()
+				)
+			}
+			provide<ListAllScenes> {
+				ListAllScenesUseCase(
+				  projectId,
 				  get()
 				)
 			}
@@ -49,6 +58,8 @@ object SceneModule {
 			}
 
 		}
+
+		SceneListModule
 
 	}
 }
