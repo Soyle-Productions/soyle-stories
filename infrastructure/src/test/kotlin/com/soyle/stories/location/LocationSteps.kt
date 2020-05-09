@@ -6,10 +6,8 @@ import com.soyle.stories.common.editingCell
 import com.soyle.stories.common.isEditing
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
 import com.soyle.stories.location.LocationSteps.interact
 import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.DeleteLocationController
@@ -42,6 +40,7 @@ import javafx.scene.text.Text
 import javafx.stage.Window
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.find
@@ -78,6 +77,25 @@ object LocationSteps : ApplicationTest() {
 			setLocationListToolOpened(double)
 		}
 		assertTrue(isLocationListToolOpen(double))
+	}
+
+	fun setLocationListToolClosed(double: SoyleStoriesTestDouble) {
+		ProjectSteps.givenProjectHasBeenOpened(double)
+		whenLocationListToolIsClosed(double)
+	}
+
+	fun whenLocationListToolIsClosed(double: SoyleStoriesTestDouble) {
+		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Locations")!!
+		interact {
+			menuItem.fire()
+		}
+	}
+
+	fun givenLocationListToolHasBeenClosed(double: SoyleStoriesTestDouble) {
+		if (isLocationListToolOpen(double)) {
+			setLocationListToolClosed(double)
+		}
+		assertFalse(isLocationListToolOpen(double))
 	}
 
 	// location creation

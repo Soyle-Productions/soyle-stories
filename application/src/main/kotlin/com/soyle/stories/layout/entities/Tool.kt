@@ -38,6 +38,13 @@ class LocationListTool(id: Id, projectId: Project.Id, isOpen: Boolean) :
     override fun close(): Tool<Project.Id> =
       LocationListTool(id, identifyingData, false)
 }
+class SceneListTool(id: Id, projectId: Project.Id, isOpen: Boolean) :
+  Tool<Project.Id>(id, projectId, isOpen, ToolType.SceneList, null) {
+    override fun open(): Tool<Project.Id> =
+      SceneListTool(id, identifyingData, true)
+    override fun close(): Tool<Project.Id> =
+      SceneListTool(id, identifyingData, false)
+}
 
 class BaseStoryStructureTool(id: Tool.Id, themeId: Theme.Id, characterId: Character.Id, isOpen: Boolean) :
     Tool<Pair<Theme.Id, Character.Id>>(id, themeId to characterId, isOpen, ToolType.BaseStoryStructure, null) {

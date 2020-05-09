@@ -8,41 +8,9 @@ repositories {
 dependencies {
     implementation libraries.soyle_stories_core
     implementation libraries.coroutines
-    testImplementation 'io.cucumber:cucumber-java8:5.5.0'
-    testImplementation 'io.cucumber:cucumber-junit:5.5.0'
-    testImplementation 'org.assertj:assertj-core:3.15.0'
-
-    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.11.0'
-    testImplementation 'io.github.prashant-ramcharan:courgette-jvm:4.6.0'
-    testImplementation 'io.github.prashant-ramcharan:webdriver-binary-downloader:1.2.2'
+    testImplementation libraries.assertj
     testImplementation project(":data")
 
     implementation project(":application")
     implementation libraries.reflectionKt
-}
-
-configurations {
-    cucumberRuntime {
-        extendsFrom testImplementation
-    }
-}
-
-task cucumber() {
-    dependsOn assemble, compileTestJava
-    doLast {
-        javaexec {
-            main = "io.cucumber.core.cli.Main"
-            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--add-plugin', 'html:build/cucumber/html-report', '--glue', 'com.soyle.stories', 'src/test/resources/features', '--strict']
-        }
-    }
-}
-
-tasks.withType(Test) {
-    systemProperties.remove("java.endorsed.dirs")
-}
-
-task runFeaturesUsingJUnit(type: Test) {
-    include '**/suites/junit/FeatureSuite.class'
-    outputs.upToDateWhen { false }
 }

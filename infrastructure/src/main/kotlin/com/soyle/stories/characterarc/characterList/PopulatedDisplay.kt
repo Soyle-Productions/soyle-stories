@@ -22,6 +22,7 @@ internal class PopulatedDisplay : View() {
 
     private val characterContextMenu = ContextMenu().apply {
         item("Rename") {
+            id = "rename"
             action {
                 val selectedItem = model.selectedItem.value
                 val selectedTreeItem = treeView.selectionModel.selectedItems.singleOrNull() ?: return@action
@@ -39,6 +40,7 @@ internal class PopulatedDisplay : View() {
             }
         }
         item("Delete") {
+            id = "delete"
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterTreeItemViewModel) {
@@ -92,8 +94,13 @@ internal class PopulatedDisplay : View() {
         this@PopulatedDisplay.treeView = treeview<Any?>(TreeItem(null)) {
             isShowRoot = false
             vgrow = Priority.ALWAYS
-            makeEditable { newName, oldValue ->
-                // rename item
+            makeEditable({ newName, oldValue ->
+
+                if (newName.isBlank()) "Name cannot be blank"
+                else null
+
+            }) { newName, oldValue ->
+
                 when (oldValue) {
                     is CharacterTreeItemViewModel -> characterListViewListener.renameCharacter(oldValue.id, newName)
                     is CharacterArcItemViewModel -> characterListViewListener.renameCharacterArc(oldValue.characterId, oldValue.themeId, newName)

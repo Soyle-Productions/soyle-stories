@@ -2,10 +2,21 @@ package com.soyle.stories
 
 import com.soyle.stories.character.CharacterArcSteps
 import com.soyle.stories.character.CharacterSteps
+import com.soyle.stories.character.CreateCharacterDialogDriver
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Scene
+import com.soyle.stories.location.LocationListDriver
 import com.soyle.stories.location.LocationSteps
+import com.soyle.stories.project.CreateProjectDialogDriver
 import com.soyle.stories.project.ProjectSteps
+import com.soyle.stories.project.WorkBenchDriver
+import com.soyle.stories.scene.CreateSceneDialogDriver
+import com.soyle.stories.scene.DeleteSceneDialogDriver
+import com.soyle.stories.scene.SceneListDriver
+import com.soyle.stories.scene.SceneSteps
+import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
@@ -20,9 +31,14 @@ class SoyleUATSteps : En, ApplicationTest() {
 
 	private val double = SoyleStoriesTestDouble()
 
+	private var targetObject: Any? = null
+
 	private var targetLocation: Location? = null
 	private var recentlyCreatedLocationName: String = ""
 	private var deletedLocation: Location? = null
+
+	private var recentlyCreatedCharacter: Character? = null
+	private var deletedCharacter: Character? = null
 
 	init {
 		Given("A project has been opened") {
@@ -70,7 +86,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			// LocationListDriver.givenRenameInputBoxIsVisible(double)
 			LocationSteps.givenLocationRenameInputBoxIsVisible(double)
 		}
-		Given("the user has entered a valid name") {
+		Given("the user has entered a valid Location name") {
 			// LocationListDriver.givenValidNameHasBeenEnteredInRenameInputBox(double)
 			LocationSteps.givenUserHasEnteredValidLocationNameInRenameInputBox(double)
 		}
@@ -115,6 +131,103 @@ class SoyleUATSteps : En, ApplicationTest() {
 			LocationSteps.givenNumberOfLocationsHaveBeenCreated(double, 1)
 			val location = LocationSteps.getLocationsCreated(double).first()
 			CharacterArcSteps.givenCharacterArcSectionHasALinkedLocation(double, section.id, location.id)
+		}
+		Given("{int} Characters have been created") { int1: Int ->
+			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, int1)
+		}
+		Given("The Character List Tool has been opened") {
+			// LocationListDriver.givenHasBeenOpened(double)
+			CharacterSteps.givenCharacterListToolHasBeenOpened(double)
+		}
+		Given("A Character has been created") {
+			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, 1)
+		}
+		Given("the Character right-click menu has been opened") {
+			CharacterSteps.givenCharacterListToolCharacterContextMenuHasBeenOpened(double)
+			//targetLocation = LocationSteps.getLocationsCreated(double).first()
+		}
+		Given("a Character has been selected") {
+			CharacterSteps.givenCharacterIsSelectedInCharacterListTool(double)
+		}
+		Given("the Character rename input box is visible") {
+			CharacterSteps.givenCharacterListToolShowingInputBoxForSelectedItem(double)
+		}
+		Given("the user has entered a valid Character name") {
+			CharacterSteps.givenValidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double)
+		}
+		Given("the user has entered an invalid Character name") {
+			CharacterSteps.givenInvalidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double)
+		}
+		Given("the Create Character Dialog has been opened") {
+			CreateCharacterDialogDriver.givenHasBeenOpened(double)
+		}
+		Given("the Create Character Dialog Name input has an invalid Character Name") {
+			CreateCharacterDialogDriver.givenNameInputHasInvalidCharacterName(double)
+		}
+		Given("the Create Character Dialog Name input has a valid Character Name") {
+			CreateCharacterDialogDriver.givenNameInputHasValidCharacterName(double)
+		}
+		Given("the Location rename input box is visible") {
+			LocationListDriver.givenRenameInputBoxIsVisible(double)
+		}
+		Given("the File Menu has been opened") {
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "file")
+		}
+		Given("the File New Menu has been opened") {
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "file", "file_new")
+		}
+		Given("the {string} tool has been opened") { toolName: String ->
+			when (toolName) {
+				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenOpened(double)
+				"Locations" -> LocationSteps.givenLocationListToolHasBeenOpened(double)
+				"Scenes" -> SceneListDriver.givenHasBeenOpened(double)
+				else -> error("no tool of type $toolName")
+			}
+		}
+		Given("the {string} tool has been closed") { toolName: String ->
+			when (toolName) {
+				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenClosed(double)
+				"Locations" -> LocationSteps.givenLocationListToolHasBeenClosed(double)
+				"Scenes" -> SceneListDriver.givenHasBeenClosed(double)
+				else -> error("no tool of type $toolName")
+			}
+		}
+		Given("the Tools Menu has been opened") {
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "tools")
+		}
+		Given("the Create Scene Dialog has been opened") {
+			CreateSceneDialogDriver.givenHasBeenOpened(double)
+		}
+		Given("the Create Scene Dialog Name input has an invalid Scene Name") {
+			CreateSceneDialogDriver.givenNameInputHasInvalidSceneName(double)
+		}
+		Given("the Create Scene Dialog Name input has a valid Scene Name") {
+			CreateSceneDialogDriver.givenNameInputHasValidSceneName(double)
+		}
+		Given("{int} Scenes have been created") { count: Int ->
+			SceneSteps.givenNumberOfCreatedScenesIsAtLeast(double, count)
+		}
+		Given("The Scene List Tool has been opened") {
+			SceneListDriver.givenHasBeenOpened(double)
+		}
+		Given("A Scene has been created") {
+			SceneSteps.givenNumberOfCreatedScenesIsAtLeast(double, 1)
+		}
+		Given("the Scene right-click menu has been opened") {
+			SceneListDriver.givenRightClickMenuHasBeenOpened(double)
+		}
+		Given("a Scene has been selected") {
+			SceneListDriver.givenASceneHasBeenSelected(double)
+		}
+		Given("the user has entered a valid Scene name") {
+			SceneListDriver.givenValidSceneNameHasBeenEntered(double)
+		}
+		Given("the Scene rename input box is visible") {
+			SceneListDriver.givenRenameInputBoxHasBeenVisible(double)
+			targetObject = SceneListDriver.getSelectedItem(double)
+		}
+		Given("The Scene List Tool tab has been selected") {
+			SceneListDriver.givenHasBeenVisible(double)
 		}
 
 
@@ -197,10 +310,72 @@ class SoyleUATSteps : En, ApplicationTest() {
 			CharacterArcSteps.whenCharacterArcSectionLocationDropDownLosesFocus(double, characterArc.themeId, characterArc.characterId)
 		}
 		When("the selected Location in in Character Arc Section Location Dropdown is deselected") {
-			UATLogger.silent = false
 			val characterArc = CharacterArcSteps.getCharacterArcsCreated(double).first()
 			CharacterArcSteps.whenSelectedLocationInCharacterArcSectionLocationDropdownIsDeselected(double, characterArc.themeId, characterArc.characterId)
-			UATLogger.silent = true
+		}
+		When("The Character List Tool is opened") {
+			CharacterSteps.whenCharacterListToolIsOpened(double)
+		}
+		When("A new Character is created") {
+			recentlyCreatedCharacter = CharacterSteps.whenCharacterIsCreated(double)
+		}
+		When("A Character is deleted") {
+			deletedCharacter = CharacterSteps.whenCharacterIsDeleted(double)
+		}
+		When("the user clicks the Character List Tool right-click menu delete button") {
+			CharacterSteps.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "delete")
+		}
+		When("the user clicks the Character List Tool delete button") {
+			CharacterSteps.whenCharacterListToolActionBarDeleteButtonIsClicked(double)
+		}
+		When("the user clicks the Character List Tool right-click menu Rename button") {
+			CharacterSteps.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "rename")
+		}
+		When("The user clicks away from the input box") {
+			ProjectSteps.whenUserClicksAway(double)
+		}
+		When("the user commits the rename") {
+			interact {
+				press(KeyCode.ENTER).release(KeyCode.ENTER)
+			}
+		}
+		When("the File New Menu is opened") {
+			WorkBenchDriver.whenMenuIsOpened(double, "file", "file_new")
+		}
+		When("the File New {string} option is selected") { menuItemText: String ->
+			WorkBenchDriver.whenMenuItemIsSelected(double, "file", "file_new", menuItemText = menuItemText)
+		}
+		When("the Tools Menu is opened") {
+			WorkBenchDriver.whenMenuIsOpened(double, "tools")
+		}
+		When("the {string} tool item is selected") { menuItemText: String ->
+			WorkBenchDriver.whenMenuItemIsSelected(double, "tools", menuItemText = menuItemText)
+		}
+		When("The Scene List Tool is opened") {
+			if (SceneListDriver.isOpen(double)) {
+				SceneListDriver.whenClosed(double)
+			}
+			SceneListDriver.whenOpened(double)
+		}
+		When("A new Scene is created") {
+			SceneSteps.whenSceneIsCreated(double)
+			targetObject = SceneSteps.getCreatedScenes(double).last()
+		}
+		When("the user clicks the Scene List Tool right-click menu Rename button") {
+			SceneListDriver.whenRightClickOptionIsClicked(double, "rename")
+		}
+		When("A Scene is deleted") {
+			val existingScenes = SceneSteps.getCreatedScenes(double)
+			SceneSteps.whenSceneIsDeleted(double)
+			targetObject = (existingScenes.toSet() - SceneSteps.getCreatedScenes(double).toSet()).single()
+		}
+		When("the user clicks the Scene List Tool right-click menu delete button") {
+			SceneListDriver.whenRightClickOptionIsClicked(double, "delete")
+			targetObject = SceneListDriver.getSelectedItem(double)
+		}
+		When("the user clicks the Scene List Tool delete button") {
+			SceneListDriver.whenBottomButtonIsClicked(double, "delete")
+			targetObject = SceneListDriver.getSelectedItem(double)
 		}
 
 
@@ -291,7 +466,150 @@ class SoyleUATSteps : En, ApplicationTest() {
 			CharacterArcSteps.isCharacterArcSectionLocationDropdownDisplayingEmptyState(double, characterArc.themeId, characterArc.characterId)
 			  .let(Assertions::assertTrue)
 		}
-
+		Then("The Character List Tool should show a special empty message") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingEmptyMessage(double))
+		}
+		Then("The Character List Tool should show all {int} Characters") { characterCount: Int ->
+			assertTrue(CharacterSteps.isCharacterListToolShowingNumberOfCharacters(double, characterCount))
+		}
+		Then("The Character List Tool should show the new Character") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingCharacter(double, recentlyCreatedCharacter!!))
+		}
+		Then("The Character List Tool should not show the deleted Character") {
+			assertFalse(CharacterSteps.isCharacterListToolShowingCharacter(double, deletedCharacter!!))
+		}
+		Then("the Confirm Delete Character Dialog should be opened") {
+			assertTrue(CharacterSteps.isConfirmDeleteCharacterDialogOpen(double))
+			targetObject = CharacterSteps.getCharacterSelectedInCharacterListTool(double)!!.let {
+				Character(Character.Id(UUID.fromString(it.id)), UUID.randomUUID(), it.name)
+			}
+		}
+		Then("the Confirm Delete Character Dialog should show the Character name") {
+			assertTrue(CharacterSteps.isConfirmDeleteCharacterDialogDisplayingNameOf(double, targetObject as Character))
+		}
+		Then("the Character's name should be replaced by an input box") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+		}
+		Then("the Character rename input box should contain the Character's name") {
+			assertTrue(CharacterSteps.isCharacterListToolRenameInputBoxContainingSelectedItemName(double))
+		}
+		Then("the Character rename input box should be replaced by the Character name") {
+			assertFalse(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+		}
+		Then("the Character name should be the new name") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingNameStoredForSelectedItem(double))
+		}
+		Then("the Character name should be the original name") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingNameStoredForSelectedItem(double))
+		}
+		Then("an error message should be displayed in the Create Character Dialog") {
+			assertTrue(CreateCharacterDialogDriver.isErrorMessageShown(double))
+		}
+		Then("the Create Character Dialog should be closed") {
+			assertFalse(CreateCharacterDialogDriver.isOpen(double))
+		}
+		Then("a new Character should be created") {}
+		Then("the Location rename input box should be replaced by the Location name") {
+			assertFalse(LocationListDriver.isRenameInputBoxVisible(double))
+		}
+		Then("the Location name should be the new name") {
+			LocationListDriver.isLocationShowingStoredName(double)
+		}
+		Then("the Location name should be the original name") {
+			LocationListDriver.isLocationShowingStoredName(double)
+		}
+		Then("the Character rename input box should be visible") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+		}
+		Then("the Character rename input box should show an error message") {
+			assertTrue(CharacterSteps.isCharacterListToolShowingErrorOnInputBoxForSelectedItem(double))
+		}
+		Then("the File New Menu should display {string}") { menuText: String ->
+			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "file", "file_new", menuItemText = menuText))
+		}
+		Then("the Create New {string} Dialog should be open") { domainObject: String ->
+			val isOpen = when (domainObject) {
+				"Project" -> CreateProjectDialogDriver.isOpen(double)
+				"Character" -> CreateCharacterDialogDriver.isOpen(double)
+				"Location" -> LocationSteps.isCreateNewLocationDialogOpen(double)
+				"Scene" -> CreateSceneDialogDriver.isOpen(double)
+				else -> false
+			}
+			assertTrue(isOpen)
+		}
+		Then("the Tools Menu should display {string}") { menuText: String ->
+			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "tools", menuItemText = menuText))
+		}
+		Then("the Tools Menu {string} option should be checked") { menuText: String ->
+			assertTrue(WorkBenchDriver.isMenuItemChecked(double, "tools", menuItemText = menuText))
+		}
+		Then("the Tools Menu {string} option should be unchecked") { menuText: String ->
+			assertFalse(WorkBenchDriver.isMenuItemChecked(double, "tools", menuItemText = menuText))
+		}
+		Then("the {string} tool should be open") { toolName: String ->
+			val isOpen = when (toolName) {
+				"Characters" -> CharacterSteps.isCharacterListToolOpen(double)
+				"Locations" -> LocationSteps.isLocationListToolOpen(double)
+				"Scenes" -> SceneListDriver.isOpen(double)
+				else -> false
+			}
+			assertTrue(isOpen)
+		}
+		Then("the {string} tool should be closed") { toolName: String ->
+			val isOpen = when (toolName) {
+				"Characters" -> CharacterSteps.isCharacterListToolOpen(double)
+				"Locations" -> LocationSteps.isLocationListToolOpen(double)
+				"Scenes" -> SceneListDriver.isOpen(double)
+				else -> error("no registered tool with name $toolName")
+			}
+			assertFalse(isOpen)
+		}
+		Then("an error message should be displayed in the Create Scene Dialog") {
+			assertTrue(CreateSceneDialogDriver.isErrorMessageShown(double))
+		}
+		Then("the Create Scene Dialog should be closed") {
+			assertFalse(CreateSceneDialogDriver.isOpen(double))
+		}
+		Then("a new Scene should be created") {
+			assertTrue(SceneSteps.getNumberOfCreatedScenes(double) >= 1)
+		}
+		Then("The Scene List Tool should show a special empty message") {
+			assertTrue(SceneListDriver.isShowingEmptyMessage(double))
+		}
+		Then("The Scene List Tool should show all {int} scenes") { count: Int ->
+			assertTrue(SceneListDriver.isShowingNumberOfScenes(double, count))
+		}
+		Then("The Scene List Tool should show the new Scene") {
+			assertTrue(SceneListDriver.isShowingScene(double, targetObject as Scene))
+		}
+		Then("the Scene's name should be replaced by an input box") {
+			assertTrue(SceneListDriver.isRenameInputBoxVisible(double))
+		}
+		Then("the Scene rename input box should contain the Scene's name") {
+			assertTrue(SceneListDriver.isRenameInputBoxShowingNameOfSelected(double))
+		}
+		Then("the Scene rename input box should be replaced by the Scene name") {
+			assertFalse(SceneListDriver.isRenameInputBoxVisible(double))
+		}
+		Then("the Scene name should be the new name") {
+			val item = SceneListDriver.getItems(double).find {
+				it.value!!.id == (targetObject as SceneItemViewModel).id
+			}
+			val matching = item!!.value!!.name == (targetObject as SceneItemViewModel).name
+			assertFalse(matching)
+		}
+		Then("the Scene name should be the original name") {
+			assertTrue(SceneListDriver.isSelectedItemNameMatching(double, (targetObject as SceneItemViewModel).name))
+		}
+		Then("The Scene List Tool should not show the deleted Scene") {
+			assertFalse(SceneListDriver.isShowingScene(double, (targetObject as Scene)))
+		}
+		Then("the Confirm Delete Scene Dialog should be opened") {
+			assertTrue(DeleteSceneDialogDriver.isOpen(double))
+		}
+		Then("the Confirm Delete Scene Dialog should show the Scene name") {
+			assertTrue(DeleteSceneDialogDriver.isShowingNameOf(double, (targetObject as SceneItemViewModel)))
+		}
 
 		After { _: Scenario ->
 			if (double.isStarted()) {

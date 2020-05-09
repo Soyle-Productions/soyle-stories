@@ -14,6 +14,7 @@ import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
+import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.soylestories.SoyleStories
 import javafx.scene.Parent
 import javafx.stage.Screen
@@ -45,14 +46,19 @@ class WorkBench : View() {
                     separator()
                     item("Character") {
                         id = "file_new_character"
-                        action { createCharacterDialog(currentStage) }
+                        action { createCharacterDialog(scope) }
                     }
                     item("Location") {
                         id = "file_new_location"
                         action {
                             layoutViewListener.openDialog(Dialog.CreateLocation)
                         }
-                    }/*
+                    }
+                    item("Scene") {
+                        id = "file_new_scene"
+                        action { createSceneDialog(scope) }
+                    }
+                    /*
                     item("Plot Point") {
                         // action { controller.createPlotPoint() }
                     }

@@ -2,9 +2,9 @@ package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
-import com.soyle.stories.di.characterarc.CharacterListModule
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.project.ProjectScope
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import tornadofx.*
@@ -16,6 +16,7 @@ import tornadofx.*
  */
 internal class ActionBar : View() {
 
+    override val scope: ProjectScope = super.scope as ProjectScope
     private val model by resolveLater<CharacterListModel>()
     private val characterListViewListener = resolve<CharacterListViewListener>()
 
@@ -25,7 +26,7 @@ internal class ActionBar : View() {
         button("New Character") {
             isDisable = false
             action {
-                createCharacterDialog(currentStage)
+                createCharacterDialog(scope)
             }
             isMnemonicParsing = false
         }
@@ -40,6 +41,7 @@ internal class ActionBar : View() {
             isMnemonicParsing = false
         }
         button("Delete") {
+            id = "actionBar_deleteLocation"
             enableWhen { model.selectedItem.isNotNull }
             action {
                 when (val selectedItem = model.selectedItem.value) {

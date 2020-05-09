@@ -9,6 +9,7 @@ import com.soyle.stories.location.locationDetails.locationDetailsTab
 import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.*
+import com.soyle.stories.scene.sceneList.SceneList
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.geometry.Side
@@ -56,6 +57,7 @@ class ToolGroup : WindowChild() {
                         when (tool) {
                             is CharacterListToolViewModel -> tab<CharacterList>()
                             is LocationListToolViewModel -> tab<LocationList>()
+                            is SceneListToolViewModel -> tab<SceneList>()
                             is BaseStoryStructureToolViewModel -> baseStoryStructureTab(scope, tool)
                             is CharacterComparisonToolViewModel -> characterComparisonTab(scope, tool.themeId, tool.characterId)
                             is LocationDetailsToolViewModel -> locationDetailsTab(scope, tool)/*

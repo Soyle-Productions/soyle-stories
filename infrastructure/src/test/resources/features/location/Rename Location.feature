@@ -13,7 +13,7 @@ Feature: Rename Location
 
   Scenario: Enter New Name in Input Box
     Given the location rename input box is visible
-    And the user has entered a valid name
+    And the user has entered a valid Location name
     When The user presses the Enter key
     Then the location rename input box should be replaced by the location name
     And the location name should be the new name

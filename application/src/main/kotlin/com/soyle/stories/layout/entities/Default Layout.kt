@@ -21,6 +21,7 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                     stack(1) {
                         //openTool(ToolType.SceneList)
                         //openTool(ToolType.PlotPointList)
+                        openTool(ToolType.SceneList, mapOf("projectId" to projectId))
                         openTool(ToolType.LocationList, mapOf("projectId" to projectId))
                         openTool(ToolType.CharacterList, mapOf("projectId" to projectId))
                     }

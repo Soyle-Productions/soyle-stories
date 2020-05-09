@@ -1,12 +1,7 @@
 package com.soyle.stories.soylestories
 
 import com.soyle.stories.di.DI
-import com.soyle.stories.di.characterarc.CharacterArcModule
-import com.soyle.stories.di.layout.LayoutModule
-import com.soyle.stories.di.location.LocationModule
-import com.soyle.stories.di.modules.ApplicationModule
-import com.soyle.stories.di.modules.DataModule
-import com.soyle.stories.di.project.ProjectModule
+import com.soyle.stories.di.configureDI
 import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.testutils.SyncThreadTransformer
 import org.testfx.api.FxToolkit
@@ -32,12 +27,7 @@ class SoyleStoriesTestDouble {
 	}
 
 	private fun initializeDI() {
-		ApplicationModule
-		DataModule
-		ProjectModule
-		LayoutModule
-		LocationModule
-		CharacterArcModule
+		configureDI()
 		synchronizeBackgroundTasks()
 	}
 

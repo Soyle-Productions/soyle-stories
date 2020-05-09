@@ -44,6 +44,7 @@ internal fun toChildViewModel(windowChild: ActiveWindowChild): WindowChildViewMo
 internal fun ActiveTool.toToolViewModel(): ToolViewModel = when (this) {
 	is CharacterListActiveTool -> CharacterListToolViewModel(toolId.toString())
 	is LocationListActiveTool -> LocationListToolViewModel(toolId.toString())
+	is SceneListActiveTool -> SceneListToolViewModel(toolId.toString())
 	is BaseStoryStructureActiveTool -> BaseStoryStructureToolViewModel(toolId.toString(), characterId.toString(), themeId.toString())
 	is CharacterComparisonActiveTool -> CharacterComparisonToolViewModel(toolId.toString(), themeId.toString(), characterId.toString())
 	is LocationDetailsActiveTool -> LocationDetailsToolViewModel(toolId.toString(), locationId.toString())

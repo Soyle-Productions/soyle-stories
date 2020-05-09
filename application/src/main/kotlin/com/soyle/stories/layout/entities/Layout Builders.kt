@@ -1,6 +1,7 @@
 package com.soyle.stories.layout.entities
 
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import java.util.*
@@ -91,9 +92,10 @@ inline fun MutableList<Tool<*>>.openTool(type: ToolType, associatedData: Map<Str
     val tool = when (type) {
         ToolType.CharacterComparison -> CharacterComparisonTool(Tool.Id(UUID.randomUUID()), associatedData["themeId"] as Theme.Id, associatedData["characterId"] as Character.Id?, true)
         ToolType.BaseStoryStructure -> BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), associatedData["themeId"] as Theme.Id, associatedData["characterId"] as Character.Id, true)
+        ToolType.LocationDetails -> LocationDetailsTool(Tool.Id(UUID.randomUUID()), associatedData["locationId"] as Location.Id, true)
         ToolType.CharacterList -> CharacterListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, true)
         ToolType.LocationList -> LocationListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, true)
-        else -> error("unsupported tool type $type")
+        ToolType.SceneList -> SceneListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, true)
     }
     this += tool
     return tool
@@ -103,9 +105,10 @@ inline fun MutableList<Tool<*>>.tool(type: ToolType, associatedData: Map<String,
     val tool = when (type) {
         ToolType.CharacterComparison -> CharacterComparisonTool(Tool.Id(UUID.randomUUID()), associatedData["themeId"] as Theme.Id, associatedData["characterId"] as Character.Id?, false)
         ToolType.BaseStoryStructure -> BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), associatedData["themeId"] as Theme.Id, associatedData["characterId"] as Character.Id, false)
+        ToolType.LocationDetails -> LocationDetailsTool(Tool.Id(UUID.randomUUID()), associatedData["locationId"] as Location.Id, false)
         ToolType.CharacterList -> CharacterListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, false)
         ToolType.LocationList -> LocationListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, false)
-        else -> error("unsupported tool type $type")
+        ToolType.SceneList -> SceneListTool(Tool.Id(UUID.randomUUID()), associatedData["projectId"] as Project.Id, false)
    }
     this += tool
     return tool

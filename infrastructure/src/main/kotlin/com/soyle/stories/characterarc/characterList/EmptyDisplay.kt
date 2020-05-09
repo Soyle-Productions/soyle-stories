@@ -1,8 +1,8 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
-import com.soyle.stories.di.characterarc.CharacterListModule
 import com.soyle.stories.di.resolve
+import com.soyle.stories.project.ProjectScope
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -21,6 +21,7 @@ import tornadofx.*
  */
 internal class EmptyDisplay : View() {
 
+    override val scope: ProjectScope = super.scope as ProjectScope
     private val model by inject<CharacterListModel>()
     private val characterListViewListener = resolve<CharacterListViewListener>()
 
@@ -54,7 +55,7 @@ internal class EmptyDisplay : View() {
             GridPane.setRowIndex(this, 1)
             GridPane.setMargin(this, Insets(5.0, 0.0, 0.0, 0.0))
             action {
-                createCharacterDialog(currentStage)
+                createCharacterDialog(scope)
             }
         }
     }

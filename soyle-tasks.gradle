@@ -80,11 +80,31 @@ task run {
         dependsOn(":infrastructure:runShadow")
     }
 }
+task zipTestReport(type: Zip) {
+    group = "Soyle Tasks"
+    description = "Create a zip archive of the courgette-report"
+
+    String zipSrc = "courgette-report/"
+
+    archiveFileName = "UAT Report.zip"
+    destinationDirectory = project.file("${project.buildDir}")
+    from "$zipSrc"
+
+    configure {
+        dependsOn(fullTestReport)
+    }
+
+    doLast {
+        println archiveFileName.get()
+        println relativePath(destinationDirectory)
+        println relativePath(archiveFile)
+    }
+}
 task buildAndPackage {
     group = "Soyle Tasks"
     description = "Create runtime images for all three platforms"
 
     configure {
-        dependsOn(":infrastructure:clean", fullTestReport, ":infrastructure:runtimeZip")
+        dependsOn(":infrastructure:runtimeZip")
     }
 }
