@@ -2,14 +2,15 @@ package com.soyle.stories.characterarc.usecases
 
 import arrow.core.Either
 import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
+import com.soyle.stories.characterarc.TestContext
+import com.soyle.stories.characterarc.repositories.ThemeRepository
+import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -20,168 +21,161 @@ import java.util.*
  */
 class ViewBaseStoryStructureTest {
 
-    private fun given(themes: List<Theme>, values: Map<String, String> = mapOf()): (UUID, UUID) -> Either<Exception, com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure.ResponseModel> {
-        val repo = object : com.soyle.stories.characterarc.repositories.ThemeRepository, CharacterArcSectionRepository {
-            override suspend fun addNewTheme(theme: Theme) = Unit
-
-            override suspend fun getThemeById(themeId: Theme.Id): Theme? = themes.find { it.id == themeId }
-            override suspend fun addNewCharacterArcSections(characterArcSections: List<CharacterArcSection>) {}
-            override suspend fun getCharacterArcSectionById(characterArcSectionId: CharacterArcSection.Id): CharacterArcSection? =
-                null
-
-            override suspend fun getCharacterArcSectionsForCharacterInTheme(
-                characterId: Character.Id,
-                themeId: Theme.Id
-            ): List<CharacterArcSection> = themes.find { it.id == themeId }?.getIncludedCharacterById(characterId)?.let {
-                CharacterArcTemplate.default().sections.map { template ->
-                    CharacterArcSection(
-                        CharacterArcSection.Id(
-                            UUID.randomUUID()
-                        ), it.id, themeId, template, null, values[template.name] ?: ""
-                    )
-                }
-            } ?: emptyList()
-
-            override suspend fun removeArcSections(sections: List<CharacterArcSection>) {}
-            override suspend fun updateCharacterArcSection(characterArcSection: CharacterArcSection) {}
-            override suspend fun getCharacterArcSectionsForCharacter(characterId: Character.Id): List<CharacterArcSection> =
-                emptyList()
-
-            override suspend fun getCharacterArcSectionsById(characterArcSectionIds: Set<CharacterArcSection.Id>): List<CharacterArcSection> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getCharacterArcSectionsForTheme(themeId: Theme.Id): List<CharacterArcSection> =emptyList()
-        }
-        val useCase: com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure =
-            com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase(
-                repo,
-                repo
-            )
-        val output = object : com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure.OutputPort {
-            var result: Either<Exception, com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure.ResponseModel>? = null
-            override fun receiveViewBaseStoryStructureFailure(failure: Exception) {
-                result = failure.left()
-            }
-
-            override fun receiveViewBaseStoryStructureResponse(response: com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure.ResponseModel) {
-                result = response.right()
-            }
-        }
-        return { characterId, themeId ->
-            runBlocking {
-                useCase.invoke(characterId, themeId, output)
-            }
-            output.result!!
-        }
-    }
-
     val characterUUID = UUID.randomUUID()
     val themeUUID = UUID.randomUUID()
+    val locationUUID = UUID.randomUUID()
     val character = Character(
-        Character.Id(characterUUID), UUID.randomUUID(), "Character Name"
+      Character.Id(characterUUID), UUID.randomUUID(), "Character Name"
     )
 
-    @Nested
-    inner class GivenThemeDoesNotExist {
+    private var result: Any? = null
 
-        val useCase = given(emptyList())
-
-        @Test
-        fun shouldOutputThemeDoesNotExistError() {
-            val (error) = useCase.invoke(characterUUID, themeUUID) as Either.Left
-            error as ThemeDoesNotExist
-            assertEquals(themeUUID, error.themeId)
-        }
-
+    @Test
+    fun `theme does not exist`() {
+        given(NoThemes)
+        whenUseCaseExecuted()
+        val result = result as ThemeDoesNotExist
+        assertEquals(themeUUID, result.themeId)
     }
 
-    @Nested
-    inner class GivenCharacterNotInRequestedTheme {
-
-        val useCase = given(
-            themes = listOf(
-                Theme(
-                    Theme.Id(
-                        themeUUID
-                    ), "", mapOf(), mapOf()
-                )
-            )
+    @Test
+    fun `character not in theme`() {
+        given(
+          themesWithIdsOf(themeUUID),
+          NoIncludedCharacters
         )
-
-        @Test
-        fun shouldOutputCharacterNotInRequestedThemeError() {
-            val (error) = useCase.invoke(characterUUID, themeUUID) as Either.Left
-            error as CharacterNotInTheme
-            assertEquals(characterUUID, error.characterId)
-            assertEquals(themeUUID, error.themeId)
-        }
-
+        whenUseCaseExecuted()
+        val result = result as CharacterNotInTheme
+        assertEquals(characterUUID, result.characterId)
+        assertEquals(themeUUID, result.themeId)
     }
 
-    @Nested
-    inner class GivenCharacterIsNotMajorCharacterInTheme {
-
-        val useCase = given(
-            listOf(
-                (Theme(
-                    Theme.Id(themeUUID),
-                    "",
-                    mapOf(),
-                    mapOf()
-                ).includeCharacter(character) as Either.Right).b
-            )
+    @Test
+    fun `character is not major character`() {
+        given(
+          themesWithIdsOf(themeUUID),
+          andIncludedCharactersWithIdsOf(characterUUID)
         )
-
-        @Test
-        fun shouldOutputCharacterDoesNotHaveCharacterArcInThemeError() {
-            val (error) = useCase.invoke(characterUUID, themeUUID) as Either.Left
-            error as CharacterIsNotMajorCharacterInTheme
-            assertEquals(characterUUID, error.characterId)
-            assertEquals(themeUUID, error.themeId)
-        }
-
+        whenUseCaseExecuted()
+        val result = result as CharacterIsNotMajorCharacterInTheme
+        assertEquals(characterUUID, result.characterId)
+        assertEquals(themeUUID, result.themeId)
     }
 
-    @Nested
-    inner class GivenCharacterWithArcInTheme {
-
-        val theme = (Theme(
-            Theme.Id(
-                themeUUID
-            ), "", mapOf(), mapOf()
+    @Test
+    fun `character is major character in theme`() {
+        given(
+          themesWithIdsOf(themeUUID),
+          andPromotedCharactersWithIdsOf(characterUUID)
         )
-            .includeCharacter(character)
-            .flatMap { it.promoteCharacter(it.getMinorCharacterById(character.id)!!) }
-                as Either.Right
-                ).b
-        val values = CharacterArcTemplate.default().sections.associate {
-            it.name to UUID.randomUUID().toString()
-        }
+        whenUseCaseExecuted()
+        assertValidResponseModel(result)
+    }
 
-        val useCase = given(
-            listOf(
-                theme
-            ),
-            values
+    @Test
+    fun `linked locations are output`() {
+        given(
+          themesWithIdsOf(themeUUID),
+          andPromotedCharactersWithIdsOf(characterUUID),
+          andArcSectionsLinkedToLocationWithIdOf(locationUUID)
         )
+        whenUseCaseExecuted()
+        assertValidResponseModel(result)
+    }
 
-        @Test
-        fun onlyRequiredSectionsShouldBeInOutput() {
-            val (baseStoryStructure) = useCase.invoke(characterUUID, themeUUID) as Either.Right
-            val requiredSections = CharacterArcTemplate.default().sections.map { it.name }.toSet()
-            assertEquals(requiredSections, baseStoryStructure.sections.map { it.templateName }.toSet())
+    val NoThemes: List<UUID> = emptyList()
+    private fun themesWithIdsOf(vararg ids: UUID) = listOf(*ids)
+    val NoIncludedCharacters: List<Pair<UUID, Boolean>> = emptyList()
+    private fun andIncludedCharactersWithIdsOf(vararg ids: UUID) = listOf(*(ids.map { it to false }.toTypedArray()))
+    private fun andPromotedCharactersWithIdsOf(vararg ids: UUID) = listOf(*(ids.map { it to true }.toTypedArray()))
+    private fun andArcSectionsLinkedToLocationWithIdOf(id: UUID) = id
+    private lateinit var themeRepository: ThemeRepository
+    private lateinit var characterArcSectionRepository: CharacterArcSectionRepository
+
+    private fun given(
+      themeIds: List<UUID>, includedCharacterIds: List<Pair<UUID, Boolean>> = emptyList(), linkedLocationId: UUID? = null
+    ) {
+        val themes = themeIds.map { uuid ->
+            val initialTheme = takeNoteOfTheme(uuid)
+            if (includedCharacterIds.isNotEmpty()) {
+                includedCharacterIds.fold(initialTheme) { theme, (id, isPromoted) ->
+                    val included = theme.includeCharacter(Character(Character.Id(id), UUID.randomUUID(), "Bob"))
+                    ((if (isPromoted) {
+                        included.flatMap {
+                            it.promoteCharacter(it.getMinorCharacterById(Character.Id(id))!!)
+                        }
+                    } else included) as Either.Right).b
+                }
+            } else initialTheme
         }
-
-        @Test
-        fun storedValuesAreOutput() {
-            val (baseStoryStructure) = useCase.invoke(characterUUID, themeUUID) as Either.Right
-            val templateToValues = baseStoryStructure.sections.associate { it.templateName to it.value }
-            templateToValues.forEach { (templateName, value) ->
-                assertEquals(values[templateName] ?: "", value)
+        val context = TestContext(initialThemes = themes)
+        themeRepository = context.themeRepository
+        val themeContext = setupContext(initialCharacterArcSections = themes.flatMap { theme ->
+            theme.characters.flatMap { character ->
+                CharacterArcTemplate.default().sections.map { template ->
+                    CharacterArcSection(
+                      CharacterArcSection.Id(
+                        UUID.randomUUID()
+                      ), character.id, theme.id, template, linkedLocationId?.let(Location::Id), ""
+                    )
+                }
             }
-        }
+        })
+        characterArcSectionRepository = themeContext.characterArcSectionRepository
+    }
 
+    private fun whenUseCaseExecuted() {
+        val useCase: ViewBaseStoryStructure = ViewBaseStoryStructureUseCase(
+          themeRepository, characterArcSectionRepository
+        )
+        runBlocking {
+            useCase.invoke(characterUUID, themeUUID, object : ViewBaseStoryStructure.OutputPort {
+                override fun receiveViewBaseStoryStructureResponse(response: ViewBaseStoryStructure.ResponseModel) {
+                    result = response
+                }
+
+                override fun receiveViewBaseStoryStructureFailure(failure: Exception) {
+                    result = failure
+                }
+            })
+        }
+    }
+
+    private fun assertValidResponseModel(actual: Any?)
+    {
+        actual as ViewBaseStoryStructure.ResponseModel
+        assertEquals(characterUUID, actual.characterId)
+        assertEquals(themeUUID, actual.themeId)
+        assertOnlyRequiredSectionsInOutput(actual)
+        assertStoredValuesAreInOutput(actual)
+        assertLinkedLocationsAreInOutput(actual)
+    }
+
+    private fun assertOnlyRequiredSectionsInOutput(response: ViewBaseStoryStructure.ResponseModel)
+    {
+        val requiredSections = CharacterArcTemplate.default().sections.map { it.name }.toSet()
+        assertEquals(requiredSections, response.sections.map { it.templateName }.toSet())
+    }
+
+    private fun assertStoredValuesAreInOutput(response: ViewBaseStoryStructure.ResponseModel)
+    {
+        val values = runBlocking {
+            characterArcSectionRepository.getCharacterArcSectionsForCharacterInTheme(Character.Id(response.characterId), Theme.Id(response.themeId))
+        }.associate { it.template.name to it.value }
+        val templateToValues = response.sections.associate { it.templateName to it.value }
+        templateToValues.forEach { (templateName, value) ->
+            assertEquals(values[templateName] ?: "", value)
+        }
+    }
+
+    private fun assertLinkedLocationsAreInOutput(response: ViewBaseStoryStructure.ResponseModel)
+    {
+        val locations = runBlocking {
+            characterArcSectionRepository.getCharacterArcSectionsForCharacterInTheme(Character.Id(response.characterId), Theme.Id(response.themeId))
+        }.associate { it.id.uuid to it.linkedLocation?.uuid }
+        response.sections.forEach {
+            assertEquals(locations.getValue(it.arcSectionId), it.linkedLocation, "Linked location id does not match")
+        }
     }
 
 }
