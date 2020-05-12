@@ -7,14 +7,14 @@ Feature: Scene List Tool
     Given A project has been opened
 
   Scenario: Show special empty message when empty
-    When The Scene List Tool is opened
-    Then The Scene List Tool should show a special empty message
+    When The Story Event List Tool is opened
+    Then The Story Event List Tool should show a special empty message
 
-  Scenario: Update when new Scenes created
-    Given The Scene List Tool has been opened
-    And The Scene List Tool tab has been selected
-    When A new Scene is created
-    Then The Scene List Tool should show the new Scene
+  Scenario: Update when new Story Event created
+    Given The Story Event List Tool has been opened
+    And The Story Event List Tool tab has been selected
+    When A new Story Event is created
+    Then The Story Event List Tool should show the new Story Event
     
   Scenario: Open Story Event creation dialog when empty
     Given The Story Event List Tool has been opened
