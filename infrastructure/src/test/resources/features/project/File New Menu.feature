@@ -14,6 +14,7 @@ Feature: File New Menu
       | "Character" |
       | "Location"  |
       | "Scene"     |
+      | "Story Event"     |
 
   Scenario Outline: File New Option opens creation dialog
     Given the File New Menu has been opened
@@ -26,3 +27,4 @@ Feature: File New Menu
       | "Character" |
       | "Location"  |
       | "Scene"     |
+      | "Story Event"     |
