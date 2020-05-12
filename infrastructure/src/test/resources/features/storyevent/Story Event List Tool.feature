@@ -1,7 +1,7 @@
 Feature: Scene List Tool
   As a user working on a project
-  I want to see the list of scenes I've created
-  So that I can prevent duplicates and remove unneeded scenes
+  I want to see the list of story events I've created
+  So that I can prevent duplicates and remove unneeded story events
 
   Background:
     Given A project has been opened
