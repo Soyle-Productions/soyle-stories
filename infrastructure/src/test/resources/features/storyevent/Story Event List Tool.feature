@@ -68,7 +68,7 @@ Feature: Story Event List Tool
   Scenario Outline: Story Event List Tool shows correct number of Story Events
     Given <number> Story Events have been created
     When The Story Events List Tool is opened
-    Then The Story Events List Tool should show all <number> locations
+    Then The Story Events List Tool should show all <number> story events
 
     Examples:
       | number |
@@ -78,30 +78,30 @@ Feature: Story Event List Tool
       | 4      |
       | 5      |
 
-  Scenario: Update when new locations created
-    Given The Location List Tool has been opened
-    When A new Location is created
-    Then The Location List Tool should show the new Location
+  Scenario: Update when new Story Event created
+    Given The Story Events List Tool has been opened
+    When A new Story Event is created
+    Then The Story Event List Tool should show the new Story Event
 
-  Scenario Outline: Update when locations are deleted
-    Given The Location List Tool has been opened
-    And <number> Locations have been created
-    When A Location is deleted
-    Then The Location List Tool should not show the deleted Location
+  Scenario Outline: Update when story events are deleted
+    Given The Story Event List Tool has been opened
+    And <number> Story Events have been created
+    When A Story Event is deleted
+    Then The Story Event List Tool should not show the deleted Story Event
 
     Examples:
       | number |
       | 2      |
 
   Scenario: Click Away after Rename
-    Given the Location rename input box is visible
-    And the user has entered a valid Location name
+    Given the Story Event rename input box is visible
+    And the user has entered a valid Story Event name
     When The user clicks away from the input box
-    Then the Location rename input box should be replaced by the Location name
-    And the Location name should be the new name
+    Then the Story Event rename input box should be replaced by the Story Event name
+    And the Story Event name should be the new name
 
   Scenario: Click Away without Rename
-    Given the Location rename input box is visible
+    Given the Story Event rename input box is visible
     When The user clicks away from the input box
-    Then the Location rename input box should be replaced by the Location name
-    And the Location name should be the original name
+    Then the Story Event rename input box should be replaced by the Story Event name
+    And the Story Event name should be the original name
