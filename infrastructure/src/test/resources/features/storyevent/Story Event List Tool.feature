@@ -63,3 +63,45 @@ Feature: Story Event List Tool
     When A new Story Event is created after the first Story Event
     Then The Story Event List Tool should show the new Story Event
 	And the new Story Event should be listed after the first Story Event in the Story Event List Tool
+
+ 	@list-story-events
+  Scenario Outline: Story Event List Tool shows correct number of Story Events
+    Given <number> Story Events have been created
+    When The Story Events List Tool is opened
+    Then The Story Events List Tool should show all <number> locations
+
+    Examples:
+      | number |
+      | 1      |
+      | 2      |
+      | 3      |
+      | 4      |
+      | 5      |
+
+  Scenario: Update when new locations created
+    Given The Location List Tool has been opened
+    When A new Location is created
+    Then The Location List Tool should show the new Location
+
+  Scenario Outline: Update when locations are deleted
+    Given The Location List Tool has been opened
+    And <number> Locations have been created
+    When A Location is deleted
+    Then The Location List Tool should not show the deleted Location
+
+    Examples:
+      | number |
+      | 2      |
+
+  Scenario: Click Away after Rename
+    Given the Location rename input box is visible
+    And the user has entered a valid Location name
+    When The user clicks away from the input box
+    Then the Location rename input box should be replaced by the Location name
+    And the Location name should be the new name
+
+  Scenario: Click Away without Rename
+    Given the Location rename input box is visible
+    When The user clicks away from the input box
+    Then the Location rename input box should be replaced by the Location name
+    And the Location name should be the original name
