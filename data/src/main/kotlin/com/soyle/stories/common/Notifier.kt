@@ -1,4 +1,4 @@
-package com.soyle.stories.eventbus
+package com.soyle.stories.common
 
 import java.lang.ref.WeakReference
 
