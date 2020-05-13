@@ -1,29 +1,29 @@
-Feature: Delete Location
+Feature: Delete Story Event
 
   Background:
     Given A project has been opened
-    And A location has been created
+    And A story event has been created
 
-  Scenario: Populated Location List
-    Given The Location List Tool has been opened
-    And the location right-click menu is open
-    When the user clicks the location list tool right-click menu delete button
-    Then the confirm delete location dialog should be opened
-    And the confirm delete location dialog should show the location name
+  Scenario: Populated Story Event List
+    Given The Story Event List Tool has been opened
+    And the story event right-click menu is open
+    When the user clicks the story event list tool right-click menu delete button
+    Then the confirm delete story event dialog should be opened
+    And the confirm delete story event dialog should show the story event name
 
-  Scenario: Populated Location List + button
-    Given The Location List Tool has been opened
-    And a location has been selected
-    When the user clicks the location list tool delete button
-    Then the confirm delete location dialog should be opened
-    And the confirm delete location dialog should show the location name
+  Scenario: Populated Story Event List + button
+    Given The Story Event List Tool has been opened
+    And a story event has been selected
+    When the user clicks the story event list tool delete button
+    Then the confirm delete story event dialog should be opened
+    And the confirm delete story event dialog should show the story event name
 
   Scenario: Confirm Delete Dialog
-    Given the delete location dialog has been opened
-    When the user clicks the confirm delete location dialog delete button
-    Then the delete location dialog should be closed
+    Given the delete story event dialog has been opened
+    When the user clicks the confirm delete story event dialog delete button
+    Then the delete story event dialog should be closed
 
   Scenario: Cancel Delete Dialog
-    Given the delete location dialog has been opened
-    When the user clicks the confirm delete location dialog cancel button
-    Then the delete location dialog should be closed
+    Given the delete story event dialog has been opened
+    When the user clicks the confirm delete story event dialog cancel button
+    Then the delete story event dialog should be closed

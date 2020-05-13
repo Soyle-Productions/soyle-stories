@@ -16,13 +16,19 @@ Background:
 
 @link-story-event-to-character-arc
 Feature: Link Story Event to Character Arc Section
+	
+  Scenario: No Character Arcs available 
+    Given no Character Arcs have been created 
+    When the Story Event Details Tool is opened 
+    Then the Character Arc Section dropdown in the Story Events Details Tool should be disabled
+	
+  Scenario: Many Character Arcs available to select
+    Given at least one Location has been created
+    And the Base Story Structure Tool has been opened
+    When the Character Arc Section Location dropdown is clicked
+    Then all Locations should be listed in the Character Arc Section Location dropdown menu
 
-  Background:
-    Given A project has been opened
-    And a Character has been created
-    And a Character Arc has been created
-
-  Scenario: Many Story Events available to select
+  Scenario: Many Character Arcs available to select
     Given at least one Location has been created
     And the Base Story Structure Tool has been opened
     When the Character Arc Section Location dropdown is clicked
