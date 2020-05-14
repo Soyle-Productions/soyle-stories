@@ -3,16 +3,16 @@
  * Date: 3/2/2020
  * Time: 5:34 PM
  */
-package com.soyle.stories.characterarc.baseStoryStructure
+package com.soyle.stories.characterarc.viewBaseStoryStructure
 
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 
 class ViewBaseStoryStructureController(
-    private val threadTransformer: ThreadTransformer,
-    private val viewBaseStoryStructure: ViewBaseStoryStructure,
-    private val viewBaseStoryStructureOutputPort: ViewBaseStoryStructure.OutputPort
+  private val threadTransformer: ThreadTransformer,
+  private val viewBaseStoryStructure: ViewBaseStoryStructure,
+  private val viewBaseStoryStructureOutputPort: ViewBaseStoryStructure.OutputPort
 ) {
 
     fun getBaseStoryStructure(characterId: String, themeId: String) {

@@ -1,4 +1,4 @@
-package com.soyle.stories.characterarc.usecaseControllers
+package com.soyle.stories.characterarc.changeCentralMoralQuestion
 
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 import java.util.*

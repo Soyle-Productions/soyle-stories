@@ -1,6 +1,6 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.controllers.RenameLocationController
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.project.layout.openTool.OpenToolController

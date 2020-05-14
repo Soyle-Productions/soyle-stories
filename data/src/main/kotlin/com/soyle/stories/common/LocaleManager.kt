@@ -1,4 +1,4 @@
-package com.soyle.stories.gui
+package com.soyle.stories.common
 
 import com.soyle.stories.scene.Locale
 

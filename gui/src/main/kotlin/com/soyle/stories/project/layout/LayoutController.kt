@@ -1,6 +1,6 @@
 package com.soyle.stories.project.layout
 
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpened

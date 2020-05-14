@@ -4,8 +4,8 @@ import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
 import com.soyle.stories.characterarc.LocalCharacterArcException
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
-import com.soyle.stories.eventbus.Notifier
-import com.soyle.stories.eventbus.listensTo
+import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.layout.LayoutException
 import com.soyle.stories.layout.usecases.ActiveWindow
 import com.soyle.stories.layout.usecases.StaticTool

@@ -13,7 +13,7 @@ import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue

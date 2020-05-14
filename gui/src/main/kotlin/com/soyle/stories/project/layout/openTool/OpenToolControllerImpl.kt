@@ -1,6 +1,6 @@
 package com.soyle.stories.project.layout.openTool
 
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import java.util.*
 

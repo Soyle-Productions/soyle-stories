@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.renameScene
 
-import com.soyle.stories.gui.LocaleManager
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.LocaleManager
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
 import java.util.*
 

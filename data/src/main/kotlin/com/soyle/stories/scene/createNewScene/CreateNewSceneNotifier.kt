@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.createNewScene
 
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 

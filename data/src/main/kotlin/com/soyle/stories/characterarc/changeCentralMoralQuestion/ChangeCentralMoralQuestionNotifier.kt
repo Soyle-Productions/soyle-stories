@@ -1,6 +1,6 @@
-package com.soyle.stories.characterarc.eventbus
+package com.soyle.stories.characterarc.changeCentralMoralQuestion
 
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 

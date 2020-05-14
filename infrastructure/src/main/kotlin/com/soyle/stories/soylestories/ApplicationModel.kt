@@ -2,7 +2,7 @@ package com.soyle.stories.soylestories
 
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.DI
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.project.projectList.ProjectListView
 import com.soyle.stories.project.projectList.ProjectListViewModel

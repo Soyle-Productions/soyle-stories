@@ -1,6 +1,6 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.eventbus.listensTo
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel

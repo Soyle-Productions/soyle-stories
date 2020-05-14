@@ -2,7 +2,7 @@ package com.soyle.stories.location.deleteLocationDialog
 
 
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBenchModel
 import com.soyle.stories.project.layout.Dialog

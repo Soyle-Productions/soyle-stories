@@ -1,6 +1,6 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.controllers.CreateNewLocationController
 
 class CreateLocationDialogController(

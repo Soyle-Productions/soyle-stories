@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 
 class RenameCharacterArcNotifier : RenameCharacterArc.OutputPort, Notifier<RenameCharacterArc.OutputPort>() {
 

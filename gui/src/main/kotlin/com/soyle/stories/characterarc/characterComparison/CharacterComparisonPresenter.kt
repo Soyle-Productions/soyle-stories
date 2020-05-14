@@ -1,15 +1,10 @@
 package com.soyle.stories.characterarc.characterComparison
 
 import com.soyle.stories.characterarc.characterComparison.presenters.*
-import com.soyle.stories.characterarc.characterComparison.presenters.BuildNewCharacterPresenter
-import com.soyle.stories.characterarc.characterComparison.presenters.DeleteLocalCharacterArcPresenter
-import com.soyle.stories.characterarc.characterComparison.presenters.IncludeCharacterInComparisonPresenter
-import com.soyle.stories.characterarc.characterComparison.presenters.PromoteMinorCharacterPresenter
-import com.soyle.stories.characterarc.characterComparison.presenters.RemoveCharacterFromLocalStoryPresenter
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
-import com.soyle.stories.eventbus.listensTo
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
 import java.util.*

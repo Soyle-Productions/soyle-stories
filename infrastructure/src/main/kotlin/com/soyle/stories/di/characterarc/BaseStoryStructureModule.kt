@@ -7,6 +7,7 @@ package com.soyle.stories.di.characterarc
 
 import com.soyle.stories.characterarc.baseStoryStructure.*
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.characterarc.viewBaseStoryStructure.ViewBaseStoryStructureController
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations

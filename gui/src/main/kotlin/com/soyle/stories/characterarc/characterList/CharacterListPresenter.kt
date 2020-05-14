@@ -12,7 +12,7 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterIte
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 

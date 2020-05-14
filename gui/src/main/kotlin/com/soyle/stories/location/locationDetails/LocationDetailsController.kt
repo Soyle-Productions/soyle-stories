@@ -1,6 +1,6 @@
 package com.soyle.stories.location.locationDetails
 
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
 import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetails
 import java.util.*

@@ -5,7 +5,7 @@
  */
 package com.soyle.stories.project.layout.openTool
 
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 
 class OpenToolNotifier : OpenTool.OutputPort, Notifier<OpenTool.OutputPort>() {

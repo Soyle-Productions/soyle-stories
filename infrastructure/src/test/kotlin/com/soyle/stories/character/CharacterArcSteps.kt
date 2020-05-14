@@ -26,8 +26,8 @@ object CharacterArcSteps : ApplicationTest() {
 
 	fun setNumberOfCharacterArcsCreated(double: SoyleStoriesTestDouble, atLeast: Int)
 	{
-		CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, 1)
-		val character = CharacterSteps.getCharactersCreated(double).first()
+		CharacterDriver.givenANumberOfCharactersHaveBeenCreated(double, 1)
+		val character = CharacterDriver.getCharactersCreated(double).first()
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val currentCount = getNumberOfCharacterArcsCreated(double)
 		runBlocking {
