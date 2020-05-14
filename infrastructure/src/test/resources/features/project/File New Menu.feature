@@ -3,6 +3,7 @@ Feature: File New Menu
   Background:
     Given A project has been opened
 
+  @storyevent @create-new-story-event
   Scenario Outline: File New Menu shows all domain concepts
     Given the File Menu has been opened
     When the File New Menu is opened
@@ -16,6 +17,7 @@ Feature: File New Menu
       | "Scene"     |
       | "Story Event"     |
 
+  @storyevent @create-new-story-event
   Scenario Outline: File New Option opens creation dialog
     Given the File New Menu has been opened
     When the File New <option> option is selected
