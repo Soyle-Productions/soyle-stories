@@ -116,3 +116,8 @@ Feature: Story Event List Tool
     When The user clicks away from the input box
     Then the Story Event rename input box should be replaced by the Story Event name
     And the Story Event name should be the original name
+
+  Scenario: Open Story Event Details Tool through Story Event List Tool
+    Given the Story Event right-click menu is open
+    When the user clicks the story event list tool right-click menu open button
+    Then the Story Event Details Tool should be open

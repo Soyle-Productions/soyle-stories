@@ -4,19 +4,11 @@ Feature: Story Event Details Tool
   I want to set the details of the story events I've created
   So that I can link relevant elements to story events 
 
-Background:
+  Background:
     Given A project has been opened
     And A Story Event has been created
     And The Story Event List Tool has been opened
 
-  Scenario: Open Story Event Details Tool through Story Event List Tool
-    Given the Story Event right-click menu is open
-    When the user clicks the story event list tool right-click menu open button
-    Then the Story Event Details Tool should be open
-
-@link-location-to-story-event
-Feature: Link Location to Story Event
-	
   Scenario: No Location available 
     Given no Locations have been created 
     When the Story Event Details Tool is opened 
@@ -27,7 +19,6 @@ Feature: Link Location to Story Event
     And the Story Event Details Tool has been opened
     When the Location Section Story Event dropdown is clicked
     Then all Locations should be listed in the Location Section Story Event dropdown menu
-
 
   Scenario: Selecting a Location
     Given at least one Location has been created
@@ -44,9 +35,6 @@ Feature: Link Location to Story Event
     When the user clicks outside the Location Section Story Event dropdown menu
     Then the Location Section Story Event dropdown menu should be closed
 
-@link-character-to-story-event
-Feature: Link Character to Story Event
-	
   Scenario: No Character available 
     Given no Characters have been created 
     When the Story Event Details Tool is opened 
