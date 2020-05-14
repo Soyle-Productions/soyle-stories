@@ -77,13 +77,24 @@ Feature: Story Event List Tool
       | 3      |
       | 4      |
       | 5      |
+	
+	
 
-  Scenario: Update when new Story Event created
-    Given The Story Events List Tool has been opened
-    When A new Story Event is created
-    Then The Story Event List Tool should show the new Story Event
+  Scenario: Open Confirm Delete Story Event Dialog From Right-Click Menu
+    Given The Story Event List Tool has been opened
+    And the Story Event right-click menu is open
+    When the user clicks the Story Event List Tool right-click menu delete button
+    Then the confirm delete Story Event dialog should be opened
+    And the confirm delete Story Event dialog should show the Story Event name
 
-  Scenario Outline: Update when story events are deleted
+  Scenario:  Open Confirm Delete Story Event Dialog From Bottom Delete Button
+    Given The Story Event List Tool has been opened
+    And a Story Event has been selected
+    When the user clicks the Story Event List Tool delete button
+    Then the confirm delete Story Event dialog should be opened
+    And the confirm delete Story Event dialog should show the Story Event name
+	
+  Scenario Outline: Update when Story Events are deleted
     Given The Story Event List Tool has been opened
     And <number> Story Events have been created
     When A Story Event is deleted
