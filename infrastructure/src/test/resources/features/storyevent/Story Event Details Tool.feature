@@ -9,10 +9,10 @@ Feature: Story Event Details Tool
     And A Story Event has been created
     And The Story Event List Tool has been opened
 
-  Scenario: No Location available 
+  Scenario: No Locations available
     Given no Locations have been created 
     When the Story Event Details Tool is opened 
-    Then the Location Section Story Event dropdown in the Story Events Details Tool should be disabled
+    Then the Location dropdown in the Story Events Details Tool should be disabled
 	
   Scenario: Many Locations available to select
     Given at least one Location has been created
