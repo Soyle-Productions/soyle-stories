@@ -39,7 +39,7 @@ class StoryEventDetails : View() {
 	}
 
 	override val root: Parent = form {
-		fieldset {
+		fieldset("Location") {
 			field {
 				button {
 
@@ -54,6 +54,15 @@ class StoryEventDetails : View() {
 						it.consume()
 						contextMenu.show(this, Side.BOTTOM, 0.0, 0.0)
 					}
+
+				}
+			}
+		}
+		fieldset("Characters") {
+			field {
+				button {
+					addClass("character-select")
+					isDisable = true
 				}
 			}
 		}

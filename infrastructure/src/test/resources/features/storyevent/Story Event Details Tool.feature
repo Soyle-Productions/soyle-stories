@@ -40,7 +40,7 @@ Feature: Story Event Details Tool
 
     @add-character-to-story-event
   Scenario: No Character available 
-    Given no Characters have been created 
+    Given
     When the Story Event Details Tool is opened 
     Then the Story Event Details Character Selection dropdown should be disabled
 

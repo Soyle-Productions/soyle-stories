@@ -87,4 +87,23 @@ object StoryEventDetailsToolDriver : ApplicationTest() {
 		return locationDropDownMenuItems(storyEventId).get(double)!!.size
 	}
 
+	private fun characterDropDown(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Button> {
+		override fun get(double: SoyleStoriesTestDouble): Button? {
+			val tool = openToolWith(storyEventId).get(double) ?: return null
+			return from(tool.root).lookup(".character-select").queryAll<Button>().firstOrNull()
+		}
+	}
+
+	fun disabledCharacterDropDown(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Button> {
+		override fun get(double: SoyleStoriesTestDouble): Button? {
+			return characterDropDown(storyEventId).get(double)?.takeIf { it.isDisable }
+		}
+	}
+
+	fun enabledCharacterDropDown(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Button> {
+		override fun get(double: SoyleStoriesTestDouble): Button? {
+			return characterDropDown(storyEventId).get(double)?.takeUnless { it.isDisable }
+		}
+	}
+
 }

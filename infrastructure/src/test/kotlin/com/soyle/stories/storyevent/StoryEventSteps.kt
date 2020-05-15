@@ -177,6 +177,11 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				  StoryEventsDriver.storyEventCreated().get(double)!!.id
 				).check(double))
 			}
+			Then("the Story Event Details Character Selection dropdown should be disabled") {
+				assertTrue(StoryEventDetailsToolDriver.disabledCharacterDropDown(
+				  StoryEventsDriver.storyEventCreated().get(double)!!.id
+				).check(double))
+			}
 		}
 	}
 

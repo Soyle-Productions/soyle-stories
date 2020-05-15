@@ -11,6 +11,9 @@ class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 			Given("a Character has been created") {
 				CharacterDriver.givenANumberOfCharactersHaveBeenCreated(double, 1)
 			}
+			Given("no Characters have been created") {
+				// no-op
+			}
 			Given("a Character Arc has been created") {
 				CharacterArcSteps.givenANumberOfCharacterArcsHaveBeenCreated(double, 1)
 			}
