@@ -5,6 +5,7 @@ import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import javafx.event.ActionEvent
+import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
 
@@ -111,6 +112,13 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 					StoryEventDetailsToolDriver.locationDropDownMenuItems(
 					  StoryEventsDriver.storyEventCreated().get(double)!!.id
 					).get(double)!!.first().fire()
+				}
+			}
+			When("the user clicks outside the Story Events Details Tool Location dropdown menu") {
+				interact {
+					clickOn(StoryEventDetailsToolDriver.openToolWith(
+					  StoryEventsDriver.storyEventCreated().get(double)!!.id
+					).get(double)!!.owningTab?.tabPane, MouseButton.PRIMARY)
 				}
 			}
 
