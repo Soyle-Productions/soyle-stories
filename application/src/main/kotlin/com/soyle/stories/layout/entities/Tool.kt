@@ -1,10 +1,7 @@
 package com.soyle.stories.layout.entities
 
 import com.soyle.stories.common.Entity
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import java.util.*
 
 sealed class Tool<T>(
@@ -67,6 +64,12 @@ sealed class Tool<T>(
 
     class LocationDetails(id: Id, val locationId: Location.Id, isOpen: Boolean) : Tool<Location.Id>(id, locationId, isOpen, null) {
         override fun copy(isOpen: Boolean, associatedData: Any?): Tool<Location.Id> = LocationDetails(id, locationId, isOpen)
+        override fun identifiedWithCharacter(characterId: Character.Id): Boolean = false
+        override fun identifiedWithAnyThemeIdIn(themeIds: Set<Theme.Id>): Boolean = false
+    }
+
+    class StoryEventDetails(id: Id, val storyEventId: StoryEvent.Id, isOpen: Boolean) : Tool<StoryEvent.Id>(id, storyEventId, isOpen, null) {
+        override fun copy(isOpen: Boolean, associatedData: Any?): Tool<StoryEvent.Id> = StoryEventDetails(id, storyEventId, isOpen)
         override fun identifiedWithCharacter(characterId: Character.Id): Boolean = false
         override fun identifiedWithAnyThemeIdIn(themeIds: Set<Theme.Id>): Boolean = false
     }

@@ -8,10 +8,7 @@ package com.soyle.stories.layout.usecases
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.layout.LayoutDoesNotExist
 import com.soyle.stories.layout.TestContext
 import com.soyle.stories.layout.entities.*
@@ -270,6 +267,18 @@ class OpenToolTest {
               { it.identifyingData == Location.Id(request.locationId) },
               LocationDetailsTool::class,
               { it.locationId == request.locationId }
+            )
+        }
+
+        @Test
+        fun `story event details`() {
+            val request = OpenTool.RequestModel.StoryEventDetails(UUID.randomUUID())
+            testType(
+              request,
+              Tool.StoryEventDetails::class,
+              { it.identifyingData == StoryEvent.Id(request.storyEventId) },
+              StoryEventDetailsTool::class,
+              { it.storyEventId == request.storyEventId }
             )
         }
 

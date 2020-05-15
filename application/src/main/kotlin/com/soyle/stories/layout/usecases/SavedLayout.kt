@@ -1,6 +1,5 @@
 package com.soyle.stories.layout.usecases
 
-import com.soyle.stories.entities.Character
 import com.soyle.stories.layout.entities.StackSplitter
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.entities.ToolStack
@@ -36,6 +35,7 @@ class StoryEventListTool(override val toolId: UUID) : OpenTool()
 class BaseStoryStructureTool(override val toolId: UUID, val characterId: UUID, val themeId: UUID) : OpenTool()
 class CharacterComparisonTool(override val toolId: UUID, val characterId: UUID, val themeId: UUID) : OpenTool()
 class LocationDetailsTool(override val toolId: UUID, val locationId: UUID) : OpenTool()
+class StoryEventDetailsTool(override val toolId: UUID, val storyEventId: UUID) : OpenTool()
 
 fun Window.toActiveWindow() = OpenWindow(id.uuid, isPrimary, child.toActiveWindowChild())
 
@@ -50,9 +50,10 @@ fun Tool<*>.toOpenTool() = when (this) {
     is Tool.LocationList -> LocationListTool(id.uuid)
     is Tool.SceneList -> SceneListTool(id.uuid)
     is Tool.StoryEventList -> StoryEventListTool(id.uuid)
-    is Tool.BaseStoryStructure -> BaseStoryStructureTool(id.uuid, identifyingData.second.uuid, identifyingData.first.uuid)
-    is Tool.CharacterComparison -> CharacterComparisonTool(id.uuid, (associatedData as Character.Id).uuid, identifyingData.uuid)
-    is Tool.LocationDetails -> LocationDetailsTool(id.uuid, identifyingData.uuid)
+    is Tool.BaseStoryStructure -> BaseStoryStructureTool(id.uuid, characterId.uuid, themeId.uuid)
+    is Tool.CharacterComparison -> CharacterComparisonTool(id.uuid, characterId!!.uuid, themeId.uuid)
+    is Tool.LocationDetails -> LocationDetailsTool(id.uuid, locationId.uuid)
+    is Tool.StoryEventDetails -> StoryEventDetailsTool(id.uuid, storyEventId.uuid)
 }
 
 fun Tool<*>.toStaticTool() = StaticTool(id.uuid, isOpen, this::class)

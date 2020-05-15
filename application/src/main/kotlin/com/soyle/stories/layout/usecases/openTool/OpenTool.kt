@@ -57,6 +57,7 @@ interface OpenTool {
         class BaseStoryStructure(val characterId: UUID, val themeId: UUID) : RequestModel()
         class CharacterComparison(val characterId: UUID, val themeId: UUID) : RequestModel()
         class LocationDetails(val locationId: UUID) : RequestModel()
+        class StoryEventDetails(val storyEventId: UUID) : RequestModel()
 
     }
 
