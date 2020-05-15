@@ -1,6 +1,7 @@
 package com.soyle.stories.storyevent
 
 import com.soyle.stories.entities.StoryEvent
+import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import javafx.event.ActionEvent
@@ -43,6 +44,11 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 			}
 			Given("a Story Event has been selected") {
 				StoryEventListToolDriver.selectedItem.given(double)
+			}
+			Given("the Story Event Details Tool has been opened") {
+				StoryEventDetailsToolDriver.openToolWith(
+				  StoryEventsDriver.storyEventCreated().get(double)!!.id
+				).given(double)
 			}
 
 
@@ -88,6 +94,13 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 			When("the Story Event Details Tool is opened") {
 				StoryEventDetailsToolDriver.openToolWith(StoryEventsDriver.storyEventCreated().get(double)!!.id).whenSet(double)
 			}
+			When("the Story Event Details Tool Location dropdown is clicked") {
+				interact {
+					StoryEventDetailsToolDriver.enabledLocationDropDown(
+					  StoryEventsDriver.storyEventCreated().get(double)!!.id
+					).get(double)!!.onAction!!.handle(ActionEvent())
+				}
+			}
 
 
 			Then("an error message should be displayed in the Create Story Event Dialog") {
@@ -122,6 +135,14 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 			}
 			Then("the Story Events Details Tool Location dropdown in the should be disabled") {
 				assertTrue(StoryEventDetailsToolDriver.disabledLocationDropDown(StoryEventsDriver.storyEventCreated().get(double)!!.id).check(double))
+			}
+			Then("all Locations should be listed in the Story Events Details Tool Location dropdown menu") {
+				assertEquals(
+				  LocationSteps.getNumberOfLocationsCreated(double),
+				  StoryEventDetailsToolDriver.locationDropDownMenuItemCount(
+					StoryEventsDriver.storyEventCreated().get(double)!!.id, double
+				  )
+				)
 			}
 		}
 	}

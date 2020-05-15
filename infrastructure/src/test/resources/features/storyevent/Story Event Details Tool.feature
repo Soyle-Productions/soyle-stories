@@ -18,7 +18,7 @@ Feature: Story Event Details Tool
   Scenario: Many Locations available to select
     Given at least one Location has been created
     And the Story Event Details Tool has been opened
-    When the Location Section Story Event dropdown is clicked
+    When the Story Event Details Tool Location dropdown is clicked
     Then all Locations should be listed in the Story Events Details Tool Location dropdown menu
 
   @link-location-to-story-event

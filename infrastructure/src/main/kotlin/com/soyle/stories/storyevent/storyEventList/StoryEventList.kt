@@ -110,6 +110,7 @@ class StoryEventList : View() {
 			id = "open"
 			action {
 				val selectedItem = model.selectedItem.value ?: return@action
+				viewListener.openStoryEventDetails(selectedItem.id)
 			}
 		}
 		item("Insert New Story Event Before") {

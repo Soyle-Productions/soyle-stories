@@ -12,6 +12,7 @@ import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetails
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsScope
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.scene.control.Button
+import javafx.scene.control.ContextMenu
 import org.testfx.framework.junit5.ApplicationTest
 
 object StoryEventDetailsToolDriver : ApplicationTest() {
@@ -36,11 +37,33 @@ object StoryEventDetailsToolDriver : ApplicationTest() {
 		}
 	}
 
-	fun disabledLocationDropDown(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Button> {
+	private fun locationDropDown(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Button> {
 		override fun get(double: SoyleStoriesTestDouble): Button? {
 			val tool = openToolWith(storyEventId).get(double) ?: return null
-			return from(tool.root).lookup("#location-select").queryAll<Button>().firstOrNull()?.takeIf { it.isDisable }
+			return from(tool.root).lookup("#location-select").queryAll<Button>().firstOrNull()
 		}
+	}
+
+	fun disabledLocationDropDown(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Button> {
+		override fun get(double: SoyleStoriesTestDouble): Button? {
+			return locationDropDown(storyEventId).get(double)?.takeIf { it.isDisable }
+		}
+	}
+
+	fun enabledLocationDropDown(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Button> {
+		override fun get(double: SoyleStoriesTestDouble): Button? {
+			return locationDropDown(storyEventId).get(double)?.takeUnless { it.isDisable }
+		}
+	}
+
+	fun visibleLocationDropDownMenu(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<ContextMenu> {
+		override fun get(double: SoyleStoriesTestDouble): ContextMenu? {
+			return locationDropDown(storyEventId).get(double)?.contextMenu?.takeIf { it.isShowing }
+		}
+	}
+
+	fun locationDropDownMenuItemCount(storyEventId: StoryEvent.Id, double: SoyleStoriesTestDouble): Int {
+		return visibleLocationDropDownMenu(storyEventId).get(double)?.items?.size ?: 0
 	}
 
 }
