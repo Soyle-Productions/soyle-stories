@@ -25,7 +25,7 @@ Feature: Story Event Details Tool
   Scenario: Selecting a Location
     Given at least one Location has been created
     And the Story Event Details Tool has been opened
-    And the LStory Events Details Tool Location dropdown menu has been opened
+    And the Story Events Details Tool Location dropdown menu has been opened
     When a Location in the Story Events Details Tool Location dropdown menu is selected
     Then the Story Events Details Tool Location dropdown should show the selected Location name
     And the Story Events Details Tool Location dropdown menu should be closed

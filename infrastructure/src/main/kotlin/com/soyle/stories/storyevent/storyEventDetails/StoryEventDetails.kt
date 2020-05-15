@@ -20,9 +20,20 @@ class StoryEventDetails : View() {
 	private val locationSelectionList = ContextMenu().apply {
 		isAutoHide = true
 		isAutoFix = true
-		items.bind(model.locations) {
-			checkmenuitem(it.name) {
-				isSelected = false // it.id == model.linkedLocationId
+		items.bind(model.locations) { location ->
+			checkmenuitem(location.name) {
+				model.selectedLocation.selectBoolean { (it?.id == location.id).toProperty() }.onChange {
+					selectedProperty().set(it)
+				}
+				setOnAction {
+					it.consume()
+					if (model.selectedLocation.value?.id == location.id) {
+						viewListener.deselectLocation()
+					} else {
+						viewListener.selectLocation(location.id)
+					}
+					this@apply.hide()
+				}
 			}
 		}
 	}
@@ -30,7 +41,12 @@ class StoryEventDetails : View() {
 	override val root: Parent = form {
 		fieldset {
 			field {
-				button(model.locationSelectionButtonLabel) {
+				button {
+
+					textProperty().bind(model.itemProperty.select {
+						(it.selectedLocation?.name ?: it.locationSelectionButtonLabel).toProperty()
+					})
+
 					id = "location-select"
 					enableWhen { model.hasLocations }
 					contextMenu = locationSelectionList

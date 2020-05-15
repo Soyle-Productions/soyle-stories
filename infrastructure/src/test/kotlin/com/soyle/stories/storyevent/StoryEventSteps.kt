@@ -50,6 +50,11 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				  StoryEventsDriver.storyEventCreated().get(double)!!.id
 				).given(double)
 			}
+			Given("the Story Events Details Tool Location dropdown menu has been opened") {
+				StoryEventDetailsToolDriver.visibleLocationDropDownMenu(
+				  StoryEventsDriver.storyEventCreated().get(double)!!.id
+				).given(double)
+			}
 
 
 			When("The Story Event List Tool is opened") {
@@ -101,6 +106,13 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 					).get(double)!!.onAction!!.handle(ActionEvent())
 				}
 			}
+			When("a Location in the Story Events Details Tool Location dropdown menu is selected") {
+				interact {
+					StoryEventDetailsToolDriver.locationDropDownMenuItems(
+					  StoryEventsDriver.storyEventCreated().get(double)!!.id
+					).get(double)!!.first().fire()
+				}
+			}
 
 
 			Then("an error message should be displayed in the Create Story Event Dialog") {
@@ -143,6 +155,19 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 					StoryEventsDriver.storyEventCreated().get(double)!!.id, double
 				  )
 				)
+			}
+			Then("the Story Events Details Tool Location dropdown should show the selected Location name") {
+				assertEquals(
+				  LocationSteps.getLocationsCreated(double).first().name,
+				  StoryEventDetailsToolDriver.enabledLocationDropDown(
+					StoryEventsDriver.storyEventCreated().get(double)!!.id
+				  ).get(double)!!.text
+				)
+			}
+			Then("the Story Events Details Tool Location dropdown menu should be closed") {
+				assertFalse(StoryEventDetailsToolDriver.visibleLocationDropDownMenu(
+				  StoryEventsDriver.storyEventCreated().get(double)!!.id
+				).check(double))
 			}
 		}
 	}

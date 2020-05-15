@@ -10,8 +10,13 @@ import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialo
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogModel
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogPresenter
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogViewListener
+import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventController
+import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventControllerImpl
+import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventNotifier
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEventUseCase
+import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
+import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEventUseCase
 import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEvents
 import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEventsUseCase
 
@@ -26,9 +31,15 @@ object StoryEventModule {
 			provide<ListAllStoryEvents> {
 				ListAllStoryEventsUseCase(get())
 			}
+			provide<LinkLocationToStoryEvent> {
+				LinkLocationToStoryEventUseCase(get(), get())
+			}
 
 			provide {
 				CreateStoryEventNotifier()
+			}
+			provide {
+				LinkLocationToStoryEventNotifier()
 			}
 
 			provide<CreateStoryEventController> {
@@ -37,6 +48,14 @@ object StoryEventModule {
 				  applicationScope.get(),
 				  get(),
 				  get<CreateStoryEventNotifier>()
+				)
+			}
+
+			provide<LinkLocationToStoryEventController> {
+				LinkLocationToStoryEventControllerImpl(
+				  applicationScope.get(),
+				  get(),
+				  get<LinkLocationToStoryEventNotifier>()
 				)
 			}
 

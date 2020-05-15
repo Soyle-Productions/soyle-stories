@@ -12,6 +12,7 @@ class StoryEventDetailsModel : Model<StoryEventDetailsScope, StoryEventDetailsVi
 
 	val title = bind(StoryEventDetailsViewModel::title)
 	val locationSelectionButtonLabel = bind(StoryEventDetailsViewModel::locationSelectionButtonLabel)
+	val selectedLocation = bind(StoryEventDetailsViewModel::selectedLocation)
 	val locations = bindImmutableList(StoryEventDetailsViewModel::locations)
 	val hasLocations = bind { (! item?.locations.isNullOrEmpty()).toProperty() }
 
