@@ -1,4 +1,4 @@
-package com.soyle.stories.project.layout.openTool
+package com.soyle.stories.layout.openTool
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.usecases.openTool.OpenTool
@@ -23,6 +23,14 @@ class OpenToolControllerImpl(
 			openTool.invoke(OpenTool.RequestModel.BaseStoryStructure(
 			  UUID.fromString(characterId),
 			  UUID.fromString(themeId)
+			), openToolOutputPort)
+		}
+	}
+
+	override fun openStoryEventDetailsTool(storyEventId: String) {
+		threadTransformer.async {
+			openTool.invoke(OpenTool.RequestModel.StoryEventDetails(
+			  UUID.fromString(storyEventId)
 			), openToolOutputPort)
 		}
 	}

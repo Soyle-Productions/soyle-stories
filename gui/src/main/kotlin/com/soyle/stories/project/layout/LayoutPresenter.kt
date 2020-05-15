@@ -17,7 +17,7 @@ import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
-import com.soyle.stories.project.layout.openTool.OpenToolPresenter
+import com.soyle.stories.project.layout.presenters.OpenToolPresenter
 import com.soyle.stories.theme.LocalThemeException
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromLocalComparison
 import kotlin.reflect.KClass

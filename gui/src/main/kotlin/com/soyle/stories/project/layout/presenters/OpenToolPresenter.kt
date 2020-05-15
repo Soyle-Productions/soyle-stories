@@ -1,4 +1,4 @@
-package com.soyle.stories.project.layout.openTool
+package com.soyle.stories.project.layout.presenters
 
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import com.soyle.stories.project.layout.LayoutView
