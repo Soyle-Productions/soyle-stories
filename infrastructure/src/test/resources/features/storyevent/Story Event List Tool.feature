@@ -1,4 +1,4 @@
-@storyevent 
+@storyevent
 Feature: Story Event List Tool
   As a user working on a project
   I want to see the list of story events I've created
@@ -7,64 +7,64 @@ Feature: Story Event List Tool
   Background:
     Given A project has been opened
 
-	@create-new-story-event
+  @create-new-story-event
   Scenario: Show special empty message when empty
     When The Story Event List Tool is opened
     Then The Story Event List Tool should show a special empty message
-    
-	@create-new-story-event
+
+  @create-new-story-event
   Scenario: Open Story Event creation dialog when empty
     Given The Story Event List Tool has been opened
     When User clicks the center create new story event button
     Then The create new Story Event dialog should be open
-    
-	@create-new-story-event
+
+  @create-new-story-event
   Scenario: Open Story Event creation dialog when populated
     Given A Story Event has been created
     And The Story Event List Tool has been opened
     When User clicks the bottom create new Story Event button
     Then The create new Story Event dialog should be open
-    
-	@create-new-story-event
+
+  @create-new-story-event
   Scenario Outline: Open Story Event creation dialog with relative Story Event
     Given A Story Event has been created
     And The Story Event List Tool has been opened
-	And the Story Event right-click menu has been opened in the Story Event List Tool
+    And the Story Event right-click menu has been opened in the Story Event List Tool
     When the <option> Story Event right-click menu option is selected in the Story Event List Tool
     Then The create new Story Event dialog should be open
-	
-	Examples:
-	  | option |
-	  | "Insert New Story Event Before" |
-	  | "Insert New Story Event After"  |
-    
-	@create-new-story-event
+
+    Examples:
+      | option                          |
+      | "Insert New Story Event Before" |
+      | "Insert New Story Event After"  |
+
+  @create-new-story-event
   Scenario: Update when new Story Event created
     Given The Story Event List Tool has been opened
     And The Story Event List Tool tab has been selected
     When A new Story Event is created without a relative Story Event
     Then The Story Event List Tool should show the new Story Event
-	And the new Story Event should be at the end of the Story Event List Tool
-    
-	@create-new-story-event
+    And the new Story Event should be at the end of the Story Event List Tool
+
+  @create-new-story-event
   Scenario: Update when new Story Event created before relative Story Event
     Given The Story Event List Tool has been opened
     And The Story Event List Tool tab has been selected
-	And a Story Event has been created
+    And a Story Event has been created
     When A new Story Event is created before a relative Story Event
     Then The Story Event List Tool should show the new Story Event
-	And the new Story Event should be listed before the relative Story Event in the Story Event List Tool
-	
-	@create-new-story-event
+    And the new Story Event should be listed before the relative Story Event in the Story Event List Tool
+
+  @create-new-story-event
   Scenario: Update when new Story Event created after relative Story Event
     Given The Story Event List Tool has been opened
     And The Story Event List Tool tab has been selected
-	And 2 Story Events have been created
+    And 2 Story Events have been created
     When A new Story Event is created after the first Story Event
     Then The Story Event List Tool should show the new Story Event
-	And the new Story Event should be listed after the first Story Event in the Story Event List Tool
+    And the new Story Event should be listed after the first Story Event in the Story Event List Tool
 
- 	@list-story-events
+  @list-story-events
   Scenario Outline: Story Event List Tool shows correct number of Story Events
     Given <number> Story Events have been created
     When The Story Event List Tool is opened
@@ -77,32 +77,31 @@ Feature: Story Event List Tool
       | 3      |
       | 4      |
       | 5      |
-	
-	
 
+  @delete-story-event
   Scenario: Open Confirm Delete Story Event Dialog From Right-Click Menu
     Given The Story Event List Tool has been opened
-    And the Story Event right-click menu is open
-    When the user clicks the Story Event List Tool right-click menu delete button
+    And a Story Event has been created
+    And the Story Event right-click menu has been opened in the Story Event List Tool
+    When the "Delete" Story Event right-click menu option is selected in the Story Event List Tool
     Then the confirm delete Story Event dialog should be opened
     And the confirm delete Story Event dialog should show the Story Event name
 
+  @delete-story-event
   Scenario:  Open Confirm Delete Story Event Dialog From Bottom Delete Button
     Given The Story Event List Tool has been opened
+    And a Story Event has been created
     And a Story Event has been selected
     When the user clicks the Story Event List Tool delete button
     Then the confirm delete Story Event dialog should be opened
     And the confirm delete Story Event dialog should show the Story Event name
-	
-  Scenario Outline: Update when Story Events are deleted
+
+  @delete-story-event
+  Scenario: Update when Story Events are deleted
     Given The Story Event List Tool has been opened
-    And <number> Story Events have been created
+    And 2 Story Events have been created
     When A Story Event is deleted
     Then The Story Event List Tool should not show the deleted Story Event
-
-    Examples:
-      | number |
-      | 2      |
 
   Scenario: Click Away after Rename
     Given the Story Event rename input box is visible
@@ -118,6 +117,7 @@ Feature: Story Event List Tool
     And the Story Event name should be the original name
 
   Scenario: Open Story Event Details Tool through Story Event List Tool
-    Given the Story Event right-click menu is open
-    When the user clicks the story event list tool right-click menu open button
+    Given a Story Event has been created
+    And the Story Event right-click menu has been opened in the Story Event List Tool
+    When the "Open" Story Event right-click menu option is selected in the Story Event List Tool
     Then the Story Event Details Tool should be open

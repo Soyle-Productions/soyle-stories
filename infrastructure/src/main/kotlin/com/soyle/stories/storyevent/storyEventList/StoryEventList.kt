@@ -106,6 +106,12 @@ class StoryEventList : View() {
 	}
 
 	private val storyEventContextMenu = ContextMenu().apply {
+		item("Open") {
+			id = "open"
+			action {
+				val selectedItem = model.selectedItem.value ?: return@action
+			}
+		}
 		item("Insert New Story Event Before") {
 			id = "insert-before"
 			action {

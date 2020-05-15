@@ -41,6 +41,9 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 			Given("a Story Event has been created") {
 				StoryEventsDriver.storyEventCreated().given(double)
 			}
+			Given("a Story Event has been selected") {
+				StoryEventListToolDriver.selectedItem.given(double)
+			}
 
 
 			When("The Story Event List Tool is opened") {
@@ -76,6 +79,11 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				val existing = StoryEventsDriver.storyEventsCreated.get(double)?.map { it.id }?.toSet() ?: emptySet()
 				StoryEventsDriver.storyEventCreatedAfter(StoryEventsDriver.storyEventCreated().get(double)!!.id.uuid.toString()).whenSet(double)
 				createdStoryEvent = StoryEventsDriver.storyEventsCreated.get(double)?.filterNot { it.id in existing }?.firstOrNull()
+			}
+			When("the user clicks the Story Event List Tool delete button") {
+				interact {
+					StoryEventListToolDriver.actionBarButton("delete").get(double)!!.onAction.handle(ActionEvent())
+				}
 			}
 
 
