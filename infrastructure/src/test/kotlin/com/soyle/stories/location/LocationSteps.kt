@@ -25,7 +25,7 @@ import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBenchModel
 import com.soyle.stories.project.layout.Dialog
-import com.soyle.stories.project.layout.openTool.OpenToolController
+import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope

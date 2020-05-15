@@ -85,6 +85,9 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 					StoryEventListToolDriver.actionBarButton("delete").get(double)!!.onAction.handle(ActionEvent())
 				}
 			}
+			When("the Story Event Details Tool is opened") {
+				StoryEventDetailsToolDriver.openToolWith(StoryEventsDriver.storyEventCreated().get(double)!!.id).whenSet(double)
+			}
 
 
 			Then("an error message should be displayed in the Create Story Event Dialog") {
@@ -116,6 +119,9 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 			}
 			Then("The Story Event List Tool should show all {int} story events") { count: Int ->
 				assertEquals(count, StoryEventListToolDriver.listedItems.get(double)!!.size)
+			}
+			Then("the Story Events Details Tool Location dropdown in the should be disabled") {
+				assertTrue(StoryEventDetailsToolDriver.disabledLocationDropDown(StoryEventsDriver.storyEventCreated().get(double)!!.id).check(double))
 			}
 		}
 	}

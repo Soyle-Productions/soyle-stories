@@ -53,6 +53,7 @@ object StoryEventModule {
 		}
 
 		StoryEventListModule
+		StoryEventDetailsModule
 	}
 
 }

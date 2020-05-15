@@ -10,7 +10,7 @@ import com.soyle.stories.characterarc.repositories.CharacterArcRepository
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.*
 import com.soyle.stories.project.ProjectSteps
-import com.soyle.stories.project.layout.openTool.OpenToolController
+import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.ActionEvent

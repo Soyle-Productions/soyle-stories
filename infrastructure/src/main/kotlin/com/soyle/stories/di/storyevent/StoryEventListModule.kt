@@ -23,7 +23,8 @@ object StoryEventListModule {
 				  StoryEventListPresenter(
 					get<StoryEventListModel>(),
 					get<CreateStoryEventNotifier>()
-				  )
+				  ),
+				  get()
 				)
 			}
 
