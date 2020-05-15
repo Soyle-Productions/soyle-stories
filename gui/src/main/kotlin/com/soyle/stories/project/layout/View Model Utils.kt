@@ -49,4 +49,5 @@ internal fun OpenTool.toToolViewModel(): ToolViewModel = when (this) {
 	is BaseStoryStructureTool -> BaseStoryStructureToolViewModel(toolId.toString(), characterId.toString(), themeId.toString())
 	is CharacterComparisonTool -> CharacterComparisonToolViewModel(toolId.toString(), themeId.toString(), characterId.toString())
 	is LocationDetailsTool -> LocationDetailsToolViewModel(toolId.toString(), locationId.toString())
+	is StoryEventDetailsTool -> StoryEventDetailsToolViewModel(toolId.toString(), storyEventId.toString())
 }

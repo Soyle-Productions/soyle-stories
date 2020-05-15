@@ -9,6 +9,7 @@ fun KClass<out Tool<*>>.toPresentableToolName(): String? {
         Tool.LocationList::class -> "Locations"
         Tool.SceneList::class -> "Scenes"
         Tool.StoryEventList::class -> "Story Events"
+        Tool.StoryEventDetails::class -> "Story Event Details"
         Tool.BaseStoryStructure::class -> "Base Story Structure"
         Tool.CharacterComparison::class -> "Character Comparison"
         else -> null
