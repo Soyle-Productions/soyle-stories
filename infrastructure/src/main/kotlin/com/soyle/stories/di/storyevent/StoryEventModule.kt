@@ -12,6 +12,8 @@ import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialo
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogViewListener
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEventUseCase
+import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEvents
+import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEventsUseCase
 
 object StoryEventModule {
 
@@ -20,6 +22,9 @@ object StoryEventModule {
 
 			provide<CreateStoryEvent> {
 				CreateStoryEventUseCase(get())
+			}
+			provide<ListAllStoryEvents> {
+				ListAllStoryEventsUseCase(get())
 			}
 
 			provide {
@@ -46,6 +51,8 @@ object StoryEventModule {
 			}
 
 		}
+
+		StoryEventListModule
 	}
 
 }

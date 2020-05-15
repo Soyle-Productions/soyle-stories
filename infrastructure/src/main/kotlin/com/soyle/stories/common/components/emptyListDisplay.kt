@@ -42,6 +42,7 @@ fun EventTarget.emptyListDisplay(
 		GridPane.setMargin(this, Insets(0.0, 0.0, 5.0, 0.0))
 	}
 	button(callToActionLabelProperty) {
+		addClass("center-button")
 		alignment = Pos.CENTER
 		isMnemonicParsing = false
 		GridPane.setHalignment(this, HPos.CENTER)

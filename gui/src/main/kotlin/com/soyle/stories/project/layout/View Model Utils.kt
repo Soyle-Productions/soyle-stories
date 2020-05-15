@@ -14,11 +14,11 @@ internal fun WindowChildViewModel.containsGroup(groupId: UUID): Boolean {
 	}
 }
 
-internal fun WindowViewModel.updateGroup(group: ActiveToolGroup): WindowViewModel {
+internal fun WindowViewModel.updateGroup(group: OpenToolGroup): WindowViewModel {
 	return WindowViewModel(id, child.updateGroup(group))
 }
 
-internal fun WindowChildViewModel.updateGroup(group: ActiveToolGroup): WindowChildViewModel = when (this) {
+internal fun WindowChildViewModel.updateGroup(group: OpenToolGroup): WindowChildViewModel = when (this) {
 	is GroupSplitterViewModel -> if (!containsGroup(group.groupId)) this else {
 		GroupSplitterViewModel(splitterId, orientation, children.map {
 			it.copy(second = it.second.updateGroup(group))
@@ -31,21 +31,22 @@ internal fun WindowChildViewModel.updateGroup(group: ActiveToolGroup): WindowChi
 	}
 }
 
-internal fun toWindowViewModel(window: ActiveWindow) = WindowViewModel(window.windowId.toString(), toChildViewModel(window.child))
-internal fun toChildViewModel(windowChild: ActiveWindowChild): WindowChildViewModel = when (windowChild) {
-	is ActiveToolGroupSplitter -> GroupSplitterViewModel(
+internal fun toWindowViewModel(window: OpenWindow) = WindowViewModel(window.windowId.toString(), toChildViewModel(window.child))
+internal fun toChildViewModel(windowChild: OpenWindowChild): WindowChildViewModel = when (windowChild) {
+	is OpenToolGroupSplitter -> GroupSplitterViewModel(
 	  windowChild.splitterId.toString(),
 	  windowChild.orientation,
 	  windowChild.children.map { it.first to toChildViewModel(it.second) })
-	is ActiveToolGroup -> ToolGroupViewModel(windowChild.groupId.toString(), windowChild.focusedToolId?.toString(), windowChild.tools.map { it.toToolViewModel() })
+	is OpenToolGroup -> ToolGroupViewModel(windowChild.groupId.toString(), windowChild.focusedToolId?.toString(), windowChild.tools.map { it.toToolViewModel() })
 	else -> error("Unexpected window child $windowChild")
 }
 
-internal fun ActiveTool.toToolViewModel(): ToolViewModel = when (this) {
-	is CharacterListActiveTool -> CharacterListToolViewModel(toolId.toString())
-	is LocationListActiveTool -> LocationListToolViewModel(toolId.toString())
-	is SceneListActiveTool -> SceneListToolViewModel(toolId.toString())
-	is BaseStoryStructureActiveTool -> BaseStoryStructureToolViewModel(toolId.toString(), characterId.toString(), themeId.toString())
-	is CharacterComparisonActiveTool -> CharacterComparisonToolViewModel(toolId.toString(), themeId.toString(), characterId.toString())
-	is LocationDetailsActiveTool -> LocationDetailsToolViewModel(toolId.toString(), locationId.toString())
+internal fun OpenTool.toToolViewModel(): ToolViewModel = when (this) {
+	is CharacterListTool -> CharacterListToolViewModel(toolId.toString())
+	is LocationListTool -> LocationListToolViewModel(toolId.toString())
+	is SceneListTool -> SceneListToolViewModel(toolId.toString())
+	is StoryEventListTool -> StoryEventListToolViewModel(toolId.toString())
+	is BaseStoryStructureTool -> BaseStoryStructureToolViewModel(toolId.toString(), characterId.toString(), themeId.toString())
+	is CharacterComparisonTool -> CharacterComparisonToolViewModel(toolId.toString(), themeId.toString(), characterId.toString())
+	is LocationDetailsTool -> LocationDetailsToolViewModel(toolId.toString(), locationId.toString())
 }

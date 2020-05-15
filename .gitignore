@@ -21,3 +21,4 @@ gradle-app.setting
 
 # Ignore updates to local variables
 local-repositories.gradle
+local-properties.properties

@@ -7,7 +7,6 @@ Feature: Story Event Details Tool
   Background:
     Given A project has been opened
     And A Story Event has been created
-    And The Story Event List Tool has been opened
 
     @link-location-to-story-event
   Scenario: No Locations available

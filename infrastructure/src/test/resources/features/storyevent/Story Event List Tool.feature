@@ -67,8 +67,8 @@ Feature: Story Event List Tool
  	@list-story-events
   Scenario Outline: Story Event List Tool shows correct number of Story Events
     Given <number> Story Events have been created
-    When The Story Events List Tool is opened
-    Then The Story Events List Tool should show all <number> story events
+    When The Story Event List Tool is opened
+    Then The Story Event List Tool should show all <number> story events
 
     Examples:
       | number |

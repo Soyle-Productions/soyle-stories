@@ -1,6 +1,6 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation

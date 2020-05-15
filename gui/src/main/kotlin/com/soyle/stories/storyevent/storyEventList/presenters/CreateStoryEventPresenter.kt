@@ -16,8 +16,7 @@ internal class CreateStoryEventPresenter(
 			val newItem = StoryEventListItemViewModel(response.newItem)
 			val itemsById = storyEvents.associateBy { it.id }
 			val updatedItems = response.updatedStoryEvents.map {
-				val original = itemsById[it.storyEventId.toString()] ?: StoryEventListItemViewModel(it)
-				StoryEventListItemViewModel(original.id, it.influenceOrderIndex, it.storyEventName)
+				StoryEventListItemViewModel(it)
 			}.associateBy { it.id }
 			val unsortedItems = updatedItems.values + itemsById.filterKeys { it !in updatedItems }.values + newItem
 

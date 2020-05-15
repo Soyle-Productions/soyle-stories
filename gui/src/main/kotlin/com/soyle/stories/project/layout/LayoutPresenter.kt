@@ -7,7 +7,7 @@ import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLoc
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.layout.LayoutException
-import com.soyle.stories.layout.usecases.ActiveWindow
+import com.soyle.stories.layout.usecases.OpenWindow
 import com.soyle.stories.layout.usecases.StaticTool
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
@@ -49,12 +49,12 @@ class LayoutPresenter(
 		locationEvents.deleteLocation.addListener(this)
 	}
 
-	private fun pushLayout(activeWindows: List<ActiveWindow>, staticTools: List<StaticTool>) {
+	private fun pushLayout(openWindows: List<OpenWindow>, staticTools: List<StaticTool>) {
 		view.update {
 			copy(
-			  staticTools = staticTools.map { StaticToolViewModel(it.toolId.toString(), it.isOpen, it.toolTypeId.toPresentableToolName()!!) },
-			  primaryWindow = activeWindows.find { it.isPrimary }!!.let(::toWindowViewModel),
-			  secondaryWindows = activeWindows.filterNot { it.isPrimary }.map(::toWindowViewModel),
+			  staticTools = staticTools.map { StaticToolViewModel(it.toolId.toString(), it.isOpen, it.toolType.toPresentableToolName()!!) },
+			  primaryWindow = openWindows.find { it.isPrimary }!!.let(::toWindowViewModel),
+			  secondaryWindows = openWindows.filterNot { it.isPrimary }.map(::toWindowViewModel),
 			  isValid = true
 			)
 		}

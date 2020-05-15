@@ -1,12 +1,15 @@
 package com.soyle.stories.storyevent
 
+import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
-import io.cucumber.java.PendingException
 import io.cucumber.java8.En
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import javafx.event.ActionEvent
+import org.junit.jupiter.api.Assertions.*
+import org.testfx.framework.junit5.ApplicationTest
 
-class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) {
+class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
+
+	private var createdStoryEvent: StoryEvent? = null
 
 	init {
 		with(en) {
@@ -21,42 +24,58 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) {
 				CreateStoryEventDialogDriver.validName.given(double)
 			}
 			Given("The Story Event List Tool has been opened") {
-				throw PendingException()
+				StoryEventListToolDriver.openTool.given(double)
 			}
 			Given("A Story Event has been created") {
 				StoryEventsDriver.storyEventsCreated(1).given(double)
 			}
 			Given("the Story Event right-click menu has been opened in the Story Event List Tool") {
-				throw PendingException()
+				StoryEventListToolDriver.openRightClickMenu.given(double)
 			}
 			Given("The Story Event List Tool tab has been selected") {
-				throw PendingException()
+				StoryEventListToolDriver.tabSelected.given(double)
 			}
 			Given("{int} Story Events have been created") { count: Int ->
 				StoryEventsDriver.storyEventsCreated(count).given(double)
 			}
+			Given("a Story Event has been created") {
+				StoryEventsDriver.storyEventCreated().given(double)
+			}
 
 
 			When("The Story Event List Tool is opened") {
-				throw PendingException()
+				if (StoryEventListToolDriver.openTool.check(double)) {
+					StoryEventListToolDriver.openTool.whenSet(double)
+				}
+				StoryEventListToolDriver.openTool.whenSet(double)
 			}
 			When("User clicks the center create new story event button") {
-				throw PendingException()
+				interact {
+					StoryEventListToolDriver.centerButton.get(double)!!.onAction.handle(ActionEvent())
+				}
 			}
 			When("User clicks the bottom create new Story Event button") {
-				throw PendingException()
+				interact {
+					StoryEventListToolDriver.actionBarButton("create").get(double)!!.onAction.handle(ActionEvent())
+				}
 			}
 			When("the {string} Story Event right-click menu option is selected in the Story Event List Tool") { option: String ->
-				throw PendingException()
+				StoryEventListToolDriver.rightClickMenuOption(option).whenSet(double)
 			}
 			When("A new Story Event is created without a relative Story Event") {
-				throw PendingException()
+				val existing = StoryEventsDriver.storyEventsCreated.get(double)?.map { it.id }?.toSet() ?: emptySet()
+				StoryEventsDriver.storyEventCreated().whenSet(double)
+				createdStoryEvent = StoryEventsDriver.storyEventsCreated.get(double)?.filterNot { it.id in existing }?.firstOrNull()
 			}
 			When("A new Story Event is created before a relative Story Event") {
-				throw PendingException()
+				val existing = StoryEventsDriver.storyEventsCreated.get(double)?.map { it.id }?.toSet() ?: emptySet()
+				StoryEventsDriver.storyEventCreatedBefore(StoryEventsDriver.storyEventCreated().get(double)!!.id.uuid.toString()).whenSet(double)
+				createdStoryEvent = StoryEventsDriver.storyEventsCreated.get(double)?.filterNot { it.id in existing }?.firstOrNull()
 			}
 			When("A new Story Event is created after the first Story Event") {
-				throw PendingException()
+				val existing = StoryEventsDriver.storyEventsCreated.get(double)?.map { it.id }?.toSet() ?: emptySet()
+				StoryEventsDriver.storyEventCreatedAfter(StoryEventsDriver.storyEventCreated().get(double)!!.id.uuid.toString()).whenSet(double)
+				createdStoryEvent = StoryEventsDriver.storyEventsCreated.get(double)?.filterNot { it.id in existing }?.firstOrNull()
 			}
 
 
@@ -73,19 +92,22 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) {
 				assertTrue(StoryEventsDriver.storyEventsCreated(1).check(double))
 			}
 			Then("The Story Event List Tool should show a special empty message") {
-				throw PendingException()
+				assertTrue(StoryEventListToolDriver.visibleEmptyDisplay.check(double))
 			}
 			Then("The Story Event List Tool should show the new Story Event") {
-				throw PendingException()
+				assertTrue(StoryEventListToolDriver.isShowingStoryEvent(createdStoryEvent!!).check(double))
 			}
 			Then("the new Story Event should be at the end of the Story Event List Tool") {
-				throw PendingException()
+				assertTrue(StoryEventListToolDriver.isShowingStoryEventAtEnd(createdStoryEvent!!).check(double))
 			}
 			Then("the new Story Event should be listed before the relative Story Event in the Story Event List Tool") {
-				throw PendingException()
+				assertTrue(StoryEventListToolDriver.isShowingStoryEventBefore(createdStoryEvent!!, createdStoryEvent!!.nextStoryEventId!!).check(double))
 			}
 			Then("the new Story Event should be listed after the first Story Event in the Story Event List Tool") {
-				throw PendingException()
+				assertTrue(StoryEventListToolDriver.isShowingStoryEventAfter(createdStoryEvent!!, createdStoryEvent!!.previousStoryEventId!!).check(double))
+			}
+			Then("The Story Event List Tool should show all {int} story events") { count: Int ->
+				assertEquals(count, StoryEventListToolDriver.listedItems.get(double)!!.size)
 			}
 		}
 	}

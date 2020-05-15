@@ -7,10 +7,9 @@ import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.Remove
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.layout.Context
 import com.soyle.stories.layout.LayoutDoesNotExist
-import com.soyle.stories.layout.entities.BaseStoryStructureTool
-import com.soyle.stories.layout.entities.CharacterComparisonTool
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import kotlinx.coroutines.runBlocking
@@ -71,22 +70,15 @@ class RemoveCharacterFromLocalStoryUseCase(
     private fun getToolsWithCharacterId(layout: Layout, characterId: Character.Id): List<Tool<*>>
     {
         return layout.tools.filter {
-            when (it) {
-                is BaseStoryStructureTool -> it.identifyingData.second == characterId
-                else -> false
-            }
+            it.identifiedWithCharacter(characterId)
         }
     }
 
     private fun getToolsWithThemeIds(layout: Layout, themeIds: List<UUID>): List<Tool<*>>
     {
-        val idSet = themeIds.toSet()
+        val idSet = themeIds.map(Theme::Id).toSet()
         return layout.tools.filter {
-            when (it) {
-                is BaseStoryStructureTool -> it.identifyingData.first.uuid in idSet
-                is CharacterComparisonTool -> it.identifyingData.uuid in idSet
-                else -> false
-            }
+            it.identifiedWithAnyThemeIdIn(idSet)
         }
     }
 

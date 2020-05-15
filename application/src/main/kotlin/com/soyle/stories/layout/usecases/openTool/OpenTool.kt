@@ -5,7 +5,7 @@
  */
 package com.soyle.stories.layout.usecases.openTool
 
-import com.soyle.stories.layout.usecases.ActiveToolGroup
+import com.soyle.stories.layout.usecases.OpenToolGroup
 import java.util.*
 
 interface OpenTool {
@@ -60,7 +60,7 @@ interface OpenTool {
 
     }
 
-    class ResponseModel(val affectedToolGroup: ActiveToolGroup, val affectedGroupSplitterIds: List<UUID>, val affectedWindowId: UUID?) {
+    class ResponseModel(val affectedToolGroup: OpenToolGroup, val affectedGroupSplitterIds: List<UUID>, val affectedWindowId: UUID?) {
 
 
 

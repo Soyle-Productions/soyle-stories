@@ -1,9 +1,8 @@
 package com.soyle.stories.theme.usecases.removeCharacterFromComparison
 
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.layout.Context
-import com.soyle.stories.layout.entities.BaseStoryStructureTool
-import com.soyle.stories.layout.entities.CharacterComparisonTool
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.theme.LocalThemeException
@@ -94,11 +93,7 @@ class RemoveCharacterFromLocalComparisonUseCase(
         layout: Layout
     ): List<Tool<*>> {
         return layout.tools.filter {
-            when (it) {
-                is BaseStoryStructureTool -> it.identifyingData.first.uuid == themeId
-                is CharacterComparisonTool -> it.identifyingData.uuid == themeId
-                else -> false
-            }
+            it.identifiedWithAnyThemeIdIn(setOf(Theme.Id(themeId)))
         }
     }
 

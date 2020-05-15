@@ -2,6 +2,7 @@ package com.soyle.stories.layout.entities
 
 import com.soyle.stories.common.Entity
 import java.util.*
+import kotlin.reflect.KClass
 
 class Window(
     override val id: Id,
@@ -42,7 +43,7 @@ class Window(
         fun focusOnTool(toolId: Tool.Id): WindowChild
 
         fun openToolInPrimaryStack(tool: Tool<*>): WindowChild
-        fun reOpenTool(toolType: ToolType, data: Any?): WindowChild
+        fun reOpenTool(toolType: KClass<out Tool<*>>, data: Any?): WindowChild
         fun closeTool(toolId: Tool.Id): WindowChild
         fun openTool(toolId: Tool.Id): WindowChild
         fun toolRemoved(toolId: Tool.Id): WindowChild
@@ -81,7 +82,7 @@ class Window(
         return Window(id, layoutId, newChild)
     }
 
-    fun reOpenTool(toolType: ToolType, data: Any?): Window {
+    fun reOpenTool(toolType: KClass<out Tool<*>>, data: Any?): Window {
         return Window(id, layoutId, child.reOpenTool(toolType, data))
     }
 
