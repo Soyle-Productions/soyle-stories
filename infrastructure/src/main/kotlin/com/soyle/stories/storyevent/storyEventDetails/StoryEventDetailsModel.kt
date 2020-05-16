@@ -16,7 +16,7 @@ class StoryEventDetailsModel : Model<StoryEventDetailsScope, StoryEventDetailsVi
 	val locations = bindImmutableList(StoryEventDetailsViewModel::locations)
 	val includedCharacters = bindImmutableList(StoryEventDetailsViewModel::includedCharacters)
 	val hasLocations = bind { (! item?.locations.isNullOrEmpty()).toProperty() }
-	val characters = bindImmutableList(StoryEventDetailsViewModel::characters)
-	val hasCharacters = bind { (! item?.characters.isNullOrEmpty()).toProperty() }
+	val availableCharacters = bindImmutableList(StoryEventDetailsViewModel::availableCharacters)
+	val hasCharacters = bind { (! item?.availableCharacters.isNullOrEmpty()).toProperty() }
 
 }

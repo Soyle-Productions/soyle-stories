@@ -39,7 +39,7 @@ class StoryEventDetails : View() {
 	}
 
 	private val characterSelectionList = ContextMenu().apply {
-		items.bind(model.characters) { character ->
+		items.bind(model.availableCharacters) { character ->
 			item(character.characterName) {
 				setOnAction {
 					it.consume()

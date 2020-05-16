@@ -11,8 +11,10 @@ import com.soyle.stories.storyevent.storyEventDetails.presenters.AddCharacterToS
 import com.soyle.stories.storyevent.storyEventDetails.presenters.LinkLocationToStoryEventPresenter
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
+import java.util.*
 
 class StoryEventDetailsPresenter(
+  storyEventId: String,
   private val view: View.Nullable<StoryEventDetailsViewModel>,
   linkLocationToStoryEventNotifier: Notifier<LinkLocationToStoryEvent.OutputPort>,
   addCharacterToStoryEventNotifier: Notifier<AddCharacterToStoryEvent.OutputPort>
@@ -22,7 +24,7 @@ class StoryEventDetailsPresenter(
 
 	private val subPresenters = listOf(
 	  LinkLocationToStoryEventPresenter(view) listensTo linkLocationToStoryEventNotifier,
-	  AddCharacterToStoryEventPresenter(view) listensTo addCharacterToStoryEventNotifier
+	  AddCharacterToStoryEventPresenter(UUID.fromString(storyEventId), view) listensTo addCharacterToStoryEventNotifier
 	)
 
 	override fun receiveListAllLocationsResponse(response: ListAllLocations.ResponseModel) {
@@ -38,6 +40,7 @@ class StoryEventDetailsPresenter(
 				  selectedLocation = selectedLocationId?.let { id -> locations.find { it.id == id } },
 				  includedCharacters = emptyList(),
 				  locations = locations,
+				  availableCharacters = emptyList(),
 				  characters = emptyList()
 				)
 			}
@@ -49,7 +52,7 @@ class StoryEventDetailsPresenter(
 
 			val characters = response.characters.map { CharacterItemViewModel(it.key.characterId.toString(), it.key.characterName) }
 
-			if (this != null) copy(characters = characters)
+			if (this != null) copy(availableCharacters = characters, characters = characters)
 			else {
 				StoryEventDetailsViewModel(
 				  title = "Story Event Details - [TODO]",
@@ -57,6 +60,7 @@ class StoryEventDetailsPresenter(
 				  selectedLocation = null,
 				  includedCharacters = emptyList(),
 				  locations = emptyList(),
+				  availableCharacters = characters,
 				  characters = characters
 				)
 			}

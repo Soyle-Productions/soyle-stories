@@ -9,5 +9,6 @@ data class StoryEventDetailsViewModel(
   val selectedLocation: LocationItemViewModel?,
   val includedCharacters: List<CharacterItemViewModel>,
   val locations: List<LocationItemViewModel>,
-  val characters: List<CharacterItemViewModel>
+  val availableCharacters: List<CharacterItemViewModel>,
+  internal val characters: List<CharacterItemViewModel>
 )

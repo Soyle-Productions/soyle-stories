@@ -15,6 +15,7 @@ object StoryEventDetailsModule {
 
 			provide(ListAllCharacterArcs.OutputPort::class, ListAllLocations.OutputPort::class) {
 				StoryEventDetailsPresenter(
+				  storyEventId,
 				  get<StoryEventDetailsModel>(),
 				  projectScope.get<LinkLocationToStoryEventNotifier>(),
 				  projectScope.get<AddCharacterToStoryEventNotifier>()
