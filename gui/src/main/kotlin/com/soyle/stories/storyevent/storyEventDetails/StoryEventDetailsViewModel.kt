@@ -7,6 +7,7 @@ data class StoryEventDetailsViewModel(
   val title: String,
   val locationSelectionButtonLabel: String,
   val selectedLocation: LocationItemViewModel?,
+  val includedCharacters: List<CharacterItemViewModel>,
   val locations: List<LocationItemViewModel>,
   val characters: List<CharacterItemViewModel>
 )

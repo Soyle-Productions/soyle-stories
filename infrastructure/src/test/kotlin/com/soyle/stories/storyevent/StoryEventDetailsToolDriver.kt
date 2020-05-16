@@ -2,6 +2,7 @@ package com.soyle.stories.storyevent
 
 import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
+import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.layout.openTool.OpenToolController
@@ -16,6 +17,7 @@ import javafx.event.ActionEvent
 import javafx.geometry.Side
 import javafx.scene.control.Button
 import javafx.scene.control.ContextMenu
+import javafx.scene.control.Label
 import javafx.scene.control.MenuItem
 import org.testfx.framework.junit5.ApplicationTest
 
@@ -114,8 +116,39 @@ object StoryEventDetailsToolDriver : ApplicationTest() {
 		}
 	}
 
+	fun visibleCharacterDropDownMenu(storyEventId: StoryEvent.Id) = object : DependentProperty<ContextMenu> {
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  { it: SoyleStoriesTestDouble -> CharacterDriver.givenANumberOfCharactersHaveBeenCreated(it, 1) } as (SoyleStoriesTestDouble) -> Unit,
+		  openToolWith(storyEventId)::given
+		)
+
+		override fun get(double: SoyleStoriesTestDouble): ContextMenu? {
+			return characterDropDown(storyEventId).get(double)?.contextMenu?.takeIf { it.isShowing }
+		}
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			val dropDown = characterDropDown(storyEventId).get(double)!!
+			interact {
+				dropDown.contextMenu.show(dropDown, Side.BOTTOM, 0.0, 0.0)
+			}
+		}
+	}
+
+	fun characterDropDownItems(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<List<MenuItem>> {
+		override fun get(double: SoyleStoriesTestDouble): List<MenuItem> {
+			return visibleCharacterDropDownMenu(storyEventId).get(double)?.items ?: emptyList()
+		}
+	}
+
 	fun characterDropDownItemCount(storyEventId: StoryEvent.Id, double: SoyleStoriesTestDouble): Int {
-		return enabledCharacterDropDown(storyEventId).get(double)?.contextMenu?.items?.size ?: 0
+		return characterDropDownItems(storyEventId).get(double)!!.size
+	}
+
+	fun includedCharacters(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Set<Label>> {
+		override fun get(double: SoyleStoriesTestDouble): Set<Label> {
+			val tool = openToolWith(storyEventId).get(double) ?: return emptySet()
+			return from(tool.root).lookup(".included-character").queryAll<Label>()
+		}
 	}
 
 }

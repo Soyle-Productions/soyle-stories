@@ -41,7 +41,11 @@ class StoryEventDetails : View() {
 	private val characterSelectionList = ContextMenu().apply {
 		items.bind(model.characters) { character ->
 			item(character.characterName) {
-
+				setOnAction {
+					it.consume()
+					viewListener.addCharacter(character.characterId)
+					this@apply.hide()
+				}
 			}
 		}
 	}
@@ -67,6 +71,13 @@ class StoryEventDetails : View() {
 			}
 		}
 		fieldset("Characters") {
+			vbox {
+				bindChildren(model.includedCharacters) {
+					label(it.characterName) {
+						addClass("included-character")
+					}
+				}
+			}
 			field {
 				button {
 					addClass("character-select")

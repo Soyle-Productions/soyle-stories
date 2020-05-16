@@ -53,7 +53,7 @@ Feature: Story Event Details Tool
 
   @add-character-to-story-event
   Scenario: Selecting a Character
-    Given at least one Character has been created
+    Given A Character has been created
     And the Story Event Details Tool has been opened
     And the Story Event Details Character Selection dropdown menu has been opened
     When a Character in the Story Event Details Character Selection dropdown menu is selected
@@ -62,7 +62,7 @@ Feature: Story Event Details Tool
 
   @add-character-to-story-event
   Scenario: Closing the menu without selecting
-    Given at least one Character has been created
+    Given A Character has been created
     And the Story Event Details Tool has been opened
     And the Story Event Details Character Selection dropdown menu has been opened
     When the user clicks outside the Story Event Details Character Selection dropdown menu

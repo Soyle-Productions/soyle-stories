@@ -14,6 +14,9 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 
 	private var createdStoryEvent: StoryEvent? = null
 
+	private fun firstStoryEventId(double: SoyleStoriesTestDouble) =
+	  StoryEventsDriver.storyEventCreated().get(double)?.id
+
 	init {
 		with(en) {
 
@@ -49,12 +52,17 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 			}
 			Given("the Story Event Details Tool has been opened") {
 				StoryEventDetailsToolDriver.openToolWith(
-				  StoryEventsDriver.storyEventCreated().get(double)!!.id
+				  firstStoryEventId(double)!!
 				).given(double)
 			}
 			Given("the Story Events Details Tool Location dropdown menu has been opened") {
 				StoryEventDetailsToolDriver.visibleLocationDropDownMenu(
-				  StoryEventsDriver.storyEventCreated().get(double)!!.id
+				  firstStoryEventId(double)!!
+				).given(double)
+			}
+			Given("the Story Event Details Character Selection dropdown menu has been opened") {
+				StoryEventDetailsToolDriver.visibleCharacterDropDownMenu(
+				  firstStoryEventId(double)!!
 				).given(double)
 			}
 
@@ -99,34 +107,41 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				}
 			}
 			When("the Story Event Details Tool is opened") {
-				StoryEventDetailsToolDriver.openToolWith(StoryEventsDriver.storyEventCreated().get(double)!!.id).whenSet(double)
+				StoryEventDetailsToolDriver.openToolWith(firstStoryEventId(double)!!).whenSet(double)
 			}
 			When("the Story Event Details Tool Location dropdown is clicked") {
 				interact {
 					StoryEventDetailsToolDriver.enabledLocationDropDown(
-					  StoryEventsDriver.storyEventCreated().get(double)!!.id
+					  firstStoryEventId(double)!!
 					).get(double)!!.onAction!!.handle(ActionEvent())
 				}
 			}
 			When("a Location in the Story Events Details Tool Location dropdown menu is selected") {
 				interact {
 					StoryEventDetailsToolDriver.locationDropDownMenuItems(
-					  StoryEventsDriver.storyEventCreated().get(double)!!.id
+					  firstStoryEventId(double)!!
 					).get(double)!!.first().fire()
 				}
 			}
 			When("the user clicks outside the Story Events Details Tool Location dropdown menu") {
 				interact {
 					clickOn(StoryEventDetailsToolDriver.openToolWith(
-					  StoryEventsDriver.storyEventCreated().get(double)!!.id
+					  firstStoryEventId(double)!!
 					).get(double)!!.owningTab?.tabPane, MouseButton.PRIMARY)
 				}
 			}
 			When("the Story Event Details Character Selection dropdown is clicked") {
 				interact {
 					StoryEventDetailsToolDriver.characterDropDown(
-					  StoryEventsDriver.storyEventCreated().get(double)!!.id
+					  firstStoryEventId(double)!!
 					).whenSet(double)
+				}
+			}
+			When("a Character in the Story Event Details Character Selection dropdown menu is selected") {
+				interact {
+					StoryEventDetailsToolDriver.characterDropDownItems(
+					  firstStoryEventId(double)!!
+					).get(double)!!.first().fire()
 				}
 			}
 
@@ -162,13 +177,14 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				assertEquals(count, StoryEventListToolDriver.listedItems.get(double)!!.size)
 			}
 			Then("the Story Events Details Tool Location dropdown in the should be disabled") {
-				assertTrue(StoryEventDetailsToolDriver.disabledLocationDropDown(StoryEventsDriver.storyEventCreated().get(double)!!.id).check(double))
+				assertTrue(StoryEventDetailsToolDriver.disabledLocationDropDown(
+				  firstStoryEventId(double)!!).check(double))
 			}
 			Then("all Locations should be listed in the Story Events Details Tool Location dropdown menu") {
 				assertEquals(
 				  LocationSteps.getNumberOfLocationsCreated(double),
 				  StoryEventDetailsToolDriver.locationDropDownMenuItemCount(
-					StoryEventsDriver.storyEventCreated().get(double)!!.id, double
+					firstStoryEventId(double)!!, double
 				  )
 				)
 			}
@@ -176,28 +192,39 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				assertEquals(
 				  LocationSteps.getLocationsCreated(double).first().name,
 				  StoryEventDetailsToolDriver.enabledLocationDropDown(
-					StoryEventsDriver.storyEventCreated().get(double)!!.id
+					firstStoryEventId(double)!!
 				  ).get(double)!!.text
 				)
 			}
 			Then("the Story Events Details Tool Location dropdown menu should be closed") {
 				assertFalse(StoryEventDetailsToolDriver.visibleLocationDropDownMenu(
-				  StoryEventsDriver.storyEventCreated().get(double)!!.id
+				  firstStoryEventId(double)!!
 				).check(double))
 			}
 			Then("the Story Event Details Character Selection dropdown should be disabled") {
 				assertTrue(StoryEventDetailsToolDriver.disabledCharacterDropDown(
-				  StoryEventsDriver.storyEventCreated().get(double)!!.id
+				  firstStoryEventId(double)!!
 				).check(double))
 			}
 			Then("all Characters should be listed in the Story Event Details Character Selection dropdown menu") {
 				assertEquals(
 				  CharacterDriver.getNumberOfCharactersCreated(double),
 				  StoryEventDetailsToolDriver.characterDropDownItemCount(
-					StoryEventsDriver.storyEventCreated().get(double)!!.id, double
+					firstStoryEventId(double)!!, double
 				  )
 				)
 			}
+			Then("the selected Character should be shown in place of the Story Event Details Character Selection dropdown") {
+				val firstCharacterName = CharacterDriver.getCharactersCreated(double).first().name
+				val includedCharacters = StoryEventDetailsToolDriver.includedCharacters(firstStoryEventId(double)!!).get(double)!!
+				assertNotNull(includedCharacters.find {
+					it.text == firstCharacterName
+				})
+			}
+			Then("the Story Event Details Character Selection dropdown should be below the list of included characters") {
+
+			}
+
 		}
 	}
 

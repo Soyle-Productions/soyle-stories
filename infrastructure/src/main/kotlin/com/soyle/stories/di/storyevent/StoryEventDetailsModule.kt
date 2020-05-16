@@ -4,6 +4,7 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllChara
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventNotifier
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventNotifier
 import com.soyle.stories.storyevent.storyEventDetails.*
 
@@ -15,7 +16,8 @@ object StoryEventDetailsModule {
 			provide(ListAllCharacterArcs.OutputPort::class, ListAllLocations.OutputPort::class) {
 				StoryEventDetailsPresenter(
 				  get<StoryEventDetailsModel>(),
-				  projectScope.get<LinkLocationToStoryEventNotifier>()
+				  projectScope.get<LinkLocationToStoryEventNotifier>(),
+				  projectScope.get<AddCharacterToStoryEventNotifier>()
 				)
 			}
 
@@ -27,6 +29,7 @@ object StoryEventDetailsModule {
 				  get(),
 				  projectScope.get(),
 				  get(),
+				  projectScope.get(),
 				  projectScope.get()
 				)
 			}
