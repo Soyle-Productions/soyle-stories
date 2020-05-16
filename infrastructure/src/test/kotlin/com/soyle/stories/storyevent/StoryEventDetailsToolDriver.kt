@@ -12,6 +12,7 @@ import com.soyle.stories.storyevent.StoryEventDetailsToolDriver.interact
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetails
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsScope
 import com.soyle.stories.testutils.findComponentsInScope
+import javafx.event.ActionEvent
 import javafx.geometry.Side
 import javafx.scene.control.Button
 import javafx.scene.control.ContextMenu
@@ -87,10 +88,17 @@ object StoryEventDetailsToolDriver : ApplicationTest() {
 		return locationDropDownMenuItems(storyEventId).get(double)!!.size
 	}
 
-	private fun characterDropDown(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Button> {
+	fun characterDropDown(storyEventId: StoryEvent.Id) = object : DependentProperty<Button> {
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  openToolWith(storyEventId)::given
+		)
 		override fun get(double: SoyleStoriesTestDouble): Button? {
 			val tool = openToolWith(storyEventId).get(double) ?: return null
 			return from(tool.root).lookup(".character-select").queryAll<Button>().firstOrNull()
+		}
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			get(double)!!.onAction.handle(ActionEvent())
 		}
 	}
 
@@ -104,6 +112,10 @@ object StoryEventDetailsToolDriver : ApplicationTest() {
 		override fun get(double: SoyleStoriesTestDouble): Button? {
 			return characterDropDown(storyEventId).get(double)?.takeUnless { it.isDisable }
 		}
+	}
+
+	fun characterDropDownItemCount(storyEventId: StoryEvent.Id, double: SoyleStoriesTestDouble): Int {
+		return enabledCharacterDropDown(storyEventId).get(double)?.contextMenu?.items?.size ?: 0
 	}
 
 }

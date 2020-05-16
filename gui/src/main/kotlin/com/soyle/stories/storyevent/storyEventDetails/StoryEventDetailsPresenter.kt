@@ -1,5 +1,7 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
+import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
@@ -11,7 +13,7 @@ import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocati
 class StoryEventDetailsPresenter(
   private val view: View.Nullable<StoryEventDetailsViewModel>,
   linkLocationToStoryEventNotifier: Notifier<LinkLocationToStoryEvent.OutputPort>
-) : ListAllLocations.OutputPort {
+) : ListAllLocations.OutputPort, ListAllCharacterArcs.OutputPort {
 
 	private var selectedLocationId: String? = null
 
@@ -30,9 +32,29 @@ class StoryEventDetailsPresenter(
 				  title = "Story Event Details - [TODO]",
 				  locationSelectionButtonLabel = "Select Location",
 				  selectedLocation = selectedLocationId?.let { id -> locations.find { it.id == id } },
-				  locations = locations
+				  locations = locations,
+				  characters = emptyList()
 				)
 			}
+		}
+	}
+
+	override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
+		view.update {
+
+			val characters = response.characters.map { CharacterItemViewModel(it.key.characterId.toString(), it.key.characterName) }
+
+			if (this != null) copy(characters = characters)
+			else {
+				StoryEventDetailsViewModel(
+				  title = "Story Event Details - [TODO]",
+				  locationSelectionButtonLabel = "Select Location",
+				  selectedLocation = null,
+				  locations = emptyList(),
+				  characters = characters
+				)
+			}
+
 		}
 	}
 

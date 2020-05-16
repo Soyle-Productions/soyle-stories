@@ -1,5 +1,6 @@
 package com.soyle.stories.storyevent
 
+import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -121,6 +122,13 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 					).get(double)!!.owningTab?.tabPane, MouseButton.PRIMARY)
 				}
 			}
+			When("the Story Event Details Character Selection dropdown is clicked") {
+				interact {
+					StoryEventDetailsToolDriver.characterDropDown(
+					  StoryEventsDriver.storyEventCreated().get(double)!!.id
+					).whenSet(double)
+				}
+			}
 
 
 			Then("an error message should be displayed in the Create Story Event Dialog") {
@@ -181,6 +189,14 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				assertTrue(StoryEventDetailsToolDriver.disabledCharacterDropDown(
 				  StoryEventsDriver.storyEventCreated().get(double)!!.id
 				).check(double))
+			}
+			Then("all Characters should be listed in the Story Event Details Character Selection dropdown menu") {
+				assertEquals(
+				  CharacterDriver.getNumberOfCharactersCreated(double),
+				  StoryEventDetailsToolDriver.characterDropDownItemCount(
+					StoryEventsDriver.storyEventCreated().get(double)!!.id, double
+				  )
+				)
 			}
 		}
 	}

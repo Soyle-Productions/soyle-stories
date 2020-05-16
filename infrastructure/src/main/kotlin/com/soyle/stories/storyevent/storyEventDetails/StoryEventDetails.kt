@@ -38,6 +38,14 @@ class StoryEventDetails : View() {
 		}
 	}
 
+	private val characterSelectionList = ContextMenu().apply {
+		items.bind(model.characters) { character ->
+			item(character.characterName) {
+
+			}
+		}
+	}
+
 	override val root: Parent = form {
 		fieldset("Location") {
 			field {
@@ -62,7 +70,13 @@ class StoryEventDetails : View() {
 			field {
 				button {
 					addClass("character-select")
-					isDisable = true
+					enableWhen { model.hasCharacters }
+
+					contextMenu = characterSelectionList
+					setOnAction {
+						it.consume()
+						contextMenu.show(this, Side.BOTTOM, 0.0, 0.0)
+					}
 				}
 			}
 		}
