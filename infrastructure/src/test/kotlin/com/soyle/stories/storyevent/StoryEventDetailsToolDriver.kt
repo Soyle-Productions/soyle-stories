@@ -4,6 +4,7 @@ import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.location.LocationSteps
@@ -19,6 +20,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Label
 import javafx.scene.control.MenuItem
+import javafx.scene.layout.HBox
 import org.testfx.framework.junit5.ApplicationTest
 
 object StoryEventDetailsToolDriver : ApplicationTest() {
@@ -147,7 +149,15 @@ object StoryEventDetailsToolDriver : ApplicationTest() {
 	fun includedCharacters(storyEventId: StoryEvent.Id) = object : ReadOnlyDependentProperty<Set<Label>> {
 		override fun get(double: SoyleStoriesTestDouble): Set<Label> {
 			val tool = openToolWith(storyEventId).get(double) ?: return emptySet()
-			return from(tool.root).lookup(".included-character").queryAll<Label>()
+			return from(tool.root).lookup(".included-character").lookup(".label").queryAll<Label>()
+		}
+	}
+
+	fun removeCharacterButton(storyEventId: StoryEvent.Id, characterId: Character.Id) = object : ReadOnlyDependentProperty<Button> {
+		override fun get(double: SoyleStoriesTestDouble): Button? {
+			val tool = openToolWith(storyEventId).get(double) ?: return null
+			val container = from(tool.root).lookup(".included-character").queryAll<HBox>().firstOrNull() ?: return null
+			return from(container).lookup(".button").queryAll<Button>().firstOrNull()
 		}
 	}
 

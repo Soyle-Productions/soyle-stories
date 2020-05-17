@@ -65,6 +65,12 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				  firstStoryEventId(double)!!
 				).given(double)
 			}
+			Given("a Character has been added to the Story Event") {
+				StoryEventsDriver.addedCharacter(
+				  firstStoryEventId(double)!!,
+				  CharacterDriver.getCharactersCreated(double).first().id
+				).given(double)
+			}
 
 
 			When("The Story Event List Tool is opened") {
@@ -151,6 +157,15 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 					).get(double)!!.owningTab?.tabPane, MouseButton.PRIMARY)
 				}
 			}
+			When("the Story Event Details Tool Remove Character button is selected") {
+				val button = StoryEventDetailsToolDriver.removeCharacterButton(
+				  firstStoryEventId(double)!!,
+				  CharacterDriver.getCharactersCreated(double).first().id
+				).get(double)
+				interact {
+					clickOn(button!!, MouseButton.PRIMARY)
+				}
+			}
 
 
 			Then("an error message should be displayed in the Create Story Event Dialog") {
@@ -235,7 +250,12 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				  firstStoryEventId(double)!!
 				).check(double))
 			}
-
+			Then("the Character should be removed from the Story Event") {
+				assertFalse(StoryEventsDriver.addedCharacter(
+				  firstStoryEventId(double)!!,
+				  CharacterDriver.getCharactersCreated(double).first().id
+				).check(double))
+			}
 
 		}
 	}

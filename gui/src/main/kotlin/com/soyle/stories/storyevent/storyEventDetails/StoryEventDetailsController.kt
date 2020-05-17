@@ -5,6 +5,7 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventController
+import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
 import java.util.*
 
@@ -18,7 +19,8 @@ class StoryEventDetailsController(
   private val listAllCharacters: ListAllCharacterArcs,
   private val listAllCharactersOutputPort: ListAllCharacterArcs.OutputPort,
   private val linkLocationToStoryEventController: LinkLocationToStoryEventController,
-  private val addCharacterToStoryEventController: AddCharacterToStoryEventController
+  private val addCharacterToStoryEventController: AddCharacterToStoryEventController,
+  private val removeCharacterFromStoryEventController: RemoveCharacterFromStoryEventController
 ) : StoryEventDetailsViewListener {
 
 	override fun getValidState() {
@@ -43,6 +45,10 @@ class StoryEventDetailsController(
 
 	override fun addCharacter(characterId: String) {
 		addCharacterToStoryEventController.addCharacterToStoryEvent(storyEventId, characterId)
+	}
+
+	override fun removeCharacter(characterId: String) {
+		removeCharacterFromStoryEventController.removeCharacter(storyEventId, characterId)
 	}
 
 }

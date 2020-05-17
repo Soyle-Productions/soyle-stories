@@ -1,5 +1,6 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
+import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.common.Notifier
@@ -9,17 +10,22 @@ import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.storyevent.StoryEventException
 import com.soyle.stories.storyevent.storyEventDetails.presenters.AddCharacterToStoryEventPresenter
+import com.soyle.stories.storyevent.storyEventDetails.presenters.BuildNewCharacterPresenter
 import com.soyle.stories.storyevent.storyEventDetails.presenters.LinkLocationToStoryEventPresenter
+import com.soyle.stories.storyevent.storyEventDetails.presenters.RemoveCharacterFromStoryEventPresenter
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
 import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
+import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 import java.util.*
 
 class StoryEventDetailsPresenter(
   storyEventId: String,
   private val view: View.Nullable<StoryEventDetailsViewModel>,
   linkLocationToStoryEventNotifier: Notifier<LinkLocationToStoryEvent.OutputPort>,
-  addCharacterToStoryEventNotifier: Notifier<AddCharacterToStoryEvent.OutputPort>
+  addCharacterToStoryEventNotifier: Notifier<AddCharacterToStoryEvent.OutputPort>,
+  removeCharacterFromStoryEventNotifier: Notifier<RemoveCharacterFromStoryEvent.OutputPort>,
+  buildNewCharacterNotifier: Notifier<BuildNewCharacter.OutputPort>
 ) : GetStoryEventDetails.OutputPort, ListAllLocations.OutputPort, ListAllCharacterArcs.OutputPort {
 
 	private val subPresenters: List<*>
@@ -29,7 +35,9 @@ class StoryEventDetailsPresenter(
 
 		subPresenters = listOf(
 		  LinkLocationToStoryEventPresenter(formattedStoryEventId, view) listensTo linkLocationToStoryEventNotifier,
-		  AddCharacterToStoryEventPresenter(formattedStoryEventId, view) listensTo addCharacterToStoryEventNotifier
+		  AddCharacterToStoryEventPresenter(formattedStoryEventId, view) listensTo addCharacterToStoryEventNotifier,
+		  BuildNewCharacterPresenter(view) listensTo buildNewCharacterNotifier,
+		  RemoveCharacterFromStoryEventPresenter(formattedStoryEventId, view) listensTo removeCharacterFromStoryEventNotifier
 		)
 	}
 

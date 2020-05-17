@@ -67,3 +67,11 @@ Feature: Story Event Details Tool
     And the Story Event Details Character Selection dropdown menu has been opened
     When the user clicks outside the Story Event Details Character Selection dropdown menu
     Then the Story Event Details Character Selection dropdown menu should be closed
+
+  @remove-character-from-story-event
+  Scenario: Remove character
+    Given the Story Event Details Tool has been opened
+    And a Character has been created
+    And a Character has been added to the Story Event
+    When the Story Event Details Tool Remove Character button is selected
+    Then the Character should be removed from the Story Event

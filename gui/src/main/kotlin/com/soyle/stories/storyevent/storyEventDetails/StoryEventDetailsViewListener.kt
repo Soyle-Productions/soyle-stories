@@ -6,5 +6,6 @@ interface StoryEventDetailsViewListener {
 	fun deselectLocation()
 	fun selectLocation(locationId: String)
 	fun addCharacter(characterId: String)
+	fun removeCharacter(characterId: String)
 
 }

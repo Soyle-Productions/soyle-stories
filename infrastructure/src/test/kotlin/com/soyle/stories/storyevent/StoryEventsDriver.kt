@@ -2,12 +2,16 @@ package com.soyle.stories.storyevent
 
 import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
+import com.soyle.stories.character.CharacterDriver
+import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.StoryEventsDriver.interact
+import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventController
 import com.soyle.stories.storyevent.repositories.StoryEventRepository
 import kotlinx.coroutines.runBlocking
@@ -92,6 +96,31 @@ object StoryEventsDriver : ApplicationTest() {
 				scope.get<CreateStoryEventController>().createStoryEvent("Story Event Name")
 			}
 		}
+	}
+
+	fun addedCharacter(storyEventId: StoryEvent.Id, characterId: Character.Id) = object : DependentProperty<Character> {
+
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  storyEventsCreated(1)::given,
+		  { it: SoyleStoriesTestDouble -> CharacterDriver.givenANumberOfCharactersHaveBeenCreated(it, 1) } as (SoyleStoriesTestDouble) -> Unit
+		)
+
+		override fun get(double: SoyleStoriesTestDouble): Character? {
+			val scope = ProjectSteps.getProjectScope(double) ?: return null
+			val eventRepo = scope.get<StoryEventRepository>()
+			val characterRepo = scope.get<CharacterRepository>()
+			val event = runBlocking { eventRepo.getStoryEventById(storyEventId) } ?: return null
+			if (event.includedCharacterIds.find { it == characterId } == null) return null
+			return runBlocking { characterRepo.getCharacterById(characterId) }
+		}
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			val scope = ProjectSteps.getProjectScope(double)!!
+			interact {
+				scope.get<AddCharacterToStoryEventController>().addCharacterToStoryEvent(storyEventId.uuid.toString(), characterId.uuid.toString())
+			}
+		}
+
 	}
 
 }

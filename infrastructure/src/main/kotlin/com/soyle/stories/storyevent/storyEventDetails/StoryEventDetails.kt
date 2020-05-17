@@ -3,6 +3,7 @@ package com.soyle.stories.storyevent.storyEventDetails
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.StoryEventDetailsToolViewModel
+import javafx.geometry.Pos
 import javafx.geometry.Side
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
@@ -73,8 +74,15 @@ class StoryEventDetails : View() {
 		fieldset("Characters") {
 			vbox {
 				bindChildren(model.includedCharacters) {
-					label(it.characterName) {
+					hbox(alignment = Pos.CENTER_LEFT, spacing = 5) {
+						id = it.characterId
 						addClass("included-character")
+						label(it.characterName)
+						button("Remove Character") {
+							action {
+								viewListener.removeCharacter(it.characterId)
+							}
+						}
 					}
 				}
 			}

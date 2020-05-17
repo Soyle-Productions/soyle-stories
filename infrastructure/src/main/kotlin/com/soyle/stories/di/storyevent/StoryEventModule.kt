@@ -17,6 +17,9 @@ import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialo
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventController
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventControllerImpl
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventNotifier
+import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
+import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
+import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventNotifier
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEventUseCase
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
@@ -27,6 +30,8 @@ import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocati
 import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEventUseCase
 import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEvents
 import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEventsUseCase
+import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
+import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventUseCase
 
 object StoryEventModule {
 
@@ -46,6 +51,9 @@ object StoryEventModule {
 		provide<GetStoryEventDetails> {
 			GetStoryEventDetailsUseCase(get())
 		}
+		provide<RemoveCharacterFromStoryEvent> {
+			RemoveCharacterFromStoryEventUseCase(get())
+		}
 	}
 
 	private fun InScope<ProjectScope>.notifiers() {
@@ -57,6 +65,9 @@ object StoryEventModule {
 		}
 		provide(AddCharacterToStoryEvent.OutputPort::class) {
 			AddCharacterToStoryEventNotifier()
+		}
+		provide(RemoveCharacterFromStoryEvent.OutputPort::class) {
+			RemoveCharacterFromStoryEventNotifier()
 		}
 	}
 
@@ -80,6 +91,14 @@ object StoryEventModule {
 
 		provide<AddCharacterToStoryEventController> {
 			AddCharacterToStoryEventControllerImpl(
+			  applicationScope.get(),
+			  get(),
+			  get()
+			)
+		}
+
+		provide<RemoveCharacterFromStoryEventController> {
+			RemoveCharacterFromStoryEventControllerImpl(
 			  applicationScope.get(),
 			  get(),
 			  get()
