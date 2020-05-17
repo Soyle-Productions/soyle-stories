@@ -15,17 +15,15 @@ class AddCharacterToStoryEventPresenter(
 		val responseId = response.characterId.toString()
 		view.updateOrInvalidated {
 
-			val includedCharacterIds = includedCharacters.map { it.characterId }.toSet()
-
-			val includedCharacters = includedCharacters + if (includedCharacterIds.contains(responseId)) emptyList()
-			else listOfNotNull(characters.find { it.characterId == responseId })
-
-			val newIncludedCharacterIds = includedCharacters.map { it.characterId }.toSet()
+			val includedCharacterIds = includedCharacterIds + responseId
 
 			copy(
-			  includedCharacters = includedCharacters,
+			  includedCharacterIds = includedCharacterIds,
+			  includedCharacters = characters.filter {
+				  it.characterId in includedCharacterIds
+			  },
 			  availableCharacters = characters.filterNot {
-				  it.characterId in newIncludedCharacterIds
+				  it.characterId in includedCharacterIds
 			  }
 			)
 		}

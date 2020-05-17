@@ -6,7 +6,9 @@ import com.soyle.stories.location.items.LocationItemViewModel
 data class StoryEventDetailsViewModel(
   val title: String,
   val locationSelectionButtonLabel: String,
+  internal val selectedLocationId: String?,
   val selectedLocation: LocationItemViewModel?,
+  internal val includedCharacterIds: Set<String>,
   val includedCharacters: List<CharacterItemViewModel>,
   val locations: List<LocationItemViewModel>,
   val availableCharacters: List<CharacterItemViewModel>,

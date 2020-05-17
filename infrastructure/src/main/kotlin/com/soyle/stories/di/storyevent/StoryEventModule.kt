@@ -21,6 +21,8 @@ import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharact
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEventUseCase
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEventUseCase
+import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
+import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetailsUseCase
 import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
 import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEventUseCase
 import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEvents
@@ -40,6 +42,9 @@ object StoryEventModule {
 		}
 		provide<AddCharacterToStoryEvent> {
 			AddCharacterToStoryEventUseCase(get(), get())
+		}
+		provide<GetStoryEventDetails> {
+			GetStoryEventDetailsUseCase(get())
 		}
 	}
 

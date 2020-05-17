@@ -7,13 +7,18 @@ import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventNotifier
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventNotifier
 import com.soyle.stories.storyevent.storyEventDetails.*
+import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
 
 object StoryEventDetailsModule {
 
 	init {
 		scoped<StoryEventDetailsScope> {
 
-			provide(ListAllCharacterArcs.OutputPort::class, ListAllLocations.OutputPort::class) {
+			provide(
+			  GetStoryEventDetails.OutputPort::class,
+			  ListAllCharacterArcs.OutputPort::class,
+			  ListAllLocations.OutputPort::class
+			) {
 				StoryEventDetailsPresenter(
 				  storyEventId,
 				  get<StoryEventDetailsModel>(),
@@ -26,6 +31,8 @@ object StoryEventDetailsModule {
 				StoryEventDetailsController(
 				  storyEventId,
 				  projectScope.applicationScope.get(),
+				  projectScope.get(),
+				  get(),
 				  projectScope.get(),
 				  get(),
 				  projectScope.get(),
