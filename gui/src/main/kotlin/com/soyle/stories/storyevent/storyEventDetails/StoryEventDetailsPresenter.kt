@@ -22,10 +22,16 @@ class StoryEventDetailsPresenter(
   addCharacterToStoryEventNotifier: Notifier<AddCharacterToStoryEvent.OutputPort>
 ) : GetStoryEventDetails.OutputPort, ListAllLocations.OutputPort, ListAllCharacterArcs.OutputPort {
 
-	private val subPresenters = listOf(
-	  LinkLocationToStoryEventPresenter(view) listensTo linkLocationToStoryEventNotifier,
-	  AddCharacterToStoryEventPresenter(UUID.fromString(storyEventId), view) listensTo addCharacterToStoryEventNotifier
-	)
+	private val subPresenters: List<*>
+
+	init {
+		val formattedStoryEventId = UUID.fromString(storyEventId)
+
+		subPresenters = listOf(
+		  LinkLocationToStoryEventPresenter(formattedStoryEventId, view) listensTo linkLocationToStoryEventNotifier,
+		  AddCharacterToStoryEventPresenter(formattedStoryEventId, view) listensTo addCharacterToStoryEventNotifier
+		)
+	}
 
 	override fun receiveGetStoryEventDetailsResponse(response: GetStoryEventDetails.ResponseModel) {
 		view.update {

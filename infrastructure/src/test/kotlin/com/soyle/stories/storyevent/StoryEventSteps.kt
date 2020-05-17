@@ -144,6 +144,13 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 					).get(double)!!.first().fire()
 				}
 			}
+			When("the user clicks outside the Story Event Details Character Selection dropdown menu") {
+				interact {
+					clickOn(StoryEventDetailsToolDriver.openToolWith(
+					  firstStoryEventId(double)!!
+					).get(double)!!.owningTab?.tabPane, MouseButton.PRIMARY)
+				}
+			}
 
 
 			Then("an error message should be displayed in the Create Story Event Dialog") {
@@ -222,8 +229,13 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				})
 			}
 			Then("the Story Event Details Character Selection dropdown should be below the list of included characters") {
-
 			}
+			Then("the Story Event Details Character Selection dropdown menu should be closed") {
+				assertFalse(StoryEventDetailsToolDriver.visibleCharacterDropDownMenu(
+				  firstStoryEventId(double)!!
+				).check(double))
+			}
+
 
 		}
 	}
