@@ -1,32 +1,28 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
+import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.location.locationList.LocationListListener
+import com.soyle.stories.location.usecases.listAllLocations.LocationItem
 import com.soyle.stories.storyevent.StoryEventException
 import com.soyle.stories.storyevent.storyEventDetails.presenters.AddCharacterToStoryEventPresenter
-import com.soyle.stories.storyevent.storyEventDetails.presenters.BuildNewCharacterPresenter
 import com.soyle.stories.storyevent.storyEventDetails.presenters.LinkLocationToStoryEventPresenter
-import com.soyle.stories.storyevent.storyEventDetails.presenters.RemoveCharacterFromStoryEventPresenter
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
 import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
-import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 import java.util.*
 
 class StoryEventDetailsPresenter(
   storyEventId: String,
   private val view: View.Nullable<StoryEventDetailsViewModel>,
   linkLocationToStoryEventNotifier: Notifier<LinkLocationToStoryEvent.OutputPort>,
-  addCharacterToStoryEventNotifier: Notifier<AddCharacterToStoryEvent.OutputPort>,
-  removeCharacterFromStoryEventNotifier: Notifier<RemoveCharacterFromStoryEvent.OutputPort>,
-  buildNewCharacterNotifier: Notifier<BuildNewCharacter.OutputPort>
-) : GetStoryEventDetails.OutputPort, ListAllLocations.OutputPort, ListAllCharacterArcs.OutputPort {
+  addCharacterToStoryEventNotifier: Notifier<AddCharacterToStoryEvent.OutputPort>
+) : GetStoryEventDetails.OutputPort, LocationListListener, CharacterListListener {
 
 	private val subPresenters: List<*>
 
@@ -35,9 +31,7 @@ class StoryEventDetailsPresenter(
 
 		subPresenters = listOf(
 		  LinkLocationToStoryEventPresenter(formattedStoryEventId, view) listensTo linkLocationToStoryEventNotifier,
-		  AddCharacterToStoryEventPresenter(formattedStoryEventId, view) listensTo addCharacterToStoryEventNotifier,
-		  BuildNewCharacterPresenter(view) listensTo buildNewCharacterNotifier,
-		  RemoveCharacterFromStoryEventPresenter(formattedStoryEventId, view) listensTo removeCharacterFromStoryEventNotifier
+		  AddCharacterToStoryEventPresenter(formattedStoryEventId, view) listensTo addCharacterToStoryEventNotifier
 		)
 	}
 
@@ -73,16 +67,16 @@ class StoryEventDetailsPresenter(
 		}
 	}
 
-	override fun receiveListAllLocationsResponse(response: ListAllLocations.ResponseModel) {
+	override fun receiveLocationListUpdate(locations: List<LocationItem>) {
 		view.update {
 
-			val locations = response.locations.map(::LocationItemViewModel)
+			val locationViewModels = locations.map(::LocationItemViewModel)
 
 			if (this != null) copy(
 			  selectedLocation = selectedLocationId?.let {
-				  locations.find { it.id == selectedLocationId }
+				  locationViewModels.find { it.id == selectedLocationId }
 			  },
-			  locations = locations
+			  locations = locationViewModels
 			)
 			else {
 				StoryEventDetailsViewModel(
@@ -92,7 +86,7 @@ class StoryEventDetailsPresenter(
 				  selectedLocation = null,
 				  includedCharacterIds = emptySet(),
 				  includedCharacters = emptyList(),
-				  locations = locations,
+				  locations = locationViewModels,
 				  availableCharacters = emptyList(),
 				  characters = emptyList()
 				)
@@ -100,17 +94,17 @@ class StoryEventDetailsPresenter(
 		}
 	}
 
-	override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
+	override fun receiveCharacterListUpdate(characters: List<CharacterItem>) {
 		view.update {
 
-			val characters = response.characters.map { CharacterItemViewModel(it.key.characterId.toString(), it.key.characterName) }
+			val viewModels = characters.map { CharacterItemViewModel(it.characterId.toString(), it.characterName) }
 
 			if (this != null) copy(
-			  availableCharacters = characters,
-			  includedCharacters = characters.filter {
+			  availableCharacters = viewModels,
+			  includedCharacters = viewModels.filter {
 				  it.characterId in includedCharacterIds
 			  },
-			  characters = characters
+			  characters = viewModels
 			)
 			else {
 				StoryEventDetailsViewModel(
@@ -121,11 +115,10 @@ class StoryEventDetailsPresenter(
 				  includedCharacterIds = emptySet(),
 				  includedCharacters = emptyList(),
 				  locations = emptyList(),
-				  availableCharacters = characters,
-				  characters = characters
+				  availableCharacters = viewModels,
+				  characters = viewModels
 				)
 			}
-
 		}
 	}
 

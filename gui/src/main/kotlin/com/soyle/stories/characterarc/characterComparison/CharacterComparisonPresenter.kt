@@ -1,9 +1,10 @@
 package com.soyle.stories.characterarc.characterComparison
 
+import com.soyle.stories.character.characterList.CharacterListListener
+import com.soyle.stories.character.characterList.LiveCharacterList
 import com.soyle.stories.characterarc.characterComparison.presenters.*
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
@@ -17,85 +18,68 @@ import java.util.*
 class CharacterComparisonPresenter(
   private val view: CharacterComparisonView,
   themeId: String,
-  characterArcEvents: CharacterArcEvents
-) : CompareCharacters.OutputPort, ListAllCharacterArcs.OutputPort {
+  characterArcEvents: CharacterArcEvents,
+  liveCharacterList: LiveCharacterList
+) : CompareCharacters.OutputPort, CharacterListListener {
 
 	private val themeId: UUID = UUID.fromString(themeId)
 
-	/*
-	hold them in a property because notifiers use weak references
-	to listeners and these presenters should be held to the life
-	cycle of this character comparison presenter.
-	 */
 	private val subPresenters: List<Any>
 
 	init {
 		val themeUUID = this.themeId
 		with(characterArcEvents) {
 			subPresenters = listOf(
-			  BuildNewCharacterPresenter(view) listensTo buildNewCharacter,
 			  IncludeCharacterInComparisonPresenter(themeUUID, view) listensTo includeCharacterInComparison,
 			  PromoteMinorCharacterPresenter(themeUUID, view) listensTo promoteMinorCharacter,
 			  DeleteLocalCharacterArcPresenter(themeUUID, view) listensTo deleteLocalCharacterArc,
-			  RemoveCharacterFromLocalStoryPresenter(themeUUID, view) listensTo removeCharacterFromStory,
 			  ChangeStoryFunctionPresenter(themeUUID, view) listensTo changeStoryFunction,
 			  ChangeThematicSectionValuePresenter(view) listensTo changeThematicSectionValue,
 			  ChangeCentralMoralQuestionPresenter(themeUUID, view) listensTo changeCentralMoralQuestion,
 			  ChangeCharacterPropertyValuePresenter(themeUUID, view) listensTo changeCharacterPropertyValue,
 			  ChangeCharacterPerspectivePropertyValuePresenter(themeUUID, view) listensTo changeCharacterPerspectivePropertyValue,
-			  RemoveCharacterFromLocalComparisonPresenter(themeUUID, view) listensTo removeCharacterFromLocalComparison,
-			  RenameCharacterPresenter(themeUUID, view) listensTo renameCharacter
+			  RemoveCharacterFromLocalComparisonPresenter(themeUUID, view) listensTo removeCharacterFromLocalComparison
 			)
 		}
+		liveCharacterList.addListener(this)
 	}
-
-	private var allCharacters: List<CharacterItem> = emptyList()
 
 	override fun receiveCharacterComparison(response: CompareCharacters.ResponseModel) {
 		view.update {
+
+			val charactersById = characters.associateBy { it.characterId }
+
+			val includedIds = response.characterSummaries.ids.map(UUID::toString).toSet()
+
 			copy(
-			  focusedCharacter = createFocusedCharacter(response),
-			  focusCharacterOptions = collectMajorCharacters(response),
+			  focusedCharacterId = response.focusedCharacterId.toString(),
+			  focusedCharacter = charactersById[response.focusedCharacterId.toString()],
+			  majorCharacterIds = response.majorCharacterIds.map(UUID::toString),
+			  focusCharacterOptions = response.majorCharacterIds.mapNotNull { charactersById[it.toString()] },
 			  subTools = createSubTools(response),
-			  availableCharactersToAdd = collectCharactersNotAlreadyIncluded(response),
+			  availableCharactersToAdd = characters.filterNot { it.characterId in includedIds },
 			  isInvalid = false
 			)
 		}
 	}
 
-	override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
+	override fun receiveCharacterListUpdate(characters: List<CharacterItem>) {
 		view.update {
-			allCharacters = response.characters.keys.toList()
+
+			val characterViewModels = characters.map {
+				CharacterItemViewModel(it.characterId.toString(), it.characterName)
+			}
+
+			val charactersById = characterViewModels.associateBy { it.characterId }
+
 			val includedIds = subTools.getOrNull(0)?.items?.map { it.characterId }?.toSet() ?: setOf()
 			copy(
-			  availableCharactersToAdd = response.characters.keys.filterNot { it.characterId.toString() in includedIds }
-				.map {
-					CharacterItemViewModel(it.characterId.toString(), it.characterName)
-				}
+			  focusedCharacter = focusedCharacterId?.let { charactersById[it] },
+			  focusCharacterOptions = majorCharacterIds.mapNotNull { charactersById[it] },
+			  characters = characterViewModels,
+			  availableCharactersToAdd = characterViewModels.filterNot { it.characterId in includedIds }
 			)
 		}
-	}
-
-	private fun createFocusedCharacter(response: CompareCharacters.ResponseModel): FocusCharacterOption? {
-		return response.characterSummaries
-		  .forceGetById(response.focusedCharacterId)
-		  .toFocusCharacterOption()
-	}
-
-	private fun collectMajorCharacters(response: CompareCharacters.ResponseModel): List<FocusCharacterOption> {
-		return response.majorCharacterIds
-		  .asSequence()
-		  .map(response.characterSummaries::forceGetById)
-		  .map { it.toFocusCharacterOption() }
-		  .toList()
-	}
-
-	private fun collectCharactersNotAlreadyIncluded(response: CompareCharacters.ResponseModel): List<CharacterItemViewModel> {
-		val includedCharacterIds = response.characterSummaries.ids.map { it.toString() }.toSet()
-
-		return allCharacters
-		  .filterNot { it.characterId.toString() in includedCharacterIds }
-		  .map { CharacterItemViewModel(it.characterId.toString(), it.characterName) }
 	}
 
 	private fun createSubTools(response: CompareCharacters.ResponseModel): List<SubToolViewModel> {
@@ -213,8 +197,8 @@ class CharacterComparisonPresenter(
 		)
 	}
 
-	private fun CompareCharacters.CharacterComparisonSummary.toFocusCharacterOption(): FocusCharacterOption {
-		return FocusCharacterOption(id.toString(), name)
+	private fun CompareCharacters.CharacterComparisonSummary.toFocusCharacterOption(): CharacterItemViewModel {
+		return CharacterItemViewModel(id.toString(), name)
 	}
 
 	override fun receiveCompareCharactersFailure(error: ThemeException) {

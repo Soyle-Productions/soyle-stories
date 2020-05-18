@@ -1,22 +1,23 @@
 package com.soyle.stories.location.locationList
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.location.controllers.RenameLocationController
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.common.isListeningTo
 import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.location.controllers.RenameLocationController
 
 class LocationListController(
   private val threadTransformer: ThreadTransformer,
-  private val listAllLocations: ListAllLocations,
-  private val listAllLocationsOutputPort: ListAllLocations.OutputPort,
+  private val liveLocationList: LiveLocationList,
+  private val locationListListener: LocationListListener,
   private val renameLocationController: RenameLocationController,
   private val openToolController: OpenToolController
 ) : LocationListViewListener {
 
 	override fun getValidState() {
-		threadTransformer.async {
-			listAllLocations.invoke(listAllLocationsOutputPort)
+		if (locationListListener isListeningTo liveLocationList) {
+			liveLocationList.removeListener(locationListListener)
 		}
+		liveLocationList.addListener(locationListListener)
 	}
 
 	override fun renameLocation(locationId: String, newName: String) {

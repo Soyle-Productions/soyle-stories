@@ -1,8 +1,11 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.character.characterList.CharacterListListener
+import com.soyle.stories.character.characterList.LiveCharacterList
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.common.isListeningTo
+import com.soyle.stories.location.locationList.LiveLocationList
+import com.soyle.stories.location.locationList.LocationListListener
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
@@ -14,10 +17,10 @@ class StoryEventDetailsController(
   private val threadTransformer: ThreadTransformer,
   private val getStoryEventDetails: GetStoryEventDetails,
   private val getStoryEventDetailsOutputPort: GetStoryEventDetails.OutputPort,
-  private val listAllLocations: ListAllLocations,
-  private val listAllLocationsOutputPort: ListAllLocations.OutputPort,
-  private val listAllCharacters: ListAllCharacterArcs,
-  private val listAllCharactersOutputPort: ListAllCharacterArcs.OutputPort,
+  private val liveCharacterList: LiveCharacterList,
+  private val characterListListener: CharacterListListener,
+  private val liveLocationList: LiveLocationList,
+  private val locationListListener: LocationListListener,
   private val linkLocationToStoryEventController: LinkLocationToStoryEventController,
   private val addCharacterToStoryEventController: AddCharacterToStoryEventController,
   private val removeCharacterFromStoryEventController: RemoveCharacterFromStoryEventController
@@ -27,12 +30,14 @@ class StoryEventDetailsController(
 		threadTransformer.async {
 			getStoryEventDetails.invoke(UUID.fromString(storyEventId), getStoryEventDetailsOutputPort)
 		}
-		threadTransformer.async {
-			listAllLocations.invoke(listAllLocationsOutputPort)
+		if (locationListListener isListeningTo liveLocationList) {
+			liveLocationList.removeListener(locationListListener)
 		}
-		threadTransformer.async {
-			listAllCharacters.invoke(listAllCharactersOutputPort)
+		liveLocationList.addListener(locationListListener)
+		if (characterListListener isListeningTo liveCharacterList) {
+			liveCharacterList.removeListener(characterListListener)
 		}
+		liveCharacterList.addListener(characterListListener)
 	}
 
 	override fun deselectLocation() {
