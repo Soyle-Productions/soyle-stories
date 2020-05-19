@@ -7,7 +7,7 @@ package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcItem
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 
 class PlanNewCharacterArcNotifier : PlanNewCharacterArc.OutputPort, Notifier<PlanNewCharacterArc.OutputPort>() {
     override fun receivePlanNewCharacterArcFailure(failure: Exception) {

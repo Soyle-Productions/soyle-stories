@@ -1,5 +1,6 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.71'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
 apply from: "soyle-tasks.gradle"
@@ -13,10 +14,10 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.71"
+    implementation libraries.kotlin
 
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    testImplementation libraries.junit
+    testRuntimeOnly libraries.junitEngine
 }
 
 compileKotlin {
@@ -28,4 +29,13 @@ compileTestKotlin {
 
 test {
     useJUnitPlatform()
+}
+
+static def getDate() {
+    def date = new Date()
+    def year = date.format('yyyy')
+    def cl = Calendar.getInstance()
+    cl.setTime(date)
+    def week = cl.get(cl.WEEK_OF_YEAR)
+    return year.substring(2) + "w" + week + (["a", "b", "c", "d", "e", "f", "g"][cl.get(cl.DAY_OF_WEEK)-1])
 }

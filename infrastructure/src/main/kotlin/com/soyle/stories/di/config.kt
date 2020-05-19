@@ -8,6 +8,7 @@ import com.soyle.stories.di.modules.DataModule
 import com.soyle.stories.di.modules.LocaleModule
 import com.soyle.stories.di.project.ProjectModule
 import com.soyle.stories.di.scene.SceneModule
+import com.soyle.stories.di.storyevent.StoryEventModule
 
 fun configureDI() {
 	ApplicationModule
@@ -18,4 +19,5 @@ fun configureDI() {
 	LocationModule
 	CharacterArcModule
 	SceneModule
+	StoryEventModule
 }

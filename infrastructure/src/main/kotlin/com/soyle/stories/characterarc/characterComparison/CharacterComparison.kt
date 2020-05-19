@@ -42,7 +42,7 @@ class CharacterComparison : View("Character Comparison") {
                     }
                 }
                 spacer()
-                combobox<FocusCharacterOption> {
+                combobox<CharacterItemViewModel> {
                     cellFormat {
                         text = item.characterName
                     }
@@ -52,7 +52,7 @@ class CharacterComparison : View("Character Comparison") {
                         selectionModel.select(it)
                         selectionBeingSet = false
                     }
-                    model.characterOptions.onChange { it: ObservableList<FocusCharacterOption>? ->
+                    model.characterOptions.onChange { it: ObservableList<CharacterItemViewModel>? ->
                         selectionBeingSet = true
                         items.setAll(it)
                         selectionModel.select(model.focusedCharacter.value)

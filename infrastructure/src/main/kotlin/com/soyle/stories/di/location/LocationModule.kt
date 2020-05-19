@@ -4,7 +4,7 @@ import com.soyle.stories.di.DI
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.DeleteLocationController
 import com.soyle.stories.location.controllers.RenameLocationController

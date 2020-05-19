@@ -151,7 +151,7 @@ class RemoveCharacterFromLocalComparisonUnitTest {
                     window {
                         primaryStack {
                             withIds.forEach {
-                                this += BaseStoryStructureTool(Tool.Id(it), Theme.Id(andIdentifiedWith.first), Character.Id(andIdentifiedWith.second), false)
+                                tool(Tool.BaseStoryStructure(Tool.Id(it), Theme.Id(andIdentifiedWith.first), Character.Id(andIdentifiedWith.second), false))
                             }
                         }
                     }
@@ -170,7 +170,7 @@ class RemoveCharacterFromLocalComparisonUnitTest {
                     window {
                         primaryStack {
                             withIds.forEach {
-                                this += CharacterComparisonTool(Tool.Id(it), Theme.Id(andIdentifiedWith), Character.Id(characterId), false)
+                                tool(Tool.CharacterComparison(Tool.Id(it), Theme.Id(andIdentifiedWith), Character.Id(characterId), false))
                             }
                         }
                     }
@@ -219,11 +219,7 @@ class RemoveCharacterFromLocalComparisonUnitTest {
     private fun assertLayoutHasNoToolsIdentifiedWithThemeId(layout: Layout)
     {
         assertTrue(layout.tools.none {
-            when (it) {
-                is BaseStoryStructureTool -> it.identifyingData.first.uuid == themeId
-                is CharacterComparisonTool -> it.identifyingData.uuid == themeId
-                else -> false
-            }
+            it.identifiedWithAnyThemeIdIn(setOf(Theme.Id(themeId)))
         })
     }
 }

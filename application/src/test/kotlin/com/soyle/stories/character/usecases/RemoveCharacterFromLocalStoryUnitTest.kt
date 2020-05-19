@@ -166,10 +166,10 @@ class RemoveCharacterFromLocalStoryUnitTest {
                         window {
                             primaryStack {
                                 repeat(identityToolCount) {
-                                    this += BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), Theme.Id(UUID.randomUUID()), Character.Id(characterId), false)
+                                    tool(Tool.BaseStoryStructure(Tool.Id(), Theme.Id(UUID.randomUUID()), Character.Id(characterId), false))
                                 }
                                 themeIds!!.subList(0, themeIdentityToolCount).forEach {
-                                    this += BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), Theme.Id(it), Character.Id(UUID.randomUUID()), false)
+                                    tool(Tool.BaseStoryStructure(Tool.Id(), Theme.Id(it), Character.Id(), false))
                                 }
                             }
                         }
@@ -257,7 +257,7 @@ class RemoveCharacterFromLocalStoryUnitTest {
             val (_, persistedItem) = persistedItems.single { it.type == "saveLayout" }
             persistedItem as Layout
             persistedItem.tools.none {
-                it is BaseStoryStructureTool && it.identifyingData.second.uuid == characterId
+                it.identifiedWithCharacter(Character.Id(characterId))
             }.mustEqual(true) { "All base story structure tools with character id should have been removed" }
 
         }

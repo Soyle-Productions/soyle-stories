@@ -11,6 +11,7 @@ import com.soyle.stories.project.repositories.ProjectRepository
 import com.soyle.stories.repositories.*
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.soylestories.ApplicationScope
+import com.soyle.stories.storyevent.repositories.StoryEventRepository
 import com.soyle.stories.theme.Context
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
@@ -82,6 +83,10 @@ object DataModule {
 
 			provide<SceneRepository> {
 				SceneRepositoryImpl()
+			}
+
+			provide<StoryEventRepository> {
+				StoryEventRepositoryImpl()
 			}
 		}
 	}

@@ -38,9 +38,12 @@ sealed class ToolViewModel {
 class CharacterListToolViewModel(override val toolId: String) : ToolViewModel()
 class LocationListToolViewModel(override val toolId: String) : ToolViewModel()
 class SceneListToolViewModel(override val toolId: String) : ToolViewModel()
+class StoryEventListToolViewModel(override val toolId: String) : ToolViewModel()
+
 class BaseStoryStructureToolViewModel(override val toolId: String, val characterId: String, val themeId: String) : ToolViewModel()
 class CharacterComparisonToolViewModel(override val toolId: String, val themeId: String, val characterId: String) : ToolViewModel()
 class LocationDetailsToolViewModel(override val toolId: String, val locationId: String) : ToolViewModel()
+class StoryEventDetailsToolViewModel(override val toolId: String, val storyEventId: String) : ToolViewModel()
 
 sealed class Dialog {
     object CreateCharacter : Dialog()

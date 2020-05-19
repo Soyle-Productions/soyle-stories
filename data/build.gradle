@@ -3,6 +3,7 @@ apply from: "$rootDir/local-repositories.gradle"
 
 dependencies {
     implementation libraries.soyle_stories_core
+    implementation libraries.coroutines
 
     implementation project(":application")
 }

@@ -7,7 +7,7 @@ package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import tornadofx.ItemViewModel
 import tornadofx.rebind
 import tornadofx.toProperty

@@ -5,7 +5,7 @@
  */
 package com.soyle.stories.layout.usecases.openTool
 
-import com.soyle.stories.layout.usecases.ActiveToolGroup
+import com.soyle.stories.layout.usecases.OpenToolGroup
 import java.util.*
 
 interface OpenTool {
@@ -57,10 +57,11 @@ interface OpenTool {
         class BaseStoryStructure(val characterId: UUID, val themeId: UUID) : RequestModel()
         class CharacterComparison(val characterId: UUID, val themeId: UUID) : RequestModel()
         class LocationDetails(val locationId: UUID) : RequestModel()
+        class StoryEventDetails(val storyEventId: UUID) : RequestModel()
 
     }
 
-    class ResponseModel(val affectedToolGroup: ActiveToolGroup, val affectedGroupSplitterIds: List<UUID>, val affectedWindowId: UUID?) {
+    class ResponseModel(val affectedToolGroup: OpenToolGroup, val affectedGroupSplitterIds: List<UUID>, val affectedWindowId: UUID?) {
 
 
 

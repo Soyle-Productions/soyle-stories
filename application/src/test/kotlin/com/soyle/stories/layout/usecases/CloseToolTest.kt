@@ -146,8 +146,8 @@ class CloseToolTest {
             if (window == null) layout(Project.Id(projectId), Layout.Id(UUID.randomUUID())) {
                 window {
                     primaryStack {
-                        this += tools.map {
-                            CharacterListTool(Tool.Id(it.id), Project.Id(projectId), it.isOpen)
+                        tools.forEach {
+                            tool(Tool.CharacterList(Tool.Id(it.id), Project.Id(projectId), it.isOpen))
                         }
                     }
                 }
@@ -156,7 +156,7 @@ class CloseToolTest {
                 val layoutId = Layout.Id(UUID.randomUUID())
                 fun makeStack(): ToolStack {
                     return ToolStack(ToolStack.Id(UUID.randomUUID()), layoutId, window.leaf.tools.map {
-                        CharacterListTool(Tool.Id(it.id), Project.Id(projectId), it.isOpen)
+                        Tool.CharacterList(Tool.Id(it.id), Project.Id(projectId), it.isOpen)
                     }, window.leaf.isPrimary, null)
                 }
                 Layout(

@@ -1,6 +1,6 @@
 package com.soyle.stories.location.deleteLocationDialog
 
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.controllers.DeleteLocationController
 
 class DeleteLocationDialogController(

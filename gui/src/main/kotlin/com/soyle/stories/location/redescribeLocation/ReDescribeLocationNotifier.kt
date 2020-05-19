@@ -1,6 +1,6 @@
 package com.soyle.stories.location.redescribeLocation
 
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
 

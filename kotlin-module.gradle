@@ -1,7 +1,7 @@
 apply plugin: 'kotlin'
 
 group 'com.soyle.stories'
-version '0.1.0'
+version parent.property("version")
 
 repositories {
     mavenCentral()

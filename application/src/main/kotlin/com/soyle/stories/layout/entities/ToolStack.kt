@@ -2,6 +2,7 @@ package com.soyle.stories.layout.entities
 
 import com.soyle.stories.common.Entity
 import java.util.*
+import kotlin.reflect.KClass
 
 class ToolStack(
     override val id: Id,
@@ -67,10 +68,10 @@ class ToolStack(
         return ToolStack(id, layoutId, tools + tool, isPrimary, null)
     }
 
-    override fun reOpenTool(toolType: ToolType, data: Any?): Window.WindowChild {
-        if (tools.find { it.type == toolType && !it.isOpen } == null) return this
+    override fun reOpenTool(toolType: KClass<out Tool<*>>, data: Any?): Window.WindowChild {
+        if (tools.find { toolType.isInstance(it) && !it.isOpen } == null) return this
         val newTools = tools.map {
-            if (it.type == toolType && ((data == null && it.associatedData == null) || it.associatedData == data))
+            if (toolType.isInstance(it) && ((data == null && it.associatedData == null) || it.associatedData == data))
                 it.open()
             else
                 it

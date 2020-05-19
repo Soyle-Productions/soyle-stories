@@ -5,14 +5,11 @@
  */
 package com.soyle.stories.characterarc.characterComparison
 
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
 import java.util.*
 
 class CharacterComparisonController(
   themeId: String,
-  private val listAllCharacterArcs: ListAllCharacterArcs,
-  private val listAllCharacterArcsOutputPort: ListAllCharacterArcs.OutputPort,
   private val compareCharacters: CompareCharacters,
   private val compareCharactersOutputPort: CompareCharacters.OutputPort
 ) {
@@ -21,7 +18,6 @@ class CharacterComparisonController(
 
 	suspend fun getCharacterComparison(characterId: String) {
 		val characterId = prepareCharacterId(characterId)
-		listAllCharacterArcs.invoke(listAllCharacterArcsOutputPort)
 		compareCharacters.invoke(
 		  themeId,
 		  characterId,

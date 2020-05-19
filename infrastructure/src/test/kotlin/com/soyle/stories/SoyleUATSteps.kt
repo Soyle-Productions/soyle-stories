@@ -1,6 +1,7 @@
 package com.soyle.stories
 
 import com.soyle.stories.character.CharacterArcSteps
+import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.character.CharacterSteps
 import com.soyle.stories.character.CreateCharacterDialogDriver
 import com.soyle.stories.entities.Character
@@ -18,6 +19,8 @@ import com.soyle.stories.scene.SceneListDriver
 import com.soyle.stories.scene.SceneSteps
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
+import com.soyle.stories.storyevent.CreateStoryEventDialogDriver
+import com.soyle.stories.storyevent.StoryEventSteps
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
 import javafx.scene.input.KeyCode
@@ -41,6 +44,15 @@ class SoyleUATSteps : En, ApplicationTest() {
 	private var deletedCharacter: Character? = null
 
 	init {
+		CharacterSteps(this, double)
+		StoryEventSteps(this, double)
+		/*
+		LocationSteps(this, double)
+		ProjectSteps(this, double)
+		SceneSteps(this, double)
+		ApplicationSteps(this, double)
+		 */
+
 		Given("A project has been opened") {
 			// ProjectDriver.givenHasBeenOpened(double)
 			ProjectSteps.givenProjectHasBeenOpened(double)
@@ -102,12 +114,6 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Given("the user has entered {string} into the description field") { string: String ->
 			LocationSteps.givenLocationDetailsToolHasDescriptionOf(double, targetLocation!!.id.uuid, string)
 		}
-		Given("a Character has been created") {
-			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, 1)
-		}
-		Given("a Character Arc has been created") {
-			CharacterArcSteps.givenANumberOfCharacterArcsHaveBeenCreated(double, 1)
-		}
 		Given("no Locations have been created") {
 			LocationSteps.givenNoLocationsHaveBeenCreated(double)
 		}
@@ -132,41 +138,8 @@ class SoyleUATSteps : En, ApplicationTest() {
 			val location = LocationSteps.getLocationsCreated(double).first()
 			CharacterArcSteps.givenCharacterArcSectionHasALinkedLocation(double, section.id, location.id)
 		}
-		Given("{int} Characters have been created") { int1: Int ->
-			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, int1)
-		}
-		Given("The Character List Tool has been opened") {
-			// LocationListDriver.givenHasBeenOpened(double)
-			CharacterSteps.givenCharacterListToolHasBeenOpened(double)
-		}
-		Given("A Character has been created") {
-			CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, 1)
-		}
-		Given("the Character right-click menu has been opened") {
-			CharacterSteps.givenCharacterListToolCharacterContextMenuHasBeenOpened(double)
-			//targetLocation = LocationSteps.getLocationsCreated(double).first()
-		}
-		Given("a Character has been selected") {
-			CharacterSteps.givenCharacterIsSelectedInCharacterListTool(double)
-		}
-		Given("the Character rename input box is visible") {
-			CharacterSteps.givenCharacterListToolShowingInputBoxForSelectedItem(double)
-		}
-		Given("the user has entered a valid Character name") {
-			CharacterSteps.givenValidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double)
-		}
-		Given("the user has entered an invalid Character name") {
-			CharacterSteps.givenInvalidCharacterNameHasBeenEnteredInCharacterListToolCharacterRenameInputBox(double)
-		}
-		Given("the Create Character Dialog has been opened") {
-			CreateCharacterDialogDriver.givenHasBeenOpened(double)
-		}
-		Given("the Create Character Dialog Name input has an invalid Character Name") {
-			CreateCharacterDialogDriver.givenNameInputHasInvalidCharacterName(double)
-		}
-		Given("the Create Character Dialog Name input has a valid Character Name") {
-			CreateCharacterDialogDriver.givenNameInputHasValidCharacterName(double)
-		}
+
+
 		Given("the Location rename input box is visible") {
 			LocationListDriver.givenRenameInputBoxIsVisible(double)
 		}
@@ -178,7 +151,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Given("the {string} tool has been opened") { toolName: String ->
 			when (toolName) {
-				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenOpened(double)
+				"Characters" -> CharacterDriver.givenCharacterListToolHasBeenOpened(double)
 				"Locations" -> LocationSteps.givenLocationListToolHasBeenOpened(double)
 				"Scenes" -> SceneListDriver.givenHasBeenOpened(double)
 				else -> error("no tool of type $toolName")
@@ -186,7 +159,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Given("the {string} tool has been closed") { toolName: String ->
 			when (toolName) {
-				"Characters" -> CharacterSteps.givenCharacterListToolHasBeenClosed(double)
+				"Characters" -> CharacterDriver.givenCharacterListToolHasBeenClosed(double)
 				"Locations" -> LocationSteps.givenLocationListToolHasBeenClosed(double)
 				"Scenes" -> SceneListDriver.givenHasBeenClosed(double)
 				else -> error("no tool of type $toolName")
@@ -314,22 +287,22 @@ class SoyleUATSteps : En, ApplicationTest() {
 			CharacterArcSteps.whenSelectedLocationInCharacterArcSectionLocationDropdownIsDeselected(double, characterArc.themeId, characterArc.characterId)
 		}
 		When("The Character List Tool is opened") {
-			CharacterSteps.whenCharacterListToolIsOpened(double)
+			CharacterDriver.whenCharacterListToolIsOpened(double)
 		}
 		When("A new Character is created") {
-			recentlyCreatedCharacter = CharacterSteps.whenCharacterIsCreated(double)
+			recentlyCreatedCharacter = CharacterDriver.whenCharacterIsCreated(double)
 		}
 		When("A Character is deleted") {
-			deletedCharacter = CharacterSteps.whenCharacterIsDeleted(double)
+			deletedCharacter = CharacterDriver.whenCharacterIsDeleted(double)
 		}
 		When("the user clicks the Character List Tool right-click menu delete button") {
-			CharacterSteps.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "delete")
+			CharacterDriver.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "delete")
 		}
 		When("the user clicks the Character List Tool delete button") {
-			CharacterSteps.whenCharacterListToolActionBarDeleteButtonIsClicked(double)
+			CharacterDriver.whenCharacterListToolActionBarDeleteButtonIsClicked(double)
 		}
 		When("the user clicks the Character List Tool right-click menu Rename button") {
-			CharacterSteps.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "rename")
+			CharacterDriver.whenCharacterListToolCharacterContextMenuButtonIsClicked(double, "rename")
 		}
 		When("The user clicks away from the input box") {
 			ProjectSteps.whenUserClicksAway(double)
@@ -467,40 +440,40 @@ class SoyleUATSteps : En, ApplicationTest() {
 			  .let(Assertions::assertTrue)
 		}
 		Then("The Character List Tool should show a special empty message") {
-			assertTrue(CharacterSteps.isCharacterListToolShowingEmptyMessage(double))
+			assertTrue(CharacterDriver.isCharacterListToolShowingEmptyMessage(double))
 		}
 		Then("The Character List Tool should show all {int} Characters") { characterCount: Int ->
-			assertTrue(CharacterSteps.isCharacterListToolShowingNumberOfCharacters(double, characterCount))
+			assertTrue(CharacterDriver.isCharacterListToolShowingNumberOfCharacters(double, characterCount))
 		}
 		Then("The Character List Tool should show the new Character") {
-			assertTrue(CharacterSteps.isCharacterListToolShowingCharacter(double, recentlyCreatedCharacter!!))
+			assertTrue(CharacterDriver.isCharacterListToolShowingCharacter(double, recentlyCreatedCharacter!!))
 		}
 		Then("The Character List Tool should not show the deleted Character") {
-			assertFalse(CharacterSteps.isCharacterListToolShowingCharacter(double, deletedCharacter!!))
+			assertFalse(CharacterDriver.isCharacterListToolShowingCharacter(double, deletedCharacter!!))
 		}
 		Then("the Confirm Delete Character Dialog should be opened") {
-			assertTrue(CharacterSteps.isConfirmDeleteCharacterDialogOpen(double))
-			targetObject = CharacterSteps.getCharacterSelectedInCharacterListTool(double)!!.let {
+			assertTrue(CharacterDriver.isConfirmDeleteCharacterDialogOpen(double))
+			targetObject = CharacterDriver.getCharacterSelectedInCharacterListTool(double)!!.let {
 				Character(Character.Id(UUID.fromString(it.id)), UUID.randomUUID(), it.name)
 			}
 		}
 		Then("the Confirm Delete Character Dialog should show the Character name") {
-			assertTrue(CharacterSteps.isConfirmDeleteCharacterDialogDisplayingNameOf(double, targetObject as Character))
+			assertTrue(CharacterDriver.isConfirmDeleteCharacterDialogDisplayingNameOf(double, targetObject as Character))
 		}
 		Then("the Character's name should be replaced by an input box") {
-			assertTrue(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+			assertTrue(CharacterDriver.isCharacterListToolShowingInputBoxForSelectedItem(double))
 		}
 		Then("the Character rename input box should contain the Character's name") {
-			assertTrue(CharacterSteps.isCharacterListToolRenameInputBoxContainingSelectedItemName(double))
+			assertTrue(CharacterDriver.isCharacterListToolRenameInputBoxContainingSelectedItemName(double))
 		}
 		Then("the Character rename input box should be replaced by the Character name") {
-			assertFalse(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+			assertFalse(CharacterDriver.isCharacterListToolShowingInputBoxForSelectedItem(double))
 		}
 		Then("the Character name should be the new name") {
-			assertTrue(CharacterSteps.isCharacterListToolShowingNameStoredForSelectedItem(double))
+			assertTrue(CharacterDriver.isCharacterListToolShowingNameStoredForSelectedItem(double))
 		}
 		Then("the Character name should be the original name") {
-			assertTrue(CharacterSteps.isCharacterListToolShowingNameStoredForSelectedItem(double))
+			assertTrue(CharacterDriver.isCharacterListToolShowingNameStoredForSelectedItem(double))
 		}
 		Then("an error message should be displayed in the Create Character Dialog") {
 			assertTrue(CreateCharacterDialogDriver.isErrorMessageShown(double))
@@ -519,10 +492,10 @@ class SoyleUATSteps : En, ApplicationTest() {
 			LocationListDriver.isLocationShowingStoredName(double)
 		}
 		Then("the Character rename input box should be visible") {
-			assertTrue(CharacterSteps.isCharacterListToolShowingInputBoxForSelectedItem(double))
+			assertTrue(CharacterDriver.isCharacterListToolShowingInputBoxForSelectedItem(double))
 		}
 		Then("the Character rename input box should show an error message") {
-			assertTrue(CharacterSteps.isCharacterListToolShowingErrorOnInputBoxForSelectedItem(double))
+			assertTrue(CharacterDriver.isCharacterListToolShowingErrorOnInputBoxForSelectedItem(double))
 		}
 		Then("the File New Menu should display {string}") { menuText: String ->
 			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "file", "file_new", menuItemText = menuText))
@@ -533,6 +506,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 				"Character" -> CreateCharacterDialogDriver.isOpen(double)
 				"Location" -> LocationSteps.isCreateNewLocationDialogOpen(double)
 				"Scene" -> CreateSceneDialogDriver.isOpen(double)
+				"Story Event" -> CreateStoryEventDialogDriver.openDialog.check(double)
 				else -> false
 			}
 			assertTrue(isOpen)
@@ -548,7 +522,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the {string} tool should be open") { toolName: String ->
 			val isOpen = when (toolName) {
-				"Characters" -> CharacterSteps.isCharacterListToolOpen(double)
+				"Characters" -> CharacterDriver.isCharacterListToolOpen(double)
 				"Locations" -> LocationSteps.isLocationListToolOpen(double)
 				"Scenes" -> SceneListDriver.isOpen(double)
 				else -> false
@@ -557,7 +531,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Then("the {string} tool should be closed") { toolName: String ->
 			val isOpen = when (toolName) {
-				"Characters" -> CharacterSteps.isCharacterListToolOpen(double)
+				"Characters" -> CharacterDriver.isCharacterListToolOpen(double)
 				"Locations" -> LocationSteps.isLocationListToolOpen(double)
 				"Scenes" -> SceneListDriver.isOpen(double)
 				else -> error("no registered tool with name $toolName")

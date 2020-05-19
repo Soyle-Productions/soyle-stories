@@ -10,7 +10,7 @@ import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import java.util.*
 

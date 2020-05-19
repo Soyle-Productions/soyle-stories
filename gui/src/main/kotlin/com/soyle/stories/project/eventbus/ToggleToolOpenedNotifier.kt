@@ -1,6 +1,6 @@
 package com.soyle.stories.project.eventbus
 
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpened
 
 /**

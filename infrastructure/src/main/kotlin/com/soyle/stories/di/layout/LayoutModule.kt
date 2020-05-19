@@ -23,9 +23,9 @@ import com.soyle.stories.project.layout.LayoutController
 import com.soyle.stories.project.layout.LayoutPresenter
 import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewListener
-import com.soyle.stories.project.layout.openTool.OpenToolController
-import com.soyle.stories.project.layout.openTool.OpenToolControllerImpl
-import com.soyle.stories.project.layout.openTool.OpenToolNotifier
+import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.layout.openTool.OpenToolControllerImpl
+import com.soyle.stories.layout.openTool.OpenToolNotifier
 import tornadofx.find
 
 object LayoutModule {

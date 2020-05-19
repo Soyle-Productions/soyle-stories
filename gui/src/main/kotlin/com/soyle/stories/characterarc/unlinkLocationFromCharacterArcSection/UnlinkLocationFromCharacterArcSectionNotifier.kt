@@ -2,7 +2,7 @@ package com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection
 
 import com.soyle.stories.characterarc.CharacterArcException
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 
 class UnlinkLocationFromCharacterArcSectionNotifier : UnlinkLocationFromCharacterArcSection.OutputPort, Notifier<UnlinkLocationFromCharacterArcSection.OutputPort>() {
 	override fun receiveUnlinkLocationFromCharacterArcSectionFailure(failure: CharacterArcException) {

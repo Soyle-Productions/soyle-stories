@@ -5,6 +5,7 @@
  */
 package com.soyle.stories.di.characterarc
 
+import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
 import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
@@ -12,6 +13,8 @@ import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.Remove
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
+import com.soyle.stories.characterarc.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
+import com.soyle.stories.characterarc.changeCentralMoralQuestion.ChangeCentralMoralQuestionNotifier
 import com.soyle.stories.characterarc.characterComparison.CharacterComparisonScope
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogController
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
@@ -44,7 +47,7 @@ import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.entities.Project
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestionUseCase

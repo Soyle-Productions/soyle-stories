@@ -3,7 +3,7 @@ package com.soyle.stories.project
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.common.bindImmutableMap
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewModel
 import com.soyle.stories.project.projectList.ProjectFileViewModel
