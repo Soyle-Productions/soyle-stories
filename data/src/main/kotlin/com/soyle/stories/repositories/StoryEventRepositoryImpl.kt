@@ -27,4 +27,8 @@ class StoryEventRepositoryImpl : StoryEventRepository {
 	override suspend fun updateStoryEvents(vararg storyEvents: StoryEvent) {
 		this.storyEvents.putAll(storyEvents.associateBy { it.id })
 	}
+
+	override suspend fun deleteStoryEvent(storyEvent: StoryEvent) {
+
+	}
 }

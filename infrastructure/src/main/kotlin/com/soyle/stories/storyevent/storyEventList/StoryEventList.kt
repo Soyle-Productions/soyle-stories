@@ -48,6 +48,7 @@ class StoryEventList : View() {
 				makeEditable { newName, oldValue ->
 					// rename item
 					if (oldValue != null) {
+						viewListener.renameStoryEvent(oldValue.id, newName)
 						//viewListener.renameScene(oldValue.id, newName)
 					}
 

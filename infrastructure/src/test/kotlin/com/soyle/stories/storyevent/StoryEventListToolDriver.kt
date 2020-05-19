@@ -2,6 +2,7 @@ package com.soyle.stories.storyevent
 
 import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
+import com.soyle.stories.common.editingCell
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -134,6 +135,7 @@ object StoryEventListToolDriver : ApplicationTest() {
 
 	val selectedItem = object : DependentProperty<TreeItem<StoryEventListItemViewModel?>> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  StoryEventsDriver.storyEventCreated()::given,
 		  itemList::given
 		)
 
@@ -186,6 +188,51 @@ object StoryEventListToolDriver : ApplicationTest() {
 			val contextMenu = openRightClickMenu.get(double)!!
 			interact {
 				contextMenu.items.find { it.text == option }!!.fire()
+			}
+		}
+	}
+
+	val visibleRenameInputBox = object : DependentProperty<TextField>
+	{
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  selectedItem::given
+		)
+
+		override fun get(double: SoyleStoriesTestDouble): TextField? {
+			val list = itemList.get(double) ?: return null
+			return (list.editingCell?.graphic as? TextField)?.takeIf { it.isVisible }
+		}
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			val list = itemList.get(double)!!
+			interact {
+				list.edit(selectedItem.get(double)!!)
+			}
+		}
+	}
+
+	val renameText = object : ReadOnlyDependentProperty<String>
+	{
+		override fun get(double: SoyleStoriesTestDouble): String? {
+			val inputBox = visibleRenameInputBox.get(double) ?: return null
+			return inputBox.text
+		}
+	}
+
+	val validStoryEventNameInRenameBox = object : DependentProperty<String>
+	{
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  visibleRenameInputBox::given
+		)
+
+		override fun get(double: SoyleStoriesTestDouble): String? {
+			return renameText.get(double)?.takeIf { it == "Valid Story Event Name" }
+		}
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			val inputBox = visibleRenameInputBox.get(double)!!
+			interact {
+				inputBox.text = "Valid Story Event Name"
 			}
 		}
 	}

@@ -1,7 +1,6 @@
 package com.soyle.stories.common
 
 import com.soyle.stories.di.DI
-import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.binding.BooleanExpression

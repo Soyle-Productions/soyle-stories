@@ -17,6 +17,8 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 	private fun firstStoryEventId(double: SoyleStoriesTestDouble) =
 	  StoryEventsDriver.storyEventCreated().get(double)?.id
 
+	private var targetStoryEvent: StoryEvent? = null
+
 	init {
 		with(en) {
 
@@ -70,6 +72,13 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				  firstStoryEventId(double)!!,
 				  CharacterDriver.getCharactersCreated(double).first().id
 				).given(double)
+			}
+			Given("the Story Event rename input box is visible") {
+				StoryEventListToolDriver.visibleRenameInputBox.given(double)
+				targetStoryEvent = StoryEventsDriver.storyEventCreated().get(double)
+			}
+			Given("the user has entered a valid Story Event name") {
+				StoryEventListToolDriver.validStoryEventNameInRenameBox.given(double)
 			}
 
 
@@ -254,6 +263,20 @@ class StoryEventSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest(
 				assertFalse(StoryEventsDriver.addedCharacter(
 				  firstStoryEventId(double)!!,
 				  CharacterDriver.getCharactersCreated(double).first().id
+				).check(double))
+			}
+			Then("the Story Event rename input box should be replaced by the Story Event name") {
+				assertFalse(StoryEventListToolDriver.visibleRenameInputBox.check(double))
+			}
+			Then("the Story Event name should be the new name") {
+				assertEquals("Valid Story Event Name", StoryEventListToolDriver.listedItems.get(double)?.first()?.value?.name)
+			}
+			Then("the Story Event name should be the original name") {
+				assertEquals(targetStoryEvent!!.name, StoryEventListToolDriver.listedItems.get(double)?.first()?.value?.name)
+			}
+			Then("the Story Event Details Tool should be open") {
+				assertTrue(StoryEventDetailsToolDriver.openToolWith(
+				  firstStoryEventId(double)!!
 				).check(double))
 			}
 

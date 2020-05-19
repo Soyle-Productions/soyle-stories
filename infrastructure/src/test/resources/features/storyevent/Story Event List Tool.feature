@@ -78,7 +78,7 @@ Feature: Story Event List Tool
       | 4      |
       | 5      |
 
-  @delete-story-event
+  @delete-story-event @excluded
   Scenario: Open Confirm Delete Story Event Dialog From Right-Click Menu
     Given The Story Event List Tool has been opened
     And a Story Event has been created
@@ -87,7 +87,7 @@ Feature: Story Event List Tool
     Then the confirm delete Story Event dialog should be opened
     And the confirm delete Story Event dialog should show the Story Event name
 
-  @delete-story-event
+  @delete-story-event @excluded
   Scenario:  Open Confirm Delete Story Event Dialog From Bottom Delete Button
     Given The Story Event List Tool has been opened
     And a Story Event has been created
@@ -96,7 +96,7 @@ Feature: Story Event List Tool
     Then the confirm delete Story Event dialog should be opened
     And the confirm delete Story Event dialog should show the Story Event name
 
-  @delete-story-event
+  @delete-story-event @excluded
   Scenario: Update when Story Events are deleted
     Given The Story Event List Tool has been opened
     And 2 Story Events have been created

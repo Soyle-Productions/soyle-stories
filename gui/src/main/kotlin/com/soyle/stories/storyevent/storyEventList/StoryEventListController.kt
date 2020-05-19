@@ -2,6 +2,7 @@ package com.soyle.stories.storyevent.storyEventList
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventController
 import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEvents
 import java.util.*
 
@@ -10,7 +11,8 @@ class StoryEventListController(
   projectId: String,
   private val listAllStoryEvents: ListAllStoryEvents,
   private val presenter: ListAllStoryEvents.OutputPort,
-  private val openToolController: OpenToolController
+  private val openToolController: OpenToolController,
+  private val renameStoryEventController: RenameStoryEventController
 ) : StoryEventListViewListener {
 
 	private val projectId: UUID = UUID.fromString(projectId)
@@ -23,6 +25,10 @@ class StoryEventListController(
 
 	override fun openStoryEventDetails(storyEventId: String) {
 		openToolController.openStoryEventDetailsTool(storyEventId)
+	}
+
+	override fun renameStoryEvent(storyEventId: String, newName: String) {
+		renameStoryEventController.renameStoryEvent(storyEventId, newName)
 	}
 
 }

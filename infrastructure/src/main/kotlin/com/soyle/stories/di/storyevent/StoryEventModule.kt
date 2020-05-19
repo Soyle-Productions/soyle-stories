@@ -20,6 +20,9 @@ import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStory
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventNotifier
+import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventController
+import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventControllerImpl
+import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventNotifier
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEventUseCase
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
@@ -32,6 +35,8 @@ import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEven
 import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEventsUseCase
 import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventUseCase
+import com.soyle.stories.storyevent.usecases.renameStoryEvent.RenameStoryEvent
+import com.soyle.stories.storyevent.usecases.renameStoryEvent.RenameStoryEventUseCase
 
 object StoryEventModule {
 
@@ -54,6 +59,9 @@ object StoryEventModule {
 		provide<RemoveCharacterFromStoryEvent> {
 			RemoveCharacterFromStoryEventUseCase(get())
 		}
+		provide<RenameStoryEvent> {
+			RenameStoryEventUseCase(get())
+		}
 	}
 
 	private fun InScope<ProjectScope>.notifiers() {
@@ -68,6 +76,9 @@ object StoryEventModule {
 		}
 		provide(RemoveCharacterFromStoryEvent.OutputPort::class) {
 			RemoveCharacterFromStoryEventNotifier()
+		}
+		provide(RenameStoryEvent.OutputPort::class) {
+			RenameStoryEventNotifier()
 		}
 	}
 
@@ -99,6 +110,14 @@ object StoryEventModule {
 
 		provide<RemoveCharacterFromStoryEventController> {
 			RemoveCharacterFromStoryEventControllerImpl(
+			  applicationScope.get(),
+			  get(),
+			  get()
+			)
+		}
+
+		provide<RenameStoryEventController> {
+			RenameStoryEventControllerImpl(
 			  applicationScope.get(),
 			  get(),
 			  get()

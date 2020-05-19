@@ -1,3 +1,4 @@
+@excluded
 Feature: Confirm Delete Story Event Dialog
 
   Background:

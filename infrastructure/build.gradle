@@ -146,7 +146,7 @@ task runStoryEventFeatures() {
        javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'com.soyle.stories', '--tags', '@storyevent', 'src/test/resources/features', '--strict']
+            args = ['--plugin', 'pretty', '--glue', 'com.soyle.stories', '--tags', '@storyevent and not @excluded', 'src/test/resources/features', '--strict']
         }
     }
 }
