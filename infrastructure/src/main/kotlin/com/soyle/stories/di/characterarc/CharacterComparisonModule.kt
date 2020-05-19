@@ -19,14 +19,13 @@ internal object CharacterComparisonModule {
                 val characterComparisonPresenter= CharacterComparisonPresenter(
                   get<CharacterComparisonModel>(),
                   themeId,
+                  projectScope.get(),
                   projectScope.get()
                 )
 
                 CharacterComparisonViewListenerImpl(
                   CharacterComparisonController(
                     themeId,
-                    projectScope.get(),
-                    characterComparisonPresenter,
                     projectScope.get(),
                     characterComparisonPresenter
                   ),

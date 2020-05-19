@@ -1,6 +1,6 @@
 package com.soyle.stories.location.redescribeLocation
 
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
 import java.util.*
 

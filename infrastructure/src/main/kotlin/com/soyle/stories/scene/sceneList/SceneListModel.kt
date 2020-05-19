@@ -2,7 +2,7 @@ package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.gui.View
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.items.SceneItemViewModel

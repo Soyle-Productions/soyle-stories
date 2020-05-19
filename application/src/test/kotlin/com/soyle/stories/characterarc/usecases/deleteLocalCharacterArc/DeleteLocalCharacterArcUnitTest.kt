@@ -122,10 +122,10 @@ class DeleteLocalCharacterArcUnitTest {
                     window {
                         primaryStack {
                             given.toolsAssociatedWithCharacterAndTheme.forEach {
-                                this += BaseStoryStructureTool(it, Theme.Id(themeId), Character.Id(characterId), false)
+                                tool(Tool.BaseStoryStructure(it, Theme.Id(themeId), Character.Id(characterId), false))
                             }
                             given.toolsAssociatedWithTheme.forEach {
-                                this += CharacterComparisonTool(it, Theme.Id(themeId), Character.Id(characterId), false)
+                                tool(Tool.BaseStoryStructure(it, Theme.Id(themeId), Character.Id(characterId), false))
                             }
                         }
                     }
@@ -178,7 +178,7 @@ class DeleteLocalCharacterArcUnitTest {
         }
 
         fun Int.toolsAssociatedWithTheme(): List<Tool.Id> {
-            given.toolsAssociatedWithTheme = List(this) { Tool.Id(UUID.randomUUID()) }
+            given.toolsAssociatedWithTheme = List(this) { Tool.Id() }
             return given.toolsAssociatedWithTheme
         }
 
@@ -213,19 +213,13 @@ class DeleteLocalCharacterArcUnitTest {
 
         fun Layout.doesNotContainToolsAssociatedWithCharacterArc() {
             tools.none {
-                when (it) {
-                    is BaseStoryStructureTool -> it.identifyingData == Theme.Id(themeId) to Character.Id(characterId)
-                    else -> false
-                }
+                it.identifiedWithCharacter(Character.Id(characterId)) && it.identifiedWithAnyThemeIdIn(setOf(Theme.Id(themeId)))
             }.mustEqual(true) { "Layout still contains tools associated with character arc" }
         }
 
         fun Layout.doesNotContainToolsAssociatedWithTheme() {
             tools.none {
-                when (it) {
-                    is CharacterComparisonTool -> it.identifyingData == Theme.Id(themeId)
-                    else -> false
-                }
+                it.identifiedWithAnyThemeIdIn(setOf(Theme.Id(themeId)))
             }.mustEqual(true) { "Layout still contains tools associated with theme" }
         }
 

@@ -108,3 +108,56 @@ task buildAndPackage {
         dependsOn(":infrastructure:runtimeZip")
     }
 }
+
+
+task nightly {
+    group = "release"
+
+    githubRelease {
+
+        token project.findProperty("gpr.token").toString()
+        owner "soyle-productions"
+        tagName "latest"
+        releaseName "Nightly Release"
+        draft false
+        prerelease true
+        def versionFilter = { it.isFile() && it.name.contains(project.version) }
+        releaseAssets jar.getDestinationDirectory().asFileTree.filter(versionFilter).files
+
+        overwrite true
+        client
+
+    }
+
+    configure {
+        dependsOn(fullTestReport, buildAndPackage, 'githubRelease')
+    }
+
+}
+
+task weekly {
+    group = "release"
+
+    githubRelease {
+
+        token project.findProperty("gpr.token").toString()
+        owner "soyle-productions"
+        tagName "snapshot-" + getDate()
+        releaseName "Weekly Release"
+        draft false
+        prerelease true
+        def versionFilter = { it.isFile() && it.name.contains(project.version) }
+        releaseAssets project(':infrastructure').buildDir.listFiles().findAll  {
+            it.name.toLowerCase().endsWith(".zip")
+        }.collect()
+
+        overwrite true
+        client
+
+    }
+
+    configure {
+        dependsOn(fullTestReport, buildAndPackage, 'githubRelease')
+    }
+
+}

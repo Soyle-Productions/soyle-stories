@@ -1,7 +1,7 @@
 package com.soyle.stories.project.projectList
 
-import com.soyle.stories.eventbus.Notifier
-import com.soyle.stories.eventbus.listensTo
+import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.project.eventbus.ProjectEvents
 import com.soyle.stories.project.projectList.presenters.CloseProjectPresenter
 import com.soyle.stories.project.projectList.presenters.OpenProjectPresenter

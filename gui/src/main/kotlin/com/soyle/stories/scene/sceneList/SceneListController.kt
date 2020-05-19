@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.sceneList
 
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 

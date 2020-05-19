@@ -2,6 +2,7 @@ package com.soyle.stories.layout.entities
 
 import com.soyle.stories.common.Entity
 import java.util.*
+import kotlin.reflect.KClass
 
 class StackSplitter(
     override val id: Id,
@@ -119,7 +120,7 @@ class StackSplitter(
             children.map { it.first to it.second.openToolInPrimaryStack(tool) })
     }
 
-    override fun reOpenTool(toolType: ToolType, data: Any?): Window.WindowChild {
+    override fun reOpenTool(toolType: KClass<out Tool<*>>, data: Any?): Window.WindowChild {
         return StackSplitter(
             id,
             orientation,

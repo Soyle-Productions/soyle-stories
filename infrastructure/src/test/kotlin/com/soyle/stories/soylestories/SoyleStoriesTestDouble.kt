@@ -1,8 +1,8 @@
 package com.soyle.stories.soylestories
 
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
-import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.testutils.SyncThreadTransformer
 import org.testfx.api.FxToolkit
 

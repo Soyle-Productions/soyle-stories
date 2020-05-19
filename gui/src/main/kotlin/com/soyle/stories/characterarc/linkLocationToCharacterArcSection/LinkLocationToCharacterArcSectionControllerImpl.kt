@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.linkLocationToCharacterArcSection
 
 import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 
 class LinkLocationToCharacterArcSectionControllerImpl(

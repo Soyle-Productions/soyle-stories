@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.linkLocationToCharacterArcSection
 
 import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 
 class LinkLocationToCharacterArcSectionNotifier : LinkLocationToCharacterArcSection.OutputPort, Notifier<LinkLocationToCharacterArcSection.OutputPort>() {
 

@@ -1,6 +1,6 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.eventbus.listensTo
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.location.events.LocationEvents
 
 class CreateLocationDialogPresenter(

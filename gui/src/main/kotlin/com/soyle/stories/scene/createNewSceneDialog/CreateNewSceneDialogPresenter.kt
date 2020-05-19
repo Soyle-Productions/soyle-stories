@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.createNewSceneDialog
 
-import com.soyle.stories.eventbus.Notifier
-import com.soyle.stories.eventbus.listensTo
+import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 

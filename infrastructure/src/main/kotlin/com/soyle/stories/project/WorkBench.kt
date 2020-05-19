@@ -16,6 +16,7 @@ import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.soylestories.SoyleStories
+import com.soyle.stories.storyevent.createStoryEventDialog.createStoryEventDialog
 import javafx.scene.Parent
 import javafx.stage.Screen
 import tornadofx.*
@@ -57,6 +58,10 @@ class WorkBench : View() {
                     item("Scene") {
                         id = "file_new_scene"
                         action { createSceneDialog(scope) }
+                    }
+                    item("Story Event") {
+                        id = "file_new_story_event"
+                        action { createStoryEventDialog(scope) }
                     }
                     /*
                     item("Plot Point") {

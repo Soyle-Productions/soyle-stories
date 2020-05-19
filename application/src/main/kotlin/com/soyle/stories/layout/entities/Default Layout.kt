@@ -19,11 +19,10 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                         //openTool(ToolType.LocationTracking)
                     }
                     stack(1) {
-                        //openTool(ToolType.SceneList)
-                        //openTool(ToolType.PlotPointList)
-                        openTool(ToolType.SceneList, mapOf("projectId" to projectId))
-                        openTool(ToolType.LocationList, mapOf("projectId" to projectId))
-                        openTool(ToolType.CharacterList, mapOf("projectId" to projectId))
+                        tool(Tool.StoryEventList(Tool.Id(), projectId, true))
+                        tool(Tool.SceneList(Tool.Id(), projectId, true))
+                        tool(Tool.LocationList(Tool.Id(), projectId, true))
+                        tool(Tool.CharacterList(Tool.Id(), projectId, true))
                     }
                 }
                 primaryStack(6) {}

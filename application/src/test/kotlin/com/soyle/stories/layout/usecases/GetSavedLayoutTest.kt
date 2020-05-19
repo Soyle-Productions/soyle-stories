@@ -76,17 +76,17 @@ class GetSavedLayoutTest {
             }
             window {
                 stack {
-                    tool(ToolType.CharacterList, mapOf("projectId" to projectId))
+                    tool(Tool.CharacterList(Tool.Id(), projectId, false))
                 }
             }
             window {
                 stackSplitter(true) {
                     stack(1) {
-                        openTool(ToolType.CharacterList, mapOf("projectId" to projectId))
-                        tool(ToolType.CharacterList, mapOf("projectId" to projectId))
+                        tool(Tool.CharacterList(Tool.Id(), projectId, true))
+                        tool(Tool.CharacterList(Tool.Id(), projectId, false))
                     }
                     stack {
-                        tool(ToolType.CharacterList, mapOf("projectId" to projectId))
+                        tool(Tool.CharacterList(Tool.Id(), projectId, false))
                     }
                 }
             }
@@ -110,9 +110,9 @@ class GetSavedLayoutTest {
             val (savedLayout) = outputSpy.result as Either.Right
 
             val stacksAndSplitters = mutableListOf<Any>()
-            fun addAllStacksAndSplitters(stackOrSplitter: ActiveWindowChild) {
+            fun addAllStacksAndSplitters(stackOrSplitter: OpenWindowChild) {
                 stacksAndSplitters.add(stackOrSplitter)
-                if (stackOrSplitter is ActiveToolGroupSplitter) {
+                if (stackOrSplitter is OpenToolGroupSplitter) {
                     stackOrSplitter.children.forEach {
                         addAllStacksAndSplitters(it.second)
                     }
@@ -131,13 +131,13 @@ class GetSavedLayoutTest {
             whenUseCaseExecuted(UUID.randomUUID())
             val (savedLayout) = outputSpy.result as Either.Right
 
-            val activeTools  = mutableListOf<ActiveTool>()
+            val activeTools  = mutableListOf<OpenTool>()
             fun collectAllTools(stackOrSplitter: Any) {
-                if (stackOrSplitter is ActiveToolGroupSplitter) {
+                if (stackOrSplitter is OpenToolGroupSplitter) {
                     stackOrSplitter.children.forEach {
                         collectAllTools(it.second)
                     }
-                } else if (stackOrSplitter is ActiveToolGroup) {
+                } else if (stackOrSplitter is OpenToolGroup) {
                     activeTools.addAll(stackOrSplitter.tools)
                 }
             }

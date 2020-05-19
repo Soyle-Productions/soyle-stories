@@ -7,7 +7,7 @@ package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.characterarc.LocalCharacterArcException
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 
 class DeleteLocalCharacterArcNotifier : DeleteLocalCharacterArc.OutputPort, Notifier<DeleteLocalCharacterArc.OutputPort>() {
     override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {

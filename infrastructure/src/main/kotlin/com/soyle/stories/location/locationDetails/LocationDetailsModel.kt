@@ -1,7 +1,7 @@
 package com.soyle.stories.location.locationDetails
 
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import tornadofx.ItemViewModel
 
 class LocationDetailsModel : ItemViewModel<LocationDetailsViewModel>(), LocationDetailsView {

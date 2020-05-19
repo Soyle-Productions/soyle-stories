@@ -6,16 +6,15 @@
 package com.soyle.stories.layout.usecases.openTool
 
 import arrow.core.Either
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.layout.LayoutDoesNotExist
-import com.soyle.stories.layout.entities.*
+import com.soyle.stories.layout.entities.Layout
+import com.soyle.stories.layout.entities.StackSplitter
+import com.soyle.stories.layout.entities.Tool
+import com.soyle.stories.layout.entities.Window
 import com.soyle.stories.layout.repositories.LayoutRepository
-import com.soyle.stories.layout.usecases.ActiveToolGroup
-import com.soyle.stories.layout.usecases.toActiveTool
-import java.util.*
+import com.soyle.stories.layout.usecases.OpenToolGroup
+import com.soyle.stories.layout.usecases.toOpenTool
 
 class OpenToolUseCase(
     private val projectId: Project.Id,
@@ -28,25 +27,25 @@ class OpenToolUseCase(
         )
 
         val toolType = when (requestModel) {
-            is OpenTool.RequestModel.BaseStoryStructure -> ToolType.BaseStoryStructure
-            is OpenTool.RequestModel.CharacterComparison -> ToolType.CharacterComparison
-            is OpenTool.RequestModel.LocationDetails -> ToolType.LocationDetails
-            else -> error("unsupported request model")
+            is OpenTool.RequestModel.BaseStoryStructure -> Tool.BaseStoryStructure::class
+            is OpenTool.RequestModel.CharacterComparison -> Tool.CharacterComparison::class
+            is OpenTool.RequestModel.LocationDetails -> Tool.LocationDetails::class
+            is OpenTool.RequestModel.StoryEventDetails -> Tool.StoryEventDetails::class
         }
         val identifyingData: Any? = when (requestModel) {
             is OpenTool.RequestModel.BaseStoryStructure -> (Theme.Id(requestModel.themeId) to Character.Id(requestModel.characterId))
             is OpenTool.RequestModel.CharacterComparison -> Theme.Id(requestModel.themeId)
             is OpenTool.RequestModel.LocationDetails -> Location.Id(requestModel.locationId)
-            else -> error("unsupported request model")
+            is OpenTool.RequestModel.StoryEventDetails -> StoryEvent.Id(requestModel.storyEventId)
         }
         val existingTool = layout.tools.find {
-            it.type == toolType && it.identifyingData == identifyingData
+            toolType.isInstance(it) && it.identifyingData == identifyingData
         }
         val tool: Tool<*> = existingTool ?: when (requestModel) {
-            is OpenTool.RequestModel.BaseStoryStructure -> BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), Theme.Id(requestModel.themeId), Character.Id(requestModel.characterId), true)
-            is OpenTool.RequestModel.CharacterComparison -> CharacterComparisonTool(Tool.Id(UUID.randomUUID()), Theme.Id(requestModel.themeId), Character.Id(requestModel.characterId), true)
-            is OpenTool.RequestModel.LocationDetails -> LocationDetailsTool(Tool.Id(UUID.randomUUID()), identifyingData as Location.Id, true)
-            else -> error("unsupported request model")
+            is OpenTool.RequestModel.BaseStoryStructure -> Tool.BaseStoryStructure(Tool.Id(), Theme.Id(requestModel.themeId), Character.Id(requestModel.characterId), true)
+            is OpenTool.RequestModel.CharacterComparison -> Tool.CharacterComparison(Tool.Id(), Theme.Id(requestModel.themeId), Character.Id(requestModel.characterId), true)
+            is OpenTool.RequestModel.LocationDetails -> Tool.LocationDetails(Tool.Id(), identifyingData as Location.Id, true)
+            is OpenTool.RequestModel.StoryEventDetails -> Tool.StoryEventDetails(Tool.Id(), identifyingData as StoryEvent.Id, true)
         }
         val exists: Boolean = existingTool != null
 
@@ -69,7 +68,7 @@ class OpenToolUseCase(
             val differences = layout.difference(operationResult.b)
 
             OpenTool.ResponseModel(
-                ActiveToolGroup(parentStack.id.uuid, parentStack.focusedTool?.uuid, parentStack.tools.filter { it.isOpen }.map { it.toActiveTool() }),
+                OpenToolGroup(parentStack.id.uuid, parentStack.focusedTool?.uuid, parentStack.tools.filter { it.isOpen }.map { it.toOpenTool() }),
                     differences.second.map { it.id.uuid },
                     differences.first.firstOrNull()?.id?.uuid
             )

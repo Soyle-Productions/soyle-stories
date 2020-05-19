@@ -10,7 +10,7 @@ import com.soyle.stories.characterarc.repositories.CharacterArcRepository
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.*
 import com.soyle.stories.project.ProjectSteps
-import com.soyle.stories.project.layout.openTool.OpenToolController
+import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.ActionEvent
@@ -26,8 +26,8 @@ object CharacterArcSteps : ApplicationTest() {
 
 	fun setNumberOfCharacterArcsCreated(double: SoyleStoriesTestDouble, atLeast: Int)
 	{
-		CharacterSteps.givenANumberOfCharactersHaveBeenCreated(double, 1)
-		val character = CharacterSteps.getCharactersCreated(double).first()
+		CharacterDriver.givenANumberOfCharactersHaveBeenCreated(double, 1)
+		val character = CharacterDriver.getCharactersCreated(double).first()
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val currentCount = getNumberOfCharacterArcsCreated(double)
 		runBlocking {

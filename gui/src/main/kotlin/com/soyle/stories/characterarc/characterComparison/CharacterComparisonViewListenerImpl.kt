@@ -1,5 +1,6 @@
 package com.soyle.stories.characterarc.characterComparison
 
+import com.soyle.stories.characterarc.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
 import com.soyle.stories.characterarc.usecaseControllers.*
 
 class CharacterComparisonViewListenerImpl(

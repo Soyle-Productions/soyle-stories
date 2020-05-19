@@ -10,8 +10,8 @@ import org.junit.runner.RunWith
 @CourgetteOptions(
   threads = 10,
   runLevel = CourgetteRunLevel.FEATURE,
-  rerunFailedScenarios = true,
-  showTestOutput = true,
+  rerunFailedScenarios = false,
+  showTestOutput = false,
   reportTargetDir = "build",
   plugin = ["extentreports"],
   cucumberOptions = CucumberOptions(

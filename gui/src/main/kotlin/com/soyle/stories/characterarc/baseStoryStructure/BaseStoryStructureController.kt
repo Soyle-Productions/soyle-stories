@@ -3,7 +3,8 @@ package com.soyle.stories.characterarc.baseStoryStructure
 import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionController
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionController
 import com.soyle.stories.characterarc.usecaseControllers.ChangeThematicSectionValueController
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.characterarc.viewBaseStoryStructure.ViewBaseStoryStructureController
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 
 class BaseStoryStructureController(

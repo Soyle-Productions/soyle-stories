@@ -90,7 +90,8 @@ class CharacterChangeSubTool : Fragment() {
                                 remainingWidth()
                                 isReorderable = false
                                 isSortable = false
-
+                                onEditCommit {
+                                }
                             }
                         }
                     }

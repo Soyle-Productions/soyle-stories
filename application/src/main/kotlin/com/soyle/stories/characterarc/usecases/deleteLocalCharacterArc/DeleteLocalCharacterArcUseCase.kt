@@ -10,8 +10,6 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.layout.Context
 import com.soyle.stories.layout.LayoutDoesNotExist
-import com.soyle.stories.layout.entities.BaseStoryStructureTool
-import com.soyle.stories.layout.entities.CharacterComparisonTool
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
@@ -78,8 +76,7 @@ class DeleteLocalCharacterArcUseCase(
         removeToolsForTheme: Boolean
     ): List<Tool<*>> {
         return if (removeToolsForTheme) {
-            layout.getToolsIdentifiedByThemeAndCharacter(Theme.Id(themeId), Character.Id(characterId)) +
-                    layout.getToolsIdentifiedByTheme(Theme.Id(themeId))
+            layout.getToolsIdentifiedByTheme(Theme.Id(themeId))
         } else {
             layout.getToolsIdentifiedByThemeAndCharacter(Theme.Id(themeId), Character.Id(characterId))
         }
@@ -89,10 +86,7 @@ class DeleteLocalCharacterArcUseCase(
         themeId: Theme.Id
     ): List<Tool<*>> {
         return tools.filter {
-            when (it) {
-                is CharacterComparisonTool -> it.identifyingData == themeId
-                else -> false
-            }
+            it.identifiedWithAnyThemeIdIn(setOf(themeId))
         }
     }
 
@@ -101,10 +95,7 @@ class DeleteLocalCharacterArcUseCase(
         characterId: Character.Id
     ): List<Tool<*>> {
         return tools.filter {
-            when (it) {
-                is BaseStoryStructureTool -> it.identifyingData.run { first == themeId && second == characterId }
-                else -> false
-            }
+            it.identifiedWithAnyThemeIdIn(setOf(themeId)) && it.identifiedWithCharacter(characterId)
         }
     }
 

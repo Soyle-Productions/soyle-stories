@@ -8,10 +8,7 @@ package com.soyle.stories.layout.usecases
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.layout.LayoutDoesNotExist
 import com.soyle.stories.layout.TestContext
 import com.soyle.stories.layout.entities.*
@@ -115,7 +112,7 @@ class OpenToolTest {
             val layout: Layout
 
             init {
-                val tool = BaseStoryStructureTool(toolId, Theme.Id(themeUUID), Character.Id(characterUUID), true)
+                val tool = Tool.BaseStoryStructure(toolId, Theme.Id(themeUUID), Character.Id(characterUUID), true)
                 layout = (this@`When layout exists`.layout.addToolToPrimaryStack(tool) as Either.Right).b
                 parentGroup = layout.getParentToolGroup(toolId)!!
             }
@@ -210,7 +207,7 @@ class OpenToolTest {
             }
         }
 
-        fun <T : Tool<*>, R : ActiveTool> testType(request: OpenTool.RequestModel, toolClass: KClass<T>, findType: (T) -> Boolean, activeClass: KClass<R>, findActive: (R) -> Boolean) {
+        fun <T : Tool<*>, R : com.soyle.stories.layout.usecases.OpenTool> testType(request: OpenTool.RequestModel, toolClass: KClass<T>, findType: (T) -> Boolean, activeClass: KClass<R>, findActive: (R) -> Boolean) {
             var savedLayout: Layout? = null
             val (result) = given(layouts = listOf(layout), saveLayout = {
                 savedLayout = it
@@ -234,11 +231,11 @@ class OpenToolTest {
             val request = OpenTool.RequestModel.BaseStoryStructure(UUID.randomUUID(), UUID.randomUUID())
             testType(
               request,
-              BaseStoryStructureTool::class,
+              Tool.BaseStoryStructure::class,
               {
-                  it.identifyingData == Theme.Id(request.themeId) to Character.Id(request.characterId)
+                  it.themeId == Theme.Id(request.themeId) && it.characterId == Character.Id(request.characterId)
               },
-              BaseStoryStructureActiveTool::class,
+              BaseStoryStructureTool::class,
               {
                   it.characterId == request.characterId && it.themeId == request.themeId
               }
@@ -250,11 +247,11 @@ class OpenToolTest {
             val request = OpenTool.RequestModel.CharacterComparison(UUID.randomUUID(), UUID.randomUUID())
             testType(
               request,
-              CharacterComparisonTool::class,
+              Tool.CharacterComparison::class,
               {
                   it.identifyingData == Theme.Id(request.themeId) && it.associatedData == Character.Id(request.characterId)
               },
-              CharacterComparisonActiveTool::class,
+              CharacterComparisonTool::class,
               {
                   it.characterId == request.characterId && it.themeId == request.themeId
               }
@@ -266,10 +263,22 @@ class OpenToolTest {
             val request = OpenTool.RequestModel.LocationDetails(UUID.randomUUID())
             testType(
               request,
-              LocationDetailsTool::class,
+              Tool.LocationDetails::class,
               { it.identifyingData == Location.Id(request.locationId) },
-              LocationDetailsActiveTool::class,
+              LocationDetailsTool::class,
               { it.locationId == request.locationId }
+            )
+        }
+
+        @Test
+        fun `story event details`() {
+            val request = OpenTool.RequestModel.StoryEventDetails(UUID.randomUUID())
+            testType(
+              request,
+              Tool.StoryEventDetails::class,
+              { it.identifyingData == StoryEvent.Id(request.storyEventId) },
+              StoryEventDetailsTool::class,
+              { it.storyEventId == request.storyEventId }
             )
         }
 
@@ -287,7 +296,7 @@ class OpenToolTest {
                     stackSplitter(1) {
                         stackSplitter(1) {
                             stack(1) {
-                                this += BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), Theme.Id(themeUUID), Character.Id(characterUUID), false)
+                                tool(Tool.BaseStoryStructure(Tool.Id(), Theme.Id(themeUUID), Character.Id(characterUUID), false))
                             }
                         }.also { ancestorSplitters.add(it) }
                     }.also { ancestorSplitters.add(it) }

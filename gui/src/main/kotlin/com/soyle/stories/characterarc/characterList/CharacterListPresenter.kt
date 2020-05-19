@@ -1,9 +1,7 @@
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
+import com.soyle.stories.character.characterList.CharacterListListener
+import com.soyle.stories.character.characterList.LiveCharacterList
 import com.soyle.stories.characterarc.LocalCharacterArcException
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
@@ -12,7 +10,7 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterIte
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 
@@ -24,61 +22,69 @@ import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharac
 class CharacterListPresenter(
   private val threadTransformer: ThreadTransformer,
   private val view: CharacterListView,
+  private val characterList: LiveCharacterList,
   characterArcEvents: CharacterArcEvents
-) : ListAllCharacterArcs.OutputPort, BuildNewCharacter.OutputPort, PlanNewCharacterArc.OutputPort,
-  PromoteMinorCharacter.OutputPort, DeleteLocalCharacterArc.OutputPort, RemoveCharacterFromLocalStory.OutputPort,
-  RenameCharacter.OutputPort, RenameCharacterArc.OutputPort {
+) : PlanNewCharacterArc.OutputPort, CharacterListListener, ListAllCharacterArcs.OutputPort,
+  PromoteMinorCharacter.OutputPort, DeleteLocalCharacterArc.OutputPort, RenameCharacterArc.OutputPort {
 
 	init {
-		characterArcEvents.buildNewCharacter.addListener(this)
+		characterList.addListener(this)
 		characterArcEvents.planNewCharacterArc.addListener(this)
 		characterArcEvents.promoteMinorCharacter.addListener(this)
 		characterArcEvents.deleteLocalCharacterArc.addListener(this)
-		characterArcEvents.removeCharacterFromStory.addListener(this)
-		characterArcEvents.renameCharacter.addListener(this)
 		characterArcEvents.renameCharacterArc.addListener(this)
 	}
 
-	override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
+	override fun receiveCharacterListUpdate(characters: List<CharacterItem>) {
 		threadTransformer.gui {
+			val existingCharacters = view.getViewModel()?.characters
+			  ?.associateBy {
+				  it.id
+			  } ?: emptyMap()
+
 			view.displayNewViewModel(
 			  CharacterListViewModel(
-				response.characters.map { (character, arcs) ->
-					val characterId = character.characterId.toString()
+				characters.map {
+					val characterId = it.characterId.toString()
+					val existingCharacter = existingCharacters[characterId]
 					CharacterTreeItemViewModel(
 					  characterId,
-					  character.characterName,
-					  false,
-					  arcs.map { arc ->
-						  CharacterArcItemViewModel(
-							characterId,
-							arc.themeId.toString(),
-							arc.characterArcName
-						  )
-					  })
+					  it.characterName,
+					  existingCharacter?.isExpanded ?: false,
+					  existingCharacter?.arcs ?: emptyList()
+					)
 				}.sortedBy { it.name }
 			  )
 			)
 		}
 	}
 
-	override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
+	override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
 		threadTransformer.gui {
-			val viewModel = view.getViewModel()
-			  ?: return@gui view.invalidate()
-
 			view.displayNewViewModel(
-			  viewModel.copy(
-				characters = (viewModel.characters + CharacterTreeItemViewModel(
-				  response.characterId.toString(),
-				  response.characterName,
-				  false,
-				  emptyList()
-				)).sortedBy { it.name }
+			  CharacterListViewModel(
+				response.characters.map { (it, arcs) ->
+					val characterId = it.characterId.toString()
+					CharacterTreeItemViewModel(
+					  characterId,
+					  it.characterName,
+					  false,
+					  arcs.map {
+						  CharacterArcItemViewModel(
+							characterId,
+							it.themeId.toString(),
+							it.characterArcName
+						  )
+					  }
+					)
+				}.sortedBy { it.name }
 			  )
 			)
+
+
 		}
 	}
+
 
 	override fun receivePlanNewCharacterArcResponse(response: CharacterArcItem) {
 		CharacterArcItemViewModel(
@@ -137,42 +143,6 @@ class CharacterListPresenter(
 		}
 	}
 
-	override fun receiveRemoveCharacterFromLocalStoryResponse(response: RemoveCharacterFromLocalStory.ResponseModel) {
-		threadTransformer.gui {
-			val viewModel = view.getViewModel()
-			  ?: return@gui view.invalidate()
-
-			val characterItem = viewModel.characters.find { it.id == response.characterId.toString() }
-			  ?: return@gui
-
-			view.displayNewViewModel(
-			  viewModel.copy(
-				characters = viewModel.characters.minus(characterItem)
-			  )
-			)
-		}
-	}
-
-	override fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {
-		threadTransformer.gui {
-			val viewModel = view.getViewModel()
-			  ?: return@gui view.invalidate()
-
-			val characterItem = viewModel.characters.find { it.id == response.characterId.toString() }
-			  ?: return@gui
-
-			view.displayNewViewModel(
-			  viewModel.copy(
-				characters = viewModel.characters.minus(characterItem).plus(
-				  characterItem.copy(
-					name = response.newName
-				  )
-				).sortedBy { it.name }
-			  )
-			)
-		}
-	}
-
 	override fun receiveRenameCharacterArcResponse(response: RenameCharacterArc.ResponseModel) {
 		threadTransformer.gui {
 			val viewModel = view.getViewModel()
@@ -186,8 +156,8 @@ class CharacterListPresenter(
 				characters = viewModel.characters.minus(characterItem).plus(
 				  characterItem.copy(
 					arcs = characterItem.arcs
-                      .filterNot { it.themeId == response.themeId.toString() }
-                      .plus(CharacterArcItemViewModel(response.characterId.toString(), response.themeId.toString(), response.newName))
+					  .filterNot { it.themeId == response.themeId.toString() }
+					  .plus(CharacterArcItemViewModel(response.characterId.toString(), response.themeId.toString(), response.newName))
 				  )
 				).sortedBy { it.name }
 			  )
@@ -195,12 +165,9 @@ class CharacterListPresenter(
 		}
 	}
 
-	override fun receiveBuildNewCharacterFailure(failure: CharacterException) {}
 	override fun receivePlanNewCharacterArcFailure(failure: Exception) {}
 	override fun receivePromoteMinorCharacterFailure(failure: ThemeException) {}
 	override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {}
-	override fun receiveRemoveCharacterFromLocalStoryFailure(failure: CharacterException) {}
-	override fun receiveRenameCharacterFailure(failure: CharacterException) {}
 	override fun receiveRenameCharacterArcFailure(failure: Exception) {}
 
 }
