@@ -24,16 +24,16 @@ Feature: Confirm Reorder Scene Dialog
 	  
 	Examples: 
 	| button |
-	| "Delete" |
+	| "Reorder" |
 	| "Show Ramifications" |
 	
 	@reorder-scene @excluded
-	Scenario: Delete without showing ramifications
-	 When the Confirm Reorder Scene Dialog "Delete" button is selected
+	Scenario: Reorder without showing ramifications
+	 When the Confirm Reorder Scene Dialog "Reorder" button is selected
 	 Then the Scene should be reordered
 	
 	@reorder-scene @excluded
-	Scenario: Delete without showing ramifications
+	Scenario: Reorder without showing ramifications
 	 When the Confirm Reorder Scene Dialog "Show Ramifications" button is selected
 	 Then the Scene should not be reordered
 	  And the Confirm Reorder Scene Dialog should be closed
