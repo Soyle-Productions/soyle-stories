@@ -139,3 +139,26 @@ Feature: Scene List Tool
     When The user clicks away from the input box
     Then the Scene rename input box should be replaced by the Scene name
     And the Scene name should be the original name
+	
+  @reorder-scene @excluded
+  Scenario: Drag Scene to reorder
+    Given the Scene List Tool has been opened
+	  And 3 Scenes have been created
+	 When a Scene is dragged to a new position in the Scene List Tool
+	 Then the Confirm Reorder Scene Dialog should be shown
+	
+  @reorder-scene @excluded
+  Scenario: Reorder Scene without confirmation
+    Given the Scene List Tool has been opened
+	  And 3 Scenes have been created
+	  And the user has requested to not be shown the Confirm Reorder Scene Dialog
+	 When a Scene is dragged to a new position in the Scene List Tool
+	 Then the Scene should be reordered
+	 
+  @reorder-scene @excluded
+  Scenario: Update when reordered
+	Given the Scene List Tool has been opened
+	  And 3 Scenes have been created
+	 When a Scene is reordered
+	 Then the Scene should be in its new position
+	  And all Scenes in the Scene List Tool should be numbered to match the list order
