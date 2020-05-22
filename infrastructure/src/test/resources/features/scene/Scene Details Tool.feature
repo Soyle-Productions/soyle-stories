@@ -108,3 +108,67 @@ Feature: Scene Details Tool
 	When a Character is removed from the Scene
 	Then the Character should not be listed in the Scene Details Tool
 	And the Scene Details Add Character button should not be disabled
+	
+	@set-character-motivation-in-scene @excluded
+	Scenario: No motivation set
+	Given a Scene has been created
+	And 1 Characters have been created
+	And 1 Characters have been included in the Scene
+	When the Scene Details Tool is opened
+	Then the Scene Details Character Motivation field should be blank
+	
+	@set-character-motivation-in-scene @excluded
+	Scenario: Motivation set in previous scene
+	Given 2 Scenes have been created
+	And 1 Characters have been created
+	And 1 Characters have been included in the Scene
+	And the Character has been included in the previous Scene
+	And the Character's motivation has been set in the previous Scene
+	When the Scene Details Tool is opened
+	Then the Scene Details Character Motivation field should show the motivation set in the previous Scene
+	And the Scene Details Character Motivation Previously Set tip should be visible
+	
+	@set-character-motivation-in-scene @excluded
+	Scenario: Motivation set in scene
+	Given a Scene has been created
+	And 1 Characters have been created
+	And 1 Characters have been included in the Scene
+	And the Character's motivation has been set in this Scene
+	When the Scene Details Tool is opened
+	Then the Scene Details Character Motivation field should show the motivation set in this Scene
+	
+	@set-character-motivation-in-scene @excluded
+	Scenario: Motivation overwritten in this Scene
+	Given 2 Scenes have been created
+	And 1 Characters have been created
+	And the Character has been included in both Scenes
+	And the Character's motivation has been set in the previous Scene
+	And the Character's motivation has been set in this Scene
+	When the Scene Details Tool is opened
+	Then the Scene Details Character Motivation field should show the motivation set in this Scene
+	And the Scene Details Character Motivation Previously Set tip should be visible
+	And the Scene Details Character Motivation Reset button should be visible
+	
+	@set-character-motivation-in-scene @excluded
+	Scenario: Hover over previously set tip
+	Given 2 Scenes have been created
+	And 1 Characters have been created
+	And the Character has been included in both Scenes
+	And the Character's motivation has been set in the previous Scene
+	And the Scene Details Tool has been opened
+	When the Scene Details Character Motivation Previously Set tooltip is opened
+	Then the Scene Details Character Motivation Previously Set tooltip should show the previous Scene name
+	And the Scene Details Character Motivation Previously Set tooltip should show the motivation set in the previous Scene
+	
+	@set-character-motivation-in-scene @excluded
+	Scenario: Jump to previous Scene
+	Given 2 Scenes have been created
+	And 1 Characters have been created
+	And the Character has been included in both Scenes
+	And the Character's motivation has been set in the previous Scene
+	And the Scene Details Tool has been opened
+	And the Scene Details Character Motivation Previously Set tooltip has been opened
+	When the Scene Details Character Motivation Previously Set tooltip Scene name is selected
+	Then the Scene Details Tool for the previous Scene should be open
+	And the Scene Details Tool for the previous Scene should be in focus
+	
