@@ -34,7 +34,7 @@ class Character(
         }
     }
 
-    data class Id(val uuid: UUID)
+    data class Id(val uuid: UUID = UUID.randomUUID())
 
     companion object {
         fun buildNewCharacter(

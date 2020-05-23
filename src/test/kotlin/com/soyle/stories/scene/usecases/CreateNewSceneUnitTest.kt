@@ -26,7 +26,6 @@ class CreateNewSceneUnitTest {
 	fun `name cannot be blank`() {
 		whenUseCaseIsExecuted()
 		val result = result as SceneNameCannotBeBlank
-		assertEquals(localNameIsBlankMessage, result.localizedMessage)
 	}
 
 	@Test
