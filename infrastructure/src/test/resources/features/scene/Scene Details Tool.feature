@@ -172,3 +172,32 @@ Feature: Scene Details Tool
 	Then the Scene Details Tool for the previous Scene should be open
 	And the Scene Details Tool for the previous Scene should be in focus
 	
+	@set-character-motivation-in-scene @excluded
+	Scenario: Motivation overwritten in this Scene
+	Given 2 Scenes have been created
+	And 1 Characters have been created
+	And the Character has been included in both Scenes
+	And the Character's motivation has been set in both Scenes
+	And the Scene Details Tool has been opened
+	When the Scene Details Character Motivation Reset button is selected
+	Then the Scene Details Character Motivation should show should show the motivation set in the previous Scene
+	And the Scene Details Character Motivation Reset button should not be visible
+	
+	@rename-character @add-character-to-story-event @excluded
+	Scenario: Scene Details Tool reacts to Chracter rename
+	Given 1 Characters have been created
+	And 1 Scenes have been created
+	And the Character has been included in the Scene
+	And the Scene Details Tool has been opened
+	When the Character is renamed
+	Then the Scene Details Tool should show the Character's new name
+	
+	@delete-character @remove-character-from-story-event @excluded
+	Scenario: Scene Details Tool reacts to Chracter deletion
+	Given 1 Characters have been created
+	And 1 Scenes have been created
+	And the Character has been included in the Scene
+	And the Scene Details Tool has been opened
+	When the Character is deleted
+	Then the Scene Details Tool should not show the deleted Character
+	
