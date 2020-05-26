@@ -12,7 +12,7 @@ Feature: Scene List Tool
     When The Scene List Tool is opened
     Then The Scene List Tool should show a special empty message
 	
-  @create-scene @excluded
+  @create-scene
   Scenario: Open Scene creation dialog when empty
     Given the Scene List Tool has been opened
     When the center Create New Scene button is selected
@@ -79,7 +79,7 @@ Feature: Scene List Tool
       | 5      |
 
   @delete-scene
-  Scenario Outline: Update when Scenes are deleted
+  Scenario: Update when Scenes are deleted
     Given The Scene List Tool has been opened
     And 2 Scenes have been created
     When A Scene is deleted
