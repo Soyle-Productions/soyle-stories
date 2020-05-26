@@ -53,6 +53,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Given("The Scene List Tool tab has been selected") {
 				SceneListDriver.givenHasBeenVisible(double)
 			}
+			Given("a Scene has been created") {
+				ScenesDriver.givenNumberOfCreatedScenesIsAtLeast(double, 1)
+			}
 
 
 			When("The Scene List Tool is opened") {
@@ -85,6 +88,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				interact {
 					clickOn(SceneListDriver.centerButton.get(double)!!, MouseButton.PRIMARY)
 				}
+			}
+			When("the bottom Create New Scene button is selected") {
+				SceneListDriver.whenBottomButtonIsClicked(double, "create")
 			}
 
 

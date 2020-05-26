@@ -18,7 +18,7 @@ Feature: Scene List Tool
     When the center Create New Scene button is selected
     Then the Create Scene Dialog should be open
 	
-  @create-scene @excluded
+  @create-scene
   Scenario: Open Scene creation dialog when populated
     Given a Scene has been created
     And the Scene List Tool has been opened
