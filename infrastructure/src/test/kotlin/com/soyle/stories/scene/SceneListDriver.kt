@@ -169,6 +169,14 @@ object SceneListDriver : ApplicationTest() {
 		} != null
 	}
 
+	fun indexOfItemWithId(double: SoyleStoriesTestDouble, id: Scene.Id): Int
+	{
+		val items = getItems(double)
+		return items.indexOfFirst {
+			it.value?.id == id.uuid.toString()
+		}
+	}
+
 	fun setItemSelected(double: SoyleStoriesTestDouble)
 	{
 		givenTreeViewIsVisible(double)

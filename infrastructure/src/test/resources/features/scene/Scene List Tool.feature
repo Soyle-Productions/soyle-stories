@@ -38,7 +38,7 @@ Feature: Scene List Tool
       | "Insert New Scene Before" |
       | "Insert New Scene After"  |
 
-  @create-scene @excluded
+  @create-scene
   Scenario: Update when new Scene created
     Given the Scene List Tool has been opened
     And the Scene List Tool tab has been selected

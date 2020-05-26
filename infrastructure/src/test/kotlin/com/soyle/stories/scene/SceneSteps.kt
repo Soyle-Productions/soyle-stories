@@ -6,6 +6,7 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.testfx.framework.junit5.ApplicationTest
 
 class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
@@ -50,7 +51,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				SceneListDriver.givenHasBeenOpened(double)
 				SceneListDriver.givenHasBeenVisible(double)
 			}
-			Given("The Scene List Tool tab has been selected") {
+			Given("the Scene List Tool tab has been selected") {
 				SceneListDriver.givenHasBeenVisible(double)
 			}
 			Given("a Scene has been created") {
@@ -91,6 +92,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			When("the Scene List Tool right-click menu {string} option is selected") { option: String ->
 				SceneListDriver.whenRightClickOptionIsClicked(double, option)
 				targetObject = SceneListDriver.getSelectedItem(double)
+			}
+			When("a new Scene is created without a relative Scene") {
+				ScenesDriver.whenSceneIsCreated(double)
+				targetObject = ScenesDriver.getCreatedScenes(double).last()
 			}
 
 
@@ -142,6 +147,15 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			}
 			Then("the Confirm Delete Scene Dialog should show the Scene name") {
 				Assertions.assertTrue(DeleteSceneDialogDriver.isShowingNameOf(double, (targetObject as SceneItemViewModel)))
+			}
+			Then("the Scene List Tool should show the new Scene") {
+				Assertions.assertTrue(SceneListDriver.isShowingScene(double, targetObject as Scene))
+			}
+			Then("the new Scene should be at the end of the Scene List Tool") {
+				assertEquals(
+				  ScenesDriver.getNumberOfCreatedScenes(double) - 1,
+				  SceneListDriver.indexOfItemWithId(double, (targetObject as Scene).id)
+				)
 			}
 		}
 	}
