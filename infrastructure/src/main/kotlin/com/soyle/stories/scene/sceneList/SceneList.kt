@@ -109,6 +109,16 @@ class SceneList : View() {
 				treeview.edit(treeview.selectionModel.selectedItem)
 			}
 		}
+		item("Insert New Scene Before") {
+			action {
+				createSceneDialog(scope)
+			}
+		}
+		item("Insert New Scene After") {
+			action {
+				createSceneDialog(scope)
+			}
+		}
 		item("Delete") {
 			id = "delete"
 			action {

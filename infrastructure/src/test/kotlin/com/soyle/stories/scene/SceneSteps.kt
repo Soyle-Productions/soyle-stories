@@ -56,6 +56,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Given("a Scene has been created") {
 				ScenesDriver.givenNumberOfCreatedScenesIsAtLeast(double, 1)
 			}
+			Given("the Scene List Tool right-click menu has been opened") {
+				SceneListDriver.givenRightClickMenuHasBeenOpened(double)
+			}
 
 
 			When("The Scene List Tool is opened") {
@@ -68,17 +71,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				ScenesDriver.whenSceneIsCreated(double)
 				targetObject = ScenesDriver.getCreatedScenes(double).last()
 			}
-			When("the user clicks the Scene List Tool right-click menu Rename button") {
-				SceneListDriver.whenRightClickOptionIsClicked(double, "rename")
-			}
 			When("A Scene is deleted") {
 				val existingScenes = ScenesDriver.getCreatedScenes(double)
 				ScenesDriver.whenSceneIsDeleted(double)
 				targetObject = (existingScenes.toSet() - ScenesDriver.getCreatedScenes(double).toSet()).single()
-			}
-			When("the user clicks the Scene List Tool right-click menu delete button") {
-				SceneListDriver.whenRightClickOptionIsClicked(double, "delete")
-				targetObject = SceneListDriver.getSelectedItem(double)
 			}
 			When("the user clicks the Scene List Tool delete button") {
 				SceneListDriver.whenBottomButtonIsClicked(double, "delete")
@@ -91,6 +87,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			}
 			When("the bottom Create New Scene button is selected") {
 				SceneListDriver.whenBottomButtonIsClicked(double, "create")
+			}
+			When("the Scene List Tool right-click menu {string} option is selected") { option: String ->
+				SceneListDriver.whenRightClickOptionIsClicked(double, option)
+				targetObject = SceneListDriver.getSelectedItem(double)
 			}
 
 

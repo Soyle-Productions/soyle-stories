@@ -285,11 +285,11 @@ object SceneListDriver : ApplicationTest() {
 		assertTrue(isValidSceneNameEntered(double))
 	}
 
-	fun whenRightClickOptionIsClicked(double: SoyleStoriesTestDouble, rightClickOptionId: String)
+	fun whenRightClickOptionIsClicked(double: SoyleStoriesTestDouble, rightClickOptionText: String)
 	{
 		val treeView = getTreeViewIfVisible(double) ?: error("no visible tree view")
 		val menu = treeView.contextMenu?.takeIf { it.isShowing } ?: error("no visible right-click menu")
-		val item = menu.items.find { it.id == rightClickOptionId } ?: error("no menu item with id $rightClickOptionId")
+		val item = menu.items.find { it.text == rightClickOptionText } ?: error("no menu item with id $rightClickOptionText")
 		interact {
 			item.fire()
 		}
