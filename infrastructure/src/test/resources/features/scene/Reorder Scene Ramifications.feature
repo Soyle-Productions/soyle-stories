@@ -4,19 +4,19 @@ Feature: Reorder Scene Ramifications
 		Given 1 Scenes have been created
 		And 1 Characters have been created
 
-	@excluded
+	@new
 	Scenario: No Characters included in Scene
 		When the Reorder Scene Ramifications Tool is opened
 		Then the Reorder Scene Ramifications Tool should display an ok message
 	
-	@excluded
+	@new
 	Scenario: No motivations set in Scene
 		Given 4 Characters have been created
 		And all Characters have been included in the Scene
 		When the Reorder Scene Ramifications Tool is opened
 		Then the Reorder Scene Ramifications Tool should display an ok message
 	
-	@excluded
+	@new
 	Scenario: Motivation only set in this Scene
 		Given 2 Scenes have been created
 		 And this is the first Scene in the story
@@ -28,7 +28,7 @@ Feature: Reorder Scene Ramifications
 		 And the Reorder Scene Ramifications Current Motivation field for this Character should show the Motivation set in this Scene
 		 And the Reorder Scene Ramifications Changed Motivation field for this Character should be empty
 		 
-	@excluded
+	@new
 	Scenario: Motivation only set in next Scene
 		Given 2 Scenes have been created
 		 And this is the Scene after the first Scene in the story
@@ -41,7 +41,7 @@ Feature: Reorder Scene Ramifications
 		 And the Reorder Scene Ramifications Current Motivation field for this Character should show the Motivation set in this Scene
 		 And the Reorder Scene Ramifications Changed Motivation field for this Character should be empty
 		
-	@excluded
+	@new
 	Scenario: Motivation for one Character set in next Scene
 		Given 2 Scenes have been created
 		 And this is the first Scene in the story
