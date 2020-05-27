@@ -4,4 +4,7 @@ interface CreateNewSceneController {
 
 	fun createNewScene(name: String)
 
+	fun createNewSceneBefore(name: String, sceneId: String)
+	fun createNewSceneAfter(name: String, sceneId: String)
+
 }

@@ -1,12 +1,15 @@
 package com.soyle.stories.scene.createNewSceneDialog
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
+import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
 
 class CreateNewScenePresenter(
   private val view: View.Nullable<CreateNewSceneDialogViewModel>
 ) : CreateNewScene.OutputPort {
+
+	override val createStoryEventOutputPort: CreateStoryEvent.OutputPort
+		get() = error("$this does not supply create story event output port")
 
 	override fun receiveCreateNewSceneResponse(response: CreateNewScene.ResponseModel) {
 		view.updateOrInvalidated {
@@ -17,7 +20,7 @@ class CreateNewScenePresenter(
 		}
 	}
 
-	override fun receiveCreateNewSceneFailure(failure: SceneException) {
+	override fun receiveCreateNewSceneFailure(failure: Exception) {
 		view.updateOrInvalidated {
 			copy(
 			  errorMessage = failure.localizedMessage?.takeUnless { it.isBlank() } ?: "Failure"

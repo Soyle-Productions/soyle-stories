@@ -12,6 +12,7 @@ import org.testfx.framework.junit5.ApplicationTest
 class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 	private var targetObject: Any? = null
+	private var createdScene: Scene? = null
 
 	init {
 		with(en) {
@@ -70,7 +71,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			}
 			When("A new Scene is created") {
 				ScenesDriver.whenSceneIsCreated(double)
-				targetObject = ScenesDriver.getCreatedScenes(double).last()
+				createdScene = ScenesDriver.getCreatedScenes(double).last()
 			}
 			When("A Scene is deleted") {
 				val existingScenes = ScenesDriver.getCreatedScenes(double)
@@ -95,7 +96,13 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			}
 			When("a new Scene is created without a relative Scene") {
 				ScenesDriver.whenSceneIsCreated(double)
-				targetObject = ScenesDriver.getCreatedScenes(double).last()
+				createdScene = ScenesDriver.getCreatedScenes(double).last()
+			}
+			When("a new Scene is created before a relative Scene") {
+				val existing = ScenesDriver.getCreatedScenes(double).map(Scene::id).toSet()
+				targetObject = existing.first()
+				ScenesDriver.createdSceneBefore(existing.first()).whenSet(double)
+				createdScene = ScenesDriver.getCreatedScenes(double).filterNot { it.id in existing }.firstOrNull()
 			}
 
 
@@ -118,7 +125,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				Assertions.assertTrue(SceneListDriver.isShowingNumberOfScenes(double, count))
 			}
 			Then("The Scene List Tool should show the new Scene") {
-				Assertions.assertTrue(SceneListDriver.isShowingScene(double, targetObject as Scene))
+				Assertions.assertTrue(SceneListDriver.isShowingScene(double, createdScene as Scene))
 			}
 			Then("the Scene's name should be replaced by an input box") {
 				Assertions.assertTrue(SceneListDriver.isRenameInputBoxVisible(double))
@@ -149,13 +156,18 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				Assertions.assertTrue(DeleteSceneDialogDriver.isShowingNameOf(double, (targetObject as SceneItemViewModel)))
 			}
 			Then("the Scene List Tool should show the new Scene") {
-				Assertions.assertTrue(SceneListDriver.isShowingScene(double, targetObject as Scene))
+				Assertions.assertTrue(SceneListDriver.isShowingScene(double, createdScene!!))
 			}
 			Then("the new Scene should be at the end of the Scene List Tool") {
 				assertEquals(
 				  ScenesDriver.getNumberOfCreatedScenes(double) - 1,
-				  SceneListDriver.indexOfItemWithId(double, (targetObject as Scene).id)
+				  SceneListDriver.indexOfItemWithId(double, (createdScene as Scene).id)
 				)
+			}
+			Then("the new Scene should be listed before the relative Scene in the Scene List Tool") {
+				val relativeIndex = SceneListDriver.indexOfItemWithId(double, (targetObject as Scene.Id))
+				val createdIndex = SceneListDriver.indexOfItemWithId(double, createdScene!!.id)
+				assertEquals(relativeIndex - 1, createdIndex)
 			}
 		}
 	}

@@ -15,6 +15,8 @@ class CreateSceneDialog : Fragment() {
 
 	override val scope: ProjectScope = super.scope as ProjectScope
 
+	private val storyEventId: String? by params
+
 	private val viewListener by resolveLater<CreateNewSceneDialogViewListener>()
 	private val model = resolve<CreateSceneDialogModel>()
 
