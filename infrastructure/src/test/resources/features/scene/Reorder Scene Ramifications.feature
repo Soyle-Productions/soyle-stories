@@ -1,58 +1,82 @@
 Feature: Reorder Scene Ramifications
 
 	Background: 
-		Given 1 Scenes have been created
+		Given 2 Scenes have been created
 		And 1 Characters have been created
 
 	@new
-	Scenario: No Characters included in Scene
-		When the Reorder Scene Ramifications Tool is opened
+	Scenario Outline: No Characters included in Scene
+		When the Reorder Scene Ramifications Tool is opened for <sceneId>
 		Then the Reorder Scene Ramifications Tool should display an ok message
 	
+	Examples:
+	| sceneId |
+	| "scene 1" |
+	| "scene 2" |
+	
 	@new
-	Scenario: No motivations set in Scene
+	Scenario Outline: No motivations set in Scene
 		Given 4 Characters have been created
-		And all Characters have been included in the Scene
-		When the Reorder Scene Ramifications Tool is opened
+		And all Characters have been included in all Scenes
+		When the Reorder Scene Ramifications Tool is opened for <sceneId>
 		Then the Reorder Scene Ramifications Tool should display an ok message
 	
-	@new
-	Scenario: Motivation only set in this Scene
-		Given 2 Scenes have been created
-		 And this is the first Scene in the story
-		 And the Character has been included in both Scenes
-		 And the Character Motivation has been set in this Scene
-		When the Reorder Scene Ramifications Tool is opened
-		Then the other Scene should be listed in the Reorder Scene Ramifications Tool
-		 And the Character should be listed in the Reorder Scene Ramifications Tool
-		 And the Reorder Scene Ramifications Current Motivation field for this Character should show the Motivation set in this Scene
-		 And the Reorder Scene Ramifications Changed Motivation field for this Character should be empty
-		 
-	@new
-	Scenario: Motivation only set in next Scene
-		Given 2 Scenes have been created
-		 And this is the Scene after the first Scene in the story
-		 And the Character has been included in both Scenes
-		 And the Character Motivation has been set in this Scene
-		 And the Character Motivation in the first scene is empty
-		When the Reorder Scene Ramifications Tool is opened
-		Then the first Scene should be listed in the Reorder Scene Ramifications Tool
-		 And the Character should be listed in the Reorder Scene Ramifications Tool
-		 And the Reorder Scene Ramifications Current Motivation field for this Character should show the Motivation set in this Scene
-		 And the Reorder Scene Ramifications Changed Motivation field for this Character should be empty
+	Examples:
+	| sceneId |
+	| "scene 1" |
+	| "scene 2" |
 		
 	@new
-	Scenario: Motivation for one Character set in next Scene
-		Given 2 Scenes have been created
-		 And this is the first Scene in the story
-		 And 2 Characters have been created
-		 And all Characters have been included in all Scenes
-		 And the Character Motivation has been set for all Characters in this Scene
-		 And the Character Motivation for one Character has been set in the next Scene
-		When the Reorder Scene Ramifications Tool is opened
-		Then the other Scene should be listed in the Reorder Scene Ramifications Tool
-		 And only the Character without their Motivation set in the next Scene should be listed in the Reorder Scene Ramifications Tool
-		 And the Reorder Scene Ramifications Current Motivation field for this Character should show the Motivation set in this Scene
-		 And the Reorder Scene Ramifications Changed Motivation field for this Character should be empty
+	Scenario: Back-to-back scenes with set motivations
+		Given the following Scenes
+			| character   | scene 1 | scene 2 |
+			| character A | value 1 | value 2 |
+		When the Reorder Scene Ramifications Tool is opened for "scene 1"
+		Then the Reorder Scene Ramifications Tool should display an ok message
+	
+	@new
+	Scenario: Motivation not set in scene currently following this scene
+		Given the following Scenes
+			| character   | scene 1 | scene 2 |
+			| character A | value 1 | inherit |
+		When the Reorder Scene Ramifications Tool is opened for "scene 1"
+		Then "scene 2" should be listed in the Reorder Scene Ramifications Tool for "scene 1"
+		 And "character A" should be listed for "scene 2" in the Reorder Scene Ramifications Tool for "scene 1"
+		 And the Reorder Scene Ramifications Current Motivation field for "character A" in "scene 2" should show "value 1"
+		 And the Reorder Scene Ramifications Changed Motivation field for "character A" in "scene 2" should be empty
+		 
+	@new
+	Scenario: Motivation not set in scene now following this scene
+		Given the following Scenes
+			| character   | scene 1 | scene 2 |
+			| character A | inherit | value 2 |
+		When the Reorder Scene Ramifications Tool is opened for "scene 2"
+		Then "scene 1" should be listed in the Reorder Scene Ramifications Tool for "scene 2"
+		 And "character A" should be listed for "scene 1" in the Reorder Scene Ramifications Tool for "scene 2"
+		 And the Reorder Scene Ramifications Current Motivation field for "character A" in "scene 1" should be empty
+		 And the Reorder Scene Ramifications Changed Motivation field for "character A" in "scene 1" should show "value 2"
+		 
+	@new
+	Scenario: Motivation set in scene now before this scene
+		Given the following Scenes
+			| character   | scene 1 | scene 2 |
+			| character A | inherit | value 2 |
+		When the Reorder Scene Ramifications Tool is opened for "scene 1"
+		Then "scene 1" should be listed in the Reorder Scene Ramifications Tool for "scene 1"
+		 And "character A" should be listed for "scene 1" in the Reorder Scene Ramifications Tool for "scene 1"
+		 And the Reorder Scene Ramifications Current Motivation field for "character A" in "scene 1" should be empty
+		 And the Reorder Scene Ramifications Changed Motivation field for "character A" in "scene 1" should show "value 2"
+		 
+	@new
+	Scenario: Motivation set in scene now before this scene
+		Given the following Scenes
+			| character   | scene 1 | scene 2 |
+			| character A | value 1 | inherit |
+		When the Reorder Scene Ramifications Tool is opened for "scene 2"
+		Then "scene 2" should be listed in the Reorder Scene Ramifications Tool for "scene 2"
+		 And "character A" should be listed for "scene 2" in the Reorder Scene Ramifications Tool for "scene 2"
+		 And the Reorder Scene Ramifications Current Motivation field for "character A" in "scene 2" should show "value 1"
+		 And the Reorder Scene Ramifications Changed Motivation field for "character A" in "scene 2" should be empty
+		
 		
 	
