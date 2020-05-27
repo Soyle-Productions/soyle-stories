@@ -104,6 +104,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				ScenesDriver.createdSceneBefore(existing.first()).whenSet(double)
 				createdScene = ScenesDriver.getCreatedScenes(double).filterNot { it.id in existing }.firstOrNull()
 			}
+			When("a new Scene is created after the first Scene") {
+				val existing = ScenesDriver.getCreatedScenes(double).map(Scene::id).toSet()
+				targetObject = existing.first()
+				ScenesDriver.createdSceneAfter(existing.first()).whenSet(double)
+				createdScene = ScenesDriver.getCreatedScenes(double).filterNot { it.id in existing }.firstOrNull()
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
@@ -168,6 +174,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				val relativeIndex = SceneListDriver.indexOfItemWithId(double, (targetObject as Scene.Id))
 				val createdIndex = SceneListDriver.indexOfItemWithId(double, createdScene!!.id)
 				assertEquals(relativeIndex - 1, createdIndex)
+			}
+			Then("the new Scene should be listed after the first Scene in the Scene List Tool") {
+				val createdIndex = SceneListDriver.indexOfItemWithId(double, createdScene!!.id)
+				assertEquals(1, createdIndex)
 			}
 		}
 	}

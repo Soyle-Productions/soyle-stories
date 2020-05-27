@@ -55,7 +55,7 @@ Feature: Scene List Tool
     Then the Scene List Tool should show the new Scene
     And the new Scene should be listed before the relative Scene in the Scene List Tool
 
-  @create-scene @excluded
+  @create-scene
   Scenario: Update when new Scene created after relative Scene
     Given the Scene List Tool has been opened
     And the Scene List Tool tab has been selected

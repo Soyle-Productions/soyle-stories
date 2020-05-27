@@ -40,6 +40,16 @@ class CreateNewSceneControllerImpl(
 	}
 
 	override fun createNewSceneAfter(name: String, sceneId: String) {
-
+		threadTransformer.async {
+			createNewScene.invoke(
+			  CreateNewScene.RequestModel(
+				name,
+				UUID.fromString(sceneId),
+				false,
+				localeManager.getCurrentLocale()
+			  ),
+			  createNewSceneOutputPort
+			)
+		}
 	}
 }

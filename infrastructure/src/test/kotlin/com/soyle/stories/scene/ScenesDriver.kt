@@ -72,6 +72,24 @@ object ScenesDriver : ApplicationTest() {
 		}
 	}
 
+	fun createdSceneAfter(sceneId: Scene.Id) = object : DependentProperty<Scene> {
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  { double: SoyleStoriesTestDouble -> givenNumberOfCreatedScenesIsAtLeast(double, 1) } as (SoyleStoriesTestDouble) -> Unit
+		)
+
+		override fun get(double: SoyleStoriesTestDouble): Scene? {
+			return null
+		}
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			val scope = ProjectSteps.getProjectScope(double)!!
+			val controller = scope.get<CreateNewSceneController>()
+			interact {
+				controller.createNewSceneAfter("Unique Scene Name ${UUID.randomUUID()}", sceneId.uuid.toString())
+			}
+		}
+	}
+
 	fun whenSceneIsDeleted(double: SoyleStoriesTestDouble)
 	{
 		val scope = ProjectSteps.getProjectScope(double)!!
