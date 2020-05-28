@@ -121,6 +121,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 					clickOn(button, MouseButton.PRIMARY)
 				}
 			}
+			When("the Confirm Delete Scene Dialog do not show again check-box is checked") {
+				val checkBox = DeleteSceneDialogDriver.doNotShowCheckbox.get(double)!!
+				interact {
+					clickOn(checkBox, MouseButton.PRIMARY)
+				}
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
@@ -197,6 +203,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				ScenesDriver.getCreatedScenes(double).find {
 					it.id == (targetObject as Scene).id
 				}!!
+			}
+			Then("the Confirm Delete Scene Dialog should not open the next time a Scene is deleted") {
+				SceneListDriver.givenASceneHasBeenSelected(double)
+				SceneListDriver.givenRightClickMenuHasBeenOpened(double)
+				SceneListDriver.whenRightClickOptionIsClicked(double, "Delete")
+				assertFalse(DeleteSceneDialogDriver.openDialog.check(double))
 			}
 		}
 	}

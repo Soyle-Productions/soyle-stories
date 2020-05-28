@@ -1,7 +1,6 @@
 package com.soyle.stories.character.characterComparison.controllers
 
 import com.soyle.stories.characterarc.characterComparison.CharacterComparisonController
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
 import kotlinx.coroutines.runBlocking
@@ -63,16 +62,6 @@ class CharacterComparisonControllerUnitTest {
 	private fun whenCalledWith(characterId: String = this.characterId.toString()) {
 		val controller = CharacterComparisonController(
 		  themeId.toString(),
-		  object : ListAllCharacterArcs {
-			  override suspend fun invoke(outputPort: ListAllCharacterArcs.OutputPort) {
-				  listAllCharacterArcsCalled = true
-			  }
-		  },
-		  object : ListAllCharacterArcs.OutputPort {
-			  override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
-
-			  }
-		  },
 		  object : CompareCharacters {
 			  override suspend fun invoke(themeId: UUID, focusCharacterId: UUID, outputPort: CompareCharacters.OutputPort) {
 				  compareCharactersCalled = true

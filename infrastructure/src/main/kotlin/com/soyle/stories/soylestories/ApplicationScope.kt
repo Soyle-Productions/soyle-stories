@@ -18,6 +18,8 @@ import kotlin.coroutines.CoroutineContext
 
 class ApplicationScope : Scope(), CoroutineScope {
 
+	val writerId: UUID = UUID.randomUUID()
+
 	private val job by lazy { SupervisorJob() }
 	override val coroutineContext: CoroutineContext
 		get() = Dispatchers.Default + job

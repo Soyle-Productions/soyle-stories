@@ -17,6 +17,7 @@ import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.workspace.repositories.FileRepository
 import com.soyle.stories.workspace.repositories.WorkspaceRepository
+import com.soyle.stories.writer.repositories.WriterRepository
 
 object DataModule {
 
@@ -87,6 +88,10 @@ object DataModule {
 
 			provide<StoryEventRepository> {
 				StoryEventRepositoryImpl()
+			}
+
+			provide<WriterRepository> {
+				WriterRepositoryImpl(applicationScope.writerId)
 			}
 		}
 	}

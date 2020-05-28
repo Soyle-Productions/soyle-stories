@@ -6,5 +6,6 @@ data class DeleteSceneDialogViewModel(
   val content: String,
   val deleteButtonLabel: String,
   val cancelButtonLabel: String,
-  val errorMessage: String?
+  val errorMessage: String?,
+  val defaultAction: Boolean?
 )

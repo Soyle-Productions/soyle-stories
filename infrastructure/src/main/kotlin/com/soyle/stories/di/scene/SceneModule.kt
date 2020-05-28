@@ -107,11 +107,16 @@ object SceneModule {
 				)
 			}
 			provide<DeleteSceneDialogViewListener> {
+				val presenter = DeleteSceneDialogPresenter(
+				  get<DeleteSceneDialogModel>()
+				)
 				DeleteSceneDialogController(
-				  DeleteSceneDialogPresenter(
-					get<DeleteSceneDialogModel>()
-				  ),
-				  get()
+				  applicationScope.get(),
+				  presenter,
+				  get(),
+				  get(),
+				  get(),
+				  presenter
 				)
 			}
 

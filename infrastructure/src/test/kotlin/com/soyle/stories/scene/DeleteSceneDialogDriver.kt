@@ -14,6 +14,7 @@ import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonBar
+import javafx.scene.control.CheckBox
 import javafx.scene.control.DialogPane
 import javafx.stage.Window
 import kotlinx.coroutines.runBlocking
@@ -30,7 +31,7 @@ object DeleteSceneDialogDriver : ApplicationTest() {
 		override fun get(double: SoyleStoriesTestDouble): Scene? {
 			val scope = ProjectSteps.getProjectScope(double) ?: return null
 			return runBlocking {
-				scope.get<SceneRepository>().listAllScenesInProject(Project.Id(scope.projectId)).first()
+				scope.get<SceneRepository>().listAllScenesInProject(Project.Id(scope.projectId)).firstOrNull()
 			}
 		}
 
@@ -48,7 +49,7 @@ object DeleteSceneDialogDriver : ApplicationTest() {
 				val styleClass = it.scene?.root?.styleClass ?: return@find false
 
 				styleClass.contains("deleteScene")
-			}
+			}?.takeIf { it.isShowing }
 		}
 
 		override fun whenSet(double: SoyleStoriesTestDouble) {
@@ -86,6 +87,13 @@ object DeleteSceneDialogDriver : ApplicationTest() {
 			val dialog = openDialog.get(double) ?: return null
 			val buttonBar = from(dialog).lookup(".button-bar").queryAllAs(ButtonBar::class.java).firstOrNull()
 			return buttonBar?.buttons?.find { it is Button && it.text == label } as? Button
+		}
+	}
+
+	val doNotShowCheckbox = object: ReadOnlyDependentProperty<CheckBox> {
+		override fun get(double: SoyleStoriesTestDouble): CheckBox? {
+			val dialog = openDialog.get(double) ?: return null
+			return from(dialog).lookup(".check-box").queryAllAs(CheckBox::class.java).firstOrNull()
 		}
 	}
 
