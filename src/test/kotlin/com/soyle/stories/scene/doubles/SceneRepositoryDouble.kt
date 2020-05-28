@@ -13,6 +13,7 @@ class SceneRepositoryDouble(
 ) : SceneRepository {
 
 	private val scenes = initialScenes.associateBy { it.id }.toMutableMap()
+	private val sceneOrder = initialScenes.groupBy { it.projectId }.mapValues { it.value.map(Scene::id) }.toMutableMap()
 
 	private val _persistedItems = mutableListOf<PersistenceLog>()
 	val persistedItems: List<PersistenceLog>
@@ -25,14 +26,23 @@ class SceneRepositoryDouble(
 		_persistedItems += PersistenceLog(type, data)
 	}
 
-	override suspend fun createNewScene(scene: Scene) {
+	override suspend fun createNewScene(scene: Scene, idOrder: List<Scene.Id>) {
 		log(scene)
 		onAddNewScene.invoke(scene)
 		scenes[scene.id] = scene
+		sceneOrder[scene.projectId] = idOrder
 	}
 
 	override suspend fun listAllScenesInProject(projectId: Project.Id): List<Scene> {
 		return scenes.values.filter { it.projectId == projectId }
+	}
+
+	override suspend fun getSceneIdsInOrder(projectId: Project.Id): List<Scene.Id> {
+		return sceneOrder[projectId] ?: emptyList()
+	}
+
+	override suspend fun updateSceneOrder(projectId: Project.Id, order: List<Scene.Id>) {
+		sceneOrder[projectId] = order
 	}
 
 	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =

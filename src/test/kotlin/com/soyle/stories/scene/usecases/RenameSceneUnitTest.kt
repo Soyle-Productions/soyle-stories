@@ -3,6 +3,7 @@ package com.soyle.stories.scene.usecases
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.SceneException
@@ -85,7 +86,7 @@ class RenameSceneUnitTest {
 	private fun given(sceneWithId: UUID? = null, andName: String? = null) {
 		sceneRepository = SceneRepositoryDouble(
 		  initialScenes = listOfNotNull(
-			sceneWithId?.let { Scene(Scene.Id(it), projectId, andName ?: originalName) }
+			sceneWithId?.let { Scene(Scene.Id(it), projectId, andName ?: originalName, StoryEvent.Id()) }
 		  ),
 		  onUpdateScene = { updatedScene = it }
 		)

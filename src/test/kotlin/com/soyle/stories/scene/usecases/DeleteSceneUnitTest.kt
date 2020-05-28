@@ -3,6 +3,7 @@ package com.soyle.stories.scene.usecases
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.doubles.LocaleDouble
@@ -46,7 +47,7 @@ class DeleteSceneUnitTest {
 	private fun given(sceneWithId: UUID? = null) {
 		repository = SceneRepositoryDouble(
 		  initialScenes = listOfNotNull(
-			sceneWithId?.let { Scene(Scene.Id(it), projectId, "") }
+			sceneWithId?.let { Scene(Scene.Id(it), projectId, "", StoryEvent.Id()) }
 		  ),
 		  onRemoveScene = { deletedScene = it }
 		)

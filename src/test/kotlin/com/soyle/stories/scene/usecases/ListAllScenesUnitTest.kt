@@ -3,6 +3,7 @@ package com.soyle.stories.scene.usecases
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
@@ -47,7 +48,7 @@ class ListAllScenesUnitTest {
 	private fun givenNoScenes() = given()
 	private fun given(sceneIds: List<UUID> = emptyList()) {
 		storedScenes = sceneIds.map {
-			Scene(Scene.Id(it), projectId, "Unique Scene Name: $it")
+			Scene(Scene.Id(it), projectId, "Unique Scene Name: $it", StoryEvent.Id())
 		}
 		sceneRepository = SceneRepositoryDouble(
 		  initialScenes = storedScenes
