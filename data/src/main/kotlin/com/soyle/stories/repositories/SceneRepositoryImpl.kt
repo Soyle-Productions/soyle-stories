@@ -7,13 +7,23 @@ import com.soyle.stories.scene.repositories.SceneRepository
 class SceneRepositoryImpl : SceneRepository {
 
 	private val scenes = mutableMapOf<Scene.Id, Scene>()
+	private val sceneOrder = mutableMapOf<Project.Id, List<Scene.Id>>()
 
-	override suspend fun createNewScene(scene: Scene) {
+	override suspend fun createNewScene(scene: Scene, idOrder: List<Scene.Id>) {
 		scenes[scene.id] = scene
+		sceneOrder[scene.projectId] = idOrder
 	}
 
 	override suspend fun listAllScenesInProject(projectId: Project.Id): List<Scene> =
 	  scenes.values.toList()
+
+	override suspend fun getSceneIdsInOrder(projectId: Project.Id): List<Scene.Id> {
+		return sceneOrder[projectId] ?: emptyList()
+	}
+
+	override suspend fun updateSceneOrder(projectId: Project.Id, order: List<Scene.Id>) {
+		sceneOrder[projectId] = order
+	}
 
 	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =
 	  scenes[sceneId]

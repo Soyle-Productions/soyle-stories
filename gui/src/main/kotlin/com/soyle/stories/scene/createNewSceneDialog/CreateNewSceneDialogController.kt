@@ -15,4 +15,12 @@ class CreateNewSceneDialogController(
 		createNewSceneController.createNewScene(name)
 	}
 
+	override fun createSceneBefore(name: String, relativeScene: String) {
+		createNewSceneController.createNewSceneBefore(name, relativeScene)
+	}
+
+	override fun createSceneAfter(name: String, relativeScene: String) {
+		createNewSceneController.createNewSceneAfter(name, relativeScene)
+	}
+
 }

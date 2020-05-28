@@ -12,7 +12,11 @@ class RenameScenePresenter(
 	override fun receiveRenameSceneResponse(response: RenameScene.ResponseModel) {
 		view.updateOrInvalidated {
 			copy(
-			  scenes = scenes.filterNot { it.id == response.sceneId.toString() } + SceneItemViewModel(response.sceneId.toString(), response.newName),
+			  scenes = scenes.map {
+				  if (it.id == response.sceneId.toString()) {
+					  SceneItemViewModel(it.id, response.newName, it.index)
+				  } else it
+			  },
 			  renameSceneFailureMessage = null
 			)
 		}

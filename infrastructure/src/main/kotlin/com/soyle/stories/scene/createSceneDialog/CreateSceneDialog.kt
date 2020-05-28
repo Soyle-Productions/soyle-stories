@@ -15,6 +15,9 @@ class CreateSceneDialog : Fragment() {
 
 	override val scope: ProjectScope = super.scope as ProjectScope
 
+	private val sceneId: String? by params
+	private val relativeDirection: Boolean by params
+
 	private val viewListener by resolveLater<CreateNewSceneDialogViewListener>()
 	private val model = resolve<CreateSceneDialogModel>()
 
@@ -31,7 +34,13 @@ class CreateSceneDialog : Fragment() {
 			onAction = EventHandler {
 				it.consume()
 				model.executing.set(true)
-				viewListener.createScene(text)
+				when {
+					sceneId != null -> when (relativeDirection) {
+						true -> viewListener.createSceneBefore(text, sceneId!!)
+						false -> viewListener.createSceneAfter(text, sceneId!!)
+					}
+					else -> viewListener.createScene(text)
+				}
 			}
 		}
 	}
@@ -45,7 +54,7 @@ class CreateSceneDialog : Fragment() {
 	}
 
 }
-fun createSceneDialog(scope: ProjectScope): CreateSceneDialog = scope.get<CreateSceneDialog>().apply {
+fun createSceneDialog(scope: ProjectScope, relativeSceneId: String? = null, direction: Boolean = true): CreateSceneDialog = find<CreateSceneDialog>(scope, mapOf("sceneId" to relativeSceneId, "relativeDirection" to direction)).apply {
 	openModal(StageStyle.UTILITY, Modality.NONE, escapeClosesWindow = true, owner = scope.get<WorkBench>().currentWindow)?.apply {
 		centerOnScreen()
 		focusedProperty().onChange {

@@ -28,6 +28,7 @@ import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenesUseCase
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
 import com.soyle.stories.scene.usecases.renameScene.RenameSceneUseCase
+import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 
 object SceneModule {
 
@@ -38,6 +39,8 @@ object SceneModule {
 			provide<CreateNewScene> {
 				CreateNewSceneUseCase(
 				  projectId,
+				  get(),
+				  get(),
 				  get()
 				)
 			}
@@ -59,7 +62,7 @@ object SceneModule {
 			}
 
 			provide(CreateNewScene.OutputPort::class) {
-				CreateNewSceneNotifier()
+				CreateNewSceneNotifier(get<CreateStoryEventNotifier>())
 			}
 			provide(RenameScene.OutputPort::class) {
 				RenameSceneNotifier()
@@ -70,6 +73,7 @@ object SceneModule {
 
 			provide<CreateNewSceneController> {
 				CreateNewSceneControllerImpl(
+				  projectId.toString(),
 				  applicationScope.get(),
 				  applicationScope.get(),
 				  get(),

@@ -7,17 +7,14 @@ import com.soyle.stories.character.CreateCharacterDialogDriver
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Scene
 import com.soyle.stories.location.LocationListDriver
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.CreateProjectDialogDriver
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBenchDriver
 import com.soyle.stories.scene.CreateSceneDialogDriver
-import com.soyle.stories.scene.DeleteSceneDialogDriver
 import com.soyle.stories.scene.SceneListDriver
 import com.soyle.stories.scene.SceneSteps
-import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.CreateStoryEventDialogDriver
 import com.soyle.stories.storyevent.StoryEventSteps
@@ -46,10 +43,10 @@ class SoyleUATSteps : En, ApplicationTest() {
 	init {
 		CharacterSteps(this, double)
 		StoryEventSteps(this, double)
+		SceneSteps(this, double)
 		/*
 		LocationSteps(this, double)
 		ProjectSteps(this, double)
-		SceneSteps(this, double)
 		ApplicationSteps(this, double)
 		 */
 
@@ -167,40 +164,6 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		Given("the Tools Menu has been opened") {
 			WorkBenchDriver.givenMenuHasBeenOpened(double, "tools")
-		}
-		Given("the Create Scene Dialog has been opened") {
-			CreateSceneDialogDriver.givenHasBeenOpened(double)
-		}
-		Given("the Create Scene Dialog Name input has an invalid Scene Name") {
-			CreateSceneDialogDriver.givenNameInputHasInvalidSceneName(double)
-		}
-		Given("the Create Scene Dialog Name input has a valid Scene Name") {
-			CreateSceneDialogDriver.givenNameInputHasValidSceneName(double)
-		}
-		Given("{int} Scenes have been created") { count: Int ->
-			SceneSteps.givenNumberOfCreatedScenesIsAtLeast(double, count)
-		}
-		Given("The Scene List Tool has been opened") {
-			SceneListDriver.givenHasBeenOpened(double)
-		}
-		Given("A Scene has been created") {
-			SceneSteps.givenNumberOfCreatedScenesIsAtLeast(double, 1)
-		}
-		Given("the Scene right-click menu has been opened") {
-			SceneListDriver.givenRightClickMenuHasBeenOpened(double)
-		}
-		Given("a Scene has been selected") {
-			SceneListDriver.givenASceneHasBeenSelected(double)
-		}
-		Given("the user has entered a valid Scene name") {
-			SceneListDriver.givenValidSceneNameHasBeenEntered(double)
-		}
-		Given("the Scene rename input box is visible") {
-			SceneListDriver.givenRenameInputBoxHasBeenVisible(double)
-			targetObject = SceneListDriver.getSelectedItem(double)
-		}
-		Given("The Scene List Tool tab has been selected") {
-			SceneListDriver.givenHasBeenVisible(double)
 		}
 
 
@@ -323,32 +286,6 @@ class SoyleUATSteps : En, ApplicationTest() {
 		}
 		When("the {string} tool item is selected") { menuItemText: String ->
 			WorkBenchDriver.whenMenuItemIsSelected(double, "tools", menuItemText = menuItemText)
-		}
-		When("The Scene List Tool is opened") {
-			if (SceneListDriver.isOpen(double)) {
-				SceneListDriver.whenClosed(double)
-			}
-			SceneListDriver.whenOpened(double)
-		}
-		When("A new Scene is created") {
-			SceneSteps.whenSceneIsCreated(double)
-			targetObject = SceneSteps.getCreatedScenes(double).last()
-		}
-		When("the user clicks the Scene List Tool right-click menu Rename button") {
-			SceneListDriver.whenRightClickOptionIsClicked(double, "rename")
-		}
-		When("A Scene is deleted") {
-			val existingScenes = SceneSteps.getCreatedScenes(double)
-			SceneSteps.whenSceneIsDeleted(double)
-			targetObject = (existingScenes.toSet() - SceneSteps.getCreatedScenes(double).toSet()).single()
-		}
-		When("the user clicks the Scene List Tool right-click menu delete button") {
-			SceneListDriver.whenRightClickOptionIsClicked(double, "delete")
-			targetObject = SceneListDriver.getSelectedItem(double)
-		}
-		When("the user clicks the Scene List Tool delete button") {
-			SceneListDriver.whenBottomButtonIsClicked(double, "delete")
-			targetObject = SceneListDriver.getSelectedItem(double)
 		}
 
 
@@ -537,52 +474,6 @@ class SoyleUATSteps : En, ApplicationTest() {
 				else -> error("no registered tool with name $toolName")
 			}
 			assertFalse(isOpen)
-		}
-		Then("an error message should be displayed in the Create Scene Dialog") {
-			assertTrue(CreateSceneDialogDriver.isErrorMessageShown(double))
-		}
-		Then("the Create Scene Dialog should be closed") {
-			assertFalse(CreateSceneDialogDriver.isOpen(double))
-		}
-		Then("a new Scene should be created") {
-			assertTrue(SceneSteps.getNumberOfCreatedScenes(double) >= 1)
-		}
-		Then("The Scene List Tool should show a special empty message") {
-			assertTrue(SceneListDriver.isShowingEmptyMessage(double))
-		}
-		Then("The Scene List Tool should show all {int} scenes") { count: Int ->
-			assertTrue(SceneListDriver.isShowingNumberOfScenes(double, count))
-		}
-		Then("The Scene List Tool should show the new Scene") {
-			assertTrue(SceneListDriver.isShowingScene(double, targetObject as Scene))
-		}
-		Then("the Scene's name should be replaced by an input box") {
-			assertTrue(SceneListDriver.isRenameInputBoxVisible(double))
-		}
-		Then("the Scene rename input box should contain the Scene's name") {
-			assertTrue(SceneListDriver.isRenameInputBoxShowingNameOfSelected(double))
-		}
-		Then("the Scene rename input box should be replaced by the Scene name") {
-			assertFalse(SceneListDriver.isRenameInputBoxVisible(double))
-		}
-		Then("the Scene name should be the new name") {
-			val item = SceneListDriver.getItems(double).find {
-				it.value!!.id == (targetObject as SceneItemViewModel).id
-			}
-			val matching = item!!.value!!.name == (targetObject as SceneItemViewModel).name
-			assertFalse(matching)
-		}
-		Then("the Scene name should be the original name") {
-			assertTrue(SceneListDriver.isSelectedItemNameMatching(double, (targetObject as SceneItemViewModel).name))
-		}
-		Then("The Scene List Tool should not show the deleted Scene") {
-			assertFalse(SceneListDriver.isShowingScene(double, (targetObject as Scene)))
-		}
-		Then("the Confirm Delete Scene Dialog should be opened") {
-			assertTrue(DeleteSceneDialogDriver.isOpen(double))
-		}
-		Then("the Confirm Delete Scene Dialog should show the Scene name") {
-			assertTrue(DeleteSceneDialogDriver.isShowingNameOf(double, (targetObject as SceneItemViewModel)))
 		}
 
 		After { _: Scenario ->

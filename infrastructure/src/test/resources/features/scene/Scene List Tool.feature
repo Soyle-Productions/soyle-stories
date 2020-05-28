@@ -12,25 +12,25 @@ Feature: Scene List Tool
     When The Scene List Tool is opened
     Then The Scene List Tool should show a special empty message
 	
-  @create-scene @excluded
+  @create-scene
   Scenario: Open Scene creation dialog when empty
     Given the Scene List Tool has been opened
     When the center Create New Scene button is selected
     Then the Create Scene Dialog should be open
 	
-  @create-scene @excluded
+  @create-scene
   Scenario: Open Scene creation dialog when populated
     Given a Scene has been created
     And the Scene List Tool has been opened
     When the bottom Create New Scene button is selected
     Then the Create Scene Dialog should be open
 
-  @create-scene @excluded
+  @create-scene
   Scenario Outline: Open Scene creation dialog with relative Scene
     Given a Scene has been created
     And the Scene List Tool has been opened
     And the Scene List Tool right-click menu has been opened
-    When the Scene List Tool right-click menu <option> is selected
+    When the Scene List Tool right-click menu <option> option is selected
     Then the Create Scene Dialog should be open
 
     Examples:
@@ -38,7 +38,7 @@ Feature: Scene List Tool
       | "Insert New Scene Before" |
       | "Insert New Scene After"  |
 
-  @create-scene @excluded
+  @create-scene
   Scenario: Update when new Scene created
     Given the Scene List Tool has been opened
     And the Scene List Tool tab has been selected
@@ -46,7 +46,7 @@ Feature: Scene List Tool
     Then the Scene List Tool should show the new Scene
     And the new Scene should be at the end of the Scene List Tool
 
-  @create-scene @excluded
+  @create-scene
   Scenario: Update when new Scene created before relative Scene
     Given the Scene List Tool has been opened
     And the Scene List Tool tab has been selected
@@ -55,7 +55,7 @@ Feature: Scene List Tool
     Then the Scene List Tool should show the new Scene
     And the new Scene should be listed before the relative Scene in the Scene List Tool
 
-  @create-scene @excluded
+  @create-scene
   Scenario: Update when new Scene created after relative Scene
     Given the Scene List Tool has been opened
     And the Scene List Tool tab has been selected
@@ -79,7 +79,7 @@ Feature: Scene List Tool
       | 5      |
 
   @delete-scene
-  Scenario Outline: Update when Scenes are deleted
+  Scenario: Update when Scenes are deleted
     Given The Scene List Tool has been opened
     And 2 Scenes have been created
     When A Scene is deleted
@@ -90,7 +90,7 @@ Feature: Scene List Tool
     Given The Scene List Tool has been opened
     And A Scene has been created
     And the Scene right-click menu has been opened
-    When the user clicks the Scene List Tool right-click menu delete button
+    When the Scene List Tool right-click menu "Delete" option is selected
     Then the Confirm Delete Scene Dialog should be opened
     And the Confirm Delete Scene Dialog should show the Scene name
 
@@ -106,7 +106,7 @@ Feature: Scene List Tool
   @rename-scene
   Scenario: Renaming inside Scene List Tool creates input box
     Given the Scene right-click menu has been opened
-    When the user clicks the Scene List Tool right-click menu Rename button
+    When the Scene List Tool right-click menu "Rename" option is selected
     Then the Scene's name should be replaced by an input box
     And the Scene rename input box should contain the Scene's name
 

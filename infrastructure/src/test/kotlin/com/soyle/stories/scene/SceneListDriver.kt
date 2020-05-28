@@ -1,5 +1,6 @@
 package com.soyle.stories.scene
 
+import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.UATLogger
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.entities.Scene
@@ -11,10 +12,7 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.geometry.Side
 import javafx.scene.Node
-import javafx.scene.control.MenuItem
-import javafx.scene.control.TextField
-import javafx.scene.control.TreeItem
-import javafx.scene.control.TreeView
+import javafx.scene.control.*
 import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -108,11 +106,20 @@ object SceneListDriver : ApplicationTest() {
 		return emptyDisplay.visibleProperty().value
 	}
 
+	val centerButton = object : ReadOnlyDependentProperty<Button> {
+		override fun get(double: SoyleStoriesTestDouble): Button? {
+			val list = getIfOpen(double) ?: return null
+			val emptyDisplay = from(list.root).lookup(".empty-display").queryAll<Node>().firstOrNull() ?: return null
+			if (! emptyDisplay.visibleProperty().get()) return null
+			return from(emptyDisplay).lookup(".center-button").queryAll<Button>().firstOrNull()
+		}
+	}
+
 	fun setTreeViewVisible(double: SoyleStoriesTestDouble)
 	{
 		givenHasBeenOpened(double)
 		givenHasBeenVisible(double)
-		SceneSteps.givenNumberOfCreatedScenesIsAtLeast(double, 1)
+		ScenesDriver.givenNumberOfCreatedScenesIsAtLeast(double, 1)
 	}
 
 	fun getTreeViewIfVisible(double: SoyleStoriesTestDouble): TreeView<SceneItemViewModel>?
@@ -160,6 +167,14 @@ object SceneListDriver : ApplicationTest() {
 			if (idsMatch && !namesMatch) UATLogger.log("Matching id but mismatched name")
 			idsMatch && namesMatch
 		} != null
+	}
+
+	fun indexOfItemWithId(double: SoyleStoriesTestDouble, id: Scene.Id): Int
+	{
+		val items = getItems(double)
+		return items.indexOfFirst {
+			it.value?.id == id.uuid.toString()
+		}
 	}
 
 	fun setItemSelected(double: SoyleStoriesTestDouble)
@@ -278,11 +293,11 @@ object SceneListDriver : ApplicationTest() {
 		assertTrue(isValidSceneNameEntered(double))
 	}
 
-	fun whenRightClickOptionIsClicked(double: SoyleStoriesTestDouble, rightClickOptionId: String)
+	fun whenRightClickOptionIsClicked(double: SoyleStoriesTestDouble, rightClickOptionText: String)
 	{
 		val treeView = getTreeViewIfVisible(double) ?: error("no visible tree view")
 		val menu = treeView.contextMenu?.takeIf { it.isShowing } ?: error("no visible right-click menu")
-		val item = menu.items.find { it.id == rightClickOptionId } ?: error("no menu item with id $rightClickOptionId")
+		val item = menu.items.find { it.text == rightClickOptionText } ?: error("no menu item with id $rightClickOptionText")
 		interact {
 			item.fire()
 		}

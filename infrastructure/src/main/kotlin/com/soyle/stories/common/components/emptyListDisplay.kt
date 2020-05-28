@@ -49,8 +49,6 @@ fun EventTarget.emptyListDisplay(
 		GridPane.setValignment(this, VPos.TOP)
 		GridPane.setRowIndex(this, 1)
 		GridPane.setMargin(this, Insets(5.0, 0.0, 0.0, 0.0))
-		action {
-			callToAction()
-		}
+		action(callToAction)
 	}
 }
