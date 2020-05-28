@@ -12,6 +12,8 @@ class StoryEvent(
   val includedCharacterIds: List<Character.Id>
 ) {
 
+	constructor(name: String, projectId: Project.Id) : this(Id(), name, projectId, null, null, null, emptyList())
+
 	private fun copy(
 	  name: String = this.name,
 	  previousStoryEventId: Id? = this.previousStoryEventId,
