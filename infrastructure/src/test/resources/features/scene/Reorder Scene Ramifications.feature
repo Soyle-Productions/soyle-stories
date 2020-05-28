@@ -57,7 +57,7 @@ Feature: Reorder Scene Ramifications
 		 And the Reorder Scene Ramifications Changed Motivation field for "character A" in "scene 1" should show "value 2"
 		 
 	@new
-	Scenario: Motivation set in scene now before this scene
+	Scenario: Move behind scene with motivation set
 		Given the following Scenes
 			| character   | scene 1 | scene 2 |
 			| character A | inherit | value 2 |
@@ -68,7 +68,7 @@ Feature: Reorder Scene Ramifications
 		 And the Reorder Scene Ramifications Changed Motivation field for "character A" in "scene 1" should show "value 2"
 		 
 	@new
-	Scenario: Motivation set in scene now before this scene
+	Scenario: Scene with motivation set moved in front of this scene
 		Given the following Scenes
 			| character   | scene 1 | scene 2 |
 			| character A | value 1 | inherit |
