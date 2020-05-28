@@ -63,8 +63,11 @@ class SceneList : View() {
 					}
 				}
 				cellFormat {
-					text = when (it) {
-						is SceneItemViewModel -> it.name
+					when (it) {
+						is SceneItemViewModel -> {
+							graphic = label("${(it.index+1)}.")
+							text = it.name
+						}
 						else -> throw IllegalArgumentException("Invalid value type")
 					}
 				}
@@ -111,12 +114,14 @@ class SceneList : View() {
 		}
 		item("Insert New Scene Before") {
 			action {
-				createSceneDialog(scope)
+				val selectedItem = model.selectedItem.value?.id ?: return@action
+				createSceneDialog(scope, selectedItem, true)
 			}
 		}
 		item("Insert New Scene After") {
 			action {
-				createSceneDialog(scope)
+				val selectedItem = model.selectedItem.value?.id ?: return@action
+				createSceneDialog(scope, selectedItem, false)
 			}
 		}
 		item("Delete") {
