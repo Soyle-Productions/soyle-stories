@@ -72,7 +72,7 @@ task fullTestReport {
         dependsOn(useCasesTest, adaptersTest, javafxTest, ":infrastructure:runFeaturesUsingJUnit")
     }
 }
-task run {
+task runInIde {
     group = "Soyle Tasks"
     description = "Start the application in the IDE"
 
