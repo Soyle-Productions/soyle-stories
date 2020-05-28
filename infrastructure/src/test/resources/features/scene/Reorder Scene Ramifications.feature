@@ -78,5 +78,32 @@ Feature: Reorder Scene Ramifications
 		 And the Reorder Scene Ramifications Current Motivation field for "character A" in "scene 2" should show "value 1"
 		 And the Reorder Scene Ramifications Changed Motivation field for "character A" in "scene 2" should be empty
 		
+	@new
+	Scenario: React to Motivation change in Ramification Tool 
+		Given the Reorder Ramifications Tool is open
+		And a Scene With a Character is listed
+		And a Character has had no set Motivation
+		And the Scene Details Tool is opened for that Scene
+		When the Motivation is set for Character in the Scene Details Tool
+		Then the Motivation for Character should show the set Motivation that Character
 		
-	
+	@new
+	Scenario: React to Motivation change in Ramification Tool 
+		Given the Reorder Ramifications Tool is open
+		And a Scene with a Character is listed
+		When the Motivation is changed for Character in the Scene Details Tool
+		Then the Motivation for Character should show the set Motivation of that Character
+		
+	@new
+	Scenario: React to Character removal in Ramifications Tool 
+		Given the Reorder Ramifications Tool has been opened
+		And a Character has been listed
+		When the user removes a Character from that Scene
+		Then the Character should be removed from the Ramifications tool
+		
+	@new
+	Scenario: React to Scene removal in Ramifications Tool 
+		Given the Reorder Ramifications Tool has been opened
+		And a Scene has been listed
+		When the user removes the Scene
+		Then the Scene should be removed from the Ramifications tool
