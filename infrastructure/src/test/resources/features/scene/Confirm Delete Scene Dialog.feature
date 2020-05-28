@@ -5,16 +5,11 @@ Feature: Confirm Delete Scene Dialog
 	Given 2 Scenes have been created
 	  And the Confirm Delete Scene Dialog has been opened
 
-	@delete-scene @excluded
-	Scenario Outline: Cancel the deletion
-	 When the Confirm Delete Scene Dialog <button> button is selected
+	@delete-scene
+	Scenario: Cancel the deletion
+	 When the Confirm Delete Scene Dialog "Cancel" button is selected
 	 Then the Confirm Delete Scene Dialog should be closed
 	  And the Scene should not be deleted
-	  
-	Examples: 
-	| button |
-	| "Cancel" |
-	| "close" |
 	
 	@delete-scene @excluded
 	Scenario Outline: Toggle show dialog

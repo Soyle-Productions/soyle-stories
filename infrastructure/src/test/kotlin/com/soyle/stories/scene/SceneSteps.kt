@@ -7,6 +7,7 @@ import io.cucumber.java8.En
 import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.testfx.framework.junit5.ApplicationTest
 
 class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
@@ -61,6 +62,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Given("the Scene List Tool right-click menu has been opened") {
 				SceneListDriver.givenRightClickMenuHasBeenOpened(double)
 			}
+			Given("the Confirm Delete Scene Dialog has been opened") {
+				DeleteSceneDialogDriver.openDialog.given(double)
+				targetObject = DeleteSceneDialogDriver.targetScene.get(double)!!
+			}
 
 
 			When("The Scene List Tool is opened") {
@@ -110,6 +115,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				ScenesDriver.createdSceneAfter(existing.first()).whenSet(double)
 				createdScene = ScenesDriver.getCreatedScenes(double).filterNot { it.id in existing }.firstOrNull()
 			}
+			When("the Confirm Delete Scene Dialog {string} button is selected") { button: String ->
+				val button = DeleteSceneDialogDriver.button(button).get(double)!!
+				interact {
+					clickOn(button, MouseButton.PRIMARY)
+				}
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
@@ -156,10 +167,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				Assertions.assertFalse(SceneListDriver.isShowingScene(double, (targetObject as Scene)))
 			}
 			Then("the Confirm Delete Scene Dialog should be opened") {
-				Assertions.assertTrue(DeleteSceneDialogDriver.isOpen(double))
+				Assertions.assertTrue(DeleteSceneDialogDriver.openDialog.check(double))
 			}
 			Then("the Confirm Delete Scene Dialog should show the Scene name") {
-				Assertions.assertTrue(DeleteSceneDialogDriver.isShowingNameOf(double, (targetObject as SceneItemViewModel)))
+				Assertions.assertTrue(DeleteSceneDialogDriver.isShowingNameOf((targetObject as SceneItemViewModel)).check(double))
 			}
 			Then("the Scene List Tool should show the new Scene") {
 				Assertions.assertTrue(SceneListDriver.isShowingScene(double, createdScene!!))
@@ -178,6 +189,14 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Then("the new Scene should be listed after the first Scene in the Scene List Tool") {
 				val createdIndex = SceneListDriver.indexOfItemWithId(double, createdScene!!.id)
 				assertEquals(1, createdIndex)
+			}
+			Then("the Confirm Delete Scene Dialog should be closed") {
+				assertFalse(DeleteSceneDialogDriver.openDialog.check(double))
+			}
+			Then("the Scene should not be deleted") {
+				ScenesDriver.getCreatedScenes(double).find {
+					it.id == (targetObject as Scene).id
+				}!!
 			}
 		}
 	}
