@@ -22,7 +22,7 @@ Feature: Confirm Delete Scene Dialog
 	| "Delete" |
 	| "Show Ramifications" |
 	
-	@delete-scene @excluded
+	@delete-scene
 	Scenario: Delete without showing ramifications
 	 When the Confirm Delete Scene Dialog "Delete" button is selected
 	 Then the Scene should be deleted

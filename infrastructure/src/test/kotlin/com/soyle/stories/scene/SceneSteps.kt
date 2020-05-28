@@ -6,8 +6,7 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
 
 class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
@@ -209,6 +208,11 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				SceneListDriver.givenRightClickMenuHasBeenOpened(double)
 				SceneListDriver.whenRightClickOptionIsClicked(double, "Delete")
 				assertFalse(DeleteSceneDialogDriver.openDialog.check(double))
+			}
+			Then("the Scene should be deleted") {
+				assertNull(ScenesDriver.getCreatedScenes(double).find {
+					it isSameEntityAs (targetObject as Scene)
+				})
 			}
 		}
 	}
