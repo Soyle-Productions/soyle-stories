@@ -4,7 +4,6 @@ import com.soyle.stories.common.hideScrollbars
 import com.soyle.stories.common.rowCountProperty
 import com.soyle.stories.di.resolveLater
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.LocationDetailsToolViewModel
 import javafx.geometry.Orientation
 import javafx.scene.Parent
 import javafx.scene.control.Tab
@@ -48,8 +47,8 @@ class LocationDetails : View() {
 	}
 }
 
-fun TabPane.locationDetailsTab(projectScope: ProjectScope, locationDetailsToolViewModel: LocationDetailsToolViewModel): Tab {
-	val scope = LocationDetailsScope(projectScope, locationDetailsToolViewModel)
+fun TabPane.locationDetailsTab(projectScope: ProjectScope, locationDetails: com.soyle.stories.layout.tools.dynamic.LocationDetails): Tab {
+	val scope = LocationDetailsScope(projectScope, locationDetails)
 	val structure = find<LocationDetails>(scope = scope)
 	val tab = tab(structure)
 	tab.tabPaneProperty().onChange {

@@ -22,11 +22,11 @@ object WorkBenchDriver : ApplicationTest() {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
 		val menuBar = from(projectScope.get<WorkBench>().root).lookup(".menu-bar").queryAll<MenuBar>().firstOrNull()
 		  ?: return null
-		val topMenu = menuBar.menus.find { it.id == menuId } ?: return null
+		val topMenu = menuBar.menus.find { it.text == menuId } ?: return null
 		if (menuIds.isEmpty()) return topMenu
 		var menu: Menu = topMenu
 		menuIds.forEach { currentMenuId ->
-			val item = menu.items.find { it.id == currentMenuId } ?: return null
+			val item = menu.items.find { it.text == currentMenuId } ?: return null
 			if (item is Menu) menu = item
 		}
 		return menu
@@ -41,13 +41,13 @@ object WorkBenchDriver : ApplicationTest() {
 	fun whenMenuIsOpened(double: SoyleStoriesTestDouble, menuId: String, vararg menuIds: String) {
 		val projectScope = ProjectSteps.getProjectScope(double)!!
 		val menuBar = from(projectScope.get<WorkBench>().root).lookup(".menu-bar").query<MenuBar>()
-		val topMenu = menuBar.menus.find { it.id == menuId }!!
+		val topMenu = menuBar.menus.find { it.text == menuId }!!
 		interact {
 			topMenu.show()
 			if (menuIds.isEmpty()) return@interact
 			var menu: Menu = topMenu
 			menuIds.forEach { currentMenuId ->
-				val item = menu.items.find { it.id == currentMenuId } ?: return@interact
+				val item = menu.items.find { it.text == currentMenuId } ?: return@interact
 				if (item is Menu) {
 					item.show()
 					menu = item

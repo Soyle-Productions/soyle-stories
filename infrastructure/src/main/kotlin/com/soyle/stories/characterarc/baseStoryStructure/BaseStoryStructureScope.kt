@@ -1,20 +1,15 @@
-/**
- * Created by Brendan
- * Date: 3/2/2020
- * Time: 5:35 PM
- */
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.di.DI
+import com.soyle.stories.layout.tools.dynamic.BaseStoryStructure
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.BaseStoryStructureToolViewModel
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventTarget
 import tornadofx.FX
 import tornadofx.Scope
 import tornadofx.removeFromParent
 
-class BaseStoryStructureScope(val projectScope: ProjectScope, private val tool: BaseStoryStructureToolViewModel) : Scope() {
+class BaseStoryStructureScope(val projectScope: ProjectScope, private val toolId: String, private val tool: BaseStoryStructure) : Scope() {
 
     private val isClosedProperty = SimpleBooleanProperty(false)
     private var isClosed
@@ -25,13 +20,13 @@ class BaseStoryStructureScope(val projectScope: ProjectScope, private val tool: 
         }
 
     val themeId: String
-        get() = tool.themeId
+        get() = tool.themeId.toString()
 
     val characterId: String
-        get() = tool.characterId
+        get() = tool.characterId.toString()
 
     init {
-    	projectScope.addScope(tool.toolId, this)
+    	projectScope.addScope(toolId, this)
     }
 
     fun close() {
@@ -41,7 +36,7 @@ class BaseStoryStructureScope(val projectScope: ProjectScope, private val tool: 
         isClosed = true
         deregister()
         DI.deregister(this)
-        projectScope.removeScope(tool.toolId, this)
+        projectScope.removeScope(toolId, this)
     }
 
 }

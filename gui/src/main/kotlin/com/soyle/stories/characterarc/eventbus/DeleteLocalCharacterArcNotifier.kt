@@ -5,16 +5,15 @@
  */
 package com.soyle.stories.characterarc.eventbus
 
-import com.soyle.stories.characterarc.LocalCharacterArcException
-import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 
-class DeleteLocalCharacterArcNotifier : DeleteLocalCharacterArc.OutputPort, Notifier<DeleteLocalCharacterArc.OutputPort>() {
-    override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {
-        notifyAll { it.receiveDeleteLocalCharacterArcFailure(failure) }
+class DeleteLocalCharacterArcNotifier : DemoteMajorCharacter.OutputPort, Notifier<DemoteMajorCharacter.OutputPort>() {
+    override fun receiveDemoteMajorCharacterResponse(response: DemoteMajorCharacter.ResponseModel) {
+        notifyAll { it.receiveDemoteMajorCharacterResponse(response) }
     }
 
-    override fun receiveDeleteLocalCharacterArcResponse(response: DeleteLocalCharacterArc.ResponseModel) {
-        notifyAll { it.receiveDeleteLocalCharacterArcResponse(response) }
+    override fun receiveDemoteMajorCharacterFailure(failure: Exception) {
+        notifyAll { it.receiveDemoteMajorCharacterFailure(failure) }
     }
 }

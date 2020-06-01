@@ -1,17 +1,14 @@
-/**
- * Created by Brendan
- * Date: 3/1/2020
- * Time: 4:05 PM
- */
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.layout.tools.dynamic.BaseStoryStructure
+import com.soyle.stories.layout.tools.dynamic.CharacterComparison
 import com.soyle.stories.layout.usecases.openTool.OpenTool
+import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 import java.util.*
 
 class CharacterListController(
@@ -20,10 +17,10 @@ class CharacterListController(
     private val listAllCharacterArcsOutputPort: ListAllCharacterArcs.OutputPort,
     private val openTool: OpenTool,
     private val openToolOutputPort: OpenTool.OutputPort,
-    private val removeCharacterFromStory: RemoveCharacterFromLocalStory,
-    private val removeCharacterFromStoryOutputPort: RemoveCharacterFromLocalStory.OutputPort,
-    private val deleteCharacterArc: DeleteLocalCharacterArc,
-    private val deleteCharacterArcOutputPort: DeleteLocalCharacterArc.OutputPort,
+    private val removeCharacterFromStory: RemoveCharacterFromStory,
+    private val removeCharacterFromStoryOutputPort: RemoveCharacterFromStory.OutputPort,
+    private val deleteCharacterArc: DemoteMajorCharacter,
+    private val deleteCharacterArcOutputPort: DemoteMajorCharacter.OutputPort,
     private val renameCharacter: RenameCharacter,
     private val renameCharacterOutputPort: RenameCharacter.OutputPort,
     private val renameCharacterArc: RenameCharacterArc,
@@ -37,7 +34,7 @@ class CharacterListController(
     }
 
     override fun openBaseStoryStructureTool(characterId: String, themeId: String) {
-        val request = OpenTool.RequestModel.BaseStoryStructure(
+        val request = BaseStoryStructure(
             UUID.fromString(characterId),
             UUID.fromString(themeId)
         )
@@ -47,9 +44,9 @@ class CharacterListController(
     }
 
     override fun openCharacterComparison(characterId: String, themeId: String) {
-        val request = OpenTool.RequestModel.CharacterComparison(
-            UUID.fromString(characterId),
-            UUID.fromString(themeId)
+        val request = CharacterComparison(
+          UUID.fromString(themeId),
+            UUID.fromString(characterId)
         )
         threadTransformer.async {
             openTool(request, openToolOutputPort)

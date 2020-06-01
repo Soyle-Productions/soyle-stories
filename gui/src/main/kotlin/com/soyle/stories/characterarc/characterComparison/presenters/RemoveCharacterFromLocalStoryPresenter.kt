@@ -1,17 +1,16 @@
 package com.soyle.stories.characterarc.characterComparison.presenters
 
-import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.characterarc.characterComparison.CharacterComparisonView
 import java.util.*
 
 internal class RemoveCharacterFromLocalStoryPresenter(
   private val themeId: UUID,
   private val view: CharacterComparisonView
-) : RemoveCharacterFromLocalStory.OutputPort {
+) : RemoveCharacterFromStory.OutputPort {
 
-	override fun receiveRemoveCharacterFromLocalStoryResponse(response: RemoveCharacterFromLocalStory.ResponseModel) {
-		if (themeId !in response.updatedThemes) return
+	override fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
+		if (themeId !in response.affectedThemeIds) return
 		view.update {
 			val focusOptions = focusCharacterOptions.filterNot { it.characterId == response.characterId.toString() }
 			val focusedCharacter = focusedCharacter?.takeUnless { it.characterId == response.characterId.toString() }
@@ -24,5 +23,5 @@ internal class RemoveCharacterFromLocalStoryPresenter(
 		}
 	}
 
-	override fun receiveRemoveCharacterFromLocalStoryFailure(failure: CharacterException) {}
+	override fun receiveRemoveCharacterFromStoryFailure(failure: Exception) {}
 }

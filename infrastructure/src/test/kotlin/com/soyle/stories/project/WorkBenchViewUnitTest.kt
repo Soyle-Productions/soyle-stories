@@ -1,6 +1,7 @@
 package com.soyle.stories.project
 
 import com.soyle.stories.di.DI
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.projectList.ProjectFileViewModel
@@ -8,10 +9,6 @@ import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.EventTarget
-import javafx.scene.Node
-import javafx.scene.Parent
-import javafx.scene.control.Menu
-import javafx.stage.Stage
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +44,7 @@ class WorkBenchViewUnitTest : ApplicationTest() {
 					TODO("Not yet implemented")
 				}
 
-				override suspend fun toggleToolOpen(toolId: String) {
+				override suspend fun toggleToolOpen(tool: FixedTool) {
 
 				}
 			}

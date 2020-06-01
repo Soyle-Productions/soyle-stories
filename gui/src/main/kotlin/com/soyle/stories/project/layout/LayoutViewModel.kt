@@ -1,5 +1,7 @@
 package com.soyle.stories.project.layout
 
+import com.soyle.stories.layout.tools.ToolType
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import kotlin.reflect.KClass
 
 /**
@@ -15,15 +17,15 @@ data class LayoutViewModel(
     val openDialogs: Map<KClass<out Dialog>, Dialog> = mapOf()
 )
 
-class WindowViewModel(val id: String, val child: WindowChildViewModel)
+data class WindowViewModel(val id: String, val child: WindowChildViewModel)
 sealed class WindowChildViewModel {
     abstract val id: String
 }
-class GroupSplitterViewModel(val splitterId: String, val orientation: Boolean, val children: List<Pair<Int, WindowChildViewModel>>) : WindowChildViewModel() {
+data class GroupSplitterViewModel(val splitterId: String, val orientation: Boolean, val children: List<Pair<Int, WindowChildViewModel>>) : WindowChildViewModel() {
     override val id: String
         get() = splitterId
 }
-class ToolGroupViewModel(val groupId: String, val focusedToolId: String?, val tools: List<ToolViewModel>) : WindowChildViewModel() {
+data class ToolGroupViewModel(val groupId: String, val focusedToolId: String?, val tools: List<ToolViewModel>) : WindowChildViewModel() {
     override val id: String
         get() = groupId
 
@@ -31,19 +33,9 @@ class ToolGroupViewModel(val groupId: String, val focusedToolId: String?, val to
         return "${super.toString()}(groupId = $groupId, focusedToolId = $focusedToolId, tools = $tools)"
     }
 }
-class StaticToolViewModel(val toolId: String, val isOpen: Boolean, val name: String)
-sealed class ToolViewModel {
-    abstract val toolId: String
-}
-class CharacterListToolViewModel(override val toolId: String) : ToolViewModel()
-class LocationListToolViewModel(override val toolId: String) : ToolViewModel()
-class SceneListToolViewModel(override val toolId: String) : ToolViewModel()
-class StoryEventListToolViewModel(override val toolId: String) : ToolViewModel()
 
-class BaseStoryStructureToolViewModel(override val toolId: String, val characterId: String, val themeId: String) : ToolViewModel()
-class CharacterComparisonToolViewModel(override val toolId: String, val themeId: String, val characterId: String) : ToolViewModel()
-class LocationDetailsToolViewModel(override val toolId: String, val locationId: String) : ToolViewModel()
-class StoryEventDetailsToolViewModel(override val toolId: String, val storyEventId: String) : ToolViewModel()
+data class StaticToolViewModel(val type: FixedTool, val isOpen: Boolean, val name: String)
+class ToolViewModel(val toolId: String, val type: ToolType, val name: String)
 
 sealed class Dialog {
     object CreateCharacter : Dialog()

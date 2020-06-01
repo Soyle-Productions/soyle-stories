@@ -5,10 +5,14 @@ import com.soyle.stories.characterarc.characterComparison.characterComparisonTab
 import com.soyle.stories.characterarc.characterList.CharacterList
 import com.soyle.stories.common.async
 import com.soyle.stories.di.resolve
+import com.soyle.stories.layout.tools.dynamic.*
+import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.temporary.TemporaryTool
 import com.soyle.stories.location.locationDetails.locationDetailsTab
 import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.*
+import com.soyle.stories.project.layout.LayoutViewListener
+import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.scene.sceneList.SceneList
 import com.soyle.stories.storyevent.storyEventDetails.storyEventDetailsTab
 import com.soyle.stories.storyevent.storyEventList.StoryEventList
@@ -56,24 +60,25 @@ class ToolGroup : WindowChild() {
                 val toolIds = vm.tools.map { it.toolId }.toSet()
                 vm.tools.map { tool ->
                     tabMap.getOrPut(tool.toolId) {
-                        when (tool) {
-                            is CharacterListToolViewModel -> tab<CharacterList>()
-                            is LocationListToolViewModel -> tab<LocationList>()
-                            is SceneListToolViewModel -> tab<SceneList>()
-                            is StoryEventListToolViewModel -> tab<StoryEventList>()
-                            is BaseStoryStructureToolViewModel -> baseStoryStructureTab(scope, tool)
-                            is CharacterComparisonToolViewModel -> characterComparisonTab(scope, tool.themeId, tool.characterId)
-                            is LocationDetailsToolViewModel -> locationDetailsTab(scope, tool)
-                            is StoryEventDetailsToolViewModel -> storyEventDetailsTab(scope, tool)/*
-                            ToolType.Timeline -> Tab("").also { tabs.add(it) }
-                            ToolType.NoteList -> Tab().also { tabs.add(it) }
-                            ToolType.SceneList -> Tab().also { tabs.add(it) }
-                            ToolType.Properties -> Tab().also { tabs.add(it) }
-                            ToolType.PlotPointList -> Tab().also { tabs.add(it) }
-                            ToolType.SceneWeave -> Tab().also { tabs.add(it) }
-                            ToolType.ContinuityErrors -> Tab().also { tabs.add(it) }
-                            ToolType.CharacterDevelopment -> Tab().also { tabs.add(it) }
-                            ToolType.LocationTracking -> Tab().also { tabs.add(it) }*/
+                        val type = tool.type
+                        when (type) {
+                            is FixedTool -> when (type) {
+                                FixedTool.CharacterList -> tab<CharacterList>()
+                                FixedTool.LocationList -> tab<LocationList>()
+                                FixedTool.SceneList -> tab<SceneList>()
+                                FixedTool.StoryEventList -> tab<StoryEventList>()
+                            }
+                            is DynamicTool -> when (type) {
+                                is BaseStoryStructure -> baseStoryStructureTab(scope, tool.toolId, type)
+                                is CharacterComparison -> characterComparisonTab(scope, type.themeId.toString(), type.characterId.toString())
+                                is LocationDetails -> locationDetailsTab(scope, type)
+                                is StoryEventDetails -> storyEventDetailsTab(scope, type)
+                                is TemporaryTool -> when (type) {
+                                    else -> kotlin.error("")
+                                }
+                                else -> kotlin.error("")
+                            }
+                            else -> kotlin.error("")
                         }.also {
                             it.setOnCloseRequest {
                                 async(scope) {
@@ -83,6 +88,30 @@ class ToolGroup : WindowChild() {
                             }
                             selectionModel.select(it)
                         }
+                        /*
+
+                        when (tool) {
+                            is CharacterListToolViewModel -> tab<CharacterList>()
+                            is LocationListToolViewModel -> tab<LocationList>()
+                            is SceneListToolViewModel -> tab<SceneList>()
+                            is StoryEventListToolViewModel -> tab<StoryEventList>()
+
+                            is BaseStoryStructureToolViewModel -> baseStoryStructureTab(scope, tool)
+                            is CharacterComparisonToolViewModel -> characterComparisonTab(scope, tool.themeId, tool.characterId)
+                            is LocationDetailsToolViewModel -> locationDetailsTab(scope, tool)
+                            is StoryEventDetailsToolViewModel -> storyEventDetailsTab(scope, tool)
+
+                            ToolType.Timeline -> Tab("").also { tabs.add(it) }
+                            ToolType.NoteList -> Tab().also { tabs.add(it) }
+                            ToolType.SceneList -> Tab().also { tabs.add(it) }
+                            ToolType.Properties -> Tab().also { tabs.add(it) }
+                            ToolType.PlotPointList -> Tab().also { tabs.add(it) }
+                            ToolType.SceneWeave -> Tab().also { tabs.add(it) }
+                            ToolType.ContinuityErrors -> Tab().also { tabs.add(it) }
+                            ToolType.CharacterDevelopment -> Tab().also { tabs.add(it) }
+                            ToolType.LocationTracking -> Tab().also { tabs.add(it) }
+                        }
+                         */
                     }
                 }
                 tabMap.forEach { (t, u) ->

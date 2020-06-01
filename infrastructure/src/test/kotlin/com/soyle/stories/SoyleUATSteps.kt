@@ -141,10 +141,10 @@ class SoyleUATSteps : En, ApplicationTest() {
 			LocationListDriver.givenRenameInputBoxIsVisible(double)
 		}
 		Given("the File Menu has been opened") {
-			WorkBenchDriver.givenMenuHasBeenOpened(double, "file")
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "File")
 		}
 		Given("the File New Menu has been opened") {
-			WorkBenchDriver.givenMenuHasBeenOpened(double, "file", "file_new")
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "File", "New")
 		}
 		Given("the {string} tool has been opened") { toolName: String ->
 			when (toolName) {
@@ -163,12 +163,12 @@ class SoyleUATSteps : En, ApplicationTest() {
 			}
 		}
 		Given("the Tools Menu has been opened") {
-			WorkBenchDriver.givenMenuHasBeenOpened(double, "tools")
+			WorkBenchDriver.givenMenuHasBeenOpened(double, "Tools")
 		}
 
 
 		When("User selects the file->new->location menu option") {
-			ProjectSteps.whenMenuItemIsSelected(double, "file", "file_new", "file_new_location")
+			ProjectSteps.whenMenuItemIsSelected(double, "File", "New", "Location")
 		}
 		When("User clicks the center create new location button") {
 			LocationSteps.whenLocationListToolCenterButtonIsClicked(double)
@@ -276,16 +276,16 @@ class SoyleUATSteps : En, ApplicationTest() {
 			}
 		}
 		When("the File New Menu is opened") {
-			WorkBenchDriver.whenMenuIsOpened(double, "file", "file_new")
+			WorkBenchDriver.whenMenuIsOpened(double, "File", "New")
 		}
 		When("the File New {string} option is selected") { menuItemText: String ->
-			WorkBenchDriver.whenMenuItemIsSelected(double, "file", "file_new", menuItemText = menuItemText)
+			WorkBenchDriver.whenMenuItemIsSelected(double, "File", "New", menuItemText = menuItemText)
 		}
 		When("the Tools Menu is opened") {
-			WorkBenchDriver.whenMenuIsOpened(double, "tools")
+			WorkBenchDriver.whenMenuIsOpened(double, "Tools")
 		}
 		When("the {string} tool item is selected") { menuItemText: String ->
-			WorkBenchDriver.whenMenuItemIsSelected(double, "tools", menuItemText = menuItemText)
+			WorkBenchDriver.whenMenuItemIsSelected(double, "Tools", menuItemText = menuItemText)
 		}
 
 
@@ -308,7 +308,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertTrue(LocationSteps.createNewLocationDialogShowsErrorMessage(double))
 		}
 		Then("The create new location dialog should be closed") {
+			UATLogger.silent = false
 			assertFalse(LocationSteps.isCreateNewLocationDialogOpen(double))
+			UATLogger.silent = true
 		}
 		Then("the confirm delete location dialog should be opened") {
 			assertTrue(LocationSteps.isConfirmDeleteLocationDialogOpen(double))
@@ -435,7 +437,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertTrue(CharacterDriver.isCharacterListToolShowingErrorOnInputBoxForSelectedItem(double))
 		}
 		Then("the File New Menu should display {string}") { menuText: String ->
-			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "file", "file_new", menuItemText = menuText))
+			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "File", "New", menuItemText = menuText))
 		}
 		Then("the Create New {string} Dialog should be open") { domainObject: String ->
 			val isOpen = when (domainObject) {
@@ -449,13 +451,13 @@ class SoyleUATSteps : En, ApplicationTest() {
 			assertTrue(isOpen)
 		}
 		Then("the Tools Menu should display {string}") { menuText: String ->
-			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "tools", menuItemText = menuText))
+			assertTrue(WorkBenchDriver.isMenuItemVisible(double, "Tools", menuItemText = menuText))
 		}
 		Then("the Tools Menu {string} option should be checked") { menuText: String ->
-			assertTrue(WorkBenchDriver.isMenuItemChecked(double, "tools", menuItemText = menuText))
+			assertTrue(WorkBenchDriver.isMenuItemChecked(double, "Tools", menuItemText = menuText))
 		}
 		Then("the Tools Menu {string} option should be unchecked") { menuText: String ->
-			assertFalse(WorkBenchDriver.isMenuItemChecked(double, "tools", menuItemText = menuText))
+			assertFalse(WorkBenchDriver.isMenuItemChecked(double, "Tools", menuItemText = menuText))
 		}
 		Then("the {string} tool should be open") { toolName: String ->
 			val isOpen = when (toolName) {

@@ -15,6 +15,7 @@ class CreateLocationDialogPresenter(
 	fun displayCreateLocationDialog() {
 		view.update {
 			CreateLocationDialogViewModel(
+			  true,
 			  null
 			)
 		}

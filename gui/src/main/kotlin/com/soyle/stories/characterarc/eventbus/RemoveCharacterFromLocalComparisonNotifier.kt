@@ -1,15 +1,15 @@
 package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.LocalThemeException
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromLocalComparison
+import com.soyle.stories.theme.ThemeException
+import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison
 
-class RemoveCharacterFromLocalComparisonNotifier : RemoveCharacterFromLocalComparison.OutputPort, Notifier<RemoveCharacterFromLocalComparison.OutputPort>() {
-    override fun receiveRemoveCharacterFromLocalComparisonFailure(failure: LocalThemeException) {
-        notifyAll { it.receiveRemoveCharacterFromLocalComparisonFailure(failure) }
+class RemoveCharacterFromLocalComparisonNotifier : RemoveCharacterFromComparison.OutputPort, Notifier<RemoveCharacterFromComparison.OutputPort>() {
+    override fun receiveRemoveCharacterFromComparisonResponse(response: RemoveCharacterFromComparison.ResponseModel) {
+        notifyAll { it.receiveRemoveCharacterFromComparisonResponse(response) }
     }
 
-    override fun receiveRemoveCharacterFromLocalComparisonResponse(response: RemoveCharacterFromLocalComparison.ResponseModel) {
-        notifyAll { it.receiveRemoveCharacterFromLocalComparisonResponse(response) }
+    override fun receiveRemoveCharacterFromComparisonFailure(failure: ThemeException) {
+        notifyAll { it.receiveRemoveCharacterFromComparisonFailure(failure) }
     }
 }

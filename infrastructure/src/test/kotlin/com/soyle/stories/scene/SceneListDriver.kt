@@ -2,9 +2,13 @@ package com.soyle.stories.scene
 
 import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.UATLogger
+import com.soyle.stories.common.async
 import com.soyle.stories.common.editingCell
+import com.soyle.stories.di.get
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.project.ProjectSteps
+import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.scene.SceneListDriver.interact
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneList
@@ -12,7 +16,10 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.geometry.Side
 import javafx.scene.Node
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.TextField
+import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -44,16 +51,20 @@ object SceneListDriver : ApplicationTest() {
 	fun isOpen(double: SoyleStoriesTestDouble): Boolean = getIfOpen(double) != null
 
 	fun whenOpened(double: SoyleStoriesTestDouble) {
-		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Scenes")!!
+		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
-			menuItem.fire()
+			async(scope) {
+				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.SceneList)
+			}
 		}
 	}
 
 	fun whenClosed(double: SoyleStoriesTestDouble) {
-		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Scenes")!!
+		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
-			menuItem.fire()
+			async(scope) {
+				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.SceneList)
+			}
 		}
 	}
 
@@ -154,7 +165,9 @@ object SceneListDriver : ApplicationTest() {
 
 	fun isShowingNumberOfScenes(double: SoyleStoriesTestDouble, count: Int): Boolean
 	{
-		return getItems(double).size == count
+		val items = getItems(double)
+		UATLogger.log("Item count: " + items.size)
+		return items.size == count
 	}
 
 	fun isShowingScene(double: SoyleStoriesTestDouble, scene: Scene): Boolean

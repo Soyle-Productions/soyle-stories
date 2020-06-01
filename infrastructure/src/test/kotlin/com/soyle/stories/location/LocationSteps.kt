@@ -1,6 +1,7 @@
 package com.soyle.stories.location
 
 import com.soyle.stories.UATLogger
+import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.common.async
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.common.isEditing
@@ -8,6 +9,8 @@ import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
+import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.location.LocationSteps.interact
 import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.DeleteLocationController
@@ -23,9 +26,7 @@ import com.soyle.stories.location.locationList.PopulatedDisplay
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectSteps
-import com.soyle.stories.project.WorkBenchModel
-import com.soyle.stories.project.layout.Dialog
-import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
@@ -45,7 +46,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.find
 import tornadofx.selectFirst
-import tornadofx.toObservable
+import tornadofx.uiComponent
 import java.util.*
 
 object LocationSteps : ApplicationTest() {
@@ -66,9 +67,11 @@ object LocationSteps : ApplicationTest() {
 	fun isLocationListToolOpen(double: SoyleStoriesTestDouble): Boolean = getOpenLocationListTool(double) != null
 
 	fun whenLocationListToolIsOpened(double: SoyleStoriesTestDouble) {
-		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Locations")!!
-		interact {
-			menuItem.fire()
+		val scope = ProjectSteps.getProjectScope(double)!!
+		CharacterDriver.interact {
+			async(scope) {
+				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.LocationList)
+			}
 		}
 	}
 
@@ -85,9 +88,11 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun whenLocationListToolIsClosed(double: SoyleStoriesTestDouble) {
-		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Locations")!!
-		interact {
-			menuItem.fire()
+		val scope = ProjectSteps.getProjectScope(double)!!
+		CharacterDriver.interact {
+			async(scope) {
+				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.LocationList)
+			}
 		}
 	}
 
@@ -167,21 +172,23 @@ object LocationSteps : ApplicationTest() {
 	// create new location dialog open
 
 	fun setCreateNewLocationDialogOpen(double: SoyleStoriesTestDouble) {
-		ProjectSteps.givenProjectHasBeenOpened(double)
-		val scope = ProjectSteps.getProjectScope(double)!!
+		val menuItem = ProjectSteps.getMenuItem(double, "File", "New", "Location")!!
 		interact {
-			find<WorkBenchModel>(scope).openDialogs.let {
-				it.set((it.get() + (Dialog.CreateLocation::class to Dialog.CreateLocation)).toObservable())
-			}
+			menuItem.fire()
 		}
 	}
 
 	fun isCreateNewLocationDialogOpen(double: SoyleStoriesTestDouble): Boolean {
-		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
-		val isOpen: Boolean
-		val dialog = findComponentsInScope<CreateLocationDialog>(projectScope).singleOrNull()
-		isOpen = dialog != null && (dialog.currentStage?.isShowing == true)
-		return isOpen
+		return getOpenCreateNewLocationDialog(double) != null
+	}
+
+	fun getOpenCreateNewLocationDialog(double: SoyleStoriesTestDouble): CreateLocationDialog?
+	{
+		val dialog = listWindows().find {
+			it.scene.root.uiComponent<CreateLocationDialog>() != null
+		}?.scene?.root?.uiComponent<CreateLocationDialog>()
+		  ?: return (null).also { UATLogger.log("no project started") }
+		return dialog.takeIf { it.currentStage?.isShowing == true }
 	}
 
 	fun givenCreateNewLocationDialogHasBeenOpened(double: SoyleStoriesTestDouble) {
@@ -306,21 +313,20 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun createLocationDialogLocationNameIsInvalid(double: SoyleStoriesTestDouble): Boolean {
-		if (!isCreateNewLocationDialogOpen(double)) return false
-		val scope = ProjectSteps.getProjectScope(double) ?: return false
+		val dialog = getOpenCreateNewLocationDialog(double)
 		var isInvalid = false
 		interact {
-			val name = findComponentsInScope<CreateLocationDialog>(scope).singleOrNull()?.name?.get()
+			val name = dialog?.name?.get()
 			isInvalid = name != null && name.isBlank()
 		}
 		return isInvalid
 	}
 
 	fun whenUserEntersInvalidLocationNameInCreatedLocationDialog(double: SoyleStoriesTestDouble) {
-		givenCreateNewLocationDialogHasBeenOpened(double)
+		val dialog = getOpenCreateNewLocationDialog(double)!!
 		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
-			val textInput = from(find<CreateLocationDialog>(scope).root).lookup("#name").queryTextInputControl()
+			val textInput = from(dialog.root).lookup("#name").queryTextInputControl()
 			textInput.requestFocus()
 			textInput.textProperty().set("  ")
 		}
@@ -334,11 +340,10 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun createLocationDialogLocationNameIsValid(double: SoyleStoriesTestDouble): Boolean {
-		if (!isCreateNewLocationDialogOpen(double)) return false
-		val scope = ProjectSteps.getProjectScope(double) ?: return false
+		val dialog = getOpenCreateNewLocationDialog(double)
 		var isInvalid = false
 		interact {
-			val name = findComponentsInScope<CreateLocationDialog>(scope).singleOrNull()?.name?.get()
+			val name = dialog?.name?.get()
 			isInvalid = name != null && name.isNotBlank()
 		}
 		return isInvalid
@@ -346,9 +351,9 @@ object LocationSteps : ApplicationTest() {
 
 	fun whenUserEntersValidLocationNameInCreatedLocationDialog(double: SoyleStoriesTestDouble) {
 		givenCreateNewLocationDialogHasBeenOpened(double)
-		val scope = ProjectSteps.getProjectScope(double)!!
+		val dialog = getOpenCreateNewLocationDialog(double)!!
 		interact {
-			from(find<CreateLocationDialog>(scope).root).lookup("#name").queryTextInputControl().textProperty().set("Valid Location Name")
+			from(dialog.root).lookup("#name").queryTextInputControl().textProperty().set("Valid Location Name")
 		}
 	}
 
@@ -397,16 +402,16 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun whenCreateLocationDialogCreateButtonIsClicked(double: SoyleStoriesTestDouble) {
-		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
+		val dialog = getOpenCreateNewLocationDialog(double)!!
 		interact {
-			from(projectScope.get<CreateLocationDialog>().root).lookup("#createLocation").queryButton().onAction.handle(ActionEvent())
+			from(dialog.root).lookup("#createLocation").queryButton().onAction.handle(ActionEvent())
 		}
 	}
 
 	fun whenCreateLocationDialogCancelButtonIsClicked(double: SoyleStoriesTestDouble) {
-		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
+		val dialog = getOpenCreateNewLocationDialog(double)!!
 		interact {
-			from(projectScope.get<CreateLocationDialog>().root).lookup("#cancel").queryButton().onAction.handle(ActionEvent())
+			from(dialog.root).lookup("#cancel").queryButton().onAction.handle(ActionEvent())
 		}
 	}
 
@@ -444,10 +449,10 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun createNewLocationDialogShowsErrorMessage(double: SoyleStoriesTestDouble): Boolean {
-		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
+		val dialog = getOpenCreateNewLocationDialog(double)
 		var text: Text? = null
 		interact {
-			text = from(findComponentsInScope<CreateLocationDialog>(projectScope).single().root).lookup("#errorMessage").queryText()
+			text = from(dialog?.root).lookup("#errorMessage").queryText()
 		}
 		return text!!.isVisible && text!!.text.isNotBlank()
 	}
@@ -536,10 +541,10 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun locationNameIsBlankInCreateLocationDialog(double: SoyleStoriesTestDouble): Boolean {
-		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
+		val dialog = getOpenCreateNewLocationDialog(double)
 		var name: String? = null
 		interact {
-			name = findComponentsInScope<CreateLocationDialog>(projectScope).singleOrNull()?.name?.value
+			name = dialog?.name?.value
 		}
 		return name?.isBlank() ?: false
 	}

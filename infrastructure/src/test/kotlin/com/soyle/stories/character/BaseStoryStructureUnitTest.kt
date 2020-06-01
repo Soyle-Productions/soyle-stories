@@ -9,7 +9,6 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.BaseStoryStructureToolViewModel
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.event.ActionEvent
@@ -35,7 +34,7 @@ class BaseStoryStructureUnitTest : ApplicationTest() {
 	val locationId = UUID.randomUUID()
 
 	val projectViewModel = ProjectFileViewModel(projectId, "Untitled", "")
-	val viewModel = BaseStoryStructureToolViewModel(toolId.toString(), characterId.toString(), themeId.toString())
+	val type = com.soyle.stories.layout.tools.dynamic.BaseStoryStructure(characterId, themeId)
 
 	@BeforeEach
 	fun setupFX() {
@@ -86,7 +85,7 @@ class BaseStoryStructureUnitTest : ApplicationTest() {
 		if (scope == null) whenBaseStoryStructureCreated()
 	}
 	private fun whenBaseStoryStructureCreated() {
-		scope = BaseStoryStructureScope(ProjectScope(ApplicationScope(), projectViewModel), viewModel)
+		scope = BaseStoryStructureScope(ProjectScope(ApplicationScope(), projectViewModel), toolId.toString(), type)
 		scoped<BaseStoryStructureScope> {
 			provide<BaseStoryStructureViewListener> {
 				object : BaseStoryStructureViewListener {

@@ -72,6 +72,8 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 					SceneListDriver.whenClosed(double)
 				}
 				SceneListDriver.whenOpened(double)
+				assertTrue(SceneListDriver.isOpen(double))
+				SceneListDriver.givenHasBeenVisible(double)
 			}
 			When("A new Scene is created") {
 				ScenesDriver.whenSceneIsCreated(double)

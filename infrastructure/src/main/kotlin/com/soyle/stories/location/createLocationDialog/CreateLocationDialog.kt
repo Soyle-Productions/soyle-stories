@@ -1,21 +1,20 @@
 package com.soyle.stories.location.createLocationDialog
 
 import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
-import com.soyle.stories.project.layout.Dialog
-import com.soyle.stories.project.layout.LayoutViewListener
+import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.WorkBench
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.stage.Modality
-import javafx.stage.Stage
 import javafx.stage.StageStyle
 import tornadofx.*
 
-class CreateLocationDialog : View("New Location") {
+class CreateLocationDialog : Fragment("New Location") {
 
 	private val model = find<CreateLocationDialogModel>()
 	private val createLocationDialogViewListener: CreateLocationDialogViewListener = resolve()
-	private val layoutViewListener: LayoutViewListener = resolve()
 
 	val name = SimpleStringProperty("")
 	val description = SimpleStringProperty("")
@@ -60,21 +59,17 @@ class CreateLocationDialog : View("New Location") {
 		}
 	}
 
-	override fun onUndock() {
-		FX.getComponents(scope).remove(CreateLocationDialog::class)
-		layoutViewListener.closeDialog(Dialog.CreateLocation::class)
-	}
-
 	init {
 		model.isOpen.onChangeUntil({ it != true }) {
 			if (it != true) close()
 		}
 		createLocationDialogViewListener.getValidState()
 	}
+
 }
 
-fun Component.createLocationDialog(owner: Stage?): CreateLocationDialog = find {
-	openModal(StageStyle.UTILITY, Modality.APPLICATION_MODAL, escapeClosesWindow = true, owner = owner)?.apply {
+fun createLocationDialog(scope: ProjectScope): CreateLocationDialog = scope.get<CreateLocationDialog>().apply {
+	openModal(StageStyle.UTILITY, Modality.APPLICATION_MODAL, escapeClosesWindow = true, owner = scope.get<WorkBench>().currentWindow)?.apply {
 		centerOnScreen()
 	}
 }

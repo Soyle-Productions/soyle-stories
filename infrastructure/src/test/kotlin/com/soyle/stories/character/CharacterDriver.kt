@@ -10,14 +10,15 @@ import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.project.ProjectSteps
+import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.ActionEvent
 import javafx.geometry.Side
 import javafx.scene.Node
 import javafx.scene.control.DialogPane
-import javafx.scene.control.MenuItem
 import javafx.scene.control.TextField
 import javafx.scene.control.TreeView
 import javafx.stage.Window
@@ -80,9 +81,11 @@ object CharacterDriver : ApplicationTest() {
 	fun isCharacterListToolOpen(double: SoyleStoriesTestDouble): Boolean = getOpenCharacterListTool(double) != null
 
 	fun whenCharacterListToolIsOpened(double: SoyleStoriesTestDouble) {
-		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Characters")!!
+		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
-			menuItem.fire()
+			async(scope) {
+				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.CharacterList)
+			}
 		}
 	}
 
@@ -100,9 +103,11 @@ object CharacterDriver : ApplicationTest() {
 	}
 
 	fun whenCharacterListToolIsClosed(double: SoyleStoriesTestDouble) {
-		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Characters")!!
+		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
-			menuItem.fire()
+			async(scope) {
+				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.CharacterList)
+			}
 		}
 	}
 

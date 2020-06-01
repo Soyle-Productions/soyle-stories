@@ -1,16 +1,15 @@
 package com.soyle.stories.characterarc.characterComparison.presenters
 
-import com.soyle.stories.characterarc.LocalCharacterArcException
 import com.soyle.stories.characterarc.characterComparison.CharacterComparisonView
-import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
+import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 import java.util.*
 
 internal class DeleteLocalCharacterArcPresenter(
   private val themeId: UUID,
   private val view: CharacterComparisonView
-) : DeleteLocalCharacterArc.OutputPort {
+) : DemoteMajorCharacter.OutputPort {
 
-	override fun receiveDeleteLocalCharacterArcResponse(response: DeleteLocalCharacterArc.ResponseModel) {
+	override fun receiveDemoteMajorCharacterResponse(response: DemoteMajorCharacter.ResponseModel) {
 		if (response.themeId == themeId && !response.themeRemoved) {
 			view.update {
 				copy(
@@ -20,6 +19,6 @@ internal class DeleteLocalCharacterArcPresenter(
 		}
 	}
 
-	override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {}
+	override fun receiveDemoteMajorCharacterFailure(failure: Exception) {}
 
 }

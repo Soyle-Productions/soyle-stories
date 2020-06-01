@@ -2,6 +2,7 @@ package com.soyle.stories.location
 
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.location.locationList.LocationListModel
@@ -34,7 +35,8 @@ class LocationListUnitTest : ApplicationTest() {
 
 				}
 
-				override suspend fun toggleToolOpen(toolId: String) {
+				override suspend fun toggleToolOpen(tool: FixedTool) {
+
 				}
 
 				override suspend fun closeTool(toolId: String) {

@@ -6,9 +6,7 @@ import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
 import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
-import com.soyle.stories.location.createLocationDialog.CreateLocationDialogModel
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
-import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
@@ -51,9 +49,7 @@ class WorkBench : View() {
                     }
                     item("Location") {
                         id = "file_new_location"
-                        action {
-                            layoutViewListener.openDialog(Dialog.CreateLocation)
-                        }
+                        action { createLocationDialog(scope) }
                     }
                     item("Scene") {
                         id = "file_new_scene"
@@ -83,11 +79,10 @@ class WorkBench : View() {
                 id = "tools"
                 items.bind(model.staticTools) {
                     checkmenuitem(it.name) {
-                        id = "tools_${it.name}"
                         isSelected = it.isOpen
                         action {
                             async(scope) {
-                                layoutViewListener.toggleToolOpen(it.toolId)
+                                layoutViewListener.toggleToolOpen(it.type)
                             }
                         }
                     }
@@ -137,11 +132,6 @@ class WorkBench : View() {
                         layoutViewListener.loadLayoutForProject(scope.projectId)
                     }
                 }
-            }
-        }
-        find<CreateLocationDialogModel>().isOpen.onChange {
-            if (it == true) {
-                createLocationDialog(this.currentStage)
             }
         }
 
