@@ -1,5 +1,6 @@
 package com.soyle.stories.scene
 
+import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -27,6 +28,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			}
 			Given("{int} Scenes have been created") { count: Int ->
 				ScenesDriver.givenNumberOfCreatedScenesIsAtLeast(double, count)
+				targetObject = ScenesDriver.getCreatedScenes(double).firstOrNull()
 			}
 			Given("The Scene List Tool has been opened") {
 				SceneListDriver.givenHasBeenOpened(double)
@@ -64,7 +66,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				DeleteSceneDialogDriver.openDialog.given(double)
 				targetObject = DeleteSceneDialogDriver.targetScene.get(double)!!
 			}
-
+			Given("all Characters have been included in the Scene") {
+				val scene = targetObject as Scene
+				CharacterDriver.getCharactersCreated(double).forEach { character ->
+					ScenesDriver.characterIncludedIn(character.id, scene.id).given(double)
+				}
+			}
 
 			When("The Scene List Tool is opened") {
 				if (SceneListDriver.isOpen(double)) {

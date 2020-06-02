@@ -9,7 +9,6 @@ Feature: Delete Scene Ramifications
 		When the Delete Scene Ramifications Tool is opened
 		Then the Delete Scene Ramifications Tool should display an ok message
 
-	@excluded
 	Scenario: No motivations set in Scene
 		Given 4 Characters have been created
 		And all Characters have been included in the Scene
