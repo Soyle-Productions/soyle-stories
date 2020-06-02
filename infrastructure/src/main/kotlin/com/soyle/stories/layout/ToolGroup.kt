@@ -7,12 +7,14 @@ import com.soyle.stories.common.async
 import com.soyle.stories.di.resolve
 import com.soyle.stories.layout.tools.dynamic.*
 import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.temporary.Ramifications
 import com.soyle.stories.layout.tools.temporary.TemporaryTool
 import com.soyle.stories.location.locationDetails.locationDetailsTab
 import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
+import com.soyle.stories.scene.deleteSceneRamifications.deleteSceneRamificationsTab
 import com.soyle.stories.scene.sceneList.SceneList
 import com.soyle.stories.storyevent.storyEventDetails.storyEventDetailsTab
 import com.soyle.stories.storyevent.storyEventList.StoryEventList
@@ -74,6 +76,9 @@ class ToolGroup : WindowChild() {
                                 is LocationDetails -> locationDetailsTab(scope, type)
                                 is StoryEventDetails -> storyEventDetailsTab(scope, type)
                                 is TemporaryTool -> when (type) {
+                                    is Ramifications -> when (type) {
+                                        is Ramifications.DeleteSceneRamifications -> deleteSceneRamificationsTab(scope, type)
+                                    }
                                     else -> kotlin.error("")
                                 }
                                 else -> kotlin.error("")

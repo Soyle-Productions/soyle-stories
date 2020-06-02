@@ -7,7 +7,7 @@ import com.soyle.stories.scene.SceneDoesNotExist
 import java.util.*
 
 sealed class Ramifications : TemporaryTool() {
-	class DeleteSceneRamifications(val sceneId: UUID, private val locale: Locale) : Ramifications() {
+	data class DeleteSceneRamifications(val sceneId: UUID, private val locale: Locale) : Ramifications() {
 		override suspend fun validate(context: OpenToolContext) {
 			context.sceneRepository.getSceneById(Scene.Id(sceneId))
 			  ?: throw SceneDoesNotExist(locale, sceneId)

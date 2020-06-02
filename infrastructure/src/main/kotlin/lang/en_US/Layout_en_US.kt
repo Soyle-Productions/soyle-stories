@@ -21,7 +21,7 @@ class Layout_en_US : LayoutLocale {
 		  CharacterComparison::class to "Character Comparison",
 		  LocationDetails::class to "Location",
 		  StoryEventDetails::class to "Story Event",
-		  Ramifications::class to "Ramifications"
+		  Ramifications.DeleteSceneRamifications::class to "Ramifications - Delete {0}"
 		)
 	}
 

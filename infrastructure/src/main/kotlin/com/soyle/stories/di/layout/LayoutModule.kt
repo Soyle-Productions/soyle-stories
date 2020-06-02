@@ -60,7 +60,7 @@ object LayoutModule {
 			}
 
 			provide(OpenToolController::class) {
-				OpenToolControllerImpl(applicationScope.get(), get(), get())
+				OpenToolControllerImpl(applicationScope.get(), applicationScope.get(), get(), get())
 			}
 
 			provide<LayoutViewListener> {

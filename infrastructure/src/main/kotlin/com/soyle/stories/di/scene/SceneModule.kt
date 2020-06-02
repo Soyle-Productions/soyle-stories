@@ -116,7 +116,8 @@ object SceneModule {
 				  get(),
 				  get(),
 				  get(),
-				  presenter
+				  presenter,
+				  get()
 				)
 			}
 

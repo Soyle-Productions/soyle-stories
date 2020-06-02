@@ -5,7 +5,6 @@ import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.java8.En
 import javafx.scene.input.MouseButton
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
 
@@ -128,59 +127,62 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 					clickOn(checkBox, MouseButton.PRIMARY)
 				}
 			}
+			When("the Delete Scene Ramifications Tool is opened") {
+				DeleteSceneRamificationsDriver.openTool.whenSet(double)
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
-				Assertions.assertTrue(CreateSceneDialogDriver.isErrorMessageShown(double))
+				assertTrue(CreateSceneDialogDriver.isErrorMessageShown(double))
 			}
 			Then("the Create Scene Dialog should be open") {
-				Assertions.assertTrue(CreateSceneDialogDriver.isOpen(double))
+				assertTrue(CreateSceneDialogDriver.isOpen(double))
 			}
 			Then("the Create Scene Dialog should be closed") {
-				Assertions.assertFalse(CreateSceneDialogDriver.isOpen(double))
+				assertFalse(CreateSceneDialogDriver.isOpen(double))
 			}
 			Then("a new Scene should be created") {
-				Assertions.assertTrue(ScenesDriver.getNumberOfCreatedScenes(double) >= 1)
+				assertTrue(ScenesDriver.getNumberOfCreatedScenes(double) >= 1)
 			}
 			Then("The Scene List Tool should show a special empty message") {
-				Assertions.assertTrue(SceneListDriver.isShowingEmptyMessage(double))
+				assertTrue(SceneListDriver.isShowingEmptyMessage(double))
 			}
 			Then("The Scene List Tool should show all {int} scenes") { count: Int ->
-				Assertions.assertTrue(SceneListDriver.isShowingNumberOfScenes(double, count))
+				assertTrue(SceneListDriver.isShowingNumberOfScenes(double, count))
 			}
 			Then("The Scene List Tool should show the new Scene") {
-				Assertions.assertTrue(SceneListDriver.isShowingScene(double, createdScene as Scene))
+				assertTrue(SceneListDriver.isShowingScene(double, createdScene as Scene))
 			}
 			Then("the Scene's name should be replaced by an input box") {
-				Assertions.assertTrue(SceneListDriver.isRenameInputBoxVisible(double))
+				assertTrue(SceneListDriver.isRenameInputBoxVisible(double))
 			}
 			Then("the Scene rename input box should contain the Scene's name") {
-				Assertions.assertTrue(SceneListDriver.isRenameInputBoxShowingNameOfSelected(double))
+				assertTrue(SceneListDriver.isRenameInputBoxShowingNameOfSelected(double))
 			}
 			Then("the Scene rename input box should be replaced by the Scene name") {
-				Assertions.assertFalse(SceneListDriver.isRenameInputBoxVisible(double))
+				assertFalse(SceneListDriver.isRenameInputBoxVisible(double))
 			}
 			Then("the Scene name should be the new name") {
 				val item = SceneListDriver.getItems(double).find {
 					it.value!!.id == (targetObject as SceneItemViewModel).id
 				}
 				val matching = item!!.value!!.name == (targetObject as SceneItemViewModel).name
-				Assertions.assertFalse(matching)
+				assertFalse(matching)
 			}
 			Then("the Scene name should be the original name") {
-				Assertions.assertTrue(SceneListDriver.isSelectedItemNameMatching(double, (targetObject as SceneItemViewModel).name))
+				assertTrue(SceneListDriver.isSelectedItemNameMatching(double, (targetObject as SceneItemViewModel).name))
 			}
 			Then("The Scene List Tool should not show the deleted Scene") {
-				Assertions.assertFalse(SceneListDriver.isShowingScene(double, (targetObject as Scene)))
+				assertFalse(SceneListDriver.isShowingScene(double, (targetObject as Scene)))
 			}
 			Then("the Confirm Delete Scene Dialog should be opened") {
-				Assertions.assertTrue(DeleteSceneDialogDriver.openDialog.check(double))
+				assertTrue(DeleteSceneDialogDriver.openDialog.check(double))
 			}
 			Then("the Confirm Delete Scene Dialog should show the Scene name") {
-				Assertions.assertTrue(DeleteSceneDialogDriver.isShowingNameOf((targetObject as SceneItemViewModel)).check(double))
+				assertTrue(DeleteSceneDialogDriver.isShowingNameOf((targetObject as SceneItemViewModel)).check(double))
 			}
 			Then("the Scene List Tool should show the new Scene") {
-				Assertions.assertTrue(SceneListDriver.isShowingScene(double, createdScene!!))
+				assertTrue(SceneListDriver.isShowingScene(double, createdScene!!))
 			}
 			Then("the new Scene should be at the end of the Scene List Tool") {
 				assertEquals(
@@ -215,6 +217,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				assertNull(ScenesDriver.getCreatedScenes(double).find {
 					it isSameEntityAs (targetObject as Scene)
 				})
+			}
+			Then("the Delete Scene Ramifications Tool should be open") {
+				assertTrue(DeleteSceneRamificationsDriver.openTool.check(double))
+			}
+			Then("the Delete Scene Ramifications Tool should display an ok message") {
+				assertTrue(DeleteSceneRamificationsDriver.okDisplay.check(double))
 			}
 		}
 	}

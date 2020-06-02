@@ -1,14 +1,17 @@
 package com.soyle.stories.layout.openTool
 
+import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.tools.dynamic.BaseStoryStructure
 import com.soyle.stories.layout.tools.dynamic.LocationDetails
 import com.soyle.stories.layout.tools.dynamic.StoryEventDetails
+import com.soyle.stories.layout.tools.temporary.Ramifications
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import java.util.*
 
 class OpenToolControllerImpl(
   private val threadTransformer: ThreadTransformer,
+  private val localeManager: LocaleManager,
   private val openTool: OpenTool,
   private val openToolOutputPort: OpenTool.OutputPort
 ) : OpenToolController {
@@ -39,6 +42,18 @@ class OpenToolControllerImpl(
 			openTool.invoke(
 			  StoryEventDetails(
 				UUID.fromString(storyEventId)
+			  ),
+			  openToolOutputPort
+			)
+		}
+	}
+
+	override fun openDeleteSceneRamificationsTool(sceneId: String) {
+		threadTransformer.async {
+			openTool.invoke(
+			  Ramifications.DeleteSceneRamifications(
+				UUID.fromString(sceneId),
+				localeManager.getCurrentLocale()
 			  ),
 			  openToolOutputPort
 			)

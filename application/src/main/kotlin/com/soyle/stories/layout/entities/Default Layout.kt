@@ -2,6 +2,7 @@ package com.soyle.stories.layout.entities
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.temporary.Ramifications
 
 /**
  * Created by Brendan
@@ -32,6 +33,7 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                 }
             }
             stack(2) {
+                marker(Ramifications.DeleteSceneRamifications::class)
                 //openTool(ToolType.Timeline)
                 //openTool(ToolType.ContinuityErrors)
             }
