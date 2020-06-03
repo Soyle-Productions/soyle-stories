@@ -48,7 +48,7 @@ class ListAllScenesUnitTest {
 	private fun givenNoScenes() = given()
 	private fun given(sceneIds: List<UUID> = emptyList()) {
 		storedScenes = sceneIds.map {
-			Scene(Scene.Id(it), projectId, "Unique Scene Name: $it", StoryEvent.Id())
+			Scene(Scene.Id(it), projectId, "Unique Scene Name: $it", StoryEvent.Id(), mapOf())
 		}
 		sceneRepository = SceneRepositoryDouble(
 		  initialScenes = storedScenes
