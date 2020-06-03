@@ -1,6 +1,7 @@
 package com.soyle.stories.entities
 
 import com.soyle.stories.common.Entity
+import com.soyle.stories.scene.CharacterNotInScene
 import java.util.*
 
 class Scene(
@@ -30,6 +31,14 @@ class Scene(
 
 	fun withName(newName: String) = copy(name = newName)
 	fun withCharacterIncluded(characterId: Character.Id) = copy(characterMotivations = characterMotivations + (characterId to null))
+	fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene
+	{
+		if (! includesCharacter(characterId)) throw CharacterNotInScene(id.uuid, characterId.uuid)
+		return copy(characterMotivations = characterMotivations.mapValues {
+			if (it.key == characterId) motivation
+			else it.value
+		})
+	}
 
 	data class Id(val uuid: UUID = UUID.randomUUID()) {
 		override fun toString(): String = "Scene($uuid)"

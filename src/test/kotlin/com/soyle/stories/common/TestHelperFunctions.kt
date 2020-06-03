@@ -23,3 +23,5 @@ inline infix fun <A, B, T> Either<A, B>.thenFailWith(expectedFailure: () -> T) {
 }
 
 fun Any?.mustEqual(expected: Any?, message: () -> String = { "" }) = assertEquals(expected, this) { message() }
+
+fun Any?.shouldBe(assertion: (Any?) -> Unit) = assertion(this)
