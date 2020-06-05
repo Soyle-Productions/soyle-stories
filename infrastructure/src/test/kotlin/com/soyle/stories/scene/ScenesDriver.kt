@@ -109,6 +109,21 @@ object ScenesDriver : ApplicationTest() {
 		controller.deleteScene(sceneId.uuid.toString())
 	}
 
+	fun deletedScene(sceneId: Scene.Id) = object : DependentProperty<Nothing> {
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  ProjectSteps::givenProjectHasBeenOpened
+		)
+		override fun get(double: SoyleStoriesTestDouble): Nothing? = null
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			val scope = ProjectSteps.getProjectScope(double)!!
+			val controller = scope.get<DeleteSceneController>()
+			interact {
+				controller.deleteScene(sceneId.uuid.toString())
+			}
+		}
+	}
+
 	fun characterIncludedIn(characterId: Character.Id, sceneId: Scene.Id) = object : DependentProperty<Nothing> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
 		  ProjectSteps::givenProjectHasBeenOpened

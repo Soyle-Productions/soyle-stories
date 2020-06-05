@@ -48,13 +48,15 @@ Feature: Delete Scene Ramifications
 		Then "character A" should be listed for "scene 3" in the Delete Scene Ramifications Tool for "scene 2"
 		And the Current Motivation field for "character A" in "scene 3" in the Delete Scene Ramifications Tool for "scene 2" should show "value2a"
 		And the Changed Motivation field for "character A" in "scene 3" in the Delete Scene Ramifications Tool for "scene 2" should show "value1a"
-		
-	@excluded
+
+	@delete-scene
 	Scenario: React to Scene Deleted
-		Given the Delete Scene Ramifications Tool has been opened
-		And 2 Scenes have been listed in the Delete Scene Ramifications Tool
-		When one of the listed Scenes is deleted
-		Then the deleted Scene should be removed from the Delete Scene Ramifications Tool
+		Given the following Scenes
+			| character   | scene 1 | scene 2 | scene 3 |
+			| character A | value1a | inherit | inherit |
+		And the Delete Scene Ramifications Tool has been opened for "scene 1"
+		When "scene 2" is deleted
+		Then "scene 2" should not be listed in the Delete Scene Ramifications Tool for "scene 1"
 		
 	@excluded
 	Scenario: React to Character Deleted

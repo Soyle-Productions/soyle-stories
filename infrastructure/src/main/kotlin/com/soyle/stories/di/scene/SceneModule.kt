@@ -180,7 +180,8 @@ object SceneModule {
 				  applicationScope.get(),
 				  projectScope.get(),
 				  DeleteSceneRamificationsPresenter(
-					get<DeleteSceneRamificationsModel>()
+					get<DeleteSceneRamificationsModel>(),
+					projectScope.get<DeleteSceneNotifier>()
 				  )
 				)
 			}

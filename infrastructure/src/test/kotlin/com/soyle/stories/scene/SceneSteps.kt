@@ -108,6 +108,11 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 					list.first() to character.id
 				}.toMap()
 			}
+			Given("the Delete Scene Ramifications Tool has been opened for {string}") { focusScene: String ->
+				val sceneId = sceneIdFor!![focusScene]!!
+				sceneRamificationsSceneId = sceneId
+				DeleteSceneRamificationsDriver.tool(sceneId).given(double)
+			}
 
 			When("The Scene List Tool is opened") {
 				if (SceneListDriver.isOpen(double)) {
@@ -182,6 +187,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				val sceneId = sceneIdFor!![sceneName]!!
 				sceneRamificationsSceneId = sceneId
 				DeleteSceneRamificationsDriver.tool(sceneId).whenSet(double)
+			}
+			When("{string} is deleted") { sceneName: String ->
+				val sceneId = sceneIdFor!![sceneName]!!
+				ScenesDriver.deletedScene(sceneId).whenSet(double)
 			}
 
 
@@ -276,6 +285,11 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			}
 			Then("the Delete Scene Ramifications Tool should display an ok message") {
 				assertTrue(DeleteSceneRamificationsDriver.okDisplay(sceneRamificationsSceneId!!).check(double))
+			}
+			Then("{string} should not be listed in the Delete Scene Ramifications Tool for {string}") { sceneName: String, focusScene: String ->
+				val focusSceneId = sceneIdFor!!.getValue(focusScene)
+				val targetSceneId = sceneIdFor!!.getValue(sceneName)
+				assertFalse(DeleteSceneRamificationsDriver.listedScene(focusSceneId, targetSceneId).check(double))
 			}
 			Then("{string} should be listed for {string} in the Delete Scene Ramifications Tool for {string}") { characterName: String, sceneName: String, focusScene: String ->
 				val focusSceneId = sceneIdFor!!.getValue(focusScene)
