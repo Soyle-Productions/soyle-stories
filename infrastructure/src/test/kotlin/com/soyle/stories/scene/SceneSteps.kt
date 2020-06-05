@@ -1,5 +1,6 @@
 package com.soyle.stories.scene
 
+import com.soyle.stories.UATLogger
 import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Scene
@@ -276,46 +277,56 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Then("the Delete Scene Ramifications Tool should display an ok message") {
 				assertTrue(DeleteSceneRamificationsDriver.okDisplay(sceneRamificationsSceneId!!).check(double))
 			}
-			Then("{string} should be listed in the Delete Scene Ramifications Tool for {string}") { listedItem: String, focusScene: String ->
+			Then("{string} should be listed for {string} in the Delete Scene Ramifications Tool for {string}") { characterName: String, sceneName: String, focusScene: String ->
 				val focusSceneId = sceneIdFor!!.getValue(focusScene)
-				val targetSceneId = sceneIdFor!![listedItem]
-				val characterId = characterIdFor!![listedItem]
-				val item: Any? = when {
-					targetSceneId != null -> DeleteSceneRamificationsDriver.listedScene(focusSceneId, targetSceneId).get(double)
-					characterId != null -> DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, characterId).get(double)
-					else -> null
-				}
+				val targetSceneId = sceneIdFor!!.getValue(sceneName)
+				val characterId = characterIdFor!!.getValue(characterName)
+				val characterItem = DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, targetSceneId, characterId).get(double)
 
-				assertNotNull(item)
+				assertNotNull(characterItem)
 			}
-			Then("{string} should not be listed in the Delete Scene Ramifications Tool for {string}") { listedItem: String, focusScene: String ->
+			Then("{string} should not be listed for {string} in the Delete Scene Ramifications Tool for {string}") { characterName: String, sceneName: String, focusScene: String ->
 				val focusSceneId = sceneIdFor!!.getValue(focusScene)
-				val targetSceneId = sceneIdFor!![listedItem]
-				val characterId = characterIdFor!![listedItem]
-				val item: Any? = when {
-					targetSceneId != null -> DeleteSceneRamificationsDriver.listedScene(focusSceneId, targetSceneId).get(double)
-					characterId != null -> DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, characterId).get(double)
-					else -> null
-				}
+				val targetSceneId = sceneIdFor!!.getValue(sceneName)
+				val characterId = characterIdFor!!.getValue(characterName)
+				val characterItem = DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, targetSceneId, characterId).get(double)
 
-				assertNull(item)
+				assertNull(characterItem)
 			}
-			Then("the Current Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should show the value from {string}") {
-				characterName: String, listedSceneName: String, focusSceneName: String, sourceSceneName: String ->
+			Then("the Current Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should show {string}") {
+				characterName: String, listedSceneName: String, focusSceneName: String, expectedValue: String ->
 
 				val characterId = characterIdFor!!.getValue(characterName)
 				val listedSceneId = sceneIdFor!!.getValue(listedSceneName)
 				val focusSceneId = sceneIdFor!!.getValue(focusSceneName)
-				val sourceSceneId = sceneIdFor!!.getValue(sourceSceneName)
+
+				UATLogger.silent = false
+				val currentMotivation = DeleteSceneRamificationsDriver.currentMotivation(focusSceneId, listedSceneId, characterId).get(double)
+				UATLogger.silent = true
+
+				assertEquals(expectedValue, currentMotivation)
+			}
+			Then("the Current Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should be empty") {
+				characterName: String, listedSceneName: String, focusSceneName: String ->
+
+				val characterId = characterIdFor!!.getValue(characterName)
+				val listedSceneId = sceneIdFor!!.getValue(listedSceneName)
+				val focusSceneId = sceneIdFor!!.getValue(focusSceneName)
 
 				val currentMotivation = DeleteSceneRamificationsDriver.currentMotivation(focusSceneId, listedSceneId, characterId).get(double)
 
-				val sourceValue = ScenesDriver.getCreatedScenes(double).find {
-					it.id == sourceSceneId && it.includesCharacter(characterId)
-				}!!.getMotivationForCharacter(characterId)?.motivation ?: ""
+				assertTrue(currentMotivation!!.isEmpty())
+			}
+			Then("the Changed Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should show {string}") {
+				characterName: String, listedSceneName: String, focusSceneName: String, expectedValue: String ->
 
-				assertEquals(sourceValue, currentMotivation)
+				val characterId = characterIdFor!!.getValue(characterName)
+				val listedSceneId = sceneIdFor!!.getValue(listedSceneName)
+				val focusSceneId = sceneIdFor!!.getValue(focusSceneName)
 
+				val changedMotivation = DeleteSceneRamificationsDriver.changedMotivation(focusSceneId, listedSceneId, characterId).get(double)
+
+				assertEquals(expectedValue, changedMotivation)
 			}
 			Then("the Changed Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should be empty") {
 				characterName: String, listedSceneName: String, focusSceneName: String ->

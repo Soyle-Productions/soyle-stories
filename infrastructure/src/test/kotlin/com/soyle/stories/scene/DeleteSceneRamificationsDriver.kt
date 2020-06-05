@@ -85,12 +85,13 @@ object DeleteSceneRamificationsDriver : ApplicationTest() {
 		}
 	}
 
-	fun listedCharacter(focusSceneId: Scene.Id, characterId: Character.Id) = object : ReadOnlyDependentProperty<Node> {
+	fun listedCharacter(focusSceneId: Scene.Id, targetSceneId: Scene.Id, characterId: Character.Id) = object : ReadOnlyDependentProperty<Node> {
 		override fun get(double: SoyleStoriesTestDouble): Node? {
 			val sceneItems = listedScenes(focusSceneId).get(double) ?: return null
-			return sceneItems.asSequence().flatMap {
-				from(it).lookup(".character-item").queryAll<Node>().asSequence()
-			}.find {
+			val targetSceneItem = sceneItems.find {
+				it.id == targetSceneId.uuid.toString()
+			} ?: return null
+			return from(targetSceneItem).lookup(".character-item").queryAll<Node>().find {
 				it.id == characterId.uuid.toString()
 			}
 		}
@@ -98,22 +99,14 @@ object DeleteSceneRamificationsDriver : ApplicationTest() {
 
 	fun currentMotivation(focusSceneId: Scene.Id, targetSceneId: Scene.Id, characterId: Character.Id) = object : ReadOnlyDependentProperty<String> {
 		override fun get(double: SoyleStoriesTestDouble): String? {
-			val sceneItems = listedScenes(focusSceneId).get(double) ?: return null
-			val sceneItem = sceneItems.find { it.id == targetSceneId.uuid.toString() } ?: return null
-			val characterNode = from(sceneItem).lookup(".character-item").queryAll<Node>().find {
-				it.id == characterId.uuid.toString()
-			} ?: return null
+			val characterNode = listedCharacter(focusSceneId, targetSceneId, characterId).get(double) ?: return null
 			return from(characterNode).lookup(".current").queryAll<Labeled>().firstOrNull()?.text
 		}
 	}
 
 	fun changedMotivation(focusSceneId: Scene.Id, targetSceneId: Scene.Id, characterId: Character.Id) = object : ReadOnlyDependentProperty<String> {
 		override fun get(double: SoyleStoriesTestDouble): String? {
-			val sceneItems = listedScenes(focusSceneId).get(double) ?: return null
-			val sceneItem = sceneItems.find { it.id == targetSceneId.uuid.toString() } ?: return null
-			val characterNode = from(sceneItem).lookup(".character-item").queryAll<Node>().find {
-				it.id == characterId.uuid.toString()
-			} ?: return null
+			val characterNode = listedCharacter(focusSceneId, targetSceneId, characterId).get(double) ?: return null
 			return from(characterNode).lookup(".changed").queryAll<Labeled>().firstOrNull()?.text
 		}
 	}
