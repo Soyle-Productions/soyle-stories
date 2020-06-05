@@ -12,12 +12,12 @@ internal class DeleteCharacterPresenter(
 		val characterId = response.characterId.toString()
 		view.updateOrInvalidated {
 			copy(
-			  scenes = scenes.map {
+			  scenes = scenes.mapNotNull {
 				  it.copy(
 					characters = it.characters.filterNot {
 						it.characterId == characterId
 					}
-				  )
+				  ).takeIf { it.characters.isNotEmpty() }
 			  }
 			)
 		}

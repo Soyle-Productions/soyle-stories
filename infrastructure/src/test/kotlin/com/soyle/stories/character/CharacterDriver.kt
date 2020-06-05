@@ -164,12 +164,16 @@ object CharacterDriver : ApplicationTest() {
 		@Synchronized get
 		@Synchronized set
 
-	fun whenCharacterIsDeleted(double: SoyleStoriesTestDouble): Character {
+	fun whenCharacterIsDeleted(double: SoyleStoriesTestDouble, characterId: Character.Id? = null): Character {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		var firstCharacter: Character? = null
 		interact {
 			async(scope.applicationScope) {
-				firstCharacter = DI.resolve<CharacterRepository>(scope).listCharactersInProject(Project.Id(scope.projectId)).first()
+				firstCharacter = if (characterId != null) {
+					DI.resolve<CharacterRepository>(scope).getCharacterById(characterId)!!
+				} else {
+					DI.resolve<CharacterRepository>(scope).listCharactersInProject(Project.Id(scope.projectId)).first()
+				}
 				DI.resolve<CharacterListViewListener>(scope).removeCharacter(firstCharacter!!.id.uuid.toString())
 			}
 		}

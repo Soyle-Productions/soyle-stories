@@ -192,6 +192,11 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				val sceneId = sceneIdFor!![sceneName]!!
 				ScenesDriver.deletedScene(sceneId).whenSet(double)
 			}
+			When("{string} is removed from {string} in the Delete Scene Ramifications Tool for {string}") {
+				characterName: String, listedSceneName: String, focusSceneName: String ->
+
+				CharacterDriver.whenCharacterIsDeleted(double, characterIdFor!!.getValue(characterName))
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
