@@ -5,16 +5,19 @@ Feature: Delete Scene Ramifications
 		Given 1 Scenes have been created
 		And 1 Characters have been created
 
+	@delete-scene
 	Scenario: No Characters included in Scene
 		When the Delete Scene Ramifications Tool is opened
 		Then the Delete Scene Ramifications Tool should display an ok message
 
+	@delete-scene
 	Scenario: No motivations set in Scene
 		Given 4 Characters have been created
 		And all Characters have been included in the Scene
 		When the Delete Scene Ramifications Tool is opened
 		Then the Delete Scene Ramifications Tool should display an ok message
 
+	@delete-scene
 	Scenario: Motivation only set in this Scene
 		Given the following Scenes
 			| character   | scene 1 | scene 2 |
@@ -24,20 +27,19 @@ Feature: Delete Scene Ramifications
 		And "character A" should be listed in the Delete Scene Ramifications Tool for "scene 1"
 		Then the Current Motivation field for "character A" in "scene 2" in the Delete Scene Ramifications Tool for "scene 1" should show the value from "scene 1"
 		Then the Changed Motivation field for "character A" in "scene 2" in the Delete Scene Ramifications Tool for "scene 1" should be empty
-		
-	@excluded
+
+	@delete-scene
 	Scenario: Motivation for one Character set in next Scene
-		Given 2 Scenes have been created
-		And this is the first Scene in the story
-		And 2 Characters have been created
-		And all Characters have been included in all Scenes
-		And the Character Motivation has been set for all Characters in this Scene
-		And the Character Motivation for one Character has been set in the next Scene
-		When the Delete Scene Ramifications Tool is opened
-		Then the other Scene should be listed in the Delete Scene Ramifications Tool
-		And only the Character without their Motivation set in the next Scene should be listed in the Delete Scene Ramifications Tool
-		And the Delete Scene Ramifications Current Motivation field for this Character should show the Motivation set in this Scene
-		And the Delete Scene Ramifications Changed Motivation field for this Character should be empty
+		Given the following Scenes
+			| character   | scene 1 | scene 2 |
+			| character A | value1a | inherit |
+			| character B | value1b | value2b |
+		When the Delete Scene Ramifications Tool is opened for "scene 1"
+		Then "scene 2" should be listed in the Delete Scene Ramifications Tool for "scene 1"
+		And "character A" should be listed in the Delete Scene Ramifications Tool for "scene 1"
+		But "character B" should not be listed in the Delete Scene Ramifications Tool for "scene 1"
+		Then the Current Motivation field for "character A" in "scene 2" in the Delete Scene Ramifications Tool for "scene 1" should show the value from "scene 1"
+		Then the Changed Motivation field for "character A" in "scene 2" in the Delete Scene Ramifications Tool for "scene 1" should be empty
 		
 	@excluded
 	Scenario: Show inherited motivations

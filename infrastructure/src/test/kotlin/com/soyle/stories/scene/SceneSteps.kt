@@ -288,6 +288,18 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 				assertNotNull(item)
 			}
+			Then("{string} should not be listed in the Delete Scene Ramifications Tool for {string}") { listedItem: String, focusScene: String ->
+				val focusSceneId = sceneIdFor!!.getValue(focusScene)
+				val targetSceneId = sceneIdFor!![listedItem]
+				val characterId = characterIdFor!![listedItem]
+				val item: Any? = when {
+					targetSceneId != null -> DeleteSceneRamificationsDriver.listedScene(focusSceneId, targetSceneId).get(double)
+					characterId != null -> DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, characterId).get(double)
+					else -> null
+				}
+
+				assertNull(item)
+			}
 			Then("the Current Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should show the value from {string}") {
 				characterName: String, listedSceneName: String, focusSceneName: String, sourceSceneName: String ->
 
