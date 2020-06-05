@@ -9,3 +9,5 @@ class SceneNameCannotBeBlank(private val locale: Locale) : SceneException() {
 class SceneDoesNotExist(private val locale: Locale, val sceneId: UUID): SceneException() {
 	override fun getLocalizedMessage(): String = locale.sceneDoesNotExist
 }
+class NoSceneExistsWithStoryEventId(val storyEventId: UUID) : SceneException()
+class CharacterNotInScene(val sceneId: UUID, val characterId: UUID) : SceneException()

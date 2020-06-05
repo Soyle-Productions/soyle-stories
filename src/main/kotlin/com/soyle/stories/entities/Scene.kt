@@ -1,21 +1,54 @@
 package com.soyle.stories.entities
 
+import com.soyle.stories.common.Entity
+import com.soyle.stories.scene.CharacterNotInScene
 import java.util.*
 
 class Scene(
-  val id: Id,
+  override val id: Id,
   val projectId: Project.Id,
   val name: String,
-  val storyEventId: StoryEvent.Id
-) {
+  val storyEventId: StoryEvent.Id,
+  val characterMotivations: List<CharacterMotivation>
+) : Entity<Scene.Id> {
+
+	constructor(projectId: Project.Id, name: String, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, listOf())
+
+	private val motivationsById by lazy { characterMotivations.associateBy { it.characterId } }
+
+	fun includesCharacter(characterId: Character.Id): Boolean
+	{
+		return motivationsById.containsKey(characterId)
+	}
+
+	fun getMotivationForCharacter(characterId: Character.Id): CharacterMotivation?
+	{
+		return motivationsById[characterId]
+	}
+
+	fun hasCharacters(): Boolean = characterMotivations.isNotEmpty()
 
 	private fun copy(
-	  name: String = this.name
-	) = Scene(id, projectId, name, storyEventId)
+	  name: String = this.name,
+	  characterMotivations: List<CharacterMotivation> = this.characterMotivations
+	) = Scene(id, projectId, name, storyEventId, characterMotivations)
 
 	fun withName(newName: String) = copy(name = newName)
+	fun withCharacterIncluded(character: Character) = copy(characterMotivations = characterMotivations + CharacterMotivation(character.id, character.name, null))
+	fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene
+	{
+		if (! includesCharacter(characterId)) throw CharacterNotInScene(id.uuid, characterId.uuid)
+		return copy(characterMotivations = characterMotivations.map {
+			if (it.characterId == characterId) CharacterMotivation(it.characterId, it.characterName, motivation)
+			else it
+		})
+	}
 
 	data class Id(val uuid: UUID = UUID.randomUUID()) {
 		override fun toString(): String = "Scene($uuid)"
+	}
+
+	class CharacterMotivation(val characterId: Character.Id, val characterName: String, val motivation: String?) {
+		fun isInherited() = motivation == null
 	}
 }

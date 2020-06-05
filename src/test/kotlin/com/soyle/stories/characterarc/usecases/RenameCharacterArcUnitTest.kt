@@ -8,11 +8,7 @@ import com.soyle.stories.characterarc.TestContext
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
 import com.soyle.stories.common.mustEqual
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.CharacterArcTemplate
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.project.NameCannotBeBlank
+import com.soyle.stories.entities.*
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.takeNoteOfTheme
@@ -108,7 +104,7 @@ class RenameCharacterArcUnitTest {
 	private fun givenNoThemes() = given(characterWithId = characterId)
 
 	private fun given(characterWithId: UUID? = null, andThemeWithId: UUID? = null, andThemeHasCharacter: Boolean = false, andCharacterIsMajorCharacter: Boolean = false) {
-		val character = characterWithId?.let { Character(Character.Id(characterWithId), UUID.randomUUID(), "Bob") }
+		val character = characterWithId?.let { Character(Character.Id(characterWithId), Project.Id(), "Bob") }
 		context = TestContext(
 		  initialCharacters = listOfNotNull(
 			character

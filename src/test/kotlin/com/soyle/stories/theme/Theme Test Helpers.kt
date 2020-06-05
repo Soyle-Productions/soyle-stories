@@ -22,7 +22,7 @@ fun takeNoteOfTheme(expectedId: UUID) = takeNoteOfTheme().let {
 }
 
 val newCharacter = Character(
-    Character.Id(UUID.randomUUID()), UUID.randomUUID(), "Name"
+    Character.Id(UUID.randomUUID()), Project.Id(), "Name"
 )
 val newArchetype = "Artist"
 val newVariationOnMoral = "When you look at it this way..."

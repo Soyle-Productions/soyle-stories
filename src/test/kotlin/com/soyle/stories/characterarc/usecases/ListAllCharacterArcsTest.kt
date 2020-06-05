@@ -20,7 +20,7 @@ import java.util.*
 class ListAllCharacterArcsTest {
 
 	val characters = List(5) {
-		(Character.buildNewCharacter(UUID.randomUUID(), UUID.randomUUID().toString()) as Either.Right).b
+		Character.buildNewCharacter(Project.Id(), UUID.randomUUID().toString())
 	}
 	val characterArcs = List(8) {
 		val characterId = characters.random().id

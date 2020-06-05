@@ -2,6 +2,7 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.identity
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison
@@ -126,7 +127,7 @@ class RemoveCharacterFromComparisonUnitTest {
         val theme = themeId?.let {
             val initialTheme = Theme(Theme.Id(themeId), "", emptyMap(), emptyMap())
             val themeWithCharacters = andCharacterIds.fold(initialTheme) { nextTheme, characterId ->
-                nextTheme.includeCharacter(Character(Character.Id(characterId), UUID.randomUUID(), "Bob"))
+                nextTheme.includeCharacter(Character(Character.Id(characterId), Project.Id(), "Bob"))
                     .fold({ throw it }, ::identity)
             }
             andMajorCharacterIds.fold(themeWithCharacters) { nextTheme, characterId ->

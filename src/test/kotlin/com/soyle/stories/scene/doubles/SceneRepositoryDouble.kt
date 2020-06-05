@@ -2,6 +2,7 @@ package com.soyle.stories.scene.doubles
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.repositories.SceneRepository
 
 class SceneRepositoryDouble(
@@ -12,8 +13,8 @@ class SceneRepositoryDouble(
   private val onRemoveScene: (Scene) -> Unit = {}
 ) : SceneRepository {
 
-	private val scenes = initialScenes.associateBy { it.id }.toMutableMap()
-	private val sceneOrder = initialScenes.groupBy { it.projectId }.mapValues { it.value.map(Scene::id) }.toMutableMap()
+	val scenes = initialScenes.associateBy { it.id }.toMutableMap()
+	val sceneOrder = initialScenes.groupBy { it.projectId }.mapValues { it.value.map(Scene::id) }.toMutableMap()
 
 	private val _persistedItems = mutableListOf<PersistenceLog>()
 	val persistedItems: List<PersistenceLog>
@@ -47,6 +48,10 @@ class SceneRepositoryDouble(
 
 	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =
 	  scenes[sceneId]
+
+	override suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene? {
+		return scenes.values.find { it.storyEventId == storyEventId }
+	}
 
 	override suspend fun updateScene(scene: Scene) {
 		log(scene)

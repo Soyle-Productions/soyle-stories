@@ -176,7 +176,7 @@ class PromoteCharacterTest {
                 (Character(
                     Character.Id(
                         it.first
-                    ), UUID.randomUUID(), "Bob"
+                    ), Project.Id(), "Bob"
                 ) to it.second)
             }
             val theme = Theme.takeNoteOf().map {

@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.MajorCharacter
 import com.soyle.stories.entities.theme.MinorCharacter
@@ -77,7 +78,7 @@ class CompareCharactersTest {
 	fun `character must be major character`() {
 		val focusCharacterId = UUID.randomUUID()
 		val (theme) = Theme.takeNoteOf()
-			.flatMap { it.includeCharacter(Character(Character.Id(focusCharacterId), UUID.randomUUID(), "Bob")) } as Either.Right
+			.flatMap { it.includeCharacter(Character(Character.Id(focusCharacterId), Project.Id(), "Bob")) } as Either.Right
 		val themes = listOf(theme)
 		val themeId = theme.id.uuid
 		val result = given(themes).testWith(themeId, focusCharacterId)
@@ -91,14 +92,14 @@ class CompareCharactersTest {
 		val majorCharacters = List(3) { Character.Id(UUID.randomUUID()) }.map {
             Character(
                 it,
-                UUID.randomUUID(),
+			  Project.Id(),
                 it.uuid.toString()
             )
         }
 		val minorCharacters = List(3) { Character.Id(UUID.randomUUID()) }.map {
             Character(
                 it,
-                UUID.randomUUID(),
+			  Project.Id(),
                 it.uuid.toString()
             )
         }
