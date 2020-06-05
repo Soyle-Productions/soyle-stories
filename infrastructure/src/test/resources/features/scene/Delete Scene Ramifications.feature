@@ -114,11 +114,11 @@ Feature: Delete Scene Ramifications
 		When the Character Motivation for "character A" is cleared in "scene 1"
 		Then the Changed Motivation field for "character A" in "scene 3" in the Delete Scene Ramifications Tool for "scene 2" should be empty
 
-	@delete-scene @set-character-motivation-in-scene @excluded
+	@delete-scene @set-character-motivation-in-scene
 	Scenario: React to previous Scenes setting a Character Motivation
 		Given the following Scenes
 			| character   | scene 1 | scene 2 | scene 3 |
 			| character A | inherit | value2  | inherit |
 		And the Delete Scene Ramifications Tool has been opened for "scene 2"
-		When the Character Motivation for "character A" is set in "scene 1"
-		Then the Changed Motivation field for "character A" in "scene 3" in the Delete Scene Ramifications Tool for "scene 2" should show the value from "scene 1"
+		When the Character Motivation for "character A" is set in "scene 1" as "value 1a"
+		Then the Changed Motivation field for "character A" in "scene 3" in the Delete Scene Ramifications Tool for "scene 2" should show "value 1a"
