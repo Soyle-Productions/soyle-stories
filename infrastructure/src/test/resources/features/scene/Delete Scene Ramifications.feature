@@ -57,12 +57,15 @@ Feature: Delete Scene Ramifications
 		And the Delete Scene Ramifications Tool has been opened for "scene 1"
 		When "scene 2" is deleted
 		Then "scene 2" should not be listed in the Delete Scene Ramifications Tool for "scene 1"
-		
-	@excluded
+
+	@delete-scene @delete-character
 	Scenario: React to Character Deleted
-		Given the Delete Scene Ramifications Tool has been opened
-		And 2 Characters have been listed for a common Scene in the Delete Scene Ramifications Tool
-		When one of the Characters is deleted
+		Given the following Scenes
+			| character   | scene 1 | scene 2 |
+			| character A | value1a | inherit |
+			| character B | value2a | inherit |
+		And the Delete Scene Ramifications Tool has been opened for "scene 1"
+		When A Character is deleted
 		Then the deleted Character should be removed from the Delete Scene Ramifications Tool
 		
 	@excluded

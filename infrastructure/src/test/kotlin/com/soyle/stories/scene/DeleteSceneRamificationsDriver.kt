@@ -97,6 +97,19 @@ object DeleteSceneRamificationsDriver : ApplicationTest() {
 		}
 	}
 
+	fun listedCharacter(focusSceneId: Scene.Id, characterId: Character.Id) = object : ReadOnlyDependentProperty<List<Node>> {
+		override fun get(double: SoyleStoriesTestDouble): List<Node> {
+			val sceneItems = listedScenes(focusSceneId).get(double) ?: return listOf()
+			return sceneItems.asSequence().mapNotNull {
+				from(it).lookup(".character-item").queryAll<Node>().find {
+					it.id == characterId.uuid.toString()
+				}
+			}.toList()
+		}
+
+		override fun check(double: SoyleStoriesTestDouble): Boolean = get(double).isNotEmpty()
+	}
+
 	fun currentMotivation(focusSceneId: Scene.Id, targetSceneId: Scene.Id, characterId: Character.Id) = object : ReadOnlyDependentProperty<String> {
 		override fun get(double: SoyleStoriesTestDouble): String? {
 			val characterNode = listedCharacter(focusSceneId, targetSceneId, characterId).get(double) ?: return null

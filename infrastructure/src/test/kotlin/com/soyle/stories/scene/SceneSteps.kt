@@ -353,6 +353,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 				assertTrue(changedMotivation!!.isEmpty())
 			}
+			Then("the deleted Character should be removed from the Delete Scene Ramifications Tool") {
+				val deletedCharacter = CharacterDriver.recentlyDeletedCharacter.get(double)!!
+				assertFalse(
+				  DeleteSceneRamificationsDriver.listedCharacter(sceneRamificationsSceneId!!, deletedCharacter.id).check(double)
+				)
+			}
 		}
 	}
 

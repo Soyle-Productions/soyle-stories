@@ -1,5 +1,6 @@
 package com.soyle.stories.character
 
+import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.character.CharacterDriver.interact
 import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
@@ -159,6 +160,10 @@ object CharacterDriver : ApplicationTest() {
 		return populatedDisplayIsVisible && characterItemViewModel != null
 	}
 
+	private var recentlyDeletedCharacters = mapOf<SoyleStoriesTestDouble, List<Character>>()
+		@Synchronized get
+		@Synchronized set
+
 	fun whenCharacterIsDeleted(double: SoyleStoriesTestDouble): Character {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		var firstCharacter: Character? = null
@@ -168,6 +173,7 @@ object CharacterDriver : ApplicationTest() {
 				DI.resolve<CharacterListViewListener>(scope).removeCharacter(firstCharacter!!.id.uuid.toString())
 			}
 		}
+		recentlyDeletedCharacters = recentlyDeletedCharacters + (double to recentlyDeletedCharacters.getOrElse(double) { listOf() } + firstCharacter!!)
 		return firstCharacter!!
 	}
 
@@ -382,5 +388,12 @@ object CharacterDriver : ApplicationTest() {
 	{
 		val inputBox = getCharacterListToolInputBox(double) ?: return false
 		return inputBox.decorators.isNotEmpty()
+	}
+
+	val recentlyDeletedCharacter = object : ReadOnlyDependentProperty<Character>
+	{
+		override fun get(double: SoyleStoriesTestDouble): Character? {
+			return recentlyDeletedCharacters[double]?.lastOrNull()
+		}
 	}
 }

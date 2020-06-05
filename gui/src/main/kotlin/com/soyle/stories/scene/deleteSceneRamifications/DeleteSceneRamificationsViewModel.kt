@@ -5,7 +5,7 @@ data class DeleteSceneRamificationsViewModel(
   val scenes: List<SceneRamificationsViewModel>
 )
 
-class SceneRamificationsViewModel(
+data class SceneRamificationsViewModel(
   val sceneName: String,
   val sceneId: String,
   val characters: List<CharacterRamificationsViewModel>
