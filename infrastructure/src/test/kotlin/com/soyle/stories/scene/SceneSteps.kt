@@ -204,6 +204,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 				DeleteSceneRamificationsDriver.removeScene(focusSceneId, listedSceneId, double)
 			}
+			When("the Character Motivation for {string} is cleared in {string}") { character: String, scene: String ->
+				val sceneId = sceneIdFor!!.getValue(scene)
+				val characterId = characterIdFor!!.getValue(character)
+
+				ScenesDriver.charactersMotivationIn(characterId, null, sceneId).whenSet(double)
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
@@ -307,9 +313,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				val focusSceneId = sceneIdFor!!.getValue(focusScene)
 				val targetSceneId = sceneIdFor!!.getValue(sceneName)
 				val characterId = characterIdFor!!.getValue(characterName)
-				val characterItem = DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, targetSceneId, characterId).get(double)
-
-				assertNotNull(characterItem)
+				assertTrue(DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, targetSceneId, characterId).check(double))
 			}
 			Then("{string} should not be listed for {string} in the Delete Scene Ramifications Tool for {string}") { characterName: String, sceneName: String, focusScene: String ->
 				val focusSceneId = sceneIdFor!!.getValue(focusScene)
@@ -374,6 +378,11 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Then("the Delete Scene Ramifications Tool for {string} should display an ok message") { focusScene: String ->
 				val focusSceneId = sceneIdFor!!.getValue(focusScene)
 				assertTrue(DeleteSceneRamificationsDriver.okDisplay(focusSceneId).check(double))
+			}
+			Then("{string} should be listed in the Delete Scene Ramifications Tool for {string}") { listedScene: String, focusScene: String ->
+				val listedSceneId = sceneIdFor!!.getValue(listedScene)
+				val focusSceneId = sceneIdFor!!.getValue(focusScene)
+				assertTrue(DeleteSceneRamificationsDriver.listedScene(focusSceneId, listedSceneId).check(double))
 			}
 		}
 	}

@@ -28,6 +28,11 @@ class DeleteSceneRamifications : View() {
 	}
 
 	init {
+		model.invalid.onChange {
+			if (it != false) {
+				viewListener.getValidState()
+			}
+		}
 		viewListener.getValidState()
 	}
 }

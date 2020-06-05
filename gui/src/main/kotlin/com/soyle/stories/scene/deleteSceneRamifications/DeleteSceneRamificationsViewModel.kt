@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.deleteSceneRamifications
 
 data class DeleteSceneRamificationsViewModel(
+  val invalid: Boolean = true,
   val okMessage: String,
   val scenes: List<SceneRamificationsViewModel>
 )

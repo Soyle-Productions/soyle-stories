@@ -11,6 +11,7 @@ class DeleteSceneRamificationsModel : ItemViewModel<DeleteSceneRamificationsView
 
 	override val scope: DeleteSceneRamificationsScope = super.scope as DeleteSceneRamificationsScope
 
+	val invalid = bind(DeleteSceneRamificationsViewModel::invalid)
 	val scenes = bindImmutableList(DeleteSceneRamificationsViewModel::scenes)
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)

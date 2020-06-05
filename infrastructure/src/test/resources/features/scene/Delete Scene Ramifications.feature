@@ -86,8 +86,8 @@ Feature: Delete Scene Ramifications
 		And the Delete Scene Ramifications Tool has been opened for "scene 1"
 		When "scene 2" is removed from the Delete Scene Ramifications Tool for "scene 1"
 		Then the Delete Scene Ramifications Tool for "scene 1" should display an ok message
-		
-	@excluded
+
+	@delete-scene @set-character-motivation-in-scene
 	Scenario: React to Character Motivation being cleared
 		Given the following Scenes
 			| character   | scene 1 | scene 2 | scene 3 |
@@ -95,8 +95,8 @@ Feature: Delete Scene Ramifications
 		And the Delete Scene Ramifications Tool has been opened for "scene 1"
 		When the Character Motivation for "character A" is cleared in "scene 2"
 		Then "scene 3" should be listed in the Delete Scene Ramifications Tool for "scene 1"
-		
-	@excluded
+
+	@delete-scene @set-character-motivation-in-scene @excluded
 	Scenario: React to Character Motivation being set
 		Given the following Scenes
 			| character   | scene 1 | scene 2 | scene 3 |
@@ -104,8 +104,8 @@ Feature: Delete Scene Ramifications
 		And the Delete Scene Ramifications Tool has been opened for "scene 1"
 		When the Character Motivation for "character A" is set in "scene 2"
 		Then "scene 3" should be removed from the Delete Scene Ramifications Tool for "scene 1"
-		
-	@excluded
+
+	@delete-scene @set-character-motivation-in-scene @excluded
 	Scenario: React to previous Scenes clearing a Character Motivation
 		Given the following Scenes
 			| character   | scene 1 | scene 2 | scene 3 |
@@ -113,8 +113,8 @@ Feature: Delete Scene Ramifications
 		And the Delete Scene Ramifications Tool has been opened for "scene 2"
 		When the Character Motivation for "character A" is cleared in "scene 1"
 		Then the Changed Motivation field for "charater A" in "scene 3" in the Delete Scene Ramifications Tool for "scene 2" should be empty
-		
-	@excluded
+
+	@delete-scene @set-character-motivation-in-scene @excluded
 	Scenario: React to previous Scenes setting a Character Motivation
 		Given the following Scenes
 			| character   | scene 1 | scene 2 | scene 3 |

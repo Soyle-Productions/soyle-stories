@@ -183,7 +183,8 @@ object SceneModule {
 				  DeleteSceneRamificationsPresenter(
 					get<DeleteSceneRamificationsModel>(),
 					projectScope.get<DeleteSceneNotifier>(),
-					projectScope.get<RemoveCharacterFromLocalStoryNotifier>()
+					projectScope.get<RemoveCharacterFromLocalStoryNotifier>(),
+					projectScope.get<SetMotivationForCharacterInSceneNotifier>()
 				  )
 				)
 			}
