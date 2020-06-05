@@ -197,6 +197,13 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 				CharacterDriver.whenCharacterIsDeleted(double, characterIdFor!!.getValue(characterName))
 			}
+			When("{string} is removed from the Delete Scene Ramifications Tool for {string}") {
+				listedScene: String, focusScene: String ->
+				val listedSceneId = sceneIdFor!![listedScene]!!
+				val focusSceneId = sceneIdFor!![focusScene]!!
+
+				DeleteSceneRamificationsDriver.removeScene(focusSceneId, listedSceneId, double)
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
@@ -363,6 +370,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				assertFalse(
 				  DeleteSceneRamificationsDriver.listedCharacter(sceneRamificationsSceneId!!, deletedCharacter.id).check(double)
 				)
+			}
+			Then("the Delete Scene Ramifications Tool for {string} should display an ok message") { focusScene: String ->
+				val focusSceneId = sceneIdFor!!.getValue(focusScene)
+				assertTrue(DeleteSceneRamificationsDriver.okDisplay(focusSceneId).check(double))
 			}
 		}
 	}

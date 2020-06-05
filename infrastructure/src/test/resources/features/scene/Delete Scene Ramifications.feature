@@ -77,14 +77,14 @@ Feature: Delete Scene Ramifications
 		And the Delete Scene Ramifications Tool has been opened for "scene 1"
 		When "character A" is removed from "scene 2" in the Delete Scene Ramifications Tool for "scene 1"
 		Then "scene 2" should not be listed in the Delete Scene Ramifications Tool for "scene 1"
-		
-	@excluded
+
+	@delete-scene
 	Scenario: React to Last Affected Scene Removed
 		Given the following Scenes
 			| character   | scene 1 | scene 2 |
 			| character A | value1  | inherit |
 		And the Delete Scene Ramifications Tool has been opened for "scene 1"
-		When "scene 2" is removed from the Delete Scene Ramifications Tool
+		When "scene 2" is removed from the Delete Scene Ramifications Tool for "scene 1"
 		Then the Delete Scene Ramifications Tool for "scene 1" should display an ok message
 		
 	@excluded

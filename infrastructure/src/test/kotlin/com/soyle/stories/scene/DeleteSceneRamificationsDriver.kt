@@ -9,6 +9,7 @@ import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.scene.DeleteSceneRamificationsDriver.interact
 import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamifications
+import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamificationsModel
 import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamificationsScope
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import javafx.scene.Node
@@ -121,6 +122,16 @@ object DeleteSceneRamificationsDriver : ApplicationTest() {
 		override fun get(double: SoyleStoriesTestDouble): String? {
 			val characterNode = listedCharacter(focusSceneId, targetSceneId, characterId).get(double) ?: return null
 			return from(characterNode).lookup(".changed").queryAll<Labeled>().firstOrNull()?.text
+		}
+	}
+
+	fun removeScene(focusSceneId: Scene.Id, targetSceneId: Scene.Id, double: SoyleStoriesTestDouble)
+	{
+		val tool = tool(focusSceneId).get(double) ?: return
+		interact {
+			tool.scope.get<DeleteSceneRamificationsModel>().apply {
+				scenes.set(scenes.filtered { it.sceneId != targetSceneId.uuid.toString() })
+			}
 		}
 	}
 
