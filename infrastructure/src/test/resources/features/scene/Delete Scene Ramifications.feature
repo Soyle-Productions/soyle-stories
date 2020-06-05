@@ -105,7 +105,7 @@ Feature: Delete Scene Ramifications
 		When the Character Motivation for "character A" is set in "scene 2"
 		Then "scene 3" should not be listed in the Delete Scene Ramifications Tool for "scene 1"
 
-	@delete-scene @set-character-motivation-in-scene @excluded
+	@delete-scene @set-character-motivation-in-scene
 	Scenario: React to previous Scenes clearing a Character Motivation
 		Given the following Scenes
 			| character   | scene 1 | scene 2 | scene 3 |
