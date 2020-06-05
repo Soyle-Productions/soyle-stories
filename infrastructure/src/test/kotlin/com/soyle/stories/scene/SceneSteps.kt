@@ -210,6 +210,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 				ScenesDriver.charactersMotivationIn(characterId, null, sceneId).whenSet(double)
 			}
+			When("the Character Motivation for {string} is set in {string}") { character: String, scene: String ->
+				val sceneId = sceneIdFor!!.getValue(scene)
+				val characterId = characterIdFor!!.getValue(character)
+
+				ScenesDriver.charactersMotivationIn(characterId, "new value", sceneId).whenSet(double)
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
