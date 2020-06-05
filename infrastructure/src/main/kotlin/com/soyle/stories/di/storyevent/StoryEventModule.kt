@@ -1,9 +1,11 @@
 package com.soyle.stories.di.storyevent
 
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventControllerImpl
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventNotifier
@@ -72,7 +74,9 @@ object StoryEventModule {
 			LinkLocationToStoryEventNotifier()
 		}
 		provide(AddCharacterToStoryEvent.OutputPort::class) {
-			AddCharacterToStoryEventNotifier()
+			AddCharacterToStoryEventNotifier().also {
+				get<IncludeCharacterInSceneController>() listensTo it
+			}
 		}
 		provide(RemoveCharacterFromStoryEvent.OutputPort::class) {
 			RemoveCharacterFromStoryEventNotifier()

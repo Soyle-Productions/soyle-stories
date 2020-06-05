@@ -11,6 +11,7 @@ import com.soyle.stories.scene.ScenesDriver.interact
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
 import com.soyle.stories.scene.repositories.SceneRepository
+import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.repositories.StoryEventRepository
@@ -32,8 +33,12 @@ object ScenesDriver : ApplicationTest() {
 	fun getCreatedScenes(double: SoyleStoriesTestDouble): List<Scene>
 	{
 		val scope = ProjectSteps.getProjectScope(double) ?: return emptyList()
+		val repo = scope.get<SceneRepository>()
 		return runBlocking {
-			scope.get<SceneRepository>().listAllScenesInProject(Project.Id(scope.projectId))
+			val order = repo.getSceneIdsInOrder(Project.Id(scope.projectId)).withIndex().associate { it.value to it.index }
+			repo.listAllScenesInProject(Project.Id(scope.projectId)).sortedBy {
+				order.getValue(it.id)
+			}
 		}
 	}
 
@@ -116,10 +121,7 @@ object ScenesDriver : ApplicationTest() {
 			val scene = runBlocking {
 				scope.get<SceneRepository>().getSceneById(sceneId)
 			} ?: return false
-			val storyEvent = runBlocking {
-				scope.get<StoryEventRepository>().getStoryEventById(scene.storyEventId)
-			} ?: return false
-			return storyEvent.includedCharacterIds.contains(characterId)
+			return scene.includesCharacter(characterId)
 		}
 
 		override fun whenSet(double: SoyleStoriesTestDouble) {
@@ -136,4 +138,38 @@ object ScenesDriver : ApplicationTest() {
 		}
 	}
 
+	fun charactersMotivationIn(characterId: Character.Id, motivation: String?, sceneId: Scene.Id) = object : DependentProperty<String> {
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
+		  characterIncludedIn(characterId, sceneId)::given
+		)
+
+		override fun get(double: SoyleStoriesTestDouble): String?
+		{
+			val scope = ProjectSteps.getProjectScope(double) ?: return null
+			val scene = runBlocking {
+				scope.get<SceneRepository>().getSceneById(sceneId)
+			} ?: return null
+			return scene.getMotivationForCharacter(characterId)?.motivation
+		}
+
+		override fun check(double: SoyleStoriesTestDouble): Boolean {
+			val scope = ProjectSteps.getProjectScope(double) ?: return false
+			val scene = runBlocking {
+				scope.get<SceneRepository>().getSceneById(sceneId)
+			} ?: return false
+			return scene.getMotivationForCharacter(characterId)?.motivation == motivation
+		}
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			val scope = ProjectSteps.getProjectScope(double)!!
+			val controller = scope.get<SetMotivationForCharacterInSceneController>()
+			interact {
+				if (motivation == null) {
+					controller.clearMotivationForCharacter(sceneId.uuid.toString(), characterId.uuid.toString())
+				} else {
+					controller.setMotivationForCharacter(sceneId.uuid.toString(), characterId.uuid.toString(), motivation)
+				}
+			}
+		}
+	}
 }

@@ -1,9 +1,11 @@
 package com.soyle.stories.scene
 
 import com.soyle.stories.character.CharacterDriver
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
+import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions.*
@@ -13,6 +15,10 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 	private var targetObject: Any? = null
 	private var createdScene: Scene? = null
+
+	private var sceneIdFor: Map<String, Scene.Id>? = null
+	private var characterIdFor: Map<String, Character.Id>? = null
+	private var sceneRamificationsSceneId: Scene.Id? = null
 
 	init {
 		with(en) {
@@ -72,6 +78,35 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 					ScenesDriver.characterIncludedIn(character.id, scene.id).given(double)
 				}
 			}
+			Given("the following Scenes") { table: DataTable ->
+				val cells = table.asLists()
+				val headers = cells.first()
+				val rows = cells.drop(1)
+				val sceneNames = headers.drop(1)
+
+				ScenesDriver.givenNumberOfCreatedScenesIsAtLeast(double, sceneNames.size)
+				val scenes = ScenesDriver.getCreatedScenes(double)
+				sceneIdFor = scenes.mapIndexed { index, scene ->
+					sceneNames[index] to scene.id
+				}.toMap()
+
+				CharacterDriver.givenANumberOfCharactersHaveBeenCreated(double, rows.size)
+				val characters = CharacterDriver.getCharactersCreated(double)
+				characterIdFor = rows.mapIndexed { index, list ->
+					val character = characters[index]
+					list.drop(1).forEachIndexed { sceneIndex, motivation ->
+						when (motivation) {
+							"inherit" -> ScenesDriver.characterIncludedIn(character.id, scenes[sceneIndex].id).given(double)
+							"-" -> {}
+							else -> {
+								ScenesDriver.characterIncludedIn(character.id, scenes[sceneIndex].id).given(double)
+								ScenesDriver.charactersMotivationIn(character.id, motivation, scenes[sceneIndex].id).given(double)
+							}
+						}
+					}
+					list.first() to character.id
+				}.toMap()
+			}
 
 			When("The Scene List Tool is opened") {
 				if (SceneListDriver.isOpen(double)) {
@@ -123,6 +158,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				createdScene = ScenesDriver.getCreatedScenes(double).filterNot { it.id in existing }.firstOrNull()
 			}
 			When("the Confirm Delete Scene Dialog {string} button is selected") { button: String ->
+				if (button == "Show Ramifications") {
+					sceneRamificationsSceneId = (targetObject as Scene).id
+				}
 				val button = DeleteSceneDialogDriver.button(button).get(double)!!
 				interact {
 					clickOn(button, MouseButton.PRIMARY)
@@ -135,7 +173,14 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				}
 			}
 			When("the Delete Scene Ramifications Tool is opened") {
-				DeleteSceneRamificationsDriver.openTool.whenSet(double)
+				val sceneId = ScenesDriver.getCreatedScenes(double).first().id
+				sceneRamificationsSceneId = sceneId
+				DeleteSceneRamificationsDriver.openTool(sceneId).whenSet(double)
+			}
+			When("the Delete Scene Ramifications Tool is opened for {string}") { sceneName: String ->
+				val sceneId = sceneIdFor!![sceneName]!!
+				sceneRamificationsSceneId = sceneId
+				DeleteSceneRamificationsDriver.tool(sceneId).whenSet(double)
 			}
 
 
@@ -226,10 +271,50 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				})
 			}
 			Then("the Delete Scene Ramifications Tool should be open") {
-				assertTrue(DeleteSceneRamificationsDriver.openTool.check(double))
+				assertTrue(DeleteSceneRamificationsDriver.openTool(sceneRamificationsSceneId!!).check(double))
 			}
 			Then("the Delete Scene Ramifications Tool should display an ok message") {
-				assertTrue(DeleteSceneRamificationsDriver.okDisplay.check(double))
+				assertTrue(DeleteSceneRamificationsDriver.okDisplay(sceneRamificationsSceneId!!).check(double))
+			}
+			Then("{string} should be listed in the Delete Scene Ramifications Tool for {string}") { listedItem: String, focusScene: String ->
+				val focusSceneId = sceneIdFor!!.getValue(focusScene)
+				val targetSceneId = sceneIdFor!![listedItem]
+				val characterId = characterIdFor!![listedItem]
+				val item: Any? = when {
+					targetSceneId != null -> DeleteSceneRamificationsDriver.listedScene(focusSceneId, targetSceneId).get(double)
+					characterId != null -> DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, characterId).get(double)
+					else -> null
+				}
+
+				assertNotNull(item)
+			}
+			Then("the Current Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should show the value from {string}") {
+				characterName: String, listedSceneName: String, focusSceneName: String, sourceSceneName: String ->
+
+				val characterId = characterIdFor!!.getValue(characterName)
+				val listedSceneId = sceneIdFor!!.getValue(listedSceneName)
+				val focusSceneId = sceneIdFor!!.getValue(focusSceneName)
+				val sourceSceneId = sceneIdFor!!.getValue(sourceSceneName)
+
+				val currentMotivation = DeleteSceneRamificationsDriver.currentMotivation(focusSceneId, listedSceneId, characterId).get(double)
+
+				val sourceValue = ScenesDriver.getCreatedScenes(double).find {
+					it.id == sourceSceneId && it.includesCharacter(characterId)
+				}!!.getMotivationForCharacter(characterId)?.motivation ?: ""
+
+				assertEquals(sourceValue, currentMotivation)
+
+			}
+			Then("the Changed Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should be empty") {
+				characterName: String, listedSceneName: String, focusSceneName: String ->
+
+				val characterId = characterIdFor!!.getValue(characterName)
+				val listedSceneId = sceneIdFor!!.getValue(listedSceneName)
+				val focusSceneId = sceneIdFor!!.getValue(focusSceneName)
+
+				val changedMotivation = DeleteSceneRamificationsDriver.changedMotivation(focusSceneId, listedSceneId, characterId).get(double)
+
+				assertTrue(changedMotivation!!.isEmpty())
 			}
 		}
 	}

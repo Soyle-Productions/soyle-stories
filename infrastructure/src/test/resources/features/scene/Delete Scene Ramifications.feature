@@ -14,18 +14,16 @@ Feature: Delete Scene Ramifications
 		And all Characters have been included in the Scene
 		When the Delete Scene Ramifications Tool is opened
 		Then the Delete Scene Ramifications Tool should display an ok message
-	
-	@excluded
+
 	Scenario: Motivation only set in this Scene
-		Given 2 Scenes have been created
-		And this is the first Scene in the story
-		And the Character has been included in both Scenes
-		And the Character Motivation has been set in this Scene
-		When the Delete Scene Ramifications Tool is opened
-		Then the other Scene should be listed in the Delete Scene Ramifications Tool
-		And the Character should be listed in the Delete Scene Ramifications Tool
-		And the Delete Scene Ramifications Current Motivation field for this Character should show the Motivation set in this Scene
-		And the Delete Scene Ramifications Changed Motivation field for this Character should be empty
+		Given the following Scenes
+			| character   | scene 1 | scene 2 |
+			| character A | value1  | inherit |
+		When the Delete Scene Ramifications Tool is opened for "scene 1"
+		Then "scene 2" should be listed in the Delete Scene Ramifications Tool for "scene 1"
+		And "character A" should be listed in the Delete Scene Ramifications Tool for "scene 1"
+		Then the Current Motivation field for "character A" in "scene 2" in the Delete Scene Ramifications Tool for "scene 1" should show the value from "scene 1"
+		Then the Changed Motivation field for "character A" in "scene 2" in the Delete Scene Ramifications Tool for "scene 1" should be empty
 		
 	@excluded
 	Scenario: Motivation for one Character set in next Scene
