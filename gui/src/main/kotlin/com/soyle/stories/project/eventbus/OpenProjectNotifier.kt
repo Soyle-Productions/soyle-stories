@@ -21,9 +21,7 @@ class OpenProjectNotifier(
     }
 
     override fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
-        notifyAll {
-            it.receiveOpenProjectResponse(response)
-        }
+        notifyAll { it.receiveOpenProjectResponse(response) }
     }
 
     override fun receiveCloseProjectFailure(failure: Exception) {

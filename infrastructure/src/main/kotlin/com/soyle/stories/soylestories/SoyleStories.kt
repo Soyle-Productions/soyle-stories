@@ -3,6 +3,7 @@ package com.soyle.stories.soylestories
 import com.soyle.stories.common.async
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
+import com.soyle.stories.di.get
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.soylestories.confirmExitDialog.ConfirmExitDialog
@@ -51,7 +52,7 @@ class SoyleStories : App(WelcomeScreen::class, WizardStyles::class) {
         }
 
         projectViews.bind(appScope.projectScopesProperty) {
-            find(scope = it)
+            it.get()
         }
     }
 

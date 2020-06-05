@@ -4,13 +4,9 @@ Feature: File Menu
     Given A project has been opened
 
   @excluded
-  Scenario Outline: File menu shows the Settings option
+  Scenario: File menu shows the Settings option
     When the File Menu is opened
-    Then the File Menu should display <item>
-	
-    Examples:
-      | item       |
-      | "Settings" |
+    Then the File Menu should display "Settings"
 	  
   @excluded
   Scenario: Open Settings dialog

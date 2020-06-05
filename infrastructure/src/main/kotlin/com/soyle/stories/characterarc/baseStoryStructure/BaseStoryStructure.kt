@@ -1,14 +1,8 @@
-/**
- * Created by Brendan
- * Date: 3/2/2020
- * Time: 5:00 PM
- */
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.BaseStoryStructureToolViewModel
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Orientation
@@ -110,8 +104,8 @@ class BaseStoryStructure : View("Base Story Structure") {
     }
 }
 
-fun TabPane.baseStoryStructureTab(projectScope: ProjectScope, baseStoryStructureTool: BaseStoryStructureToolViewModel): Tab {
-    val scope = BaseStoryStructureScope(projectScope, baseStoryStructureTool)
+fun TabPane.baseStoryStructureTab(projectScope: ProjectScope, toolId: String, baseStoryStructure: com.soyle.stories.layout.tools.dynamic.BaseStoryStructure): Tab {
+    val scope = BaseStoryStructureScope(projectScope, toolId, baseStoryStructure)
     val structure = find<BaseStoryStructure>(scope = scope)
     val tab = tab(structure)
     tab.tabPaneProperty().onChange {

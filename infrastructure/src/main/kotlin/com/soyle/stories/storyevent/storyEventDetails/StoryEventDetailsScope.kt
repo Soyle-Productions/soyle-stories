@@ -1,17 +1,17 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
 import com.soyle.stories.di.DI
+import com.soyle.stories.layout.tools.dynamic.StoryEventDetails
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.StoryEventDetailsToolViewModel
 import javafx.event.EventTarget
 import tornadofx.FX
 import tornadofx.Scope
 import tornadofx.removeFromParent
 
-class StoryEventDetailsScope(val projectScope: ProjectScope, storyEventDetailsToolViewModel: StoryEventDetailsToolViewModel) : Scope()
+class StoryEventDetailsScope(val projectScope: ProjectScope, tool: StoryEventDetails) : Scope()
 {
 
-	val storyEventId = storyEventDetailsToolViewModel.storyEventId
+	val storyEventId = tool.storyEventId.toString()
 
 	init {
 		projectScope.addScope(storyEventId, this)

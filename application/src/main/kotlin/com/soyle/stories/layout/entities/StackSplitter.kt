@@ -1,8 +1,8 @@
 package com.soyle.stories.layout.entities
 
 import com.soyle.stories.common.Entity
+import com.soyle.stories.layout.tools.ToolType
 import java.util.*
-import kotlin.reflect.KClass
 
 class StackSplitter(
     override val id: Id,
@@ -10,16 +10,73 @@ class StackSplitter(
     val layoutId: Layout.Id,
     val children: List<Pair<Int, Window.WindowChild>>
 ) : Entity<StackSplitter.Id>,
-    Window.WindowChild {
+    Window.MutableWindowChild {
 
-    override val isPrimary: Boolean by lazy { children.any { it.second.isPrimary } }
+    private fun copy(
+      children: List<Pair<Int, Window.WindowChild>> = this.children
+    ) = StackSplitter(id, orientation, layoutId, children)
+
     override val isOpen: Boolean by lazy { children.any { it.second.isOpen } }
-    override val staticTools: List<Tool<*>> by lazy { children.flatMap { it.second.staticTools } }
-    override val tools: List<Tool<*>> by lazy { children.flatMap { it.second.tools } }
+    override val tools: List<Tool> by lazy { children.flatMap { it.second.tools } }
+    override val toolStacks: List<ToolStack> by lazy { children.flatMap { (it.second as Window.MutableWindowChild).toolStacks } }
 
-    init {
-        if (children.filter { it.second.isPrimary }.size > 1) throw Error("May not have more than one primary stack in a layout.")
+    private val toolIds by lazy { tools.map(Tool::id).toSet() }
+    private val toolStackIds by lazy { toolStacks.map(ToolStack::id).toSet() }
+    override fun hasTool(toolId: Tool.Id): Boolean = toolIds.contains(toolId)
+    override fun hasToolStack(stackId: ToolStack.Id): Boolean = toolStackIds.contains(stackId)
+    override fun getToolStackForToolType(toolType: ToolType): ToolStack? {
+        children.forEach {
+            val stack = (it.second as Window.MutableWindowChild).getToolStackForToolType(toolType)
+            if (stack != null) return stack
+        }
+        return null
     }
+
+    override fun withToolClosed(tool: Tool.Id): StackSplitter {
+        if (! hasTool(tool)) return this
+        return copy(
+          children = children.map {
+              if (it.second.hasTool(tool)) it.first to (it.second as Window.MutableWindowChild).withToolClosed(tool)
+              else it
+          }
+        )
+    }
+
+    override fun withToolOpened(tool: Tool.Id): StackSplitter {
+        if (! hasTool(tool)) return this
+        return copy(
+          children = children.map {
+              if (it.second.hasTool(tool)) it.first to (it.second as Window.MutableWindowChild).withToolOpened(tool)
+              else it
+          }
+        )
+    }
+
+    override fun withToolAddedToStack(tool: Tool, stackId: ToolStack.Id): StackSplitter {
+        if (! hasToolStack(stackId)) return this
+        return copy(
+          children = children.map {
+              if (it.second.hasToolStack(stackId)) it.copy(second = (it.second as Window.MutableWindowChild).withToolAddedToStack(tool, stackId))
+              else it
+          }
+        )
+    }
+
+    override fun withoutTools(toolIds: Set<Tool.Id>): StackSplitter {
+        if (this.toolIds.intersect(toolIds).isEmpty()) return this
+        return copy(
+          children = children.map {
+              it.copy(second = (it.second as Window.MutableWindowChild).withoutTools(toolIds))
+          }
+        )
+    }
+/*
+    override val primaryStack: ToolStack? by lazy { children.find { it.second.isPrimary }?.second?.primaryStack }
+    override val staticTools: List<Tool<*>> by lazy { children.flatMap { it.second.staticTools } }
+    override val markers: List<TempToolMarker> by lazy {
+        children.flatMap { it.second.markers }
+    }
+
 
     private val findToolCache = mutableMapOf<Tool.Id, Pair<Boolean, Boolean>>()
     private fun findTool(toolId: Tool.Id): Pair<Boolean, Boolean>
@@ -37,10 +94,6 @@ class StackSplitter(
 
     override fun isToolOpen(toolId: Tool.Id): Boolean {
         return findTool(toolId).second
-    }
-
-    override fun hasTool(toolId: Tool.Id): Boolean {
-        return findTool(toolId).first
     }
 
     override fun getParentToolGroup(toolId: Tool.Id): ToolStack? {
@@ -106,9 +159,11 @@ class StackSplitter(
         )
     }
 
-
-    class Id(val uuid: UUID){
-        override fun toString(): String = "Splitter($uuid)"
+    override fun withTemporaryToolMarkerOnPrimaryToolStack(marker: TempToolMarker): StackSplitter {
+        return if (! isPrimary) this
+        else StackSplitter(
+          id, orientation, layoutId, children.map { it.copy(second = it.second.withTemporaryToolMarkerOnPrimaryToolStack(marker)) }
+        )
     }
 
     override fun openToolInPrimaryStack(tool: Tool<*>): Window.WindowChild {
@@ -126,5 +181,20 @@ class StackSplitter(
             orientation,
             layoutId,
             children.map { it.first to it.second.reOpenTool(toolType, data) })
+    }
+
+    private val _hasMarkerCache by lazy { markers.toSet() }
+    override fun hasMarker(marker: TempToolMarker): Boolean = _hasMarkerCache.contains(marker)
+    override fun addToolNextToMarker(tool: Tool<*>, marker: TempToolMarker): StackSplitter {
+        if (! hasMarker(marker)) return this
+        return StackSplitter(id, orientation, layoutId, children.map {
+            if (! it.second.hasMarker(marker)) it
+            else it.copy(second = it.second.addToolNextToMarker(tool, marker))
+        })
+    }
+    */
+
+    class Id(val uuid: UUID) : Window.WindowChild.Id {
+        override fun toString(): String = "Splitter($uuid)"
     }
 }

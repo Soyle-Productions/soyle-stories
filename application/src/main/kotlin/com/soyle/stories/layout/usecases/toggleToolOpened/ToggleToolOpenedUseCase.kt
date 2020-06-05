@@ -1,34 +1,50 @@
 package com.soyle.stories.layout.usecases.toggleToolOpened
 
+import com.soyle.stories.entities.Project
+import com.soyle.stories.layout.LayoutDoesNotContainFixedTool
+import com.soyle.stories.layout.LayoutDoesNotExist
+import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.repositories.LayoutRepository
-import com.soyle.stories.layout.usecases.toActiveWindow
-import com.soyle.stories.layout.usecases.toStaticTool
-import kotlinx.coroutines.runBlocking
+import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
+import com.soyle.stories.layout.usecases.toResponseModel
 import java.util.*
 
-/**
- * Created by Brendan
- * Date: 2/15/2020
- * Time: 5:19 PM
- */
 class ToggleToolOpenedUseCase(
+  projectId: UUID,
     private val layoutRepository: LayoutRepository
 ) : ToggleToolOpened {
 
-    override suspend fun invoke(toolId: UUID, outputPort: ToggleToolOpened.OutputPort) {
-        val typedToolId = Tool.Id(toolId)
-        val storedLayout = layoutRepository.getLayoutContainingTool(typedToolId) ?: return
-        val modifiedLayout = if (storedLayout.isToolOpen(typedToolId)) storedLayout.closeTool(typedToolId)
-        else storedLayout.openTool(typedToolId)
-        modifiedLayout.map {
-            runBlocking {
-                layoutRepository.saveLayout(it)
-            }
-            ToggleToolOpened.ResponseModel(
-                it.id.uuid, it.windows.map { it.toActiveWindow() }, it.staticTools.map { it.toStaticTool() }
-            ).let(outputPort::receiveToggleToolOpenedResponse)
+    private val projectId = Project.Id(projectId)
+
+    override suspend fun invoke(fixedTool: FixedTool, outputPort: ToggleToolOpened.OutputPort) {
+        val response = try { execute(fixedTool) }
+        catch (t: Throwable) {
+            return outputPort.failedToToggleToolOpen(t)
         }
+        outputPort.receiveToggleToolOpenedResponse(response)
+    }
+
+    private suspend fun execute(fixedTool: FixedTool): GetSavedLayout.ResponseModel {
+        val layout = getLayout()
+        val tool = layout.getTool(fixedTool)
+        val modifiedLayout = toggleToolOpen(layout, tool)
+        return modifiedLayout.toResponseModel()
+    }
+
+    private suspend fun getLayout()  = layoutRepository.getLayoutForProject(projectId)
+      ?: throw LayoutDoesNotExist()
+
+    private fun Layout.getTool(fixedTool: FixedTool): Tool = getToolByType(fixedTool)
+      ?: throw LayoutDoesNotContainFixedTool(fixedTool)
+
+    private suspend fun toggleToolOpen(layout: Layout, tool: Tool): Layout
+    {
+        val modifiedLayout = if (tool.isOpen) layout.withToolClosed(tool.id)
+        else layout.withToolOpened(tool.id)
+        layoutRepository.saveLayout(modifiedLayout)
+        return modifiedLayout
     }
 
 }

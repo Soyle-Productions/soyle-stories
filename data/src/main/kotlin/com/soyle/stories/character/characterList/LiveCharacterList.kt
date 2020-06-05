@@ -2,7 +2,7 @@ package com.soyle.stories.character.characterList
 
 import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
@@ -13,7 +13,7 @@ class LiveCharacterList(
   threadTransformer: ThreadTransformer,
   listAllCharacterArcs: ListAllCharacterArcs,
   buildNewCharacterNotifier: Notifier<BuildNewCharacter.OutputPort>,
-  removeCharacterFromLocalStoryNotifier: Notifier<RemoveCharacterFromLocalStory.OutputPort>,
+  removeCharacterFromLocalStoryNotifier: Notifier<RemoveCharacterFromStory.OutputPort>,
   renameCharacterNotifier: Notifier<RenameCharacter.OutputPort>
 ): Notifier<CharacterListListener>() {
 
@@ -27,7 +27,7 @@ class LiveCharacterList(
 	private val outputs = object :
 	  ListAllCharacterArcs.OutputPort,
 	  BuildNewCharacter.OutputPort,
-	  RemoveCharacterFromLocalStory.OutputPort,
+	  RemoveCharacterFromStory.OutputPort,
 	  RenameCharacter.OutputPort
 	{
 		override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
@@ -42,7 +42,7 @@ class LiveCharacterList(
 			notifyAll { it.receiveCharacterListUpdate(characters) }
 		}
 
-		override fun receiveRemoveCharacterFromLocalStoryResponse(response: RemoveCharacterFromLocalStory.ResponseModel) {
+		override fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
 			val characters = characters!!.filterNot { it.characterId == response.characterId }
 			this@LiveCharacterList.characters = characters
 			notifyAll { it.receiveCharacterListUpdate(characters) }
@@ -55,7 +55,7 @@ class LiveCharacterList(
 		}
 
 		override fun receiveBuildNewCharacterFailure(failure: CharacterException) {}
-		override fun receiveRemoveCharacterFromLocalStoryFailure(failure: CharacterException) {}
+		override fun receiveRemoveCharacterFromStoryFailure(failure: Exception) {}
 		override fun receiveRenameCharacterFailure(failure: CharacterException) {}
 	}
 

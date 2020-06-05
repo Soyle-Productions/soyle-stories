@@ -17,10 +17,10 @@ class CharacterComparisonController(
 	private val themeId: UUID = UUID.fromString(themeId)
 
 	suspend fun getCharacterComparison(characterId: String) {
-		val characterId = prepareCharacterId(characterId)
+		val preparedId = prepareCharacterId(characterId)
 		compareCharacters.invoke(
 		  themeId,
-		  characterId,
+		  preparedId,
 		  compareCharactersOutputPort
 		)
 	}

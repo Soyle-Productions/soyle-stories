@@ -1,11 +1,10 @@
 package com.soyle.stories.di.layout
 
-import com.soyle.stories.characterarc.eventbus.DeleteLocalCharacterArcNotifier
-import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalComparisonNotifier
-import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalStoryNotifier
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.Project
+import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.layout.openTool.OpenToolControllerImpl
+import com.soyle.stories.layout.openTool.OpenToolNotifier
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.closeTool.CloseToolUseCase
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
@@ -23,9 +22,6 @@ import com.soyle.stories.project.layout.LayoutController
 import com.soyle.stories.project.layout.LayoutPresenter
 import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewListener
-import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.layout.openTool.OpenToolControllerImpl
-import com.soyle.stories.layout.openTool.OpenToolNotifier
 import tornadofx.find
 
 object LayoutModule {
@@ -38,13 +34,13 @@ object LayoutModule {
 					GetSavedLayoutUseCase(get())
 				}
 				provide<ToggleToolOpened> {
-					ToggleToolOpenedUseCase(get())
+					ToggleToolOpenedUseCase(projectId, get())
 				}
 				provide<OpenTool> {
-					OpenToolUseCase(Project.Id(projectId), get())
+					OpenToolUseCase(projectId, get(), get())
 				}
 				provide<CloseTool> {
-					CloseToolUseCase(get(), projectId)
+					CloseToolUseCase(projectId, get())
 				}
 			}
 
@@ -64,7 +60,7 @@ object LayoutModule {
 			}
 
 			provide(OpenToolController::class) {
-				OpenToolControllerImpl(applicationScope.get(), get(), get())
+				OpenToolControllerImpl(applicationScope.get(), applicationScope.get(), get(), get())
 			}
 
 			provide<LayoutViewListener> {
@@ -78,14 +74,11 @@ object LayoutModule {
 				  get(),
 				  LayoutPresenter(
 					get(),
+					applicationScope.get(),
 					get<GetSavedLayoutNotifier>(),
 					get<ToggleToolOpenedNotifier>(),
 					get<OpenToolNotifier>(),
-					get<CloseToolNotifier>(),
-					get<RemoveCharacterFromLocalStoryNotifier>(),
-					get<DeleteLocalCharacterArcNotifier>(),
-					get<RemoveCharacterFromLocalComparisonNotifier>(),
-					get()
+					get<CloseToolNotifier>()
 				  )
 				)
 			}

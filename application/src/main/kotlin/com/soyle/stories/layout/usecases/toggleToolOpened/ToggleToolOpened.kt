@@ -1,8 +1,7 @@
 package com.soyle.stories.layout.usecases.toggleToolOpened
 
-import com.soyle.stories.layout.usecases.OpenWindow
-import com.soyle.stories.layout.usecases.StaticTool
-import java.util.*
+import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 
 /**
  * Created by Brendan
@@ -11,14 +10,11 @@ import java.util.*
  */
 interface ToggleToolOpened {
 
-    suspend operator fun invoke(toolId: UUID, outputPort: OutputPort)
-
-    class ResponseModel(
-	  val layoutId: UUID, val windows: List<OpenWindow>, val staticTools: List<StaticTool>
-    )
+    suspend operator fun invoke(fixedTool: FixedTool, outputPort: OutputPort)
 
     interface OutputPort {
-        fun receiveToggleToolOpenedResponse(response: ResponseModel)
+        fun failedToToggleToolOpen(failure: Throwable)
+        fun receiveToggleToolOpenedResponse(response: GetSavedLayout.ResponseModel)
     }
 
 }

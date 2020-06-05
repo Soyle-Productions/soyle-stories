@@ -13,7 +13,7 @@ import com.soyle.stories.layout.repositories.LayoutRepository
 class MockLayoutRepository(
     getLayoutForProject: Layout? = null,
     getLayoutContainingTool: Layout? = null,
-    getToolsWithCharacterIdInIdentifyingData: List<Tool<*>>? = null,
+    getToolsWithCharacterIdInIdentifyingData: List<Tool>? = null,
     getLayoutsContainingToolIds: List<Layout>? = null
 ) : LayoutRepository {
 

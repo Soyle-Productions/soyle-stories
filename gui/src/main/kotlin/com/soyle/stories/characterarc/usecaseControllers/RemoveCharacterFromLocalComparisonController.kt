@@ -1,17 +1,15 @@
 package com.soyle.stories.characterarc.usecaseControllers
 
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromLocalComparison
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import java.util.*
 
 class RemoveCharacterFromLocalComparisonController(
-  private val themeId: String,
-  private val removeCharacterFromLocalComparison: RemoveCharacterFromLocalComparison,
-  private val removeCharacterFromLocalComparisonOutputPort: RemoveCharacterFromLocalComparison.OutputPort
+  private val removeCharacterFromLocalComparison: RemoveCharacterFromStory,
+  private val removeCharacterFromLocalComparisonOutputPort: RemoveCharacterFromStory.OutputPort
 ) {
 
 	suspend fun removeCharacterFromComparison(characterId: String) {
 		removeCharacterFromLocalComparison.invoke(
-		  UUID.fromString(themeId),
 		  UUID.fromString(characterId),
 		  removeCharacterFromLocalComparisonOutputPort
 		)

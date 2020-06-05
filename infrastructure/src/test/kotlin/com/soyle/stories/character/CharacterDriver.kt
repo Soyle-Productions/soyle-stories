@@ -1,5 +1,6 @@
 package com.soyle.stories.character
 
+import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.character.CharacterDriver.interact
 import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
@@ -10,14 +11,15 @@ import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.project.ProjectSteps
+import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.event.ActionEvent
 import javafx.geometry.Side
 import javafx.scene.Node
 import javafx.scene.control.DialogPane
-import javafx.scene.control.MenuItem
 import javafx.scene.control.TextField
 import javafx.scene.control.TreeView
 import javafx.stage.Window
@@ -80,9 +82,11 @@ object CharacterDriver : ApplicationTest() {
 	fun isCharacterListToolOpen(double: SoyleStoriesTestDouble): Boolean = getOpenCharacterListTool(double) != null
 
 	fun whenCharacterListToolIsOpened(double: SoyleStoriesTestDouble) {
-		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Characters")!!
+		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
-			menuItem.fire()
+			async(scope) {
+				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.CharacterList)
+			}
 		}
 	}
 
@@ -100,9 +104,11 @@ object CharacterDriver : ApplicationTest() {
 	}
 
 	fun whenCharacterListToolIsClosed(double: SoyleStoriesTestDouble) {
-		val menuItem: MenuItem = ProjectSteps.getMenuItem(double, "tools", "tools_Characters")!!
+		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
-			menuItem.fire()
+			async(scope) {
+				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.CharacterList)
+			}
 		}
 	}
 
@@ -154,15 +160,24 @@ object CharacterDriver : ApplicationTest() {
 		return populatedDisplayIsVisible && characterItemViewModel != null
 	}
 
-	fun whenCharacterIsDeleted(double: SoyleStoriesTestDouble): Character {
+	private var recentlyDeletedCharacters = mapOf<SoyleStoriesTestDouble, List<Character>>()
+		@Synchronized get
+		@Synchronized set
+
+	fun whenCharacterIsDeleted(double: SoyleStoriesTestDouble, characterId: Character.Id? = null): Character {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		var firstCharacter: Character? = null
 		interact {
 			async(scope.applicationScope) {
-				firstCharacter = DI.resolve<CharacterRepository>(scope).listCharactersInProject(Project.Id(scope.projectId)).first()
+				firstCharacter = if (characterId != null) {
+					DI.resolve<CharacterRepository>(scope).getCharacterById(characterId)!!
+				} else {
+					DI.resolve<CharacterRepository>(scope).listCharactersInProject(Project.Id(scope.projectId)).first()
+				}
 				DI.resolve<CharacterListViewListener>(scope).removeCharacter(firstCharacter!!.id.uuid.toString())
 			}
 		}
+		recentlyDeletedCharacters = recentlyDeletedCharacters + (double to recentlyDeletedCharacters.getOrElse(double) { listOf() } + firstCharacter!!)
 		return firstCharacter!!
 	}
 
@@ -377,5 +392,12 @@ object CharacterDriver : ApplicationTest() {
 	{
 		val inputBox = getCharacterListToolInputBox(double) ?: return false
 		return inputBox.decorators.isNotEmpty()
+	}
+
+	val recentlyDeletedCharacter = object : ReadOnlyDependentProperty<Character>
+	{
+		override fun get(double: SoyleStoriesTestDouble): Character? {
+			return recentlyDeletedCharacters[double]?.lastOrNull()
+		}
 	}
 }

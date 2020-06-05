@@ -2,7 +2,6 @@ package com.soyle.stories.storyevent.storyEventDetails
 
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.StoryEventDetailsToolViewModel
 import javafx.geometry.Pos
 import javafx.geometry.Side
 import javafx.scene.Parent
@@ -108,8 +107,8 @@ class StoryEventDetails : View() {
 
 }
 
-fun TabPane.storyEventDetailsTab(projectScope: ProjectScope, storyEventDetailsToolViewModel: StoryEventDetailsToolViewModel): Tab {
-	val scope = StoryEventDetailsScope(projectScope, storyEventDetailsToolViewModel)
+fun TabPane.storyEventDetailsTab(projectScope: ProjectScope, storyEventDetails: com.soyle.stories.layout.tools.dynamic.StoryEventDetails): Tab {
+	val scope = StoryEventDetailsScope(projectScope, storyEventDetails)
 	val structure = find<StoryEventDetails>(scope = scope)
 	val tab = tab(structure)
 	tab.tabPaneProperty().onChange {

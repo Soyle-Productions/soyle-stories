@@ -14,5 +14,11 @@ class CreateNewLocationPresenter(
 		}
 	}
 
-	override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {}
+	override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
+		view.updateOrInvalidated {
+			copy(
+			  isOpen = false
+			)
+		}
+	}
 }

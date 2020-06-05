@@ -3,8 +3,10 @@ package com.soyle.stories.di.modules
 import com.soyle.stories.characterarc.repositories.CharacterArcRepository
 import com.soyle.stories.characterarc.repositories.CharacterRepository
 import com.soyle.stories.di.DI
+import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.layout.repositories.LayoutRepository
+import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.repositories.ProjectRepository
@@ -17,6 +19,7 @@ import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.workspace.repositories.FileRepository
 import com.soyle.stories.workspace.repositories.WorkspaceRepository
+import com.soyle.stories.writer.repositories.WriterRepository
 
 object DataModule {
 
@@ -87,6 +90,20 @@ object DataModule {
 
 			provide<StoryEventRepository> {
 				StoryEventRepositoryImpl()
+			}
+
+			provide<WriterRepository> {
+				WriterRepositoryImpl(applicationScope.writerId)
+			}
+
+			provide<OpenToolContext> {
+				object : OpenToolContext {
+					override val characterRepository: com.soyle.stories.character.repositories.CharacterRepository = get()
+					override val locationRepository: LocationRepository = get()
+					override val sceneRepository: SceneRepository = get()
+					override val storyEventRepository: StoryEventRepository = get()
+					override val themeRepository: ThemeRepository = get()
+				}
 			}
 		}
 	}

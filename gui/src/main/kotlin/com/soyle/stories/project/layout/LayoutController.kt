@@ -1,6 +1,7 @@
 package com.soyle.stories.project.layout
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpened
@@ -29,8 +30,8 @@ class LayoutController(
         }
     }
 
-    override suspend fun toggleToolOpen(toolId: String) {
-        toggleToolOpened.invoke(UUID.fromString(toolId), toggleToolOpenedOutputPort)
+    override suspend fun toggleToolOpen(tool: FixedTool) {
+        toggleToolOpened.invoke(tool, toggleToolOpenedOutputPort)
     }
 
     override suspend fun closeTool(toolId: String) {

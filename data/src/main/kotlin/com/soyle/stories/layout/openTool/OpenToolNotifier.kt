@@ -6,6 +6,7 @@
 package com.soyle.stories.layout.openTool
 
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 
 class OpenToolNotifier : OpenTool.OutputPort, Notifier<OpenTool.OutputPort>() {
@@ -13,7 +14,7 @@ class OpenToolNotifier : OpenTool.OutputPort, Notifier<OpenTool.OutputPort>() {
         notifyAll { it.receiveOpenToolFailure(failure) }
     }
 
-    override fun receiveOpenToolResponse(response: OpenTool.ResponseModel) {
+    override fun receiveOpenToolResponse(response: GetSavedLayout.ResponseModel) {
         notifyAll { it.receiveOpenToolResponse(response) }
     }
 }

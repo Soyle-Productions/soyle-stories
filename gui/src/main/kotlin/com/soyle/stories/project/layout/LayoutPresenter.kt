@@ -1,104 +1,70 @@
 package com.soyle.stories.project.layout
 
-import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
-import com.soyle.stories.characterarc.LocalCharacterArcException
-import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.common.listensTo
 import com.soyle.stories.layout.LayoutException
-import com.soyle.stories.layout.usecases.OpenWindow
-import com.soyle.stories.layout.usecases.StaticTool
+import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpened
-import com.soyle.stories.location.LocationException
-import com.soyle.stories.location.events.LocationEvents
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
-import com.soyle.stories.project.layout.presenters.OpenToolPresenter
-import com.soyle.stories.theme.LocalThemeException
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromLocalComparison
 import kotlin.reflect.KClass
 
 class LayoutPresenter(
   private val view: LayoutView,
+  private val locale: LayoutLocale,
   getSavedLayoutNotifier: Notifier<GetSavedLayout.OutputPort>,
   toggleToolOpenedNotifier: Notifier<ToggleToolOpened.OutputPort>,
   openToolNotifier: Notifier<OpenTool.OutputPort>,
-  closeToolNotifier: Notifier<CloseTool.OutputPort>,
-  removeCharacterNotifier: Notifier<RemoveCharacterFromLocalStory.OutputPort>,
-  deleteLocalCharacterArcNotifier: Notifier<DeleteLocalCharacterArc.OutputPort>,
-  removeCharacterFromComparisonNotifier: Notifier<RemoveCharacterFromLocalComparison.OutputPort>,
-  locationEvents: LocationEvents
-) : GetSavedLayout.OutputPort, ToggleToolOpened.OutputPort, CloseTool.OutputPort, RemoveCharacterFromLocalStory.OutputPort, DeleteLocalCharacterArc.OutputPort, RemoveCharacterFromLocalComparison.OutputPort, CreateNewLocation.OutputPort, DeleteLocation.OutputPort {
-
-	private val subPresenters = listOf(
-	  OpenToolPresenter(view) listensTo openToolNotifier
-	)
+  closeToolNotifier: Notifier<CloseTool.OutputPort>
+) : GetSavedLayout.OutputPort,
+  ToggleToolOpened.OutputPort,
+  CloseTool.OutputPort,
+  OpenTool.OutputPort
+{
 
 	init {
 		getSavedLayoutNotifier.addListener(this)
 		toggleToolOpenedNotifier.addListener(this)
 		closeToolNotifier.addListener(this)
-		removeCharacterNotifier.addListener(this)
-		deleteLocalCharacterArcNotifier.addListener(this)
-		removeCharacterFromComparisonNotifier.addListener(this)
-		locationEvents.createNewLocation.addListener(this)
-		locationEvents.deleteLocation.addListener(this)
+		openToolNotifier.addListener(this)
 	}
 
-	private fun pushLayout(openWindows: List<OpenWindow>, staticTools: List<StaticTool>) {
+	private fun pushLayout(response: GetSavedLayout.ResponseModel)
+	{
+		val fixedTools = response.fixedTools.associateBy { it.toolType::class }
 		view.update {
 			copy(
-			  staticTools = staticTools.map { StaticToolViewModel(it.toolId.toString(), it.isOpen, it.toolType.toPresentableToolName()!!) },
-			  primaryWindow = openWindows.find { it.isPrimary }!!.let(::toWindowViewModel),
-			  secondaryWindows = openWindows.filterNot { it.isPrimary }.map(::toWindowViewModel),
+			  staticTools = FixedTool::class.nestedClasses.map {
+				  val obj = it.objectInstance as FixedTool
+				  if (it in fixedTools) {
+					  StaticToolViewModel(obj, true, locale.toolName(obj))
+				  } else {
+					  StaticToolViewModel(obj, false, locale.toolName(obj))
+				  }
+			  },
+			  primaryWindow = toWindowViewModel(response.windows.find { it.isPrimary }!!, locale),
+			  secondaryWindows = response.windows.filterNot { it.isPrimary }.map { toWindowViewModel(it, locale) },
 			  isValid = true
 			)
 		}
 	}
 
 	override fun receiveGetSavedLayoutResponse(response: GetSavedLayout.ResponseModel) {
-		pushLayout(response.windows, response.staticTools)
+		pushLayout(response)
 	}
 
-	override fun receiveToggleToolOpenedResponse(response: ToggleToolOpened.ResponseModel) {
-		pushLayout(response.windows, response.staticTools)
+	override fun receiveToggleToolOpenedResponse(response: GetSavedLayout.ResponseModel) {
+		pushLayout(response)
 	}
 
-	override fun receiveCloseToolResponse(response: CloseTool.ResponseModel) {
-		val closedWindowId = response.closedWindowId?.toString()
-		view.update {
-			if (closedWindowId != null) {
-				copy(secondaryWindows = secondaryWindows.filterNot { it.id == closedWindowId })
-			} else {
-				copy(isValid = false)
-			}
-		}
+	override fun receiveCloseToolResponse(response: GetSavedLayout.ResponseModel) {
+		pushLayout(response)
 	}
 
-	override fun receiveRemoveCharacterFromLocalStoryResponse(response: RemoveCharacterFromLocalStory.ResponseModel) {
-		if (response.removedTools.isEmpty()) return
-		view.update {
-			copy(isValid = false)
-		}
+	override fun receiveOpenToolResponse(response: GetSavedLayout.ResponseModel) {
+		pushLayout(response)
 	}
 
-	override fun receiveDeleteLocalCharacterArcResponse(response: DeleteLocalCharacterArc.ResponseModel) {
-		if (response.removedTools.isEmpty()) return
-		view.update {
-			copy(isValid = false)
-		}
-	}
-
-	override fun receiveRemoveCharacterFromLocalComparisonResponse(response: RemoveCharacterFromLocalComparison.ResponseModel) {
-		if (response.removedTools.isEmpty()) return
-		view.update {
-			copy(isValid = false)
-		}
-	}
 
 	fun displayDialog(dialog: Dialog) {
 		view.update {
@@ -116,40 +82,8 @@ class LayoutPresenter(
 		}
 	}
 
-	override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
-		view.update {
-			copy(
-			  openDialogs = openDialogs - Dialog.CreateLocation::class
-			)
-		}
-	}
-
-    override fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
-        view.update {
-            copy(
-              openDialogs = openDialogs - Dialog.DeleteLocation::class
-            )
-        }
-    }
-
-    override fun receiveDeleteLocationFailure(failure: LocationException) {
-
-    }
-	override fun receiveCreateNewLocationFailure(failure: LocationException) {
-
-	}
-
-	override fun receiveRemoveCharacterFromLocalComparisonFailure(failure: LocalThemeException) {
-
-	}
-
-	override fun receiveRemoveCharacterFromLocalStoryFailure(failure: CharacterException) {
-
-	}
-
 	override fun receiveCloseToolFailure(failure: LayoutException) {}
+	override fun failedToToggleToolOpen(failure: Throwable) {}
+	override fun receiveOpenToolFailure(failure: Exception) {}
 
-	override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {
-
-	}
 }

@@ -2,6 +2,7 @@ package com.soyle.stories.repositories
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.repositories.SceneRepository
 
 class SceneRepositoryImpl : SceneRepository {
@@ -19,6 +20,10 @@ class SceneRepositoryImpl : SceneRepository {
 
 	override suspend fun getSceneIdsInOrder(projectId: Project.Id): List<Scene.Id> {
 		return sceneOrder[projectId] ?: emptyList()
+	}
+
+	override suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene? {
+		return scenes.values.find { it.storyEventId == storyEventId }
 	}
 
 	override suspend fun updateSceneOrder(projectId: Project.Id, order: List<Scene.Id>) {

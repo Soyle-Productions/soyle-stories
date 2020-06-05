@@ -47,7 +47,7 @@ internal class StartNewLocalProjectPresenter(
 					is FileAlreadyExists -> "File already exists"
 					is ProjectFailure -> when (exception.cause) {
 						is NameCannotBeBlank -> "Project name cannot be blank"
-						else -> exception.localizedMessage ?: ""
+						else -> exception.localizedMessage
 					}
 					else -> exception.localizedMessage ?: ""
 				}

@@ -2,9 +2,7 @@ package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.character.characterList.LiveCharacterList
-import com.soyle.stories.characterarc.LocalCharacterArcException
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
-import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
@@ -12,6 +10,7 @@ import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharac
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.ThemeException
+import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 
 /**
@@ -25,7 +24,7 @@ class CharacterListPresenter(
   private val characterList: LiveCharacterList,
   characterArcEvents: CharacterArcEvents
 ) : PlanNewCharacterArc.OutputPort, CharacterListListener, ListAllCharacterArcs.OutputPort,
-  PromoteMinorCharacter.OutputPort, DeleteLocalCharacterArc.OutputPort, RenameCharacterArc.OutputPort {
+  PromoteMinorCharacter.OutputPort, DemoteMajorCharacter.OutputPort, RenameCharacterArc.OutputPort {
 
 	init {
 		characterList.addListener(this)
@@ -123,7 +122,7 @@ class CharacterListPresenter(
 		}
 	}
 
-	override fun receiveDeleteLocalCharacterArcResponse(response: DeleteLocalCharacterArc.ResponseModel) {
+	override fun receiveDemoteMajorCharacterResponse(response: DemoteMajorCharacter.ResponseModel) {
 		threadTransformer.gui {
 			val viewModel = view.getViewModel()
 			  ?: return@gui view.invalidate()
@@ -167,7 +166,7 @@ class CharacterListPresenter(
 
 	override fun receivePlanNewCharacterArcFailure(failure: Exception) {}
 	override fun receivePromoteMinorCharacterFailure(failure: ThemeException) {}
-	override fun receiveDeleteLocalCharacterArcFailure(failure: LocalCharacterArcException) {}
+	override fun receiveDemoteMajorCharacterFailure(failure: Exception) {}
 	override fun receiveRenameCharacterArcFailure(failure: Exception) {}
 
 }
