@@ -48,7 +48,7 @@ class Scene(
 		override fun toString(): String = "Scene($uuid)"
 	}
 
-	class CharacterMotivation(val characterId: Character.Id, val characterName: String, internal val motivation: String?) {
+	class CharacterMotivation(val characterId: Character.Id, val characterName: String, val motivation: String?) {
 		fun isInherited() = motivation == null
 	}
 }
