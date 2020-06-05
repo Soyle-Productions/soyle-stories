@@ -21,7 +21,7 @@ class TestContext(
 		override suspend fun getCharacterById(characterId: Character.Id): Character? = characters[characterId]
 
 		override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> = characters.values.filter {
-			it.projectId == projectId.uuid
+			it.projectId == projectId
 		}
 	}
 

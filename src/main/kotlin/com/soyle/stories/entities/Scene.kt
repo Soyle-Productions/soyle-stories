@@ -9,38 +9,46 @@ class Scene(
   val projectId: Project.Id,
   val name: String,
   val storyEventId: StoryEvent.Id,
-  private val characterMotivations: Map<Character.Id, String?>
+  val characterMotivations: List<CharacterMotivation>
 ) : Entity<Scene.Id> {
 
-	constructor(projectId: Project.Id, name: String, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, mapOf())
+	constructor(projectId: Project.Id, name: String, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, listOf())
+
+	private val motivationsById by lazy { characterMotivations.associateBy { it.characterId } }
 
 	fun includesCharacter(characterId: Character.Id): Boolean
 	{
-		return characterMotivations.containsKey(characterId)
+		return motivationsById.containsKey(characterId)
 	}
 
-	fun getMotivationForCharacter(characterId: Character.Id): String?
+	fun getMotivationForCharacter(characterId: Character.Id): CharacterMotivation?
 	{
-		return characterMotivations[characterId]
+		return motivationsById[characterId]
 	}
+
+	fun hasCharacters(): Boolean = characterMotivations.isNotEmpty()
 
 	private fun copy(
 	  name: String = this.name,
-	  characterMotivations: Map<Character.Id, String?> = this.characterMotivations
+	  characterMotivations: List<CharacterMotivation> = this.characterMotivations
 	) = Scene(id, projectId, name, storyEventId, characterMotivations)
 
 	fun withName(newName: String) = copy(name = newName)
-	fun withCharacterIncluded(characterId: Character.Id) = copy(characterMotivations = characterMotivations + (characterId to null))
+	fun withCharacterIncluded(character: Character) = copy(characterMotivations = characterMotivations + CharacterMotivation(character.id, character.name, null))
 	fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene
 	{
 		if (! includesCharacter(characterId)) throw CharacterNotInScene(id.uuid, characterId.uuid)
-		return copy(characterMotivations = characterMotivations.mapValues {
-			if (it.key == characterId) motivation
-			else it.value
+		return copy(characterMotivations = characterMotivations.map {
+			if (it.characterId == characterId) CharacterMotivation(it.characterId, it.characterName, motivation)
+			else it
 		})
 	}
 
 	data class Id(val uuid: UUID = UUID.randomUUID()) {
 		override fun toString(): String = "Scene($uuid)"
+	}
+
+	class CharacterMotivation(val characterId: Character.Id, val characterName: String, internal val motivation: String?) {
+		fun isInherited() = motivation == null
 	}
 }

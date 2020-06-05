@@ -25,7 +25,7 @@ class ViewBaseStoryStructureTest {
     val themeUUID = UUID.randomUUID()
     val locationUUID = UUID.randomUUID()
     val character = Character(
-      Character.Id(characterUUID), UUID.randomUUID(), "Character Name"
+      Character.Id(characterUUID), Project.Id(), "Character Name"
     )
 
     private var result: Any? = null
@@ -99,7 +99,7 @@ class ViewBaseStoryStructureTest {
             val initialTheme = takeNoteOfTheme(uuid)
             if (includedCharacterIds.isNotEmpty()) {
                 includedCharacterIds.fold(initialTheme) { theme, (id, isPromoted) ->
-                    val included = theme.includeCharacter(Character(Character.Id(id), UUID.randomUUID(), "Bob"))
+                    val included = theme.includeCharacter(Character(Character.Id(id), Project.Id(), "Bob"))
                     ((if (isPromoted) {
                         included.flatMap {
                             it.promoteCharacter(it.getMinorCharacterById(Character.Id(id))!!)

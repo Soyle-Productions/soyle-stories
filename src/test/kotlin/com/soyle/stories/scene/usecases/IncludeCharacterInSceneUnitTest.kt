@@ -66,7 +66,7 @@ class IncludeCharacterInSceneUnitTest {
 
 	private fun givenSceneExistsWithStoryEventId()
 	{
-		Scene(Scene.Id(sceneId), Project.Id(), "", StoryEvent.Id(storyEventId), mapOf()).let {
+		Scene(Scene.Id(sceneId), Project.Id(), "", StoryEvent.Id(storyEventId), listOf()).let {
 			sceneRepository.scenes[it.id] = it
 		}
 	}
@@ -74,14 +74,14 @@ class IncludeCharacterInSceneUnitTest {
 	private fun givenCharacterExists()
 	{
 		runBlocking {
-			characterRepository.addNewCharacter(Character(Character.Id(characterId), Project.Id().uuid, "Bob"))
+			characterRepository.addNewCharacter(Character(Character.Id(characterId), Project.Id(), "Bob"))
 		}
 	}
 
 	private fun givenSceneIncludesCharacter()
 	{
 		runBlocking {
-			sceneRepository.getSceneForStoryEvent(StoryEvent.Id(storyEventId))!!.withCharacterIncluded(Character.Id(characterId)).let {
+			sceneRepository.getSceneForStoryEvent(StoryEvent.Id(storyEventId))!!.withCharacterIncluded(Character(Character.Id(characterId), Project.Id(), "")).let {
 				sceneRepository.scenes[it.id] = it
 			}
 		}

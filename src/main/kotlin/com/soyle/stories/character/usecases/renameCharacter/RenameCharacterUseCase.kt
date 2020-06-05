@@ -5,6 +5,7 @@ import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.repositories.ThemeRepository
+import com.soyle.stories.character.usecases.validateCharacterName
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import java.util.*
@@ -42,15 +43,9 @@ class RenameCharacterUseCase(
 	}
 
 	private suspend fun changeNameForAllInstancesOfCharacter(name: String, character: Character, themes: List<Theme>) {
-		foldCharacterRename(character, name)
+		validateCharacterName(name)
+		characterRepository.updateCharacter(character.withName(name))
 		renameCharacterInThemes(character, name)
-	}
-
-	private suspend fun foldCharacterRename(character: Character, newName: String) {
-		character.rename(newName).fold(
-		  { throw it },
-		  { characterRepository.updateCharacter(it) }
-		)
 	}
 
 	private suspend fun renameCharacterInThemes(character: Character, name: String)

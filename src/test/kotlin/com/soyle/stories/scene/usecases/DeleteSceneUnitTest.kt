@@ -47,7 +47,7 @@ class DeleteSceneUnitTest {
 	private fun given(sceneWithId: UUID? = null) {
 		repository = SceneRepositoryDouble(
 		  initialScenes = listOfNotNull(
-			sceneWithId?.let { Scene(Scene.Id(it), projectId, "", StoryEvent.Id(), mapOf()) }
+			sceneWithId?.let { Scene(Scene.Id(it), projectId, "", StoryEvent.Id(), listOf()) }
 		  ),
 		  onRemoveScene = { deletedScene = it }
 		)

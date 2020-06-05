@@ -121,7 +121,7 @@ class AddCharacterToStoryEventUnitTest {
 		private fun makeCharacterRepository(characterIds: List<UUID>): CharacterRepository
 		{
 			return CharacterRepositoryDouble(initialCharacters = characterIds.map {
-				Character(Character.Id(it),  Project.Id().uuid, "Bob")
+				Character(Character.Id(it),  Project.Id(), "Bob")
 			})
 		}
 	}

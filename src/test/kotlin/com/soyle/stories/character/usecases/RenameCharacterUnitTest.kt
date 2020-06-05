@@ -9,6 +9,7 @@ import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
@@ -50,7 +51,6 @@ class RenameCharacterUnitTest {
 		givenCharacterWithId(characterId = characterId)
 		whenUseCaseIsExecuted(inputName = inputName)
 		val result = result as CharacterNameCannotBeBlank
-		result.characterId.mustEqual(characterId)
 	}
 
 	@Test
@@ -97,7 +97,7 @@ class RenameCharacterUnitTest {
 	}
 
 	fun givenCharacterWithId(characterId: UUID? = null, andName: String? = null, andThemeId: UUID? = null, andThemeHasCharacter: Boolean = false) {
-		val character = characterId?.let { Character(Character.Id(it), UUID.randomUUID(), andName ?: "Original Name") }
+		val character = characterId?.let { Character(Character.Id(it), Project.Id(), andName ?: "Original Name") }
 		context = TestContext(
 		  initialCharacters = listOfNotNull(
 			character

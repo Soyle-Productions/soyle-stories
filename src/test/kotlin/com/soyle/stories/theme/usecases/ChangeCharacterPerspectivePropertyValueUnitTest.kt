@@ -3,6 +3,7 @@ package com.soyle.stories.theme.usecases
 import arrow.core.Either
 import arrow.core.identity
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
@@ -153,7 +154,7 @@ class ChangeCharacterPerspectivePropertyValueUnitTest {
     private fun givenThemeWith(themeId: UUID, andMajorCharacter: UUID? = null, vararg andCharacters: UUID) {
         val theme = Theme(Theme.Id(themeId), "", emptyMap(), emptyMap()).let {
             andCharacters.fold(it) { nextTheme, characterId ->
-                nextTheme.includeCharacter(Character(Character.Id(characterId), UUID.randomUUID(), "Bob"))
+                nextTheme.includeCharacter(Character(Character.Id(characterId), Project.Id(), "Bob"))
                     .fold({ throw it }, ::identity)
             }
         }.let { theme ->

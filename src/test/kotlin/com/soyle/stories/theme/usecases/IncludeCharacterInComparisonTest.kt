@@ -6,6 +6,7 @@ import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.CharacterAlreadyIncludedInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
@@ -66,7 +67,7 @@ class IncludeCharacterInComparisonTest {
     val themeUUID = UUID.randomUUID()
     val characterName = "Bob the Builder"
     val character = Character(
-        Character.Id(characterUUID), themeUUID, characterName
+        Character.Id(characterUUID), Project.Id(), characterName
     )
 
     @Nested

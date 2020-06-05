@@ -35,7 +35,7 @@ class SetMotivationForCharacterInSceneUseCase(
 		?: throw CharacterDoesNotExist(characterId))
 
 	private suspend fun setMotivationIfNeeded(scene: Scene, character: Character, request: SetMotivationForCharacterInScene.RequestModel) {
-		if (scene.getMotivationForCharacter(character.id) != request.motivation) {
+		if (scene.getMotivationForCharacter(character.id)?.motivation != request.motivation) {
 			sceneRepository.updateScene(scene.withMotivationForCharacter(character.id, request.motivation))
 		}
 	}

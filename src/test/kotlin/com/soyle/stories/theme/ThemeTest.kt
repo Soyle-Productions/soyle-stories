@@ -3,6 +3,7 @@ package com.soyle.stories.theme
 import arrow.core.Either
 import arrow.core.flatMap
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -74,10 +75,10 @@ class ThemeTest {
 	inner class ForPairsOfCharacters {
 
 		val characterA = Character(
-            Character.Id(UUID.randomUUID()), UUID.randomUUID(), "Name"
+            Character.Id(UUID.randomUUID()), Project.Id(), "Name"
         )
 		val characterB = Character(
-            Character.Id(UUID.randomUUID()), UUID.randomUUID(), "Name"
+            Character.Id(UUID.randomUUID()), Project.Id(), "Name"
         )
 
 		val themeWithCharacterA = (takeNoteOfTheme()

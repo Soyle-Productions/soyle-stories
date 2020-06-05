@@ -21,7 +21,7 @@ import java.util.*
  */
 class PlanNewCharacterArcTest {
 
-    val projectId = UUID.randomUUID()
+    val projectId = Project.Id()
 
     fun given(
         characters: List<Character>,

@@ -1,8 +1,5 @@
 package com.soyle.stories.entities
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import com.soyle.stories.common.Entity
 import java.util.*
 
@@ -12,44 +9,20 @@ import java.util.*
  * Time: 8:19 PM
  */
 class Character(
-    override val id: Id,
-    val projectId: UUID,
-    // Characters have a name
-    val name: String
+  override val id: Id,
+  val projectId: Project.Id,
+  // Characters have a name
+  val name: String
 ) : Entity<Character.Id> {
 
-    init {
-        if (name.isBlank()) throw com.soyle.stories.character.CharacterNameCannotBeBlank(id.uuid)
-    }
+	fun withName(name: String): Character {
+		return Character(id, projectId, name)
+	}
 
-    fun rename(name: String): Either<com.soyle.stories.character.CharacterException, Character> {
-        return try {
-            Character(
-                id,
-                projectId,
-                name
-            ).right()
-        } catch (e: com.soyle.stories.character.CharacterException) {
-            e.left()
-        }
-    }
+	data class Id(val uuid: UUID = UUID.randomUUID())
 
-    data class Id(val uuid: UUID = UUID.randomUUID())
-
-    companion object {
-        fun buildNewCharacter(
-            projectId: UUID,
-            name: String
-        ): Either<com.soyle.stories.character.CharacterException, Character> {
-            return try {
-                Character(
-                    Id(UUID.randomUUID()),
-                    projectId,
-                    name
-                ).right()
-            } catch (e: com.soyle.stories.character.CharacterException) {
-                e.left()
-            }
-        }
-    }
+	companion object {
+		fun buildNewCharacter(projectId: Project.Id, name: String): Character =
+		  Character(Id(), projectId, name)
+	}
 }

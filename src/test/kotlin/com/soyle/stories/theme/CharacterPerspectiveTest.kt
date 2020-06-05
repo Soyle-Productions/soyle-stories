@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.right
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.CharacterPerspective
 import com.soyle.stories.entities.theme.MajorCharacter
@@ -23,7 +24,7 @@ import java.util.*
 class CharacterPerspectiveTest {
 
 	val otherCharacters = List(5) { Character.Id(UUID.randomUUID()) }
-		.map { Character(it, UUID.randomUUID(), it.uuid.toString()) }
+		.map { Character(it, Project.Id(), it.uuid.toString()) }
 
 	tailrec fun Theme.includeCharacters(characters: List<Character>): Either<ThemeException, Theme> {
 		if (characters.isEmpty()) return this.right()
@@ -87,7 +88,7 @@ class CharacterPerspectiveTest {
 		listOf(
 			theme.getMajorCharacterById(newCharacter.id) as MajorCharacter to Character(
                 Character.Id(UUID.randomUUID()),
-                UUID.randomUUID(),
+                 Project.Id(),
                 "Name"
             ),
 			MajorCharacter(
@@ -171,7 +172,7 @@ class CharacterPerspectiveTest {
 		listOf(
 			theme.getMajorCharacterById(newCharacter.id) as MajorCharacter to Character(
                 Character.Id(UUID.randomUUID()),
-                UUID.randomUUID(),
+			  Project.Id(),
                 "Name"
             ),
 			MajorCharacter(

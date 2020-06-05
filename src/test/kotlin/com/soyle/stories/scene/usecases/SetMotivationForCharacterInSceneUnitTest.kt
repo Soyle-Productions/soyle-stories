@@ -17,7 +17,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
-import java.util.*
 
 class SetMotivationForCharacterInSceneUnitTest {
 
@@ -78,13 +77,13 @@ class SetMotivationForCharacterInSceneUnitTest {
 
 	private fun givenSceneExists(includesCharacter: Boolean = false, hasSameMotivation: Boolean = false)
 	{
-		val scene = Scene(Scene.Id(sceneId), Project.Id(), "Scene Name 42", StoryEvent.Id(), mapOf()).let {
+		val scene = Scene(Scene.Id(sceneId), Project.Id(), "Scene Name 42", StoryEvent.Id(), listOf()).let {
 			when {
 				includesCharacter && hasSameMotivation -> {
-					it.withCharacterIncluded(Character.Id(characterId))
+					it.withCharacterIncluded(Character(Character.Id(characterId), Project.Id(), ""))
 					  .withMotivationForCharacter(Character.Id(characterId), motivationToSet)
 				}
-				includesCharacter -> it.withCharacterIncluded(Character.Id(characterId))
+				includesCharacter -> it.withCharacterIncluded(Character(Character.Id(characterId), Project.Id(), ""))
 				else -> it
 			}
 		}
@@ -98,7 +97,7 @@ class SetMotivationForCharacterInSceneUnitTest {
 	{
 		runBlocking {
 			characterRepository.addNewCharacter(
-			  Character(Character.Id(characterId), UUID.randomUUID(), "Bob")
+			  Character(Character.Id(characterId), Project.Id(), "Bob")
 			)
 		}
 	}
@@ -129,7 +128,7 @@ class SetMotivationForCharacterInSceneUnitTest {
 		assertEquals(originalScene!!.projectId, actual.projectId)
 		assertEquals(originalScene!!.name, actual.name)
 		assertEquals(originalScene!!.storyEventId, actual.storyEventId)
-		assertEquals(motivationToSet, actual.getMotivationForCharacter(Character.Id(characterId)))
+		assertEquals(motivationToSet, actual.getMotivationForCharacter(Character.Id(characterId))?.motivation)
 	}
 
 	private fun responseModel(): (Any?) -> Unit = { actual ->

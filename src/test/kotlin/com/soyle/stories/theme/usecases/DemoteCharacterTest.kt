@@ -7,10 +7,7 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.CharacterArcTemplate
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.MinorCharacter
 import com.soyle.stories.entities.theme.ThematicTemplate
 import com.soyle.stories.theme.*
@@ -159,7 +156,7 @@ class DemoteCharacterTest {
             val charactersToInclude = includedCharacters[uuid]?.map {
                 Character(
                     Character.Id(it.first),
-                    UUID.randomUUID(),
+                  Project.Id(),
                     "Bob"
                 ) to it.second
             }

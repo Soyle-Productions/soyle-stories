@@ -29,7 +29,7 @@ class IncludeCharacterInSceneUseCase(
 
 	private suspend fun addCharacterIfNotIncluded(scene: Scene, character: Character) {
 		if (!scene.includesCharacter(character.id)) {
-			sceneRepository.updateScene(scene.withCharacterIncluded(character.id))
+			sceneRepository.updateScene(scene.withCharacterIncluded(character))
 		}
 	}
 

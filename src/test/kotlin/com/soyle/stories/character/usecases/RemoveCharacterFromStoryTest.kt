@@ -10,10 +10,7 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.CharacterArcTemplateSection
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.theme.includeCharacter
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import kotlinx.coroutines.runBlocking
@@ -130,13 +127,13 @@ class RemoveCharacterFromStoryTest {
 
         fun buildCharacter() = Character(
             Character.Id(UUID.randomUUID()),
-            UUID.randomUUID(),
+            Project.Id(),
             "Character Name"
         )
 
         val character = Character(
             Character.Id(characterUUID),
-            UUID.randomUUID(),
+          Project.Id(),
             "Character Name"
         )
 

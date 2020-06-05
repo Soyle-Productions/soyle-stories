@@ -104,7 +104,7 @@ class CreateNewSceneUseCase(
 	}
 
 	private suspend fun createNewScene(storyEvent: StoryEvent, request: CreateNewScene.RequestModel): CreateNewScene.ResponseModel {
-		val scene = Scene(Scene.Id(), projectId, request.name, storyEvent.id, mapOf())
+		val scene = Scene(Scene.Id(), projectId, request.name, storyEvent.id, listOf())
 		return insertScene(scene, request)
 	}
 
