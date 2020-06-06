@@ -66,7 +66,7 @@ class IncludeCharacterInSceneUnitTest {
 
 	private fun givenSceneExistsWithStoryEventId()
 	{
-		Scene(Scene.Id(sceneId), Project.Id(), "", StoryEvent.Id(storyEventId), listOf()).let {
+		Scene(Scene.Id(sceneId), Project.Id(), "", StoryEvent.Id(storyEventId), null, listOf()).let {
 			sceneRepository.scenes[it.id] = it
 		}
 	}

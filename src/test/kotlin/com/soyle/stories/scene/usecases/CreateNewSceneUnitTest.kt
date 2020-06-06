@@ -175,11 +175,11 @@ class CreateNewSceneUnitTest {
 		}
 		if (sceneWithId != null) {
 			runBlocking {
-				sceneRepository.createNewScene(Scene(Scene.Id(sceneWithId), projectId, "", StoryEvent.Id(storyEventId), listOf()),
+				sceneRepository.createNewScene(Scene(Scene.Id(sceneWithId), projectId, "", StoryEvent.Id(storyEventId), null, listOf()),
 				sceneRepository.getSceneIdsInOrder(projectId) + Scene.Id(sceneWithId)
 				)
 				repeat(numberOfScenesAfterRelativeScene) {
-					val scene = Scene(Scene.Id(), projectId, "", StoryEvent.Id(), listOf())
+					val scene = Scene(projectId, "", StoryEvent.Id())
 					sceneRepository.createNewScene(scene,
 					  sceneRepository.getSceneIdsInOrder(projectId) + scene.id
 					)

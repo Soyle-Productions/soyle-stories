@@ -77,7 +77,7 @@ class SetMotivationForCharacterInSceneUnitTest {
 
 	private fun givenSceneExists(includesCharacter: Boolean = false, hasSameMotivation: Boolean = false)
 	{
-		val scene = Scene(Scene.Id(sceneId), Project.Id(), "Scene Name 42", StoryEvent.Id(), listOf()).let {
+		val scene = Scene(Scene.Id(sceneId), Project.Id(), "Scene Name 42", StoryEvent.Id(), null, listOf()).let {
 			when {
 				includesCharacter && hasSameMotivation -> {
 					it.withCharacterIncluded(Character(Character.Id(characterId), Project.Id(), ""))
