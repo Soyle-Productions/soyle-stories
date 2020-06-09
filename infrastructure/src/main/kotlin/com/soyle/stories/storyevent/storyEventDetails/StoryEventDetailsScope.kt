@@ -1,7 +1,7 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
 import com.soyle.stories.di.DI
-import com.soyle.stories.layout.tools.dynamic.StoryEventDetails
+import com.soyle.stories.layout.config.dynamic.StoryEventDetails
 import com.soyle.stories.project.ProjectScope
 import javafx.event.EventTarget
 import tornadofx.FX

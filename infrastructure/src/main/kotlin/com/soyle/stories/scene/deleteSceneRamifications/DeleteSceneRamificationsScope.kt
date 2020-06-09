@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.deleteSceneRamifications
 
-import com.soyle.stories.layout.tools.temporary.Ramifications
+import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventTarget
@@ -8,7 +8,7 @@ import tornadofx.FX
 import tornadofx.Scope
 import tornadofx.removeFromParent
 
-class DeleteSceneRamificationsScope(private val type: Ramifications.DeleteSceneRamifications, val projectScope: ProjectScope) : Scope() {
+class DeleteSceneRamificationsScope(private val type: DeleteSceneRamifications, val projectScope: ProjectScope) : Scope() {
 
 	val applicationScope
 		get() = projectScope.applicationScope

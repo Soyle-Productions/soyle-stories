@@ -1,22 +1,19 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
+import com.soyle.stories.common.ToolView
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.resolve
-import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Orientation
 import javafx.geometry.Side
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
 import tornadofx.*
 
-class BaseStoryStructure : View("Base Story Structure") {
+class BaseStoryStructure : ToolView() {
 
-    override val scope = super.scope as BaseStoryStructureScope
     val model = find<BaseStoryStructureModel>()
     private val baseStoryStructureViewListener = resolve<BaseStoryStructureViewListener>()
 
@@ -102,16 +99,8 @@ class BaseStoryStructure : View("Base Story Structure") {
             if (it == null) itemRoot.removeFromParent()
         }
     }
-}
 
-fun TabPane.baseStoryStructureTab(projectScope: ProjectScope, toolId: String, baseStoryStructure: com.soyle.stories.layout.tools.dynamic.BaseStoryStructure): Tab {
-    val scope = BaseStoryStructureScope(projectScope, toolId, baseStoryStructure)
-    val structure = find<BaseStoryStructure>(scope = scope)
-    val tab = tab(structure)
-    tab.tabPaneProperty().onChange {
-        if (it == null) {
-            scope.close()
-        }
+    init {
+    	title = "Base Story Structure"
     }
-    return tab
 }

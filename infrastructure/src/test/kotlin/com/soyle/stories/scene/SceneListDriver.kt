@@ -6,7 +6,7 @@ import com.soyle.stories.common.async
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Scene
-import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.scene.SceneListDriver.interact

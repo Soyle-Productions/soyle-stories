@@ -7,7 +7,7 @@ import com.soyle.stories.layout.assertResponseModel
 import com.soyle.stories.layout.doubles.LayoutRepositoryDouble
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
-import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpened
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpenedUseCase

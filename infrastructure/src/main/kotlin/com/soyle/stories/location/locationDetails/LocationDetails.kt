@@ -3,11 +3,8 @@ package com.soyle.stories.location.locationDetails
 import com.soyle.stories.common.hideScrollbars
 import com.soyle.stories.common.rowCountProperty
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.project.ProjectScope
 import javafx.geometry.Orientation
 import javafx.scene.Parent
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
 import javafx.scene.layout.Region
 import tornadofx.*
 
@@ -45,16 +42,4 @@ class LocationDetails : View() {
 		titleProperty.bind(model.toolName)
 		locationDetailsViewListener.getValidState()
 	}
-}
-
-fun TabPane.locationDetailsTab(projectScope: ProjectScope, locationDetails: com.soyle.stories.layout.tools.dynamic.LocationDetails): Tab {
-	val scope = LocationDetailsScope(projectScope, locationDetails)
-	val structure = find<LocationDetails>(scope = scope)
-	val tab = tab(structure)
-	tab.tabPaneProperty().onChange {
-		if (it == null) {
-			scope.close()
-		}
-	}
-	return tab
 }

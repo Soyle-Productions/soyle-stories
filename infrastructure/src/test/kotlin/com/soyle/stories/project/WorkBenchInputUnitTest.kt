@@ -1,28 +1,19 @@
 package com.soyle.stories.project
 
 import com.soyle.stories.di.DI
-import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
-import com.soyle.stories.project.startProjectDialog.StartProjectDialog
 import com.soyle.stories.soylestories.ApplicationScope
-import com.soyle.stories.testutils.findComponentsInScope
-import javafx.event.ActionEvent
-import javafx.scene.control.Menu
-import javafx.scene.control.MenuBar
-import javafx.scene.control.MenuItem
-import javafx.stage.Stage
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.testfx.api.FxToolkit
-import org.testfx.api.FxToolkitContext
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.*
 import java.net.URI
 import java.util.*
-import javax.swing.Action
 import kotlin.reflect.KClass
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

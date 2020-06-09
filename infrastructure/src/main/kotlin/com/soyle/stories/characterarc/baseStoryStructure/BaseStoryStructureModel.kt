@@ -1,36 +1,17 @@
-/**
- * Created by Brendan
- * Date: 3/2/2020
- * Time: 5:53 PM
- */
 package com.soyle.stories.characterarc.baseStoryStructure
 
+import com.soyle.stories.common.Model
 import com.soyle.stories.common.bindImmutableList
-import com.soyle.stories.di.resolveLater
-import com.soyle.stories.common.ThreadTransformer
-import tornadofx.ItemViewModel
-import tornadofx.rebind
+import com.soyle.stories.soylestories.ApplicationScope
 import tornadofx.toProperty
 
-class BaseStoryStructureModel : ItemViewModel<BaseStoryStructureViewModel>(), BaseStoryStructureView {
-
-    override val scope: BaseStoryStructureScope = super.scope as BaseStoryStructureScope
+class BaseStoryStructureModel : Model<BaseStoryStructureScope, BaseStoryStructureViewModel>(BaseStoryStructureScope::class) {
 
     val sections = bindImmutableList(BaseStoryStructureViewModel::sections)
     val availableLocations = bindImmutableList(BaseStoryStructureViewModel::availableLocations)
     val locationsAvailable = bind { item?.availableLocations?.isNotEmpty().toProperty() }
 
-    private val threadTransformer: ThreadTransformer by resolveLater(scope.projectScope.applicationScope)
+    override val applicationScope: ApplicationScope
+        get() = scope.projectScope.applicationScope
 
-    override fun update(update: BaseStoryStructureViewModel?.() -> BaseStoryStructureViewModel) {
-        threadTransformer.gui {
-            rebind { item = item.update() }
-        }
-    }
-
-    override fun updateOrInvalidated(update: BaseStoryStructureViewModel.() -> BaseStoryStructureViewModel) {
-        threadTransformer.gui {
-            rebind { item = item?.update() }
-        }
-    }
 }

@@ -25,6 +25,7 @@ object SceneListModule {
 					get<RenameSceneNotifier>(),
 					get<DeleteSceneNotifier>()
 				  ),
+				  get(),
 				  get()
 				)
 			}

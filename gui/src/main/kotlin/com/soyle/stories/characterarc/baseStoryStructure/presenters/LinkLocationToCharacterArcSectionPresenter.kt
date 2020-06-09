@@ -1,11 +1,12 @@
 package com.soyle.stories.characterarc.baseStoryStructure.presenters
 
-import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureView
+import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureViewModel
 import com.soyle.stories.characterarc.baseStoryStructure.StoryStructureSectionViewModel
 import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
+import com.soyle.stories.gui.View
 
 class LinkLocationToCharacterArcSectionPresenter(
-  private val view: BaseStoryStructureView
+  private val view: View.Nullable<BaseStoryStructureViewModel>
 ) : LinkLocationToCharacterArcSection.OutputPort {
 	override fun receiveLinkLocationToCharacterArcSectionResponse(response: LinkLocationToCharacterArcSection.ResponseModel) {
 		val sectionId = response.characterArcSectionId.toString()

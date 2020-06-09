@@ -1,7 +1,7 @@
 package com.soyle.stories.project.layout
 
 import com.soyle.stories.layout.tools.ToolType
-import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.FixedTool
 import kotlin.reflect.KClass
 
 /**

@@ -1,7 +1,7 @@
 package com.soyle.stories.project
 
 import com.soyle.stories.di.DI
-import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.layout.Dialog
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.projectList.ProjectFileViewModel

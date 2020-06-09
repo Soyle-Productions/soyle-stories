@@ -2,6 +2,7 @@ package com.soyle.stories.di.layout
 
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.layout.config.defaultLayout
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.layout.openTool.OpenToolControllerImpl
 import com.soyle.stories.layout.openTool.OpenToolNotifier
@@ -31,7 +32,7 @@ object LayoutModule {
 
 			usecases@ run {
 				provide<GetSavedLayout> {
-					GetSavedLayoutUseCase(get())
+					GetSavedLayoutUseCase(get(), ::defaultLayout)
 				}
 				provide<ToggleToolOpened> {
 					ToggleToolOpenedUseCase(projectId, get())
@@ -74,11 +75,11 @@ object LayoutModule {
 				  get(),
 				  LayoutPresenter(
 					get(),
-					applicationScope.get(),
 					get<GetSavedLayoutNotifier>(),
 					get<ToggleToolOpenedNotifier>(),
 					get<OpenToolNotifier>(),
-					get<CloseToolNotifier>()
+					get<CloseToolNotifier>(),
+					ToolModule
 				  )
 				)
 			}

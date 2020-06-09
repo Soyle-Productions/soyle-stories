@@ -106,15 +106,3 @@ class StoryEventDetails : View() {
 	}
 
 }
-
-fun TabPane.storyEventDetailsTab(projectScope: ProjectScope, storyEventDetails: com.soyle.stories.layout.tools.dynamic.StoryEventDetails): Tab {
-	val scope = StoryEventDetailsScope(projectScope, storyEventDetails)
-	val structure = find<StoryEventDetails>(scope = scope)
-	val tab = tab(structure)
-	tab.tabPaneProperty().onChange {
-		if (it == null) {
-			scope.close()
-		}
-	}
-	return tab
-}

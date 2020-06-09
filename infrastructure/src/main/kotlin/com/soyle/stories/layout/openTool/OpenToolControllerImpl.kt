@@ -2,10 +2,8 @@ package com.soyle.stories.layout.openTool
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.layout.tools.dynamic.BaseStoryStructure
-import com.soyle.stories.layout.tools.dynamic.LocationDetails
-import com.soyle.stories.layout.tools.dynamic.StoryEventDetails
-import com.soyle.stories.layout.tools.temporary.Ramifications
+import com.soyle.stories.layout.config.dynamic.*
+import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import java.util.*
 
@@ -37,6 +35,16 @@ class OpenToolControllerImpl(
 		}
 	}
 
+	override fun openCharacterComparison(themeId: String, characterId: String) {
+		val request = CharacterComparison(
+		  UUID.fromString(themeId),
+		  UUID.fromString(characterId)
+		)
+		threadTransformer.async {
+			openTool.invoke(request, openToolOutputPort)
+		}
+	}
+
 	override fun openStoryEventDetailsTool(storyEventId: String) {
 		threadTransformer.async {
 			openTool.invoke(
@@ -51,7 +59,19 @@ class OpenToolControllerImpl(
 	override fun openDeleteSceneRamificationsTool(sceneId: String) {
 		threadTransformer.async {
 			openTool.invoke(
-			  Ramifications.DeleteSceneRamifications(
+			  DeleteSceneRamifications(
+				UUID.fromString(sceneId),
+				localeManager.getCurrentLocale()
+			  ),
+			  openToolOutputPort
+			)
+		}
+	}
+
+	override fun openSceneDetailsTool(sceneId: String) {
+		threadTransformer.async {
+			openTool.invoke(
+			  SceneDetails(
 				UUID.fromString(sceneId),
 				localeManager.getCurrentLocale()
 			  ),

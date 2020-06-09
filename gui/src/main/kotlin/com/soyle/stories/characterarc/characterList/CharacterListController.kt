@@ -5,9 +5,7 @@ import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.layout.tools.dynamic.BaseStoryStructure
-import com.soyle.stories.layout.tools.dynamic.CharacterComparison
-import com.soyle.stories.layout.usecases.openTool.OpenTool
+import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 import java.util.*
 
@@ -15,8 +13,7 @@ class CharacterListController(
     private val threadTransformer: ThreadTransformer,
     private val listAllCharacterArcs: ListAllCharacterArcs,
     private val listAllCharacterArcsOutputPort: ListAllCharacterArcs.OutputPort,
-    private val openTool: OpenTool,
-    private val openToolOutputPort: OpenTool.OutputPort,
+    private val openToolController: OpenToolController,
     private val removeCharacterFromStory: RemoveCharacterFromStory,
     private val removeCharacterFromStoryOutputPort: RemoveCharacterFromStory.OutputPort,
     private val deleteCharacterArc: DemoteMajorCharacter,
@@ -34,23 +31,11 @@ class CharacterListController(
     }
 
     override fun openBaseStoryStructureTool(characterId: String, themeId: String) {
-        val request = BaseStoryStructure(
-            UUID.fromString(characterId),
-            UUID.fromString(themeId)
-        )
-        threadTransformer.async {
-            openTool(request, openToolOutputPort)
-        }
+        openToolController.openBaseStoryStructureTool(themeId, characterId)
     }
 
     override fun openCharacterComparison(characterId: String, themeId: String) {
-        val request = CharacterComparison(
-          UUID.fromString(themeId),
-            UUID.fromString(characterId)
-        )
-        threadTransformer.async {
-            openTool(request, openToolOutputPort)
-        }
+        openToolController.openCharacterComparison(themeId, characterId)
     }
 
     override fun renameCharacter(characterId: String, newName: String) {

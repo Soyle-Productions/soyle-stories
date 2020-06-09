@@ -1,6 +1,6 @@
 package com.soyle.stories.layout.usecases.toggleToolOpened
 
-import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 
 /**

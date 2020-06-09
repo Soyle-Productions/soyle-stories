@@ -24,6 +24,7 @@ import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneNo
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
+import com.soyle.stories.scene.sceneDetails.*
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
@@ -33,6 +34,8 @@ import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
 import com.soyle.stories.scene.usecases.deleteScene.DeleteSceneUseCase
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingSceneUseCase
+import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
+import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetailsUseCase
 import com.soyle.stories.scene.usecases.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.scene.usecases.includeCharacterInScene.IncludeCharacterInSceneUseCase
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
@@ -87,6 +90,9 @@ object SceneModule {
 			}
 			provide<GetPotentialChangesFromDeletingScene> {
 				GetPotentialChangesFromDeletingSceneUseCase(get())
+			}
+			provide<GetSceneDetails> {
+				GetSceneDetailsUseCase(get())
 			}
 
 			provide(CreateNewScene.OutputPort::class) {
@@ -189,6 +195,24 @@ object SceneModule {
 				)
 			}
 
+		}
+
+		scoped<SceneDetailsScope> {
+			provide<SceneDetailsViewListener> {
+				SceneDetailsController(
+				  sceneId.toString(),
+				  projectScope.applicationScope.get(),
+				  projectScope.applicationScope.get(),
+				  projectScope.get(),
+				  SceneDetailsPresenter(
+					get<SceneDetailsModel>(),
+					projectScope.get(),
+					projectScope.get(),
+					projectScope.get<IncludeCharacterInSceneNotifier>()
+				  ),
+				  projectScope.get()
+				)
+			}
 		}
 
 		SceneListModule

@@ -5,7 +5,7 @@ import com.soyle.stories.layout.LayoutDoesNotExist
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.repositories.LayoutRepository
 import com.soyle.stories.layout.repositories.OpenToolContext
-import com.soyle.stories.layout.tools.dynamic.DynamicTool
+import com.soyle.stories.layout.tools.DynamicTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.toResponseModel
 import java.util.*

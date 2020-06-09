@@ -18,7 +18,7 @@ import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.entities.ToolStack
 import com.soyle.stories.layout.entities.layout
-import com.soyle.stories.layout.tools.dynamic.DynamicTool
+import com.soyle.stories.layout.tools.DynamicTool
 import com.soyle.stories.layout.tools.dynamic.LocationDetails
 import com.soyle.stories.layout.tools.temporary.Ramifications
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
@@ -138,7 +138,7 @@ class OpenToolTest {
     }
 
     private fun givenDataForTemporaryToolExists() {
-        Scene(Scene.Id(temporaryTool.sceneId), Project.Id(projectId), "", StoryEvent.Id()).let {
+        Scene(Scene.Id(temporaryTool.sceneId), Project.Id(projectId), "", StoryEvent.Id(), null, listOf()).let {
             context.sceneRepository.scenes[it.id] = it
             context.sceneRepository.sceneOrder[it.projectId] = listOf(it.id)
         }
