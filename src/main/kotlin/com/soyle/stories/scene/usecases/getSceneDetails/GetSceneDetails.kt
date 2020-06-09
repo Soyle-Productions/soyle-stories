@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.usecases.getSceneDetails
 
 import com.soyle.stories.scene.Locale
+import com.soyle.stories.scene.usecases.common.IncludedCharacterDetails
 import java.util.*
 
 interface GetSceneDetails {
@@ -9,9 +10,7 @@ interface GetSceneDetails {
 
 	suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
-	class ResponseModel(val sceneId: UUID, val locationId: UUID?, val characters: List<IncludedCharacterDetails>)
-	class IncludedCharacterDetails(val characterId: UUID, val characterName: String, val motivation: String?, val inheritedMotivation: InheritedMotivation?)
-	class InheritedMotivation(val sceneId: UUID, val sceneName: String, val motivation: String)
+	class ResponseModel(val sceneId: UUID, val storyEventId: UUID, val locationId: UUID?, val characters: List<IncludedCharacterDetails>)
 
 	interface OutputPort {
 		fun failedToGetSceneDetails(failure: Exception)

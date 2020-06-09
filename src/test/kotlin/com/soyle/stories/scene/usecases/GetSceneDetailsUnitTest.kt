@@ -5,6 +5,7 @@ import com.soyle.stories.entities.*
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.sceneDoesNotExist
+import com.soyle.stories.scene.usecases.common.IncludedCharacterDetails
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetailsUseCase
 import kotlinx.coroutines.runBlocking
@@ -18,6 +19,7 @@ class GetSceneDetailsUnitTest {
 
 	private val projectId = Project.Id()
 	private val sceneId = Scene.Id()
+	private val storyEventId = StoryEvent.Id()
 	private val linkedLocationId = Location.Id()
 
 	private val includedCharacters = List(5) {
@@ -72,7 +74,7 @@ class GetSceneDetailsUnitTest {
 	private fun givenSceneExists(withLocation: Boolean = false, includesCharacters: Boolean = false, motivationsPreviouslySet: Boolean = false)
 	{
 		val scene = Scene(
-		  sceneId, projectId, "", StoryEvent.Id(), linkedLocationId.takeIf { withLocation },
+		  sceneId, projectId, "", storyEventId, linkedLocationId.takeIf { withLocation },
 		  includedCharacters.takeIf { includesCharacters } ?: listOf()
 		)
 		sceneRepository.scenes[scene.id] = scene
@@ -108,6 +110,7 @@ class GetSceneDetailsUnitTest {
 	): (Any?) -> Unit = { actual ->
 		actual as GetSceneDetails.ResponseModel
 		assertEquals(sceneId.uuid, actual.sceneId)
+		assertEquals(storyEventId.uuid, actual.storyEventId)
 
 		if (expectLocation) assertEquals(linkedLocationId.uuid, actual.locationId)
 		else assertNull(actual.locationId)
@@ -116,7 +119,7 @@ class GetSceneDetailsUnitTest {
 			val expectedCharacters = includedCharacters.associateBy { it.characterId.uuid }
 			assertEquals(
 			  expectedCharacters.keys,
-			  actual.characters.map(GetSceneDetails.IncludedCharacterDetails::characterId).toSet()
+			  actual.characters.map(IncludedCharacterDetails::characterId).toSet()
 			)
 			actual.characters.forEach {
 				val expectedCharacter = expectedCharacters.getValue(it.characterId)

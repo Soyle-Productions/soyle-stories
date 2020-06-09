@@ -45,6 +45,8 @@ class Scene(
 			else it
 		})
 	}
+	fun withLocationLinked(locationId: Location.Id) = copy(locationId = locationId)
+	fun withoutLocation() = copy(locationId = null)
 
 	data class Id(val uuid: UUID = UUID.randomUUID()) {
 		override fun toString(): String = "Scene($uuid)"

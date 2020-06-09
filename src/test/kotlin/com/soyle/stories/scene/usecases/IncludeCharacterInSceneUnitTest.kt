@@ -20,7 +20,9 @@ class IncludeCharacterInSceneUnitTest {
 
 	private val storyEventId = StoryEvent.Id().uuid
 	private val characterId = Character.Id().uuid
+	private val characterName = "${UUID.randomUUID()}"
 	private val sceneId = Scene.Id().uuid
+	private val projectId = Project.Id()
 
 	private var savedScene: Scene? = null
 	private var result: Any? = null
@@ -59,6 +61,16 @@ class IncludeCharacterInSceneUnitTest {
 		result.shouldBe(responseModel())
 	}
 
+	@Test
+	fun `characters previously set motivations`() {
+		givenSceneExistsWithStoryEventId()
+		givenCharacterExists()
+		givenMotivationsForCharacterPreviouslySet()
+		whenCharacterIncludedInScene()
+		assertSceneUpdated()
+		result.shouldBe(responseModel())
+	}
+
 	private val sceneRepository = SceneRepositoryDouble(onUpdateScene = {
 		savedScene = it
 	})
@@ -66,25 +78,41 @@ class IncludeCharacterInSceneUnitTest {
 
 	private fun givenSceneExistsWithStoryEventId()
 	{
-		Scene(Scene.Id(sceneId), Project.Id(), "", StoryEvent.Id(storyEventId), null, listOf()).let {
+		Scene(Scene.Id(sceneId), projectId, "", StoryEvent.Id(storyEventId), null, listOf()).let {
 			sceneRepository.scenes[it.id] = it
+			sceneRepository.sceneOrder[projectId] = listOf(it.id)
 		}
 	}
 
 	private fun givenCharacterExists()
 	{
 		runBlocking {
-			characterRepository.addNewCharacter(Character(Character.Id(characterId), Project.Id(), "Bob"))
+			characterRepository.addNewCharacter(Character(Character.Id(characterId), projectId, characterName))
 		}
 	}
 
 	private fun givenSceneIncludesCharacter()
 	{
-		runBlocking {
-			sceneRepository.getSceneForStoryEvent(StoryEvent.Id(storyEventId))!!.withCharacterIncluded(Character(Character.Id(characterId), Project.Id(), "")).let {
-				sceneRepository.scenes[it.id] = it
-			}
+		sceneRepository.scenes[Scene.Id(sceneId)]!!.withCharacterIncluded(Character(Character.Id(characterId), Project.Id(), characterName)).let {
+			sceneRepository.scenes[it.id] = it
 		}
+	}
+
+	private var lastMotiveSource: Scene? = null
+
+	private fun givenMotivationsForCharacterPreviouslySet()
+	{
+		repeat(5) {
+			Scene(projectId, "${UUID.randomUUID()}", StoryEvent.Id())
+			  .withCharacterIncluded(characterRepository.characters.values.first())
+			  .withMotivationForCharacter(Character.Id(characterId), "${UUID.randomUUID()}")
+			  .let {
+				  sceneRepository.scenes[it.id] = it
+			  }
+		}
+		val previousIds = sceneRepository.scenes.values.filterNot { it.id.uuid == sceneId }.map { it.id }
+		sceneRepository.sceneOrder[projectId] = previousIds + Scene.Id(sceneId)
+		lastMotiveSource = sceneRepository.scenes.getValue(previousIds.last())
 	}
 
 	private fun whenCharacterIncludedInScene() {
@@ -125,8 +153,19 @@ class IncludeCharacterInSceneUnitTest {
 
 		actual as IncludeCharacterInScene.ResponseModel
 		assertEquals(sceneId, actual.sceneId)
-		assertEquals(characterId, actual.characterId)
+		assertEquals(characterId, actual.characterDetails.characterId)
+		assertEquals(characterName, actual.characterDetails.characterName)
+		assertNull(actual.characterDetails.motivation)
+		assertInheritedMotivation(actual)
+	}
 
+	private fun assertInheritedMotivation(actual: IncludeCharacterInScene.ResponseModel)
+	{
+		val lastMotiveSource = lastMotiveSource ?: return
+		assertNotNull(actual.characterDetails.inheritedMotivation)
+		assertEquals(lastMotiveSource.id.uuid, actual.characterDetails.inheritedMotivation!!.sceneId)
+		assertEquals(lastMotiveSource.name, actual.characterDetails.inheritedMotivation!!.sceneName)
+		assertEquals(lastMotiveSource.getMotivationForCharacter(Character.Id(characterId))?.motivation, actual.characterDetails.inheritedMotivation!!.motivation)
 	}
 
 }

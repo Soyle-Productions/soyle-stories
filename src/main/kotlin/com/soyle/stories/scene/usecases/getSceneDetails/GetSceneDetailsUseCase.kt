@@ -1,10 +1,11 @@
 package com.soyle.stories.scene.usecases.getSceneDetails
 
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.repositories.SceneRepository
+import com.soyle.stories.scene.usecases.common.IncludedCharacterDetails
+import com.soyle.stories.scene.usecases.common.getLastSetMotivation
+import com.soyle.stories.scene.usecases.common.getScenesBefore
 
 class GetSceneDetailsUseCase(
   private val sceneRepository: SceneRepository
@@ -21,6 +22,7 @@ class GetSceneDetailsUseCase(
 		val scene = getScene(request)
 		return GetSceneDetails.ResponseModel(
 		  scene.id.uuid,
+		  scene.storyEventId.uuid,
 		  scene.locationId?.uuid,
 		  getIncludedCharacterDetails(scene)
 		)
@@ -30,41 +32,14 @@ class GetSceneDetailsUseCase(
 	  sceneRepository.getSceneById(Scene.Id(request.sceneId))
 		?: throw SceneDoesNotExist(request.locale, request.sceneId)
 
-	private suspend fun getIncludedCharacterDetails(scene: Scene): List<GetSceneDetails.IncludedCharacterDetails>
+	private suspend fun getIncludedCharacterDetails(scene: Scene): List<IncludedCharacterDetails>
 	{
-		val scenesBefore = getScenesBefore(scene).asReversed()
+		val scenesBefore = getScenesBefore(scene, sceneRepository).asReversed()
 		return scene.characterMotivations.map {
-			GetSceneDetails.IncludedCharacterDetails(it.characterId.uuid, it.characterName, it.motivation,
+			IncludedCharacterDetails(it.characterId.uuid, it.characterName, it.motivation,
 			  getLastSetMotivation(scenesBefore, it.characterId)
 			)
 		}
-	}
-
-	private suspend fun getScenesBefore(scene: Scene): List<Scene> {
-		return sceneRepository.listAllScenesInProject(scene.projectId)
-		  .sortedByProjectOrder(scene.projectId)
-		  .takeWhile { it.id != scene.id }
-	}
-
-	private suspend fun List<Scene>.sortedByProjectOrder(projectId: Project.Id): List<Scene> {
-		val indexOf = sceneRepository.getSceneIdsInOrder(projectId)
-		  .withIndex()
-		  .associate { it.value to it.index }
-		return sortedBy { indexOf.getValue(it.id) }
-	}
-
-	private fun getLastSetMotivation(
-	  reversedScenesBefore: List<Scene>, characterId: Character.Id
-	): GetSceneDetails.InheritedMotivation?
-	{
-		val lastSetScene = reversedScenesBefore.find {
-			it.includesCharacter(characterId) && !it.getMotivationForCharacter(characterId)!!.isInherited()
-		} ?: return null
-		return GetSceneDetails.InheritedMotivation(
-		  lastSetScene.id.uuid,
-		  lastSetScene.name,
-		  lastSetScene.getMotivationForCharacter(characterId)!!.motivation!!
-		)
 	}
 
 

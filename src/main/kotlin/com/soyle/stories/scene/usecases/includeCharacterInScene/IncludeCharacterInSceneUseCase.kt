@@ -7,6 +7,7 @@ import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.NoSceneExistsWithStoryEventId
 import com.soyle.stories.scene.repositories.SceneRepository
+import com.soyle.stories.scene.usecases.common.*
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
 
 class IncludeCharacterInSceneUseCase(
@@ -24,7 +25,29 @@ class IncludeCharacterInSceneUseCase(
 		val scene = getScene(response)
 		val character = getCharacter(response)
 		addCharacterIfNotIncluded(scene, character)
-		return IncludeCharacterInScene.ResponseModel(scene.id.uuid, character.id.uuid)
+		return IncludeCharacterInScene.ResponseModel(
+		  scene.id.uuid,
+		  getCharacterDetails(scene, character)
+		)
+	}
+
+	private suspend fun getCharacterDetails(scene: Scene, character: Character): IncludedCharacterDetails {
+		return IncludedCharacterDetails(
+		  character.id.uuid,
+		  character.name,
+		  null,
+		  getInheritedMotivation(scene, character)
+		)
+	}
+
+	private suspend fun getInheritedMotivation(scene: Scene, character: Character): InheritedMotivation?
+	{
+		return getScenesBefore(scene, sceneRepository)
+		  .sortedByProjectOrder(scene.projectId, sceneRepository)
+		  .asReversed()
+		  .let {
+			  getLastSetMotivation(it, character.id)
+		  }
 	}
 
 	private suspend fun addCharacterIfNotIncluded(scene: Scene, character: Character) {
