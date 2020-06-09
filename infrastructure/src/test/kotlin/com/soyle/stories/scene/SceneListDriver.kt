@@ -54,7 +54,7 @@ object SceneListDriver : ApplicationTest() {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
 			async(scope) {
-				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.SceneList)
+				scope.get<LayoutViewListener>().toggleToolOpen(com.soyle.stories.layout.config.fixed.SceneList)
 			}
 		}
 	}
@@ -63,7 +63,7 @@ object SceneListDriver : ApplicationTest() {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
 			async(scope) {
-				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.SceneList)
+				scope.get<LayoutViewListener>().toggleToolOpen(com.soyle.stories.layout.config.fixed.SceneList)
 			}
 		}
 	}

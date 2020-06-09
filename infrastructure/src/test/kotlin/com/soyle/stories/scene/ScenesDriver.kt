@@ -4,12 +4,14 @@ import com.soyle.stories.DependentProperty
 import com.soyle.stories.UATLogger
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.scene.ScenesDriver.interact
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
+import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -185,6 +187,26 @@ object ScenesDriver : ApplicationTest() {
 					controller.setMotivationForCharacter(sceneId.uuid.toString(), characterId.uuid.toString(), motivation)
 				}
 			}
+		}
+	}
+
+	fun locationLinkedToScene(scene: Scene, location: Location) = object : DependentProperty<Unit>
+	{
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf()
+
+		override fun get(double: SoyleStoriesTestDouble): Unit? = Unit
+		override fun check(double: SoyleStoriesTestDouble): Boolean {
+			val repo = ProjectSteps.getProjectScope(double)
+			  ?.get<SceneRepository>() ?: return false
+			return runBlocking {
+				repo.getSceneById(scene.id)?.locationId == location.id
+			}
+		}
+
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			val controller = ProjectSteps.getProjectScope(double)!!
+			  .get<LinkLocationToSceneController>()
+			controller.linkLocationToScene(scene.id.uuid.toString(), location.id.uuid.toString())
 		}
 	}
 }

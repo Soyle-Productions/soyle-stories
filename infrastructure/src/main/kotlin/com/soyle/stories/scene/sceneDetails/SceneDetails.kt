@@ -1,18 +1,15 @@
 package com.soyle.stories.scene.sceneDetails
 
 import com.soyle.stories.di.resolve
-import com.soyle.stories.project.ProjectScope
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.geometry.Side
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
 import tornadofx.*
 
-class SceneDetails : View() {
+class SceneDetails : View("Scene") {
 
 	override val scope: SceneDetailsScope = super.scope as SceneDetailsScope
 	private val viewListener = resolve<SceneDetailsViewListener>()
@@ -23,12 +20,22 @@ class SceneDetails : View() {
 			textProperty.bind(model.locationSectionLabel)
 			field {
 				button {
+					addClass("location-select")
+					enableWhen {
+						model.availableLocations.select {
+							(!it.isNullOrEmpty() || model.selectedLocation.value != null).toProperty()
+						}
+					}
 					textProperty().bind(model.select {
-						(it.selectedLocation?.name ?: "[${it.locationDropDownEmptyLabel}]").toProperty()
+						(it.selectedLocation?.name ?: it.locationDropDownEmptyLabel).toProperty()
 					})
 					contextMenu = ContextMenu().apply {
 						items.bind(model.availableLocations) {
-							item(it.name)
+							item(it.name) {
+								action {
+									viewListener.linkLocation(it.id)
+								}
+							}
 						}
 					}
 					action {
@@ -46,6 +53,7 @@ class SceneDetails : View() {
 					fitToParentWidth()
 					bindChildren(model.includedCharacters) {
 						field(it.characterName) {
+							addClass("included-character")
 							fitToParentWidth()
 							hbox(spacing = 10) {
 								fitToParentWidth()
@@ -75,6 +83,7 @@ class SceneDetails : View() {
 				}
 			}
 			button(model.addCharacterButtonLabel) {
+				addClass("add-character")
 				enableWhen {
 					model.availableCharacters.select {
 						(!it.isNullOrEmpty()).toProperty()
