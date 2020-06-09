@@ -1,7 +1,7 @@
 package com.soyle.stories.location.locationDetails
 
 import com.soyle.stories.di.DI
-import com.soyle.stories.layout.tools.dynamic.LocationDetails
+import com.soyle.stories.layout.config.dynamic.LocationDetails
 import com.soyle.stories.project.ProjectScope
 import javafx.event.EventTarget
 import tornadofx.FX

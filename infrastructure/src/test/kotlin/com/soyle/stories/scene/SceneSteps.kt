@@ -4,11 +4,13 @@ import com.soyle.stories.UATLogger
 import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import javafx.scene.input.MouseButton
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
 
@@ -74,7 +76,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				targetObject = DeleteSceneDialogDriver.targetScene.get(double)!!
 			}
 			Given("all Characters have been included in the Scene") {
-				val scene = targetObject as Scene
+				val scene = targetObject as? Scene ?: ScenesDriver.getCreatedScenes(double).first()
 				CharacterDriver.getCharactersCreated(double).forEach { character ->
 					ScenesDriver.characterIncludedIn(character.id, scene.id).given(double)
 				}
@@ -112,6 +114,20 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				val sceneId = sceneIdFor!![focusScene]!!
 				sceneRamificationsSceneId = sceneId
 				DeleteSceneRamificationsDriver.tool(sceneId).given(double)
+			}
+			Given("a Location has been linked to the Scene") {
+				ScenesDriver
+				  .locationLinkedToScene(
+					ScenesDriver.getCreatedScenes(double).first(),
+					LocationSteps.getLocationsCreated(double).first()
+				  )
+				  .given(double)
+			}
+			Given("the Scene Details Tool has been opened") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .openTool
+				  .given(double)
 			}
 
 			When("The Scene List Tool is opened") {
@@ -221,6 +237,26 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				val characterId = characterIdFor!!.getValue(character)
 
 				ScenesDriver.charactersMotivationIn(characterId, motive, sceneId).whenSet(double)
+			}
+			When("the Scene Details Tool is opened") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .openTool
+				  .whenSet(double)
+			}
+			When("a Location is selected from the Scene Details Location drop-down") {
+				val item = SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .locationDropDownItems(double)!!
+				  .first()
+				targetObject = item.text
+				interact { item.fire() }
+			}
+			When("the Character is included in the Scene") {
+				ScenesDriver.characterIncludedIn(
+				  CharacterDriver.getCharactersCreated(double).first().id,
+				  ScenesDriver.getCreatedScenes(double).first().id
+				)
 			}
 
 
@@ -395,6 +431,94 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				val listedSceneId = sceneIdFor!!.getValue(listedScene)
 				val focusSceneId = sceneIdFor!!.getValue(focusScene)
 				assertTrue(DeleteSceneRamificationsDriver.listedScene(focusSceneId, listedSceneId).check(double))
+			}
+			Then("the Scene Details Location dropdown should be disabled") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .isLocationDropDownDisabled
+				  .check(double)
+				  .let(::assertTrue)
+			}
+			Then("the Scene Details Location dropdown should not be disabled") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .isLocationDropDownDisabled
+				  .check(double)
+				  .let(::assertFalse)
+			}
+			Then("the Scene Details Location dropdown should show {string}") { location: String ->
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .locationDropDownText
+				  .get(double)
+				  .let { assertEquals(location, it) }
+			}
+			Then("the Scene Details Location dropdown should show the linked Location name") {
+				val scene = ScenesDriver.getCreatedScenes(double).first()
+				val location = LocationSteps.getLocationsCreated(double).find {
+					it.id == scene.locationId
+				}!!.name
+				SceneDetailsDriver
+				  .toolFor(scene)
+				  .locationDropDownText
+				  .get(double)
+				  .let { assertEquals(location, it) }
+			}
+			Then("the Location should be linked to the Scene") {
+				val scene = ScenesDriver.getCreatedScenes(double).first()
+				val location = LocationSteps.getLocationsCreated(double).find { it.id == scene.locationId }!!
+				assertEquals(targetObject as String, location.name)
+			}
+			Then("the Scene Details Location drop-down should show the selected Location name") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .locationDropDownText
+				  .get(double)
+				  .let { assertEquals(targetObject as String, it) }
+			}
+			Then("the Scene Details Location drop-down should show the new Location name") {
+				val locationName = LocationSteps.getLocationsCreated(double).first().name
+				val text = SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .locationDropDownText
+				  .get(double)
+				assertEquals(locationName, text)
+			}
+			Then("the Scene Details Add Character button should be disabled") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .isAddCharacterButtonDisabled
+				  .check(double)
+				  .let(::assertTrue)
+			}
+			Then("the Scene Details Add Character button should not be disabled") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .isAddCharacterButtonDisabled
+				  .check(double)
+				  .let(::assertFalse)
+			}
+			Then("no Characters should be listed in the Scene Details Tool") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .isIncludedCharacterListEmpty
+				  .check(double)
+				  .let(::assertTrue)
+			}
+			Then("all Characters should be listed in the Scene Details Tool") {
+				val characters = CharacterDriver.getCharactersCreated(double)
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .includedCharacterListHasAll(characters)
+				  .check(double)
+				  .let(Assertions::assertTrue)
+			}
+			Then("the Character should be listed in the Scene Details Tool") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .includedCharacterListHas(CharacterDriver.getCharactersCreated(double).first())
+				  .check(double)
+				  .let(Assertions::assertTrue)
 			}
 		}
 	}

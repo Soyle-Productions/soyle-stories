@@ -8,7 +8,7 @@ import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.tools.dynamic.BaseStoryStructure
 import com.soyle.stories.layout.tools.dynamic.CharacterComparison
-import com.soyle.stories.layout.tools.dynamic.DynamicTool
+import com.soyle.stories.layout.tools.DynamicTool
 import com.soyle.stories.layout.tools.dynamic.StoryEventDetails
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.removeToolsWithId.RemoveToolsWithId

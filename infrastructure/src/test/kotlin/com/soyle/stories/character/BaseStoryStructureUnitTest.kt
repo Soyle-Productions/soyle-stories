@@ -34,7 +34,7 @@ class BaseStoryStructureUnitTest : ApplicationTest() {
 	val locationId = UUID.randomUUID()
 
 	val projectViewModel = ProjectFileViewModel(projectId, "Untitled", "")
-	val type = com.soyle.stories.layout.tools.dynamic.BaseStoryStructure(characterId, themeId)
+	val type = com.soyle.stories.layout.config.dynamic.BaseStoryStructure(characterId, themeId)
 
 	@BeforeEach
 	fun setupFX() {

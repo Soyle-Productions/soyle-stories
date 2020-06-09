@@ -4,11 +4,8 @@ import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.common.async
 import com.soyle.stories.common.editingCell
-import com.soyle.stories.di.get
 import com.soyle.stories.entities.StoryEvent
-import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.project.ProjectSteps
-import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.StoryEventListToolDriver.interact
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
@@ -37,7 +34,7 @@ object StoryEventListToolDriver : ApplicationTest() {
 			val scope = ProjectSteps.getProjectScope(double)!!
 			interact {
 				async(scope) {
-					scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.StoryEventList)
+					//scope.get<LayoutViewListener>().toggleToolOpen(com.soyle.stories.layout.config.fixed.StoryEventList)
 				}
 			}
 		}

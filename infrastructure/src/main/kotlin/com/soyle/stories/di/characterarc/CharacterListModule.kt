@@ -48,7 +48,6 @@ internal object CharacterListModule {
 				  get(),
 				  get(),
 				  get(),
-				  get(),
 				  get()
 				)
 			}

@@ -2,6 +2,7 @@ package com.soyle.stories.layout.doubles
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.repositories.SceneRepository
 
 class SceneRepositoryDouble(
@@ -31,6 +32,10 @@ class SceneRepositoryDouble(
 
 	override suspend fun updateSceneOrder(projectId: Project.Id, order: List<Scene.Id>) {
 		sceneOrder[projectId] = order
+	}
+
+	override suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene? {
+		return scenes.values.find { it.storyEventId == storyEventId }
 	}
 
 	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =

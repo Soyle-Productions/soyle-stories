@@ -124,15 +124,3 @@ class CharacterComparison : View("Character Comparison") {
         }
     }
 }
-
-fun TabPane.characterComparisonTab(projectScope: ProjectScope, themeId: String, characterId: String): Tab {
-    val scope = CharacterComparisonScope(projectScope, themeId, characterId)
-    val comparison = find<CharacterComparison>(scope = scope)
-    val tab = tab(comparison)
-    tab.tabPaneProperty().onChange {
-        if (it == null) {
-            scope.close()
-        }
-    }
-    return tab
-}

@@ -3,9 +3,12 @@ package com.soyle.stories
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import org.junit.jupiter.api.Assertions
 
-interface ReadOnlyDependentProperty<T : Any> {
+interface Conditional {
+	fun check(double: SoyleStoriesTestDouble): Boolean
+}
+interface ReadOnlyDependentProperty<T : Any> : Conditional {
 	fun get(double: SoyleStoriesTestDouble): T?
-	fun check(double: SoyleStoriesTestDouble): Boolean = get(double) != null
+	override fun check(double: SoyleStoriesTestDouble): Boolean = get(double) != null
 }
 
 interface DependentProperty<T : Any> : ReadOnlyDependentProperty<T> {

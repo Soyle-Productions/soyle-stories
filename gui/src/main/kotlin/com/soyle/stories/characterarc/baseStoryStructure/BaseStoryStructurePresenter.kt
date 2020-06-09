@@ -4,12 +4,13 @@ import com.soyle.stories.characterarc.baseStoryStructure.presenters.*
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.gui.View
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 
 class BaseStoryStructurePresenter(
-  private val view: BaseStoryStructureView,
+  private val view: View.Nullable<BaseStoryStructureViewModel>,
   characterArcEvents: CharacterArcEvents,
   locationEvents: LocationEvents
 ) : ViewBaseStoryStructure.OutputPort, ListAllLocations.OutputPort {

@@ -124,6 +124,13 @@ class SceneList : View() {
 				createSceneDialog(scope, selectedItem, false)
 			}
 		}
+		item("Open") {
+			action {
+				when (val selectedItem = model.selectedItem.value) {
+					is SceneItemViewModel -> viewListener.openSceneDetails(selectedItem.id)
+				}
+			}
+		}
 		item("Delete") {
 			id = "delete"
 			action {

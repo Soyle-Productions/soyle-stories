@@ -1,6 +1,7 @@
-package com.soyle.stories.scene.deleteSceneRamifications
+package com.soyle.stories.common
 
-import com.soyle.stories.layout.tools.temporary.Ramifications
+import com.soyle.stories.di.DI
+import com.soyle.stories.layout.tools.ToolType
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventTarget
@@ -8,7 +9,7 @@ import tornadofx.FX
 import tornadofx.Scope
 import tornadofx.removeFromParent
 
-class RamificationsScope(val projectScope: ProjectScope, val type: Ramifications) : Scope() {
+abstract class ToolScope<T : ToolType>(val projectScope: ProjectScope, val toolId: String, val type: T) : Scope() {
 
 	private val isClosedProperty = SimpleBooleanProperty(false)
 	private var isClosed
@@ -19,7 +20,7 @@ class RamificationsScope(val projectScope: ProjectScope, val type: Ramifications
 		}
 
 	init {
-		projectScope.addScope(type.toString(), this)
+		projectScope.addScope(toolId, this)
 	}
 
 	fun close() {
@@ -28,6 +29,7 @@ class RamificationsScope(val projectScope: ProjectScope, val type: Ramifications
 		}
 		isClosed = true
 		deregister()
+		DI.deregister(this)
+		projectScope.removeScope(toolId, this)
 	}
-
 }

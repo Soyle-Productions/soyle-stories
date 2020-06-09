@@ -37,8 +37,8 @@ internal object BaseStoryStructureModule {
             provide<BaseStoryStructureViewListener> {
                 BaseStoryStructureController(
                   projectScope.applicationScope.get(),
-                  themeId,
-                  characterId,
+                  type.themeId.toString(),
+                  type.characterId.toString(),
                   projectScope.get(),
                   get(),
                   get(),

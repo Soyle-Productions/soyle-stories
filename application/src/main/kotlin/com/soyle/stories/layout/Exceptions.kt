@@ -5,7 +5,7 @@
  */
 package com.soyle.stories.layout
 
-import com.soyle.stories.layout.tools.fixed.FixedTool
+import com.soyle.stories.layout.tools.FixedTool
 import java.util.*
 
 abstract class LayoutException : Exception()

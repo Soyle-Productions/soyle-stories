@@ -3,6 +3,7 @@ package com.soyle.stories.layout.usecases
 import com.soyle.stories.entities.Project
 import com.soyle.stories.layout.doubles.LayoutRepositoryDouble
 import com.soyle.stories.layout.entities.Layout
+import com.soyle.stories.layout.entities.Window
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayoutUseCase
 import kotlinx.coroutines.runBlocking
@@ -47,7 +48,9 @@ class GetSavedLayoutTest {
 
     private fun whenSavedLayoutIsRequested()
     {
-        val useCase: GetSavedLayout = GetSavedLayoutUseCase(layoutRepository)
+        val useCase: GetSavedLayout = GetSavedLayoutUseCase(layoutRepository) { projectId, layoutId ->
+            Layout(layoutId, projectId, listOf(Window(layoutId)))
+        }
         val output = object : GetSavedLayout.OutputPort {
             override fun receiveGetSavedLayoutResponse(response: GetSavedLayout.ResponseModel) {
                 result = response

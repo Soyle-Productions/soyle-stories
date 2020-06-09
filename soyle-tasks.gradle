@@ -130,7 +130,7 @@ task nightly {
     }
 
     configure {
-        dependsOn(fullTestReport, buildAndPackage, 'githubRelease')
+        dependsOn(buildAndPackage, 'githubRelease')
     }
 
 }

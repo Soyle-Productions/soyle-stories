@@ -1,8 +1,13 @@
-package com.soyle.stories.layout.entities
+package com.soyle.stories.layout.config
 
 import com.soyle.stories.entities.Project
-import com.soyle.stories.layout.tools.fixed.FixedTool
-import com.soyle.stories.layout.tools.temporary.Ramifications
+import com.soyle.stories.layout.config.fixed.CharacterList
+import com.soyle.stories.layout.config.fixed.LocationList
+import com.soyle.stories.layout.config.fixed.SceneList
+import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
+import com.soyle.stories.layout.entities.Layout
+import com.soyle.stories.layout.entities.Tool
+import com.soyle.stories.layout.entities.layout
 
 /**
  * Created by Brendan
@@ -21,10 +26,9 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                         //openTool(ToolType.LocationTracking)
                     }
                     stack(1) {
-                        tool(Tool(FixedTool.StoryEventList))
-                        tool(Tool(FixedTool.SceneList))
-                        tool(Tool(FixedTool.LocationList))
-                        tool(Tool(FixedTool.CharacterList))
+                        tool(Tool(SceneList))
+                        tool(Tool(LocationList))
+                        tool(Tool(CharacterList))
                     }
                 }
                 primaryStack(6) {}
@@ -33,7 +37,7 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                 }
             }
             stack(2) {
-                marker(Ramifications.DeleteSceneRamifications::class)
+                marker(DeleteSceneRamifications::class)
                 //openTool(ToolType.Timeline)
                 //openTool(ToolType.ContinuityErrors)
             }

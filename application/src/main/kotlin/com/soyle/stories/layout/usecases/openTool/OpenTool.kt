@@ -1,6 +1,6 @@
 package com.soyle.stories.layout.usecases.openTool
 
-import com.soyle.stories.layout.tools.dynamic.DynamicTool
+import com.soyle.stories.layout.tools.DynamicTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 
 interface OpenTool {

@@ -9,8 +9,8 @@ import com.soyle.stories.layout.doubles.LayoutRepositoryDouble
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.repositories.OpenToolContext
-import com.soyle.stories.layout.tools.fixed.FixedTool
-import com.soyle.stories.layout.tools.temporary.TemporaryTool
+import com.soyle.stories.layout.tools.FixedTool
+import com.soyle.stories.layout.tools.TemporaryTool
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.closeTool.CloseToolUseCase
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout

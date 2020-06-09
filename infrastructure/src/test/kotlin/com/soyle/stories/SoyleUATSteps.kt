@@ -201,6 +201,12 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("A Location is deleted") {
 			deletedLocation = LocationSteps.whenLocationIsDeleted(double)
 		}
+		When("the Location is renamed") {
+			LocationSteps.whenLocationIsRenamed(double)
+		}
+		When("the Location is deleted") {
+			LocationSteps.whenLocationIsDeleted(double)
+		}
 		When("the user clicks the location list tool right-click menu delete button") {
 			LocationSteps.whenLocationListToolRightClickMenuButtonIsClicked(double, "delete")
 		}

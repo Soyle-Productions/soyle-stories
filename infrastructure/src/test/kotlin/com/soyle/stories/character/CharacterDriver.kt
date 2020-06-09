@@ -11,7 +11,6 @@ import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
-import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -85,7 +84,7 @@ object CharacterDriver : ApplicationTest() {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
 			async(scope) {
-				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.CharacterList)
+				scope.get<LayoutViewListener>().toggleToolOpen(com.soyle.stories.layout.config.fixed.CharacterList)
 			}
 		}
 	}
@@ -107,7 +106,7 @@ object CharacterDriver : ApplicationTest() {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
 			async(scope) {
-				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.CharacterList)
+				scope.get<LayoutViewListener>().toggleToolOpen(com.soyle.stories.layout.config.fixed.CharacterList)
 			}
 		}
 	}

@@ -10,10 +10,10 @@ import com.soyle.stories.di.get
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.layout.tools.fixed.FixedTool
 import com.soyle.stories.location.LocationSteps.interact
 import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.DeleteLocationController
+import com.soyle.stories.location.controllers.RenameLocationController
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.location.items.LocationItemViewModel
@@ -70,7 +70,7 @@ object LocationSteps : ApplicationTest() {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		CharacterDriver.interact {
 			async(scope) {
-				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.LocationList)
+				scope.get<LayoutViewListener>().toggleToolOpen(com.soyle.stories.layout.config.fixed.LocationList)
 			}
 		}
 	}
@@ -91,7 +91,7 @@ object LocationSteps : ApplicationTest() {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		CharacterDriver.interact {
 			async(scope) {
-				scope.get<LayoutViewListener>().toggleToolOpen(FixedTool.LocationList)
+				scope.get<LayoutViewListener>().toggleToolOpen(com.soyle.stories.layout.config.fixed.LocationList)
 			}
 		}
 	}
@@ -468,6 +468,17 @@ object LocationSteps : ApplicationTest() {
 			}
 		}
 		return firstLocation!!
+	}
+
+	fun whenLocationIsRenamed(double: SoyleStoriesTestDouble) {
+		ProjectSteps.givenProjectHasBeenOpened(double)
+		val scope = ProjectSteps.getProjectScope(double)!!
+		val repo = scope.get<LocationRepository>()
+		val controller = scope.get<RenameLocationController>()
+		runBlocking {
+			val firstLocation = repo.getAllLocationsInProject(Project.Id(scope.projectId)).first()
+			controller.renameLocation(firstLocation.id.uuid.toString(), "Renamed Location")
+		}
 	}
 
 	fun whenLocationListToolRightClickMenuButtonIsClicked(double: SoyleStoriesTestDouble, menuItemId: String) {

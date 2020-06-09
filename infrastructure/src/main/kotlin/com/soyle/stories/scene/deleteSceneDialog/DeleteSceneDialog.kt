@@ -23,17 +23,18 @@ fun deleteSceneDialog(scope: ProjectScope, sceneItemViewModel: SceneItemViewMode
 		if (viewModel == null) return@onChangeOnce
 
 		val confirmButton = ButtonType(viewModel.deleteButtonLabel, ButtonBar.ButtonData.FINISH)
-		val ramificationsButton = ButtonType("Show Ramifications", ButtonBar.ButtonData.YES)
+		//val ramificationsButton = ButtonType("Show Ramifications", ButtonBar.ButtonData.YES)
 		val cancelButton = ButtonType(viewModel.cancelButtonLabel, ButtonBar.ButtonData.CANCEL_CLOSE)
 
-		val alert = Alert(Alert.AlertType.CONFIRMATION, viewModel.content, ramificationsButton, confirmButton, cancelButton)
+		val alert = Alert(Alert.AlertType.CONFIRMATION, viewModel.content, /*ramificationsButton, */confirmButton, cancelButton)
 		alert.title = viewModel.title
 		alert.headerText = viewModel.header
 		alert.dialogPane.styleClass.add("deleteScene")
 		alert.dialogPane.content = alert.dialogPane.pane {
 			label(viewModel.content)
 			checkbox {
-				model.defaultAction.bindBidirectional(selectedProperty())
+				isDisable = true
+				//model.defaultAction.bindBidirectional(selectedProperty())
 			}
 		}
 		scope.get<WorkBench>().currentStage?.also { owner ->
@@ -44,9 +45,9 @@ fun deleteSceneDialog(scope: ProjectScope, sceneItemViewModel: SceneItemViewMode
 		}
 		alert.resultProperty().onChangeOnce {
 			when (it) {
-				ramificationsButton -> {
+				/*ramificationsButton -> {
 					viewListener.viewRamifications(sceneItemViewModel.id, ! model.defaultAction.get())
-				}
+				}*/
 				confirmButton -> {
 					viewListener.deleteScene(sceneItemViewModel.id, ! model.defaultAction.get())
 				}
