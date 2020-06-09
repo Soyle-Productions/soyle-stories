@@ -9,10 +9,11 @@ class Scene(
   val projectId: Project.Id,
   val name: String,
   val storyEventId: StoryEvent.Id,
+  val locationId: Location.Id?,
   val characterMotivations: List<CharacterMotivation>
 ) : Entity<Scene.Id> {
 
-	constructor(projectId: Project.Id, name: String, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, listOf())
+	constructor(projectId: Project.Id, name: String, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, null, listOf())
 
 	private val motivationsById by lazy { characterMotivations.associateBy { it.characterId } }
 
@@ -30,8 +31,9 @@ class Scene(
 
 	private fun copy(
 	  name: String = this.name,
+	  locationId: Location.Id? = this.locationId,
 	  characterMotivations: List<CharacterMotivation> = this.characterMotivations
-	) = Scene(id, projectId, name, storyEventId, characterMotivations)
+	) = Scene(id, projectId, name, storyEventId, locationId, characterMotivations)
 
 	fun withName(newName: String) = copy(name = newName)
 	fun withCharacterIncluded(character: Character) = copy(characterMotivations = characterMotivations + CharacterMotivation(character.id, character.name, null))
@@ -43,6 +45,8 @@ class Scene(
 			else it
 		})
 	}
+	fun withLocationLinked(locationId: Location.Id) = copy(locationId = locationId)
+	fun withoutLocation() = copy(locationId = null)
 
 	data class Id(val uuid: UUID = UUID.randomUUID()) {
 		override fun toString(): String = "Scene($uuid)"

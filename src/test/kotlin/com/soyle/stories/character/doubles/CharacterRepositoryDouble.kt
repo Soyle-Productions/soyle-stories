@@ -11,7 +11,7 @@ class CharacterRepositoryDouble(
   private val onDeleteCharacterWithId: (Character.Id) -> Unit = {}
 ) : CharacterRepository {
 
-	private val characters = initialCharacters.associateBy { it.id }.toMutableMap()
+	val characters = initialCharacters.associateBy { it.id }.toMutableMap()
 	override suspend fun addNewCharacter(character: Character) {
 		onAddNewCharacter.invoke(character)
 		characters[character.id] = character

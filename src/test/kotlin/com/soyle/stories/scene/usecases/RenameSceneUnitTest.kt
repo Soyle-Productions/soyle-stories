@@ -86,7 +86,7 @@ class RenameSceneUnitTest {
 	private fun given(sceneWithId: UUID? = null, andName: String? = null) {
 		sceneRepository = SceneRepositoryDouble(
 		  initialScenes = listOfNotNull(
-			sceneWithId?.let { Scene(Scene.Id(it), projectId, andName ?: originalName, StoryEvent.Id(), listOf()) }
+			sceneWithId?.let { Scene(Scene.Id(it), projectId, andName ?: originalName, StoryEvent.Id(), null, listOf()) }
 		  ),
 		  onUpdateScene = { updatedScene = it }
 		)
