@@ -117,7 +117,9 @@ task nightly {
 
         token project.findProperty("gpr.token").toString()
         owner "soyle-productions"
+        repo "soyle-stories-desktop"
         tagName "latest"
+        targetCommitish "develop"
         releaseName "Nightly Release"
         draft false
         prerelease true
@@ -142,6 +144,7 @@ task weekly {
 
         token project.findProperty("gpr.token").toString()
         owner "soyle-productions"
+        repo "soyle-stories-desktop"
         tagName "snapshot-" + getDate()
         releaseName "Weekly Release"
         draft false

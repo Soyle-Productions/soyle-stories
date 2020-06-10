@@ -6,6 +6,7 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
+import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventControllerImpl
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventNotifier
@@ -79,7 +80,9 @@ object StoryEventModule {
 			}
 		}
 		provide(RemoveCharacterFromStoryEvent.OutputPort::class) {
-			RemoveCharacterFromStoryEventNotifier()
+			RemoveCharacterFromStoryEventNotifier().also {
+				get<RemoveCharacterFromSceneController>() listensTo it
+			}
 		}
 		provide(RenameStoryEvent.OutputPort::class) {
 			RenameStoryEventNotifier()

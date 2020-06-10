@@ -5,6 +5,7 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
+import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import java.util.*
 
 class SceneDetailsController(
@@ -14,7 +15,8 @@ class SceneDetailsController(
   private val getSceneDetails: GetSceneDetails,
   private val getSceneDetailsOutputPort: GetSceneDetails.OutputPort,
   private val linkLocationToSceneController: LinkLocationToSceneController,
-  private val addCharacterToStoryEvent: AddCharacterToStoryEventController
+  private val addCharacterToStoryEvent: AddCharacterToStoryEventController,
+  private val removeCharacterFromStoryEventController: RemoveCharacterFromStoryEventController
 ) : SceneDetailsViewListener {
 
 	private val sceneId = UUID.fromString(sceneId)
@@ -34,6 +36,10 @@ class SceneDetailsController(
 
 	override fun addCharacter(storyEventId: String, characterId: String) {
 		addCharacterToStoryEvent.addCharacterToStoryEvent(storyEventId, characterId)
+	}
+
+	override fun removeCharacter(storyEventId: String, characterId: String) {
+		removeCharacterFromStoryEventController.removeCharacter(storyEventId, characterId)
 	}
 
 }

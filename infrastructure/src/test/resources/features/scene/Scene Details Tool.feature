@@ -90,7 +90,7 @@ Feature: Scene Details Tool
 	Then the Scene Details Add Character button should be disabled
 	And the Character should be listed in the Scene Details Tool
 	
-	@remove-character-from-story-event @excluded
+	@remove-character-from-story-event
 	Scenario: Remove Character
 	Given a Scene has been created
 	And 2 Characters have been created
@@ -99,7 +99,7 @@ Feature: Scene Details Tool
 	When a Character is removed from the Scene
 	Then the Character should not be listed in the Scene Details Tool
 	
-	@remove-character-from-story-event @excluded
+	@remove-character-from-story-event
 	Scenario: Remove last Character
 	Given a Scene has been created
 	And 2 Characters have been created

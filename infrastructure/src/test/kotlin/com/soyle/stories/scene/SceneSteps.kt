@@ -129,6 +129,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				  .openTool
 				  .given(double)
 			}
+			Given("{int} Characters have been included in the Scene") { characterCount: Int ->
+				val scene = targetObject as? Scene ?: ScenesDriver.getCreatedScenes(double).first()
+				CharacterDriver.getCharactersCreated(double).take(characterCount).forEach { character ->
+					ScenesDriver.characterIncludedIn(character.id, scene.id).given(double)
+				}
+			}
 
 			When("The Scene List Tool is opened") {
 				if (SceneListDriver.isOpen(double)) {
@@ -256,7 +262,12 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				ScenesDriver.characterIncludedIn(
 				  CharacterDriver.getCharactersCreated(double).first().id,
 				  ScenesDriver.getCreatedScenes(double).first().id
-				)
+				).whenSet(double)
+			}
+			When("a Character is removed from the Scene") {
+				val scene = targetObject as? Scene ?: ScenesDriver.getCreatedScenes(double).first()
+				targetObject = scene.characterMotivations.first().characterId
+				ScenesDriver.characterRemovedFrom(scene, scene.characterMotivations.first().characterId).whenSet(double)
 			}
 
 
@@ -485,11 +496,13 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				assertEquals(locationName, text)
 			}
 			Then("the Scene Details Add Character button should be disabled") {
+				UATLogger.silent = false
 				SceneDetailsDriver
 				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
 				  .isAddCharacterButtonDisabled
 				  .check(double)
 				  .let(::assertTrue)
+				UATLogger.silent = true
 			}
 			Then("the Scene Details Add Character button should not be disabled") {
 				SceneDetailsDriver
@@ -519,6 +532,13 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				  .includedCharacterListHas(CharacterDriver.getCharactersCreated(double).first())
 				  .check(double)
 				  .let(Assertions::assertTrue)
+			}
+			Then("the Character should not be listed in the Scene Details Tool") {
+				SceneDetailsDriver
+				  .toolFor(ScenesDriver.getCreatedScenes(double).first())
+				  .includedCharacterListHas(CharacterDriver.getCharactersCreated(double).find { it.id == targetObject as Character.Id }!!)
+				  .check(double)
+				  .let(Assertions::assertFalse)
 			}
 		}
 	}

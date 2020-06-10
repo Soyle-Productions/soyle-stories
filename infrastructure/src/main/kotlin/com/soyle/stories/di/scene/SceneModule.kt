@@ -24,6 +24,8 @@ import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneNo
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneControllerImpl
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
+import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
+import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
@@ -45,6 +47,8 @@ import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToSceneUseCase
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenesUseCase
+import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
 import com.soyle.stories.scene.usecases.renameScene.RenameSceneUseCase
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
@@ -102,6 +106,9 @@ object SceneModule {
 			provide<LinkLocationToScene> {
 				LinkLocationToSceneUseCase(get(), get())
 			}
+			provide<RemoveCharacterFromScene> {
+				RemoveCharacterFromSceneUseCase(get())
+			}
 
 			provide(CreateNewScene.OutputPort::class) {
 				CreateNewSceneNotifier(get<CreateStoryEventNotifier>())
@@ -120,6 +127,9 @@ object SceneModule {
 			}
 			provide(LinkLocationToScene.OutputPort::class) {
 				LinkLocationToSceneNotifier()
+			}
+			provide(RemoveCharacterFromScene.OutputPort::class) {
+				RemoveCharacterFromSceneNotifier()
 			}
 
 			provide<CreateNewSceneController> {
@@ -164,6 +174,14 @@ object SceneModule {
 			}
 			provide<LinkLocationToSceneController> {
 				LinkLocationToSceneControllerImpl(
+				  applicationScope.get(),
+				  applicationScope.get(),
+				  get(),
+				  get()
+				)
+			}
+			provide {
+				RemoveCharacterFromSceneController(
 				  applicationScope.get(),
 				  applicationScope.get(),
 				  get(),
@@ -229,8 +247,10 @@ object SceneModule {
 					projectScope.get(),
 					projectScope.get(),
 					projectScope.get<IncludeCharacterInSceneNotifier>(),
-					projectScope.get<LinkLocationToSceneNotifier>()
+					projectScope.get<LinkLocationToSceneNotifier>(),
+					projectScope.get<RemoveCharacterFromSceneNotifier>()
 				  ),
+				  projectScope.get(),
 				  projectScope.get(),
 				  projectScope.get()
 				)

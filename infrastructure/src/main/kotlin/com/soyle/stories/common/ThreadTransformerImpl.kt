@@ -1,11 +1,6 @@
-/**
- * Created by Brendan
- * Date: 3/14/2020
- * Time: 10:44 PM
- */
+
 package com.soyle.stories.common
 
-import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.soylestories.ApplicationScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

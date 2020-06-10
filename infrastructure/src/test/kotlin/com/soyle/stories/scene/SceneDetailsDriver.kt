@@ -3,6 +3,7 @@ package com.soyle.stories.scene
 import com.soyle.stories.Conditional
 import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
+import com.soyle.stories.UATLogger
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Scene
@@ -35,7 +36,7 @@ object SceneDetailsDriver {
 			override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf()
 
 			override fun get(double: SoyleStoriesTestDouble): SceneDetails? {
-				val scope = scope.get(double) ?: return null
+				val scope = scope.get(double) ?: return (null).also { UATLogger.log("No registered scene details scope") }
 				return findComponentsInScope<SceneDetails>(scope).firstOrNull()
 			}
 
@@ -87,14 +88,14 @@ object SceneDetailsDriver {
 		private val addCharacterButton = object : ReadOnlyDependentProperty<Button>
 		{
 			override fun get(double: SoyleStoriesTestDouble): Button? {
-				val tool = openTool.get(double) ?: return null
+				val tool = openTool.get(double) ?: return (null).also { UATLogger.log("Scene Details not yet open") }
 				return from(tool.root).lookup(".add-character").queryAll<Button>().firstOrNull()
 			}
 		}
 
 		val isAddCharacterButtonDisabled = object : Conditional {
 			override fun check(double: SoyleStoriesTestDouble): Boolean {
-				val dropDown = addCharacterButton.get(double) ?: return false
+				val dropDown = addCharacterButton.get(double) ?: return (false).also { UATLogger.log("add character button not found") }
 				return dropDown.disableProperty().get()
 			}
 		}

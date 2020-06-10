@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.sceneDetails
 
+import com.soyle.stories.characterarc.components.characterNameModel
 import com.soyle.stories.di.resolve
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
@@ -52,7 +53,8 @@ class SceneDetails : View("Scene") {
 				vbox {
 					fitToParentWidth()
 					bindChildren(model.includedCharacters) {
-						field(it.characterName) {
+						field {
+							textProperty.bind(scope.projectScope.characterNameModel(it.characterId, it.characterName))
 							addClass("included-character")
 							fitToParentWidth()
 							hbox(spacing = 10) {
@@ -73,10 +75,13 @@ class SceneDetails : View("Scene") {
 
 										}
 									}
-								}/*
+								}
 								button(model.removeCharacterButtonLabel) {
 									hgrow = Priority.NEVER
-								}*/
+									action {
+										viewListener.removeCharacter(model.storyEventId.value!!, it.characterId)
+									}
+								}
 							}
 						}
 					}

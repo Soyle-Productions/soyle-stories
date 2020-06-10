@@ -16,6 +16,7 @@ import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
+import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import com.soyle.stories.storyevent.repositories.StoryEventRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -32,8 +33,7 @@ object ScenesDriver : ApplicationTest() {
 		}
 	}
 
-	fun getCreatedScenes(double: SoyleStoriesTestDouble): List<Scene>
-	{
+	fun getCreatedScenes(double: SoyleStoriesTestDouble): List<Scene> {
 		val scope = ProjectSteps.getProjectScope(double) ?: return emptyList()
 		val repo = scope.get<SceneRepository>()
 		return runBlocking {
@@ -47,18 +47,15 @@ object ScenesDriver : ApplicationTest() {
 	fun getNumberOfCreatedScenes(double: SoyleStoriesTestDouble): Int =
 	  getCreatedScenes(double).size
 
-	fun whenSceneIsCreated(double: SoyleStoriesTestDouble)
-	{
+	fun whenSceneIsCreated(double: SoyleStoriesTestDouble) {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val controller = scope.get<CreateNewSceneController>()
 		controller.createNewScene("Unique Scene Name ${UUID.randomUUID()}")
 	}
 
-	fun givenNumberOfCreatedScenesIsAtLeast(double: SoyleStoriesTestDouble, count: Int)
-	{
+	fun givenNumberOfCreatedScenesIsAtLeast(double: SoyleStoriesTestDouble, count: Int) {
 		UATLogger.log("Given Number of Created Scenes is At Least $count")
-		if (getNumberOfCreatedScenes(double) < count)
-		{
+		if (getNumberOfCreatedScenes(double) < count) {
 			setNumberOfCreatedScenes(double, count)
 		}
 		assertTrue(getNumberOfCreatedScenes(double) >= count)
@@ -100,8 +97,7 @@ object ScenesDriver : ApplicationTest() {
 		}
 	}
 
-	fun whenSceneIsDeleted(double: SoyleStoriesTestDouble)
-	{
+	fun whenSceneIsDeleted(double: SoyleStoriesTestDouble) {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val controller = scope.get<DeleteSceneController>()
 		val repository = scope.get<SceneRepository>()
@@ -115,6 +111,7 @@ object ScenesDriver : ApplicationTest() {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
 		  ProjectSteps::givenProjectHasBeenOpened
 		)
+
 		override fun get(double: SoyleStoriesTestDouble): Nothing? = null
 
 		override fun whenSet(double: SoyleStoriesTestDouble) {
@@ -160,8 +157,7 @@ object ScenesDriver : ApplicationTest() {
 		  characterIncludedIn(characterId, sceneId)::given
 		)
 
-		override fun get(double: SoyleStoriesTestDouble): String?
-		{
+		override fun get(double: SoyleStoriesTestDouble): String? {
 			val scope = ProjectSteps.getProjectScope(double) ?: return null
 			val scene = runBlocking {
 				scope.get<SceneRepository>().getSceneById(sceneId)
@@ -190,8 +186,7 @@ object ScenesDriver : ApplicationTest() {
 		}
 	}
 
-	fun locationLinkedToScene(scene: Scene, location: Location) = object : DependentProperty<Unit>
-	{
+	fun locationLinkedToScene(scene: Scene, location: Location) = object : DependentProperty<Unit> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf()
 
 		override fun get(double: SoyleStoriesTestDouble): Unit? = Unit
@@ -207,6 +202,16 @@ object ScenesDriver : ApplicationTest() {
 			val controller = ProjectSteps.getProjectScope(double)!!
 			  .get<LinkLocationToSceneController>()
 			controller.linkLocationToScene(scene.id.uuid.toString(), location.id.uuid.toString())
+		}
+	}
+
+	fun characterRemovedFrom(scene: Scene, characterId: Character.Id) = object : DependentProperty<Unit> {
+		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf()
+		override fun get(double: SoyleStoriesTestDouble): Unit? = null
+		override fun whenSet(double: SoyleStoriesTestDouble) {
+			ProjectSteps.getProjectScope(double)!!
+			  .get<RemoveCharacterFromStoryEventController>()
+			  .removeCharacter(scene.storyEventId.uuid.toString(), characterId.uuid.toString())
 		}
 	}
 }

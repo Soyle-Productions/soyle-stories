@@ -14,6 +14,7 @@ import com.soyle.stories.location.usecases.listAllLocations.LocationItem
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
 import com.soyle.stories.scene.usecases.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
+import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
 import java.util.*
 
 class SceneDetailsPresenter(
@@ -22,8 +23,10 @@ class SceneDetailsPresenter(
   characterList: LiveCharacterList,
   locationList: LiveLocationList,
   characterIncludedInScene: Notifier<IncludeCharacterInScene.OutputPort>,
-  locationLinkedToScene: Notifier<LinkLocationToScene.OutputPort>
-) : GetSceneDetails.OutputPort, CharacterListListener, LocationListListener, IncludeCharacterInScene.OutputPort, LinkLocationToScene.OutputPort {
+  locationLinkedToScene: Notifier<LinkLocationToScene.OutputPort>,
+  characterRemovedFromScene: Notifier<RemoveCharacterFromScene.OutputPort>
+) : GetSceneDetails.OutputPort, CharacterListListener, LocationListListener, IncludeCharacterInScene.OutputPort, LinkLocationToScene.OutputPort,
+  RemoveCharacterFromScene.OutputPort {
 
 	private val sceneId = UUID.fromString(sceneId)
 
@@ -32,6 +35,7 @@ class SceneDetailsPresenter(
 		this listensTo locationList
 		this listensTo characterIncludedInScene
 		this listensTo locationLinkedToScene
+		this listensTo characterRemovedFromScene
 	}
 
 	override fun sceneDetailsRetrieved(response: GetSceneDetails.ResponseModel) {
@@ -145,6 +149,21 @@ class SceneDetailsPresenter(
 		}
 	}
 
+	override fun characterRemovedFromScene(response: RemoveCharacterFromScene.ResponseModel) {
+		if (response.sceneId != sceneId) return
+		val characterId = response.characterId.toString()
+		view.updateOrInvalidated {
+			val remainingCharacters = includedCharacters.filterNot { it.characterId == characterId }
+			val remainingCharacterIds = remainingCharacters.map { it.characterId }.toSet()
+			copyOrDefault(
+			  includedCharacters = includedCharacters.filterNot { it.characterId == characterId },
+			  availableCharacters = characters.filterNot {
+				  it.characterId in remainingCharacterIds
+			  }
+			)
+		}
+	}
+
 	private fun SceneDetailsViewModel?.copyOrDefault(
 	  storyEventId: String? = this?.storyEventId,
 	  locationSectionLabel: String = this?.locationSectionLabel ?: "Setting",
@@ -180,6 +199,10 @@ class SceneDetailsPresenter(
 	override fun failedToGetSceneDetails(failure: Exception) {}
 	override fun failedToIncludeCharacterInScene(failure: Exception) {}
 	override fun failedToLinkLocationToScene(failure: Exception) {
+		println(failure)
+	}
+
+	override fun failedToRemoveCharacterFromScene(failure: Exception) {
 		println(failure)
 	}
 
