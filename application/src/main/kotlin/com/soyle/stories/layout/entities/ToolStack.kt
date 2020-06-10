@@ -49,7 +49,7 @@ class ToolStack(
         return copy(tools = tools.map {
             if (it.id == tool) it.opened()
             else it
-        })
+        }, focusedTool = tool)
     }
 
     override fun withToolAddedToStack(tool: Tool, stackId: Id): ToolStack {

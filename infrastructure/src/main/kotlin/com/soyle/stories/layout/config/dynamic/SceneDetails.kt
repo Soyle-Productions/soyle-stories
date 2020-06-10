@@ -50,7 +50,7 @@ object SceneDetailsConfig : ToolConfig<SceneDetails> {
 
 }
 
-class SceneDetails(val sceneId: UUID, private val locale: Locale) : DynamicTool() {
+data class SceneDetails(val sceneId: UUID, private val locale: Locale) : DynamicTool() {
 
 	override suspend fun validate(context: OpenToolContext) {
 		context.sceneRepository.getSceneById(Scene.Id(sceneId))

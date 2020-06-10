@@ -6,6 +6,7 @@ import com.soyle.stories.soylestories.ApplicationScope
 
 class SceneDetailsModel : Model<SceneDetailsScope, SceneDetailsViewModel>(SceneDetailsScope::class) {
 
+	val invalid = bind(SceneDetailsViewModel::invalid)
 	val storyEventId = bind(SceneDetailsViewModel::storyEventId)
 	val locationSectionLabel = bind(SceneDetailsViewModel::locationSectionLabel)
 	val locationDropDownEmptyLabel = bind(SceneDetailsViewModel::locationDropDownEmptyLabel)

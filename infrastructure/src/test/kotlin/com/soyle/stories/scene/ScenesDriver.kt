@@ -8,6 +8,7 @@ import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectSteps
+import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.ScenesDriver.interact
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
@@ -24,6 +25,30 @@ import org.testfx.framework.junit5.ApplicationTest
 import java.util.*
 
 object ScenesDriver : ApplicationTest() {
+
+	fun registerIdentifiers(double: SoyleStoriesTestDouble, identifiers: List<Pair<String, Scene.Id>>)
+	{
+		ProjectSteps.getProjectScope(double)?.get<WorkBench>()?.properties?.put("sceneIdFor", identifiers.toMap())
+	}
+
+	fun getSceneIdentifiers(double: SoyleStoriesTestDouble): Map<String, Scene.Id>?
+	{
+		return ProjectSteps.getProjectScope(double)?.get<WorkBench>()?.properties?.get("sceneIdFor") as? Map<String, Scene.Id>
+	}
+
+	fun getSceneIdByIdentifier(double: SoyleStoriesTestDouble, identifier: String): Scene.Id?
+	{
+		return getSceneIdentifiers(double)?.get(identifier)
+	}
+
+	fun getSceneByIdentifier(double: SoyleStoriesTestDouble, identifier: String): Scene?
+	{
+		val id = getSceneIdByIdentifier(double, identifier) ?: return null
+		val repo = ProjectSteps.getProjectScope(double)?.get<SceneRepository>() ?: return null
+		return runBlocking {
+			repo.getSceneById(id)
+		}
+	}
 
 	fun setNumberOfCreatedScenes(double: SoyleStoriesTestDouble, count: Int) {
 		ProjectSteps.givenProjectHasBeenOpened(double)

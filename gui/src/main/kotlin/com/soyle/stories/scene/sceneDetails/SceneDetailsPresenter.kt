@@ -15,6 +15,7 @@ import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
 import com.soyle.stories.scene.usecases.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import java.util.*
 
 class SceneDetailsPresenter(
@@ -24,9 +25,15 @@ class SceneDetailsPresenter(
   locationList: LiveLocationList,
   characterIncludedInScene: Notifier<IncludeCharacterInScene.OutputPort>,
   locationLinkedToScene: Notifier<LinkLocationToScene.OutputPort>,
-  characterRemovedFromScene: Notifier<RemoveCharacterFromScene.OutputPort>
-) : GetSceneDetails.OutputPort, CharacterListListener, LocationListListener, IncludeCharacterInScene.OutputPort, LinkLocationToScene.OutputPort,
-  RemoveCharacterFromScene.OutputPort {
+  characterRemovedFromScene: Notifier<RemoveCharacterFromScene.OutputPort>,
+  characterMotivationSet: Notifier<SetMotivationForCharacterInScene.OutputPort>
+) : GetSceneDetails.OutputPort,
+  CharacterListListener,
+  LocationListListener,
+  IncludeCharacterInScene.OutputPort,
+  LinkLocationToScene.OutputPort,
+  RemoveCharacterFromScene.OutputPort,
+SetMotivationForCharacterInScene.OutputPort {
 
 	private val sceneId = UUID.fromString(sceneId)
 
@@ -36,6 +43,7 @@ class SceneDetailsPresenter(
 		this listensTo characterIncludedInScene
 		this listensTo locationLinkedToScene
 		this listensTo characterRemovedFromScene
+		this listensTo characterMotivationSet
 	}
 
 	override fun sceneDetailsRetrieved(response: GetSceneDetails.ResponseModel) {
@@ -43,6 +51,7 @@ class SceneDetailsPresenter(
 			val locationId = response.locationId?.toString()
 			val includedCharacterIds = response.characters.map { it.characterId.toString() }.toSet()
 			copyOrDefault(
+			  invalid = false,
 			  storyEventId = response.storyEventId.toString(),
 			  includedCharacters = response.characters.map {
 				  SceneDetailsCharacterViewModel(
@@ -164,7 +173,33 @@ class SceneDetailsPresenter(
 		}
 	}
 
+	override fun motivationSetForCharacterInScene(response: SetMotivationForCharacterInScene.ResponseModel) {
+		if (response.sceneId != sceneId) return
+		val characterId = response.characterId.toString()
+		view.updateOrInvalidated {
+			if (response.motivation == null) {
+				return@updateOrInvalidated copyOrDefault(invalid = true)
+			}
+
+			copyOrDefault(
+			  includedCharacters = includedCharacters.map {
+				  if (it.characterId != characterId) it
+				  else {
+					  SceneDetailsCharacterViewModel(
+						it.characterId,
+						it.characterName,
+						response.motivation ?: "",
+						it.previousMotivationSource,
+						true
+					  )
+				  }
+			  }
+			)
+		}
+	}
+
 	private fun SceneDetailsViewModel?.copyOrDefault(
+	  invalid: Boolean = this?.invalid ?: true,
 	  storyEventId: String? = this?.storyEventId,
 	  locationSectionLabel: String = this?.locationSectionLabel ?: "Setting",
 	  locationDropDownEmptyLabel: String = this?.locationDropDownEmptyLabel ?: "Select Location",
@@ -180,6 +215,7 @@ class SceneDetailsPresenter(
 	  characters: List<CharacterItemViewModel> = this?.characters ?: listOf(),
 	  locations: List<LocationItemViewModel> = this?.locations ?: listOf()
 	) = SceneDetailsViewModel(
+	  invalid,
 	  storyEventId,
 	  locationSectionLabel,
 	  locationDropDownEmptyLabel,
@@ -203,6 +239,10 @@ class SceneDetailsPresenter(
 	}
 
 	override fun failedToRemoveCharacterFromScene(failure: Exception) {
+		println(failure)
+	}
+
+	override fun failedToSetMotivationForCharacterInScene(failure: Exception) {
 		println(failure)
 	}
 

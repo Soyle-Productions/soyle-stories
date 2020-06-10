@@ -248,8 +248,11 @@ object SceneModule {
 					projectScope.get(),
 					projectScope.get<IncludeCharacterInSceneNotifier>(),
 					projectScope.get<LinkLocationToSceneNotifier>(),
-					projectScope.get<RemoveCharacterFromSceneNotifier>()
+					projectScope.get<RemoveCharacterFromSceneNotifier>(),
+					projectScope.get<SetMotivationForCharacterInSceneNotifier>()
 				  ),
+				  projectScope.get(),
+				  projectScope.get(),
 				  projectScope.get(),
 				  projectScope.get(),
 				  projectScope.get()

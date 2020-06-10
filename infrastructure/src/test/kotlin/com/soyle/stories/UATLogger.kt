@@ -14,4 +14,10 @@ object UATLogger {
 	fun log(message: Any?) {
 		if (! silent) println(message)
 	}
+
+	fun enableLogging(block: () -> Unit) {
+		silent = false
+		block()
+		silent = true
+	}
 }

@@ -14,9 +14,9 @@ import com.soyle.stories.scene.sceneDetails.SceneDetailsScope
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.scene.Node
-import javafx.scene.control.Button
-import javafx.scene.control.Labeled
-import javafx.scene.control.MenuItem
+import javafx.scene.control.*
+import javafx.scene.input.MouseButton
+import javafx.scene.text.Text
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.Field
 
@@ -44,6 +44,14 @@ object SceneDetailsDriver {
 				interact {
 					ProjectSteps.getProjectScope(double)!!.get<OpenToolController>().openSceneDetailsTool(scene.id.uuid.toString())
 				}
+			}
+		}
+
+		val isToolFocused = object : Conditional {
+			override fun check(double: SoyleStoriesTestDouble): Boolean {
+				return openTool.get(double)?.owningTab?.let {
+					it.tabPane?.selectionModel?.selectedItem == it
+				} ?: false
 			}
 		}
 
@@ -85,11 +93,11 @@ object SceneDetailsDriver {
 			}
 		}
 
-		private val addCharacterButton = object : ReadOnlyDependentProperty<Button>
+		private val addCharacterButton = object : ReadOnlyDependentProperty<MenuButton>
 		{
-			override fun get(double: SoyleStoriesTestDouble): Button? {
+			override fun get(double: SoyleStoriesTestDouble): MenuButton? {
 				val tool = openTool.get(double) ?: return (null).also { UATLogger.log("Scene Details not yet open") }
-				return from(tool.root).lookup(".add-character").queryAll<Button>().firstOrNull()
+				return from(tool.root).lookup(".add-character").queryAll<MenuButton>().firstOrNull()
 			}
 		}
 
@@ -121,6 +129,150 @@ object SceneDetailsDriver {
 				} != null
 			}
 		}
+
+		fun motivationTextFor(character: Character) = object : ReadOnlyDependentProperty<String> {
+			override fun get(double: SoyleStoriesTestDouble): String? {
+				val tool = openTool.get(double) ?: return null
+				return (from(tool.root).lookup(".included-character").queryAll<Field>().find {
+					it.text == character.name
+				}?.lookup(".text-field") as? TextField)?.text ?: ""
+			}
+		}
+
+		val previouslySetToolTip: PreviouslySetToolTipDriver = object : PreviouslySetToolTipDriver
+		{
+			override val openTooltip = object : DependentProperty<Tooltip> {
+				override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf()
+
+				override fun get(double: SoyleStoriesTestDouble): Tooltip? {
+					return characterFields(double).asSequence()
+					  .mapNotNull { (it.lookup(".previously-set-tip") as? Hyperlink)?.tooltip }
+					  .find { it.isShowing }
+				}
+
+				override fun check(double: SoyleStoriesTestDouble): Boolean = get(double)?.isShowing == true
+
+				override fun whenSet(double: SoyleStoriesTestDouble) {
+					interact {
+						characterFields(double).asSequence()
+						  .mapNotNull { (it.lookup(".previously-set-tip") as? Hyperlink) }
+						  .filter { it.tooltip != null }
+						  .firstOrNull()
+						  ?.let {
+							  clickOn(it, MouseButton.PRIMARY)
+						  }
+					}
+				}
+			}
+			override val sceneName: ReadOnlyDependentProperty<String> = object : ReadOnlyDependentProperty<String> {
+				override fun get(double: SoyleStoriesTestDouble): String? {
+					val tooltip = openTooltip.get(double) ?: return (null).also { UATLogger.log("tooltip not yet open")}
+					val tooltipGraphic = tooltip.graphic ?: return (null).also { UATLogger.log("no graphic on tooltip")}
+					val sceneName = from(tooltipGraphic).lookup(".hyperlink").queryAll<Hyperlink>().firstOrNull()
+					  ?: return (null).also { UATLogger.log("no scene name link in tooltip graphic")}
+					return sceneName.text
+				}
+			}
+			override val motivation: ReadOnlyDependentProperty<String> = object : ReadOnlyDependentProperty<String> {
+				override fun get(double: SoyleStoriesTestDouble): String? {
+					val tooltipGraphic = openTooltip.get(double)?.graphic ?: return null
+					val motivation = from(tooltipGraphic).lookup(".motivation").queryAll<Text>().firstOrNull()
+					return motivation?.text
+				}
+			}
+			override fun whenSceneNameSelected(double: SoyleStoriesTestDouble) {
+				val tooltip = openTooltip.get(double) ?: return (Unit).also { UATLogger.log("tooltip not yet open")}
+				val tooltipGraphic = tooltip.graphic ?: return (Unit).also { UATLogger.log("no graphic on tooltip")}
+				val sceneName = from(tooltipGraphic).lookup(".hyperlink").queryAll<Hyperlink>().firstOrNull()
+				  ?: return (Unit).also { UATLogger.log("no scene name link in tooltip graphic")}
+				interact {
+					clickOn(sceneName, MouseButton.PRIMARY)
+				}
+			}
+		}
+
+		fun previouslySetToolTipFor(character: Character): PreviouslySetToolTipDriver = object : PreviouslySetToolTipDriver
+		{
+			override val openTooltip = object : DependentProperty<Tooltip> {
+				override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf()
+
+				override fun get(double: SoyleStoriesTestDouble): Tooltip? {
+					return listedCharacter(character).previouslySetTip(double)?.tooltip
+				}
+
+				override fun check(double: SoyleStoriesTestDouble): Boolean = get(double)?.isShowing == true
+
+				override fun whenSet(double: SoyleStoriesTestDouble) {
+					interact {
+						listedCharacter(character).previouslySetTip(double)?.let {
+							clickOn(it, MouseButton.PRIMARY)
+						}
+					}
+				}
+			}
+			override val sceneName: ReadOnlyDependentProperty<String> = previouslySetToolTip.sceneName
+			override val motivation: ReadOnlyDependentProperty<String> = previouslySetToolTip.motivation
+			override fun whenSceneNameSelected(double: SoyleStoriesTestDouble) = previouslySetToolTip.whenSceneNameSelected(double)
+		}
+
+		private fun characterFields(double: SoyleStoriesTestDouble): Set<Field> {
+			val tool = openTool.get(double) ?: return setOf()
+			return from(tool.root).lookup(".included-character").queryAll<Field>()
+		}
+
+		fun listedCharacter(character: Character): ListedCharacterDriver = object : ListedCharacterDriver
+		{
+			fun field(double: SoyleStoriesTestDouble): Field?
+			{
+				return characterFields(double).find {
+					it.text == character.name
+				}
+			}
+			override fun previouslySetTip(double: SoyleStoriesTestDouble): Hyperlink?
+			{
+				return field(double)?.lookup(".previously-set-tip") as? Hyperlink
+			}
+
+			override val motivationText: ReadOnlyDependentProperty<String> = object : ReadOnlyDependentProperty<String> {
+				override fun get(double: SoyleStoriesTestDouble): String? {
+					return (field(double)?.lookup(".text-field") as? TextField)?.text ?: ""
+				}
+			}
+
+			override val isPreviouslySetTipVisible: Conditional = object : Conditional {
+				override fun check(double: SoyleStoriesTestDouble): Boolean {
+					return previouslySetTip(double)?.visibleProperty()?.get() ?: false
+				}
+			}
+			override val isResetButtonVisible: Conditional = object : Conditional {
+				override fun check(double: SoyleStoriesTestDouble): Boolean {
+					return (field(double)?.lookup(".reset-button") as? Hyperlink)?.visibleProperty()?.get() ?: false
+				}
+			}
+
+			override fun whenResetButtonSelected(double: SoyleStoriesTestDouble) {
+				(field(double)?.lookup(".reset-button") as? Hyperlink)?.let {
+					interact {
+						clickOn(it, MouseButton.PRIMARY)
+					}
+				}
+			}
+		}
+	}
+
+	interface ListedCharacterDriver {
+		val motivationText: ReadOnlyDependentProperty<String>
+		val isPreviouslySetTipVisible: Conditional
+		val isResetButtonVisible: Conditional
+		fun previouslySetTip(double: SoyleStoriesTestDouble): Hyperlink?
+		fun whenResetButtonSelected(double: SoyleStoriesTestDouble)
+	}
+
+	interface PreviouslySetToolTipDriver {
+		val openTooltip: DependentProperty<Tooltip>
+		val sceneName: ReadOnlyDependentProperty<String>
+		val motivation: ReadOnlyDependentProperty<String>
+		fun whenSceneNameSelected(double: SoyleStoriesTestDouble)
 	}
 
 	fun toolFor(scene: Scene) = ScopedDriver(scene)

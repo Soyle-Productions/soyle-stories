@@ -4,6 +4,7 @@ import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
 import com.soyle.stories.location.items.LocationItemViewModel
 
 class SceneDetailsViewModel(
+  val invalid: Boolean,
   val storyEventId: String?,
   val locationSectionLabel: String,
   val locationDropDownEmptyLabel: String,

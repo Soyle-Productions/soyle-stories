@@ -1,7 +1,7 @@
 package com.soyle.stories.project.layout
 
-import com.soyle.stories.layout.tools.ToolType
 import com.soyle.stories.layout.tools.FixedTool
+import com.soyle.stories.layout.tools.ToolType
 import kotlin.reflect.KClass
 
 /**
@@ -35,7 +35,7 @@ data class ToolGroupViewModel(val groupId: String, val focusedToolId: String?, v
 }
 
 data class StaticToolViewModel(val type: FixedTool, val isOpen: Boolean, val name: String)
-class ToolViewModel(val toolId: String, val type: ToolType, val name: String)
+data class ToolViewModel(val toolId: String, val type: ToolType, val name: String)
 
 sealed class Dialog {
     object CreateCharacter : Dialog()
