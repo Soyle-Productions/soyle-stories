@@ -175,7 +175,7 @@ Feature: Scene Details Tool
     Then the "scene 2" Scene Details "Character A" Character Motivation field should show "value 1"
     And the "scene 2" Scene Details "Character A" Character Motivation Reset button should not be visible
 
-  @rename-character @add-character-to-story-event @excluded
+  @rename-character @add-character-to-story-event
   Scenario: Scene Details Tool reacts to Character rename
     Given the following Scenes
       | characters  | scene 1 |
@@ -184,7 +184,7 @@ Feature: Scene Details Tool
     When the Character "Character A" is renamed to "Frank"
     Then the "scene 1" Scene Details "Character A" name should show "Frank"
 
-  @delete-character @remove-character-from-story-event @excluded
+  @delete-character @remove-character-from-story-event
   Scenario: Scene Details Tool reacts to Character deletion
     Given the following Scenes
       | characters  | scene 1 |

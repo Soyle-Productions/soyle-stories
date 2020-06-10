@@ -19,7 +19,6 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 	private var targetObject: Any? = null
 	private var createdScene: Scene? = null
 
-	private var characterIdFor: Map<String, Character.Id>? = null
 	private var sceneRamificationsSceneId: Scene.Id? = null
 
 	init {
@@ -94,7 +93,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 				CharacterDriver.givenANumberOfCharactersHaveBeenCreated(double, rows.size)
 				val characters = CharacterDriver.getCharactersCreated(double)
-				characterIdFor = rows.mapIndexed { index, list ->
+				CharacterDriver.registerIdentifiers(double, rows.mapIndexed { index, list ->
 					val character = characters[index]
 					list.drop(1).forEachIndexed { sceneIndex, motivation ->
 						when (motivation) {
@@ -107,7 +106,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 						}
 					}
 					list.first() to character.id
-				}.toMap()
+				})
 			}
 			Given("the Delete Scene Ramifications Tool has been opened for {string}") { focusScene: String ->
 				val sceneId = ScenesDriver.getSceneIdByIdentifier(double, focusScene)!!
@@ -143,7 +142,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				sceneId: String, characterId: String ->
 				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
 				SceneDetailsDriver.toolFor(scene)
-				  .previouslySetToolTipFor(CharacterDriver.getCharactersCreated(double).find { it.id == characterIdFor!!.getValue(characterId) }!!)
+				  .previouslySetToolTipFor(CharacterDriver.getCharacterByIdentifier(double, characterId)!!)
 				  .openTooltip
 				  .given(double)
 			}
@@ -227,9 +226,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				ScenesDriver.deletedScene(sceneId).whenSet(double)
 			}
 			When("{string} is removed from {string} in the Delete Scene Ramifications Tool for {string}") {
-				characterName: String, listedSceneName: String, focusSceneName: String ->
+				characterIdentifier: String, listedSceneName: String, focusSceneName: String ->
 
-				CharacterDriver.whenCharacterIsDeleted(double, characterIdFor!!.getValue(characterName))
+				CharacterDriver.whenCharacterIsDeleted(double, CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!)
 			}
 			When("{string} is removed from the Delete Scene Ramifications Tool for {string}") {
 				listedScene: String, focusScene: String ->
@@ -238,21 +237,21 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 
 				DeleteSceneRamificationsDriver.removeScene(focusSceneId, listedSceneId, double)
 			}
-			When("the Character Motivation for {string} is cleared in {string}") { character: String, scene: String ->
+			When("the Character Motivation for {string} is cleared in {string}") { characterIdentifier: String, scene: String ->
 				val sceneId = ScenesDriver.getSceneIdByIdentifier(double, scene)!!
-				val characterId = characterIdFor!!.getValue(character)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 
 				ScenesDriver.charactersMotivationIn(characterId, null, sceneId).whenSet(double)
 			}
-			When("the Character Motivation for {string} is set in {string}") { character: String, scene: String ->
+			When("the Character Motivation for {string} is set in {string}") { characterIdentifier: String, scene: String ->
 				val sceneId = ScenesDriver.getSceneIdByIdentifier(double, scene)!!
-				val characterId = characterIdFor!!.getValue(character)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 
 				ScenesDriver.charactersMotivationIn(characterId, "new value", sceneId).whenSet(double)
 			}
-			When("the Character Motivation for {string} is set in {string} as {string}") { character: String, scene: String, motive: String ->
+			When("the Character Motivation for {string} is set in {string} as {string}") { characterIdentifier: String, scene: String, motive: String ->
 				val sceneId = ScenesDriver.getSceneIdByIdentifier(double, scene)!!
-				val characterId = characterIdFor!!.getValue(character)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 
 				ScenesDriver.charactersMotivationIn(characterId, motive, sceneId).whenSet(double)
 			}
@@ -289,7 +288,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			When("the {string} Scene Details Character Motivation Previously Set tooltip is opened for {string}") {
 				sceneId: String, characterId: String ->
 				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
-				val character = characterIdFor!!.getValue(characterId).let { id -> CharacterDriver.getCharactersCreated(double).find { it.id == id } }!!
+				val character = CharacterDriver.getCharacterByIdentifier(double, characterId)!!
 				SceneDetailsDriver
 				  .toolFor(scene)
 				  .previouslySetToolTipFor(character)
@@ -307,7 +306,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			When("the {string} Scene Details {string} Character Motivation Reset button is selected") {
 				sceneId: String, characterId: String ->
 				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
-				val character = CharacterDriver.getCharactersCreated(double).find { it.id == characterIdFor!!.getValue(characterId) }!!
+				val character = CharacterDriver.getCharacterByIdentifier(double, characterId)!!
 				SceneDetailsDriver.toolFor(scene)
 				  .listedCharacter(character)
 				  .whenResetButtonSelected(double)
@@ -411,24 +410,26 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				val targetSceneId = ScenesDriver.getSceneIdByIdentifier(double, sceneName)!!
 				assertFalse(DeleteSceneRamificationsDriver.listedScene(focusSceneId, targetSceneId).check(double))
 			}
-			Then("{string} should be listed for {string} in the Delete Scene Ramifications Tool for {string}") { characterName: String, sceneName: String, focusScene: String ->
+			Then("{string} should be listed for {string} in the Delete Scene Ramifications Tool for {string}") {
+				characterIdentifier: String, sceneName: String, focusScene: String ->
 				val focusSceneId = ScenesDriver.getSceneIdByIdentifier(double, focusScene)!!
 				val targetSceneId = ScenesDriver.getSceneIdByIdentifier(double, sceneName)!!
-				val characterId = characterIdFor!!.getValue(characterName)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 				assertTrue(DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, targetSceneId, characterId).check(double))
 			}
-			Then("{string} should not be listed for {string} in the Delete Scene Ramifications Tool for {string}") { characterName: String, sceneName: String, focusScene: String ->
+			Then("{string} should not be listed for {string} in the Delete Scene Ramifications Tool for {string}") {
+				characterIdentifier: String, sceneName: String, focusScene: String ->
 				val focusSceneId = ScenesDriver.getSceneIdByIdentifier(double, focusScene)!!
 				val targetSceneId = ScenesDriver.getSceneIdByIdentifier(double, sceneName)!!
-				val characterId = characterIdFor!!.getValue(characterName)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 				val characterItem = DeleteSceneRamificationsDriver.listedCharacter(focusSceneId, targetSceneId, characterId).get(double)
 
 				assertNull(characterItem)
 			}
 			Then("the Current Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should show {string}") {
-				characterName: String, listedSceneName: String, focusSceneName: String, expectedValue: String ->
+				characterIdentifier: String, listedSceneName: String, focusSceneName: String, expectedValue: String ->
 
-				val characterId = characterIdFor!!.getValue(characterName)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 				val listedSceneId = ScenesDriver.getSceneIdByIdentifier(double, listedSceneName)!!
 				val focusSceneId = ScenesDriver.getSceneIdByIdentifier(double, focusSceneName)!!
 
@@ -439,9 +440,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				assertEquals(expectedValue, currentMotivation)
 			}
 			Then("the Current Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should be empty") {
-				characterName: String, listedSceneName: String, focusSceneName: String ->
+				characterIdentifier: String, listedSceneName: String, focusSceneName: String ->
 
-				val characterId = characterIdFor!!.getValue(characterName)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 				val listedSceneId = ScenesDriver.getSceneIdByIdentifier(double, listedSceneName)!!
 				val focusSceneId = ScenesDriver.getSceneIdByIdentifier(double, focusSceneName)!!
 
@@ -450,9 +451,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				assertTrue(currentMotivation!!.isEmpty())
 			}
 			Then("the Changed Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should show {string}") {
-				characterName: String, listedSceneName: String, focusSceneName: String, expectedValue: String ->
+				characterIdentifier: String, listedSceneName: String, focusSceneName: String, expectedValue: String ->
 
-				val characterId = characterIdFor!!.getValue(characterName)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 				val listedSceneId = ScenesDriver.getSceneIdByIdentifier(double, listedSceneName)!!
 				val focusSceneId = ScenesDriver.getSceneIdByIdentifier(double, focusSceneName)!!
 
@@ -461,9 +462,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				assertEquals(expectedValue, changedMotivation)
 			}
 			Then("the Changed Motivation field for {string} in {string} in the Delete Scene Ramifications Tool for {string} should be empty") {
-				characterName: String, listedSceneName: String, focusSceneName: String ->
+				characterIdentifier: String, listedSceneName: String, focusSceneName: String ->
 
-				val characterId = characterIdFor!!.getValue(characterName)
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
 				val listedSceneId = ScenesDriver.getSceneIdByIdentifier(double, listedSceneName)!!
 				val focusSceneId = ScenesDriver.getSceneIdByIdentifier(double, focusSceneName)!!
 
@@ -591,7 +592,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Then("the {string} Scene Details {string} Character Motivation field should show {string}") {
 				sceneId: String, characterId: String, expectedMotivation: String ->
 				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
-				val character = characterIdFor!!.getValue(characterId).let { id -> CharacterDriver.getCharactersCreated(double).find { it.id == id } }!!
+				val character = CharacterDriver.getCharacterByIdentifier(double, characterId)!!
 				val motivation = SceneDetailsDriver.toolFor(scene)
 				  .listedCharacter(character)
 				  .motivationText
@@ -601,7 +602,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Then("the {string} Scene Details {string} Character Motivation Previously Set tip should be visible") {
 				sceneId: String, characterId: String ->
 				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
-				val character = characterIdFor!!.getValue(characterId).let { id -> CharacterDriver.getCharactersCreated(double).find { it.id == id } }!!
+				val character = CharacterDriver.getCharacterByIdentifier(double, characterId)!!
 				SceneDetailsDriver.toolFor(scene)
 				  .listedCharacter(character)
 				  .isPreviouslySetTipVisible
@@ -611,7 +612,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Then("the {string} Scene Details {string} Character Motivation Reset button should be visible") {
 				sceneId: String, characterId: String ->
 				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
-				val character = characterIdFor!!.getValue(characterId).let { id -> CharacterDriver.getCharactersCreated(double).find { it.id == id } }!!
+				val character = CharacterDriver.getCharacterByIdentifier(double, characterId)!!
 				SceneDetailsDriver.toolFor(scene)
 				  .listedCharacter(character)
 				  .isResetButtonVisible
@@ -654,10 +655,29 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			Then("the {string} Scene Details {string} Character Motivation Reset button should not be visible")
 			{ sceneId: String, characterId: String ->
 				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
-				val character = characterIdFor!!.getValue(characterId).let { id -> CharacterDriver.getCharactersCreated(double).find { it.id == id } }!!
+				val character = CharacterDriver.getCharacterByIdentifier(double, characterId)!!
 				SceneDetailsDriver.toolFor(scene)
 				  .listedCharacter(character)
 				  .isResetButtonVisible
+				  .check(double)
+				  .let(::assertFalse)
+			}
+			Then("the {string} Scene Details {string} name should show {string}")
+			{ sceneId: String, characterId: String, expectedName: String ->
+				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
+				val character = CharacterDriver.getCharacterByIdentifier(double, characterId)!!
+				val characterName = SceneDetailsDriver.toolFor(scene)
+				  .listedCharacter(character)
+				  .characterName
+				  .get(double)
+				assertEquals(expectedName, characterName)
+			}
+			Then("the {string} Scene Details should not list {string} as an included character")
+			{ sceneId: String, characterId: String ->
+				val scene = ScenesDriver.getSceneByIdentifier(double, sceneId)!!
+				val character = CharacterDriver.getCharacterIdByIdentifier(double, characterId)!!
+				SceneDetailsDriver.toolFor(scene)
+				  .hasListedCharacter(character)
 				  .check(double)
 				  .let(::assertFalse)
 			}

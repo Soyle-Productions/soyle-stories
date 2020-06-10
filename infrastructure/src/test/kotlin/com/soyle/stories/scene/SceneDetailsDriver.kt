@@ -220,17 +220,33 @@ object SceneDetailsDriver {
 			return from(tool.root).lookup(".included-character").queryAll<Field>()
 		}
 
+		fun hasListedCharacter(character: Character.Id) = object : Conditional
+		{
+			override fun check(double: SoyleStoriesTestDouble): Boolean {
+				return characterFields(double).find {
+					it.id == character.uuid.toString()
+				} != null
+			}
+		}
+
 		fun listedCharacter(character: Character): ListedCharacterDriver = object : ListedCharacterDriver
 		{
 			fun field(double: SoyleStoriesTestDouble): Field?
 			{
 				return characterFields(double).find {
-					it.text == character.name
+					it.id == character.id.uuid.toString()
 				}
 			}
 			override fun previouslySetTip(double: SoyleStoriesTestDouble): Hyperlink?
 			{
 				return field(double)?.lookup(".previously-set-tip") as? Hyperlink
+			}
+
+			override val isListed: Conditional = object : Conditional
+			{
+				override fun check(double: SoyleStoriesTestDouble): Boolean {
+					return field(double) != null
+				}
 			}
 
 			override val motivationText: ReadOnlyDependentProperty<String> = object : ReadOnlyDependentProperty<String> {
@@ -257,13 +273,22 @@ object SceneDetailsDriver {
 					}
 				}
 			}
+
+			override val characterName: ReadOnlyDependentProperty<String> = object : ReadOnlyDependentProperty<String>
+			{
+				override fun get(double: SoyleStoriesTestDouble): String? {
+					return field(double)?.text
+				}
+			}
 		}
 	}
 
 	interface ListedCharacterDriver {
 		val motivationText: ReadOnlyDependentProperty<String>
+		val isListed: Conditional
 		val isPreviouslySetTipVisible: Conditional
 		val isResetButtonVisible: Conditional
+		val characterName: ReadOnlyDependentProperty<String>
 		fun previouslySetTip(double: SoyleStoriesTestDouble): Hyperlink?
 		fun whenResetButtonSelected(double: SoyleStoriesTestDouble)
 	}

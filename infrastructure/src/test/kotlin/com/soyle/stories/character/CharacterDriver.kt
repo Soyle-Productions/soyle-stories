@@ -2,6 +2,7 @@ package com.soyle.stories.character
 
 import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.character.CharacterDriver.interact
+import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.repositories.CharacterRepository
@@ -12,6 +13,7 @@ import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.project.ProjectSteps
+import com.soyle.stories.project.WorkBench
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
@@ -31,6 +33,30 @@ import tornadofx.selectFirst
 import java.util.*
 
 object CharacterDriver : ApplicationTest() {
+
+	fun registerIdentifiers(double: SoyleStoriesTestDouble, identifiers: List<Pair<String, Character.Id>>)
+	{
+		ProjectSteps.getProjectScope(double)?.get<WorkBench>()?.properties?.put("characterIdFor", identifiers.toMap())
+	}
+
+	fun getCharacterIdentifiers(double: SoyleStoriesTestDouble): Map<String, Character.Id>?
+	{
+		return ProjectSteps.getProjectScope(double)?.get<WorkBench>()?.properties?.get("characterIdFor") as? Map<String, Character.Id>
+	}
+
+	fun getCharacterIdByIdentifier(double: SoyleStoriesTestDouble, identifier: String): Character.Id?
+	{
+		return getCharacterIdentifiers(double)?.get(identifier)
+	}
+
+	fun getCharacterByIdentifier(double: SoyleStoriesTestDouble, identifier: String): Character?
+	{
+		val id = getCharacterIdByIdentifier(double, identifier) ?: return null
+		val repo = ProjectSteps.getProjectScope(double)?.get<CharacterRepository>() ?: return null
+		return runBlocking {
+			repo.getCharacterById(id)
+		}
+	}
 
 	fun setNumberOfCharactersCreated(double: SoyleStoriesTestDouble, atLeast: Int) {
 		ProjectSteps.givenProjectHasBeenOpened(double)
@@ -398,5 +424,12 @@ object CharacterDriver : ApplicationTest() {
 		override fun get(double: SoyleStoriesTestDouble): Character? {
 			return recentlyDeletedCharacters[double]?.lastOrNull()
 		}
+	}
+
+	fun whenCharacterIsRenamed(double: SoyleStoriesTestDouble, characterId: Character.Id, newName: String)
+	{
+		ProjectSteps.getProjectScope(double)!!
+		  .get<RenameCharacterController>()
+		  .renameCharacter(characterId.uuid.toString(), newName)
 	}
 }

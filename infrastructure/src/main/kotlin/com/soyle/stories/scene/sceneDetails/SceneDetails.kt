@@ -59,6 +59,7 @@ class SceneDetails : View("Scene") {
 					fitToParentWidth()
 					bindChildren(model.includedCharacters) {
 						field {
+							id = it.characterId
 							textProperty.bind(scope.projectScope.characterNameModel(it.characterId, it.characterName))
 							addClass("included-character")
 							fitToParentWidth()

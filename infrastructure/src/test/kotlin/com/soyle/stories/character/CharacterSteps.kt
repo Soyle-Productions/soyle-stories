@@ -52,6 +52,19 @@ class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 				CreateCharacterDialogDriver.givenNameInputHasValidCharacterName(double)
 			}
 
+			When("the Character {string} is renamed to {string}") {
+				characterIdentifier: String, newName: String ->
+
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
+				CharacterDriver.whenCharacterIsRenamed(double, characterId, newName)
+			}
+			When("the Character {string} is deleted") {
+				characterIdentifier: String ->
+
+				val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterIdentifier)!!
+				CharacterDriver.whenCharacterIsDeleted(double, characterId)
+			}
+
 		}
 	}
 

@@ -1,6 +1,8 @@
 package com.soyle.stories.di.characterarc
 
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
+import com.soyle.stories.character.renameCharacter.RenameCharacterController
+import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
@@ -189,7 +191,7 @@ object CharacterArcModule {
 		provide { ChangeThematicSectionValueController(applicationScope.get(), get(), get()) }
 		provide<LinkLocationToCharacterArcSectionController> { LinkLocationToCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
 		provide<UnlinkLocationFromCharacterArcSectionController> { UnlinkLocationFromCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
-
+		provide<RenameCharacterController> { RenameCharacterControllerImpl(applicationScope.get(), get(), get()) }
 	}
 
 

@@ -33,7 +33,7 @@ class SceneDetailsPresenter(
   IncludeCharacterInScene.OutputPort,
   LinkLocationToScene.OutputPort,
   RemoveCharacterFromScene.OutputPort,
-SetMotivationForCharacterInScene.OutputPort {
+  SetMotivationForCharacterInScene.OutputPort {
 
 	private val sceneId = UUID.fromString(sceneId)
 
@@ -89,8 +89,19 @@ SetMotivationForCharacterInScene.OutputPort {
 			val characterViewModels = characters.map {
 				CharacterItemViewModel(it.characterId.toString(), it.characterName)
 			}
+			val characterNames = characterViewModels.associate { it.characterId to it.characterName }
 			copyOrDefault(
 			  characters = characterViewModels,
+			  includedCharacters = (this?.includedCharacters ?: listOf()).mapNotNull {
+				  if (it.characterId !in characterNames) return@mapNotNull null
+				  SceneDetailsCharacterViewModel(
+					it.characterId,
+					characterNames.getValue(it.characterId),
+					it.motivation,
+					it.previousMotivationSource,
+					it.canReset
+				  )
+			  },
 			  availableCharacters = characterViewModels.filter {
 				  it.characterId !in includedCharacterIds
 			  }
