@@ -2,6 +2,7 @@ package com.soyle.stories.scene.usecases.reorderScene
 
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.SceneDoesNotExist
+import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
 
@@ -12,7 +13,9 @@ class ReorderSceneUseCase(
 	override suspend fun invoke(request: ReorderScene.RequestModel, output: ReorderScene.OutputPort) {
 		val response = try {
 			execute(request)
-		} catch (e: Exception) {
+		} catch (e: SceneException) {
+			return output.failedToReorderScene(e)
+		} catch (e: IndexOutOfBoundsException) {
 			return output.failedToReorderScene(e)
 		}
 		output.sceneReordered(response)
@@ -23,7 +26,7 @@ class ReorderSceneUseCase(
 		val currentIndex = getSceneIndex(scene, orderedSceneIds)
 		val newIndex = sanitizeIndex(request.newIndex, currentIndex, orderedSceneIds)
 		val newOrder = updateSceneOrderIfNeeded(newIndex, currentIndex, orderedSceneIds, scene)
-		return createResponse(scene, newIndex, currentIndex, getScenesWithChangedIndices(orderedSceneIds, newOrder))
+		return createResponse(scene, currentIndex, getScenesWithChangedIndices(orderedSceneIds, newOrder))
 	}
 
 	private suspend fun getScenes(request: ReorderScene.RequestModel): Pair<Scene, List<Scene.Id>>
@@ -46,7 +49,10 @@ class ReorderSceneUseCase(
 	{
 		if (index < 0) throw IndexOutOfBoundsException(index)
 		if (index > orderedSceneIds.size) throw IndexOutOfBoundsException(index)
-		return if (index == currentIndex + 1) currentIndex else index
+		return when (index) {
+			currentIndex + 1 -> currentIndex
+			else -> index
+		}
 	}
 
 	private suspend fun updateSceneOrderIfNeeded(sanitizedIndex: Int, currentIndex: Int, orderedSceneIds: List<Scene.Id>, scene: Scene): List<Scene.Id> {
@@ -58,9 +64,9 @@ class ReorderSceneUseCase(
 	private suspend fun updateSceneOrder(orderedSceneIds: List<Scene.Id>, sanitizedIndex: Int, scene: Scene): List<Scene.Id> {
 		val update = orderedSceneIds.toMutableList().let {
 			it.add(sanitizedIndex, scene.id)
-			it.withIndex().filter { (index, id) ->
+			it.asSequence().withIndex().filter { (index, id) ->
 				id != scene.id || index == sanitizedIndex
-			}.map { it.value }
+			}.map { it.value }.toList()
 		}
 		sceneRepository.updateSceneOrder(scene.projectId, update)
 		return update
@@ -73,14 +79,14 @@ class ReorderSceneUseCase(
 		  .filter { it.index != originalIndex.getValue(it.value) }
 	}
 
-	private suspend fun createResponse(scene: Scene, newIndex: Int, oldIndex: Int, updatedIds: List<IndexedValue<Scene.Id>>): ReorderScene.ResponseModel {
+	private suspend fun createResponse(scene: Scene, oldIndex: Int, updatedIds: List<IndexedValue<Scene.Id>>): ReorderScene.ResponseModel {
+		val items = updatedIds.associate {
+			it.value to SceneItem(it.value.uuid, sceneRepository.getSceneById(it.value)!!.name, it.index)
+		}
 		return ReorderScene.ResponseModel(
-		  SceneItem(scene.id.uuid, scene.name, newIndex),
+		  items[scene.id] ?: SceneItem(scene.id.uuid, scene.name, oldIndex),
 		  oldIndex,
-		  updatedIds.mapNotNull {
-			  if (it.value == scene.id) return@mapNotNull null
-			  SceneItem(it.value.uuid, sceneRepository.getSceneById(it.value)!!.name, it.index)
-		  })
+		  items.values.filterNot { it.id == scene.id.uuid })
 	}
 
 	private suspend fun getScene(request: ReorderScene.RequestModel) =

@@ -64,7 +64,7 @@ class ReorderSceneUnitTest {
 	fun `scene at different index`() {
 		`given scene exists`(existingSceneCount = 5, atIndex = 1)
 		`when scene is reordered`(3)
-		result shouldBe responseModel(initialIndex= 1, newIndex= 3, updates =
+		result shouldBe responseModel(initialIndex= 1, newIndex= 2, updates =
 		    listOf(otherSceneIds[2] to 1)
 		)
 		assertEquals(
@@ -82,6 +82,19 @@ class ReorderSceneUnitTest {
 		)
 		assertEquals(
 		  listOf(sceneId, otherSceneIds[0], otherSceneIds[1], otherSceneIds[2], otherSceneIds[4]),
+		  savedSceneIds
+		)
+	}
+
+	@Test
+	fun `move to end`() {
+		`given scene exists`(existingSceneCount = 4, atIndex = 1)
+		`when scene is reordered`(4)
+		result shouldBe responseModel(initialIndex= 1, newIndex= 3, updates =
+		listOf(otherSceneIds[2] to 1, otherSceneIds[3] to 2)
+		)
+		assertEquals(
+		  listOf(otherSceneIds[0], otherSceneIds[2], otherSceneIds[3], sceneId),
 		  savedSceneIds
 		)
 	}
