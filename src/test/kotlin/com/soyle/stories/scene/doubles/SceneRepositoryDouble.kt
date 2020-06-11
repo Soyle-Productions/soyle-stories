@@ -9,6 +9,7 @@ class SceneRepositoryDouble(
   initialScenes: List<Scene> = emptyList(),
 
   private val onAddNewScene: (Scene) -> Unit = {},
+  private val onUpdateSceneOrder: (Project.Id, List<Scene.Id>) -> Unit = { _, _ -> },
   private val onUpdateScene: (Scene) -> Unit = {},
   private val onRemoveScene: (Scene) -> Unit = {}
 ) : SceneRepository {
@@ -43,6 +44,7 @@ class SceneRepositoryDouble(
 	}
 
 	override suspend fun updateSceneOrder(projectId: Project.Id, order: List<Scene.Id>) {
+		onUpdateSceneOrder.invoke(projectId, order)
 		sceneOrder[projectId] = order
 	}
 
