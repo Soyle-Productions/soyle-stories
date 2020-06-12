@@ -11,7 +11,7 @@ Feature: Confirm Delete Scene Dialog
 	 Then the Confirm Delete Scene Dialog should be closed
 	  And the Scene should not be deleted
 	
-	@delete-scene @excluded
+	@delete-scene
 	Scenario Outline: Toggle show dialog
 	 When the Confirm Delete Scene Dialog do not show again check-box is checked
 	  And the Confirm Delete Scene Dialog <button> button is selected
@@ -20,7 +20,7 @@ Feature: Confirm Delete Scene Dialog
 	Examples: 
 	| button |
 	| "Delete" |
-	| "Show Ramifications" |
+	@excluded | "Show Ramifications" |
 	
 	@delete-scene
 	Scenario: Delete without showing ramifications

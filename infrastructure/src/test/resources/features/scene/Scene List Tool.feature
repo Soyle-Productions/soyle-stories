@@ -147,7 +147,7 @@ Feature: Scene List Tool
 	 When a Scene is dragged to a new position in the Scene List Tool
 	 Then the Confirm Reorder Scene Dialog should be shown
 	
-  @reorder-scene @excluded
+  @reorder-scene
   Scenario: Reorder Scene without confirmation
     Given the Scene List Tool has been opened
 	  And 3 Scenes have been created

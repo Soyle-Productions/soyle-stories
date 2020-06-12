@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.reorderSceneDialog
 
+import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
 import javafx.scene.Parent
 import javafx.scene.control.Alert
@@ -7,9 +8,7 @@ import javafx.scene.control.ButtonBar
 import javafx.scene.control.ButtonType
 import javafx.stage.Modality
 import javafx.stage.StageStyle
-import tornadofx.Fragment
-import tornadofx.onChange
-import tornadofx.onChangeOnce
+import tornadofx.*
 import kotlin.properties.Delegates
 
 class ReorderSceneDialog : Fragment() {
@@ -24,7 +23,13 @@ class ReorderSceneDialog : Fragment() {
 
 	override val root: Parent = alert.dialogPane.apply {
 		headerTextProperty().bind(model.header)
-		contentTextProperty().bind(model.content)
+		content = vbox {
+			label(model.content)
+			checkbox {
+				textProperty().bind(model.showAgainLabel)
+				selectedProperty().bindBidirectional(model.showAgain)
+			}
+		}
 		model.itemProperty.onChange { viewModel ->
 			if (viewModel == null) {
 				buttonTypes.clear()
@@ -40,16 +45,20 @@ class ReorderSceneDialog : Fragment() {
 
 	init {
 		titleProperty.bind(model.title)
-		model.itemProperty.onChangeOnce {
-			openModal(StageStyle.DECORATED, Modality.APPLICATION_MODAL)
-		}
 		alert.resultProperty().onChangeOnce {
 			when (it?.buttonData) {
-				ButtonBar.ButtonData.FINISH -> viewListener.reorderScene(sceneId, index, true)
-				ButtonBar.ButtonData.CANCEL_CLOSE -> {}
+				ButtonBar.ButtonData.FINISH -> viewListener.reorderScene(sceneId, index, ! model.showAgain.value)
+				ButtonBar.ButtonData.YES -> {}
 				else -> {}
 			}
 			close()
+		}
+		model.itemProperty.onChangeUntil({ it?.doDefaultAction != null }) {
+			if (it?.doDefaultAction == false) {
+				openModal(StageStyle.DECORATED, Modality.APPLICATION_MODAL)
+			} else if (it?.doDefaultAction == true) {
+				alert.result = ButtonType("", ButtonBar.ButtonData.FINISH)
+			}
 		}
 	}
 

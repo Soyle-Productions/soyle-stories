@@ -18,6 +18,7 @@ import com.soyle.stories.scene.SceneSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.CreateStoryEventDialogDriver
 import com.soyle.stories.storyevent.StoryEventSteps
+import com.soyle.stories.writer.WriterSteps
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
 import javafx.scene.input.KeyCode
@@ -44,6 +45,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 		CharacterSteps(this, double)
 		StoryEventSteps(this, double)
 		SceneSteps(this, double)
+		WriterSteps(this, double)
 		/*
 		LocationSteps(this, double)
 		ProjectSteps(this, double)

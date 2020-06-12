@@ -237,9 +237,12 @@ object SceneModule {
 			}
 			provide<ReorderSceneDialogViewListener> {
 				ReorderSceneDialogController(
+				  applicationScope.get(),
 				  ReorderSceneDialogPresenter(
 					get<ReorderSceneDialogModel>()
 				  ),
+				  get(),
+				  get(),
 				  get()
 				)
 			}

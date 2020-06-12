@@ -7,6 +7,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.scene.DeleteSceneDialogDriver.interact
+import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialog
 import com.soyle.stories.scene.deleteSceneDialog.deleteSceneDialog
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.repositories.SceneRepository
@@ -19,6 +20,7 @@ import javafx.scene.control.DialogPane
 import javafx.stage.Window
 import kotlinx.coroutines.runBlocking
 import org.testfx.framework.junit5.ApplicationTest
+import tornadofx.uiComponent
 
 object DeleteSceneDialogDriver : ApplicationTest() {
 
@@ -45,10 +47,8 @@ object DeleteSceneDialogDriver : ApplicationTest() {
 
 		override fun get(double: SoyleStoriesTestDouble): Window? {
 			ProjectSteps.getProjectScope(double) ?: return null
-			return listTargetWindows().find {
-				val styleClass = it.scene?.root?.styleClass ?: return@find false
-
-				styleClass.contains("deleteScene")
+			return listWindows().find {
+				it.scene.root.uiComponent<DeleteSceneDialog>() != null
 			}?.takeIf { it.isShowing }
 		}
 

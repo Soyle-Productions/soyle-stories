@@ -332,6 +332,7 @@ object SceneListDriver : ApplicationTest() {
 	fun whenASceneIsDragged(double: SoyleStoriesTestDouble)
 	{
 		val list = getTreeViewIfVisible(double) ?: error("scene list is not open")
+		ReorderSceneDialogSteps.setReorderRequest(double, ScenesDriver.getCreatedScenes(double).first() to 2)
 		interact {
 			val screenBounds = list.localToScreen(list.boundsInLocal)
 			moveTo(screenBounds.minX + 6, screenBounds.minY + 6)

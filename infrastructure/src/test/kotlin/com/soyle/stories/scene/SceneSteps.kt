@@ -9,6 +9,7 @@ import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import javafx.event.ActionEvent
 import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
@@ -22,6 +23,9 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 	private var sceneRamificationsSceneId: Scene.Id? = null
 
 	init {
+
+		ReorderSceneDialogSteps(en, double)
+
 		with(en) {
 
 			Given("the Create Scene Dialog has been opened") {
@@ -200,15 +204,15 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				if (button == "Show Ramifications") {
 					sceneRamificationsSceneId = (targetObject as Scene).id
 				}
-				val button = DeleteSceneDialogDriver.button(button).get(double)!!
+				val btn = DeleteSceneDialogDriver.button(button).get(double)!!
 				interact {
-					clickOn(button, MouseButton.PRIMARY)
+					btn.fireEvent(ActionEvent())
 				}
 			}
 			When("the Confirm Delete Scene Dialog do not show again check-box is checked") {
 				val checkBox = DeleteSceneDialogDriver.doNotShowCheckbox.get(double)!!
 				interact {
-					clickOn(checkBox, MouseButton.PRIMARY)
+					checkBox.fire()
 				}
 			}
 			When("the Delete Scene Ramifications Tool is opened") {
@@ -394,7 +398,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				assertEquals(1, createdIndex)
 			}
 			Then("the Confirm Delete Scene Dialog should be closed") {
-				assertFalse(DeleteSceneDialogDriver.openDialog.check(double))
+				assertFalse(DeleteSceneDialogDriver.openWindow.check(double))
 			}
 			Then("the Scene should not be deleted") {
 				ScenesDriver.getCreatedScenes(double).find {
@@ -403,9 +407,8 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			}
 			Then("the Confirm Delete Scene Dialog should not open the next time a Scene is deleted") {
 				SceneListDriver.givenASceneHasBeenSelected(double)
-				SceneListDriver.givenRightClickMenuHasBeenOpened(double)
-				SceneListDriver.whenRightClickOptionIsClicked(double, "Delete")
-				assertFalse(DeleteSceneDialogDriver.openDialog.check(double))
+				SceneListDriver.whenBottomButtonIsClicked(double, "delete")
+				assertFalse(DeleteSceneDialogDriver.openWindow.check(double))
 			}
 			Then("the Scene should be deleted") {
 				assertNull(ScenesDriver.getCreatedScenes(double).find {
@@ -694,10 +697,6 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				  .check(double)
 				  .let(::assertFalse)
 			}
-			Then("the Confirm Reorder Scene Dialog should be shown") {
-				ReorderSceneDialogDriver.isDialogOpen(double)
-				  .let(::assertTrue)
-			}
 			Then("the Scene should be in its new position") {
 				val firstScene = targetObject as Scene
 				val listedIndex = SceneListDriver.indexOfItemWithId(double, firstScene.id)
@@ -709,7 +708,18 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 					assertEquals(it.index, it.value.value!!.index)
 				}
 			}
-
+			Then("the Scene should not be reordered") {
+				val request = ReorderSceneDialogSteps.reorderRequest(double)!!
+				val index = ScenesDriver.getCreatedScenes(double).indexOfFirst { it.id == request.first.id }
+				assertNotEquals(request.second, index)
+			}
+			Then("the Scene should be reordered") {
+				val request = ReorderSceneDialogSteps.reorderRequest(double)!!
+				val index = ScenesDriver.getCreatedScenes(double).indexOfFirst { it.id == request.first.id }
+				assertTrue(
+				  index == request.second || index == request.second -1
+				)
+			}
 		}
 	}
 
