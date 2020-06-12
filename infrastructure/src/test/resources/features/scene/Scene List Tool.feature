@@ -140,7 +140,7 @@ Feature: Scene List Tool
     Then the Scene rename input box should be replaced by the Scene name
     And the Scene name should be the original name
 	
-  @reorder-scene @excluded
+  @reorder-scene
   Scenario: Drag Scene to reorder
     Given the Scene List Tool has been opened
 	  And 3 Scenes have been created
@@ -155,7 +155,7 @@ Feature: Scene List Tool
 	 When a Scene is dragged to a new position in the Scene List Tool
 	 Then the Scene should be reordered
 	 
-  @reorder-scene @excluded
+  @reorder-scene
   Scenario: Update when reordered
 	Given the Scene List Tool has been opened
 	  And 3 Scenes have been created

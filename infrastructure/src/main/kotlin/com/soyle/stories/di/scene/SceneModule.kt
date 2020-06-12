@@ -29,6 +29,13 @@ import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
+import com.soyle.stories.scene.reorderScene.ReorderSceneController
+import com.soyle.stories.scene.reorderScene.ReorderSceneControllerImpl
+import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
+import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogController
+import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogModel
+import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogPresenter
+import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogViewListener
 import com.soyle.stories.scene.sceneDetails.*
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
@@ -51,6 +58,8 @@ import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacter
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
 import com.soyle.stories.scene.usecases.renameScene.RenameSceneUseCase
+import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
+import com.soyle.stories.scene.usecases.reorderScene.ReorderSceneUseCase
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
@@ -109,6 +118,9 @@ object SceneModule {
 			provide<RemoveCharacterFromScene> {
 				RemoveCharacterFromSceneUseCase(get())
 			}
+			provide<ReorderScene> {
+				ReorderSceneUseCase(get())
+			}
 
 			provide(CreateNewScene.OutputPort::class) {
 				CreateNewSceneNotifier(get<CreateStoryEventNotifier>())
@@ -130,6 +142,9 @@ object SceneModule {
 			}
 			provide(RemoveCharacterFromScene.OutputPort::class) {
 				RemoveCharacterFromSceneNotifier()
+			}
+			provide(ReorderScene.OutputPort::class) {
+				ReorderSceneNotifier()
 			}
 
 			provide<CreateNewSceneController> {
@@ -188,6 +203,14 @@ object SceneModule {
 				  get()
 				)
 			}
+			provide<ReorderSceneController> {
+				ReorderSceneControllerImpl(
+				  applicationScope.get(),
+				  applicationScope.get(),
+				  get(),
+				  get()
+				)
+			}
 
 			provide<CreateNewSceneDialogViewListener> {
 				CreateNewSceneDialogController(
@@ -210,6 +233,13 @@ object SceneModule {
 				  get(),
 				  presenter,
 				  get()
+				)
+			}
+			provide<ReorderSceneDialogViewListener> {
+				ReorderSceneDialogController(
+				  ReorderSceneDialogPresenter(
+					get<ReorderSceneDialogModel>()
+				  )
 				)
 			}
 

@@ -3,6 +3,7 @@ package com.soyle.stories.scene.sceneList
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.scene.renameScene.RenameSceneController
+import com.soyle.stories.scene.reorderScene.ReorderSceneController
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 
 class SceneListController(
@@ -10,7 +11,8 @@ class SceneListController(
   private val listAllScenes: ListAllScenes,
   private val listAllScenesOutputPort: ListAllScenes.OutputPort,
   private val renameSceneController: RenameSceneController,
-  private val openToolController: OpenToolController
+  private val openToolController: OpenToolController,
+  private val reorderSceneController: ReorderSceneController
 ) : SceneListViewListener {
 	override fun getValidState() {
 		threadTransformer.async {
@@ -24,5 +26,9 @@ class SceneListController(
 
 	override fun renameScene(sceneId: String, newName: String) {
 		renameSceneController.renameScene(sceneId, newName)
+	}
+
+	override fun reorderScene(sceneId: String, newIndex: Int) {
+		reorderSceneController.reorderScene(sceneId, newIndex)
 	}
 }

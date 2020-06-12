@@ -2,18 +2,23 @@ package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.common.components.emptyListDisplay
 import com.soyle.stories.common.makeEditable
+import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.scene.deleteSceneDialog.deleteSceneDialog
 import com.soyle.stories.scene.items.SceneItemViewModel
+import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialog
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
+import javafx.scene.effect.BlurType
+import javafx.scene.effect.InnerShadow
 import javafx.scene.layout.Priority
+import javafx.scene.paint.Color
 import tornadofx.*
 
 class SceneList : View() {
@@ -63,9 +68,12 @@ class SceneList : View() {
 					}
 				}
 				cellFormat {
+					setOnSceneDragged { sceneId, name, newIndex ->
+						scope.get<ReorderSceneDialog>().show(sceneId, name, newIndex)
+					}
 					when (it) {
 						is SceneItemViewModel -> {
-							graphic = label("${(it.index+1)}.")
+							graphic = label("${it.index + 1}.")
 							text = it.name
 						}
 						else -> throw IllegalArgumentException("Invalid value type")
@@ -142,9 +150,28 @@ class SceneList : View() {
 	}
 
 	init {
+		Styles
 		titleProperty.bind(model.toolTitle)
 
 		viewListener.getValidState()
 	}
 
+}
+
+class Styles : Stylesheet() {
+	companion object {
+		val draggingCell by cssclass()
+
+		init {
+			importStylesheet(Styles::class)
+		}
+	}
+
+	init {
+		draggingCell {
+			backgroundColor += Color.GREY
+			textFill = Color.GREY
+			effect = InnerShadow(BlurType.THREE_PASS_BOX, Color.BLACK, 2.0, 0.0, 0.0, 1.0)
+		}
+	}
 }

@@ -13,6 +13,7 @@ import com.soyle.stories.scene.ScenesDriver.interact
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.reorderScene.ReorderSceneController
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
@@ -238,5 +239,10 @@ object ScenesDriver : ApplicationTest() {
 			  .get<RemoveCharacterFromStoryEventController>()
 			  .removeCharacter(scene.storyEventId.uuid.toString(), characterId.uuid.toString())
 		}
+	}
+
+	fun reorderScene(double: SoyleStoriesTestDouble, scene: Scene, index: Int) {
+		ProjectSteps.getProjectScope(double)!!
+		  .get<ReorderSceneController>().reorderScene(scene.id.uuid.toString(), index)
 	}
 }

@@ -6,7 +6,6 @@ import com.soyle.stories.common.async
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Scene
-import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.scene.SceneListDriver.interact
@@ -327,6 +326,18 @@ object SceneListDriver : ApplicationTest() {
 		val list = getIfOpen(double) ?: error("scene list is not open")
 		interact {
 			clickOn(from(list.root).lookup("#actionBar_$buttonId").queryButton(), MouseButton.PRIMARY)
+		}
+	}
+
+	fun whenASceneIsDragged(double: SoyleStoriesTestDouble)
+	{
+		val list = getTreeViewIfVisible(double) ?: error("scene list is not open")
+		interact {
+			val screenBounds = list.localToScreen(list.boundsInLocal)
+			moveTo(screenBounds.minX + 6, screenBounds.minY + 6)
+			  .press(MouseButton.PRIMARY)
+			  .drag(screenBounds.minX + 6, screenBounds.minY + 60, MouseButton.PRIMARY)
+			  .release(MouseButton.PRIMARY)
 		}
 	}
 

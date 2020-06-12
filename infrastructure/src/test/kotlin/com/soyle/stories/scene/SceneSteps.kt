@@ -311,6 +311,19 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				  .listedCharacter(character)
 				  .whenResetButtonSelected(double)
 			}
+			When("a Scene is dragged to a new position in the Scene List Tool") {
+				SceneListDriver.whenASceneIsDragged(double)
+			}
+			When("a Scene is reordered") {
+				val scenes = ScenesDriver.getCreatedScenes(double)
+				targetObject = scenes.first()
+				ScenesDriver
+				  .reorderScene(
+					double,
+					scenes.first(),
+					scenes.size
+				  )
+			}
 
 
 			Then("an error message should be displayed in the Create Scene Dialog") {
@@ -681,6 +694,22 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				  .check(double)
 				  .let(::assertFalse)
 			}
+			Then("the Confirm Reorder Scene Dialog should be shown") {
+				ReorderSceneDialogDriver.isDialogOpen(double)
+				  .let(::assertTrue)
+			}
+			Then("the Scene should be in its new position") {
+				val firstScene = targetObject as Scene
+				val listedIndex = SceneListDriver.indexOfItemWithId(double, firstScene.id)
+				assertEquals(2, listedIndex)
+			}
+			Then("all Scenes in the Scene List Tool should be numbered to match the list order") {
+				val items = SceneListDriver.getItems(double)
+				items.withIndex().forEach {
+					assertEquals(it.index, it.value.value!!.index)
+				}
+			}
+
 		}
 	}
 
