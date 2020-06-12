@@ -239,7 +239,8 @@ object SceneModule {
 				ReorderSceneDialogController(
 				  ReorderSceneDialogPresenter(
 					get<ReorderSceneDialogModel>()
-				  )
+				  ),
+				  get()
 				)
 			}
 
@@ -279,7 +280,8 @@ object SceneModule {
 					projectScope.get<IncludeCharacterInSceneNotifier>(),
 					projectScope.get<LinkLocationToSceneNotifier>(),
 					projectScope.get<RemoveCharacterFromSceneNotifier>(),
-					projectScope.get<SetMotivationForCharacterInSceneNotifier>()
+					projectScope.get<SetMotivationForCharacterInSceneNotifier>(),
+					projectScope.get<ReorderSceneNotifier>()
 				  ),
 				  projectScope.get(),
 				  projectScope.get(),

@@ -15,6 +15,7 @@ import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
 import com.soyle.stories.scene.usecases.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import java.util.*
 
@@ -26,14 +27,16 @@ class SceneDetailsPresenter(
   characterIncludedInScene: Notifier<IncludeCharacterInScene.OutputPort>,
   locationLinkedToScene: Notifier<LinkLocationToScene.OutputPort>,
   characterRemovedFromScene: Notifier<RemoveCharacterFromScene.OutputPort>,
-  characterMotivationSet: Notifier<SetMotivationForCharacterInScene.OutputPort>
+  characterMotivationSet: Notifier<SetMotivationForCharacterInScene.OutputPort>,
+  sceneReordered: Notifier<ReorderScene.OutputPort>
 ) : GetSceneDetails.OutputPort,
   CharacterListListener,
   LocationListListener,
   IncludeCharacterInScene.OutputPort,
   LinkLocationToScene.OutputPort,
   RemoveCharacterFromScene.OutputPort,
-  SetMotivationForCharacterInScene.OutputPort {
+  SetMotivationForCharacterInScene.OutputPort,
+	ReorderScene.OutputPort {
 
 	private val sceneId = UUID.fromString(sceneId)
 
@@ -44,6 +47,7 @@ class SceneDetailsPresenter(
 		this listensTo locationLinkedToScene
 		this listensTo characterRemovedFromScene
 		this listensTo characterMotivationSet
+		this listensTo sceneReordered
 	}
 
 	override fun sceneDetailsRetrieved(response: GetSceneDetails.ResponseModel) {
@@ -209,6 +213,12 @@ class SceneDetailsPresenter(
 		}
 	}
 
+	override fun sceneReordered(response: ReorderScene.ResponseModel) {
+		view.updateOrInvalidated {
+			copyOrDefault(invalid = true)
+		}
+	}
+
 	private fun SceneDetailsViewModel?.copyOrDefault(
 	  invalid: Boolean = this?.invalid ?: true,
 	  storyEventId: String? = this?.storyEventId,
@@ -256,5 +266,7 @@ class SceneDetailsPresenter(
 	override fun failedToSetMotivationForCharacterInScene(failure: Exception) {
 		println(failure)
 	}
+
+	override fun failedToReorderScene(failure: Exception) {}
 
 }

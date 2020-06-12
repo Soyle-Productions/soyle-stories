@@ -10,11 +10,15 @@ import javafx.stage.StageStyle
 import tornadofx.Fragment
 import tornadofx.onChange
 import tornadofx.onChangeOnce
+import kotlin.properties.Delegates
 
 class ReorderSceneDialog : Fragment() {
 
 	val viewListener = resolve<ReorderSceneDialogViewListener>()
 	val model = resolve<ReorderSceneDialogModel>()
+
+	private lateinit var sceneId: String
+	private var index by Delegates.notNull<Int>()
 
 	private val alert = Alert(Alert.AlertType.CONFIRMATION)
 
@@ -41,7 +45,7 @@ class ReorderSceneDialog : Fragment() {
 		}
 		alert.resultProperty().onChangeOnce {
 			when (it?.buttonData) {
-				ButtonBar.ButtonData.FINISH -> {}
+				ButtonBar.ButtonData.FINISH -> viewListener.reorderScene(sceneId, index, true)
 				ButtonBar.ButtonData.CANCEL_CLOSE -> {}
 				else -> {}
 			}
@@ -51,6 +55,8 @@ class ReorderSceneDialog : Fragment() {
 
 	fun show(sceneId: String, sceneName: String, index: Int)
 	{
+		this.sceneId = sceneId
+		this.index = index
 		viewListener.getValidState(sceneId, sceneName, index)
 	}
 
