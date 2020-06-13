@@ -12,7 +12,7 @@ class ReorderSceneDialogModel : Model<ProjectScope, ReorderSceneDialogViewModel>
 	val reorderButtonLabel = bind(ReorderSceneDialogViewModel::reorderButtonLabel)
 	val cancelButtonLabel = bind(ReorderSceneDialogViewModel::cancelButtonLabel)
 	val showAgainLabel = bind(ReorderSceneDialogViewModel::showAgainLabel)
-	val showAgain = bind(ReorderSceneDialogViewModel::doDefaultAction)
+	val showAgain = bind(ReorderSceneDialogViewModel::showAgain)
 	val errorMessage = bind(ReorderSceneDialogViewModel::errorMessage)
 
 	override val applicationScope: ApplicationScope

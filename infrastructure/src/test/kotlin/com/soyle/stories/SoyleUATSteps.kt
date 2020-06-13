@@ -46,9 +46,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 		StoryEventSteps(this, double)
 		SceneSteps(this, double)
 		WriterSteps(this, double)
+		ProjectSteps(this, double)
 		/*
 		LocationSteps(this, double)
-		ProjectSteps(this, double)
 		ApplicationSteps(this, double)
 		 */
 

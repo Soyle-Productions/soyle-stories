@@ -1,3 +1,4 @@
+@project
 Feature: File New Menu
 
   Background:

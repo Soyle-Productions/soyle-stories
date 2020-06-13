@@ -135,7 +135,7 @@ object ScenesDriver : ApplicationTest() {
 
 	fun deletedScene(sceneId: Scene.Id) = object : DependentProperty<Nothing> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps::givenProjectHasBeenOpened
+		  ProjectSteps.Driver::givenProjectHasBeenOpened
 		)
 
 		override fun get(double: SoyleStoriesTestDouble): Nothing? = null
@@ -151,7 +151,7 @@ object ScenesDriver : ApplicationTest() {
 
 	fun characterIncludedIn(characterId: Character.Id, sceneId: Scene.Id) = object : DependentProperty<Nothing> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps::givenProjectHasBeenOpened
+		  ProjectSteps.Driver::givenProjectHasBeenOpened
 		)
 
 		override fun get(double: SoyleStoriesTestDouble): Nothing? = null

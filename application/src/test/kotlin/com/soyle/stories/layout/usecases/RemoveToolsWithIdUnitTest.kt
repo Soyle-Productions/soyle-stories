@@ -6,10 +6,8 @@ import com.soyle.stories.layout.assertResponseModel
 import com.soyle.stories.layout.doubles.LayoutRepositoryDouble
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
-import com.soyle.stories.layout.tools.dynamic.BaseStoryStructure
-import com.soyle.stories.layout.tools.dynamic.CharacterComparison
+import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.layout.tools.DynamicTool
-import com.soyle.stories.layout.tools.dynamic.StoryEventDetails
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.removeToolsWithId.RemoveToolsWithId
 import com.soyle.stories.layout.usecases.removeToolsWithId.RemoveToolsWithIdUseCase
@@ -74,11 +72,12 @@ class RemoveToolsWithIdUnitTest {
 
 	private fun givenDynamicToolsExistInLayoutWithId(isOpen: Boolean)
 	{
-		dynamicTools = listOf(
-		  BaseStoryStructure(id, UUID.randomUUID()),
-		  StoryEventDetails(id),
-		  CharacterComparison(id, UUID.randomUUID())
-		)
+		dynamicTools = List(3) {
+			object : DynamicTool() {
+				override fun identifiedWithId(id: UUID): Boolean = id == this@RemoveToolsWithIdUnitTest.id
+				override suspend fun validate(context: OpenToolContext) {}
+			}
+		}
 		layoutRepository.layout = dynamicTools!!.fold(layoutRepository.layout!!) { layout, tool ->
 			layout.withToolAddedToStack(Tool(tool, isOpen), layout.primaryStack.id)
 		}

@@ -22,7 +22,7 @@ object DeleteSceneRamificationsDriver : ApplicationTest() {
 
 	fun tool(sceneId: Scene.Id) = object : DependentProperty<DeleteSceneRamifications> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps::givenProjectHasBeenOpened,
+		  ProjectSteps.Driver::givenProjectHasBeenOpened,
 		  { it: SoyleStoriesTestDouble -> ScenesDriver.givenNumberOfCreatedScenesIsAtLeast(it, 1) } as (SoyleStoriesTestDouble) -> Unit
 		)
 

@@ -5,22 +5,18 @@
  */
 package com.soyle.stories.layout.usecases
 
-import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.layout.assertLayoutDoesNotExist
 import com.soyle.stories.layout.assertResponseModel
 import com.soyle.stories.layout.doubles.LayoutRepositoryDouble
-import com.soyle.stories.layout.doubles.LocaleDouble
 import com.soyle.stories.layout.doubles.OpenToolContextDouble
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.entities.ToolStack
 import com.soyle.stories.layout.entities.layout
+import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.layout.tools.DynamicTool
-import com.soyle.stories.layout.tools.dynamic.LocationDetails
-import com.soyle.stories.layout.tools.temporary.Ramifications
+import com.soyle.stories.layout.tools.TemporaryTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import com.soyle.stories.layout.usecases.openTool.OpenToolUseCase
@@ -31,8 +27,24 @@ import java.util.*
 
 class OpenToolTest {
 
-    private val dynamicTool = LocationDetails(Location.Id().uuid)
-    private val temporaryTool = Ramifications.DeleteSceneRamifications(UUID.randomUUID(), LocaleDouble())
+    private var validationFails: Boolean = true
+
+    private val dynamicTool: DynamicTool = DynamicDouble()
+    private val temporaryTool: TemporaryTool = TemporaryDouble()
+
+    private inner class DynamicDouble : DynamicTool() {
+        override fun identifiedWithId(id: UUID): Boolean = false
+        override suspend fun validate(context: OpenToolContext) {
+            if (validationFails) throw Exception("validation error")
+        }
+    }
+
+    private inner class TemporaryDouble : TemporaryTool() {
+        override fun identifiedWithId(id: UUID): Boolean = false
+        override suspend fun validate(context: OpenToolContext) {
+            if (validationFails) throw Exception("validation error")
+        }
+    }
 
     private var result: Any? = null
 
@@ -124,7 +136,7 @@ class OpenToolTest {
                     primaryStack(1) {}
                     stack(1) {
                         markedToolStackId = id
-                        marker(Ramifications.DeleteSceneRamifications::class)
+                        marker(TemporaryDouble::class)
                     }
                 }
             }
@@ -132,16 +144,11 @@ class OpenToolTest {
     }
 
     private fun givenDataForDynamicToolExists() {
-        Location(Location.Id(dynamicTool.locationId), Project.Id(projectId), "", "").let {
-            context.locationRepository.locations[it.id] = it
-        }
+        validationFails = false
     }
 
     private fun givenDataForTemporaryToolExists() {
-        Scene(Scene.Id(temporaryTool.sceneId), Project.Id(projectId), "", StoryEvent.Id(), null, listOf()).let {
-            context.sceneRepository.scenes[it.id] = it
-            context.sceneRepository.sceneOrder[it.projectId] = listOf(it.id)
-        }
+        validationFails = false
     }
 
     private fun whenAToolIsOpened(type: DynamicTool) {

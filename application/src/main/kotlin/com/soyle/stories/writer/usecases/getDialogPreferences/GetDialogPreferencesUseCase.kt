@@ -1,18 +1,16 @@
 package com.soyle.stories.writer.usecases.getDialogPreferences
 
-import com.soyle.stories.entities.Writer
 import com.soyle.stories.writer.DialogType
-import com.soyle.stories.writer.UnexpectedPreferenceValue
-import com.soyle.stories.writer.WriterNotRegistered
 import com.soyle.stories.writer.repositories.WriterRepository
+import com.soyle.stories.writer.usecases.DialogPreference
+import com.soyle.stories.writer.usecases.getWriter
+import com.soyle.stories.writer.usecases.getWriterPreferenceFor
 import java.util.*
 
 class GetDialogPreferencesUseCase(
-  writerId: UUID,
-  private val preferencesRepository: WriterRepository
+  private val writerId: UUID,
+  private val writerRepository: WriterRepository
 ) : GetDialogPreferences {
-
-	private val writerId = Writer.Id(writerId)
 
 	override suspend fun invoke(request: DialogType, output: GetDialogPreferences.OutputPort) {
 		val response = try { execute(request) }
@@ -20,21 +18,10 @@ class GetDialogPreferencesUseCase(
 		output.gotDialogPreferences(response)
 	}
 
-	private suspend fun execute(request: DialogType): GetDialogPreferences.ResponseModel {
-		val writer = getWriter()
+	private suspend fun execute(request: DialogType): DialogPreference {
+		val writer = writerRepository.getWriter(writerId)
 		val preference = getWriterPreferenceFor(writer, request)
-		return GetDialogPreferences.ResponseModel(request.name, preference)
-	}
-
-	private suspend fun getWriter() = (preferencesRepository.getWriterById(writerId)
-	  ?: throw WriterNotRegistered(writerId.uuid))
-
-	private fun getWriterPreferenceFor(writer: Writer, request: DialogType): Boolean
-	{
-		val preference = writer.preferences["dialog.$request"] ?: true
-		if (preference !is Boolean)
-			throw UnexpectedPreferenceValue(request.name, preference)
-		return preference
+		return DialogPreference(request, preference)
 	}
 
 }

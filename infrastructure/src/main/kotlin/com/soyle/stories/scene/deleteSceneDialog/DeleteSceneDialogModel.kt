@@ -13,7 +13,7 @@ class DeleteSceneDialogModel : Model<ProjectScope, DeleteSceneDialogViewModel>(P
 	val deleteButtonLabel = bind(DeleteSceneDialogViewModel::deleteButtonLabel)
 	val cancelButtonLabel = bind(DeleteSceneDialogViewModel::cancelButtonLabel)
 	val errorMessage = bind(DeleteSceneDialogViewModel::errorMessage)
-	val defaultAction = bind(DeleteSceneDialogViewModel::defaultAction)
+	val showAgain = bind(DeleteSceneDialogViewModel::showAgain)
 
 
 

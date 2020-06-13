@@ -1,8 +1,11 @@
+@project
 Feature: Settings Dialog
 
-  @excluded
+  Background:
+    Given A project has been opened
+
   Scenario Outline: Enabled dialogs are checked
-    Given <dialog> has not been requested to be hidden
+    Given the <dialog> has not been requested to be hidden
     When the Settings Dialog is opened
     Then the <dialog> option should be checked
 
@@ -11,9 +14,8 @@ Feature: Settings Dialog
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
 
-  @excluded
   Scenario Outline: Disabled dialogs are unchecked
-    Given <dialog> has been requested to be hidden
+    Given the <dialog> has been requested to be hidden
     When the Settings Dialog is opened
     Then the <dialog> option should not be checked
 
@@ -22,12 +24,10 @@ Feature: Settings Dialog
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
 
-  @excluded
   Scenario: Settings Dialog Save button disabled without changes
     When the Settings Dialog is opened
     Then the Settings Dialog "Save" button should be disabled
 
-  @excluded
   Scenario Outline: Changes enable save
     Given the Settings Dialog has been opened
     When the <dialog> option is toggled
@@ -38,7 +38,6 @@ Feature: Settings Dialog
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
 
-  @excluded
   Scenario Outline: Close without saving
     Given the Settings Dialog has been opened
     And the <dialog> option has been toggled
@@ -51,9 +50,8 @@ Feature: Settings Dialog
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
 
-  @excluded
   Scenario Outline: Request to hide
-    Given <dialog> has not been requested to be hidden
+    Given the <dialog> has not been requested to be hidden
     And the Settings Dialog has been opened
     And the <dialog> option has been toggled
     When the Settings Dialog "Save" button is selected
@@ -65,7 +63,6 @@ Feature: Settings Dialog
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
 
-  @excluded
   Scenario Outline: Undo request to hide
     Given the <dialog> has been requested to be hidden
     And the Settings Dialog has been opened

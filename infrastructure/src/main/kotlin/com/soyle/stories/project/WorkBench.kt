@@ -3,6 +3,7 @@ package com.soyle.stories.project
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.async
 import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
@@ -14,6 +15,7 @@ import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.soylestories.SoyleStories
+import com.soyle.stories.writer.settingsDialog.SettingsDialog
 import javafx.scene.Parent
 import javafx.stage.Screen
 import tornadofx.*
@@ -62,6 +64,9 @@ class WorkBench : View() {
                     item("Section") {
                         // action { controller.createSection() }
                     }*/
+                }
+                item("Settings") {
+                    action { scope.get<SettingsDialog>().show() }
                 }
             }
             menu("Edit") {

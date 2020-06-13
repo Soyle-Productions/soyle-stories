@@ -8,5 +8,5 @@ data class ReorderSceneDialogViewModel(
   val cancelButtonLabel: String,
   val showAgainLabel: String,
   val errorMessage: String?,
-  val doDefaultAction: Boolean?
+  val showAgain: Boolean?
 )

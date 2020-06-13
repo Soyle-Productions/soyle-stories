@@ -11,11 +11,9 @@ import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpened
 import com.soyle.stories.layout.usecases.toggleToolOpened.ToggleToolOpenedUseCase
-import de.jodamob.junit5.SealedClassesSource
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
 
 class ToggleToolOpenUnitTest {
 
@@ -23,29 +21,30 @@ class ToggleToolOpenUnitTest {
 
 	@Test
 	fun `layout doesn't exist`() {
-		whenToolIsToggled(FixedTool.CharacterList)
+		whenToolIsToggled(object : FixedTool() {})
 		assertLayoutDoesNotExist().invoke(result)
 	}
 
 	@Test
 	fun `layout doesn't contain fixed tool`() {
+		val fixedTool = object : FixedTool() {}
 		givenLayoutExists()
-		whenToolIsToggled(FixedTool.CharacterList)
-		assertLayoutDoesNotContainFixedTool(FixedTool.CharacterList).invoke(result)
+		whenToolIsToggled(fixedTool)
+		assertLayoutDoesNotContainFixedTool(fixedTool).invoke(result)
 	}
 
-	@ParameterizedTest
-	@SealedClassesSource
-	fun `close if open`(fixedTool: FixedTool) {
+	@Test
+	fun `close if open`() {
+		val fixedTool = object : FixedTool() {}
 		givenLayoutExists()
 		givenLayoutHasFixedTool(fixedTool, isOpen = true)
 		whenToolIsToggled(fixedTool)
 		assertResponseModel(savedLayout!!).invoke(result)
 	}
 
-	@ParameterizedTest
-	@SealedClassesSource
-	fun `open if closed`(fixedTool: FixedTool) {
+	@Test
+	fun `open if closed`() {
+		val fixedTool = object : FixedTool() {}
 		givenLayoutExists()
 		givenLayoutHasFixedTool(fixedTool, isOpen = false)
 		whenToolIsToggled(fixedTool)

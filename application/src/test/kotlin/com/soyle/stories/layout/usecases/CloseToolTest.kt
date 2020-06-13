@@ -83,7 +83,7 @@ class CloseToolTest {
 
             override fun identifiedWithId(id: UUID): Boolean = false
             override suspend fun validate(context: OpenToolContext) {}
-        } else FixedTool.CharacterList
+        } else object : FixedTool() {}
         layoutRepository.layout = layoutRepository.layout!!.let {
             it.withToolAddedToStack(Tool(Tool.Id(toolId), testType, isOpen), it.primaryStack.id)
         }

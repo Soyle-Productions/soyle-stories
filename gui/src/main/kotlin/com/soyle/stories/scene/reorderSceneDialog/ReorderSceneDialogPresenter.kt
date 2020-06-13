@@ -2,6 +2,7 @@ package com.soyle.stories.scene.reorderSceneDialog
 
 import com.soyle.stories.gui.View
 import com.soyle.stories.writer.DialogType
+import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
 
 
@@ -20,16 +21,16 @@ class ReorderSceneDialogPresenter (
 			  cancelButtonLabel = "Cancel",
 			  showAgainLabel = "Do not show this dialog again.",
 			  errorMessage = null,
-			  doDefaultAction = null
+			  showAgain = null
 			)
 		}
 	}
 
-	override fun gotDialogPreferences(response: GetDialogPreferences.ResponseModel) {
-		if (response.dialog != DialogType.ReorderScene.name) return
+	override fun gotDialogPreferences(response: DialogPreference) {
+		if (response.id != DialogType.ReorderScene) return
 		view.updateOrInvalidated {
 			copy(
-			  doDefaultAction = ! response.shouldShow
+			  showAgain = response.shouldShow
 			)
 		}
 	}
@@ -38,7 +39,7 @@ class ReorderSceneDialogPresenter (
 		view.updateOrInvalidated {
 			copy(
 			  errorMessage = failure.localizedMessage ?: "",
-			  doDefaultAction = false
+			  showAgain = false
 			)
 		}
 	}

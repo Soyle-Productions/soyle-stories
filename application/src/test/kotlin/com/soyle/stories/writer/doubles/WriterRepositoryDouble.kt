@@ -7,7 +7,7 @@ class WriterRepositoryDouble(
   private val onReplaceWriter: (Writer) -> Unit = {}
 ) : WriterRepository {
 
-	private val writers = mutableMapOf<Writer.Id, Writer>()
+	val writers = mutableMapOf<Writer.Id, Writer>()
 
 	override suspend fun addWriter(writer: Writer) {
 		writers[writer.id] = writer

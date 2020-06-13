@@ -4,6 +4,7 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
+import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
 
 class DeleteSceneDialogPresenter(
@@ -20,16 +21,16 @@ class DeleteSceneDialogPresenter(
 			  deleteButtonLabel = "Delete",
 			  cancelButtonLabel = "Cancel",
 			  errorMessage = null,
-			  defaultAction = null
+			  showAgain = null
 			)
 		}
 	}
 
-	override fun gotDialogPreferences(response: GetDialogPreferences.ResponseModel)
+	override fun gotDialogPreferences(response: DialogPreference)
 	{
 		view.updateOrInvalidated {
 			copy(
-			  defaultAction = ! response.shouldShow
+			  showAgain = response.shouldShow
 			)
 		}
 	}
@@ -37,7 +38,7 @@ class DeleteSceneDialogPresenter(
 	override fun failedToGetDialogPreferences(failure: Exception) {
 		view.updateOrInvalidated {
 			copy(
-			  defaultAction = false
+			  showAgain = false
 			)
 		}
 	}

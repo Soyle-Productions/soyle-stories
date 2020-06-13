@@ -26,9 +26,9 @@ class GetDialogPreferencesUnitTest {
 
 	@Test
 	fun `dialog doesn't exist`() {
-		val dialogThatDoesNotExist = DialogType.values().random().name
+		val dialogThatDoesNotExist = DialogType.values().random()
 		givenWriterExists()
-		whenUseCaseIsExecuted(dialog = dialogThatDoesNotExist)
+		whenUseCaseIsExecuted(dialog = dialogThatDoesNotExist.name)
 		responseModel(dialogThatDoesNotExist, true).invoke(result)
 	}
 
@@ -44,9 +44,9 @@ class GetDialogPreferencesUnitTest {
 	@ParameterizedTest
 	@ValueSource(booleans = [true, false])
 	fun `output stored value`(shouldShowDialog: Boolean) {
-		val dialogThatExists = DialogType.values().random().name
-		givenPreferenceForDialogVisibilitySet(dialogThatExists, shouldShowDialog)
-		whenUseCaseIsExecuted(dialog=dialogThatExists)
+		val dialogThatExists = DialogType.values().random()
+		givenPreferenceForDialogVisibilitySet(dialogThatExists.name, shouldShowDialog)
+		whenUseCaseIsExecuted(dialog=dialogThatExists.name)
 		responseModel(dialogThatExists, shouldShowDialog).invoke(result)
 	}
 
@@ -79,7 +79,7 @@ class GetDialogPreferencesUnitTest {
 				result = failure
 			}
 
-			override fun gotDialogPreferences(response: GetDialogPreferences.ResponseModel) {
+			override fun gotDialogPreferences(response: DialogPreference) {
 				result = response
 			}
 		}
@@ -94,9 +94,9 @@ class GetDialogPreferencesUnitTest {
 		assertEquals(value, actual.value)
 	}
 
-	private fun responseModel(dialog: String, shouldShow: Boolean): (Any?) -> Unit = { actual ->
-		actual as GetDialogPreferences.ResponseModel
-		assertEquals(dialog, actual.dialog)
+	private fun responseModel(dialog: DialogType, shouldShow: Boolean): (Any?) -> Unit = { actual ->
+		actual as DialogPreference
+		assertEquals(dialog, actual.id)
 		assertEquals(shouldShow, actual.shouldShow)
 	}
 

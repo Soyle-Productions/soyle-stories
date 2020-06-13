@@ -22,7 +22,7 @@ object StoryEventListToolDriver : ApplicationTest() {
 
 	val openTool = object : DependentProperty<StoryEventList> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps::givenProjectHasBeenOpened
+		  ProjectSteps.Driver::givenProjectHasBeenOpened
 		)
 
 		override fun get(double: SoyleStoriesTestDouble): StoryEventList? {
