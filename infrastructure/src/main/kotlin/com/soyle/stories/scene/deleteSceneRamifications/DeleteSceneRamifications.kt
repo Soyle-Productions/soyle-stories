@@ -4,6 +4,7 @@ import com.soyle.stories.common.components.emptyListDisplay
 import com.soyle.stories.di.resolve
 import javafx.event.ActionEvent
 import javafx.event.Event
+import javafx.geometry.Insets
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
 import tornadofx.*
@@ -34,6 +35,7 @@ class DeleteSceneRamifications : View() {
 			}
 		}
 		buttonbar {
+			this.padding = Insets(10.0, 10.0, 10.0, 10.0)
 			button("Delete") {
 				action {
 					viewListener.deleteScene(scope.sceneId)

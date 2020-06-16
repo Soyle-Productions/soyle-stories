@@ -1,6 +1,9 @@
 package com.soyle.stories.scene.deleteSceneRamifications
 
 import javafx.event.EventTarget
+import javafx.geometry.Orientation
+import javafx.scene.layout.Priority
+import javafx.scene.paint.Color
 import tornadofx.*
 
 internal fun EventTarget.sceneItem(viewModel: SceneRamificationsViewModel) = titledpane(viewModel.sceneName, collapsible = true) {
@@ -10,17 +13,21 @@ internal fun EventTarget.sceneItem(viewModel: SceneRamificationsViewModel) = tit
 	content = form{
 		vbox {
 			viewModel.characters.forEach {
-				fieldset(it.characterName) {
+				fieldset(it.characterName, labelPosition = Orientation.VERTICAL) {
 					addClass("character-item")
 					id = it.characterId
 					hbox {
 						field("Current Motivation") {
-							label(it.currentMotivation) {
+							hgrow = Priority.ALWAYS
+							textfield(it.currentMotivation) {
+								isDisable = true
 								addClass("current")
 							}
 						}
 						field("Changed Motivation") {
-							label(it.changedMotivation) {
+							hgrow = Priority.ALWAYS
+							textfield(it.changedMotivation) {
+								isDisable = true
 								addClass("changed")
 							}
 						}
