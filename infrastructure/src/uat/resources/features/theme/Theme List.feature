@@ -36,13 +36,30 @@ Feature: Theme List
     Then the Theme List Theme Context Menu should be open
     And the Theme List Theme Context Menu should have <option> as an option
 
+    @open-tool @new @excluded
     Examples:
       | option |
-    @open-tool @new @excluded | "Compare Values" |
-    @open-tool @new           | "Compare Characters" |
-    @create-symbol @new       | "Create Symbol" |
-    @rename-theme @new        | "Rename" |
-    @delete-theme @new        | "Delete" |
+      | "Compare Values" |
+
+    @open-tool @new
+    Examples:
+      | option |
+      | "Compare Characters" |
+
+    @create-symbol @new
+    Examples:
+      | option |
+      | "Create Symbol" |
+
+    @rename-theme @new
+    Examples:
+      | option |
+      | "Rename" |
+
+    @delete-theme @new
+    Examples:
+      | option |
+      | "Delete" |
 
   @open-tool @new @excluded
   Scenario: Open Theme Value Web

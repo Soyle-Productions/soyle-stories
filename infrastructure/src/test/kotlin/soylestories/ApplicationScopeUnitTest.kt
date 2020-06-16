@@ -2,7 +2,6 @@ package com.soyle.stories.soylestories
 
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import javafx.collections.FXCollections
-import javafx.stage.Stage
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

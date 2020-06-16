@@ -1,6 +1,5 @@
 package com.soyle.stories.project
 
-import com.mongodb.internal.connection.tlschannel.util.Util.assertTrue
 import com.soyle.stories.UATLogger
 import com.soyle.stories.common.async
 import com.soyle.stories.di.get
@@ -14,6 +13,7 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.BorderPane
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest
 
 class ProjectSteps(en: En, double: SoyleStoriesTestDouble) {

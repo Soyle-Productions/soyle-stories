@@ -1,41 +1,61 @@
+buildscript {
+    apply from: "$LIBRARIES"
+}
+
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
-    id "com.github.breadmoirai.github-release" version "2.2.12"
+    id 'org.jetbrains.kotlin.jvm' version "$KOTLIN_VERSION"
+    id "com.github.breadmoirai.github-release" version "$GITHUB_RELEASE_VERSION"
 }
 
-apply from: "soyle-tasks.gradle"
-apply from: "dependencies.gradle"
-
-group 'com.soyle.stories'
-version project.property("version")
-
-repositories {
-    mavenCentral()
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
 }
 
-dependencies {
-    implementation libraries.kotlin
+subprojects { project ->
 
-    testImplementation libraries.junit
-    testRuntimeOnly libraries.junitEngine
+    group = GROUP
+    version = VERSION_NAME
+
+    archivesBaseName = ARTIFACT_ID
+
+    tasks.withType(Test) {
+        maxParallelForks = Runtime.runtime.availableProcessors()
+    }
+
+    sourceCompatibility = JAVA_VERSION
+    targetCompatibility = JAVA_VERSION
+
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "14"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "14"
+wrapper {
+    gradleVersion = "6.3"
+    distributionType = Wrapper.DistributionType.ALL
 }
 
-test {
-    useJUnitPlatform()
+task buildAndPackage {
+    group = "Soyle Tasks"
+    description = "Create runtime images for all three platforms"
+
+    configure {
+        dependsOn(":infrastructure:runtimeZip")
+    }
 }
 
-static def getDate() {
-    def date = new Date()
-    def year = date.format('yyyy')
-    def cl = Calendar.getInstance()
-    cl.setTime(date)
-    def week = cl.get(cl.WEEK_OF_YEAR)
-    return year.substring(2) + "w" + week + (["a", "b", "c", "d", "e", "f", "g"][cl.get(cl.DAY_OF_WEEK)-1])
+configure(subprojects) {
+    apply plugin: 'java'
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    dependencies {
+        implementation libraries.kotlin
+        testImplementation libraries.junit
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = JAVA_VERSION
+    }
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = JAVA_VERSION
+    }
 }

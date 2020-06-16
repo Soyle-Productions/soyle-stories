@@ -7,20 +7,25 @@ import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.soylestories.ApplicationScope
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.*
+import com.soyle.stories.testutils.findComponentsInScope
+import javafx.event.EventTarget
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
-import tornadofx.*
+import tornadofx.FX
+import tornadofx.find
 import java.net.URI
 import java.util.*
 import kotlin.reflect.KClass
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class WorkBenchInputUnitTest : ApplicationTest() {
+class WorkBenchViewUnitTest : ApplicationTest() {
 
-	val calls = mutableSetOf<String>()
-
+	@BeforeAll
 	fun registerListeners() {
 		DI.registerTypeFactory<LayoutViewListener, ProjectScope> {
 			object : LayoutViewListener {
@@ -33,7 +38,6 @@ class WorkBenchInputUnitTest : ApplicationTest() {
 				}
 
 				override fun loadLayoutForProject(projectId: UUID) {
-					calls.add("loadLayoutForProject")
 				}
 
 				override fun openDialog(dialog: Dialog) {
@@ -83,12 +87,7 @@ class WorkBenchInputUnitTest : ApplicationTest() {
 		}
 	}
 
-	@BeforeEach
-	fun clearPastCalls() {
-		calls.clear()
-	}
-
-	private val appScope = ApplicationScope()
+	val appScope = ApplicationScope()
 
 	@BeforeEach
 	fun setupFX() {
@@ -96,13 +95,37 @@ class WorkBenchInputUnitTest : ApplicationTest() {
 	}
 
 	@Test
-	fun `load layout when created`() {
+	fun `display dialog while loading`() {
+		var dialog: ProjectLoadingDialog? = null
 		interact {
-			val scope = ProjectScope(appScope, ProjectFileViewModel(UUID.randomUUID(), "", ""))
-			registerListeners()
+			val scope = ProjectScope(
+                appScope,
+                ProjectFileViewModel(UUID.randomUUID(), "", "")
+            )
 			find<WorkBench>(scope)
+			dialog = findComponentsInScope<ProjectLoadingDialog>(scope).single()
 		}
-		assertThat(calls).contains("loadLayoutForProject")
+		Assertions.assertThat(dialog!!.currentStage!!.isShowing).isTrue()
+	}
+
+	@Test
+	fun `close dialog when done loading`() {
+		var dialog: ProjectLoadingDialog? = null
+		interact {
+			val scope = ProjectScope(
+                appScope,
+                ProjectFileViewModel(UUID.randomUUID(), "", "")
+            )
+			find<WorkBench>(scope)
+			find<WorkBenchModel>(scope).loadingProgress.unbind()
+			find<WorkBenchModel>(scope).loadingProgress.set(
+                WorkBenchModel.MAX_LOADING_VALUE
+            )
+			dialog = findComponentsInScope<ProjectLoadingDialog>(scope).single()
+		}
+		Assertions.assertThat(dialog!!.currentStage!!.isShowing).isFalse()
 	}
 
 }
+
+class ExpectedNode<N : EventTarget>(val nodeType: KClass<N>, val id: String)

@@ -13,7 +13,11 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-      @delete-theme @new | "Confirm Delete Theme Dialog"  |
+
+    @new
+    Examples:
+      | dialog                        |
+      | "Confirm Delete Theme Dialog" |
 
   Scenario Outline: Disabled dialogs are unchecked
     Given the <dialog> has been requested to be hidden
@@ -24,7 +28,11 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-    @delete-theme @new | "Confirm Delete Theme Dialog"  |
+
+    @new
+    Examples:
+      | dialog                        |
+      | "Confirm Delete Theme Dialog" |
 
   Scenario: Settings Dialog Save button disabled without changes
     When the Settings Dialog is opened
@@ -39,7 +47,11 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-    @delete-theme @new | "Confirm Delete Theme Dialog"  |
+
+    @new
+    Examples:
+      | dialog                        |
+      | "Confirm Delete Theme Dialog" |
 
   Scenario Outline: Close without saving
     Given the Settings Dialog has been opened
@@ -52,7 +64,11 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-    @delete-theme @new | "Confirm Delete Theme Dialog"  |
+
+    @new
+    Examples:
+      | dialog                        |
+      | "Confirm Delete Theme Dialog" |
 
   Scenario Outline: Request to hide
     Given the <dialog> has not been requested to be hidden
@@ -66,7 +82,11 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-    @delete-theme @new | "Confirm Delete Theme Dialog"  |
+
+    @new
+    Examples:
+      | dialog                        |
+      | "Confirm Delete Theme Dialog" |
 
   Scenario Outline: Undo request to hide
     Given the <dialog> has been requested to be hidden
@@ -80,4 +100,8 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-    @delete-theme @new | "Confirm Delete Theme Dialog"  |
+
+    @new
+    Examples:
+      | dialog                        |
+      | "Confirm Delete Theme Dialog" |

@@ -4,20 +4,41 @@ import org.openjfx.gradle.JavaFXOptions
 import org.apache.tools.ant.filters.*
 
 plugins {
-    id 'java'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm'
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'com.github.johnrengelman.shadow' version '5.2.0'
     id 'org.beryx.runtime' version '1.8.0'
+    id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
 }
 
-apply from: "$rootDir/kotlin-module.gradle"
-apply from: "$rootDir/local-repositories.gradle"
+apply from: "$rootDir/$SUBPROJECT_CONFIG"
 
-repositories {
-    jcenter()
+sourceSets {
+    uat {
+        kotlin.srcDirs += 'src/uat/kotlin'
+        java.srcDirs += 'src/uat/java'
+        compileClasspath += sourceSets.main.output + sourceSets.test.output
+        runtimeClasspath += output + compileClasspath
+    }
 }
+
+configurations {
+    uatRuntime.extendsFrom testImplementation
+
+    uatCompile.extendsFrom testCompile
+    uatImplementation.extendsFrom testImplementation
+
+    cucumberRuntime {
+        extendsFrom uatImplementation
+    }
+}
+
+compileUatKotlin {
+    kotlinOptions {
+        jvmTarget = "$JAVA_VERSION"
+    }
+}
+
 
 javafx {
     version = "14"
@@ -36,7 +57,7 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin'
     }
     implementation libraries.coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.3.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-javafx:$KOTLIN_COROUTINES_VERSION"
 
     implementation "de.jensd:fontawesomefx-commons:11.0"
     implementation "de.jensd:fontawesomefx-controls:11.0"
@@ -44,16 +65,10 @@ dependencies {
     implementation "de.jensd:fontawesomefx-materialicons:2.2.0-11"
     implementation "de.jensd:fontawesomefx-emojione:2.2.7-11"
 
-    testImplementation 'org.junit.vintage:junit-vintage-engine:5.6.0'
-    testImplementation 'info.cukes:cucumber-java:1.0.11'
-    testImplementation 'info.cukes:cucumber-jvm:1.0.11'
-    testImplementation 'io.cucumber:cucumber-java8:5.5.0'
-    testImplementation 'io.cucumber:cucumber-junit:5.5.0'
-    testImplementation libraries.assertj
+    uatImplementation 'io.cucumber:cucumber-java8:6.1.1'
+    uatImplementation 'io.cucumber:cucumber-junit:6.1.1'
 
-    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.11.0'
-    testImplementation 'io.github.prashant-ramcharan:courgette-jvm:4.6.0'
-    testImplementation 'io.github.prashant-ramcharan:webdriver-binary-downloader:1.2.2'
+    testImplementation libraries.assertj
 
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
@@ -113,30 +128,35 @@ tasks["runtime"].doLast {
     }
 }
 
-configurations {
-    cucumberRuntime {
-        extendsFrom testImplementation
-    }
-}
+idea {
+    module {
+        testSourceDirs += file('src/uat/java')
+        testSourceDirs += file('src/uat/kotlin')
+        scopes.TEST.plus += configurations.uatCompileClasspath
 
-task cucumber() {
-    dependsOn assemble, compileTestJava
-    doLast {
-        javaexec {
-            main = "io.cucumber.core.cli.Main"
-            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--tags', 'not @excluded', '--glue', 'com.soyle.stories', 'src/test/resources/features', '--strict']
+        settings {
+            packagePrefix["src/test/kotlin"] = "com.soyle.stories"
+            packagePrefix["src/uat/kotlin"] = "com.soyle.stories"
         }
     }
 }
 
-tasks.withType(Test) {
-    systemProperties.remove("java.endorsed.dirs")
-}
+task uat(type: Test) {
+    group "verification"
 
-task runFeaturesUsingJUnit(type: Test) {
-    group = "UAT"
+    testClassesDirs = sourceSets.uat.output.classesDirs
+    classpath = sourceSets.uat.runtimeClasspath
 
-    include '**/suites/junit/FeatureSuite.class'
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output + sourceSets.uat.output
+            args = ['--strict', '--plugin', 'pretty', '--tags', 'not @excluded', '--glue', 'com.soyle.stories', 'src/uat/resources/features']
+        }
+    }
+
     outputs.upToDateWhen { false }
 }
+
+check.dependsOn uat
+uat.mustRunAfter test

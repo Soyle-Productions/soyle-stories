@@ -148,7 +148,7 @@ object CharacterDriver : ApplicationTest() {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
 		var emptyDisplayIsVisible = false
 		interact {
-			emptyDisplayIsVisible = projectScope.get<EmptyDisplay>().let {
+			emptyDisplayIsVisible = projectScope.get<CharacterList>().let {
 				it.root.isVisible && it.currentStage != null
 			}
 		}
@@ -160,10 +160,10 @@ object CharacterDriver : ApplicationTest() {
 		var populatedDisplayIsVisible = false
 		var characterListSize = 0
 		interact {
-			populatedDisplayIsVisible = projectScope.get<PopulatedDisplay>().let {
+			populatedDisplayIsVisible = projectScope.get<CharacterList>().let {
 				it.root.isVisible && it.currentStage != null
 			}
-			characterListSize = (projectScope.get<PopulatedDisplay>().root.lookup(".tree-view") as TreeView<*>).root.children.size
+			characterListSize = (projectScope.get<CharacterList>().root.lookup(".tree-view") as TreeView<*>).root.children.size
 		}
 		return populatedDisplayIsVisible && characterListSize == characterCount
 	}
@@ -173,10 +173,10 @@ object CharacterDriver : ApplicationTest() {
 		var populatedDisplayIsVisible = false
 		var characterItemViewModel: CharacterTreeItemViewModel? = null
 		interact {
-			populatedDisplayIsVisible = projectScope.get<PopulatedDisplay>().let {
+			populatedDisplayIsVisible = projectScope.get<CharacterList>().let {
 				it.root.isVisible && it.currentStage != null
 			}
-			characterItemViewModel = from(projectScope.get<PopulatedDisplay>().root).lookup(".tree-view").query<TreeView<*>>()
+			characterItemViewModel = from(projectScope.get<CharacterList>().root).lookup(".tree-view").query<TreeView<*>>()
 			  .root.children
 			  .map { it.value }
 			  .filterIsInstance<CharacterTreeItemViewModel>()
@@ -308,7 +308,7 @@ object CharacterDriver : ApplicationTest() {
 	{
 		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
 		interact {
-			from(projectScope.get<ActionBar>().root).lookup("#actionBar_deleteLocation").queryButton().onAction.handle(ActionEvent())
+			from(projectScope.get<CharacterList>().root).lookup("#actionBar_deleteLocation").queryButton().onAction.handle(ActionEvent())
 		}
 	}
 

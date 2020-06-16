@@ -1,5 +1,5 @@
-apply from: "$rootDir/kotlin-module.gradle"
-apply from: "$rootDir/local-repositories.gradle"
+
+apply from: "$rootDir/$SUBPROJECT_CONFIG"
 
 dependencies {
     implementation libraries.soyle_stories_core

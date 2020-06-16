@@ -19,10 +19,7 @@ import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationDetails.LocationDetails
 import com.soyle.stories.location.locationDetails.LocationDetailsScope
-import com.soyle.stories.location.locationList.ActionBar
-import com.soyle.stories.location.locationList.EmptyDisplay
 import com.soyle.stories.location.locationList.LocationList
-import com.soyle.stories.location.locationList.PopulatedDisplay
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectSteps
@@ -286,7 +283,7 @@ object LocationSteps : ApplicationTest() {
 
 	fun locationRenameInputBoxIsVisible(double: SoyleStoriesTestDouble): Boolean {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return false
-		val populatedDisplay = findComponentsInScope<PopulatedDisplay>(projectScope).singleOrNull() ?: return false
+		val populatedDisplay = findComponentsInScope<LocationList>(projectScope).singleOrNull() ?: return false
 		val isEditing = from(populatedDisplay.root).lookup(".tree-view").query<TreeView<*>>().isEditing
 		val isVisible = from(populatedDisplay.root).lookup(".tree-view").query<TreeView<*>>().editingCell?.graphic?.isVisible ?: false
 		return isEditing && isVisible
@@ -383,21 +380,21 @@ object LocationSteps : ApplicationTest() {
 	fun whenLocationListToolCenterButtonIsClicked(double: SoyleStoriesTestDouble) {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
 		interact {
-			from(projectScope.get<EmptyDisplay>().root).lookup("#emptyDisplay_createLocation").queryButton().onAction.handle(ActionEvent())
+			from(projectScope.get<LocationList>().root).lookup("#emptyDisplay_createLocation").queryButton().onAction.handle(ActionEvent())
 		}
 	}
 
 	fun whenLocationListToolActionBarCreateButtonIsClicked(double: SoyleStoriesTestDouble) {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
 		interact {
-			from(projectScope.get<ActionBar>().root).lookup("#actionBar_createLocation").queryButton().onAction.handle(ActionEvent())
+			from(projectScope.get<LocationList>().root).lookup("#actionBar_createLocation").queryButton().onAction.handle(ActionEvent())
 		}
 	}
 
 	fun whenLocationListToolActionBarDeleteButtonIsClicked(double: SoyleStoriesTestDouble) {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
 		interact {
-			from(projectScope.get<ActionBar>().root).lookup("#actionBar_deleteLocation").queryButton().onAction.handle(ActionEvent())
+			from(projectScope.get<LocationList>().root).lookup("#actionBar_deleteLocation").queryButton().onAction.handle(ActionEvent())
 		}
 	}
 
@@ -419,7 +416,7 @@ object LocationSteps : ApplicationTest() {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
 		var emptyDisplayIsVisible = false
 		interact {
-			emptyDisplayIsVisible = projectScope.get<EmptyDisplay>().let {
+			emptyDisplayIsVisible = projectScope.get<LocationList>().let {
 				it.root.isVisible && it.currentStage != null
 			}
 		}
@@ -431,10 +428,10 @@ object LocationSteps : ApplicationTest() {
 		var populatedDisplayIsVisible = false
 		var locationListSize = 0
 		interact {
-			populatedDisplayIsVisible = projectScope.get<PopulatedDisplay>().let {
+			populatedDisplayIsVisible = projectScope.get<LocationList>().let {
 				it.root.isVisible && it.currentStage != null
 			}
-			locationListSize = (projectScope.get<PopulatedDisplay>().root.lookup(".tree-view") as TreeView<*>).root.children.size
+			locationListSize = (projectScope.get<LocationList>().root.lookup(".tree-view") as TreeView<*>).root.children.size
 		}
 		return populatedDisplayIsVisible && locationListSize == number
 	}
@@ -443,7 +440,7 @@ object LocationSteps : ApplicationTest() {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: error("Project not yet created")
 		var locations: List<TreeItem<*>> = emptyList()
 		interact {
-			locations = (projectScope.get<PopulatedDisplay>().root.lookup(".tree-view") as TreeView<*>).root.children.toList()
+			locations = (projectScope.get<LocationList>().root.lookup(".tree-view") as TreeView<*>).root.children.toList()
 		}
 		return locations.isNotEmpty() && locations.find { (it.value as? LocationItemViewModel)?.name == name } != null
 	}
