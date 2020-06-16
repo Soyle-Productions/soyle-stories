@@ -1,4 +1,4 @@
-@storyevent 
+@storyevent  @excluded
 Feature: Story Event Details Tool
   As a user working on a project
   I want to set the details of the story events I've created

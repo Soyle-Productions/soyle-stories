@@ -1,4 +1,4 @@
-@storyevent
+@storyevent @excluded
 Feature: Story Event List Tool
   As a user working on a project
   I want to see the list of story events I've created

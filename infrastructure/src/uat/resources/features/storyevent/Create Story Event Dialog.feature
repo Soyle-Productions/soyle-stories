@@ -1,4 +1,4 @@
-@storyevent
+@storyevent @excluded
 Feature: Create Story Event Dialog
 
   Background:
