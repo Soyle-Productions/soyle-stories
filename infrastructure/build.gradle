@@ -132,7 +132,7 @@ idea {
     module {
         testSourceDirs += file('src/uat/java')
         testSourceDirs += file('src/uat/kotlin')
-        scopes.TEST.plus += configurations.uatCompileClasspath
+        scopes.TEST.plus += [configurations.uatCompile]
 
         settings {
             packagePrefix["src/test/kotlin"] = "com.soyle.stories"

@@ -20,10 +20,6 @@ Feature: Confirm Delete Scene Dialog
     Examples:
       | button   |
       | "Delete" |
-
-    @excluded
-    Examples:
-      | button               |
       | "Show Ramifications" |
 
   @delete-scene
@@ -31,7 +27,7 @@ Feature: Confirm Delete Scene Dialog
     When the Confirm Delete Scene Dialog "Delete" button is selected
     Then the Scene should be deleted
 
-  @delete-scene @excluded
+  @delete-scene
   Scenario: Show ramifications
     When the Confirm Delete Scene Dialog "Show Ramifications" button is selected
     Then the Scene should not be deleted

@@ -41,9 +41,9 @@ class DeleteSceneDialog : Fragment() {
 				return@onChange
 			}
 			buttonTypes.setAll(
-			  ButtonType(viewModel.deleteButtonLabel, ButtonBar.ButtonData.FINISH),
-			  //val ramificationsButton = ButtonType("Show Ramifications", ButtonBar.ButtonData.YES)
-			  ButtonType(viewModel.cancelButtonLabel, ButtonBar.ButtonData.CANCEL_CLOSE)
+			  ButtonType(viewModel.deleteButtonLabel, Delete),
+			  ButtonType("Show Ramifications", Ramifications),
+			  ButtonType(viewModel.cancelButtonLabel, Cancel)
 			)
 		}
 	}
@@ -52,8 +52,8 @@ class DeleteSceneDialog : Fragment() {
 		titleProperty.bind(model.title)
 		alert.resultProperty().onChangeOnce {
 			when (it?.buttonData) {
-				ButtonBar.ButtonData.FINISH -> viewListener.deleteScene(sceneId, model.showAgain.value)
-				ButtonBar.ButtonData.YES -> {}
+				Delete -> viewListener.deleteScene(sceneId, model.showAgain.value)
+				Ramifications -> viewListener.viewRamifications(sceneId, model.showAgain.value)
 				else -> {}
 			}
 			close()
@@ -62,7 +62,7 @@ class DeleteSceneDialog : Fragment() {
 			if (it?.showAgain == true) {
 				openModal(StageStyle.DECORATED, Modality.APPLICATION_MODAL)
 			} else if (it?.showAgain == false) {
-				alert.result = ButtonType("", ButtonBar.ButtonData.FINISH)
+				alert.result = ButtonType("", Delete)
 			}
 		}
 	}
@@ -71,6 +71,12 @@ class DeleteSceneDialog : Fragment() {
 	{
 		sceneId = sceneItemViewModel.id
 		viewListener.getValidState(sceneItemViewModel)
+	}
+
+	companion object {
+		private val Delete = ButtonBar.ButtonData.FINISH
+		private val Ramifications = ButtonBar.ButtonData.YES
+		private val Cancel = ButtonBar.ButtonData.CANCEL_CLOSE
 	}
 
 }

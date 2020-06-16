@@ -262,7 +262,8 @@ object SceneModule {
 					projectScope.get<DeleteSceneNotifier>(),
 					projectScope.get<RemoveCharacterFromLocalStoryNotifier>(),
 					projectScope.get<SetMotivationForCharacterInSceneNotifier>()
-				  )
+				  ),
+					projectScope.get()
 				)
 			}
 

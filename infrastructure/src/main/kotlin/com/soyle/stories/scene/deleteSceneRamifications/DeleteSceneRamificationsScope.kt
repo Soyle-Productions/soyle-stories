@@ -34,6 +34,7 @@ class DeleteSceneRamificationsScope(private val type: DeleteSceneRamifications, 
 			if (it is EventTarget) it.removeFromParent()
 		}
 		isClosed = true
+		projectScope.removeScope(type.toString(), this)
 		deregister()
 	}
 }

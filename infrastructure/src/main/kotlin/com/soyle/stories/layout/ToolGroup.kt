@@ -65,7 +65,9 @@ class ToolGroup : WindowChild() {
                     }
                 }
                 tabMap.forEach { (t, u) ->
-                    if (t !in toolIds) u.close()
+                    if (t !in toolIds) {
+                        u.close()
+                    }
                 }
                 tabMap.keys.removeIf { it !in toolIds }/*
                 vm.focusedToolId?.let {

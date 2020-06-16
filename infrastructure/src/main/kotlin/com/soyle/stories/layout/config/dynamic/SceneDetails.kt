@@ -7,6 +7,7 @@ import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.layout.tools.DynamicTool
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneDoesNotExist
@@ -32,7 +33,7 @@ object SceneDetailsConfig : ToolConfig<SceneDetails> {
 		}
 	}
 
-	override fun getTabConfig(toolId: String, type: SceneDetails): ToolTabConfig {
+	override fun getTabConfig(tool: ToolViewModel, type: SceneDetails): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
 				val scope = SceneDetailsScope(projectScope, type)

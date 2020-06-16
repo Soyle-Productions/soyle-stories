@@ -7,6 +7,7 @@ import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.layout.tools.DynamicTool
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import com.soyle.stories.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsScope
@@ -30,7 +31,7 @@ object StoryEventDetailsConfig : ToolConfig<StoryEventDetails> {
 		}
 	}
 
-	override fun getTabConfig(toolId: String, type: StoryEventDetails): ToolTabConfig {
+	override fun getTabConfig(tool: ToolViewModel, type: StoryEventDetails): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
 				val scope = StoryEventDetailsScope(projectScope, type)

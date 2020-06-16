@@ -55,13 +55,13 @@ object ToolModule : RegisteredToolsConfig {
 	fun getTabConfigFor(tool: ToolViewModel): ToolTabConfig {
 		return registeredTools
 		  .getValue(tool.type::class)
-		  .let { getTabConfig(it, tool.toolId, tool.type) }
+		  .let { getTabConfig(it, tool, tool.type) }
 	}
 
-	private fun <T : ToolType> getTabConfig(config: ToolConfig<T>, toolId: String, type: ToolType): ToolTabConfig {
+	private fun <T : ToolType> getTabConfig(config: ToolConfig<T>, tool: ToolViewModel, type: ToolType): ToolTabConfig {
 		val expectedType = config.getRegistration().first
 		return if (expectedType.isInstance(type)) {
-			config.getTabConfig(toolId, type as T)
+			config.getTabConfig(tool, type as T)
 		} else error("")
 	}
 

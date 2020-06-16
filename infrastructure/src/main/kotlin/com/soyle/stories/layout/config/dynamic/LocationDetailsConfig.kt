@@ -9,6 +9,7 @@ import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.locationDetails.LocationDetailsScope
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
@@ -32,7 +33,7 @@ object LocationDetailsConfig : ToolConfig<LocationDetails> {
 		}
 	}
 
-	override fun getTabConfig(toolId: String, type: LocationDetails): ToolTabConfig {
+	override fun getTabConfig(tool: ToolViewModel, type: LocationDetails): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
 				val scope = LocationDetailsScope(projectScope, type)

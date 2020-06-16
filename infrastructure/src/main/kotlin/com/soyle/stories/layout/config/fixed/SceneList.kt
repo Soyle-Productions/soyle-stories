@@ -5,6 +5,7 @@ import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
@@ -19,7 +20,7 @@ object SceneList : ToolConfig<SceneList>, FixedTool() {
 		return SceneList::class to this
 	}
 
-	override fun getTabConfig(toolId: String, type: SceneList): ToolTabConfig = object : ToolTabConfig {
+	override fun getTabConfig(tool: ToolViewModel, type: SceneList): ToolTabConfig = object : ToolTabConfig {
 		override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
 			val list = projectScope.get<com.soyle.stories.scene.sceneList.SceneList>()
 			return tabPane.tab(list)

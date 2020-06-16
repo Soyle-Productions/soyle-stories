@@ -8,6 +8,7 @@ import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.layout.tools.TemporaryTool
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneDoesNotExist
@@ -33,11 +34,12 @@ object DeleteSceneRamificationsConfig : ToolConfig<DeleteSceneRamifications> {
 		}
 	}
 
-	override fun getTabConfig(toolId: String, type: DeleteSceneRamifications): ToolTabConfig {
+	override fun getTabConfig(tool: ToolViewModel, type: DeleteSceneRamifications): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
 				val scope = DeleteSceneRamificationsScope(type, projectScope)
 				val view = scope.get<com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamifications>()
+				view.title = tool.name
 				val tab = tabPane.tab(view)
 				tab.tabPaneProperty().onChange {
 					if (it == null) {

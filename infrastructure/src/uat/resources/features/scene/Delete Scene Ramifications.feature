@@ -122,3 +122,17 @@ Feature: Delete Scene Ramifications
 		And the Delete Scene Ramifications Tool has been opened for "scene 2"
 		When the Character Motivation for "character A" is set in "scene 1" as "value 1a"
 		Then the Changed Motivation field for "character A" in "scene 3" in the Delete Scene Ramifications Tool for "scene 2" should show "value 1a"
+
+	@delete-scene
+	Scenario: Commit Delete Scene
+		Given the Delete Scene Ramifications Tool has been opened
+		When the Delete Scene Ramifications Tool "Delete" button is selected
+		Then the Scene should be deleted
+		And the Delete Scene Ramifications Tool should be closed
+
+	@delete-scene
+	Scenario: Commit Delete Scene
+		Given the Delete Scene Ramifications Tool has been opened
+		When the Delete Scene Ramifications Tool "Cancel" button is selected
+		Then the Delete Scene Ramifications Tool should be closed
+		But the Scene should not be deleted
