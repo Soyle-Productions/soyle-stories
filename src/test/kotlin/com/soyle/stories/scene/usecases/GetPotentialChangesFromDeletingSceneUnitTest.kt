@@ -5,9 +5,11 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
+import com.soyle.stories.scene.characterMotivations
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.sceneDoesNotExist
+import com.soyle.stories.scene.usecases.common.AffectedScene
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingSceneUseCase
 import kotlinx.coroutines.runBlocking
@@ -323,7 +325,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
 		}
 		val targetScene = orderedScenes.selector()
 		sceneRepository.scenes.remove(targetScene.id)
-		sceneRepository.scenes[sceneId] = Scene(sceneId, targetScene.projectId, targetScene.name, targetScene.storyEventId, null, targetScene.characterMotivations)
+		sceneRepository.scenes[sceneId] = Scene(sceneId, targetScene.projectId, targetScene.name, targetScene.storyEventId, null, targetScene.characterMotivations())
 		sceneRepository.sceneOrder[projectId] = sceneRepository.sceneOrder.getValue(projectId).map {
 			if (it == targetScene.id) sceneId
 			else it
@@ -361,7 +363,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
 	private fun responseModel(
 	  sceneCount: Int,
 	  characterCountPer: Int? = null,
-	  characterCount: ((GetPotentialChangesFromDeletingScene.AffectedScene) -> Int)? = null
+	  characterCount: ((AffectedScene) -> Int)? = null
 	): (Any?) -> Unit = {
 		actual ->
 

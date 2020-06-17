@@ -10,7 +10,7 @@ class Scene(
   val name: String,
   val storyEventId: StoryEvent.Id,
   val locationId: Location.Id?,
-  val characterMotivations: List<CharacterMotivation>
+  private val characterMotivations: List<CharacterMotivation>
 ) : Entity<Scene.Id> {
 
 	constructor(projectId: Project.Id, name: String, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, null, listOf())
@@ -25,6 +25,10 @@ class Scene(
 	fun getMotivationForCharacter(characterId: Character.Id): CharacterMotivation?
 	{
 		return motivationsById[characterId]
+	}
+
+	val includedCharacters: List<IncludedCharacter> by lazy {
+		characterMotivations.map { IncludedCharacter(it.characterId, it.characterName) }
 	}
 
 	fun hasCharacters(): Boolean = characterMotivations.isNotEmpty()
@@ -56,4 +60,5 @@ class Scene(
 	class CharacterMotivation(val characterId: Character.Id, val characterName: String, val motivation: String?) {
 		fun isInherited() = motivation == null
 	}
+	class IncludedCharacter(val characterId: Character.Id, val characterName: String)
 }

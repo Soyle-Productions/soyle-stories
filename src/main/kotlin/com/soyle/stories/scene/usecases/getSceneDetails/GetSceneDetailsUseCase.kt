@@ -35,8 +35,9 @@ class GetSceneDetailsUseCase(
 	private suspend fun getIncludedCharacterDetails(scene: Scene): List<IncludedCharacterDetails>
 	{
 		val scenesBefore = getScenesBefore(scene, sceneRepository).asReversed()
-		return scene.characterMotivations.map {
-			IncludedCharacterDetails(it.characterId.uuid, it.characterName, it.motivation,
+		return scene.includedCharacters.map {
+			val motivation = scene.getMotivationForCharacter(it.characterId)!!
+			IncludedCharacterDetails(it.characterId.uuid, it.characterName, motivation.motivation,
 			  getLastSetMotivation(scenesBefore, it.characterId)
 			)
 		}

@@ -4,6 +4,8 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.repositories.SceneRepository
+import com.soyle.stories.scene.usecases.common.AffectedCharacter
+import com.soyle.stories.scene.usecases.common.AffectedScene
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene.*
 
 class GetPotentialChangesFromDeletingSceneUseCase(
@@ -96,8 +98,9 @@ class GetPotentialChangesFromDeletingSceneUseCase(
 	}
 
 	private fun getCharacterMotivationsSetInScene(scene: Scene) =
-	  scene.characterMotivations
-		.filterNot(Scene.CharacterMotivation::isInherited)
+	  scene.includedCharacters.asSequence()
+		  .map { scene.getMotivationForCharacter(it.characterId)!! }
+		.filterNot { it.isInherited() }.toList()
 
 	private suspend fun getScenesBeforeAndAfter(scene: Scene): Pair<List<Scene>, List<Scene>> {
 		val sceneOrder = sceneRepository.getSceneIdsInOrder(scene.projectId).withIndex().associate { it.value to it.index }
@@ -112,6 +115,6 @@ class GetPotentialChangesFromDeletingSceneUseCase(
 		?: throw SceneDoesNotExist(request.locale, request.sceneId))
 
 	private fun allMotivesInherited(scene: Scene): Boolean {
-		return scene.characterMotivations.all { it.isInherited() }
+		return scene.includedCharacters.all { scene.getMotivationForCharacter(it.characterId)!!.isInherited() }
 	}
 }
