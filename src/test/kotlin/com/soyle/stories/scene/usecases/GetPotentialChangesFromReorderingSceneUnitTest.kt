@@ -158,6 +158,20 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
     }
 
     @Test
+    fun `different motivations mean scene is affected`() {
+        givenScenesToCharacters("""
+               A, B, C
+            1: z, y, -
+        """)
+        potentialChangesForMoving("A", to=2)
+        expectResult(
+            "C" to listOf(
+                "1" to "y -> z"
+            )
+        )
+    }
+
+    @Test
     fun `common case`() {
         givenScenesToCharacters("""
                A, B, C, D, E
@@ -188,7 +202,7 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
     private fun givenScenes(vararg ids: String)
     {
         sceneRepository.sceneOrder[projectId] = ids.map {
-            val scene = Scene(projectId, "", StoryEvent.Id())
+            val scene = Scene(projectId, it, StoryEvent.Id())
             sceneRepository.scenes[scene.id] = scene
             sceneIdMap[it] = scene.id
             scene.id

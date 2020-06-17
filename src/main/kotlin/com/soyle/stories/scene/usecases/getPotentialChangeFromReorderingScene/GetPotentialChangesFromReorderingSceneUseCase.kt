@@ -8,7 +8,6 @@ import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.usecases.common.AffectedCharacter
 import com.soyle.stories.scene.usecases.common.AffectedScene
 import com.soyle.stories.scene.usecases.common.sortedByProjectOrder
-import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -29,9 +28,9 @@ class GetPotentialChangesFromReorderingSceneUseCase(
     private suspend fun getScenesAffectedByMovingSceneToIndex(scene: Scene, index: Int)
     :  List<AffectedScene>
     {
-        val orderedScenes = sceneRepository.getOrderedScenes(scene.projectId)
-        if (index.isSameAsCurrentIndex(orderedScenes, scene)) return listOf()
-        val reorderedScenes = orderedScenes.moveScene(scene, index)
+        val orderedScenes = sceneRepository.getOrderedScenes(scene.projectId) // A, B, C
+        if (index.isSameAsCurrentIndex(orderedScenes, scene)) return listOf() // 2 == 0, 2 == 1
+        val reorderedScenes = orderedScenes.moveScene(scene, index) // B, A, C
         return getScenesWithChangedMotivationForCharacters(orderedScenes, reorderedScenes, scene.includedCharacters)
     }
 
@@ -50,7 +49,7 @@ class GetPotentialChangesFromReorderingSceneUseCase(
     private fun IndexedScenes.moveScene(scene: Scene, index: Int): IndexedScenes {
         val startIndex = indexOf(scene.id)
         val newList = if (startIndex < index)
-            moveForward(index, startIndex)
+            moveForward(index -1, startIndex)
         else moveBackward(index, startIndex)
         return IndexedScenes(newList)
     }
@@ -75,9 +74,9 @@ class GetPotentialChangesFromReorderingSceneUseCase(
     ): List<Scene> {
         return List(size) {
             when {
+                it < startIndex -> this[it]
                 it < index -> this[it + 1]
                 it == index -> this[startIndex]
-                it < startIndex -> this[it]
                 else -> this[it]
             }
         }
