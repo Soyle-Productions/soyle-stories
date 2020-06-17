@@ -10,6 +10,7 @@ import com.soyle.stories.layout.config.fixed.CharacterList
 import com.soyle.stories.layout.config.fixed.LocationList
 import com.soyle.stories.layout.config.fixed.SceneList
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamificationsConfig
+import com.soyle.stories.layout.config.temporary.ReorderSceneRamificationsConfig
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.layout.tools.ToolType
 import com.soyle.stories.project.layout.ToolViewModel
@@ -36,7 +37,8 @@ object ToolModule : RegisteredToolsConfig {
 	  /**
 	   * Temporary Tools
 	   */
-	  DeleteSceneRamificationsConfig.getRegistration()
+	  DeleteSceneRamificationsConfig.getRegistration(),
+		ReorderSceneRamificationsConfig.getRegistration()
 	)
 
 	override fun getConfigFor(type: ToolType): ToolViewModelConfig {

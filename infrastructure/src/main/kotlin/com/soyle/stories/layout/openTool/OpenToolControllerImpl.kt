@@ -4,6 +4,7 @@ import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.config.dynamic.*
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
+import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import java.util.*
 
@@ -64,6 +65,19 @@ class OpenToolControllerImpl(
 				localeManager.getCurrentLocale()
 			  ),
 			  openToolOutputPort
+			)
+		}
+	}
+
+	override fun openReorderSceneRamificationsTool(sceneId: String, newIndex: Int) {
+		threadTransformer.async {
+			openTool.invoke(
+				ReorderSceneRamifications(
+					UUID.fromString(sceneId),
+					newIndex,
+					localeManager.getCurrentLocale()
+				),
+				openToolOutputPort
 			)
 		}
 	}

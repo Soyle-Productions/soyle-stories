@@ -1,5 +1,6 @@
 package com.soyle.stories.layout.doubles
 
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.storyevent.repositories.StoryEventRepository
@@ -27,6 +28,10 @@ class StoryEventRepositoryDouble(
 
 	override suspend fun getLastStoryEventInProject(projectId: Project.Id): StoryEvent? = storyEvents.values.find {
 		it.nextStoryEventId == null && it.projectId == projectId
+	}
+
+	override suspend fun getStoryEventsWithCharacter(characterId: Character.Id): List<StoryEvent> {
+		return storyEvents.values.filter { it.includedCharacterIds.contains(characterId) }
 	}
 
 	override suspend fun updateStoryEvent(storyEvent: StoryEvent) {

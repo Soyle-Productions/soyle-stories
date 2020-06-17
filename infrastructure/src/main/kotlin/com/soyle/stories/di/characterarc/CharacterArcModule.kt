@@ -39,11 +39,14 @@ import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSec
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.entities.Project
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
+import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestionUseCase
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
@@ -144,7 +147,9 @@ object CharacterArcModule {
 				override val deleteLocalCharacterArc: Notifier<DemoteMajorCharacter.OutputPort> =
 				  DeleteLocalCharacterArcNotifier()
 				override val removeCharacterFromStory: Notifier<RemoveCharacterFromStory.OutputPort> =
-				  RemoveCharacterFromLocalStoryNotifier()
+				  RemoveCharacterFromLocalStoryNotifier().also {
+					  get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
+				  }
 				override val changeStoryFunction: Notifier<ChangeStoryFunction.OutputPort> =
 				  ChangeStoryFunctionNotifier()
 				override val changeThematicSectionValue =

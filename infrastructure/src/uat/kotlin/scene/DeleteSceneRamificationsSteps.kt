@@ -16,6 +16,7 @@ import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Button
 import javafx.scene.control.Labeled
+import javafx.scene.control.TextField
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.select
@@ -127,7 +128,7 @@ class DeleteSceneRamificationsSteps(en: En, double: SoyleStoriesTestDouble, setT
 				override fun get(double: SoyleStoriesTestDouble): String? {
 					val characterNode =
 						listedCharacter(focusSceneId, targetSceneId, characterId).get(double) ?: return null
-					return from(characterNode).lookup(".current").queryAll<Labeled>().firstOrNull()?.text
+					return from(characterNode).lookup(".current").queryAll<TextField>().firstOrNull()?.text
 				}
 			}
 
@@ -136,7 +137,7 @@ class DeleteSceneRamificationsSteps(en: En, double: SoyleStoriesTestDouble, setT
 				override fun get(double: SoyleStoriesTestDouble): String? {
 					val characterNode =
 						listedCharacter(focusSceneId, targetSceneId, characterId).get(double) ?: return null
-					return from(characterNode).lookup(".changed").queryAll<Labeled>().firstOrNull()?.text
+					return from(characterNode).lookup(".changed").queryAll<TextField>().firstOrNull()?.text
 				}
 			}
 

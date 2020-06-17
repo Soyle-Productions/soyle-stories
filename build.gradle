@@ -1,6 +1,11 @@
 buildscript {
     apply from: "$LIBRARIES"
+
+    def props = new Properties()
+    props.load(project.rootProject.file('local-properties.properties').newDataInputStream())
+    props.each { key, value -> ext.set(key, value) }
 }
+
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version "$KOTLIN_VERSION"
@@ -43,6 +48,8 @@ task buildAndPackage {
         dependsOn(":infrastructure:runtimeZip")
     }
 }
+
+apply from: 'publish-conf.gradle'
 
 configure(subprojects) {
     apply plugin: 'java'

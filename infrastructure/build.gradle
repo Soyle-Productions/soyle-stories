@@ -151,7 +151,7 @@ task uat(type: Test) {
         javaexec {
             main = "io.cucumber.core.cli.Main"
             classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output + sourceSets.uat.output
-            args = ['--strict', '--plugin', 'pretty', '--tags', 'not @excluded', '--glue', 'com.soyle.stories', 'src/uat/resources/features']
+            args = ['--strict', '--plugin', 'pretty', '--tags', 'not @excluded and not @new', '--glue', 'com.soyle.stories', 'src/uat/resources/features']
         }
     }
 

@@ -5,6 +5,7 @@ import com.soyle.stories.layout.config.fixed.CharacterList
 import com.soyle.stories.layout.config.fixed.LocationList
 import com.soyle.stories.layout.config.fixed.SceneList
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
+import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.entities.layout
@@ -38,6 +39,7 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
             }
             stack(2) {
                 marker(DeleteSceneRamifications::class)
+                marker(ReorderSceneRamifications::class)
                 //openTool(ToolType.Timeline)
                 //openTool(ToolType.ContinuityErrors)
             }

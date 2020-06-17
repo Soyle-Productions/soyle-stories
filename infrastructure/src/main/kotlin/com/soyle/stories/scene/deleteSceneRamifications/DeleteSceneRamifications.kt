@@ -43,7 +43,7 @@ class DeleteSceneRamifications : View() {
 			}
 			button("Cancel") {
 				action {
-					owningTab?.onCloseRequest?.handle(ActionEvent())
+					viewListener.cancel()
 				}
 			}
 		}

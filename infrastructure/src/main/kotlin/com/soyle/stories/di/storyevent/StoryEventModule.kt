@@ -115,7 +115,7 @@ object StoryEventModule {
 			)
 		}
 
-		provide<RemoveCharacterFromStoryEventController> {
+		provide(RemoveCharacterFromStoryEventController::class) {
 			RemoveCharacterFromStoryEventControllerImpl(
 			  applicationScope.get(),
 			  get(),

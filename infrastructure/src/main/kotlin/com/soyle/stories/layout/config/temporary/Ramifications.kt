@@ -37,7 +37,7 @@ object DeleteSceneRamificationsConfig : ToolConfig<DeleteSceneRamifications> {
 	override fun getTabConfig(tool: ToolViewModel, type: DeleteSceneRamifications): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-				val scope = DeleteSceneRamificationsScope(type, projectScope)
+				val scope = DeleteSceneRamificationsScope(tool.toolId, type, projectScope)
 				val view = scope.get<com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamifications>()
 				view.title = tool.name
 				val tab = tabPane.tab(view)

@@ -39,7 +39,17 @@ object ScenesDriver : ApplicationTest() {
 
 	fun getSceneIdByIdentifier(double: SoyleStoriesTestDouble, identifier: String): Scene.Id?
 	{
-		return getSceneIdentifiers(double)?.get(identifier)
+		val identifiers = getSceneIdentifiers(double) ?: emptyMap()
+		val registeredId = identifiers[identifier]
+		if (registeredId == null) {
+			val registeredScenes = identifiers.values.toSet()
+			val allScenes = getCreatedScenes(double)
+			val firstUnregisteredScene = allScenes.find {
+				it.id !in registeredScenes
+			}
+			return firstUnregisteredScene?.id
+		}
+		return registeredId
 	}
 
 	fun getSceneByIdentifier(double: SoyleStoriesTestDouble, identifier: String): Scene?

@@ -36,6 +36,7 @@ import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogController
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogModel
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogPresenter
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogViewListener
+import com.soyle.stories.scene.reorderSceneRamifications.*
 import com.soyle.stories.scene.sceneDetails.*
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
@@ -44,6 +45,8 @@ import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
 import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
 import com.soyle.stories.scene.usecases.deleteScene.DeleteSceneUseCase
+import com.soyle.stories.scene.usecases.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
+import com.soyle.stories.scene.usecases.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingSceneUseCase
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingSceneUseCase
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
@@ -66,237 +69,263 @@ import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 
 object SceneModule {
 
-	init {
+    init {
 
-		scoped<ProjectScope> {
+        scoped<ProjectScope> {
 
-			provide<CreateNewScene> {
-				CreateNewSceneUseCase(
-				  projectId,
-				  get(),
-				  get(),
-				  get()
-				)
-			}
-			provide<ListAllScenes> {
-				ListAllScenesUseCase(
-				  projectId,
-				  get()
-				)
-			}
-			provide<RenameScene> {
-				RenameSceneUseCase(
-				  get()
-				)
-			}
-			provide<DeleteScene> {
-				DeleteSceneUseCase(
-				  get()
-				)
-			}
-			provide<IncludeCharacterInScene> {
-				IncludeCharacterInSceneUseCase(
-				  get(),
-				  get()
-				)
-			}
-			provide<SetMotivationForCharacterInScene> {
-				SetMotivationForCharacterInSceneUseCase(
-				  get(),
-				  get()
-				)
-			}
-			provide<GetPotentialChangesFromDeletingScene> {
-				GetPotentialChangesFromDeletingSceneUseCase(get())
-			}
-			provide<GetSceneDetails> {
-				GetSceneDetailsUseCase(get())
-			}
-			provide<LinkLocationToScene> {
-				LinkLocationToSceneUseCase(get(), get())
-			}
-			provide<RemoveCharacterFromScene> {
-				RemoveCharacterFromSceneUseCase(get())
-			}
-			provide<ReorderScene> {
-				ReorderSceneUseCase(get())
-			}
+            provide<CreateNewScene> {
+                CreateNewSceneUseCase(
+                    projectId,
+                    get(),
+                    get(),
+                    get()
+                )
+            }
+            provide<ListAllScenes> {
+                ListAllScenesUseCase(
+                    projectId,
+                    get()
+                )
+            }
+            provide<RenameScene> {
+                RenameSceneUseCase(
+                    get()
+                )
+            }
+            provide<DeleteScene> {
+                DeleteSceneUseCase(
+                    get()
+                )
+            }
+            provide<IncludeCharacterInScene> {
+                IncludeCharacterInSceneUseCase(
+                    get(),
+                    get()
+                )
+            }
+            provide<SetMotivationForCharacterInScene> {
+                SetMotivationForCharacterInSceneUseCase(
+                    get(),
+                    get()
+                )
+            }
+            provide<GetPotentialChangesFromDeletingScene> {
+                GetPotentialChangesFromDeletingSceneUseCase(get())
+            }
+            provide<GetPotentialChangesFromReorderingScene> {
+                GetPotentialChangesFromReorderingSceneUseCase(get())
+            }
+            provide<GetSceneDetails> {
+                GetSceneDetailsUseCase(get())
+            }
+            provide<LinkLocationToScene> {
+                LinkLocationToSceneUseCase(get(), get())
+            }
+            provide<RemoveCharacterFromScene> {
+                RemoveCharacterFromSceneUseCase(get())
+            }
+            provide<ReorderScene> {
+                ReorderSceneUseCase(get())
+            }
 
-			provide(CreateNewScene.OutputPort::class) {
-				CreateNewSceneNotifier(get<CreateStoryEventNotifier>())
-			}
-			provide(RenameScene.OutputPort::class) {
-				RenameSceneNotifier()
-			}
-			provide(DeleteScene.OutputPort::class) {
-				DeleteSceneNotifier()
-			}
-			provide(SetMotivationForCharacterInScene.OutputPort::class) {
-				SetMotivationForCharacterInSceneNotifier()
-			}
-			provide(IncludeCharacterInScene.OutputPort::class) {
-				IncludeCharacterInSceneNotifier()
-			}
-			provide(LinkLocationToScene.OutputPort::class) {
-				LinkLocationToSceneNotifier()
-			}
-			provide(RemoveCharacterFromScene.OutputPort::class) {
-				RemoveCharacterFromSceneNotifier()
-			}
-			provide(ReorderScene.OutputPort::class) {
-				ReorderSceneNotifier()
-			}
+            provide(CreateNewScene.OutputPort::class) {
+                CreateNewSceneNotifier(get<CreateStoryEventNotifier>())
+            }
+            provide(RenameScene.OutputPort::class) {
+                RenameSceneNotifier()
+            }
+            provide(DeleteScene.OutputPort::class) {
+                DeleteSceneNotifier()
+            }
+            provide(SetMotivationForCharacterInScene.OutputPort::class) {
+                SetMotivationForCharacterInSceneNotifier()
+            }
+            provide(IncludeCharacterInScene.OutputPort::class) {
+                IncludeCharacterInSceneNotifier()
+            }
+            provide(LinkLocationToScene.OutputPort::class) {
+                LinkLocationToSceneNotifier()
+            }
+            provide(RemoveCharacterFromScene.OutputPort::class) {
+                RemoveCharacterFromSceneNotifier()
+            }
+            provide(ReorderScene.OutputPort::class) {
+                ReorderSceneNotifier()
+            }
 
-			provide<CreateNewSceneController> {
-				CreateNewSceneControllerImpl(
-				  projectId.toString(),
-				  applicationScope.get(),
-				  applicationScope.get(),
-				  get(),
-				  get()
-				)
-			}
-			provide<RenameSceneController> {
-				RenameSceneControllerImpl(
-				  applicationScope.get(),
-				  applicationScope.get(),
-				  get(),
-				  get()
-				)
-			}
-			provide<DeleteSceneController> {
-				DeleteSceneControllerImpl(
-				  applicationScope.get(),
-				  applicationScope.get(),
-				  get(),
-				  get()
-				)
-			}
-			provide<SetMotivationForCharacterInSceneController> {
-				SetMotivationForCharacterInSceneControllerImpl(
-				  applicationScope.get(),
-				  applicationScope.get(),
-				  get(),
-				  get()
-				)
-			}
-			provide {
-				IncludeCharacterInSceneController(
-				  applicationScope.get(),
-				  get(),
-				  get()
-				)
-			}
-			provide<LinkLocationToSceneController> {
-				LinkLocationToSceneControllerImpl(
-				  applicationScope.get(),
-				  applicationScope.get(),
-				  get(),
-				  get()
-				)
-			}
-			provide {
-				RemoveCharacterFromSceneController(
-				  applicationScope.get(),
-				  applicationScope.get(),
-				  get(),
-				  get()
-				)
-			}
-			provide<ReorderSceneController> {
-				ReorderSceneControllerImpl(
-				  applicationScope.get(),
-				  applicationScope.get(),
-				  get(),
-				  get()
-				)
-			}
+            provide<CreateNewSceneController> {
+                CreateNewSceneControllerImpl(
+                    projectId.toString(),
+                    applicationScope.get(),
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
+            provide<RenameSceneController> {
+                RenameSceneControllerImpl(
+                    applicationScope.get(),
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
+            provide<DeleteSceneController> {
+                DeleteSceneControllerImpl(
+                    applicationScope.get(),
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
+            provide<SetMotivationForCharacterInSceneController> {
+                SetMotivationForCharacterInSceneControllerImpl(
+                    applicationScope.get(),
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
+            provide {
+                IncludeCharacterInSceneController(
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
+            provide<LinkLocationToSceneController> {
+                LinkLocationToSceneControllerImpl(
+                    applicationScope.get(),
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
+            provide {
+                RemoveCharacterFromSceneController(
+                    applicationScope.get(),
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
+            provide<ReorderSceneController> {
+                ReorderSceneControllerImpl(
+                    applicationScope.get(),
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
 
-			provide<CreateNewSceneDialogViewListener> {
-				CreateNewSceneDialogController(
-				  CreateNewSceneDialogPresenter(
-					get<CreateSceneDialogModel>(),
-					get<CreateNewSceneNotifier>()
-				  ),
-				  get()
-				)
-			}
-			provide<DeleteSceneDialogViewListener> {
-				val presenter = DeleteSceneDialogPresenter(
-				  get<DeleteSceneDialogModel>()
-				)
-				DeleteSceneDialogController(
-				  applicationScope.get(),
-				  presenter,
-				  get(),
-				  get(),
-				  get(),
-				  presenter,
-				  get()
-				)
-			}
-			provide<ReorderSceneDialogViewListener> {
-				ReorderSceneDialogController(
-				  applicationScope.get(),
-				  ReorderSceneDialogPresenter(
-					get<ReorderSceneDialogModel>()
-				  ),
-				  get(),
-				  get(),
-				  get()
-				)
-			}
+            provide<CreateNewSceneDialogViewListener> {
+                CreateNewSceneDialogController(
+                    CreateNewSceneDialogPresenter(
+                        get<CreateSceneDialogModel>(),
+                        get<CreateNewSceneNotifier>()
+                    ),
+                    get()
+                )
+            }
+            provide<DeleteSceneDialogViewListener> {
+                val presenter = DeleteSceneDialogPresenter(
+                    get<DeleteSceneDialogModel>()
+                )
+                DeleteSceneDialogController(
+                    applicationScope.get(),
+                    presenter,
+                    get(),
+                    get(),
+                    get(),
+                    presenter,
+                    get()
+                )
+            }
+            provide<ReorderSceneDialogViewListener> {
+                ReorderSceneDialogController(
+                    applicationScope.get(),
+                    ReorderSceneDialogPresenter(
+                        get<ReorderSceneDialogModel>()
+                    ),
+                    get(),
+                    get(),
+                    get(),
+                    get()
+                )
+            }
 
-		}
+        }
 
-		scoped<DeleteSceneRamificationsScope> {
+        scoped<DeleteSceneRamificationsScope> {
 
-			provide<DeleteSceneRamificationsViewListener> {
-				DeleteSceneRamificationsController(
-				  sceneId,
-				  applicationScope.get(),
-				  applicationScope.get(),
-				  projectScope.get(),
-				  DeleteSceneRamificationsPresenter(
-					get<DeleteSceneRamificationsModel>(),
-					projectScope.get<DeleteSceneNotifier>(),
-					projectScope.get<RemoveCharacterFromLocalStoryNotifier>(),
-					projectScope.get<SetMotivationForCharacterInSceneNotifier>()
-				  ),
-					projectScope.get()
-				)
-			}
+            provide<DeleteSceneRamificationsViewListener> {
+                DeleteSceneRamificationsController(
+                    sceneId,
+                    toolId,
+                    applicationScope.get(),
+                    applicationScope.get(),
+                    projectScope.get(),
+                    DeleteSceneRamificationsPresenter(
+                        get<DeleteSceneRamificationsModel>(),
+                        projectScope.get<DeleteSceneNotifier>(),
+                        projectScope.get<RemoveCharacterFromLocalStoryNotifier>(),
+                        projectScope.get<SetMotivationForCharacterInSceneNotifier>()
+                    ),
+                    projectScope.get(),
+                    projectScope.get()
+                )
+            }
 
-		}
+        }
 
-		scoped<SceneDetailsScope> {
-			provide<SceneDetailsViewListener> {
-				SceneDetailsController(
-				  sceneId.toString(),
-				  projectScope.applicationScope.get(),
-				  projectScope.applicationScope.get(),
-				  projectScope.get(),
-				  SceneDetailsPresenter(
-					sceneId.toString(),
-					get<SceneDetailsModel>(),
-					projectScope.get(),
-					projectScope.get(),
-					projectScope.get<IncludeCharacterInSceneNotifier>(),
-					projectScope.get<LinkLocationToSceneNotifier>(),
-					projectScope.get<RemoveCharacterFromSceneNotifier>(),
-					projectScope.get<SetMotivationForCharacterInSceneNotifier>(),
-					projectScope.get<ReorderSceneNotifier>()
-				  ),
-				  projectScope.get(),
-				  projectScope.get(),
-				  projectScope.get(),
-				  projectScope.get(),
-				  projectScope.get()
-				)
-			}
-		}
+        scoped<ReorderSceneRamificationsScope> {
+            provide<ReorderSceneRamificationsViewListener> {
+                ReorderSceneRamificationsController(
+                    sceneId,
+                    toolId,
+                    reorderIndex,
+                    applicationScope.get(),
+                    projectScope.get(),
+                    ReorderSceneRamificationsPresenter(
+                        get<ReorderSceneRamificationsModel>(),
+                        projectScope.get<DeleteSceneNotifier>(),
+                        projectScope.get<RemoveCharacterFromSceneNotifier>(),
+                        projectScope.get<SetMotivationForCharacterInSceneNotifier>()
+                    ),
+                    projectScope.get(),
+                    projectScope.get()
+                )
+            }
+        }
 
-		SceneListModule
+        scoped<SceneDetailsScope> {
+            provide<SceneDetailsViewListener> {
+                SceneDetailsController(
+                    sceneId.toString(),
+                    projectScope.applicationScope.get(),
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    SceneDetailsPresenter(
+                        sceneId.toString(),
+                        get<SceneDetailsModel>(),
+                        projectScope.get(),
+                        projectScope.get(),
+                        projectScope.get<IncludeCharacterInSceneNotifier>(),
+                        projectScope.get<LinkLocationToSceneNotifier>(),
+                        projectScope.get<RemoveCharacterFromSceneNotifier>(),
+                        projectScope.get<SetMotivationForCharacterInSceneNotifier>(),
+                        projectScope.get<ReorderSceneNotifier>()
+                    ),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get()
+                )
+            }
+        }
 
-	}
+        SceneListModule
+
+    }
 }

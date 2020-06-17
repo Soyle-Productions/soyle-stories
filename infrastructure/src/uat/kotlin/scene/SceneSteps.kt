@@ -2,15 +2,19 @@ package com.soyle.stories.scene
 
 import com.soyle.stories.UATLogger
 import com.soyle.stories.character.CharacterDriver
+import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.location.LocationSteps
+import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.scene.items.SceneItemViewModel
+import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import javafx.event.ActionEvent
 import javafx.scene.input.MouseButton
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
@@ -27,6 +31,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 		DeleteSceneRamificationsSteps(en, double) {
 			targetObject = it
 		}
+		ReorderSceneRamificationsSteps(en, double)
 		ReorderSceneDialogSteps(en, double)
 
 		with(en) {
@@ -152,6 +157,19 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 				  .previouslySetToolTipFor(CharacterDriver.getCharacterByIdentifier(double, characterId)!!)
 				  .openTooltip
 				  .given(double)
+			}
+			Given("all Characters have been included in all Scenes") {
+				val scenes = ScenesDriver.getCreatedScenes(double)
+				val characters = CharacterDriver.getCharactersCreated(double)
+				val projectScope = ProjectSteps.getProjectScope(double)!!
+				val repo = projectScope.get<SceneRepository>()!!
+				scenes.forEach {
+					val newScene = characters.fold(it) { scene, character ->
+						scene.withCharacterIncluded(character)
+					}
+					runBlocking { repo.updateScene(newScene) }
+
+				}
 			}
 
 			When("The Scene List Tool is opened") {
@@ -284,8 +302,8 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) : ApplicationTest() {
 			}
 			When("a Character is removed from the Scene") {
 				val scene = targetObject as? Scene ?: ScenesDriver.getCreatedScenes(double).first()
-				targetObject = scene.characterMotivations.first().characterId
-				ScenesDriver.characterRemovedFrom(scene, scene.characterMotivations.first().characterId).whenSet(double)
+				targetObject = scene.includedCharacters.first().characterId
+				ScenesDriver.characterRemovedFrom(scene, scene.includedCharacters.first().characterId).whenSet(double)
 			}
 			When("the {string} Scene Details Tool is opened") { scene: String ->
 				val sceneId = ScenesDriver.getSceneIdByIdentifier(double, scene)!!
