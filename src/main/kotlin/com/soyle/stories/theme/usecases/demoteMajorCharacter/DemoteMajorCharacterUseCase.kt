@@ -54,12 +54,12 @@ class DemoteMajorCharacterUseCase(
 
     private suspend fun saveTheme(
         updatedTheme: Theme
-    ) {
+    ) {/*
         if (updatedTheme.characters.filterIsInstance<MajorCharacter>().isEmpty()) {
             context.themeRepository.deleteTheme(updatedTheme)
-        } else {
+        } else {*/
             updateTheme(updatedTheme)
-        }
+        //}
     }
 
     private suspend fun removeThematicSectionsForThemeAndCharacter(

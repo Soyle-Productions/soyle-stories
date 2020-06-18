@@ -34,7 +34,7 @@ class PlanNewCharacterArcUseCase(
             return outputPort.receivePlanNewCharacterArcFailure(it)
         }
 
-        val creationResult = Theme.takeNoteOf(Project.Id(), "")
+        val creationResult = Theme.takeNoteOf(Project.Id(), name)
             .map { theme ->
                 theme to theme.thematicTemplate.sections.map {
                     CharacterArcSection(
