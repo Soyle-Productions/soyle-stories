@@ -1,6 +1,10 @@
 package com.soyle.stories.common
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by Brendan
@@ -31,14 +35,20 @@ abstract class Notifier<Listener : Any> {
 
     fun hasListener(listener: Listener): Boolean = findWeakReference(listener) != null
 
-    protected fun notifyAll(block: (Listener) -> Unit) {
+    protected fun notifyAll(context: CoroutineContext = Dispatchers.Default, block: suspend (Listener) -> Unit) {
         val listeners = synchronized(this) {
             val listeners = this.listeners.toList()
             this.listeners.removeAll(listeners.filter { it.get() == null })
             listeners
         }
         listeners.forEach {
-            it.get()?.also(block)
+            val listener = it.get()
+            CoroutineScope(context).launch {
+                listener?.also {
+                    block(it)
+                }
+            }
+            Unit
         }
     }
 

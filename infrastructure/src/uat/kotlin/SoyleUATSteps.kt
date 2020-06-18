@@ -18,6 +18,8 @@ import com.soyle.stories.scene.SceneSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.CreateStoryEventDialogDriver
 import com.soyle.stories.storyevent.StoryEventSteps
+import com.soyle.stories.theme.CreateThemeDialogSteps
+import com.soyle.stories.theme.ThemeSteps
 import com.soyle.stories.writer.WriterSteps
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
@@ -45,6 +47,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 		CharacterSteps(this, double)
 		StoryEventSteps(this, double)
 		SceneSteps(this, double)
+		ThemeSteps(this, double)
 		WriterSteps(this, double)
 		ProjectSteps(this, double)
 		/*
@@ -187,6 +190,16 @@ class SoyleUATSteps : En, ApplicationTest() {
 			LocationSteps.whenCreateLocationDialogCreateButtonIsClicked(double)
 		}
 		When("The user presses the Esc key") {
+			interact {
+				press(KeyCode.ESCAPE).release(KeyCode.ESCAPE)
+			}
+		}
+		When("the Enter key is pressed") {
+			interact {
+				press(KeyCode.ENTER).release(KeyCode.ENTER)
+			}
+		}
+		When("the Esc key is pressed") {
 			interact {
 				press(KeyCode.ESCAPE).release(KeyCode.ESCAPE)
 			}
@@ -453,6 +466,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 				"Character" -> CreateCharacterDialogDriver.isOpen(double)
 				"Location" -> LocationSteps.isCreateNewLocationDialogOpen(double)
 				"Scene" -> CreateSceneDialogDriver.isOpen(double)
+				"Theme" -> CreateThemeDialogSteps.isDialogOpen(double)
 				"Story Event" -> CreateStoryEventDialogDriver.openDialog.check(double)
 				else -> false
 			}

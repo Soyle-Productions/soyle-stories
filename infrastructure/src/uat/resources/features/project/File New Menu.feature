@@ -16,6 +16,7 @@ Feature: File New Menu
       | "Character" |
       | "Location"  |
       | "Scene"     |
+      | "Theme"     |
 
   @storyevent @create-new-story-event
   Scenario Outline: File New Option opens creation dialog
@@ -29,3 +30,4 @@ Feature: File New Menu
       | "Character" |
       | "Location"  |
       | "Scene"     |
+      | "Theme"     |

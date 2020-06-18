@@ -15,6 +15,7 @@ import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.soylestories.SoyleStories
+import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
 import com.soyle.stories.writer.settingsDialog.SettingsDialog
 import javafx.scene.Parent
 import javafx.stage.Screen
@@ -55,6 +56,10 @@ class WorkBench : View() {
                     item("Scene") {
                         id = "file_new_scene"
                         action { createSceneDialog(scope) }
+                    }
+                    item("Theme") {
+                        id = "file_new_theme"
+                        action { scope.get<CreateThemeDialog>().show(currentWindow) }
                     }
                     /*
                     item("Plot Point") {

@@ -2,6 +2,7 @@ package com.soyle.stories.repositories
 
 import com.soyle.stories.characterarc.repositories.ThemeRepository
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 
 class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositories.ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository {
@@ -10,9 +11,15 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 		themes[theme.id] = theme
 	}
 
+	override suspend fun addTheme(theme: Theme) = addNewTheme(theme)
+
 	override suspend fun getThemeById(themeId: Theme.Id): Theme? = themes[themeId]
 	override suspend fun updateTheme(theme: Theme) {
 		themes[theme.id] = theme
+	}
+
+	override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {
+		return themes.values.filter { it.projectId == projectId }
 	}
 
 	override suspend fun deleteThemes(themes: List<Theme>) {
