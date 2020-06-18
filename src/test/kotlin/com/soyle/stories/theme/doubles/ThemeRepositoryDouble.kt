@@ -5,7 +5,8 @@ import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.repositories.ThemeRepository
 
 class ThemeRepositoryDouble(
-    private val onAddTheme: (Theme) -> Unit = {}
+    private val onAddTheme: (Theme) -> Unit = {},
+    private val onDeleteTheme: (Theme) -> Unit = {}
 ) : ThemeRepository
 {
     val themes = mutableMapOf<Theme.Id, Theme>()
@@ -27,5 +28,6 @@ class ThemeRepositoryDouble(
 
     override suspend fun deleteTheme(theme: Theme) {
         themes.remove(theme.id)
+        onDeleteTheme(theme)
     }
 }
