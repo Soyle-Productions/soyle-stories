@@ -4,29 +4,40 @@ Feature: Theme List
   Background:
     Given A project has been opened
 
-  @list-symbols-by-theme @new
+  @list-symbols-by-theme
   Scenario: No Themes Yet Created
     When the Theme List tool is opened
     Then the Theme List tool should show a special empty message
 
-  @create-theme @new
+  @create-theme
   Scenario: Create First Theme
     Given the Theme List tool has been opened
     When the Theme List Create First Theme button is selected
     Then the Create Theme Dialog should be open
 
-  @list-symbols-by-theme @new
-  Scenario: Some Themes Created
+  @list-symbols-by-theme
+  Scenario Outline: Some Themes Created
     Given <number> Themes have been created
     When the Theme List tool is opened
     Then the Theme List tool should show all <number> themes
 
-  @create-theme @new
+    Examples:
+    | number |
+    | 2      |
+    | 4      |
+
+  @create-theme
   Scenario: Create Another Theme
     Given a Theme has been created
     And the Theme List tool has been opened
     When the Theme List "Create New Theme" button is selected
     Then the Create Theme Dialog should be open
+
+  @create-theme
+  Scenario: React to New Theme Created
+    Given the Theme List tool has been opened
+    When a theme is created
+    Then the Theme List Tool should show the new theme
 
   @new
   Scenario Outline: Right-Click on Theme

@@ -60,6 +60,9 @@ class CreateThemeDialogSteps(en: En, double: SoyleStoriesTestDouble) {
                 from(dialog.root).lookup(".text-field").queryTextInputControl().text = ""
             }
 
+            Then("the Create Theme Dialog should be open") {
+                assertTrue(isDialogOpen(double))
+            }
             Then("the Create Theme Dialog should be closed") {
                 assertFalse(isDialogOpen(double))
             }
