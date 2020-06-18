@@ -160,9 +160,9 @@ class DemoteCharacterTest {
                     "Bob"
                 ) to it.second
             }
-            val theme = Theme.takeNoteOf().map {
+            val theme = Theme.takeNoteOf(Project.Id(), "").map {
                 Theme(
-                    Theme.Id(uuid),
+                    Theme.Id(uuid), Project.Id(), "", listOf(),
                     it.centralMoralQuestion,
                     it.characters.associateBy { it.id },
                     it.similaritiesBetweenCharacters

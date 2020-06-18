@@ -106,7 +106,7 @@ class IncludeCharacterInComparisonTest {
             characters = listOf(character),
             themes = listOf(
                 Theme(
-                    Theme.Id(themeUUID), "", mapOf(
+                    Theme.Id(themeUUID), Project.Id(), "", listOf(), "", mapOf(
                         Character.Id(characterUUID) to character.asMinorCharacter(
                             listOf()
                         )
@@ -132,7 +132,7 @@ class IncludeCharacterInComparisonTest {
                 Theme(
                     Theme.Id(
                         themeUUID
-                    ), "", mapOf(), mapOf()
+                    ), Project.Id(), "", listOf(), "", mapOf(), mapOf()
                 )
             )
         ).invoke(characterUUID, themeUUID) as Either.Right).b
@@ -161,7 +161,7 @@ class IncludeCharacterInComparisonTest {
                     Theme(
                         Theme.Id(
                             themeUUID
-                        ), "", mapOf(), mapOf()
+                        ), Project.Id(), "", listOf(), "", mapOf(), mapOf()
                     )
                 ),
                 updateTheme = {
@@ -182,7 +182,7 @@ class IncludeCharacterInComparisonTest {
                     Theme(
                         Theme.Id(
                             themeUUID
-                        ), "", mapOf(), mapOf()
+                        ), Project.Id(), "", listOf(), "", mapOf(), mapOf()
                     )
                 ),
                 updateTheme = {

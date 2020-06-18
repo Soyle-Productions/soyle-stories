@@ -104,7 +104,7 @@ class RenameCharacterUnitTest {
 		  ),
 		  initialThemes = listOfNotNull(
 			andThemeId?.let { expectedId ->
-				val theme = Theme.takeNoteOf("").fold({ throw it}) { Theme(Theme.Id(expectedId), it.centralMoralQuestion, it.characters.associateBy { it.id }, it.similaritiesBetweenCharacters)}
+				val theme = Theme.takeNoteOf(Project.Id(), "").fold({ throw it}) { Theme(Theme.Id(expectedId), Project.Id(), "", listOf(), it.centralMoralQuestion, it.characters.associateBy { it.id }, it.similaritiesBetweenCharacters)}
 				if (andThemeHasCharacter) theme.includeCharacter(character!!, emptyList()).fold({ throw it}, ::identity)
 				else theme
 			}

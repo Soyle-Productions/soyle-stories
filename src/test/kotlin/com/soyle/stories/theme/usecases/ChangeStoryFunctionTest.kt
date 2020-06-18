@@ -6,6 +6,7 @@
 package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.CharacterPerspective
 import com.soyle.stories.entities.theme.MajorCharacter
@@ -216,7 +217,7 @@ class ChangeStoryFunctionTest {
         private val context = TestContext(
             initialThemes = themes.map { (themeUUID, characters) ->
                 Theme(
-                    Theme.Id(themeUUID),
+                    Theme.Id(themeUUID), Project.Id(), "", listOf(),
                     "",
                     characters.associate { (characterUUID, functions) ->
                         val characterId = Character.Id(characterUUID)

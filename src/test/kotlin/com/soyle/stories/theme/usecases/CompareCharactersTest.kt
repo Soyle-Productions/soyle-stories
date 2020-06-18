@@ -66,7 +66,7 @@ class CompareCharactersTest {
 	@Test
 	fun `character not in theme should output failure`() {
 		val focusCharacterId = UUID.randomUUID()
-		val (theme) = Theme.takeNoteOf() as Either.Right
+		val (theme) = Theme.takeNoteOf(Project.Id(), "") as Either.Right
 		val themes = listOf(theme)
 		val themeId = theme.id.uuid
 		val result = given(themes).testWith(themeId, focusCharacterId)
@@ -77,7 +77,7 @@ class CompareCharactersTest {
 	@Test
 	fun `character must be major character`() {
 		val focusCharacterId = UUID.randomUUID()
-		val (theme) = Theme.takeNoteOf()
+		val (theme) = Theme.takeNoteOf(Project.Id(), "")
 			.flatMap { it.includeCharacter(Character(Character.Id(focusCharacterId), Project.Id(), "Bob")) } as Either.Right
 		val themes = listOf(theme)
 		val themeId = theme.id.uuid
@@ -117,7 +117,7 @@ class CompareCharactersTest {
 		val minorCharacter2Similarity = "Similarity"
 
 		init {
-			val (themeTemp) = Theme.takeNoteOf(centralMoralQuestion)
+			val (themeTemp) = Theme.takeNoteOf(Project.Id(), centralMoralQuestion)
 				.flatMap { it.includeCharacter(majorCharacters[0]) }
 				.flatMap { it.includeCharacter(majorCharacters[1]) }
 				.flatMap { it.includeCharacter(majorCharacters[2]) }

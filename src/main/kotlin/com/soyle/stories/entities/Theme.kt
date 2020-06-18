@@ -20,20 +20,35 @@ import java.util.*
 
 class Theme(
     override val id: Id,
+    val projectId: Project.Id,
+    val name: String,
+    val symbols: List<Symbol>,
     val centralMoralQuestion: String,
     private val includedCharacters: Map<Character.Id, CharacterInTheme>,
     val similaritiesBetweenCharacters: Map<Set<Character.Id>, String>
 ) : Entity<Theme.Id> {
 
+    constructor(
+        projectId: Project.Id,
+        name: String,
+        symbols: List<Symbol> = listOf(),
+        centralMoralQuestion: String = ""
+    ) : this(Id(), projectId, name, symbols, centralMoralQuestion, mapOf(), mapOf())
+
     val thematicTemplate: ThematicTemplate
         get() = ThematicTemplate.default()
 
     private fun copy(
+        name: String = this.name,
+        symbols: List<Symbol> = this.symbols,
         centralMoralQuestion: String = this.centralMoralQuestion,
         includedCharacters: Map<Character.Id, CharacterInTheme> = this.includedCharacters,
         similaritiesBetweenCharacters: Map<Set<Character.Id>, String> = this.similaritiesBetweenCharacters
     ) = Theme(
         id,
+        projectId,
+        name,
+        symbols,
         centralMoralQuestion,
         includedCharacters,
         similaritiesBetweenCharacters
@@ -250,14 +265,17 @@ class Theme(
         else null
     }
 
-    data class Id(val uuid: UUID) {
+    data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "Theme(${uuid})"
     }
 
     companion object {
-        fun takeNoteOf(centralMoralQuestion: String = ""): Either<ThemeException, Theme> {
+        fun takeNoteOf(projectId: Project.Id, name: String, centralMoralQuestion: String = ""): Either<ThemeException, Theme> {
             return Theme(
                 Id(UUID.randomUUID()),
+                projectId,
+                name,
+                listOf(),
                 centralMoralQuestion,
                 mapOf(),
                 mapOf()

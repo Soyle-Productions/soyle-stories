@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.usecases
 
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
@@ -85,7 +86,7 @@ class ChangeCentralMoralQuestionUnitTest {
     }
     private fun givenThemeWithId(themeId: UUID, andQuestion: String = "") {
         context = setupContext(
-            initialThemes = listOf(Theme(Theme.Id(themeId), andQuestion, emptyMap(), emptyMap())),
+            initialThemes = listOf(Theme(Theme.Id(themeId), Project.Id(), "", listOf(), andQuestion, emptyMap(), emptyMap())),
             updateTheme = {
                 updatedTheme = it
             }

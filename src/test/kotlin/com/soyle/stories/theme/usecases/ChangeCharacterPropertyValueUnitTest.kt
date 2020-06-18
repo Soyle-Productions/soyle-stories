@@ -104,7 +104,7 @@ class ChangeCharacterPropertyValueUnitTest {
         )
     }
     private fun givenThemeWithId(themeId: UUID, andCharacter: UUID? = null) {
-        val theme = Theme(Theme.Id(themeId), "", emptyMap(), emptyMap()).let {
+        val theme = Theme(Theme.Id(themeId), Project.Id(), "", listOf(), "", emptyMap(), emptyMap()).let {
             if (andCharacter == null) it
             else it.includeCharacter(Character(Character.Id(andCharacter), Project.Id(), "Bob")).fold({ throw it }, ::identity)
         }

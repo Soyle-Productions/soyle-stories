@@ -5,6 +5,7 @@ import arrow.core.flatMap
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
@@ -33,7 +34,7 @@ class PlanNewCharacterArcUseCase(
             return outputPort.receivePlanNewCharacterArcFailure(it)
         }
 
-        val creationResult = Theme.takeNoteOf()
+        val creationResult = Theme.takeNoteOf(Project.Id(), "")
             .map { theme ->
                 theme to theme.thematicTemplate.sections.map {
                     CharacterArcSection(

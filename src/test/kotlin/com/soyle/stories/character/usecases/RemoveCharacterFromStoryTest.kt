@@ -137,19 +137,19 @@ class RemoveCharacterFromStoryTest {
             "Character Name"
         )
 
-        val themeWithOnlyCharacter = (Theme.takeNoteOf().flatMap { it.includeCharacter(character) } as Either.Right).b
+        val themeWithOnlyCharacter = (Theme.takeNoteOf(Project.Id(), "").flatMap { it.includeCharacter(character) } as Either.Right).b
         val themesWithCharacter = listOf(
-            (Theme.takeNoteOf().flatMap { it.includeCharacter(character) }
+            (Theme.takeNoteOf(Project.Id(), "").flatMap { it.includeCharacter(character) }
                 .flatMap { it.includeCharacter(buildCharacter()) } as Either.Right).b,
-            (Theme.takeNoteOf().flatMap { it.includeCharacter(character) }
+            (Theme.takeNoteOf(Project.Id(), "").flatMap { it.includeCharacter(character) }
                 .flatMap { it.includeCharacter(buildCharacter()) } as Either.Right).b
         )
         val allThemesWithCharacter = (themesWithCharacter + themeWithOnlyCharacter).onEach {
             assertTrue(it.containsCharacter(character.id))
         }
         val themesWithoutCharacter = listOf(
-            (Theme.takeNoteOf() as Either.Right).b,
-            (Theme.takeNoteOf() as Either.Right).b
+            (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b,
+            (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b
         )
         val useCase = given(
             listOf(character),

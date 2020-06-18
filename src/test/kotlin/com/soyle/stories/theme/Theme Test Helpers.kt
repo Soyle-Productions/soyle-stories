@@ -15,10 +15,10 @@ import java.util.*
  * Time: 4:39 PM
  */
 
-fun takeNoteOfTheme() = (Theme.takeNoteOf() as Either.Right).b
+fun takeNoteOfTheme(): Theme = (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b
 
-fun takeNoteOfTheme(expectedId: UUID) = takeNoteOfTheme().let {
-	Theme(Theme.Id(expectedId), it.centralMoralQuestion, it.characters.associateBy { it.id }, it.similaritiesBetweenCharacters)
+fun takeNoteOfTheme(expectedId: UUID): Theme = takeNoteOfTheme().let {
+	Theme(Theme.Id(expectedId), Project.Id(), "", listOf(), it.centralMoralQuestion, it.characters.associateBy { it.id }, it.similaritiesBetweenCharacters)
 }
 
 val newCharacter = Character(
@@ -27,10 +27,10 @@ val newCharacter = Character(
 val newArchetype = "Artist"
 val newVariationOnMoral = "When you look at it this way..."
 
-val themeWithCharacter = (Theme.takeNoteOf()
+val themeWithCharacter = (Theme.takeNoteOf(Project.Id(), "")
 	.flatMap { it.includeCharacter(newCharacter) } as Either.Right).b
 
-val themeWithoutCharacter = (Theme.takeNoteOf() as Either.Right).b
+val themeWithoutCharacter = (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b
 
 fun promoteCharacter(): Either<ThemeException, Theme> {
 	val characterInTheme = themeWithCharacter.getMinorCharacterById(newCharacter.id)!!

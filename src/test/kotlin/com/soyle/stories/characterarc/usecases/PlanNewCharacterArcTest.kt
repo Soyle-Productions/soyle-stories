@@ -73,6 +73,10 @@ class PlanNewCharacterArcTest {
 
             }
 
+            override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {
+                TODO("Not yet implemented")
+            }
+
             override suspend fun removeCharacterArc(themeId: Theme.Id, characterId: Character.Id) {
 
             }
