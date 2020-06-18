@@ -6,3 +6,7 @@
 package com.soyle.stories.theme
 
 fun ThemeDoesNotExist.themeIdMustEqual(value: Any) = assert(themeId == value) { "themeId of ThemeDoesNotExist does not equal $value" }
+
+fun themeNameCannotBeBlank(actual: Any?) {
+    actual as ThemeNameCannotBeBlank
+}

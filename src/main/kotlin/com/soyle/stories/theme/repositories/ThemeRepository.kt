@@ -11,6 +11,7 @@ import com.soyle.stories.entities.Theme
 interface ThemeRepository {
     suspend fun listThemesInProject(projectId: Project.Id): List<Theme>
     suspend fun getThemeById(id: Theme.Id): Theme?
+    suspend fun addTheme(theme: Theme)
     suspend fun updateTheme(theme: Theme)
     suspend fun deleteTheme(theme: Theme)
 }

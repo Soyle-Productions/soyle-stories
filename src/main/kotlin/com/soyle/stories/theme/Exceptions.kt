@@ -12,6 +12,8 @@ abstract class ThemeException : Exception() {
     abstract val themeId: UUID
 }
 
+object ThemeNameCannotBeBlank : Exception()
+
 class CharacterAlreadyIncludedInTheme(val characterId: UUID, override val themeId: UUID) : ThemeException()
 class CharacterNotInTheme(override val themeId: UUID, val characterId: UUID) : ThemeException()
 class StoryFunctionAlreadyApplied(

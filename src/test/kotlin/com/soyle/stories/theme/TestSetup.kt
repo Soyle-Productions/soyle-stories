@@ -103,6 +103,10 @@ fun setupContext(
             themes.putAll(initialThemes.map { it.id to it })
         }
 
+        override suspend fun addTheme(theme: Theme) {
+            TODO("Not yet implemented")
+        }
+
         override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {
             TODO("Not yet implemented")
         }

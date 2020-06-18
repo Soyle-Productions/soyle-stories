@@ -48,6 +48,10 @@ class PlanNewCharacterArcTest {
                 themes[theme.id] = theme
             }
 
+            override suspend fun addTheme(theme: Theme) {
+                TODO("Not yet implemented")
+            }
+
             override suspend fun addNewCharacterArc(characterArc: CharacterArc) =
                 addNewCharacterArc.invoke(characterArc)
 
