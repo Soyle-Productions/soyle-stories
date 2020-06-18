@@ -144,8 +144,6 @@ class DemoteCharacterTest {
             it.whenExecuted().assert {
                 output as DemoteMajorCharacter.ResponseModel
                 assertTrue(output.themeRemoved)
-
-                assertThemeDeleted()
             }
         }
     }

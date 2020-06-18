@@ -54,6 +54,8 @@ class Theme(
         similaritiesBetweenCharacters
     )
 
+    fun withName(name: String) = copy(name = name)
+
     fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> {
         return copy(
             centralMoralQuestion = question

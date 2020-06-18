@@ -117,7 +117,7 @@ class CompareCharactersTest {
 		val minorCharacter2Similarity = "Similarity"
 
 		init {
-			val (themeTemp) = Theme.takeNoteOf(Project.Id(), centralMoralQuestion)
+			val (themeTemp) = Theme.takeNoteOf(Project.Id(), "", centralMoralQuestion)
 				.flatMap { it.includeCharacter(majorCharacters[0]) }
 				.flatMap { it.includeCharacter(majorCharacters[1]) }
 				.flatMap { it.includeCharacter(majorCharacters[2]) }

@@ -6,6 +6,7 @@ import com.soyle.stories.theme.repositories.ThemeRepository
 
 class ThemeRepositoryDouble(
     private val onAddTheme: (Theme) -> Unit = {},
+    private val onUpdateTheme: (Theme) -> Unit = {},
     private val onDeleteTheme: (Theme) -> Unit = {}
 ) : ThemeRepository
 {
@@ -24,6 +25,7 @@ class ThemeRepositoryDouble(
 
     override suspend fun updateTheme(theme: Theme) {
         themes[theme.id]= theme
+        onUpdateTheme(theme)
     }
 
     override suspend fun deleteTheme(theme: Theme) {
