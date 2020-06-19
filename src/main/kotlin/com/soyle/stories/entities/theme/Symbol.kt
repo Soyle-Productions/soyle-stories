@@ -8,7 +8,9 @@ class Symbol(
     val name: String
 ) : Entity<Symbol.Id> {
 
-    data class Id(val uuid: UUID) {
+    constructor(name: String) : this(Id(), name)
+
+    data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "Symbol($uuid)"
     }
 }
