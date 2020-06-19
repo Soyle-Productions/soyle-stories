@@ -12,6 +12,7 @@ import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
+import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
@@ -35,7 +36,7 @@ object CharacterComparisonConfig : ToolConfig<CharacterComparison> {
 
 	override fun getTabConfig(tool: ToolViewModel, type: CharacterComparison): ToolTabConfig = object : ToolTabConfig {
 		override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-			val scope = CharacterComparisonScope(projectScope, type.themeId.toString(), type.characterId.toString())
+			val scope = CharacterComparisonScope(projectScope, tool.toolId, type.themeId.toString(), type.characterId?.toString())
 			val comparison = find<com.soyle.stories.characterarc.characterComparison.CharacterComparison>(scope = scope)
 			val tab = tabPane.tab(comparison)
 			tab.tabPaneProperty().onChange {
@@ -52,10 +53,6 @@ object CharacterComparisonConfig : ToolConfig<CharacterComparison> {
 class CharacterComparison(val themeId: UUID, val characterId: UUID?) : DynamicTool() {
 
 	override suspend fun validate(context: OpenToolContext) {
-		if (characterId != null) {
-			context.characterRepository.getCharacterById(Character.Id(characterId))
-			  ?: throw CharacterDoesNotExist(characterId)
-		}
 		context.themeRepository.getThemeById(Theme.Id(themeId))
 		  ?: throw ThemeDoesNotExist(themeId)
 	}

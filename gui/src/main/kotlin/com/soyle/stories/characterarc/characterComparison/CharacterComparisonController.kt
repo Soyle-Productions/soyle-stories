@@ -16,8 +16,8 @@ class CharacterComparisonController(
 
 	private val themeId: UUID = UUID.fromString(themeId)
 
-	suspend fun getCharacterComparison(characterId: String) {
-		val preparedId = prepareCharacterId(characterId)
+	suspend fun getCharacterComparison(characterId: String?) {
+		val preparedId = characterId?.let(::prepareCharacterId)
 		compareCharacters.invoke(
 		  themeId,
 		  preparedId,

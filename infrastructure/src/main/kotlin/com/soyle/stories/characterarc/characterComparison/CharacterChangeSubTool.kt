@@ -100,7 +100,7 @@ class CharacterChangeSubTool : Fragment() {
         }
     }
 
-    private fun Field.textValueField(prop: CharacterChangeSubToolViewModel.() -> SectionValue) {
+    private fun Field.textValueField(prop: CharacterChangeSubToolViewModel.() -> SectionValue?) {
         textfield(characterChangeTool.select { (it?.prop()?.value ?: "").toProperty() }) {
             fitToParentWidth()
             focusedProperty().onChange { focused ->

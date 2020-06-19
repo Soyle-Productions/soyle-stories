@@ -71,6 +71,7 @@ class WriterSteps(en: En, double: SoyleStoriesTestDouble) {
 			return when(uatLabel) {
 				"Confirm Reorder Scene Dialog" -> DialogType.ReorderScene
 				"Confirm Delete Scene Dialog" -> DialogType.DeleteScene
+				"Confirm Delete Theme Dialog" -> DialogType.DeleteTheme
 				else -> null
 			}
 		}

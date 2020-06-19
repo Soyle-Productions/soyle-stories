@@ -16,7 +16,7 @@ class CharacterComparisonViewListenerImpl(
   private val removeCharacterFromLocalComparisonController: RemoveCharacterFromLocalComparisonController
 ) : CharacterComparisonViewListener {
 
-	override suspend fun getCharacterComparison(characterId: String) {
+	override suspend fun getCharacterComparison(characterId: String?) {
 		characterComparisonController.getCharacterComparison(characterId)
 	}
 

@@ -42,7 +42,7 @@ class SoyleStories : App(WelcomeScreen::class, WizardStyles::class) {
 
         stage.icons += appIcon
 
-        find<SplashScreen>(appScope)
+        //find<SplashScreen>(appScope)
         find<FailedProjectsDialog>(appScope)
         find<ConfirmExitDialog>(appScope)
         find<OpenProjectOptionDialog>(appScope)

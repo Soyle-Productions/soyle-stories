@@ -1,13 +1,18 @@
 package com.soyle.stories.theme.themeList
 
 import com.soyle.stories.common.components.emptyListDisplay
+import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.theme.ThemeNameCannotBeBlank
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
+import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialog
+import com.soyle.stories.theme.usecases.validateThemeName
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -15,6 +20,10 @@ class ThemeList : View() {
 
     private val viewListener = resolve<ThemeListViewListener>()
     private val model = resolve<ThemeListModel>()
+
+    private var treeview: TreeView<Any?> by singleAssign()
+
+    val themeItemContextMenu = themeItemContextMenu(model, viewListener)
 
     override val root: Parent = stackpane {
         hgrow = Priority.SOMETIMES
@@ -32,13 +41,38 @@ class ThemeList : View() {
             minWidth = 200.0
             minHeight = 100.0
             vgrow = Priority.ALWAYS
-            treeview<Any?>(TreeItem(null)) {
+            this@ThemeList.treeview = treeview<Any?>(TreeItem(null)) {
                 isShowRoot = false
                 vgrow = Priority.ALWAYS
+                model.selectedItem.bind(selectionModel.selectedItemProperty().select { it.valueProperty() })
+                makeEditable({ newName, item ->
+                    when (item) {
+                        is ThemeListItemViewModel -> {
+                            try {
+                                validateThemeName(newName)
+                                null
+                            }
+                            catch (e: ThemeNameCannotBeBlank) { "Theme name cannot be blank." }
+                        }
+                        else -> null
+                    }
+                }) { newName, item ->
+                    when (item) {
+                        is ThemeListItemViewModel -> {
+                            viewListener.renameTheme(item.themeId, newName)
+                        }
+                    }
+                    item
+                }
                 cellFormat {
-                    text = when (it) {
-                        is ThemeListItemViewModel -> it.themeName
-                        is SymbolListItemViewModel -> it.symbolName
+                    when (it) {
+                        is ThemeListItemViewModel -> {
+                            text = it.themeName
+                            contextMenu = themeItemContextMenu
+                        }
+                        is SymbolListItemViewModel -> {
+                            text = it.symbolName
+                        }
                         else -> throw IllegalArgumentException("Invalid value type")
                     }
                 }
@@ -49,6 +83,7 @@ class ThemeList : View() {
                         else -> emptyList()
                     }
                 }
+                contextMenu = themeListContextMenu()
             }
             hbox(alignment = Pos.CENTER, spacing = 10.0) {
                 isFillHeight = false
@@ -62,6 +97,17 @@ class ThemeList : View() {
                     }
                     isMnemonicParsing = false
                 }
+                button(model.deleteButtonLabel) {
+                    id = "actionBar_delete"
+                    enableWhen { model.selectedItem.isNotNull }
+                    action {
+                        val item = model.selectedItem.get()
+                        if (item is ThemeListItemViewModel) {
+                            scope.get<DeleteThemeDialog>().show(item.themeId, item.themeName)
+                        }
+                    }
+                    isMnemonicParsing = false
+                }
             }
         }
     }
@@ -71,6 +117,17 @@ class ThemeList : View() {
             owningTab?.tabPane?.requestLayout()
         }
         viewListener.getValidState()
+    }
+
+    internal fun editThemeName(themeId: String)
+    {
+        val treeItem = treeview.root.children.find {
+            when (val value = it.value) {
+                is ThemeListItemViewModel -> value.themeId == themeId
+                else -> false
+            }
+        } ?: return
+        treeview.edit(treeItem)
     }
 
 }

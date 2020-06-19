@@ -13,10 +13,6 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-
-    @new
-    Examples:
-      | dialog                        |
       | "Confirm Delete Theme Dialog" |
 
   Scenario Outline: Disabled dialogs are unchecked
@@ -28,10 +24,6 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-
-    @new
-    Examples:
-      | dialog                        |
       | "Confirm Delete Theme Dialog" |
 
   Scenario: Settings Dialog Save button disabled without changes
@@ -47,10 +39,6 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-
-    @new
-    Examples:
-      | dialog                        |
       | "Confirm Delete Theme Dialog" |
 
   Scenario Outline: Close without saving
@@ -64,10 +52,6 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-
-    @new
-    Examples:
-      | dialog                        |
       | "Confirm Delete Theme Dialog" |
 
   Scenario Outline: Request to hide
@@ -82,10 +66,6 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-
-    @new
-    Examples:
-      | dialog                        |
       | "Confirm Delete Theme Dialog" |
 
   Scenario Outline: Undo request to hide
@@ -100,8 +80,4 @@ Feature: Settings Dialog
       | dialog                         |
       | "Confirm Reorder Scene Dialog" |
       | "Confirm Delete Scene Dialog"  |
-
-    @new
-    Examples:
-      | dialog                        |
       | "Confirm Delete Theme Dialog" |

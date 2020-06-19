@@ -12,14 +12,25 @@ import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogController
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogModel
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogPresenter
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogViewListener
+import com.soyle.stories.theme.deleteTheme.DeleteThemeController
+import com.soyle.stories.theme.deleteTheme.DeleteThemeControllerImpl
+import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
+import com.soyle.stories.theme.deleteThemeDialog.*
+import com.soyle.stories.theme.renameTheme.RenameThemeController
+import com.soyle.stories.theme.renameTheme.RenameThemeControllerImpl
+import com.soyle.stories.theme.renameTheme.RenameThemeNotifier
 import com.soyle.stories.theme.themeList.ThemeListController
 import com.soyle.stories.theme.themeList.ThemeListModel
 import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateThemeUseCase
+import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
+import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByThemeUseCase
+import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
+import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
 
 object ThemeModule {
 
@@ -38,6 +49,8 @@ object ThemeModule {
     {
         provide<CreateTheme> { CreateThemeUseCase(get()) }
         provide<ListSymbolsByTheme> { ListSymbolsByThemeUseCase(get()) }
+        provide<DeleteTheme> { DeleteThemeUseCase(get()) }
+        provide<RenameTheme> { RenameThemeUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -45,12 +58,24 @@ object ThemeModule {
         provide(CreateTheme.OutputPort::class) {
             CreateThemeNotifier()
         }
+        provide(DeleteTheme.OutputPort::class) {
+            DeleteThemeNotifier()
+        }
+        provide(RenameTheme.OutputPort::class) {
+            RenameThemeNotifier()
+        }
     }
 
     private fun InScope<ProjectScope>.controllers()
     {
         provide<CreateThemeController> {
             CreateThemeControllerImpl(projectId.toString(), applicationScope.get(), get(), get())
+        }
+        provide<DeleteThemeController> {
+            DeleteThemeControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<RenameThemeController> {
+            RenameThemeControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -75,13 +100,36 @@ object ThemeModule {
             )
 
             presenter listensTo get<CreateThemeNotifier>()
+            presenter listensTo get<DeleteThemeNotifier>()
+            presenter listensTo get<RenameThemeNotifier>()
 
             ThemeListController(
                 projectId.toString(),
                 applicationScope.get(),
                 get(),
-                presenter
+                presenter,
+                get(),
+                get()
             )
+        }
+
+        scoped<DeleteThemeDialogScope> {
+            provide<DeleteThemeDialogViewListener> {
+                val presenter = DeleteThemeDialogPresenter(
+                    themeId, themeName, projectScope.get<DeleteThemeDialogModel>()
+                )
+
+                presenter listensTo projectScope.get<DeleteThemeNotifier>()
+
+                DeleteThemeDialogController(
+                    themeId,
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    presenter,
+                    projectScope.get(),
+                    projectScope.get()
+                )
+            }
         }
     }
 }

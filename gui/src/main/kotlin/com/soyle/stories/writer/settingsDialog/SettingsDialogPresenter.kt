@@ -29,6 +29,7 @@ class SettingsDialogPresenter(
 		return when (dialogType) {
 			DialogType.DeleteScene -> "Confirm Delete Scene Dialog"
 			DialogType.ReorderScene -> "Confirm Reorder Scene Dialog"
+			DialogType.DeleteTheme -> "Confirm Delete Theme Dialog"
 		}
 	}
 

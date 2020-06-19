@@ -43,6 +43,8 @@ compileUatKotlin {
 javafx {
     version = "14"
     modules = ['javafx.controls', 'javafx.fxml'/*, 'javafx.web', 'javafx.swing'*/]
+
+    
 }
 
 def javaFXOptions = convention.findByType(JavaFXOptions.class) ?: convention.findPlugin(JavaFXOptions.class) ?: convention.getByType(JavaFXOptions.class)

@@ -4,8 +4,9 @@ data class ThemeListViewModel(
     val emptyMessage: String,
     val createFirstThemeButtonLabel: String,
     val themes: List<ThemeListItemViewModel>,
-    val createThemeButtonLabel: String
+    val createThemeButtonLabel: String,
+    val deleteButtonLabel: String
 )
 
-class ThemeListItemViewModel(val themeId: String, val themeName: String, val symbols: List<SymbolListItemViewModel>)
+data class ThemeListItemViewModel(val themeId: String, val themeName: String, val symbols: List<SymbolListItemViewModel>)
 class SymbolListItemViewModel(val symbolId: String, val symbolName: String)

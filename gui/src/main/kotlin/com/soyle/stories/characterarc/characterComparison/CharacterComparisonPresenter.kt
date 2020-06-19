@@ -45,6 +45,7 @@ class CharacterComparisonPresenter(
 	}
 
 	override fun receiveCharacterComparison(response: CompareCharacters.ResponseModel) {
+		val focusCharacterId = response.focusedCharacterId?.toString()
 		view.update {
 
 			val charactersById = characters.associateBy { it.characterId }
@@ -52,8 +53,8 @@ class CharacterComparisonPresenter(
 			val includedIds = response.characterSummaries.ids.map(UUID::toString).toSet()
 
 			copy(
-			  focusedCharacterId = response.focusedCharacterId.toString(),
-			  focusedCharacter = charactersById[response.focusedCharacterId.toString()],
+			  focusedCharacterId = focusCharacterId,
+			  focusedCharacter = focusCharacterId?.let { charactersById[it] },
 			  majorCharacterIds = response.majorCharacterIds.map(UUID::toString),
 			  focusCharacterOptions = response.majorCharacterIds.mapNotNull { charactersById[it.toString()] },
 			  subTools = createSubTools(response),
@@ -180,14 +181,17 @@ class CharacterComparisonPresenter(
 	}
 
 	private fun createCharacterChangeSubTool(response: CompareCharacters.ResponseModel, comparisonItems: List<ComparisonItem>): CharacterChangeSubToolViewModel {
-		val focusedItem = comparisonItems.find { it.characterId == response.focusedCharacterId.toString() }!!
+		val focusedCharacterId = response.focusedCharacterId?.toString()
+		val focusedItem = focusedCharacterId ?.let {
+			comparisonItems.find { it.characterId == focusedCharacterId }!!
+		}
 
 		return CharacterChangeSubToolViewModel(
 		  label = "Character Change",
-		  psychWeakness = focusedItem.compSections.getValue("Psychological Weakness"),
-		  moralWeakness = focusedItem.compSections.getValue("Moral Weakness"),
+		  psychWeakness = focusedItem?.compSections?.getValue("Psychological Weakness"),
+		  moralWeakness = focusedItem?.compSections?.getValue("Moral Weakness"),
 		  change = "",
-		  desire = focusedItem.compSections.getValue("Desire"),
+		  desire = focusedItem?.compSections?.getValue("Desire"),
 		  sections = listOf(
 			"Opponent Attack on Hero's Weakness",
 			"Values or Beliefs",

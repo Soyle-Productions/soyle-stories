@@ -43,10 +43,10 @@ data class MoralProblemSubToolViewModel(
 
 data class CharacterChangeSubToolViewModel(
   override val label: String,
-  val psychWeakness: SectionValue,
-  val moralWeakness: SectionValue,
+  val psychWeakness: SectionValue?,
+  val moralWeakness: SectionValue?,
   val change: String,
-  val desire: SectionValue,
+  val desire: SectionValue?,
   override val sections: List<String>,
   override val items: List<ComparisonItem>
 ) : SubToolViewModel()

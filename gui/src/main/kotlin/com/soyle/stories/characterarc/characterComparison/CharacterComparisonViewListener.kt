@@ -7,7 +7,7 @@ package com.soyle.stories.characterarc.characterComparison
 
 interface CharacterComparisonViewListener {
 
-    suspend fun getCharacterComparison(characterId: String)
+    suspend fun getCharacterComparison(characterId: String?)
     suspend fun addCharacterToComparison(characterId: String)
     suspend fun promoteCharacter(characterId: String)
     suspend fun demoteCharacter(characterId: String)

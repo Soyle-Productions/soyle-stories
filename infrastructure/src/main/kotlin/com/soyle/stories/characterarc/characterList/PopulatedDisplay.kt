@@ -67,14 +67,6 @@ internal class PopulatedDisplay : View() {
                 }
             }
         }
-        item("Compare Characters") {
-            action {
-                val selectedItem = model.selectedItem.value
-                if (selectedItem is CharacterArcItemViewModel) {
-                    characterListViewListener.openCharacterComparison(selectedItem.characterId, selectedItem.themeId)
-                }
-            }
-        }
         item("Delete") {
             action {
                 val selectedItem = model.selectedItem.value

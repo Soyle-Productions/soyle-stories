@@ -39,7 +39,13 @@ Feature: Theme List
     When a theme is created
     Then the Theme List Tool should show the new theme
 
-  @new
+  @delete-theme
+  Scenario: React to Theme Deleted
+    Given a Theme has been created
+    And the Theme List tool has been opened
+    When a theme is deleted
+    Then the Theme List Tool should not show the deleted theme
+
   Scenario Outline: Right-Click on Theme
     Given a Theme has been created
     And the Theme List tool has been opened
@@ -52,7 +58,7 @@ Feature: Theme List
       | option |
       | "Compare Values" |
 
-    @open-tool @new
+    @open-tool
     Examples:
       | option |
       | "Compare Characters" |
@@ -62,12 +68,12 @@ Feature: Theme List
       | option |
       | "Create Symbol" |
 
-    @rename-theme @new
+    @rename-theme
     Examples:
       | option |
       | "Rename" |
 
-    @delete-theme @new
+    @delete-theme
     Examples:
       | option |
       | "Delete" |
@@ -75,8 +81,13 @@ Feature: Theme List
   @open-tool @new @excluded
   Scenario: Open Theme Value Web
 
-  @open-tool @new @excluded
+  @open-tool
   Scenario: Open Character Comparison
+    Given a Theme has been created
+    And the Theme List tool has been opened
+    And the Theme List Theme Context Menu has been opened
+    When the Theme List Theme Context Menu "Compare Characters" option is selected
+    Then the Character Comparison Tool should be open
 
   @create-symbol @new
   Scenario: Create Symbol for Theme
@@ -86,7 +97,7 @@ Feature: Theme List
     When the Theme List Theme Context Menu "Create Symbol" option is selected
     Then the Create Symbol Dialog should be open
 
-  @delete-theme @new
+  @delete-theme
   Scenario: Delete Theme by Right-Clicking
     Given a Theme has been created
     And the Theme List tool has been opened
@@ -94,7 +105,7 @@ Feature: Theme List
     When the Theme List Theme Context Menu "Delete" option is selected
     Then the Confirm Delete Theme Dialog should be open
 
-  @rename-theme @new
+  @rename-theme
   Scenario: Rename
     Given a Theme has been created
     And the Theme List tool has been opened
@@ -102,7 +113,7 @@ Feature: Theme List
     When the Theme List Theme Context Menu "Rename" option is selected
     Then the Theme List Rename Theme Text Field should be open
 
-  @rename-theme @new
+  @rename-theme
   Scenario Outline: Cancel Rename Theme
     Given a Theme has been created
     And the Theme List tool has been opened
@@ -115,7 +126,7 @@ Feature: Theme List
       | Pressing Escape |
       | Clicking Away |
 
-  @rename-theme @new
+  @rename-theme
   Scenario Outline: Commit Rename Theme
     Given a Theme has been created
     And the Theme List tool has been opened
@@ -130,7 +141,7 @@ Feature: Theme List
       | Pressing Enter |
       | Clicking Away |
 
-  @rename-theme @new
+  @rename-theme
   Scenario Outline: Fail to Rename Theme
     Given a Theme has been created
     And the Theme List tool has been opened
@@ -163,7 +174,7 @@ Feature: Theme List
   @rename-symbol @new @excluded
   Scenario: Fail to Rename Symbol
 
-  @delete-theme @new
+  @delete-theme
   Scenario: Delete Theme by Selection and Delete Button
     Given a Theme has been created
     And the Theme List tool has been opened

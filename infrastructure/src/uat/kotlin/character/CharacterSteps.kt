@@ -6,6 +6,7 @@ import io.cucumber.java8.En
 class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 
 	init {
+		CharacterComparisonSteps(en, double)
 		with(en) {
 
 			Given("a Character has been created") {

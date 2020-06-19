@@ -217,10 +217,10 @@ object CharacterDriver : ApplicationTest() {
 
 	fun getCharacterSelectedInCharacterListTool(double: SoyleStoriesTestDouble): CharacterTreeItemViewModel? {
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
-		val locationList = findComponentsInScope<CharacterList>(projectScope).singleOrNull() ?: return null
+		val list = findComponentsInScope<CharacterList>(projectScope).singleOrNull() ?: return null
 		var selected: CharacterTreeItemViewModel? = null
 		interact {
-			selected = from(locationList.root).lookup(".tree-view").query<TreeView<*>>()
+			selected = from(list.root).lookup(".tree-view").query<TreeView<*>>()
 			  .selectionModel.selectedItem?.value as? CharacterTreeItemViewModel
 		}
 		return selected

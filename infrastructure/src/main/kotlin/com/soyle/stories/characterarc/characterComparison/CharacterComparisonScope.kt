@@ -13,7 +13,7 @@ import javafx.event.EventTarget
 import kotlinx.coroutines.runBlocking
 import tornadofx.*
 
-class CharacterComparisonScope(val projectScope: ProjectScope, val themeId: String, characterId: String) : Scope() {
+class CharacterComparisonScope(val projectScope: ProjectScope, private val toolId: String, val themeId: String, characterId: String?) : Scope() {
 
     private val model = find<CharacterComparisonModel>(scope = this)
     private val characterComparisonViewListener = resolve<CharacterComparisonViewListener>(scope = this)
@@ -27,16 +27,17 @@ class CharacterComparisonScope(val projectScope: ProjectScope, val themeId: Stri
         }
 
     init {
-        getCharacterComparison(characterId)
-
+        projectScope.addScope(toolId, this)
+        //getCharacterComparison(characterId)
+/*
         model.isInvalid.onChangeUntil(isClosedProperty) {
             if (it == true) {
-                getCharacterComparison(model.focusedCharacter.value.characterId)
+                getCharacterComparison(model.focusedCharacter.value?.characterId)
             }
-        }
+        }*/
     }
 
-    private fun getCharacterComparison(characterId: String) {
+    private fun getCharacterComparison(characterId: String?) {
         runAsync {
             runBlocking {
                 characterComparisonViewListener.getCharacterComparison(characterId)
@@ -48,6 +49,7 @@ class CharacterComparisonScope(val projectScope: ProjectScope, val themeId: Stri
         FX.getComponents(this).values.forEach {
             if (it is EventTarget) it.removeFromParent()
         }
+        projectScope.removeScope(toolId, this)
         isClosed = true
         deregister()
     }
