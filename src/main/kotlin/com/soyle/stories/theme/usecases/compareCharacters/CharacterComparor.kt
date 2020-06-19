@@ -12,7 +12,7 @@ import java.util.*
 
 internal class CharacterComparor(
     private val theme: Theme,
-    private val focusCharacter: MajorCharacter,
+    private val focusCharacter: MajorCharacter?,
     arcSections: List<CharacterArcSection>
 ) {
 
@@ -26,7 +26,7 @@ internal class CharacterComparor(
     fun compareCharacters(): CompareCharacters.ResponseModel {
         return CompareCharacters.ResponseModel(
             centralQuestion = theme.centralMoralQuestion,
-            focusedCharacterId = focusCharacter.id.uuid,
+            focusedCharacterId = focusCharacter?.id?.uuid,
             majorCharacterIds = majorCharacterIds(),
             comparisonSections = thematicTemplateSectionNames(),
             characterSummaries = summarizeCharacters()
@@ -43,6 +43,7 @@ internal class CharacterComparor(
             .toList()
 
     private fun summarizeCharacters(): CompareCharacters.CharacterSummaries {
+        if (focusCharacter == null) return CompareCharacters.CharacterSummaries(mapOf())
         return (unfocusedCharacterComparisons() + focusCharacter.toCharacterComparison())
             .associateBy { it.id }
             .let(CompareCharacters::CharacterSummaries)
@@ -50,8 +51,8 @@ internal class CharacterComparor(
 
     private fun unfocusedCharacterComparisons(): List<CompareCharacters.CharacterComparisonSummary> =
         theme.characters.asSequence()
-            .filter { it.id != focusCharacter.id }
-            .map { focusCharacter.compareToCharacter(it) }
+            .filter { it.id != focusCharacter!!.id }
+            .map { focusCharacter!!.compareToCharacter(it) }
             .toList()
 
     private fun MajorCharacter.compareToCharacter(

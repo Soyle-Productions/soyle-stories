@@ -21,7 +21,7 @@ class CompareCharactersUseCase(
     private val context: Context
 ) : CompareCharacters {
 
-    override suspend fun invoke(themeId: UUID, focusCharacterId: UUID, outputPort: OutputPort) {
+    override suspend fun invoke(themeId: UUID, focusCharacterId: UUID?, outputPort: OutputPort) {
         val response = try {
             compareCharacters(themeId, focusCharacterId)
         } catch (t: ThemeException) {
@@ -30,11 +30,11 @@ class CompareCharactersUseCase(
         outputPort.receiveCharacterComparison(response)
     }
 
-    private suspend fun compareCharacters(themeId: UUID, focusCharacterId: UUID): ResponseModel {
+    private suspend fun compareCharacters(themeId: UUID, focusCharacterId: UUID?): ResponseModel {
         val theme = getThemeById(themeId)
         return CharacterComparor(
             theme = theme,
-            focusCharacter = theme.getFocusCharacter(focusCharacterId),
+            focusCharacter = focusCharacterId?.let { theme.getFocusCharacter(it) },
             arcSections = getArcSectionsIn(theme)
         ).compareCharacters()
     }
