@@ -63,7 +63,7 @@ Feature: Theme List
       | option |
       | "Compare Characters" |
 
-    @create-symbol @new
+    @create-symbol
     Examples:
       | option |
       | "Create Symbol" |
@@ -89,7 +89,7 @@ Feature: Theme List
     When the Theme List Theme Context Menu "Compare Characters" option is selected
     Then the Character Comparison Tool should be open
 
-  @create-symbol @new
+  @create-symbol
   Scenario: Create Symbol for Theme
     Given a Theme has been created
     And the Theme List tool has been opened
@@ -187,3 +187,10 @@ Feature: Theme List
 
   @create-symbol @new @excluded
   Scenario: Create Symbol without Theme
+
+  @create-symbol
+  Scenario: React Symbol Created
+    Given a Theme has been created
+    And the Theme List tool has been opened
+    When a symbol is created
+    Then the Theme List Tool should show the new symbol

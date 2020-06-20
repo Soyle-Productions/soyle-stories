@@ -5,6 +5,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
+import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
@@ -44,6 +45,16 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             assertTrue(themes.size >= count)
             return themes
         }
+
+        fun createSymbol(double: SoyleStoriesTestDouble)
+        {
+            val scope = ProjectSteps.getProjectScope(double)!!
+            val controller = scope.get<AddSymbolToThemeController>()
+            val theme = getCreatedThemes(double).first()
+            interact {
+                controller.addSymbolToTheme(theme.id.uuid.toString(), "New Theme ${UUID.randomUUID()}") { throw it }
+            }
+        }
     }
 
     init {
@@ -71,6 +82,9 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 interact {
                     controller.deleteTheme(themeToDelete)
                 }
+            }
+            When("a symbol is created") {
+                createSymbol(double)
             }
 
             Then("the Theme should be deleted") {

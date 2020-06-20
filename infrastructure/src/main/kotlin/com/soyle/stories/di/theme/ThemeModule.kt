@@ -128,6 +128,7 @@ object ThemeModule {
             presenter listensTo get<CreateThemeNotifier>()
             presenter listensTo get<DeleteThemeNotifier>()
             presenter listensTo get<RenameThemeNotifier>()
+            presenter listensTo get<AddSymbolToThemeNotifier>()
 
             ThemeListController(
                 projectId.toString(),

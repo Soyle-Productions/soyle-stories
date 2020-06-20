@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.themeList
 
 import com.soyle.stories.di.get
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialog
 import javafx.scene.control.ContextMenu
 import tornadofx.action
@@ -13,6 +14,14 @@ internal fun ThemeList.themeItemContextMenu(model: ThemeListModel, viewListener:
             val selectedItem = model.selectedItem.value
             if (selectedItem is ThemeListItemViewModel) {
                 viewListener.openCharacterComparison(selectedItem.themeId)
+            }
+        }
+    }
+    item("Create Symbol") {
+        action {
+            val selectedItem = model.selectedItem.value
+            if (selectedItem is ThemeListItemViewModel) {
+                scope.get<CreateSymbolDialog>().show(selectedItem.themeId, currentWindow)
             }
         }
     }

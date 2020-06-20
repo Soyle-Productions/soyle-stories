@@ -2,6 +2,8 @@ package com.soyle.stories.theme.themeList
 
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.usecases.SymbolItem
+import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
+import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
@@ -16,7 +18,11 @@ import java.util.*
 
 class ThemeListPresenter(
     private val view: View.Nullable<ThemeListViewModel>
-) : ListSymbolsByTheme.OutputPort, CreateTheme.OutputPort, DeleteTheme.OutputPort, RenameTheme.OutputPort {
+) : ListSymbolsByTheme.OutputPort,
+    CreateTheme.OutputPort,
+    DeleteTheme.OutputPort,
+    RenameTheme.OutputPort,
+    AddSymbolToTheme.OutputPort {
 
     override suspend fun symbolsListedByTheme(response: SymbolsByTheme) {
         val viewModel = ThemeListViewModel(
@@ -66,14 +72,34 @@ class ThemeListPresenter(
         }
     }
 
+    override suspend fun addedSymbolToTheme(response: SymbolAddedToTheme) {
+        val themeId = response.themeId.toString()
+        val newItem = symbolItem(response.symbolId, response.symbolName)
+        view.updateOrInvalidated {
+            copy(
+                themes = themes.map {
+                    if (it.themeId != themeId) it
+                    else it.copy(
+                        symbols = sortedSymbols(it.symbols + newItem)
+                    )
+                }
+            )
+        }
+    }
+
     private fun sortedThemes(themes: List<ThemeListItemViewModel>) = themes.sortedBy { it.themeName.toLowerCase() }
 
     private fun themeItem(themeId: UUID, themeName: String, symbols: List<SymbolItem> = listOf()) = ThemeListItemViewModel(
         themeId.toString(),
         themeName,
-        symbols.map {
-            SymbolListItemViewModel(it.symbolId.toString(), it.symbolName)
-        }.sortedBy { it.symbolName.toLowerCase() }
+        sortedSymbols(symbols.map {
+            symbolItem(it.symbolId, it.symbolName)
+        })
     )
+
+    private fun sortedSymbols(symbols: List<SymbolListItemViewModel>) = symbols.sortedBy { it.symbolName.toLowerCase() }
+
+    private fun symbolItem(symbolId: UUID, symbolName: String) =
+        SymbolListItemViewModel(symbolId.toString(), symbolName)
 
 }

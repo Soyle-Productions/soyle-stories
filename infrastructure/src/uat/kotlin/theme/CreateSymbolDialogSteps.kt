@@ -91,6 +91,9 @@ class CreateSymbolDialogSteps(en: En, double: SoyleStoriesTestDouble) {
             Then("the Create Symbol Dialog should not be closed") {
                 assertNotNull(getOpenDialog())
             }
+            Then("the Create Symbol Dialog should be open") {
+                assertNotNull(getOpenDialog())
+            }
             Then("the Create Symbol Dialog should show an error message") {
                 val dialog = getOpenDialog()!!
                 assertTrue(from(dialog.root).lookup(".text-field").queryTextInputControl().decorators.isNotEmpty())

@@ -229,6 +229,15 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
                 val inputBox = treeView.editingCell?.graphic as TextField
                 assertTrue(inputBox.decorators.isNotEmpty()) { "No decorator on rename input box" }
             }
+            Then("the Theme List Tool should show the new symbol") {
+                val themes = ThemeSteps.getCreatedThemes(double).associateBy { it.id.uuid.toString() }
+                val tool = getOpenTool(double)!!
+                val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
+                treeView.root.children.forEach {
+                    val theme = themes.getValue((it.value as ThemeListItemViewModel).themeId)
+                    assertEquals(theme.symbols.size, it.children.size)
+                }
+            }
 
         }
     }
