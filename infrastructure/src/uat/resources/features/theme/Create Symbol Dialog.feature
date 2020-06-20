@@ -4,12 +4,10 @@ Feature: Create Symbol Dialog
   Background:
     Given A project has been opened
 
-  @new
   Scenario: Open Dialog with Theme
     Given a Theme has been created
     When the Create Symbol Dialog is opened with a Theme
     Then the Create Symbol Dialog Theme field should not be visible
-    But the Create Symbol Dialog Theme toggle button should not be disabled
 
   @create-theme @list-themes @new
   Scenario: Open Dialog without Theme
@@ -29,7 +27,6 @@ Feature: Create Symbol Dialog
     And the Create Symbol Dialog Theme toggle button should say "Select Existing Theme"
     But the Create Symbol Dialog Theme toggle button should be disabled
 
-  @new
   Scenario: Create Symbol with Valid Name
     Given the Create Symbol Dialog has been opened
     And a valid Symbol Name has been entered into the Create Symbol Dialog Name field
@@ -37,7 +34,6 @@ Feature: Create Symbol Dialog
     Then the Create Symbol Dialog should be closed
     And a new Symbol should be created with the supplied name
 
-  @new
   Scenario: Create Symbol with Invalid Name
     Given the Create Symbol Dialog has been opened
     And an invalid Symbol Name has been entered into the Create Symbol Dialog Name field
@@ -46,7 +42,6 @@ Feature: Create Symbol Dialog
     And the Create Symbol Dialog should show an error message
     But a new Symbol should not be created
 
-  @new
   Scenario: Cancel Symbol Creation
     Given the Create Symbol Dialog has been opened
     When the Esc key is pressed

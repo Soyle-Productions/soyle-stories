@@ -49,6 +49,7 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
     init {
         CreateThemeDialogSteps(en, double)
         DeleteThemeDialogSteps(en, double)
+        CreateSymbolDialogSteps(en, double)
         ThemeListToolSteps(en, double)
 
         with(en) {

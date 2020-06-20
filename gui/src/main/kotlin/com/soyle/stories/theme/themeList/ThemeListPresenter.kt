@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.themeList
 
 import com.soyle.stories.gui.View
+import com.soyle.stories.theme.usecases.SymbolItem
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
@@ -11,38 +12,30 @@ import com.soyle.stories.theme.usecases.listSymbolsByTheme.symbols
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.theme
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenamedTheme
+import java.util.*
 
 class ThemeListPresenter(
     private val view: View.Nullable<ThemeListViewModel>
 ) : ListSymbolsByTheme.OutputPort, CreateTheme.OutputPort, DeleteTheme.OutputPort, RenameTheme.OutputPort {
 
     override suspend fun symbolsListedByTheme(response: SymbolsByTheme) {
-        view.update {
-            ThemeListViewModel(
-                emptyMessage = "No themes created yet.",
-                createFirstThemeButtonLabel = "Create First Theme",
-                themes = response.themes.map {
-                    ThemeListItemViewModel(
-                        it.theme.themeId.toString(),
-                        it.theme.themeName,
-                        it.symbols.map {
-                            SymbolListItemViewModel(it.symbolId.toString(), it.symbolName)
-                        }.sortedBy { it.symbolName.toLowerCase() })
-                }.sortedBy { it.themeName.toLowerCase() },
-                createThemeButtonLabel = "Create New Theme",
-                deleteButtonLabel = "Delete"
-            )
-        }
+        val viewModel = ThemeListViewModel(
+            emptyMessage = "No themes created yet.",
+            createFirstThemeButtonLabel = "Create First Theme",
+            themes = sortedThemes(response.themes.map {
+                themeItem(it.theme.themeId, it.theme.themeName, it.symbols)
+            }),
+            createThemeButtonLabel = "Create New Theme",
+            deleteButtonLabel = "Delete"
+        )
+        view.update { viewModel }
     }
 
     override suspend fun themeCreated(response: CreatedTheme) {
+        val newItem = themeItem(response.themeId, response.themeName)
         view.updateOrInvalidated {
             copy(
-                themes = (themes + ThemeListItemViewModel(
-                    response.themeId.toString(),
-                    response.themeName,
-                    listOf()
-                )).sortedBy { it.themeName.toLowerCase() }
+                themes = sortedThemes(themes + newItem)
             )
         }
     }
@@ -51,9 +44,9 @@ class ThemeListPresenter(
         val themeId = response.themeId.toString()
         view.updateOrInvalidated {
             copy(
-                themes = (themes.filterNot {
+                themes = themes.filterNot {
                     it.themeId == themeId
-                }).sortedBy { it.themeName.toLowerCase() }
+                }
             )
         }
     }
@@ -63,14 +56,24 @@ class ThemeListPresenter(
         val newName = response.newName
         view.updateOrInvalidated {
             copy(
-                themes = (themes.map {
+                themes = sortedThemes(themes.map {
                     if (it.themeId != themeId) it
                     else it.copy(
                         themeName = newName
                     )
-                }).sortedBy { it.themeName.toLowerCase() }
+                })
             )
         }
     }
+
+    private fun sortedThemes(themes: List<ThemeListItemViewModel>) = themes.sortedBy { it.themeName.toLowerCase() }
+
+    private fun themeItem(themeId: UUID, themeName: String, symbols: List<SymbolItem> = listOf()) = ThemeListItemViewModel(
+        themeId.toString(),
+        themeName,
+        symbols.map {
+            SymbolListItemViewModel(it.symbolId.toString(), it.symbolName)
+        }.sortedBy { it.symbolName.toLowerCase() }
+    )
 
 }

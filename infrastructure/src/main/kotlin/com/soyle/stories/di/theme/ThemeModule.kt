@@ -5,6 +5,10 @@ import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
+import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeControllerImpl
+import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeNotifier
+import com.soyle.stories.theme.createSymbolDialog.*
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeControllerImpl
 import com.soyle.stories.theme.createTheme.CreateThemeNotifier
@@ -23,6 +27,8 @@ import com.soyle.stories.theme.themeList.ThemeListController
 import com.soyle.stories.theme.themeList.ThemeListModel
 import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
+import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
+import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToThemeUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateThemeUseCase
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
@@ -51,6 +57,7 @@ object ThemeModule {
         provide<ListSymbolsByTheme> { ListSymbolsByThemeUseCase(get()) }
         provide<DeleteTheme> { DeleteThemeUseCase(get()) }
         provide<RenameTheme> { RenameThemeUseCase(get()) }
+        provide<AddSymbolToTheme> { AddSymbolToThemeUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -63,6 +70,9 @@ object ThemeModule {
         }
         provide(RenameTheme.OutputPort::class) {
             RenameThemeNotifier()
+        }
+        provide(AddSymbolToTheme.OutputPort::class) {
+            AddSymbolToThemeNotifier()
         }
     }
 
@@ -77,6 +87,9 @@ object ThemeModule {
         provide<RenameThemeController> {
             RenameThemeControllerImpl(applicationScope.get(), get(), get())
         }
+        provide<AddSymbolToThemeController> {
+            AddSymbolToThemeControllerImpl(applicationScope.get(), get(), get())
+        }
     }
 
     private fun InScope<ProjectScope>.gui()
@@ -89,6 +102,19 @@ object ThemeModule {
             presenter listensTo get<CreateThemeNotifier>()
 
             CreateThemeDialogController(
+                presenter,
+                get()
+            )
+        }
+
+        provide<CreateSymbolDialogViewListener> {
+            val presenter = CreateSymbolDialogPresenter(
+                get<CreateSymbolDialogModel>()
+            )
+
+            presenter listensTo get<AddSymbolToThemeNotifier>()
+
+            CreateSymbolDialogController(
                 presenter,
                 get()
             )
