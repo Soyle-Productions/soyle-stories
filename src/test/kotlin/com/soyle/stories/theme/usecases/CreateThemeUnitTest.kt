@@ -4,7 +4,9 @@ import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.theme.symbolNameCannotBeBlank
 import com.soyle.stories.theme.themeNameCannotBeBlank
+import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateThemeUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
@@ -45,17 +47,45 @@ class CreateThemeUnitTest {
         result shouldBe createdTheme(name)
     }
 
-    private fun whenUseCaseCalled(name: String)
+    @Test
+    fun `create with invalid first symbol name`() {
+        val name = "New Theme ${UUID.randomUUID()}"
+        val symbolName = ""
+        whenUseCaseCalled(name, symbolName)
+        assertNoThemeAdded()
+        result shouldBe ::symbolNameCannotBeBlank
+    }
+
+    @Test
+    fun `create with valid first symbol name`() {
+        val name = "New Theme ${UUID.randomUUID()}"
+        val symbolName = "New Symbol ${UUID.randomUUID()}"
+        whenUseCaseCalled(name, symbolName)
+        assertThemeAddedToRepository(name)
+        result shouldBe {
+            it as List<*>
+            it.first() shouldBe createdTheme(name)
+            it.component2() shouldBe symbolAddedToTheme(symbolName)
+        }
+    }
+
+    private fun whenUseCaseCalled(name: String, firstSymbolName: String? = null)
     {
         val useCase: CreateTheme = CreateThemeUseCase(ThemeRepositoryDouble(onAddTheme = { createdTheme = it }))
         val output = object : CreateTheme.OutputPort {
             override suspend fun themeCreated(response: CreatedTheme) {
                 result = response
             }
+
+            override suspend fun addedSymbolToTheme(response: SymbolAddedToTheme) {
+                if (result != null) result = listOf(result, response)
+                else result = response
+            }
         }
+        val request = CreateTheme.RequestModel(projectId.uuid, name, firstSymbolName)
         runBlocking {
             try {
-                useCase.invoke(projectId.uuid, name, output)
+                useCase.invoke(request, output)
             } catch (t: Throwable) {
                 result = t
             }
@@ -78,5 +108,12 @@ class CreateThemeUnitTest {
         assertEquals(projectId.uuid, actual.projectId)
         assertEquals(createdTheme!!.id.uuid, actual.themeId)
         assertEquals(expectedName, actual.themeName)
+    }
+
+    private fun symbolAddedToTheme(expectedName: String): (Any?) -> Unit = { actual: Any?  ->
+        actual as SymbolAddedToTheme
+        assertEquals(createdTheme!!.id.uuid, actual.themeId)
+        assertEquals(createdTheme!!.symbols.single().id.uuid, actual.symbolId)
+        assertEquals(expectedName, actual.symbolName)
     }
 }

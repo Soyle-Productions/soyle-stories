@@ -5,6 +5,7 @@
  */
 package com.soyle.stories.theme
 
+import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.*
 
@@ -17,4 +18,8 @@ fun themeNameCannotBeBlank(actual: Any?) {
 fun themeDoesNotExist(themeId: UUID): (Any?) -> Unit = { actual ->
     actual as ThemeDoesNotExist
     assertEquals(themeId, actual.themeId)
+}
+fun symbolNameCannotBeBlank(actual: Any?)
+{
+    actual as SymbolNameCannotBeBlank
 }
