@@ -15,6 +15,9 @@ import java.util.*
 class CreateThemeDialogSteps(en: En, double: SoyleStoriesTestDouble) {
 
     companion object : ApplicationTest() {
+
+        val validThemeName = "Valid Theme Name ${UUID.randomUUID()}"
+
         fun getOpenDialog(double: SoyleStoriesTestDouble): CreateThemeDialog?
         {
             return listWindows().asSequence()
@@ -43,7 +46,6 @@ class CreateThemeDialogSteps(en: En, double: SoyleStoriesTestDouble) {
         }
     }
 
-    private val validThemeName = "Valid Theme Name ${UUID.randomUUID()}"
 
     init {
         with(en) {

@@ -8,6 +8,7 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
+import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import io.cucumber.java8.En
 import kotlinx.coroutines.runBlocking
@@ -85,6 +86,16 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             }
             When("a symbol is created") {
                 createSymbol(double)
+            }
+            When("a theme is renamed") {
+                val theme = getCreatedThemes(double).first()
+                val request = theme.id to "New Theme Name ${UUID.randomUUID()}"
+                ThemeListToolSteps.renameRequest = request
+                val scope = ProjectSteps.getProjectScope(double)!!
+                val controller = scope.get<RenameThemeController>()
+                interact {
+                    controller.renameTheme(theme.id.uuid.toString(), request.second)
+                }
             }
 
             Then("the Theme should be deleted") {

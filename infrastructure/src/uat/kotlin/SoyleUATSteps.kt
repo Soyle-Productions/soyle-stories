@@ -18,6 +18,7 @@ import com.soyle.stories.scene.SceneSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.CreateStoryEventDialogDriver
 import com.soyle.stories.storyevent.StoryEventSteps
+import com.soyle.stories.theme.CreateSymbolDialogSteps
 import com.soyle.stories.theme.CreateThemeDialogSteps
 import com.soyle.stories.theme.ThemeListToolSteps
 import com.soyle.stories.theme.ThemeSteps
@@ -471,6 +472,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 				"Scene" -> CreateSceneDialogDriver.isOpen(double)
 				"Theme" -> CreateThemeDialogSteps.isDialogOpen(double)
 				"Story Event" -> CreateStoryEventDialogDriver.openDialog.check(double)
+				"Symbol" -> CreateSymbolDialogSteps.isDialogOpen()
 				else -> false
 			}
 			assertTrue(isOpen)

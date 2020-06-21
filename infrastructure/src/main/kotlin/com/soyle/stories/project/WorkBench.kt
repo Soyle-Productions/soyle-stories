@@ -15,6 +15,7 @@ import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.soylestories.SoyleStories
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
 import com.soyle.stories.writer.settingsDialog.SettingsDialog
 import javafx.scene.Parent
@@ -60,6 +61,10 @@ class WorkBench : View() {
                     item("Theme") {
                         id = "file_new_theme"
                         action { scope.get<CreateThemeDialog>().show(currentWindow) }
+                    }
+                    item("Symbol") {
+                        id = "file_new_symbol"
+                        action { scope.get<CreateSymbolDialog>().show(themeId = null, parentWindow = currentWindow) }
                     }
                     /*
                     item("Plot Point") {

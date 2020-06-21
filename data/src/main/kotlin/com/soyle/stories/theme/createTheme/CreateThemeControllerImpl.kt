@@ -14,11 +14,27 @@ class CreateThemeControllerImpl(
     private val projectId = UUID.fromString(projectId)
 
     override fun createTheme(name: String, onError: (Throwable) -> Unit) {
+        val request = CreateTheme.RequestModel(
+            projectId,
+            name
+        )
+        createTheme(request, onError)
+    }
+
+    override fun createThemeAndFirstSymbol(themeName: String, symbolName: String, onError: (Throwable) -> Unit) {
+        val request = CreateTheme.RequestModel(
+            projectId,
+            themeName,
+            symbolName
+        )
+        createTheme(request, onError)
+    }
+
+    private fun createTheme(request: CreateTheme.RequestModel, onError: (Throwable) -> Unit)
+    {
         threadTransformer.async {
             try {
-                createTheme.invoke(
-                    projectId, name, createThemeOutputPort
-                )
+                createTheme.invoke(request, createThemeOutputPort)
             } catch (t: Throwable) { onError(t) }
         }
     }

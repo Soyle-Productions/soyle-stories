@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.createThemeDialog
 
 import com.soyle.stories.gui.View
+import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 
@@ -34,5 +35,7 @@ class CreateThemeDialogPresenter(
             CreateThemeDialogViewModel("", "", null, created = true)
         }
     }
+
+    override suspend fun addedSymbolToTheme(response: SymbolAddedToTheme) {}
 
 }

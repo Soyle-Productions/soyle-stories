@@ -24,6 +24,7 @@ class ThemeList : View() {
     private var treeview: TreeView<Any?> by singleAssign()
 
     val themeItemContextMenu = themeItemContextMenu(model, viewListener)
+    val symbolItemContextMenu = symbolItemContextMenu()
 
     override val root: Parent = stackpane {
         hgrow = Priority.SOMETIMES
@@ -72,9 +73,12 @@ class ThemeList : View() {
                         }
                         is SymbolListItemViewModel -> {
                             text = it.symbolName
+                            contextMenu = symbolItemContextMenu
+                            isEditable = false
                         }
                         else -> throw IllegalArgumentException("Invalid value type")
                     }
+                    setOnMouseClicked { it.consume() }
                 }
                 populate { parentItem: TreeItem<Any?> ->
                     when (val itemValue = parentItem.value) {
@@ -82,6 +86,9 @@ class ThemeList : View() {
                         is ThemeListItemViewModel -> itemValue.symbols
                         else -> emptyList()
                     }
+                }
+                setOnMouseClicked {
+                    selectionModel.clearSelection()
                 }
                 contextMenu = themeListContextMenu()
             }

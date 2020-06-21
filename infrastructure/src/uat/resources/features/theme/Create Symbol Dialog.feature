@@ -9,16 +9,17 @@ Feature: Create Symbol Dialog
     When the Create Symbol Dialog is opened with a Theme
     Then the Create Symbol Dialog Theme field should not be visible
 
-  @create-theme @list-themes @new
+  @create-theme @list-themes
   Scenario: Open Dialog without Theme
     Given 5 Themes have been created
     When the Create Symbol Dialog is opened without a Theme
     Then the Create Symbol Dialog Theme field should be visible
     And the Create Symbol Dialog Theme field should be a dropdown
+    And the Create Symbol Dialog Theme field should list all themes
     And the Create Symbol Dialog Theme field label should say "Select Existing Theme"
     And the Create Symbol Dialog Theme toggle button should say "Create New Theme"
 
-  @create-theme @list-themes @new
+  @create-theme @list-themes
   Scenario: Open Dialog without Theme Before Any Themes Created
     When the Create Symbol Dialog is opened without a Theme
     Then the Create Symbol Dialog Theme field should be visible
@@ -39,7 +40,7 @@ Feature: Create Symbol Dialog
     And an invalid Symbol Name has been entered into the Create Symbol Dialog Name field
     When the Enter key is pressed
     Then the Create Symbol Dialog should not be closed
-    And the Create Symbol Dialog should show an error message
+    And the Create Symbol Dialog should show an error message for the Symbol Name field
     But a new Symbol should not be created
 
   Scenario: Cancel Symbol Creation
@@ -48,7 +49,7 @@ Feature: Create Symbol Dialog
     Then the Create Symbol Dialog should be closed
     But a new Symbol should not be created
 
-  @create-theme @new
+  @create-theme
   Scenario: Create Symbol and Theme with Valid Theme Name
     Given the Create Symbol Dialog has been opened without a Theme
     And a valid Symbol Name has been entered into the Create Symbol Dialog Name field
@@ -58,18 +59,17 @@ Feature: Create Symbol Dialog
     And a new Theme should be created with the supplied name
     And a new Symbol should be created with the supplied name in the new Theme
 
-  @create-theme @new
+  @create-theme
   Scenario: Create Symbol and Theme with Invalid Theme Name
     Given the Create Symbol Dialog has been opened without a Theme
     And a valid Symbol Name has been entered into the Create Symbol Dialog Name field
-    And an invalid Symbol Name has been entered into the Create Symbol Dialog Name field
+    And an invalid Theme Name has been entered into the Create Symbol Dialog Theme field
     When the Enter key is pressed
     Then the Create Symbol Dialog should not be closed
-    And the Create Symbol Dialog should show an error message
+    And the Create Symbol Dialog should show an error message for the Theme Name field
     But a new Theme should not be created
     And a new Symbol should not be created
 
-  @new
   Scenario: Create Symbol with Theme Selected
     Given 5 Themes have been created
     And the Create Symbol Dialog has been opened without a Theme
@@ -79,22 +79,22 @@ Feature: Create Symbol Dialog
     Then the Create Symbol Dialog should be closed
     And a new Symbol should be created with the supplied name in the selected Theme
 
-  @create-theme @new
+  @create-theme
   Scenario: React to New Theme Created
     Given the Create Symbol Dialog has been opened without a Theme
-    When a Theme is created
+    When a theme is created
     Then the new Theme should be listed in the Create Symbol Dialog Theme list
 
-  @delete-theme @new
+  @delete-theme
   Scenario: React to Theme Deleted
     Given a Theme has been created
     And the Create Symbol Dialog has been opened without a Theme
-    When a Theme is deleted
+    When a theme is deleted
     Then the deleted Theme should not be listed in the Create Symbol Dialog Theme list
 
-  @rename-theme @new
+  @rename-theme
   Scenario: React to Theme Renamed
     Given a Theme has been created
     And the Create Symbol Dialog has been opened without a Theme
-    When a Theme is renamed
+    When a theme is renamed
     Then the renamed Theme should show the new name in the Create Symbol Dialog Theme list

@@ -35,6 +35,8 @@ import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByThemeUseCase
+import com.soyle.stories.theme.usecases.listThemes.ListThemes
+import com.soyle.stories.theme.usecases.listThemes.ListThemesUseCase
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
 
@@ -58,12 +60,13 @@ object ThemeModule {
         provide<DeleteTheme> { DeleteThemeUseCase(get()) }
         provide<RenameTheme> { RenameThemeUseCase(get()) }
         provide<AddSymbolToTheme> { AddSymbolToThemeUseCase(get()) }
+        provide<ListThemes> { ListThemesUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
     {
         provide(CreateTheme.OutputPort::class) {
-            CreateThemeNotifier()
+            CreateThemeNotifier(get())
         }
         provide(DeleteTheme.OutputPort::class) {
             DeleteThemeNotifier()
@@ -113,9 +116,16 @@ object ThemeModule {
             )
 
             presenter listensTo get<AddSymbolToThemeNotifier>()
+            presenter listensTo get<CreateThemeNotifier>()
+            presenter listensTo get<DeleteThemeNotifier>()
+            presenter listensTo get<RenameThemeNotifier>()
 
             CreateSymbolDialogController(
+                projectId.toString(),
+                applicationScope.get(),
                 presenter,
+                get(),
+                get(),
                 get()
             )
         }

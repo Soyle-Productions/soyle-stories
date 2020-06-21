@@ -34,7 +34,6 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
     companion object : ApplicationTest() {
 
         var renameRequest: Pair<Theme.Id, String>? = null
-            private set
 
         fun getOpenTool(double: SoyleStoriesTestDouble): ThemeList?
         {
