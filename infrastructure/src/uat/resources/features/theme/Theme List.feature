@@ -22,9 +22,9 @@ Feature: Theme List
     Then the Theme List tool should show all <number> themes
 
     Examples:
-    | number |
-    | 2      |
-    | 4      |
+      | number |
+      | 2      |
+      | 4      |
 
   @create-theme
   Scenario: Create Another Theme
@@ -53,33 +53,38 @@ Feature: Theme List
     Then the Theme List Theme Context Menu should be open
     And the Theme List Theme Context Menu should have <option> as an option
 
-    @open-tool @new @excluded
+    @open-tool @new
     Examples:
-      | option |
+      | option           |
       | "Compare Values" |
 
     @open-tool
     Examples:
-      | option |
+      | option               |
       | "Compare Characters" |
 
     @create-symbol
     Examples:
-      | option |
+      | option          |
       | "Create Symbol" |
 
     @rename-theme
     Examples:
-      | option |
+      | option   |
       | "Rename" |
 
     @delete-theme
     Examples:
-      | option |
+      | option   |
       | "Delete" |
 
-  @open-tool @new @excluded
+  @open-tool @new
   Scenario: Open Theme Value Web
+    Given a Theme has been created
+    And the Theme List tool has been opened
+    And the Theme List Theme Context Menu has been opened
+    When the Theme List Theme Context Menu "Compare Values" option is selected
+    Then the Value Web Tool should be open
 
   @open-tool
   Scenario: Open Character Comparison
@@ -122,9 +127,9 @@ Feature: Theme List
     Then the Theme List Rename Theme Text Field should not be open
 
     Examples:
-      | action |
+      | action          |
       | Pressing Escape |
-      | Clicking Away |
+      | Clicking Away   |
 
   @rename-theme
   Scenario Outline: Commit Rename Theme
@@ -137,9 +142,9 @@ Feature: Theme List
     And the Theme should be renamed
 
     Examples:
-      | action |
+      | action         |
       | Pressing Enter |
-      | Clicking Away |
+      | Clicking Away  |
 
   @rename-theme
   Scenario Outline: Fail to Rename Theme
@@ -152,27 +157,81 @@ Feature: Theme List
     But the Theme should not be renamed
 
     Examples:
-      | action |
+      | action         |
       | Pressing Enter |
-      | Clicking Away |
+      | Clicking Away  |
 
-  @new @excluded
-  Scenario: Right-Click on Symbol
+  @new
+  Scenario Outline: Right-Click on Symbol
+    Given a symbol has been created
+    And the Theme List tool has been opened
+    When a symbol is right-clicked
+    Then the Theme List Symbol Context Menu should be open
+    And the Theme List Symbol Context Menu should have <option> as an option
 
-  @delete-symbol @new @excluded
+    Examples:
+      | option   |
+      | "Rename" |
+      | "Delete" |
+
+  @delete-symbol @new
   Scenario: Delete Symbol by Right-Clicking
+    Given a symbol has been created
+    And the Theme List tool has been opened
+    And a symbol has been right-clicked
+    When the Theme List Symbol Context Menu "Delete" option is selected
+    Then the Confirm Delete Symbol Dialog should be open
 
-  @rename-symbol @new @excluded
+  @rename-symbol @new
   Scenario: Rename Symbol
+    Given a symbol has been created
+    And the Theme List tool has been opened
+    And the Theme List Symbol Context Menu has been opened
+    When the Theme List Symbol Context Menu "Rename" option is selected
+    Then the Theme List Rename Symbol Text Field should be open
 
-  @rename-symbol @new @excluded
-  Scenario: Cancel Rename Symbol
+  @rename-symbol @new
+  Scenario Outline: Cancel Rename Symbol
+    Given a symbol has been created
+    And the Theme List tool has been opened
+    And the Theme List Rename Symbol Text Field has been opened
+    When the symbol rename is cancelled by <action>
+    Then the Theme List Rename Symbol Text Field should not be open
 
-  @rename-symbol @new @excluded
-  Scenario: Commit Rename Symbol
+    Examples:
+      | action          |
+      | Pressing Escape |
+      | Clicking Away   |
 
-  @rename-symbol @new @excluded
-  Scenario: Fail to Rename Symbol
+  @rename-symbol @new
+  Scenario Outline: Commit Rename Symbol
+    Given a symbol has been created
+    And the Theme List tool has been opened
+    And the Theme List Rename Symbol Text Field has been opened
+    And a valid symbol name has been entered in the Theme List Rename Symbol Field
+    When the symbol rename is committed by <action>
+    Then the Theme List Rename Symbol Text Field should not be open
+    And the symbol should be renamed
+
+    Examples:
+      | action         |
+      | Pressing Enter |
+      | Clicking Away  |
+
+  @rename-symbol @new
+  Scenario Outline: Fail to Rename Symbol
+    Given a symbol has been created
+    And the Theme List tool has been opened
+    And the Theme List Rename Symbol Text Field has been opened
+    And an invalid symbol name has been entered in the Theme List Rename Symbol Text Field
+    When the symbol rename is committed by <action>
+    Then the Theme List Rename Symbol Text Field should show an error message
+    But the symbol should not be renamed
+
+    Examples:
+      | action         |
+      | Pressing Enter |
+      | Clicking Away  |
 
   @delete-theme
   Scenario: Delete Theme by Selection and Delete Button
@@ -182,11 +241,19 @@ Feature: Theme List
     When the Theme List "Delete" button is selected
     Then the Confirm Delete Theme Dialog should be open
 
-  @delete-symbol @new @excluded
+  @delete-symbol @new
   Scenario: Delete Symbol by Selection and Delete Button
+    Given a symbol has been created
+    And the Theme List tool has been opened
+    And a symbol has been selected in the Theme List tool
+    When the Theme List "Delete" button is selected
+    Then the Confirm Delete Symbol Dialog should be open
 
-  @create-symbol @new @excluded
+  @create-symbol @new
   Scenario: Create Symbol without Theme
+    Given the Theme List tool has been opened
+    When the Theme List "Create Symbol" button is selected
+    Then the Create Symbol Dialog should be open
 
   @create-symbol
   Scenario: React Symbol Created
