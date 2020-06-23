@@ -27,6 +27,8 @@ import com.soyle.stories.theme.themeList.ThemeListController
 import com.soyle.stories.theme.themeList.ThemeListModel
 import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
+import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
+import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToThemeUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
@@ -37,8 +39,13 @@ import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByThemeUseCase
 import com.soyle.stories.theme.usecases.listThemes.ListThemes
 import com.soyle.stories.theme.usecases.listThemes.ListThemesUseCase
+import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInTheme
+import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThemeUseCase
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
+import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsController
+import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsPresenter
+import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListener
 
 object ThemeModule {
 
@@ -61,6 +68,7 @@ object ThemeModule {
         provide<RenameTheme> { RenameThemeUseCase(get()) }
         provide<AddSymbolToTheme> { AddSymbolToThemeUseCase(get()) }
         provide<ListThemes> { ListThemesUseCase(get()) }
+        provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -165,6 +173,23 @@ object ThemeModule {
                     presenter,
                     projectScope.get(),
                     projectScope.get()
+                )
+            }
+        }
+
+        scoped<ValueOppositionWebsScope> {
+            provide<ValueOppositionWebsViewListener> {
+                val presenter = ValueOppositionWebsPresenter(
+                    themeId.toString(),
+                    get<ValueOppositionWebsModel>()
+                )
+
+
+                ValueOppositionWebsController(
+                    themeId.toString(),
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    presenter
                 )
             }
         }

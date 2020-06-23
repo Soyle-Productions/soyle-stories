@@ -93,4 +93,15 @@ class OpenToolControllerImpl(
 			)
 		}
 	}
+
+	override fun openValueOppositionWeb(themeId: String) {
+		threadTransformer.async {
+			openTool.invoke(
+				ValueOppositionWebs(
+					UUID.fromString(themeId)
+				),
+				openToolOutputPort
+			)
+		}
+	}
 }

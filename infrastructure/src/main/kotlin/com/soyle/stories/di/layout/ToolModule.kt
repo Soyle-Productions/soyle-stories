@@ -2,10 +2,7 @@ package com.soyle.stories.di.layout
 
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
-import com.soyle.stories.layout.config.dynamic.BaseStoryStructureConfig
-import com.soyle.stories.layout.config.dynamic.CharacterComparisonConfig
-import com.soyle.stories.layout.config.dynamic.LocationDetailsConfig
-import com.soyle.stories.layout.config.dynamic.SceneDetailsConfig
+import com.soyle.stories.layout.config.dynamic.*
 import com.soyle.stories.layout.config.fixed.CharacterList
 import com.soyle.stories.layout.config.fixed.LocationList
 import com.soyle.stories.layout.config.fixed.SceneList
@@ -36,6 +33,7 @@ object ToolModule : RegisteredToolsConfig {
         CharacterComparisonConfig.getRegistration(),
         LocationDetailsConfig.getRegistration(),
         SceneDetailsConfig.getRegistration(),
+        ValueOppositionWebsConfig.getRegistration(),
         /**
          * Temporary Tools
          */

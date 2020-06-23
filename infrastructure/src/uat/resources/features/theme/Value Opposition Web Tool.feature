@@ -5,12 +5,12 @@ Feature: Value Opposition Web Tool
     Given A project has been opened
     And a Theme has been created
 
-  @list-value-webs-in-theme @new
+  @list-value-webs-in-theme
   Scenario: Open Tool Before Any Value Webs Created in Theme
     When the Value Opposition Web Tool is opened
     Then the Value Opposition Web Tool should show a special empty message
 
-  @list-value-webs-in-theme @new
+  @list-value-webs-in-theme
   Scenario: Open Tool with Value Webs Created in Theme
     Given 5 value webs have been created in the theme open in the Value Opposition Web Tool
     When the Value Opposition Web Tool is opened

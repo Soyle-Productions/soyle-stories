@@ -9,5 +9,6 @@ interface OpenToolController {
 	fun openDeleteSceneRamificationsTool(sceneId: String)
 	fun openReorderSceneRamificationsTool(sceneId: String, newIndex: Int)
 	fun openSceneDetailsTool(sceneId: String)
+	fun openValueOppositionWeb(themeId: String)
 
 }

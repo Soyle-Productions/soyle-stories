@@ -3,6 +3,7 @@ package com.soyle.stories.theme
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
@@ -63,6 +64,7 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
         DeleteThemeDialogSteps(en, double)
         CreateSymbolDialogSteps(en, double)
         ThemeListToolSteps(en, double)
+        ValueOppositionWebSteps(en, double)
 
         with(en) {
 
@@ -71,6 +73,22 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             }
             Given("a Theme has been created") {
                 givenANumberOfThemesHaveBeenCreated(1, double)
+            }
+            Given("{int} value webs have been created in the theme open in the Value Opposition Web Tool") { count: Int ->
+                val theme = givenANumberOfThemesHaveBeenCreated(1, double).first()
+                val currentCount = theme.valueWebs.size
+                if (currentCount < count) {
+                    val updatedTheme = (currentCount until count).fold(theme) { currentTheme, it ->
+                        Theme(currentTheme.id, currentTheme.projectId, currentTheme.name, currentTheme.symbols, currentTheme.centralMoralQuestion,
+                        currentTheme.characters.associateBy { it.id }, currentTheme.similaritiesBetweenCharacters, currentTheme.valueWebs + ValueWeb(""))
+                    }
+                    val scope = ProjectSteps.getProjectScope(double)!!
+                    val repo = scope.get<ThemeRepository>()
+                    runBlocking {
+                        repo.updateTheme(updatedTheme)
+                    }
+                }
+                assertTrue(count <= givenANumberOfThemesHaveBeenCreated(1, double).first().valueWebs.size)
             }
 
             When("a theme is created") {
