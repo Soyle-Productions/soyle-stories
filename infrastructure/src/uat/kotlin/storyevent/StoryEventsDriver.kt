@@ -26,7 +26,7 @@ object StoryEventsDriver : ApplicationTest() {
 	private fun storyEventCreated(relative: String?, direction: Boolean?)  = object : DependentProperty<StoryEvent>
 	{
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps.Driver::givenProjectHasBeenOpened
+		  ProjectSteps.Driver::checkProjectHasBeenOpened
 		)
 
 		override fun get(double: SoyleStoriesTestDouble): StoryEvent? {
@@ -72,7 +72,7 @@ object StoryEventsDriver : ApplicationTest() {
 	fun storyEventsCreated(atLeast: Int) = object : DependentProperty<List<StoryEvent>>
 	{
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps.Driver::givenProjectHasBeenOpened
+		  ProjectSteps.Driver::checkProjectHasBeenOpened
 		)
 
 		override fun set(double: SoyleStoriesTestDouble) {

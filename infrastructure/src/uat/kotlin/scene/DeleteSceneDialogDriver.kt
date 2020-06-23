@@ -26,7 +26,7 @@ object DeleteSceneDialogDriver : ApplicationTest() {
 
 	val targetScene = object : DependentProperty<Scene> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps.Driver::givenProjectHasBeenOpened,
+		  ProjectSteps.Driver::checkProjectHasBeenOpened,
 		  { double: SoyleStoriesTestDouble -> ScenesDriver.givenNumberOfCreatedScenesIsAtLeast(double, 1) } as (SoyleStoriesTestDouble) -> Unit
 		)
 

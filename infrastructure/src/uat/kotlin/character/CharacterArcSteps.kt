@@ -64,7 +64,7 @@ object CharacterArcSteps : ApplicationTest() {
 
 	fun setBaseStoryStructureToolOpen(double: SoyleStoriesTestDouble, themeId: Theme.Id, characterId: Character.Id)
 	{
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenBaseStoryStructureToolIsOpened(double, themeId, characterId)
 	}
 
@@ -223,7 +223,7 @@ object CharacterArcSteps : ApplicationTest() {
 
 	fun setCharacterArcSectionLinkedToLocation(double: SoyleStoriesTestDouble, sectionId: CharacterArcSection.Id, locationId: Location.Id)
 	{
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		val scope = ProjectSteps.getProjectScope(double)!!
 		interact {
 			scope.get<LinkLocationToCharacterArcSectionController>().linkLocation(sectionId.uuid.toString(), locationId.uuid.toString())

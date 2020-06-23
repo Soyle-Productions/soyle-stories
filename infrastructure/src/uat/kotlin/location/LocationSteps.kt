@@ -51,7 +51,7 @@ object LocationSteps : ApplicationTest() {
 	// location list tool is opened
 
 	fun setLocationListToolOpened(double: SoyleStoriesTestDouble) {
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenLocationListToolIsOpened(double)
 	}
 
@@ -80,7 +80,7 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun setLocationListToolClosed(double: SoyleStoriesTestDouble) {
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenLocationListToolIsClosed(double)
 	}
 
@@ -104,13 +104,13 @@ object LocationSteps : ApplicationTest() {
 
 	fun setLocationCreated(double: SoyleStoriesTestDouble)
 	{
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenLocationIsCreated(double)
 	}
 
 	fun setNoLocationsCreated(double: SoyleStoriesTestDouble)
 	{
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val locations = getLocationsCreated(double)
 		interact {
@@ -455,7 +455,7 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun whenLocationIsDeleted(double: SoyleStoriesTestDouble): Location {
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		val scope = ProjectSteps.getProjectScope(double)!!
 		var firstLocation: Location? = null
 		interact {
@@ -468,7 +468,7 @@ object LocationSteps : ApplicationTest() {
 	}
 
 	fun whenLocationIsRenamed(double: SoyleStoriesTestDouble) {
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val repo = scope.get<LocationRepository>()
 		val controller = scope.get<RenameLocationController>()

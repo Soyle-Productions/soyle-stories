@@ -62,7 +62,7 @@ object ScenesDriver : ApplicationTest() {
 	}
 
 	fun setNumberOfCreatedScenes(double: SoyleStoriesTestDouble, count: Int) {
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		val createdCount = getNumberOfCreatedScenes(double)
 		repeat(count - createdCount) {
 			whenSceneIsCreated(double)
@@ -145,7 +145,7 @@ object ScenesDriver : ApplicationTest() {
 
 	fun deletedScene(sceneId: Scene.Id) = object : DependentProperty<Nothing> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps.Driver::givenProjectHasBeenOpened
+		  ProjectSteps.Driver::checkProjectHasBeenOpened
 		)
 
 		override fun get(double: SoyleStoriesTestDouble): Nothing? = null
@@ -161,7 +161,7 @@ object ScenesDriver : ApplicationTest() {
 
 	fun characterIncludedIn(characterId: Character.Id, sceneId: Scene.Id) = object : DependentProperty<Nothing> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps.Driver::givenProjectHasBeenOpened
+		  ProjectSteps.Driver::checkProjectHasBeenOpened
 		)
 
 		override fun get(double: SoyleStoriesTestDouble): Nothing? = null

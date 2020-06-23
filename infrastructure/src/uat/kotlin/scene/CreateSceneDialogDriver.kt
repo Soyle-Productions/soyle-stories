@@ -13,7 +13,7 @@ import tornadofx.uiComponent
 object CreateSceneDialogDriver : ApplicationTest() {
 
 	fun setIsOpen(double: SoyleStoriesTestDouble) {
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		ProjectSteps.getProjectScope(double)!!.let {
 			interact {
 				createSceneDialog(it)

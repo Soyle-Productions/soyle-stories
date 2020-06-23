@@ -15,7 +15,6 @@ import io.cucumber.java8.En
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Button
-import javafx.scene.control.Labeled
 import javafx.scene.control.TextField
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.testfx.framework.junit5.ApplicationTest
@@ -26,7 +25,7 @@ class DeleteSceneRamificationsSteps(en: En, double: SoyleStoriesTestDouble, setT
 	companion object : ApplicationTest() {
 		fun tool(sceneId: Scene.Id) = object : DependentProperty<DeleteSceneRamifications> {
 			override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-				ProjectSteps.Driver::givenProjectHasBeenOpened,
+				ProjectSteps.Driver::checkProjectHasBeenOpened,
 				{ it: SoyleStoriesTestDouble ->
 					ScenesDriver.givenNumberOfCreatedScenesIsAtLeast(
 						it,

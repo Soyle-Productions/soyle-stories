@@ -8,6 +8,9 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeControllerImpl
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeNotifier
+import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
+import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeControllerImpl
+import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeNotifier
 import com.soyle.stories.theme.createSymbolDialog.*
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeControllerImpl
@@ -16,6 +19,10 @@ import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogController
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogModel
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogPresenter
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogViewListener
+import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogController
+import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogModel
+import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogPresenter
+import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogViewListener
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeControllerImpl
 import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
@@ -31,6 +38,8 @@ import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToThemeUseCase
+import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
+import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateThemeUseCase
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
@@ -69,6 +78,7 @@ object ThemeModule {
         provide<AddSymbolToTheme> { AddSymbolToThemeUseCase(get()) }
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
+        provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -85,6 +95,9 @@ object ThemeModule {
         provide(AddSymbolToTheme.OutputPort::class) {
             AddSymbolToThemeNotifier()
         }
+        provide(AddValueWebToTheme.OutputPort::class) {
+            AddValueWebToThemeNotifier()
+        }
     }
 
     private fun InScope<ProjectScope>.controllers()
@@ -100,6 +113,9 @@ object ThemeModule {
         }
         provide<AddSymbolToThemeController> {
             AddSymbolToThemeControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<AddValueWebToThemeController> {
+            AddValueWebToThemeControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -192,6 +208,19 @@ object ThemeModule {
                     presenter
                 )
             }
+        }
+
+        provide<CreateValueWebDialogViewListener> {
+            val presenter = CreateValueWebDialogPresenter(
+                get<CreateValueWebDialogModel>()
+            )
+
+            presenter listensTo get<AddValueWebToThemeNotifier>()
+
+            CreateValueWebDialogController(
+                presenter,
+                get()
+            )
         }
     }
 }

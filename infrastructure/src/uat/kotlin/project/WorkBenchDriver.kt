@@ -14,7 +14,7 @@ object WorkBenchDriver : ApplicationTest() {
 
 	fun setMenuOpen(double: SoyleStoriesTestDouble, menuId: String, vararg menuIds: String)
 	{
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenMenuIsOpened(double, menuId, *menuIds)
 	}
 

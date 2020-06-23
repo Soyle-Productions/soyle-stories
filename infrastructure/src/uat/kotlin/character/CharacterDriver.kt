@@ -59,7 +59,7 @@ object CharacterDriver : ApplicationTest() {
 	}
 
 	fun setNumberOfCharactersCreated(double: SoyleStoriesTestDouble, atLeast: Int) {
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		val currentCount = getNumberOfCharactersCreated(double)
 		runBlocking {
 			repeat(atLeast - currentCount) {
@@ -95,7 +95,7 @@ object CharacterDriver : ApplicationTest() {
 	}
 
 	fun setCharacterListToolOpen(double: SoyleStoriesTestDouble) {
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenCharacterListToolIsOpened(double)
 	}
 
@@ -124,7 +124,7 @@ object CharacterDriver : ApplicationTest() {
 
 	fun setCharacterListToolClosed(double: SoyleStoriesTestDouble)
 	{
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenCharacterListToolIsClosed(double)
 	}
 

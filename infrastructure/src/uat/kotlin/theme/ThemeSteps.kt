@@ -38,7 +38,7 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
         {
             val currentCount = getCreatedThemes(double).size
             if (currentCount < count) {
-                ProjectSteps.givenProjectHasBeenOpened(double)
+                ProjectSteps.checkProjectHasBeenOpened(double)
                 repeat(count - currentCount) {
                     createTheme(double)
                 }
@@ -63,6 +63,7 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
         CreateThemeDialogSteps(en, double)
         DeleteThemeDialogSteps(en, double)
         CreateSymbolDialogSteps(en, double)
+        CreateValueWebDialogSteps(en, double)
         ThemeListToolSteps(en, double)
         ValueOppositionWebSteps(en, double)
 

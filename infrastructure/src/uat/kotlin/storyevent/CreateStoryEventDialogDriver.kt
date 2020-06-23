@@ -17,7 +17,7 @@ object CreateStoryEventDialogDriver : ApplicationTest() {
 
 	val openDialog: DependentProperty<CreateStoryEventDialog> = object : DependentProperty<CreateStoryEventDialog> {
 		override val dependencies: List<(SoyleStoriesTestDouble) -> Unit> = listOf(
-		  ProjectSteps.Driver::givenProjectHasBeenOpened
+		  ProjectSteps.Driver::checkProjectHasBeenOpened
 		)
 
 		override fun whenSet(double: SoyleStoriesTestDouble) {

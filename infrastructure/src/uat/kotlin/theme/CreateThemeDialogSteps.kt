@@ -34,7 +34,7 @@ class CreateThemeDialogSteps(en: En, double: SoyleStoriesTestDouble) {
 
         fun givenDialogHasBeenOpened(double: SoyleStoriesTestDouble): CreateThemeDialog
         {
-            ProjectSteps.givenProjectHasBeenOpened(double)
+            ProjectSteps.checkProjectHasBeenOpened(double)
             val scope = ProjectSteps.getProjectScope(double)!!
             var dialog: CreateThemeDialog? = listWindows().find { it.scene.root.uiComponent<CreateThemeDialog>() != null }
                 ?.scene?.root?.uiComponent()

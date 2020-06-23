@@ -57,7 +57,7 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
 
         fun givenToolHasBeenOpened(double: SoyleStoriesTestDouble): ThemeList
         {
-            ProjectSteps.givenProjectHasBeenOpened(double)
+            ProjectSteps.checkProjectHasBeenOpened(double)
             return getOpenTool(double) ?: kotlin.run {
                 toggleOpen(double)
                 getOpenTool(double)!!
@@ -66,7 +66,7 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
 
         fun givenToolHasBeenClosed(double: SoyleStoriesTestDouble)
         {
-            ProjectSteps.givenProjectHasBeenOpened(double)
+            ProjectSteps.checkProjectHasBeenOpened(double)
             if (isToolOpen(double)) toggleOpen(double)
             assertFalse(isToolOpen(double))
         }

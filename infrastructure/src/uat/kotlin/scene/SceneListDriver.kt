@@ -29,13 +29,13 @@ object SceneListDriver : ApplicationTest() {
 
 	fun setOpen(double: SoyleStoriesTestDouble)
 	{
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenOpened(double)
 	}
 
 	fun setClosed(double: SoyleStoriesTestDouble)
 	{
-		ProjectSteps.givenProjectHasBeenOpened(double)
+		ProjectSteps.checkProjectHasBeenOpened(double)
 		whenOpened(double)
 	}
 

@@ -59,7 +59,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 
 		Given("A project has been opened") {
 			// ProjectDriver.givenHasBeenOpened(double)
-			ProjectSteps.givenProjectHasBeenOpened(double)
+			ProjectSteps.checkProjectHasBeenOpened(double)
 		}
 		Given("The Location List Tool has been opened") {
 			// LocationListDriver.givenHasBeenOpened(double)

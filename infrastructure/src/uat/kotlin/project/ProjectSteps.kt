@@ -53,11 +53,18 @@ class ProjectSteps(en: En, double: SoyleStoriesTestDouble) {
 			}
 		}
 
-		fun givenProjectHasBeenOpened(double: SoyleStoriesTestDouble) {
-			if (! isProjectOpened(double)) {
+		fun checkProjectHasBeenOpened(double: SoyleStoriesTestDouble): Unit {
+			getProjectScope(double) ?: run {
 				setProjectHasBeenOpened(double)
+				getProjectScope(double)!!
 			}
-			assertTrue(isProjectOpened(double))
+		}
+
+		fun givenProjectHasBeenOpened(double: SoyleStoriesTestDouble): ProjectScope {
+			return getProjectScope(double) ?: run {
+				setProjectHasBeenOpened(double)
+				getProjectScope(double)!!
+			}
 		}
 
 		/**
@@ -70,7 +77,7 @@ class ProjectSteps(en: En, double: SoyleStoriesTestDouble) {
 		 *
 		 */
 		fun setSelectedMenuItem(double: SoyleStoriesTestDouble, menuId: String, vararg menuItemIds: String) {
-			givenProjectHasBeenOpened(double)
+			checkProjectHasBeenOpened(double)
 			whenMenuItemIsSelected(double, menuId, *menuItemIds)
 		}
 

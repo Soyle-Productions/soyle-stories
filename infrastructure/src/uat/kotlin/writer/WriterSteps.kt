@@ -44,7 +44,7 @@ class WriterSteps(en: En, double: SoyleStoriesTestDouble) {
 
 		fun givenDialogRequestedToBeHidden(double: SoyleStoriesTestDouble, dialogType: DialogType)
 		{
-			ProjectSteps.givenProjectHasBeenOpened(double)
+			ProjectSteps.checkProjectHasBeenOpened(double)
 			if (getDialogPreference(double, dialogType) != false) {
 				setDialogPreferences(double, dialogType, false)
 			}
@@ -53,7 +53,7 @@ class WriterSteps(en: En, double: SoyleStoriesTestDouble) {
 
 		fun givenDialogRequestedToBeShown(double: SoyleStoriesTestDouble, dialogType: DialogType)
 		{
-			ProjectSteps.givenProjectHasBeenOpened(double)
+			ProjectSteps.checkProjectHasBeenOpened(double)
 			if (getDialogPreference(double, dialogType) != true) {
 				setDialogPreferences(double, dialogType, true)
 			}
