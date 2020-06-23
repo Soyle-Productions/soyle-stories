@@ -23,6 +23,10 @@ class ThemeListController(
         }
     }
 
+    override fun openValueWeb(themeId: String) {
+        openToolController.openValueOppositionWeb(themeId)
+    }
+
     override fun openCharacterComparison(themeId: String) {
         openToolController.openCharacterComparison(themeId, null)
     }

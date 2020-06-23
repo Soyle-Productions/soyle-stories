@@ -9,6 +9,14 @@ import tornadofx.bind
 import tornadofx.item
 
 internal fun ThemeList.themeItemContextMenu(model: ThemeListModel, viewListener: ThemeListViewListener) = ContextMenu().apply {
+    item("Compare Values") {
+        action {
+            val selectedItem = model.selectedItem.value
+            if (selectedItem is ThemeListItemViewModel) {
+                viewListener.openValueWeb(selectedItem.themeId)
+            }
+        }
+    }
     item("Compare Characters") {
         action {
             val selectedItem = model.selectedItem.value

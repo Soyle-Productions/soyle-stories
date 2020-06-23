@@ -53,7 +53,7 @@ Feature: Theme List
     Then the Theme List Theme Context Menu should be open
     And the Theme List Theme Context Menu should have <option> as an option
 
-    @open-tool @new
+    @open-tool
     Examples:
       | option           |
       | "Compare Values" |
@@ -78,7 +78,7 @@ Feature: Theme List
       | option   |
       | "Delete" |
 
-  @open-tool @new
+  @open-tool
   Scenario: Open Theme Value Web
     Given a Theme has been created
     And the Theme List tool has been opened
