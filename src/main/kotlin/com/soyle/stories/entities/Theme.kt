@@ -54,6 +54,7 @@ class Theme(
 
     fun withName(name: String) = copy(name = name)
     fun withSymbol(symbol: Symbol) = copy(symbols = symbols + symbol)
+    fun withValueWeb(valueWeb: ValueWeb) = copy(valueWebs = valueWebs + valueWeb)
 
     fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> {
         return copy(
