@@ -86,7 +86,7 @@ class ChangeCentralMoralQuestionUnitTest {
     }
     private fun givenThemeWithId(themeId: UUID, andQuestion: String = "") {
         context = setupContext(
-            initialThemes = listOf(Theme(Theme.Id(themeId), Project.Id(), "", listOf(), andQuestion, emptyMap(), emptyMap())),
+            initialThemes = listOf(makeTheme(Theme.Id(themeId), centralMoralQuestion = andQuestion)),
             updateTheme = {
                 updatedTheme = it
             }

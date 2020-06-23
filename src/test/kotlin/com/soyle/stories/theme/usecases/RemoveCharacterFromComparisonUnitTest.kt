@@ -125,7 +125,7 @@ class RemoveCharacterFromComparisonUnitTest {
     private fun givenNoThemes() = givenThemeWith()
     private fun givenThemeWith(themeId: UUID? = null, andMajorCharacterIds: List<UUID> = emptyList(), vararg andCharacterIds: UUID) {
         val theme = themeId?.let {
-            val initialTheme = Theme(Theme.Id(themeId), Project.Id(), "", listOf(), "", emptyMap(), emptyMap())
+            val initialTheme = makeTheme(Theme.Id(themeId))
             val themeWithCharacters = andCharacterIds.fold(initialTheme) { nextTheme, characterId ->
                 nextTheme.includeCharacter(Character(Character.Id(characterId), Project.Id(), "Bob"))
                     .fold({ throw it }, ::identity)

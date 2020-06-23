@@ -1,8 +1,3 @@
-/**
- * Created by Brendan
- * Date: 2/5/2020
- * Time: 3:47 PM
- */
 package com.soyle.stories.entities
 
 import arrow.core.Either
@@ -25,7 +20,8 @@ class Theme(
     val symbols: List<Symbol>,
     val centralMoralQuestion: String,
     private val includedCharacters: Map<Character.Id, CharacterInTheme>,
-    val similaritiesBetweenCharacters: Map<Set<Character.Id>, String>
+    val similaritiesBetweenCharacters: Map<Set<Character.Id>, String>,
+    val valueWebs: List<ValueWeb>
 ) : Entity<Theme.Id> {
 
     constructor(
@@ -33,7 +29,7 @@ class Theme(
         name: String,
         symbols: List<Symbol> = listOf(),
         centralMoralQuestion: String = ""
-    ) : this(Id(), projectId, name, symbols, centralMoralQuestion, mapOf(), mapOf())
+    ) : this(Id(), projectId, name, symbols, centralMoralQuestion, mapOf(), mapOf(), listOf())
 
     val thematicTemplate: ThematicTemplate
         get() = ThematicTemplate.default()
@@ -43,7 +39,8 @@ class Theme(
         symbols: List<Symbol> = this.symbols,
         centralMoralQuestion: String = this.centralMoralQuestion,
         includedCharacters: Map<Character.Id, CharacterInTheme> = this.includedCharacters,
-        similaritiesBetweenCharacters: Map<Set<Character.Id>, String> = this.similaritiesBetweenCharacters
+        similaritiesBetweenCharacters: Map<Set<Character.Id>, String> = this.similaritiesBetweenCharacters,
+        valueWebs: List<ValueWeb> = this.valueWebs
     ) = Theme(
         id,
         projectId,
@@ -51,7 +48,8 @@ class Theme(
         symbols,
         centralMoralQuestion,
         includedCharacters,
-        similaritiesBetweenCharacters
+        similaritiesBetweenCharacters,
+        valueWebs
     )
 
     fun withName(name: String) = copy(name = name)
@@ -281,7 +279,8 @@ class Theme(
                 listOf(),
                 centralMoralQuestion,
                 mapOf(),
-                mapOf()
+                mapOf(),
+                listOf()
             ).right()
         }
     }

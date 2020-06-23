@@ -158,20 +158,13 @@ class DemoteCharacterTest {
                     "Bob"
                 ) to it.second
             }
-            val theme = Theme.takeNoteOf(Project.Id(), "").map {
-                Theme(
-                    Theme.Id(uuid), Project.Id(), "", listOf(),
-                    it.centralMoralQuestion,
-                    it.characters.associateBy { it.id },
-                    it.similaritiesBetweenCharacters
-                )
+            val theme = makeTheme(Theme.Id(uuid))
+            if (charactersToInclude.isNullOrEmpty()) return@map theme
+            charactersToInclude.fold(theme) { currentTheme, (character, promote) ->
+                ((if (!promote) currentTheme.includeCharacter(character)
+                else currentTheme.includeCharacter(character)
+                    .flatMap { it.promoteCharacter(it.getMinorCharacterById(character.id) as MinorCharacter) }) as Either.Right).b
             }
-            if (charactersToInclude.isNullOrEmpty()) return@map (theme as Either.Right).b
-            (charactersToInclude.fold(theme) { either, (character, promote) ->
-                if (!promote) either.flatMap { it.includeCharacter(character) }
-                else either.flatMap { it.includeCharacter(character) }
-                    .flatMap { it.promoteCharacter(it.getMinorCharacterById(character.id) as MinorCharacter) }
-            } as Either.Right).b
         }
 
         fun whenExecuted(): DemoteCharacterAssertions {

@@ -12,10 +12,7 @@ import com.soyle.stories.entities.theme.CharacterPerspective
 import com.soyle.stories.entities.theme.MajorCharacter
 import com.soyle.stories.entities.theme.MinorCharacter
 import com.soyle.stories.entities.theme.StoryFunction
-import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
-import com.soyle.stories.theme.CharacterNotInTheme
-import com.soyle.stories.theme.TestContext
-import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
 import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunctionUseCase
 import kotlinx.coroutines.runBlocking
@@ -216,10 +213,9 @@ class ChangeStoryFunctionTest {
 
         private val context = TestContext(
             initialThemes = themes.map { (themeUUID, characters) ->
-                Theme(
-                    Theme.Id(themeUUID), Project.Id(), "", listOf(),
-                    "",
-                    characters.associate { (characterUUID, functions) ->
+                makeTheme(
+                    Theme.Id(themeUUID),
+                    includedCharacters = characters.associate { (characterUUID, functions) ->
                         val characterId = Character.Id(characterUUID)
                         val isMajorCharacter = functions != null
                         characterId to if (isMajorCharacter) MajorCharacter(
@@ -233,8 +229,7 @@ class ChangeStoryFunctionTest {
                                     ?: emptyList<StoryFunction>())
                             }, mapOf())
                         ) else MinorCharacter(characterId, "Bob", "", "", listOf())
-                    },
-                    mapOf()
+                    }
                 )
             }
         )

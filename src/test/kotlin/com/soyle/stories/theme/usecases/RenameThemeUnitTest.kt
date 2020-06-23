@@ -4,6 +4,7 @@ import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.themeNameCannotBeBlank
@@ -51,7 +52,7 @@ class RenameThemeUnitTest {
 
     private fun givenThemeExists()
     {
-        themeRepository.themes[themeId] = Theme(themeId, Project.Id(), oldName, listOf(), "", mapOf(), mapOf())
+        themeRepository.themes[themeId] = makeTheme(themeId, name = oldName)
     }
 
     private fun whenThemeIsRenamed(name: String = "")

@@ -11,6 +11,7 @@ import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -104,7 +105,7 @@ class RenameCharacterUnitTest {
 		  ),
 		  initialThemes = listOfNotNull(
 			andThemeId?.let { expectedId ->
-				val theme = Theme.takeNoteOf(Project.Id(), "").fold({ throw it}) { Theme(Theme.Id(expectedId), Project.Id(), "", listOf(), it.centralMoralQuestion, it.characters.associateBy { it.id }, it.similaritiesBetweenCharacters)}
+				val theme = makeTheme(id = Theme.Id(expectedId))
 				if (andThemeHasCharacter) theme.includeCharacter(character!!, emptyList()).fold({ throw it}, ::identity)
 				else theme
 			}

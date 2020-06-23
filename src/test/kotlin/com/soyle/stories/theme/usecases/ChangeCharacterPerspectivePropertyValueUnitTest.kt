@@ -152,7 +152,7 @@ class ChangeCharacterPerspectivePropertyValueUnitTest {
     }
 
     private fun givenThemeWith(themeId: UUID, andMajorCharacter: UUID? = null, vararg andCharacters: UUID) {
-        val theme = Theme(Theme.Id(themeId), Project.Id(), "", listOf(), "", emptyMap(), emptyMap()).let {
+        val theme = makeTheme(Theme.Id(themeId)).let {
             andCharacters.fold(it) { nextTheme, characterId ->
                 nextTheme.includeCharacter(Character(Character.Id(characterId), Project.Id(), "Bob"))
                     .fold({ throw it }, ::identity)

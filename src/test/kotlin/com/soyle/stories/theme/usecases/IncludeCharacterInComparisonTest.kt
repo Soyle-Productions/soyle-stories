@@ -10,6 +10,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.CharacterAlreadyIncludedInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.setupContext
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparisonUseCase
@@ -105,13 +106,11 @@ class IncludeCharacterInComparisonTest {
         val useCase = given(
             characters = listOf(character),
             themes = listOf(
-                Theme(
-                    Theme.Id(themeUUID), Project.Id(), "", listOf(), "", mapOf(
-                        Character.Id(characterUUID) to character.asMinorCharacter(
-                            listOf()
-                        )
-                    ), mapOf()
-                )
+                makeTheme(Theme.Id(themeUUID), includedCharacters = mapOf(
+                    Character.Id(characterUUID) to character.asMinorCharacter(
+                        listOf()
+                    )
+                ))
             )
         )
 
@@ -129,11 +128,7 @@ class IncludeCharacterInComparisonTest {
         val result = (given(
             characters = listOf(character),
             themes = listOf(
-                Theme(
-                    Theme.Id(
-                        themeUUID
-                    ), Project.Id(), "", listOf(), "", mapOf(), mapOf()
-                )
+                makeTheme(Theme.Id(themeUUID))
             )
         ).invoke(characterUUID, themeUUID) as Either.Right).b
 
@@ -158,11 +153,7 @@ class IncludeCharacterInComparisonTest {
             given(
                 characters = listOf(character),
                 themes = listOf(
-                    Theme(
-                        Theme.Id(
-                            themeUUID
-                        ), Project.Id(), "", listOf(), "", mapOf(), mapOf()
-                    )
+                    makeTheme(Theme.Id(themeUUID))
                 ),
                 updateTheme = {
                     updatedTheme = it
@@ -179,11 +170,7 @@ class IncludeCharacterInComparisonTest {
             given(
                 characters = listOf(character),
                 themes = listOf(
-                    Theme(
-                        Theme.Id(
-                            themeUUID
-                        ), Project.Id(), "", listOf(), "", mapOf(), mapOf()
-                    )
+                    makeTheme(Theme.Id(themeUUID))
                 ),
                 updateTheme = {
                     updatedTheme = it

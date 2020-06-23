@@ -3,9 +3,7 @@ package com.soyle.stories.theme
 import arrow.core.Either
 import arrow.core.flatMap
 import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.MinorCharacter
-import com.soyle.stories.entities.theme.ThematicSection
-import com.soyle.stories.entities.theme.ThematicTemplate
+import com.soyle.stories.entities.theme.*
 import com.soyle.stories.translators.asCharacterArcTemplateSection
 import java.util.*
 
@@ -17,9 +15,21 @@ import java.util.*
 
 fun takeNoteOfTheme(): Theme = (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b
 
-fun takeNoteOfTheme(expectedId: UUID): Theme = takeNoteOfTheme().let {
-	Theme(Theme.Id(expectedId), Project.Id(), "", listOf(), it.centralMoralQuestion, it.characters.associateBy { it.id }, it.similaritiesBetweenCharacters)
-}
+fun makeTheme(
+	id: Theme.Id = Theme.Id(),
+	projectId: Project.Id = Project.Id(),
+	name: String = "",
+	symbols: List<Symbol> = listOf(),
+	centralMoralQuestion: String = "",
+	includedCharacters: Map<Character.Id, CharacterInTheme> = mapOf(),
+	similaritiesBetweenCharacters: Map<Set<Character.Id>, String> = mapOf(),
+	valueWebs: List<ValueWeb> = listOf()
+): Theme = Theme(
+	id, projectId, name, symbols, centralMoralQuestion, includedCharacters, similaritiesBetweenCharacters, valueWebs
+)
+
+fun takeNoteOfTheme(expectedId: UUID): Theme =
+	makeTheme(id = Theme.Id(expectedId))
 
 val newCharacter = Character(
     Character.Id(UUID.randomUUID()), Project.Id(), "Name"

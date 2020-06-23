@@ -4,6 +4,7 @@ import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
@@ -38,7 +39,7 @@ class DeleteThemeUnitTest {
 
     private fun givenThemeExists()
     {
-        themeRepository.themes[themeId] = Theme(themeId, Project.Id(), "", listOf(), "", mapOf(), mapOf())
+        themeRepository.themes[themeId] = makeTheme(themeId)
     }
 
     private fun whenThemeIsDeleted()

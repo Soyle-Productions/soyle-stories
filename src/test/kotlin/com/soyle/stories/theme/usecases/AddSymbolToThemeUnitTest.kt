@@ -5,6 +5,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToThemeUseCase
@@ -74,9 +75,9 @@ class AddSymbolToThemeUnitTest {
 
     private fun givenThemeExists(symbolCount: Int = 0)
     {
-        themeRepository.themes[themeId] = Theme(themeId, Project.Id(), "", List(symbolCount) {
+        themeRepository.themes[themeId] = makeTheme(themeId, symbols = List(symbolCount) {
             Symbol("Symbol $it")
-        }, "", mapOf(), mapOf())
+        })
     }
 
     private fun whenSymbolIsAddedToTheme(name: String = "")

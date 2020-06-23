@@ -179,23 +179,16 @@ class PromoteCharacterTest {
                     ), Project.Id(), "Bob"
                 ) to it.second)
             }
-            val theme = Theme.takeNoteOf(Project.Id(), "").map {
-                Theme(
-                    Theme.Id(rep.uuid), Project.Id(), "", listOf(),
-                    it.centralMoralQuestion,
-                    it.characters.associateBy { it.id },
-                    it.similaritiesBetweenCharacters
-                )
-            }
+            val theme = makeTheme(Theme.Id(rep.uuid))
             if (charactersToInclude.isNotEmpty()) {
-                charactersToInclude.fold(theme) { either, (character, promoted) ->
-                    either.flatMap { it.includeCharacter(character) }.let {
+                charactersToInclude.fold(theme) { currentTheme, (character, promoted) ->
+                    (currentTheme.includeCharacter(character).let {
                         if (!promoted) it
                         else it.flatMap { it.promoteCharacter(it.getMinorCharacterById(character.id) as MinorCharacter) }
-                    }
+                    } as Either.Right).b
                 }
             } else theme
-        }.map { (it as Either.Right).b }
+        }
         val characterArcs = arcReps.map {
             CharacterArc(
                 Character.Id(it.characterId),
