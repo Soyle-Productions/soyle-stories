@@ -23,3 +23,9 @@ fun symbolNameCannotBeBlank(actual: Any?)
 {
     actual as SymbolNameCannotBeBlank
 }
+
+fun symbolDoesNotExist(symbolId: UUID): (Any?) -> Unit = { actual ->
+    actual as SymbolDoesNotExist
+    assertEquals(symbolId, actual.entityId)
+    assertEquals(symbolId, actual.symbolId)
+}

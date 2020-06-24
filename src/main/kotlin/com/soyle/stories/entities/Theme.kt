@@ -54,6 +54,7 @@ class Theme(
 
     fun withName(name: String) = copy(name = name)
     fun withSymbol(symbol: Symbol) = copy(symbols = symbols + symbol)
+    fun withoutSymbol(symbolId: Symbol.Id) = copy(symbols = symbols.filterNot { it.id == symbolId })
     fun withValueWeb(valueWeb: ValueWeb) = copy(valueWebs = valueWebs + valueWeb)
 
     fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> {
@@ -266,6 +267,41 @@ class Theme(
         )
         else null
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Theme
+
+        if (id != other.id) return false
+        if (projectId != other.projectId) return false
+        if (name != other.name) return false
+        if (symbols != other.symbols) return false
+        if (centralMoralQuestion != other.centralMoralQuestion) return false
+        if (includedCharacters != other.includedCharacters) return false
+        if (similaritiesBetweenCharacters != other.similaritiesBetweenCharacters) return false
+        if (valueWebs != other.valueWebs) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + projectId.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + symbols.hashCode()
+        result = 31 * result + centralMoralQuestion.hashCode()
+        result = 31 * result + includedCharacters.hashCode()
+        result = 31 * result + similaritiesBetweenCharacters.hashCode()
+        result = 31 * result + valueWebs.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralMoralQuestion='$centralMoralQuestion', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
+    }
+
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "Theme(${uuid})"

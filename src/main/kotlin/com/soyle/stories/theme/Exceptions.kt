@@ -1,5 +1,6 @@
 package com.soyle.stories.theme
 
+import com.soyle.stories.common.EntityNotFoundException
 import com.soyle.stories.entities.theme.StoryFunction
 import java.util.*
 
@@ -41,3 +42,5 @@ data class CannotSeparateCharacterArcNotYetCreated(val characterId: UUID)
 
 object RequiredArcSectionTypesCannotAllowMultiple
 object ArcSectionTypesUsedInCharacterCompCannotAllowMultiple
+
+class SymbolDoesNotExist(val symbolId: UUID) : EntityNotFoundException(symbolId)

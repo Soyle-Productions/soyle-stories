@@ -5,6 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacterUseCase
 import kotlinx.coroutines.runBlocking
@@ -36,6 +37,10 @@ class PlanNewCharacterArcTest {
             override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> = characters
             override suspend fun getCharacterById(characterId: Character.Id): Character? =
                 characters.find { it.id == characterId }
+
+            override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
+                TODO("Not yet implemented")
+            }
 
             override suspend fun addNewTheme(theme: Theme) {
                 addNewTheme.invoke(theme)

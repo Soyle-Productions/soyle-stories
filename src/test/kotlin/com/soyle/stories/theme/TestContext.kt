@@ -6,6 +6,7 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.CharacterRepository
@@ -124,6 +125,10 @@ class TestContext(
         }
 
         override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
             TODO("Not yet implemented")
         }
         override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]

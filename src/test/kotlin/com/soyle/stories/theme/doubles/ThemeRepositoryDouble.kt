@@ -2,6 +2,7 @@ package com.soyle.stories.theme.doubles
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.theme.repositories.ThemeRepository
 
 class ThemeRepositoryDouble(
@@ -17,6 +18,10 @@ class ThemeRepositoryDouble(
     }
 
     override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]
+
+    override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
+        return themes.values.find { it.symbols.any { it.id == symbolId } }
+    }
 
     override suspend fun addTheme(theme: Theme) {
         themes[theme.id] = theme
