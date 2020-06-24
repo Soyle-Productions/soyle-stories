@@ -3,7 +3,9 @@ package com.soyle.stories.theme
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
@@ -35,6 +37,14 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             controller.createTheme("New Theme ${UUID.randomUUID()}") { throw it }
         }
 
+        fun getTheme(themeId: String, scope: ProjectScope): Theme?
+        {
+            val repo = scope.get<ThemeRepository>()
+            return runBlocking {
+                repo.getThemeById(Theme.Id(UUID.fromString(themeId)))
+            }
+        }
+
         fun givenANumberOfThemesHaveBeenCreated(count: Int, double: SoyleStoriesTestDouble): List<Theme>
         {
             val currentCount = getCreatedThemes(double).size
@@ -49,14 +59,25 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             return themes
         }
 
-        fun createSymbol(double: SoyleStoriesTestDouble)
+        fun createSymbol(scope: ProjectScope, themeId: String)
         {
-            val scope = ProjectSteps.getProjectScope(double)!!
             val controller = scope.get<AddSymbolToThemeController>()
-            val theme = getCreatedThemes(double).first()
             interact {
-                controller.addSymbolToTheme(theme.id.uuid.toString(), "New Theme ${UUID.randomUUID()}") { throw it }
+                controller.addSymbolToTheme(themeId, "New Symbol ${UUID.randomUUID()}") { throw it }
             }
+        }
+
+        fun givenANumberOfSymbolsHaveBeenCreated(count: Int, themeId: String, scope: ProjectScope): List<Symbol>
+        {
+            val currentCount = getTheme(themeId, scope)?.symbols?.size ?: 0
+            if (currentCount < count) {
+                repeat(count - currentCount) {
+                    createSymbol(scope, themeId)
+                }
+            }
+            val symbols = getTheme(themeId, scope)!!.symbols
+            assertTrue(symbols.size >= count)
+            return symbols
         }
     }
 
@@ -64,6 +85,7 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
         CreateThemeDialogSteps(en, double)
         DeleteThemeDialogSteps(en, double)
         CreateSymbolDialogSteps(en, double)
+        DeleteSymbolDialogSteps(en, double)
         CreateValueWebDialogSteps(en, double)
         ThemeListToolSteps(en, double)
         ValueOppositionWebSteps(en, double)
@@ -91,6 +113,11 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 }
                 assertTrue(count <= givenANumberOfThemesHaveBeenCreated(1, double).first().valueWebs.size)
             }
+            Given("a symbol has been created") {
+                val projectScope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val theme = givenANumberOfThemesHaveBeenCreated(1, double).first()
+                givenANumberOfSymbolsHaveBeenCreated(1, theme.id.uuid.toString(), projectScope)
+            }
 
             When("a theme is created") {
                 createTheme(double)
@@ -104,7 +131,9 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 }
             }
             When("a symbol is created") {
-                createSymbol(double)
+                val projectScope = ProjectSteps.getProjectScope(double)!!
+                val theme = getCreatedThemes(double).first()
+                createSymbol(projectScope, theme.id.uuid.toString())
             }
             When("a theme is renamed") {
                 val theme = getCreatedThemes(double).first()
@@ -142,6 +171,14 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val (themeId, name) = ThemeListToolSteps.renameRequest!!
                 val theme = getCreatedThemes(double).find { it.id == themeId }!!
                 assertNotEquals(name, theme.name)
+            }
+            Then("the symbol should be deleted") {
+                val symbolId = DeleteSymbolDialogSteps.requestedSymbolId!!
+                assertNull(getCreatedThemes(double).flatMap { it.symbols }.find { it.id == symbolId })
+            }
+            Then("the symbol should not be deleted") {
+                val symbolId = DeleteSymbolDialogSteps.requestedSymbolId!!
+                assertNotNull(getCreatedThemes(double).flatMap { it.symbols }.find { it.id == symbolId })
             }
 
         }

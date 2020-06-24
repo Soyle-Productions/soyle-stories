@@ -4,6 +4,7 @@ import com.soyle.stories.characterarc.repositories.ThemeRepository
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.Symbol
 
 class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositories.ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository {
 	val themes = mutableMapOf<Theme.Id, Theme>()
@@ -12,6 +13,10 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 	}
 
 	override suspend fun addTheme(theme: Theme) = addNewTheme(theme)
+
+	override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
+		return themes.values.find { it.symbols.any { it.id == symbolId } }
+	}
 
 	override suspend fun getThemeById(themeId: Theme.Id): Theme? = themes[themeId]
 	override suspend fun updateTheme(theme: Theme) {

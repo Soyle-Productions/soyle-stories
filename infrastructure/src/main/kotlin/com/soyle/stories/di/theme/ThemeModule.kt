@@ -23,10 +23,14 @@ import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogControll
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogModel
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogPresenter
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogViewListener
+import com.soyle.stories.theme.deleteSymbolDialog.*
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeControllerImpl
 import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
 import com.soyle.stories.theme.deleteThemeDialog.*
+import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
+import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeControllerImpl
+import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeNotifier
 import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.renameTheme.RenameThemeControllerImpl
 import com.soyle.stories.theme.renameTheme.RenameThemeNotifier
@@ -50,6 +54,8 @@ import com.soyle.stories.theme.usecases.listThemes.ListThemes
 import com.soyle.stories.theme.usecases.listThemes.ListThemesUseCase
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInTheme
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThemeUseCase
+import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
+import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsController
@@ -79,6 +85,7 @@ object ThemeModule {
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
         provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get()) }
+        provide<RemoveSymbolFromTheme> { RemoveSymbolFromThemeUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -98,6 +105,9 @@ object ThemeModule {
         provide(AddValueWebToTheme.OutputPort::class) {
             AddValueWebToThemeNotifier()
         }
+        provide(RemoveSymbolFromTheme.OutputPort::class) {
+            RemoveSymbolFromThemeNotifier()
+        }
     }
 
     private fun InScope<ProjectScope>.controllers()
@@ -116,6 +126,9 @@ object ThemeModule {
         }
         provide<AddValueWebToThemeController> {
             AddValueWebToThemeControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<RemoveSymbolFromThemeController> {
+            RemoveSymbolFromThemeControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -163,6 +176,7 @@ object ThemeModule {
             presenter listensTo get<DeleteThemeNotifier>()
             presenter listensTo get<RenameThemeNotifier>()
             presenter listensTo get<AddSymbolToThemeNotifier>()
+            presenter listensTo get<RemoveSymbolFromThemeNotifier>()
 
             ThemeListController(
                 projectId.toString(),
@@ -184,6 +198,25 @@ object ThemeModule {
 
                 DeleteThemeDialogController(
                     themeId,
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    presenter,
+                    projectScope.get(),
+                    projectScope.get()
+                )
+            }
+        }
+
+        scoped<DeleteSymbolDialogScope> {
+            provide<DeleteSymbolDialogViewListener> {
+                val presenter = DeleteSymbolDialogPresenter(
+                    symbolId, symbolName, projectScope.get<DeleteSymbolDialogModel>()
+                )
+
+                presenter listensTo projectScope.get<RemoveSymbolFromThemeNotifier>()
+
+                DeleteSymbolDialogController(
+                    symbolId,
                     projectScope.applicationScope.get(),
                     projectScope.get(),
                     presenter,

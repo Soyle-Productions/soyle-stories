@@ -6,6 +6,7 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.ThemeNameCannotBeBlank
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
+import com.soyle.stories.theme.deleteSymbolDialog.DeleteSymbolDialog
 import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialog
 import com.soyle.stories.theme.usecases.validateThemeName
 import javafx.geometry.Insets
@@ -24,7 +25,7 @@ class ThemeList : View() {
     private var treeview: TreeView<Any?> by singleAssign()
 
     val themeItemContextMenu = themeItemContextMenu(model, viewListener)
-    val symbolItemContextMenu = symbolItemContextMenu()
+    val symbolItemContextMenu = symbolItemContextMenu(model)
 
     override val root: Parent = stackpane {
         hgrow = Priority.SOMETIMES
@@ -84,7 +85,7 @@ class ThemeList : View() {
                     when (val itemValue = parentItem.value) {
                         null -> model.themes
                         is ThemeListItemViewModel -> itemValue.symbols
-                        else -> emptyList()
+                        else -> null
                     }
                 }
                 setOnMouseClicked {
@@ -109,8 +110,9 @@ class ThemeList : View() {
                     enableWhen { model.selectedItem.isNotNull }
                     action {
                         val item = model.selectedItem.get()
-                        if (item is ThemeListItemViewModel) {
-                            scope.get<DeleteThemeDialog>().show(item.themeId, item.themeName)
+                        when (item) {
+                            is ThemeListItemViewModel -> scope.get<DeleteThemeDialog>().show(item.themeId, item.themeName)
+                            is SymbolListItemViewModel -> scope.get<DeleteSymbolDialog>().show(item.symbolId, item.symbolName)
                         }
                     }
                     isMnemonicParsing = false

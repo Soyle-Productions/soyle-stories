@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.deleteThemeDialog
+package com.soyle.stories.theme.deleteSymbolDialog
 
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
@@ -11,11 +11,11 @@ import javafx.stage.Modality
 import javafx.stage.StageStyle
 import tornadofx.*
 
-class DeleteThemeDialog : Fragment() {
+class DeleteSymbolDialog : Fragment() {
 
     override val scope: ProjectScope = super.scope as ProjectScope
 
-    val model = resolve<DeleteThemeDialogModel>()
+    val model = resolve<DeleteSymbolDialogModel>()
 
     private val alert = Alert(Alert.AlertType.CONFIRMATION)
 
@@ -50,18 +50,18 @@ class DeleteThemeDialog : Fragment() {
         }
     }
 
-    private var internalScope: DeleteThemeDialogScope? = null
+    private var internalScope: DeleteSymbolDialogScope? = null
 
     override fun onUndock() {
         internalScope?.close()
     }
 
-    fun show(themeId: String, themeName: String) {
-        val internalScope = DeleteThemeDialogScope(scope, themeId, themeName)
-        val viewListener = resolve<DeleteThemeDialogViewListener>(internalScope)
+    fun show(symbolId: String, symbolName: String) {
+        val internalScope = DeleteSymbolDialogScope(scope, symbolId, symbolName)
+        val viewListener = resolve<DeleteSymbolDialogViewListener>(internalScope)
         alert.resultProperty().onChangeOnce {
             when (it?.buttonData) {
-                Delete -> viewListener.deleteTheme(! model.doDefaultAction.value)
+                Delete -> viewListener.deleteSymbol(! model.doDefaultAction.value)
                 else -> {}
             }
             internalScope.close()
