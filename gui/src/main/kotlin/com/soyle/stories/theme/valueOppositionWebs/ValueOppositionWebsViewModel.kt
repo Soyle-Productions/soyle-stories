@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.valueOppositionWebs
 
-class ValueOppositionWebsViewModel(
+data class ValueOppositionWebsViewModel(
     val valueWebs: List<ValueWebItemViewModel>
 )
 

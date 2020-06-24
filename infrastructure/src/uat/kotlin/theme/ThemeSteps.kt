@@ -7,6 +7,7 @@ import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
+import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.renameTheme.RenameThemeController
@@ -80,8 +81,7 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val currentCount = theme.valueWebs.size
                 if (currentCount < count) {
                     val updatedTheme = (currentCount until count).fold(theme) { currentTheme, it ->
-                        Theme(currentTheme.id, currentTheme.projectId, currentTheme.name, currentTheme.symbols, currentTheme.centralMoralQuestion,
-                        currentTheme.characters.associateBy { it.id }, currentTheme.similaritiesBetweenCharacters, currentTheme.valueWebs + ValueWeb(""))
+                        currentTheme.withValueWeb(ValueWeb(""))
                     }
                     val scope = ProjectSteps.getProjectScope(double)!!
                     val repo = scope.get<ThemeRepository>()
@@ -114,6 +114,14 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val controller = scope.get<RenameThemeController>()
                 interact {
                     controller.renameTheme(theme.id.uuid.toString(), request.second)
+                }
+            }
+            When("a value web is created for the theme open in the Value Opposition Web Tool") {
+                val scope = ProjectSteps.getProjectScope(double)!!
+                val controller = scope.get<AddValueWebToThemeController>()
+                val theme = getCreatedThemes(double).first()
+                interact {
+                    controller.addValueWebToTheme(theme.id.uuid.toString(), "New Value Web") { throw it }
                 }
             }
 

@@ -34,32 +34,37 @@ Feature: Value Opposition Web Tool
   @delete-value-web @new @excluded
   Scenario: Delete Value Web
 
-  @create-value-web @new
+  @create-value-web
   Scenario: Create Value Web
+    Given the Value Opposition Web Tool has been opened
     When the Value Opposition Web Tool Create Value Web button is selected
     Then the Create Value Web Dialog should be open
 
-  @create-value-web @new
+  @create-value-web
   Scenario: React to Value Web Created
+    Given the Value Opposition Web Tool has been opened
     When a value web is created for the theme open in the Value Opposition Web Tool
     Then the Value Opposition Web Tool should show the created value web
 
   @list-oppositions-in-value-web @new
   Scenario: Select Value Web Before Any Value Oppositions Created for Value Web
-    Given a value web has been created for the theme open in the Value Opposition Web Tool
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
     When a value web in the Value Opposition Web Tool is selected
     Then the Value Opposition Web Tool Opposition Web should show a special empty message
 
   @list-oppositions-in-value-web @new
   Scenario: Select Value Web with Value Oppositions Created for Value Web
-    Given a value web has been created for the theme open in the Value Opposition Web Tool
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
     And 5 value oppositions have been created for the value web
     When a value web in the Value Opposition Web Tool is selected
     Then the Value Opposition Web Tool Opposition Web should list all 5 value oppositions
 
   @add-opposition-to-value-web @new
   Scenario: Add Value Opposition to Value Web
-    Given a value web has been created for the theme open in the Value Opposition Web Tool
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
     And the value web in the Value Opposition Web Tool has been selected
     When the Value Opposition Web Tool Create Value Opposition button is selected
     Then a new value opposition should be listed in the Value Opposition Web Tool Opposition Web
@@ -72,7 +77,8 @@ Feature: Value Opposition Web Tool
 
   @rename-value-opposition @new
   Scenario: Rename Value Opposition
-    Given a value web has been created for the theme open in the Value Opposition Web Tool
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
     And a value opposition has been created for the value web
     And the value web in the Value Opposition Web Tool has been selected
     When the value opposition name is selected
@@ -82,7 +88,8 @@ Feature: Value Opposition Web Tool
 
   @rename-value-opposition @new
   Scenario Outline: Cancel Rename Value Opposition
-    Given a value web has been created for the theme open in the Value Opposition Web Tool
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
     And a value opposition has been created for the value web
     And the value web in the Value Opposition Web Tool has been selected
     And the value opposition is being renamed
@@ -96,7 +103,8 @@ Feature: Value Opposition Web Tool
 
   @rename-value-opposition @new
   Scenario Outline: Commit Rename Value Opposition
-    Given a value web has been created for the theme open in the Value Opposition Web Tool
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
     And a value opposition has been created for the value web
     And the value web in the Value Opposition Web Tool has been selected
     And the value opposition is being renamed
@@ -112,7 +120,8 @@ Feature: Value Opposition Web Tool
 
   @rename-value-opposition @new
   Scenario Outline: Fail to Rename Value Opposition
-    Given a value web has been created for the theme open in the Value Opposition Web Tool
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
     And a value opposition has been created for the value web
     And the value web in the Value Opposition Web Tool has been selected
     And the value opposition is being renamed

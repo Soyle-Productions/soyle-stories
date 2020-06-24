@@ -41,6 +41,7 @@ object ValueOppositionWebsConfig : ToolConfig<ValueOppositionWebs> {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
 				val scope = ValueOppositionWebsScope(projectScope, tool.toolId, type)
 				val view = find<com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebs>(scope = scope)
+				view.title = tool.name
 				val tab = tabPane.tab(view)
 				tab.tabPaneProperty().onChange {
 					if (it == null) {

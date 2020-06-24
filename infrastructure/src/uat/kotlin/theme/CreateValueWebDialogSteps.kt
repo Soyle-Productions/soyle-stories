@@ -69,6 +69,9 @@ class CreateValueWebDialogSteps(en: En, double: SoyleStoriesTestDouble) {
             Then("the Create Value Web Dialog should be closed") {
                 assertNull(getOpenDialog(double))
             }
+            Then("the Create Value Web Dialog should be open") {
+                assertNotNull(getOpenDialog(double))
+            }
             Then("the Create Value Web Dialog should show an error message") {
                 val dialog = getOpenDialog(double)!!
                 val nameField = from(dialog.root).lookup(".text-field").queryTextInputControl()

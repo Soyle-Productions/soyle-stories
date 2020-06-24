@@ -200,6 +200,7 @@ object ThemeModule {
                     get<ValueOppositionWebsModel>()
                 )
 
+                presenter listensTo projectScope.get<AddValueWebToThemeNotifier>()
 
                 ValueOppositionWebsController(
                     themeId.toString(),
