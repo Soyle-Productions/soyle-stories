@@ -1,5 +1,6 @@
 package com.soyle.stories.theme
 
+import com.soyle.stories.common.DuplicateOperationException
 import com.soyle.stories.common.EntityNotFoundException
 import com.soyle.stories.entities.theme.StoryFunction
 import java.util.*
@@ -44,3 +45,4 @@ object RequiredArcSectionTypesCannotAllowMultiple
 object ArcSectionTypesUsedInCharacterCompCannotAllowMultiple
 
 class SymbolDoesNotExist(val symbolId: UUID) : EntityNotFoundException(symbolId)
+class SymbolAlreadyHasName(val symbolId: UUID, val symbolName: String) : DuplicateOperationException()

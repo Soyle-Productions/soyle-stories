@@ -29,3 +29,9 @@ fun symbolDoesNotExist(symbolId: UUID): (Any?) -> Unit = { actual ->
     assertEquals(symbolId, actual.entityId)
     assertEquals(symbolId, actual.symbolId)
 }
+
+fun symbolAlreadyHasName(symbolId: UUID, name: String): (Any?) -> Unit = { actual ->
+    actual as SymbolAlreadyHasName
+    assertEquals(symbolId, actual.symbolId)
+    assertEquals(name, actual.symbolName)
+}
