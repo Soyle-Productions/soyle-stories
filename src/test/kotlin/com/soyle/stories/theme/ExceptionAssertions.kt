@@ -35,3 +35,9 @@ fun symbolAlreadyHasName(symbolId: UUID, name: String): (Any?) -> Unit = { actua
     assertEquals(symbolId, actual.symbolId)
     assertEquals(name, actual.symbolName)
 }
+
+fun valueWebDoesNotExist(valueWebId: UUID): (Any?) -> Unit = { actual ->
+    actual as ValueWebDoesNotExist
+    assertEquals(valueWebId, actual.entityId)
+    assertEquals(valueWebId, actual.valueWebId)
+}

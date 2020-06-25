@@ -46,3 +46,5 @@ object ArcSectionTypesUsedInCharacterCompCannotAllowMultiple
 
 class SymbolDoesNotExist(val symbolId: UUID) : EntityNotFoundException(symbolId)
 class SymbolAlreadyHasName(val symbolId: UUID, val symbolName: String) : DuplicateOperationException()
+
+class ValueWebDoesNotExist(val valueWebId: UUID) : EntityNotFoundException(valueWebId)
