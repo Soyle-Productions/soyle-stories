@@ -189,6 +189,16 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val symbolId = DeleteSymbolDialogSteps.requestedSymbolId!!
                 assertNotNull(getCreatedThemes(double).flatMap { it.symbols }.find { it.id == symbolId })
             }
+            Then("the symbol should be renamed") {
+                val (symbolId, name) = ThemeListToolSteps.renameRequest!!
+                val symbol = getCreatedThemes(double).asSequence().flatMap { it.symbols.asSequence() }.find { it.id == symbolId }!!
+                assertEquals(name, symbol.name)
+            }
+            Then("the symbol should not be renamed") {
+                val (symbolId, name) = ThemeListToolSteps.renameRequest!!
+                val symbol = getCreatedThemes(double).asSequence().flatMap { it.symbols.asSequence() }.find { it.id == symbolId }!!
+                assertNotEquals(name, symbol.name)
+            }
 
         }
     }

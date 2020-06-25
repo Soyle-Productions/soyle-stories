@@ -10,4 +10,4 @@ data class ThemeListViewModel(
 )
 
 data class ThemeListItemViewModel(val themeId: String, val themeName: String, val symbols: List<SymbolListItemViewModel>)
-class SymbolListItemViewModel(val symbolId: String, val symbolName: String)
+data class SymbolListItemViewModel(val symbolId: String, val symbolName: String)

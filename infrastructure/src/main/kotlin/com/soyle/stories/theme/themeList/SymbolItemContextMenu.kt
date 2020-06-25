@@ -8,6 +8,14 @@ import tornadofx.action
 import tornadofx.item
 
 internal fun ThemeList.symbolItemContextMenu(model: ThemeListModel) = ContextMenu().apply {
+    item("Rename") {
+        action {
+            val selectedItem = model.selectedItem.value
+            if (selectedItem is SymbolListItemViewModel) {
+                editSymbolName(selectedItem.symbolId)
+            }
+        }
+    }
     item("Delete") {
         action {
             val item = model.selectedItem.get()

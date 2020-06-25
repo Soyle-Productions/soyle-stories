@@ -6,5 +6,6 @@ interface ThemeListViewListener {
     fun openValueWeb(themeId: String)
     fun openCharacterComparison(themeId: String)
     fun renameTheme(themeId: String, newName: String)
+    fun renameSymbol(symbolId: String, newName: String)
 
 }

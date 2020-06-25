@@ -168,13 +168,9 @@ Feature: Theme List
     Then the Theme List Symbol Context Menu should be open
     And the Theme List Symbol Context Menu should have <option> as an option
 
-    @new
     Examples:
       | option   |
       | "Rename" |
-
-    Examples:
-      | option   |
       | "Delete" |
 
   @delete-symbol
@@ -185,7 +181,7 @@ Feature: Theme List
     When the Theme List Symbol Context Menu "Delete" option is selected
     Then the Confirm Delete Symbol Dialog should be open
 
-  @rename-symbol @new
+  @rename-symbol
   Scenario: Rename Symbol
     Given a symbol has been created
     And the Theme List tool has been opened
@@ -193,7 +189,7 @@ Feature: Theme List
     When the Theme List Symbol Context Menu "Rename" option is selected
     Then the Theme List Rename Symbol Text Field should be open
 
-  @rename-symbol @new
+  @rename-symbol
   Scenario Outline: Cancel Rename Symbol
     Given a symbol has been created
     And the Theme List tool has been opened
@@ -206,7 +202,7 @@ Feature: Theme List
       | Pressing Escape |
       | Clicking Away   |
 
-  @rename-symbol @new
+  @rename-symbol
   Scenario Outline: Commit Rename Symbol
     Given a symbol has been created
     And the Theme List tool has been opened
@@ -221,7 +217,7 @@ Feature: Theme List
       | Pressing Enter |
       | Clicking Away  |
 
-  @rename-symbol @new
+  @rename-symbol
   Scenario Outline: Fail to Rename Symbol
     Given a symbol has been created
     And the Theme List tool has been opened

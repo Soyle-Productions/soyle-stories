@@ -14,6 +14,8 @@ import com.soyle.stories.theme.usecases.listSymbolsByTheme.symbols
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.theme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
+import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
+import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenamedTheme
 import java.util.*
@@ -25,7 +27,8 @@ class ThemeListPresenter(
     DeleteTheme.OutputPort,
     RenameTheme.OutputPort,
     AddSymbolToTheme.OutputPort,
-    RemoveSymbolFromTheme.OutputPort {
+    RemoveSymbolFromTheme.OutputPort,
+    RenameSymbol.OutputPort {
 
     override suspend fun symbolsListedByTheme(response: SymbolsByTheme) {
         val viewModel = ThemeListViewModel(
@@ -100,6 +103,26 @@ class ThemeListPresenter(
                     if (it.themeId != themeId) it
                     else it.copy(
                         symbols = it.symbols.filterNot { it.symbolId == symbolId }
+                    )
+                }
+            )
+        }
+    }
+
+    override suspend fun symbolRenamed(response: RenamedSymbol) {
+        val themeId = response.themeId.toString()
+        val symbolId = response.symbolId.toString()
+        view.updateOrInvalidated {
+            copy(
+                themes = themes.map {
+                    if (it.themeId != themeId) it
+                    else it.copy(
+                        symbols = sortedSymbols(it.symbols.map {
+                            if (it.symbolId != symbolId) it
+                            else it.copy(
+                                symbolName = response.newName
+                            )
+                        })
                     )
                 }
             )

@@ -1,6 +1,7 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
@@ -236,7 +237,7 @@ class CreateSymbolDialogSteps(en: En, double: SoyleStoriesTestDouble) {
                 val dropdown = getThemeDropdown(dialog)
                 val renameRequest = ThemeListToolSteps.renameRequest!!
                 val themeItem = dropdown.items.find {
-                    it.id == renameRequest.first.uuid.toString()
+                    it.id == (renameRequest.first as Theme.Id).uuid.toString()
                 }!!
                 assertEquals(renameRequest.second, themeItem.text)
             }

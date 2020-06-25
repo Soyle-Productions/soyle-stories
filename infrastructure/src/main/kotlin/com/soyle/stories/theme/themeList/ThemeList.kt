@@ -9,6 +9,8 @@ import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
 import com.soyle.stories.theme.deleteSymbolDialog.DeleteSymbolDialog
 import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialog
+import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
+import com.soyle.stories.theme.usecases.validateSymbolName
 import com.soyle.stories.theme.usecases.validateThemeName
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -57,12 +59,24 @@ class ThemeList : View() {
                             }
                             catch (e: ThemeNameCannotBeBlank) { "Theme name cannot be blank." }
                         }
+                        is SymbolListItemViewModel -> {
+                            try {
+                                validateSymbolName(newName)
+                                null
+                            }
+                            catch (e: SymbolNameCannotBeBlank) {
+                                "Symbol name cannot be blank."
+                            }
+                        }
                         else -> null
                     }
                 }) { newName, item ->
                     when (item) {
                         is ThemeListItemViewModel -> {
                             viewListener.renameTheme(item.themeId, newName)
+                        }
+                        is SymbolListItemViewModel -> {
+                            viewListener.renameSymbol(item.symbolId, newName)
                         }
                     }
                     item
@@ -76,7 +90,6 @@ class ThemeList : View() {
                         is SymbolListItemViewModel -> {
                             text = it.symbolName
                             contextMenu = symbolItemContextMenu
-                            isEditable = false
                         }
                         else -> throw IllegalArgumentException("Invalid value type")
                     }
@@ -141,6 +154,17 @@ class ThemeList : View() {
         val treeItem = treeview.root.children.find {
             when (val value = it.value) {
                 is ThemeListItemViewModel -> value.themeId == themeId
+                else -> false
+            }
+        } ?: return
+        treeview.edit(treeItem)
+    }
+
+    internal fun editSymbolName(symbolId: String)
+    {
+        val treeItem = treeview.root.children.asSequence().flatMap { it.children.asSequence() }.find {
+            when (val value = it.value) {
+                is SymbolListItemViewModel -> value.symbolId == symbolId
                 else -> false
             }
         } ?: return

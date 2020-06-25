@@ -31,6 +31,9 @@ import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeControllerImpl
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeNotifier
+import com.soyle.stories.theme.renameSymbol.RenameSymbolController
+import com.soyle.stories.theme.renameSymbol.RenameSymbolControllerImpl
+import com.soyle.stories.theme.renameSymbol.RenameSymbolNotifier
 import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.renameTheme.RenameThemeControllerImpl
 import com.soyle.stories.theme.renameTheme.RenameThemeNotifier
@@ -56,6 +59,8 @@ import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThem
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThemeUseCase
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
+import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
+import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbolUseCase
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsController
@@ -86,6 +91,7 @@ object ThemeModule {
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
         provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get()) }
         provide<RemoveSymbolFromTheme> { RemoveSymbolFromThemeUseCase(get()) }
+        provide<RenameSymbol> { RenameSymbolUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -108,6 +114,9 @@ object ThemeModule {
         provide(RemoveSymbolFromTheme.OutputPort::class) {
             RemoveSymbolFromThemeNotifier()
         }
+        provide(RenameSymbol.OutputPort::class) {
+            RenameSymbolNotifier()
+        }
     }
 
     private fun InScope<ProjectScope>.controllers()
@@ -129,6 +138,9 @@ object ThemeModule {
         }
         provide<RemoveSymbolFromThemeController> {
             RemoveSymbolFromThemeControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<RenameSymbolController> {
+            RenameSymbolControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -177,12 +189,14 @@ object ThemeModule {
             presenter listensTo get<RenameThemeNotifier>()
             presenter listensTo get<AddSymbolToThemeNotifier>()
             presenter listensTo get<RemoveSymbolFromThemeNotifier>()
+            presenter listensTo get<RenameSymbolNotifier>()
 
             ThemeListController(
                 projectId.toString(),
                 applicationScope.get(),
                 get(),
                 presenter,
+                get(),
                 get(),
                 get()
             )

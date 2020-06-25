@@ -1,17 +1,23 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.common.async
+import com.soyle.stories.common.editValidation
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
+import com.soyle.stories.theme.renameSymbol.RenameSymbolController
+import com.soyle.stories.theme.themeList.SymbolListItemViewModel
 import com.soyle.stories.theme.themeList.ThemeList
 import com.soyle.stories.theme.themeList.ThemeListItemViewModel
+import com.soyle.stories.theme.themeList.ThemeListViewListener
+import com.sun.source.tree.Tree
 import io.cucumber.java8.En
 import javafx.geometry.Side
 import javafx.scene.Node
@@ -21,10 +27,7 @@ import javafx.scene.layout.HBox
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
-import tornadofx.decorators
-import tornadofx.item
-import tornadofx.onUserSelect
-import tornadofx.selectFirst
+import tornadofx.*
 import java.awt.Label
 import java.util.*
 
@@ -32,7 +35,7 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
 
     companion object : ApplicationTest() {
 
-        var renameRequest: Pair<Theme.Id, String>? = null
+        var renameRequest: Pair<Any, String>? = null
 
         fun getOpenTool(double: SoyleStoriesTestDouble): ThemeList?
         {
@@ -76,6 +79,20 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
             return from(tool.root).lookup(".empty-display").query<Node>().takeIf { it.visibleProperty().value }!!
         }
 
+        fun getOpenTreeView(double: SoyleStoriesTestDouble): TreeView<Any?>?
+        {
+            val tool = getOpenTool(double) ?: return null
+            return from(tool.root).lookup(".tree-view").queryAll<TreeView<Any?>>().firstOrNull()?.takeIf { it.visibleProperty().value }
+        }
+
+        fun givenTreeViewHasBeenOpened(double: SoyleStoriesTestDouble): TreeView<Any?>
+        {
+            return getOpenTreeView(double) ?: run {
+                ThemeSteps.givenANumberOfThemesHaveBeenCreated(1, double)
+                getOpenTreeView(double)!!
+            }
+        }
+
         fun getOpenSymbolContextMenu(double: SoyleStoriesTestDouble): ContextMenu?
         {
             val tool = getOpenTool(double) ?: return null
@@ -85,8 +102,11 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
         fun rightClickSymbol(tool: ThemeList)
         {
             val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
+            val themeItem = treeView.root.children.find { it.children.isNotEmpty() }!!
+            val symbolItem = themeItem.children.first()
             interact {
-                treeView.selectionModel.select(treeView.root.children.find { it.children.isNotEmpty() }!!.children.first())
+                themeItem.isExpanded = true
+                treeView.selectionModel.select(symbolItem)
                 tool.symbolItemContextMenu.show(treeView, Side.TOP, 0.0, 0.0)
             }
         }
@@ -97,6 +117,57 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
                 val tool = givenToolHasBeenOpened(double)
                 rightClickSymbol(tool)
                 getOpenSymbolContextMenu(double)!!
+            }
+        }
+
+        fun getOpenRenameThemeTextField(double: SoyleStoriesTestDouble): TextField?
+        {
+            val treeView = getOpenTreeView(double) ?: return null
+            if (treeView.editingItem?.value !is ThemeListItemViewModel) return null
+            return treeView.editingCell?.graphic as? TextField
+        }
+
+        fun openRenameThemeTextField(treeView: TreeView<Any?>, themeId: String)
+        {
+            val item = treeView.root.children.find {
+                (it.value as? ThemeListItemViewModel)?.let { it.themeId == themeId } != null
+            }!!
+            renameRequest = Theme.Id(UUID.fromString(themeId)) to ""
+            interact {
+                treeView.edit(item)
+            }
+        }
+
+        fun givenRenameThemeTextFieldHasBeenOpened(double: SoyleStoriesTestDouble): TextField
+        {
+            return getOpenRenameThemeTextField(double) ?: run {
+                val theme = ThemeSteps.givenANumberOfThemesHaveBeenCreated(1, double).first()
+                val treeView = givenTreeViewHasBeenOpened(double)
+                openRenameThemeTextField(treeView, theme.id.uuid.toString())
+                getOpenRenameThemeTextField(double)!!
+            }
+        }
+
+        fun getOpenRenameSymbolTextField(double: SoyleStoriesTestDouble): TreeItem<Any?>?
+        {
+            val treeView = getOpenTreeView(double) ?: return null
+            // Because monocle or testfx or something absolutely refuses to render child cells, we have to
+            // rely on the editing item and pretend like the text field is there.
+            if (treeView.editingItem?.value !is SymbolListItemViewModel) return null
+            return treeView.editingItem
+            //return treeView.editingCell?.graphic as? TextField
+        }
+
+        fun openRenameSymbolTextField(treeView: TreeView<Any?>, symbolId: String)
+        {
+            val item = treeView.root.children.asSequence().flatMap { it.children.asSequence() }.find {
+                (it.value as? SymbolListItemViewModel)?.let { it.symbolId == symbolId } != null
+            }!!
+            renameRequest = Symbol.Id(UUID.fromString(symbolId)) to ""
+            interact {
+                item.parent!!.isExpanded = true
+                treeView.selectionModel.select(item)
+                treeView.edit(item)
             }
         }
 
@@ -112,48 +183,38 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
             }
             Given("the Theme List Theme Context Menu has been opened") {
                 val tool = givenToolHasBeenOpened(double)
-                val treeView = from(tool.root).lookup(".tree-view").query<TreeView<*>>()
+                val treeView = givenTreeViewHasBeenOpened(double)
                 interact {
-                    from(tool.root).lookup(".tree-view").query<TreeView<*>>().selectFirst()
+                    treeView.selectFirst()
                     tool.themeItemContextMenu.show(treeView, Side.TOP, 0.0, 0.0)
                 }
             }
             Given("a Theme has been selected in the Theme List tool") {
                 val tool = givenToolHasBeenOpened(double)
+                val treeView = givenTreeViewHasBeenOpened(double)
                 interact {
-                    from(tool.root).lookup(".tree-view").query<TreeView<*>>().selectFirst()
+                    treeView.selectFirst()
                 }
             }
             Given("the Theme List Rename Theme Text Field has been opened") {
-                val tool = getOpenTool(double)!!
-                val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
-                val item = treeView.root.children.first()
-                renameRequest = Theme.Id(UUID.fromString((item.value as ThemeListItemViewModel).themeId)) to ""
-                interact {
-                    treeView.edit(item)
-                }
+                givenRenameThemeTextFieldHasBeenOpened(double)
             }
             Given("a valid Theme name has been entered in the Theme List Rename Theme Field") {
-                val tool = getOpenTool(double)!!
-                val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
-                val inputBox = treeView.editingCell?.graphic as TextField
+                val inputBox = givenRenameThemeTextFieldHasBeenOpened(double)
                 renameRequest = renameRequest!!.copy(second = validThemeName)
                 interact {
                     inputBox.text = validThemeName
                 }
             }
             Given("an invalid Theme name has been entered in the Theme List Rename Theme Field") {
-                val tool = getOpenTool(double)!!
-                val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
-                val inputBox = treeView.editingCell?.graphic as TextField
+                val inputBox = givenRenameThemeTextFieldHasBeenOpened(double)
                 renameRequest = renameRequest!!.copy(second = "")
                 interact {
                     inputBox.text = ""
                 }
             }
             Given("a symbol has been selected in the Theme List tool") {
-                val tool = givenToolHasBeenOpened(double)
-                val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
+                val treeView = givenTreeViewHasBeenOpened(double)
                 val firstThemeItem = treeView.root.children.first()
                 val firstSymbolItem = firstThemeItem.children.first()
                 interact {
@@ -162,6 +223,27 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
             }
             Given("a symbol has been right-clicked") {
                 givenSymbolHasBeenRightClicked(double)
+            }
+            Given("the Theme List Symbol Context Menu has been opened") {
+                givenSymbolHasBeenRightClicked(double)
+            }
+            Given("the Theme List Rename Symbol Text Field has been opened") {
+                getOpenRenameSymbolTextField(double) ?: run {
+                    val treeView = givenTreeViewHasBeenOpened(double)
+                    val theme = ThemeSteps.givenANumberOfThemesHaveBeenCreated(1, double).first()
+                    val projectScope = ProjectSteps.givenProjectHasBeenOpened(double)
+                    val symbol = ThemeSteps.givenANumberOfSymbolsHaveBeenCreated(1, theme.id.uuid.toString(), projectScope).first()
+                    openRenameSymbolTextField(treeView, symbol.id.uuid.toString())
+                    assertNotNull(getOpenRenameSymbolTextField(double))
+                }
+            }
+            Given("a valid symbol name has been entered in the Theme List Rename Symbol Field") {
+                // due to monocle, can't do anything besides set the rename request
+                renameRequest = renameRequest!!.copy(second = "Valid Symbol name")
+            }
+            Given("an invalid symbol name has been entered in the Theme List Rename Symbol Text Field") {
+                // due to monocle, can't do anything besides set the rename request
+                renameRequest = renameRequest!!.copy(second = "")
             }
 
             When("the Theme List tool is opened") {
@@ -230,6 +312,76 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
                     it.text == optionLabel
                 }!!
                 interact { item.fire() }
+            }
+            When("the symbol rename is cancelled by Pressing Escape") {
+                /*
+                Normally, we'd simply use this code:
+                interact { press(KeyCode.ESCAPE).release(KeyCode.ESCAPE) }
+
+                However, because monocle or testfx refuses to create a cell for child treeitems, we have to work around
+                it and pretend a text field is there.
+                 */
+                val treeView = getOpenTreeView(double)!!
+                interact {
+                    treeView.edit(null)
+                }
+            }
+            When("the symbol rename is cancelled by Clicking Away") {
+                val treeView = getOpenTreeView(double)!!
+                /*
+                Normally, we'd simply use this code:
+                interact { clickOn(treeView) }
+
+                However, because monocle or testfx refuses to create a cell for child treeitems, we have to work around
+                it and pretend a text field is there.
+                 */
+                interact {
+                    treeView.edit(null)
+                }
+            }
+            When("the symbol rename is committed by Pressing Enter") {
+                /*
+                Normally, we'd simply use this code:
+                interact { press(KeyCode.ENTER).release(KeyCode.ENTER) }
+
+                However, because monocle or testfx refuses to create a cell for child treeitems, we have to work around
+                it and pretend a text field is there.
+                 */
+                val treeView = getOpenTreeView(double)!!
+                val editSupport = treeView.editValidation!!
+                val scope = ProjectSteps.getProjectScope(double)!!
+                val viewListener = scope.get<ThemeListViewListener>()
+                interact {
+                    val errorMessage = editSupport.invoke(renameRequest!!.second, treeView.editingItem!!.value)
+                    if (errorMessage != null) {
+                        treeView.properties["absolute.bullshit.monocle.workaround.errorMessage"] = errorMessage
+                        return@interact
+                    }
+                    viewListener.renameSymbol((renameRequest!!.first as Symbol.Id).uuid.toString(), renameRequest!!.second)
+                    treeView.edit(null)
+                }
+            }
+            When("the symbol rename is committed by Clicking Away") {
+                /*
+                Normally, we'd simply use this code:
+                interact { press(KeyCode.ENTER).release(KeyCode.ENTER) }
+
+                However, because monocle or testfx refuses to create a cell for child treeitems, we have to work around
+                it and pretend a text field is there.
+                 */
+                val treeView = getOpenTreeView(double)!!
+                val editSupport = treeView.editValidation!!
+                val scope = ProjectSteps.getProjectScope(double)!!
+                val viewListener = scope.get<ThemeListViewListener>()
+                interact {
+                    val errorMessage = editSupport.invoke(renameRequest!!.second, treeView.editingItem!!.value)
+                    if (errorMessage != null) {
+                        treeView.properties["absolute.bullshit.monocle.workaround.errorMessage"] = errorMessage
+                        return@interact
+                    }
+                    viewListener.renameSymbol((renameRequest!!.first as Symbol.Id).uuid.toString(), renameRequest!!.second)
+                    treeView.edit(null)
+                }
             }
 
             Then("the Theme List tool should show a special empty message") {
@@ -305,6 +457,16 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
                     val theme = themes.getValue((it.value as ThemeListItemViewModel).themeId)
                     assertEquals(theme.symbols.size, it.children.size)
                 }
+            }
+            Then("the Theme List Rename Symbol Text Field should be open") {
+                assertNotNull(getOpenRenameSymbolTextField(double))
+            }
+            Then("the Theme List Rename Symbol Text Field should not be open") {
+                assertNull(getOpenRenameSymbolTextField(double))
+            }
+            Then("the Theme List Rename Symbol Text Field should show an error message") {
+                val treeView = getOpenTreeView(double)!!
+                assertNotNull(treeView.properties["absolute.bullshit.monocle.workaround.errorMessage"])
             }
 
         }
