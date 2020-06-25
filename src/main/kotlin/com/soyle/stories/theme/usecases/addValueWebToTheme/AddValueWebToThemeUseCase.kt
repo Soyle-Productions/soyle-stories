@@ -16,7 +16,18 @@ class AddValueWebToThemeUseCase(
         val theme = getTheme(themeId)
         validateValueWebName(name)
         val valueWeb = createValueWeb(name, theme)
-        output.addedValueWebToTheme(ValueWebAddedToTheme(themeId, valueWeb.id.uuid, name))
+        output.addedValueWebToTheme(responseModel(themeId, valueWeb, name))
+    }
+
+    private fun responseModel(
+        themeId: UUID,
+        valueWeb: ValueWeb,
+        name: String
+    ): ValueWebAddedToTheme {
+        return ValueWebAddedToTheme(
+            themeId, valueWeb.id.uuid, name,
+            OppositionAddedToValueWeb(themeId, valueWeb.id.uuid, valueWeb.oppositions.first().id.uuid, name)
+        )
     }
 
     private suspend fun createValueWeb(name: String, theme: Theme): ValueWeb {

@@ -56,14 +56,21 @@ class AddValueWebToThemeUnitTest {
             assertEquals(themeId, updatedTheme.id)
             val createdValueWeb = updatedTheme.valueWebs.single()
             assertEquals(name, createdValueWeb.name)
+            val firstOpposition = createdValueWeb.oppositions.single()
+            assertEquals(name, firstOpposition.name)
         }
 
         @Test
         fun `check output`() {
             val actual = result as ValueWebAddedToTheme
             assertEquals(themeId.uuid, actual.themeId)
-            assertEquals(updatedTheme!!.valueWebs.single().id.uuid, actual.valueWebId)
+            val createdValueWeb = updatedTheme!!.valueWebs.single()
+            assertEquals(createdValueWeb.id.uuid, actual.valueWebId)
             assertEquals(name, actual.valueWebName)
+            assertEquals(themeId.uuid, actual.oppositionAddedToValueWeb.themeId)
+            assertEquals(createdValueWeb.id.uuid, actual.oppositionAddedToValueWeb.valueWebId)
+            assertEquals(createdValueWeb.oppositions.single().id.uuid, actual.oppositionAddedToValueWeb.oppositionValueId)
+            assertEquals(name, actual.oppositionAddedToValueWeb.oppositionValueName)
         }
     }
 
