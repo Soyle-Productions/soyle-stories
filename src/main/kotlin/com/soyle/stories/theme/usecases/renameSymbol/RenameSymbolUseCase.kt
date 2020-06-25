@@ -16,6 +16,7 @@ class RenameSymbolUseCase(
         val theme = getThemeContainingSymbol(symbolId)
         val symbol = theme.symbols.find { it.id.uuid == symbolId }!!
         if (symbol.name == name) throw SymbolAlreadyHasName(symbolId, name)
+        themeRepository.updateTheme(theme.withoutSymbol(symbol.id).withSymbol(symbol.withName(name)))
         output.symbolRenamed(RenamedSymbol(theme.id.uuid, symbolId, name))
     }
 

@@ -9,7 +9,7 @@ import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbolUseCase
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -25,11 +25,14 @@ class RenameSymbolUnitTest {
         }
     }
 
+    private var updatedTheme: Theme? = null
+
     @Test
     fun `new name is invalid`() {
         assertThrows<SymbolNameCannotBeBlank> {
             renameSymbol()
         }
+        assertNull(updatedTheme)
     }
 
     @Test
@@ -37,6 +40,7 @@ class RenameSymbolUnitTest {
         result = assertThrows<SymbolDoesNotExist> {
             renameSymbol("Not blank name")
         }
+        assertNull(updatedTheme)
         result shouldBe symbolDoesNotExist(symbolId.uuid)
     }
 
@@ -49,20 +53,24 @@ class RenameSymbolUnitTest {
         result = assertThrows<SymbolAlreadyHasName> {
             renameSymbol(sameName)
         }
+        assertNull(updatedTheme)
         result shouldBe symbolAlreadyHasName(symbolId.uuid, sameName)
     }
 
     @Test
     fun `input name is valid and different`() {
         val newName = "Valid New Name"
-        repo.themes[themeId] = makeTheme(themeId, symbols = listOf(
+        val theme = makeTheme(themeId, symbols = listOf(
             Symbol(symbolId, "Different Name")
         ))
+        repo.themes[themeId] = theme
         renameSymbol(newName)
+        assertNotNull(updatedTheme)
+        assertEquals(theme.withoutSymbol(symbolId).withSymbol(Symbol(symbolId, newName)), updatedTheme!!)
         result shouldBe renamedSymbol(newName)
     }
 
-    val repo = ThemeRepositoryDouble()
+    val repo = ThemeRepositoryDouble(onUpdateTheme = { updatedTheme = it })
 
     private fun renameSymbol(name: String = "") {
         val useCase: RenameSymbol = RenameSymbolUseCase(repo)
