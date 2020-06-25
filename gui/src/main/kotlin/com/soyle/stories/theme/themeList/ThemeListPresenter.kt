@@ -35,6 +35,7 @@ class ThemeListPresenter(
                 themeItem(it.theme.themeId, it.theme.themeName, it.symbols)
             }),
             createThemeButtonLabel = "Create New Theme",
+            createSymbolButtonLabel = "Create Symbol",
             deleteButtonLabel = "Delete"
         )
         view.update { viewModel }

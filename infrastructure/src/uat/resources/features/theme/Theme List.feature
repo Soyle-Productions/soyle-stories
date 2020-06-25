@@ -161,7 +161,6 @@ Feature: Theme List
       | Pressing Enter |
       | Clicking Away  |
 
-  @new
   Scenario Outline: Right-Click on Symbol
     Given a symbol has been created
     And the Theme List tool has been opened
@@ -169,12 +168,16 @@ Feature: Theme List
     Then the Theme List Symbol Context Menu should be open
     And the Theme List Symbol Context Menu should have <option> as an option
 
+    @new
     Examples:
       | option   |
       | "Rename" |
+
+    Examples:
+      | option   |
       | "Delete" |
 
-  @delete-symbol @new
+  @delete-symbol
   Scenario: Delete Symbol by Right-Clicking
     Given a symbol has been created
     And the Theme List tool has been opened
@@ -241,7 +244,7 @@ Feature: Theme List
     When the Theme List "Delete" button is selected
     Then the Confirm Delete Theme Dialog should be open
 
-  @delete-symbol @new
+  @delete-symbol
   Scenario: Delete Symbol by Selection and Delete Button
     Given a symbol has been created
     And the Theme List tool has been opened
@@ -249,15 +252,22 @@ Feature: Theme List
     When the Theme List "Delete" button is selected
     Then the Confirm Delete Symbol Dialog should be open
 
-  @create-symbol @new
+  @create-symbol
   Scenario: Create Symbol without Theme
     Given the Theme List tool has been opened
     When the Theme List "Create Symbol" button is selected
     Then the Create Symbol Dialog should be open
 
   @create-symbol
-  Scenario: React Symbol Created
+  Scenario: React to Symbol Created
     Given a Theme has been created
     And the Theme List tool has been opened
     When a symbol is created
     Then the Theme List Tool should show the new symbol
+
+  @delete-symbol
+  Scenario: React to Symbol Deleted
+    Given a symbol has been created
+    And the Theme List tool has been opened
+    When a symbol is deleted
+    Then the Theme List Tool should not show the deleted symbol

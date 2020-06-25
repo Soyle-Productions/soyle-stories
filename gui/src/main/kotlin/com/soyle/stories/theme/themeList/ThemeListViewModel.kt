@@ -5,6 +5,7 @@ data class ThemeListViewModel(
     val createFirstThemeButtonLabel: String,
     val themes: List<ThemeListItemViewModel>,
     val createThemeButtonLabel: String,
+    val createSymbolButtonLabel: String,
     val deleteButtonLabel: String
 )
 

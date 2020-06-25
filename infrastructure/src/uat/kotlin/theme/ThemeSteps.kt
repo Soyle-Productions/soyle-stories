@@ -12,6 +12,7 @@ import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
+import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import io.cucumber.java8.En
@@ -151,6 +152,14 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val theme = getCreatedThemes(double).first()
                 interact {
                     controller.addValueWebToTheme(theme.id.uuid.toString(), "New Value Web") { throw it }
+                }
+            }
+            When("a symbol is deleted") {
+                val projectScope = ProjectSteps.getProjectScope(double)!!
+                val controller = projectScope.get<RemoveSymbolFromThemeController>()
+                val theme = getCreatedThemes(double).first()
+                interact {
+                    controller.removeSymbolFromTheme(theme.symbols.first().id.uuid.toString())
                 }
             }
 

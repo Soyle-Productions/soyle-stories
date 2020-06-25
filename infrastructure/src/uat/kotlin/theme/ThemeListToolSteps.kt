@@ -15,16 +15,15 @@ import com.soyle.stories.theme.themeList.ThemeListItemViewModel
 import io.cucumber.java8.En
 import javafx.geometry.Side
 import javafx.scene.Node
-import javafx.scene.control.Button
-import javafx.scene.control.Labeled
-import javafx.scene.control.TextField
-import javafx.scene.control.TreeView
+import javafx.scene.control.*
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.HBox
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.decorators
+import tornadofx.item
+import tornadofx.onUserSelect
 import tornadofx.selectFirst
 import java.awt.Label
 import java.util.*
@@ -37,17 +36,16 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
 
         fun getOpenTool(double: SoyleStoriesTestDouble): ThemeList?
         {
-            val projectScope = ProjectSteps.getProjectScope(double) ?: return null
-            return findComponentsInScope<ThemeList>(projectScope).singleOrNull()?.takeIf {
+            val scope = ProjectSteps.getProjectScope(double) ?: return null
+            return findComponentsInScope<ThemeList>(scope).singleOrNull()?.takeIf {
                 it.currentStage?.isShowing == true
             }
         }
 
-        fun isToolOpen(double: SoyleStoriesTestDouble): Boolean = getOpenTool(double) != null
+        fun isToolOpen(double: SoyleStoriesTestDouble) = getOpenTool(double) != null
 
-        fun toggleOpen(double: SoyleStoriesTestDouble)
+        fun toggleOpen(scope: ProjectScope)
         {
-            val scope = ProjectSteps.getProjectScope(double)!!
             interact {
                 async(scope) {
                     scope.get<LayoutViewListener>().toggleToolOpen(com.soyle.stories.layout.config.fixed.ThemeList)
@@ -57,24 +55,49 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
 
         fun givenToolHasBeenOpened(double: SoyleStoriesTestDouble): ThemeList
         {
-            ProjectSteps.checkProjectHasBeenOpened(double)
-            return getOpenTool(double) ?: kotlin.run {
-                toggleOpen(double)
+            return getOpenTool(double) ?: run {
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                toggleOpen(scope)
                 getOpenTool(double)!!
             }
         }
 
         fun givenToolHasBeenClosed(double: SoyleStoriesTestDouble)
         {
-            ProjectSteps.checkProjectHasBeenOpened(double)
-            if (isToolOpen(double)) toggleOpen(double)
-            assertFalse(isToolOpen(double))
+            if (getOpenTool(double) != null) {
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                toggleOpen(scope)
+            }
+            assertNull(getOpenTool(double))
         }
 
-        fun getOpenEmptyDisplay(double: SoyleStoriesTestDouble): Node?
+        fun getOpenEmptyDisplay(tool: ThemeList): Node?
+        {
+            return from(tool.root).lookup(".empty-display").query<Node>().takeIf { it.visibleProperty().value }!!
+        }
+
+        fun getOpenSymbolContextMenu(double: SoyleStoriesTestDouble): ContextMenu?
         {
             val tool = getOpenTool(double) ?: return null
-            return from(tool.root).lookup(".empty-display").query<Node>().takeIf { it.visibleProperty().value }!!
+            return tool.symbolItemContextMenu.takeIf { it.isShowing }
+        }
+
+        fun rightClickSymbol(tool: ThemeList)
+        {
+            val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
+            interact {
+                treeView.selectionModel.select(treeView.root.children.find { it.children.isNotEmpty() }!!.children.first())
+                tool.symbolItemContextMenu.show(treeView, Side.TOP, 0.0, 0.0)
+            }
+        }
+
+        fun givenSymbolHasBeenRightClicked(double: SoyleStoriesTestDouble): ContextMenu
+        {
+            return getOpenSymbolContextMenu(double) ?: run {
+                val tool = givenToolHasBeenOpened(double)
+                rightClickSymbol(tool)
+                getOpenSymbolContextMenu(double)!!
+            }
         }
 
     }
@@ -128,13 +151,29 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
                     inputBox.text = ""
                 }
             }
+            Given("a symbol has been selected in the Theme List tool") {
+                val tool = givenToolHasBeenOpened(double)
+                val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
+                val firstThemeItem = treeView.root.children.first()
+                val firstSymbolItem = firstThemeItem.children.first()
+                interact {
+                    treeView.selectionModel.select(firstSymbolItem)
+                }
+            }
+            Given("a symbol has been right-clicked") {
+                givenSymbolHasBeenRightClicked(double)
+            }
 
             When("the Theme List tool is opened") {
-                if (isToolOpen(double)) toggleOpen(double)
-                toggleOpen(double)
+                val scope = ProjectSteps.getProjectScope(double)!!
+                if (getOpenTool(double) != null) {
+                    toggleOpen(scope)
+                }
+                toggleOpen(scope)
             }
             When("the Theme List Create First Theme button is selected") {
-                val emptyDisplay = getOpenEmptyDisplay(double)!!
+                val tool = getOpenTool(double)!!
+                val emptyDisplay = getOpenEmptyDisplay(tool)!!
                 val button = from(emptyDisplay).lookup(".center-button").queryButton()
                 interact { button.fire() }
             }
@@ -182,9 +221,20 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
                     clickOn(treeView)
                 }
             }
+            When("a symbol is right-clicked") {
+                val tool = getOpenTool(double)!!
+                rightClickSymbol(tool)
+            }
+            When("the Theme List Symbol Context Menu {string} option is selected") { optionLabel: String ->
+                val item = getOpenSymbolContextMenu(double)!!.items.find {
+                    it.text == optionLabel
+                }!!
+                interact { item.fire() }
+            }
 
             Then("the Theme List tool should show a special empty message") {
-                val emptyDisplay = getOpenEmptyDisplay(double)!!
+                val tool = getOpenTool(double)!!
+                val emptyDisplay = getOpenEmptyDisplay(tool)!!
                 assertTrue(from(emptyDisplay).lookup(".label").query<Labeled>().text.isNotBlank())
             }
             Then("the Theme List tool should show all {int} themes") { count: Int ->
@@ -229,6 +279,25 @@ class ThemeListToolSteps(en: En, double: SoyleStoriesTestDouble) {
                 assertTrue(inputBox.decorators.isNotEmpty()) { "No decorator on rename input box" }
             }
             Then("the Theme List Tool should show the new symbol") {
+                val themes = ThemeSteps.getCreatedThemes(double).associateBy { it.id.uuid.toString() }
+                val tool = getOpenTool(double)!!
+                val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()
+                treeView.root.children.forEach {
+                    val theme = themes.getValue((it.value as ThemeListItemViewModel).themeId)
+                    assertEquals(theme.symbols.size, it.children.size)
+                }
+            }
+            Then("the Theme List Symbol Context Menu should be open") {
+                val tool = getOpenTool(double)!!
+                assertTrue(tool.symbolItemContextMenu.isShowing)
+            }
+            Then("the Theme List Symbol Context Menu should have {string} as an option") { optionLabel: String ->
+                val item = getOpenSymbolContextMenu(double)!!.items.find {
+                    it.text == optionLabel
+                }
+                assertNotNull(item)
+            }
+            Then("the Theme List Tool should not show the deleted symbol") {
                 val themes = ThemeSteps.getCreatedThemes(double).associateBy { it.id.uuid.toString() }
                 val tool = getOpenTool(double)!!
                 val treeView = from(tool.root).lookup(".tree-view").query<TreeView<Any?>>()

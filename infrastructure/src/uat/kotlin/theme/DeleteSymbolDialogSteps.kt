@@ -11,6 +11,7 @@ import com.soyle.stories.writer.WriterSteps
 import io.cucumber.java8.En
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.uiComponent
@@ -98,6 +99,9 @@ class DeleteSymbolDialogSteps(en: En, double: SoyleStoriesTestDouble) {
             }
             Then("the Confirm Delete Symbol Dialog should not be open") {
                 assertNull(getOpenDialog())
+            }
+            Then("the Confirm Delete Symbol Dialog should be open") {
+                assertNotNull(getOpenDialog())
             }
             Then("the Confirm Delete Symbol Dialog should not open the next time a symbol is deleted") {
                 val projectScope = ProjectSteps.givenProjectHasBeenOpened(double)

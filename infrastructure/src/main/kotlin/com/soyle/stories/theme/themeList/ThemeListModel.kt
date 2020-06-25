@@ -14,6 +14,7 @@ class ThemeListModel : Model<ProjectScope, ThemeListViewModel>(ProjectScope::cla
     val emptyMessage = bind(ThemeListViewModel::emptyMessage)
     val createFirstThemeButtonLabel = bind(ThemeListViewModel::createFirstThemeButtonLabel)
     val createThemeButtonLabel = bind(ThemeListViewModel::createThemeButtonLabel)
+    val createSymbolButtonLabel = bind(ThemeListViewModel::createSymbolButtonLabel)
     val deleteButtonLabel = bind(ThemeListViewModel::deleteButtonLabel)
 
     val selectedItem = SimpleObjectProperty<Any?>(null)

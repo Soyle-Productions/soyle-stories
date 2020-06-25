@@ -5,6 +5,7 @@ import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.ThemeNameCannotBeBlank
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
 import com.soyle.stories.theme.deleteSymbolDialog.DeleteSymbolDialog
 import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialog
@@ -102,6 +103,13 @@ class ThemeList : View() {
                     isDisable = false
                     action {
                         scope.get<CreateThemeDialog>().show(currentWindow)
+                    }
+                    isMnemonicParsing = false
+                }
+                button(model.createSymbolButtonLabel) {
+                    isDisable = false
+                    action {
+                        scope.get<CreateSymbolDialog>().show((model.selectedItem.value as? ThemeListItemViewModel)?.themeId, currentWindow)
                     }
                     isMnemonicParsing = false
                 }
