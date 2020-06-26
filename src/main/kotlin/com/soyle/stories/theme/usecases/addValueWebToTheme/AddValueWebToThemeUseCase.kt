@@ -5,6 +5,7 @@ import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.theme.usecases.addOppositionToValueWeb.OppositionAddedToValueWeb
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.validateValueWebName
 import java.util.*

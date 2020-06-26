@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.usecases.addValueWebToTheme
 
+import com.soyle.stories.theme.usecases.addOppositionToValueWeb.OppositionAddedToValueWeb
 import java.util.*
 
 class ValueWebAddedToTheme(
@@ -7,11 +8,4 @@ class ValueWebAddedToTheme(
     val valueWebId: UUID,
     val valueWebName: String,
     val oppositionAddedToValueWeb: OppositionAddedToValueWeb
-)
-
-class OppositionAddedToValueWeb(
-    val themeId: UUID,
-    val valueWebId: UUID,
-    val oppositionValueId: UUID,
-    val oppositionValueName: String
 )

@@ -56,6 +56,7 @@ class Theme(
     fun withSymbol(symbol: Symbol) = copy(symbols = symbols + symbol)
     fun withoutSymbol(symbolId: Symbol.Id) = copy(symbols = symbols.filterNot { it.id == symbolId })
     fun withValueWeb(valueWeb: ValueWeb) = copy(valueWebs = valueWebs + valueWeb)
+    fun withoutValueWeb(valueWebId: ValueWeb.Id) = copy(valueWebs = valueWebs.filterNot { it.id == valueWebId })
 
     fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> {
         return copy(

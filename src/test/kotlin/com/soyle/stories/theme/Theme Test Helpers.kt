@@ -28,6 +28,12 @@ fun makeTheme(
 	id, projectId, name, symbols, centralMoralQuestion, includedCharacters, similaritiesBetweenCharacters, valueWebs
 )
 
+fun makeValueWeb(
+	id: ValueWeb.Id = ValueWeb.Id(),
+	name: String = "",
+	oppositions: List<OppositionValue> = listOf()
+) = ValueWeb(id, name, oppositions)
+
 fun takeNoteOfTheme(expectedId: UUID): Theme =
 	makeTheme(id = Theme.Id(expectedId))
 
