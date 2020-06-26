@@ -41,3 +41,15 @@ fun valueWebDoesNotExist(valueWebId: UUID): (Any?) -> Unit = { actual ->
     assertEquals(valueWebId, actual.entityId)
     assertEquals(valueWebId, actual.valueWebId)
 }
+
+fun oppositionValueDoesNotExist(oppositionValueId: UUID): (Any?) -> Unit = { actual ->
+    actual as OppositionValueDoesNotExist
+    assertEquals(oppositionValueId, actual.entityId)
+    assertEquals(oppositionValueId, actual.oppositionValueId)
+}
+
+fun oppositionValueAlreadyHasName(oppositionValueId: UUID, expectedName: String): (Any?) -> Unit = { actual ->
+    actual as OppositionValueAlreadyHasName
+    assertEquals(oppositionValueId, actual.oppositionValueId) { "[OppositionValueAlreadyHasName] has incorrect id" }
+    assertEquals(expectedName, actual.oppositionValueName) { "[OppositionValueAlreadyHasName] has incorrect name" }
+}

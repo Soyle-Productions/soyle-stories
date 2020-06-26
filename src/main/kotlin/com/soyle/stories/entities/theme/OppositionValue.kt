@@ -11,6 +11,17 @@ class OppositionValue(
 
     constructor(name: String) : this(Id(), name, listOf())
 
+    private fun copy(
+        name: String = this.name,
+        representations: List<SymbolicRepresentation> = this.representations
+    ) = OppositionValue(
+        id,
+        name,
+        representations
+    )
+
+    fun withName(name: String) = copy(name = name)
+
     data class Id(val uuid: UUID = UUID.randomUUID())
 
 }

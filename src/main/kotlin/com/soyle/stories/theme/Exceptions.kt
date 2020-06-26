@@ -2,6 +2,7 @@ package com.soyle.stories.theme
 
 import com.soyle.stories.common.DuplicateOperationException
 import com.soyle.stories.common.EntityNotFoundException
+import com.soyle.stories.common.ValidationException
 import com.soyle.stories.entities.theme.StoryFunction
 import java.util.*
 
@@ -48,3 +49,6 @@ class SymbolDoesNotExist(val symbolId: UUID) : EntityNotFoundException(symbolId)
 class SymbolAlreadyHasName(val symbolId: UUID, val symbolName: String) : DuplicateOperationException()
 
 class ValueWebDoesNotExist(val valueWebId: UUID) : EntityNotFoundException(valueWebId)
+class OppositionValueDoesNotExist(val oppositionValueId: UUID) : EntityNotFoundException(oppositionValueId)
+object OppositionValueNameCannotBeBlank : ValidationException()
+class OppositionValueAlreadyHasName(val oppositionValueId: UUID, val oppositionValueName: String) : DuplicateOperationException()

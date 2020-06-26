@@ -2,6 +2,7 @@ package com.soyle.stories.theme.doubles
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.repositories.ThemeRepository
@@ -26,6 +27,14 @@ class ThemeRepositoryDouble(
 
     override suspend fun getThemeContainingValueWebWithId(valueWebId: ValueWeb.Id): Theme? {
         return themes.values.find { it.valueWebs.any { it.id == valueWebId } }
+    }
+
+    override suspend fun getThemeContainingOppositionValueWithId(oppositionValueId: OppositionValue.Id): Theme? {
+        return themes.values.find {
+            it.valueWebs.any {
+                it.oppositions.any { it.id == oppositionValueId }
+            }
+        }
     }
 
     override suspend fun addTheme(theme: Theme) {

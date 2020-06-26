@@ -34,6 +34,12 @@ fun makeValueWeb(
 	oppositions: List<OppositionValue> = listOf()
 ) = ValueWeb(id, name, oppositions)
 
+fun makeOppositionValue(
+	id: OppositionValue.Id = OppositionValue.Id(),
+	name: String = "",
+	representations: List<SymbolicRepresentation> = listOf()
+) = OppositionValue(id, name, representations)
+
 fun takeNoteOfTheme(expectedId: UUID): Theme =
 	makeTheme(id = Theme.Id(expectedId))
 

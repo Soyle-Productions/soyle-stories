@@ -5,6 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
@@ -44,6 +45,10 @@ class PlanNewCharacterArcTest {
             }
 
             override suspend fun getThemeContainingValueWebWithId(valueWebId: ValueWeb.Id): Theme? {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getThemeContainingOppositionValueWithId(oppositionValueId: OppositionValue.Id): Theme? {
                 TODO("Not yet implemented")
             }
 

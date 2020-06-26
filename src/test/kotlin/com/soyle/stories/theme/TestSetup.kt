@@ -6,6 +6,7 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.repositories.CharacterArcRepository
@@ -106,6 +107,11 @@ fun setupContext(
         }
 
         override suspend fun addTheme(theme: Theme) {
+            TODO("Not yet implemented")
+        }
+
+
+        override suspend fun getThemeContainingOppositionValueWithId(oppositionValueId: OppositionValue.Id): Theme? {
             TODO("Not yet implemented")
         }
 

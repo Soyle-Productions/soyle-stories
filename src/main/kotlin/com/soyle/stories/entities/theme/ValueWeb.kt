@@ -21,6 +21,7 @@ class ValueWeb(
     )
 
     fun withOpposition(opposition: OppositionValue) = copy(oppositions = oppositions + opposition)
+    fun withoutOpposition(oppositionId: OppositionValue.Id) = copy(oppositions = oppositions.filterNot { it.id == oppositionId })
 
     data class Id(val uuid: UUID = UUID.randomUUID())
 
