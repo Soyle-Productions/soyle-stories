@@ -18,15 +18,17 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 		resolve<ThreadTransformer>(applicationScope)
 	}
 
+	open fun viewModel(): VM? = item
+
 	override fun update(update: VM?.() -> VM) {
 		threadTransformer.gui {
-			rebind { item = item.update() }
+			rebind { item = viewModel().update() }
 		}
 	}
 
 	override fun updateOrInvalidated(update: VM.() -> VM) {
 		threadTransformer.gui {
-			rebind { item = item?.update() }
+			rebind { item = viewModel()?.update() }
 		}
 	}
 

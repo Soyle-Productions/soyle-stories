@@ -5,6 +5,9 @@ import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
+import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebControllerImpl
+import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebNotifier
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeControllerImpl
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeNotifier
@@ -31,6 +34,9 @@ import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeControllerImpl
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeNotifier
+import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueController
+import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueControllerImpl
+import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueNotifier
 import com.soyle.stories.theme.renameSymbol.RenameSymbolController
 import com.soyle.stories.theme.renameSymbol.RenameSymbolControllerImpl
 import com.soyle.stories.theme.renameSymbol.RenameSymbolNotifier
@@ -43,6 +49,8 @@ import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
+import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
+import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWebUseCase
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToThemeUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
@@ -51,6 +59,8 @@ import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateThemeUseCase
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
+import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWeb
+import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWebUseCase
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByThemeUseCase
 import com.soyle.stories.theme.usecases.listThemes.ListThemes
@@ -59,6 +69,8 @@ import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThem
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThemeUseCase
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
+import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValue
+import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValueUseCase
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbolUseCase
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
@@ -92,6 +104,9 @@ object ThemeModule {
         provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get()) }
         provide<RemoveSymbolFromTheme> { RemoveSymbolFromThemeUseCase(get()) }
         provide<RenameSymbol> { RenameSymbolUseCase(get()) }
+        provide<ListOppositionsInValueWeb> { ListOppositionsInValueWebUseCase(get()) }
+        provide<AddOppositionToValueWeb> { AddOppositionToValueWebUseCase(get()) }
+        provide<RenameOppositionValue> { RenameOppositionValueUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -117,6 +132,12 @@ object ThemeModule {
         provide(RenameSymbol.OutputPort::class) {
             RenameSymbolNotifier()
         }
+        provide(AddOppositionToValueWeb.OutputPort::class) {
+            AddOppositionToValueWebNotifier()
+        }
+        provide(RenameOppositionValue.OutputPort::class) {
+            RenameOppositionValueNotifier()
+        }
     }
 
     private fun InScope<ProjectScope>.controllers()
@@ -141,6 +162,12 @@ object ThemeModule {
         }
         provide<RenameSymbolController> {
             RenameSymbolControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<AddOppositionToValueWebController> {
+            AddOppositionToValueWebControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<RenameOppositionValueController> {
+            RenameOppositionValueControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -248,10 +275,15 @@ object ThemeModule {
                 )
 
                 presenter listensTo projectScope.get<AddValueWebToThemeNotifier>()
+                presenter listensTo projectScope.get<AddOppositionToValueWebNotifier>()
+                presenter listensTo projectScope.get<RenameOppositionValueNotifier>()
 
                 ValueOppositionWebsController(
                     themeId.toString(),
                     projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
                     projectScope.get(),
                     presenter
                 )

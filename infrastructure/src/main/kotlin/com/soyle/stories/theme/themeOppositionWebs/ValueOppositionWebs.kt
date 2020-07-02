@@ -4,6 +4,10 @@ import com.soyle.stories.common.components.emptyListDisplay
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
+import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
+import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.valueWebList
+import com.soyle.stories.theme.themeOppositionWebs.components.oppositionValueCard
+import com.soyle.stories.theme.valueOppositionWebs.OppositionValueViewModel
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListener
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
@@ -12,14 +16,19 @@ import javafx.animation.TranslateTransition
 import javafx.beans.property.ReadOnlyDoubleProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleStringProperty
+import javafx.collections.ObservableList
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.effect.DropShadow
+import javafx.scene.layout.BorderStrokeStyle
+import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
 import javafx.util.Duration
 import tornadofx.*
 import kotlin.math.max
@@ -66,12 +75,44 @@ class ValueOppositionWebs : View() {
                             else targetX.set(-menu.width)
                         }
                     }
-                    label("[Value Selected]") {
-                        isVisible = false
+                    label(model.selectedValueWeb.select { it.valueWebName.toProperty() }) {
                     }
                     spacer()
                     button("Add Opposition") {
-                        isVisible = false
+                        visibleWhen { model.selectedValueWeb.isNotNull }
+                        action {
+                            val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@action
+                            viewListener.addOpposition(valueWebId)
+                        }
+                    }
+                }
+                gridpane {
+                    vgap = 10.0
+                    hgap = 10.0
+                    padding = Insets(10.0)
+                    columnConstraints.add(ColumnConstraints().apply {
+                        hgrow = Priority.ALWAYS
+                        isFillWidth = true
+                    })
+                   val secondColumnConstraint = ColumnConstraints().apply {
+                        hgrow = Priority.ALWAYS
+                        isFillWidth = true
+                    }
+                    widthProperty().onChange {
+                        if (it < 300 && columnConstraints.size == 2) columnConstraints.remove(secondColumnConstraint)
+                        else if (it >= 300 && columnConstraints.size == 1) columnConstraints.add(secondColumnConstraint)
+                    }
+                    if (width >= 300) {
+                        columnConstraints.add(secondColumnConstraint)
+                    }
+                    model.oppositionValues.addListener { oppositionValues, old, new ->
+                        val oldSize = old?.size ?: 0
+                        val newSize = new?.size ?: 0
+                        if (oldSize < newSize) {
+                            repeat(newSize - oldSize) {
+                                oppositionValueCard(it + oldSize, model, viewListener)
+                            }
+                        }
                     }
                 }
                 anchorpaneConstraints {
@@ -101,10 +142,15 @@ class ValueOppositionWebs : View() {
                     }
                 }
                 vbox {
-                    addClass("value-web-list")
+                    addClass(valueWebList)
                     bindChildren(model.valueWebs) {
-                        label(it.valueWebName) {
-                            padding = Insets(5.0, 5.0, 5.0, 10.0)
+                        val isValueWebSelected = model.selectedValueWeb.value?.valueWebId == it.valueWebId
+
+                        hyperlink(it.valueWebName) {
+                            toggleClass(selectedItem, isValueWebSelected)
+                            action {
+                                model.selectedValueWeb.set(it)
+                            }
                         }
                     }
                 }
@@ -138,6 +184,9 @@ class ValueOppositionWebs : View() {
                 animatedMenuX.set(0.0)
                 targetX.set(0.0)
             }
+        }
+        model.selectedValueWeb.onChange {
+            if (it != null) viewListener.selectValueWeb(it.valueWebId)
         }
     }
 }

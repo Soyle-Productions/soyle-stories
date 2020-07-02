@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
  * Date: 2/14/2020
  * Time: 2:50 PM
  */
-class SoyleStories : App(WelcomeScreen::class, WizardStyles::class) {
+class SoyleStories : App(WelcomeScreen::class, Styles::class) {
 
     private val appScope = ApplicationScope()
     override var scope: Scope = appScope

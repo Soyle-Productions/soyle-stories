@@ -3,11 +3,13 @@ package com.soyle.stories.theme
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
+import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
@@ -16,6 +18,7 @@ import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeContro
 import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import io.cucumber.java8.En
+import io.cucumber.messages.internal.com.google.protobuf.Value
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
@@ -43,6 +46,15 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             val repo = scope.get<ThemeRepository>()
             return runBlocking {
                 repo.getThemeById(Theme.Id(UUID.fromString(themeId)))
+            }
+        }
+
+        fun getValueWeb(valueWebId: String, scope: ProjectScope): ValueWeb?
+        {
+            val repo = scope.get<ThemeRepository>()
+            return runBlocking {
+                repo.getThemeContainingValueWebWithId(ValueWeb.Id(UUID.fromString(valueWebId)))?.valueWebs
+                    ?.find { it.id.uuid.toString() == valueWebId }
             }
         }
 
@@ -79,6 +91,69 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             val symbols = getTheme(themeId, scope)!!.symbols
             assertTrue(symbols.size >= count)
             return symbols
+        }
+
+        fun createValueWeb(scope: ProjectScope, themeId: String)
+        {
+            val controller = scope.get<AddValueWebToThemeController>()
+            interact {
+                controller.addValueWebToTheme(themeId, "New Value Web ${UUID.randomUUID()}") { throw it }
+            }
+        }
+
+        fun givenANumberOfValueWebsHaveBeenCreated(count: Int, themeId: String, scope: ProjectScope): List<ValueWeb>
+        {
+            val currentCount = getTheme(themeId, scope)?.valueWebs?.size ?: 0
+            if (currentCount < count) {
+                repeat(count - currentCount) {
+                    createValueWeb(scope, themeId)
+                }
+            }
+            val valueWebs = getTheme(themeId, scope)!!.valueWebs
+            assertTrue(valueWebs.size >= count)
+            return valueWebs
+        }
+
+        fun createOppositionValue(scope: ProjectScope, valueWebId: String)
+        {
+            val controller = scope.get<AddOppositionToValueWebController>()
+            interact {
+                controller.addOpposition(valueWebId)
+            }
+        }
+
+        fun removeOppositionValue(scope: ProjectScope, valueWebId: String)
+        {
+            /*
+            val controller = scope.get<RemoveOppositionFromValueWebController>()
+            interact {
+                controller.addOpposition(valueWebId)
+            }*/
+        }
+
+        fun givenANumberOfOppositionsHaveBeenCreated(count: Int, valueWebId: String, scope: ProjectScope): List<OppositionValue>
+        {
+            val currentCount = getValueWeb(valueWebId, scope)?.oppositions?.size ?: 0
+            if (currentCount < count) {
+                repeat(count - currentCount) {
+                    createOppositionValue(scope, valueWebId)
+                }
+            }
+            val oppositions = getValueWeb(valueWebId, scope)!!.oppositions
+            assertTrue(oppositions.size >= count)
+            return oppositions
+        }
+
+        fun givenTheNumberOfOppositionsHasBeenReducedTo(count: Int, valueWebId: String, scope: ProjectScope)
+        {
+            val currentCount = getValueWeb(valueWebId, scope)?.oppositions?.size ?: 0
+            if (currentCount > count) {
+                repeat(count - currentCount) {
+                    createOppositionValue(scope, valueWebId)
+                }
+            }
+            val oppositions = getValueWeb(valueWebId, scope)!!.oppositions
+            assertTrue(oppositions.size >= count)
         }
     }
 

@@ -47,13 +47,14 @@ Feature: Value Opposition Web Tool
     Then the Value Opposition Web Tool should show the created value web
 
   @list-oppositions-in-value-web @new
-  Scenario: Select Value Web Before Any Value Oppositions Created for Value Web
+  Scenario: Select Value Web After All Value Oppositions Removed from Value Web
     Given the Value Opposition Web Tool has been opened
     And a value web has been created for the theme open in the Value Opposition Web Tool
+    And all value oppositions have been removed from the value web
     When a value web in the Value Opposition Web Tool is selected
     Then the Value Opposition Web Tool Opposition Web should show a special empty message
 
-  @list-oppositions-in-value-web @new
+  @list-oppositions-in-value-web
   Scenario: Select Value Web with Value Oppositions Created for Value Web
     Given the Value Opposition Web Tool has been opened
     And a value web has been created for the theme open in the Value Opposition Web Tool
@@ -61,7 +62,7 @@ Feature: Value Opposition Web Tool
     When a value web in the Value Opposition Web Tool is selected
     Then the Value Opposition Web Tool Opposition Web should list all 5 value oppositions
 
-  @add-opposition-to-value-web @new
+  @add-opposition-to-value-web
   Scenario: Add Value Opposition to Value Web
     Given the Value Opposition Web Tool has been opened
     And a value web has been created for the theme open in the Value Opposition Web Tool
@@ -75,7 +76,7 @@ Feature: Value Opposition Web Tool
   @remove-value-opposition @new @excluded
   Scenario: Remove Value Opposition from Value Web
 
-  @rename-value-opposition @new
+  @rename-value-opposition
   Scenario: Rename Value Opposition
     Given the Value Opposition Web Tool has been opened
     And a value web has been created for the theme open in the Value Opposition Web Tool
@@ -86,7 +87,7 @@ Feature: Value Opposition Web Tool
     And the value opposition name text box should be focused
     And the text in the value opposition name text box should be selected
 
-  @rename-value-opposition @new
+  @rename-value-opposition
   Scenario Outline: Cancel Rename Value Opposition
     Given the Value Opposition Web Tool has been opened
     And a value web has been created for the theme open in the Value Opposition Web Tool
@@ -94,14 +95,14 @@ Feature: Value Opposition Web Tool
     And the value web in the Value Opposition Web Tool has been selected
     And the value opposition is being renamed
     When the value opposition rename is cancelled by <action>
-    Then then value opposition name should not be a text box
+    Then the value opposition name should not be a text box
 
     Examples:
       | action          |
       | Pressing Escape |
       | Clicking Away   |
 
-  @rename-value-opposition @new
+  @rename-value-opposition
   Scenario Outline: Commit Rename Value Opposition
     Given the Value Opposition Web Tool has been opened
     And a value web has been created for the theme open in the Value Opposition Web Tool
@@ -110,7 +111,7 @@ Feature: Value Opposition Web Tool
     And the value opposition is being renamed
     And a valid value opposition name has been entered in the value opposition rename text box
     When the value opposition rename is committed by <action>
-    Then then value opposition name should not be a text box
+    Then the value opposition name should not be a text box
     And the value opposition should be renamed
 
     Examples:
@@ -118,7 +119,7 @@ Feature: Value Opposition Web Tool
       | Pressing Enter |
       | Clicking Away  |
 
-  @rename-value-opposition @new
+  @rename-value-opposition
   Scenario Outline: Fail to Rename Value Opposition
     Given the Value Opposition Web Tool has been opened
     And a value web has been created for the theme open in the Value Opposition Web Tool
@@ -127,13 +128,13 @@ Feature: Value Opposition Web Tool
     And the value opposition is being renamed
     And an invalid value opposition name has been entered in the value opposition rename text box
     When the value opposition rename is committed by <action>
-    Then then value opposition rename text box should show an error message
+    Then the value opposition <error message location> should show an error message
     But the value opposition should not be renamed
 
     Examples:
-      | action         |
-      | Pressing Enter |
-      | Clicking Away  |
+      | action         | error message location |
+      | Pressing Enter | rename text box        |
+      | Clicking Away  | name                   |
 
   @add-symbol-to-value-web @new @excluded
   Scenario: Add Symbol to Value Opposition
