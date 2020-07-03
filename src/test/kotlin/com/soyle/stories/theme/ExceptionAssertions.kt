@@ -60,3 +60,9 @@ fun valueWebDoesNotContainOppositionValue(valueWebId: UUID, oppositionValueId: U
     assertEquals(oppositionValueId, actual.oppositionValueId)
     assertEquals(oppositionValueId, actual.entityId)
 }
+
+fun valueWebAlreadyHasName(valueWebId: UUID, name: String): (Any?) -> Unit = { actual ->
+    actual as ValueWebAlreadyHasName
+    assertEquals(valueWebId, actual.valueWebId)
+    assertEquals(name, actual.valueWebName)
+}

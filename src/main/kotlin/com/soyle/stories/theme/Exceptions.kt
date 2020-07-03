@@ -53,3 +53,4 @@ class OppositionValueDoesNotExist(val oppositionValueId: UUID) : EntityNotFoundE
 object OppositionValueNameCannotBeBlank : ValidationException()
 class OppositionValueAlreadyHasName(val oppositionValueId: UUID, val oppositionValueName: String) : DuplicateOperationException()
 class ValueWebDoesNotContainOppositionValue(val valueWebId: UUID, val oppositionValueId: UUID) : EntityNotFoundException(oppositionValueId)
+class ValueWebAlreadyHasName(val valueWebId: UUID, val valueWebName: String) : DuplicateOperationException()
