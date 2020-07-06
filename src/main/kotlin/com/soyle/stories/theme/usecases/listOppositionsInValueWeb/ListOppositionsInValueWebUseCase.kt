@@ -17,7 +17,7 @@ class ListOppositionsInValueWebUseCase(
 
         output.oppositionsListedInValueWeb(OppositionsInValueWeb(valueWeb.oppositions.map {
             OppositionValueItem(it.id.uuid, it.name, it.representations.map {
-                SymbolicItem(it.entityUUID(), it.name)
+                SymbolicItem(it.entityUUID, it.name)
             })
         }))
     }

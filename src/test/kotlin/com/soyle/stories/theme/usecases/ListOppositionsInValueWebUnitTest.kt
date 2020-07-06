@@ -52,9 +52,9 @@ class ListOppositionsInValueWebUnitTest {
     fun `oppositions have symbolic representations`() {
         val oppositions = List(5) { OppositionValue(OppositionValue.Id(), it.toString(), List(it*it) {
             when {
-                it % 2 == 0 -> SymbolicCharacter(Character.Id(), "Character $it")
-                it % 3 == 0 -> SymbolicLocation(Location.Id(), "Location $it")
-                else -> SymbolicSymbol(Symbol.Id(), "Symbol $it")
+                it % 2 == 0 -> SymbolicRepresentation(Character.Id().uuid, "Character $it")
+                it % 3 == 0 -> SymbolicRepresentation(Location.Id().uuid, "Location $it")
+                else -> SymbolicRepresentation(Symbol.Id().uuid, "Symbol $it")
             }
         }) }
         val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, "", oppositions)))
@@ -88,7 +88,7 @@ class ListOppositionsInValueWebUnitTest {
         actual as OppositionsInValueWeb
         assertEquals(expectedOppositions.map {
             OppositionValueItem(it.id.uuid, it.name, it.representations.map {
-                SymbolicItem(it.entityUUID(), it.name)
+                SymbolicItem(it.entityUUID, it.name)
             })
         }, actual.oppositions)
     }

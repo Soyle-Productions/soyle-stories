@@ -21,6 +21,7 @@ class OppositionValue(
     )
 
     fun withName(name: String) = copy(name = name)
+    fun withRepresentation(representation: SymbolicRepresentation) = copy(representations = representations + representation)
 
     data class Id(val uuid: UUID = UUID.randomUUID())
 
