@@ -44,6 +44,7 @@ class PopOutEditBox(
 
     init {
         scene = Scene(HBox(textInput))
+        FX.applyStylesheetsTo(scene)
         addEventFilter(KeyEvent.KEY_PRESSED) {
             if (it.code == KeyCode.ESCAPE) cancel()
         }
