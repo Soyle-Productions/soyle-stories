@@ -73,6 +73,7 @@ class WriterSteps(en: En, double: SoyleStoriesTestDouble) {
 				"Confirm Delete Scene Dialog" -> DialogType.DeleteScene
 				"Confirm Delete Theme Dialog" -> DialogType.DeleteTheme
 				"Confirm Delete Symbol Dialog" -> DialogType.DeleteSymbol
+				"Confirm Delete Value Web Dialog" -> DialogType.DeleteValueWeb
 				else -> null
 			}
 		}

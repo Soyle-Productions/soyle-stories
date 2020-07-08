@@ -14,10 +14,14 @@ import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
+import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
+import com.soyle.stories.theme.removeValueWebFromTheme.RemoveValueWebFromThemeController
 import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
 import io.cucumber.java8.En
+import io.cucumber.java8.HookBody
 import io.cucumber.messages.internal.com.google.protobuf.Value
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
@@ -35,10 +39,16 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             }
         }
 
-        fun createTheme(double: SoyleStoriesTestDouble) {
+        fun createTheme(double: SoyleStoriesTestDouble, withName: String = "New Theme ${UUID.randomUUID()}") {
             val scope = ProjectSteps.getProjectScope(double)!!
             val controller = scope.get<CreateThemeController>()
-            controller.createTheme("New Theme ${UUID.randomUUID()}") { throw it }
+            controller.createTheme(withName) { throw it }
+            val repo = scope.get<ThemeRepository>()
+            runBlocking {
+                repo.listThemesInProject(Project.Id(scope.projectId)).find { it.name == withName }!!.let {
+                    uatNameToUUID["Theme($withName)"] = it.id.uuid
+                }
+            }
         }
 
         fun getTheme(themeId: String, scope: ProjectScope): Theme?
@@ -58,6 +68,14 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             }
         }
 
+        private val uatNameToUUID = mutableMapOf<String, UUID>()
+
+        fun getValueWebWithName(valueWebName: String, scope: ProjectScope): ValueWeb?
+        {
+            val uuid = uatNameToUUID["ValueWeb($valueWebName)"] ?: return null
+            return getValueWeb(uuid.toString(), scope)
+        }
+
         fun givenANumberOfThemesHaveBeenCreated(count: Int, double: SoyleStoriesTestDouble): List<Theme>
         {
             val currentCount = getCreatedThemes(double).size
@@ -70,6 +88,23 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             val themes = getCreatedThemes(double)
             assertTrue(themes.size >= count)
             return themes
+        }
+
+        fun getThemeWithName(double: SoyleStoriesTestDouble, themeName: String): Theme?
+        {
+            val scope = ProjectSteps.getProjectScope(double) ?: return null
+            val uuid = uatNameToUUID["Theme($themeName)"] ?: return null
+            return getTheme(uuid.toString(), scope)
+        }
+
+        fun givenAThemeHasBeenCreatedWithTheName(double: SoyleStoriesTestDouble, themeName: String): Theme
+        {
+            val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+            val uuid = uatNameToUUID["Theme($themeName)"] ?: run {
+                createTheme(double, themeName)
+                uatNameToUUID.getValue("Theme($themeName)")
+            }
+            return getTheme(uuid.toString(), scope)!!
         }
 
         fun createSymbol(scope: ProjectScope, themeId: String)
@@ -93,11 +128,17 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             return symbols
         }
 
-        fun createValueWeb(scope: ProjectScope, themeId: String)
+        fun createValueWeb(scope: ProjectScope, themeId: String, withName: String = "New Value Web ${UUID.randomUUID()}")
         {
             val controller = scope.get<AddValueWebToThemeController>()
             interact {
-                controller.addValueWebToTheme(themeId, "New Value Web ${UUID.randomUUID()}") { throw it }
+                controller.addValueWebToTheme(themeId, withName) { throw it }
+            }
+            val repo = scope.get<ThemeRepository>()
+            runBlocking {
+                repo.getThemeById(Theme.Id(UUID.fromString(themeId)))!!.valueWebs.find { it.name == withName }!!.let {
+                    uatNameToUUID["ValueWeb($withName)"] = it.id.uuid
+                }
             }
         }
 
@@ -112,6 +153,16 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             val valueWebs = getTheme(themeId, scope)!!.valueWebs
             assertTrue(valueWebs.size >= count)
             return valueWebs
+        }
+
+        fun givenAValueWebHasBeenCreatedWithTheName(double: SoyleStoriesTestDouble, themeId: String, name: String): ValueWeb
+        {
+            val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+            val uuid = uatNameToUUID["ValueWeb($name)"] ?: run {
+                createValueWeb(scope, themeId, name)
+                uatNameToUUID.getValue("ValueWeb($name)")
+            }
+            return getValueWeb(uuid.toString(), scope)!!
         }
 
         fun createOppositionValue(scope: ProjectScope, valueWebId: String)
@@ -163,13 +214,24 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
         CreateSymbolDialogSteps(en, double)
         DeleteSymbolDialogSteps(en, double)
         CreateValueWebDialogSteps(en, double)
+        DeleteValueWebDialogSteps(en, double)
         ThemeListToolSteps(en, double)
         ValueOppositionWebSteps(en, double)
 
         with(en) {
 
+            Before(HookBody {
+                uatNameToUUID.clear()
+            })
+
             Given("{int} Themes have been created") { count: Int ->
                 givenANumberOfThemesHaveBeenCreated(count, double)
+            }
+            Given("a value web called {string} has been created for the {string} theme") {
+                    valueWebName: String, themeName: String ->
+
+                val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                givenAValueWebHasBeenCreatedWithTheName(double, theme.id.uuid.toString(), valueWebName)
             }
             Given("a Theme has been created") {
                 givenANumberOfThemesHaveBeenCreated(1, double)
@@ -193,6 +255,24 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val projectScope = ProjectSteps.givenProjectHasBeenOpened(double)
                 val theme = givenANumberOfThemesHaveBeenCreated(1, double).first()
                 givenANumberOfSymbolsHaveBeenCreated(1, theme.id.uuid.toString(), projectScope)
+            }
+            Given("all value oppositions have been removed from the {string} value web") { valueWebName: String ->
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val valueWeb = getValueWebWithName(valueWebName, scope)!!
+                val controller = scope.get<RemoveOppositionFromValueWebController>()
+                interact {
+                    valueWeb.oppositions.forEach {
+                        controller.removeOpposition(it.id.uuid.toString(), valueWeb.id.uuid.toString())
+                    }
+                }
+            }
+            Given("a value opposition has been created for the {string} value web") { valueWebName: String ->
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val valueWeb = getValueWebWithName(valueWebName, scope)!!
+                if (valueWeb.oppositions.isEmpty()) {
+                    createOppositionValue(scope, valueWeb.id.uuid.toString())
+                }
+                assertFalse(getValueWebWithName(valueWebName, scope)!!.oppositions.isEmpty())
             }
 
             When("a theme is created") {
@@ -237,6 +317,14 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                     controller.removeSymbolFromTheme(theme.symbols.first().id.uuid.toString())
                 }
             }
+            When("the {string} value web is deleted") { valueWebName: String ->
+                val projectScope = ProjectSteps.getProjectScope(double)!!
+                val controller = projectScope.get<RemoveValueWebFromThemeController>()
+                val valueWeb = getValueWebWithName(valueWebName, projectScope)!!
+                interact {
+                    controller.removeValueWeb(valueWeb.id.uuid.toString())
+                }
+            }
 
             Then("the Theme should be deleted") {
                 val themeId = DeleteThemeDialogSteps.requestedThemeId!!
@@ -274,7 +362,14 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val symbol = getCreatedThemes(double).asSequence().flatMap { it.symbols.asSequence() }.find { it.id == symbolId }!!
                 assertNotEquals(name, symbol.name)
             }
-
+            Then("the value web should be deleted") {
+                val valueWebId = DeleteValueWebDialogSteps.requestedValueWebId!!
+                assertNull(getCreatedThemes(double).flatMap { it.valueWebs }.find { it.id == valueWebId })
+            }
+            Then("the value web should not be deleted") {
+                val valueWebId = DeleteValueWebDialogSteps.requestedValueWebId!!
+                assertNotNull(getCreatedThemes(double).flatMap { it.valueWebs }.find { it.id == valueWebId })
+            }
         }
     }
 

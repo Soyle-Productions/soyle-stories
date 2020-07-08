@@ -16,23 +16,70 @@ Feature: Value Opposition Web Tool
     When the Value Opposition Web Tool is opened
     Then the Value Opposition Web Tool should list all 5 value webs
 
-  @new @excluded
-  Scenario: Right-Click on Value Web
-
-  @rename-value-web @new @excluded
+  @rename-value-web
   Scenario: Rename Value Web
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
+    And the value web in the Value Opposition Web Tool has been selected
+    When the value web name is selected
+    Then the value web name should be a text box
+    And the value web name text box should be focused
+    And the text in the value web name text box should be selected
 
-  @rename-value-web @new @excluded
+  @rename-value-web
   Scenario: Cancel Rename Value Web
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
+    And the value web in the Value Opposition Web Tool has been selected
+    And the value web is being renamed
+    When the value web rename is cancelled by Pressing Escape
+    Then the value web name should not be a text box
 
-  @rename-value-web @new @excluded
+  @rename-value-web
   Scenario: Commit Rename Value Web
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
+    And the value web in the Value Opposition Web Tool has been selected
+    And the value web is being renamed
+    And a valid value web name has been entered in the value web rename text box
+    When the value web rename is committed by Pressing Enter
+    Then the value web name should not be a text box
+    And the value web should be renamed
 
-  @rename-value-web @new @excluded
+  @rename-value-web
   Scenario: Fail to Rename Value Web
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
+    And the value web in the Value Opposition Web Tool has been selected
+    And the value web is being renamed
+    And an invalid value web name has been entered in the value web rename text box
+    When the value web rename is committed by Pressing Enter
+    Then the value web rename text box should show an error message
+    But the value web should not be renamed
 
-  @delete-value-web @new @excluded
+  @delete-value-web
   Scenario: Delete Value Web
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
+    And the value web in the Value Opposition Web Tool has been selected
+    When the value web menu button "Delete" button is selected in the Value Opposition Web Tool
+    Then the Confirm Delete Value Web Dialog should be open
+
+  @delete-value-web
+  Scenario: React to Value Web Deleted
+    Given the Value Opposition Web Tool has been opened for the theme "Growing Up"
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    When the "Justice" value web is deleted
+    Then the "Growing Up" Value Opposition Web Tool should not list the "Justice" value web
+
+  @delete-value-web
+  Scenario: React to Selected Value Web Deleted
+    Given the Value Opposition Web Tool has been opened for the theme "Growing Up"
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And the "Justice" value web has been selected in the "Growing Up" Value Opposition Web Tool
+    When the "Justice" value web is deleted
+    Then the "Growing Up" Value Opposition Web Tool should not list the "Justice" value web
+    And the "Growing Up" Value Opposition Web Tool should have no value web selected
 
   @create-value-web
   Scenario: Create Value Web
@@ -46,13 +93,13 @@ Feature: Value Opposition Web Tool
     When a value web is created for the theme open in the Value Opposition Web Tool
     Then the Value Opposition Web Tool should show the created value web
 
-  @list-oppositions-in-value-web @new
+  @list-oppositions-in-value-web
   Scenario: Select Value Web After All Value Oppositions Removed from Value Web
-    Given the Value Opposition Web Tool has been opened
-    And a value web has been created for the theme open in the Value Opposition Web Tool
-    And all value oppositions have been removed from the value web
-    When a value web in the Value Opposition Web Tool is selected
-    Then the Value Opposition Web Tool Opposition Web should show a special empty message
+    Given the Value Opposition Web Tool has been opened for the theme "Growing Up"
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And all value oppositions have been removed from the "Justice" value web
+    When the "Justice" value web is selected in the "Growing Up" Value Opposition Web Tool
+    Then the "Growing Up" Value Opposition Web Tool Opposition Web should show a special empty message
 
   @list-oppositions-in-value-web
   Scenario: Select Value Web with Value Oppositions Created for Value Web
@@ -73,8 +120,14 @@ Feature: Value Opposition Web Tool
     And the value opposition name text box should be focused
     And the text in the value opposition name text box should be selected
 
-  @remove-value-opposition @new @excluded
+  @remove-value-opposition
   Scenario: Remove Value Opposition from Value Web
+    Given the Value Opposition Web Tool has been opened for the theme "Growing Up"
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And a value opposition has been created for the "Justice" value web
+    And the "Justice" value web has been selected in the "Growing Up" Value Opposition Web Tool
+    When the "Remove" button is selected on the first value opposition in the "Justice" value web
+    Then the "Growing Up" Value Opposition Web Tool Opposition Web should show a special empty message
 
   @rename-value-opposition
   Scenario: Rename Value Opposition
@@ -136,11 +189,23 @@ Feature: Value Opposition Web Tool
       | Pressing Enter | rename text box        |
       | Clicking Away  | name                   |
 
-  @add-symbol-to-value-web @new @excluded
+  @add-symbol-to-value-web @new
   Scenario: Add Symbol to Value Opposition
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
+    And a value opposition has been created for the value web
+    And the value web in the Value Opposition Web Tool has been selected
+    When the value opposition "Add Symbol" button is selected
+    Then the Add Symbol to Opposition Dialog should be open
 
-  @add-symbol-to-value-web @new @excluded
+  @add-symbol-to-value-web @new
   Scenario: React to Symbol Added to Value Opposition
+    Given the Value Opposition Web Tool has been opened
+    And a value web has been created for the theme open in the Value Opposition Web Tool
+    And a value opposition has been created for the value web
+    And the value web in the Value Opposition Web Tool has been selected
+    When a symbol is added to a value opposition in the selected value web
+    Then the symbol should be listed in the value opposition card
 
   @delete-symbol @new @excluded
   Scenario: React to Symbol Deleted

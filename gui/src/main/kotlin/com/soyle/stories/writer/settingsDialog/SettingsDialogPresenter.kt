@@ -31,6 +31,7 @@ class SettingsDialogPresenter(
 			DialogType.ReorderScene -> "Confirm Reorder Scene Dialog"
 			DialogType.DeleteTheme -> "Confirm Delete Theme Dialog"
 			DialogType.DeleteSymbol -> "Confirm Delete Symbol Dialog"
+			DialogType.DeleteValueWeb -> "Confirm Delete Value Web Dialog"
 		}
 	}
 

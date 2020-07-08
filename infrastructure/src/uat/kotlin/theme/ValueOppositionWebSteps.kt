@@ -3,6 +3,7 @@ package com.soyle.stories.theme
 import com.soyle.stories.common.components.PopOutEditBox
 import com.soyle.stories.common.components.popOutEditBox
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
@@ -17,6 +18,7 @@ import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Button
 import javafx.scene.control.Hyperlink
+import javafx.scene.control.MenuButton
 import javafx.scene.control.TextInputControl
 import javafx.scene.input.ContextMenuEvent
 import javafx.scene.input.KeyCode
@@ -29,6 +31,9 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
 
     companion object : ApplicationTest() {
 
+        var renameRequest: Pair<Any, String>? = null
+
+        private val validValueWebName = "Valid Value Web Name"
         private val validOppositionName = "Valid Opposition Name"
 
         fun getOpenTool(double: SoyleStoriesTestDouble): ValueOppositionWebs?
@@ -46,6 +51,15 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
             }
         }
 
+        fun getOpenToolForTheme(double: SoyleStoriesTestDouble, theme: Theme): ValueOppositionWebs?
+        {
+            val projectScope = ProjectSteps.getProjectScope(double) ?: return null
+            val scope = projectScope.toolScopes.asSequence()
+                .filterIsInstance<ValueOppositionWebsScope>()
+                .find { it.themeId == theme.id.uuid } ?: return null
+            return findComponentsInScope<ValueOppositionWebs>(scope).firstOrNull()
+        }
+
         fun givenToolHasBeenOpened(double: SoyleStoriesTestDouble): ValueOppositionWebs
         {
             return getOpenTool(double) ?: run {
@@ -54,6 +68,17 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
                     ThemeSteps.givenANumberOfThemesHaveBeenCreated(1, double).first().id.uuid.toString()
                 )
                 getOpenTool(double)!!
+            }
+        }
+
+        fun givenToolHasBeenOpenedForTheme(double: SoyleStoriesTestDouble, theme: Theme): ValueOppositionWebs
+        {
+            return getOpenToolForTheme(double, theme) ?: run {
+                openTool(
+                    ProjectSteps.givenProjectHasBeenOpened(double),
+                    theme.id.uuid.toString()
+                )
+                getOpenToolForTheme(double, theme)!!
             }
         }
 
@@ -83,6 +108,10 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
             Given("the Value Opposition Web Tool has been opened") {
                 givenToolHasBeenOpened(double)
             }
+            Given("the Value Opposition Web Tool has been opened for the theme {string}") { themeName: String ->
+                val theme = ThemeSteps.givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                givenToolHasBeenOpenedForTheme(double, theme)
+            }
             Given("a value web has been created for the theme open in the Value Opposition Web Tool") {
                 val scope = ProjectSteps.givenProjectHasBeenOpened(double)
                 val theme = ThemeSteps.givenANumberOfThemesHaveBeenCreated(1, double).first()
@@ -103,6 +132,17 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
             Given("the value web in the Value Opposition Web Tool has been selected") {
                 val tool = givenToolHasBeenOpened(double)
                 val valueWebLink = from(tool.root).lookup(".${Styles.valueWebList.name} .hyperlink").query<Hyperlink>()
+                interact {
+                    valueWebLink.fire()
+                }
+            }
+            Given("the {string} value web has been selected in the {string} Value Opposition Web Tool") {
+                valueWebName: String, themeName: String ->
+
+                val theme = ThemeSteps.givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                val tool = givenToolHasBeenOpenedForTheme(double, theme)
+                val valueWebLinks = from(tool.root).lookup(".${Styles.valueWebList.name} .hyperlink").queryAll<Hyperlink>()
+                val valueWebLink = valueWebLinks.find { it.text == valueWebName }!!
                 interact {
                     valueWebLink.fire()
                 }
@@ -137,6 +177,27 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
                 val card = oppositionCards.first()
                 val cardName = from(card).lookup(".hyperlink").query<Hyperlink>()
                 val popOutEditBox = givenPopOutEditBoxHasBeenOpenedForNode(cardName)
+                interact {
+                    popOutEditBox.textInput.text = ""
+                }
+            }
+            Given("the value web is being renamed") {
+                val tool = givenToolHasBeenOpened(double)
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                givenPopOutEditBoxHasBeenOpenedForNode(valueWebName)
+            }
+            Given("a valid value web name has been entered in the value web rename text box") {
+                val tool = givenToolHasBeenOpened(double)
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                val popOutEditBox = givenPopOutEditBoxHasBeenOpenedForNode(valueWebName)
+                interact {
+                    popOutEditBox.textInput.text = validValueWebName
+                }
+            }
+            Given("an invalid value web name has been entered in the value web rename text box") {
+                val tool = givenToolHasBeenOpened(double)
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                val popOutEditBox = givenPopOutEditBoxHasBeenOpenedForNode(valueWebName)
                 interact {
                     popOutEditBox.textInput.text = ""
                 }
@@ -205,6 +266,51 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
                     popOutEditBox.complete()
                 }
             }
+            When("the value web name is selected") {
+                val tool = getOpenTool(double)!!
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                interact {
+                    valueWebName.fire()
+                }
+            }
+            When("the value web menu button {string} button is selected in the Value Opposition Web Tool") { button: String ->
+                val tool = getOpenTool(double)!!
+                val menuButton = from(tool.root).lookup(".menu-button").query<MenuButton>()
+                val items = menuButton.items.toList()
+                val item = items.find { it.text == button }!!
+                interact { item.fire() }
+            }
+            When("the value web rename is cancelled by Pressing Escape") {
+                interact {
+                    press(KeyCode.ESCAPE).release(KeyCode.ESCAPE)
+                }
+            }
+            When("the value web rename is committed by Pressing Enter") {
+                interact {
+                    press(KeyCode.ENTER).release(KeyCode.ENTER)
+                }
+            }
+            When("the {string} value web is selected in the {string} Value Opposition Web Tool") {
+                valueWebName: String, themeName: String ->
+
+                val theme = ThemeSteps.givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                val tool = givenToolHasBeenOpenedForTheme(double, theme)
+                val valueWebLinks = from(tool.root).lookup(".${Styles.valueWebList.name} .hyperlink").queryAll<Hyperlink>()
+                val valueWebLink = valueWebLinks.find { it.text == valueWebName }!!
+                interact {
+                    valueWebLink.fire()
+                }
+            }
+            When("the {string} button is selected on the first value opposition in the {string} value web") {
+                buttonName: String, valueWebName: String ->
+                val tool = getOpenTool(double)!!
+                val oppositionCards = from(tool.root).lookup(".${Styles.oppositionCard.name}").queryAll<Node>()
+                val firstCard = oppositionCards.first()
+                val button = from(firstCard).lookup(buttonName).query<Button>()
+                interact {
+                    button.fire()
+                }
+            }
 
             Then("the Value Web Tool should be open") {
                 assertNotNull(getOpenTool(double))
@@ -237,9 +343,6 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
                             "Children: ${valueWebList.childrenUnmodifiable}\n" +
                             "Model: ${tool.scope.get<ValueOppositionWebsModel>().valueWebs}"
                 }
-            }
-            Then("the Value Opposition Web Tool Opposition Web should show a special empty message") {
-                TODO()
             }
             Then("the Value Opposition Web Tool Opposition Web should list all {int} value oppositions") { count: Int ->
                 val tool = getOpenTool(double)!!
@@ -310,6 +413,69 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
                 val cardName = from(lastCard).lookup(".hyperlink").query<Hyperlink>()
                 assertNotEquals(validOppositionName, cardName.text)
             }
+            Then("the value web name should not be a text box") {
+                val tool = getOpenTool(double)!!
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                assertNull(getOpenPopOutEditBoxForNode(valueWebName))
+            }
+            Then("the value web name should be a text box") {
+                val tool = getOpenTool(double)!!
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                getOpenPopOutEditBoxForNode(valueWebName)!!
+            }
+            Then("the value web name text box should be focused") {
+                val tool = getOpenTool(double)!!
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                val popout = getOpenPopOutEditBoxForNode(valueWebName)!!
+                assertTrue(popout.textInput.isFocused)
+            }
+            Then("the text in the value web name text box should be selected") {
+                val tool = getOpenTool(double)!!
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                val popout = getOpenPopOutEditBoxForNode(valueWebName)!!
+                assertEquals(popout.textInput.text, popout.textInput.selectedText)
+            }
+            Then("the value web should be renamed") {
+                val tool = getOpenTool(double)!!
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                assertEquals(validValueWebName, valueWebName.text)
+            }
+            Then("the value web should not be renamed") {
+                val tool = getOpenTool(double)!!
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                assertNotEquals(validValueWebName, valueWebName.text)
+            }
+            Then("the value web rename text box should show an error message") {
+                val tool = getOpenTool(double)!!
+                val valueWebName = from(tool.root).lookup("#ValueWebName").query<Hyperlink>()
+                val popout = getOpenPopOutEditBoxForNode(valueWebName)!!
+                popout.textInput.decorators.single()
+            }
+            Then("the {string} Value Opposition Web Tool should not list the {string} value web") {
+                themeName: String, valueWebName: String ->
+
+                val theme = ThemeSteps.getThemeWithName(double, themeName)!!
+                val tool = getOpenToolForTheme(double, theme)!!
+                val valueWebLinks = from(tool.root).lookup(".${Styles.valueWebList.name} .hyperlink").queryAll<Hyperlink>()
+                assertNull(valueWebLinks.find { it.text == valueWebName })
+            }
+            Then("the {string} Value Opposition Web Tool should have no value web selected") {
+                themeName: String ->
+
+                val theme = ThemeSteps.getThemeWithName(double, themeName)!!
+                val tool = getOpenToolForTheme(double, theme)!!
+                assertNull(tool.scope.get<ValueOppositionWebsModel>().selectedValueWeb.value)
+            }
+            Then("the {string} Value Opposition Web Tool Opposition Web should show a special empty message") {
+                    themeName: String ->
+
+                val theme = ThemeSteps.getThemeWithName(double, themeName)!!
+                val tool = getOpenToolForTheme(double, theme)!!
+                val content = from(tool.root).lookup(".content-pane").query<Parent>()
+                val emptyOppositionDisplay = from(content).lookup(".empty-display").query<Node>()
+                assertTrue(emptyOppositionDisplay.visibleProperty().get())
+            }
+
         }
     }
 

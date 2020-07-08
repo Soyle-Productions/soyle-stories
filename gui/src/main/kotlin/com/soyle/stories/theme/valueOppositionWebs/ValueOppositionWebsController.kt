@@ -2,7 +2,9 @@ package com.soyle.stories.theme.valueOppositionWebs
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
+import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
 import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueController
+import com.soyle.stories.theme.renameValueWeb.RenameValueWebController
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWeb
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInTheme
@@ -15,6 +17,8 @@ class ValueOppositionWebsController(
     private val listOppositionsInValueWeb: ListOppositionsInValueWeb,
     private val addOppositionToValueWebController: AddOppositionToValueWebController,
     private val renameOppositionValueController: RenameOppositionValueController,
+    private val renameValueWebController: RenameValueWebController,
+    private val removeOppositionFromValueWebController: RemoveOppositionFromValueWebController,
     private val presenter: ValueOppositionWebsPresenter
 ) : ValueOppositionWebsViewListener {
 
@@ -47,6 +51,16 @@ class ValueOppositionWebsController(
         renameOppositionValueController.renameOpposition(oppositionId, name) {
             presenter.presentError(oppositionId, it)
         }
+    }
+
+    override fun renameValueWeb(valueWebId: String, name: String) {
+        renameValueWebController.renameValueWeb(valueWebId, name) {
+            presenter.presentError(valueWebId, it)
+        }
+    }
+
+    override fun removeOpposition(valueWebId: String, oppositionId: String) {
+        removeOppositionFromValueWebController.removeOpposition(oppositionId, valueWebId)
     }
 
 }

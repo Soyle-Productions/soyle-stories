@@ -13,7 +13,7 @@ import tornadofx.onChange
 class ValueOppositionWebsModel : Model<ValueOppositionWebsScope, ValueOppositionWebsViewModel>(ValueOppositionWebsScope::class) {
 
     val valueWebs = bindImmutableList(ValueOppositionWebsViewModel::valueWebs)
-    val selectedValueWeb = SimpleObjectProperty<ValueWebItemViewModel>(null)
+    val selectedValueWeb = bind(ValueOppositionWebsViewModel::selectedValueWeb) as SimpleObjectProperty
     val oppositionValues = bindImmutableList(ValueOppositionWebsViewModel::oppositionValues)
     val errorMessage = bind(ValueOppositionWebsViewModel::errorMessage) as SimpleStringProperty
     val errorSource = bind(ValueOppositionWebsViewModel::errorSource) as SimpleStringProperty
@@ -22,7 +22,9 @@ class ValueOppositionWebsModel : Model<ValueOppositionWebsScope, ValueOpposition
 
     override fun viewModel(): ValueOppositionWebsViewModel? {
         return item?.copy(
-            selectedValueWeb = selectedValueWeb.value
+            selectedValueWeb = selectedValueWeb.value,
+            errorSource = null,
+            errorMessage = null
         )
     }
 

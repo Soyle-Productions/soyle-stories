@@ -31,9 +31,16 @@ import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeControllerImpl
 import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
 import com.soyle.stories.theme.deleteThemeDialog.*
+import com.soyle.stories.theme.deleteValueWebDialog.*
+import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
+import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebControllerImpl
+import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebNotifier
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeControllerImpl
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeNotifier
+import com.soyle.stories.theme.removeValueWebFromTheme.RemoveValueWebFromThemeController
+import com.soyle.stories.theme.removeValueWebFromTheme.RemoveValueWebFromThemeControllerImpl
+import com.soyle.stories.theme.removeValueWebFromTheme.RemoveValueWebFromThemeNotifier
 import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueController
 import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueControllerImpl
 import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueNotifier
@@ -43,6 +50,9 @@ import com.soyle.stories.theme.renameSymbol.RenameSymbolNotifier
 import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.renameTheme.RenameThemeControllerImpl
 import com.soyle.stories.theme.renameTheme.RenameThemeNotifier
+import com.soyle.stories.theme.renameValueWeb.RenameValueWebController
+import com.soyle.stories.theme.renameValueWeb.RenameValueWebControllerImpl
+import com.soyle.stories.theme.renameValueWeb.RenameValueWebNotifier
 import com.soyle.stories.theme.themeList.ThemeListController
 import com.soyle.stories.theme.themeList.ThemeListModel
 import com.soyle.stories.theme.themeList.ThemeListPresenter
@@ -67,14 +77,20 @@ import com.soyle.stories.theme.usecases.listThemes.ListThemes
 import com.soyle.stories.theme.usecases.listThemes.ListThemesUseCase
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInTheme
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThemeUseCase
+import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
+import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWebUseCase
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
+import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromTheme
+import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromThemeUseCase
 import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValue
 import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValueUseCase
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbolUseCase
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
+import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
+import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsController
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsPresenter
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListener
@@ -107,6 +123,9 @@ object ThemeModule {
         provide<ListOppositionsInValueWeb> { ListOppositionsInValueWebUseCase(get()) }
         provide<AddOppositionToValueWeb> { AddOppositionToValueWebUseCase(get()) }
         provide<RenameOppositionValue> { RenameOppositionValueUseCase(get()) }
+        provide<RemoveValueWebFromTheme> { RemoveValueWebFromThemeUseCase(get()) }
+        provide<RenameValueWeb> { RenameValueWebUseCase(get()) }
+        provide<RemoveOppositionFromValueWeb> { RemoveOppositionFromValueWebUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -138,6 +157,15 @@ object ThemeModule {
         provide(RenameOppositionValue.OutputPort::class) {
             RenameOppositionValueNotifier()
         }
+        provide(RemoveValueWebFromTheme.OutputPort::class) {
+            RemoveValueWebFromThemeNotifier()
+        }
+        provide(RenameValueWeb.OutputPort::class) {
+            RenameValueWebNotifier()
+        }
+        provide(RemoveOppositionFromValueWeb.OutputPort::class) {
+            RemoveOppositionFromValueWebNotifier()
+        }
     }
 
     private fun InScope<ProjectScope>.controllers()
@@ -168,6 +196,15 @@ object ThemeModule {
         }
         provide<RenameOppositionValueController> {
             RenameOppositionValueControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<RemoveValueWebFromThemeController> {
+            RemoveValueWebFromThemeControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<RenameValueWebController> {
+            RenameValueWebControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<RemoveOppositionFromValueWebController> {
+            RemoveOppositionFromValueWebControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -267,6 +304,25 @@ object ThemeModule {
             }
         }
 
+        scoped<DeleteValueWebDialogScope> {
+            provide<DeleteValueWebDialogViewListener> {
+                val presenter = DeleteValueWebDialogPresenter(
+                    valueWebId, valueWebName, projectScope.get<DeleteValueWebDialogModel>()
+                )
+
+                presenter listensTo projectScope.get<RemoveValueWebFromThemeNotifier>()
+
+                DeleteValueWebDialogController(
+                    valueWebId,
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    presenter,
+                    projectScope.get(),
+                    projectScope.get()
+                )
+            }
+        }
+
         scoped<ValueOppositionWebsScope> {
             provide<ValueOppositionWebsViewListener> {
                 val presenter = ValueOppositionWebsPresenter(
@@ -277,10 +333,15 @@ object ThemeModule {
                 presenter listensTo projectScope.get<AddValueWebToThemeNotifier>()
                 presenter listensTo projectScope.get<AddOppositionToValueWebNotifier>()
                 presenter listensTo projectScope.get<RenameOppositionValueNotifier>()
+                presenter listensTo projectScope.get<RenameValueWebNotifier>()
+                presenter listensTo projectScope.get<RemoveValueWebFromThemeNotifier>()
+                presenter listensTo projectScope.get<RemoveOppositionFromValueWebNotifier>()
 
                 ValueOppositionWebsController(
                     themeId.toString(),
                     projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),

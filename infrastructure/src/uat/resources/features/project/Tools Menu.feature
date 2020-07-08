@@ -13,6 +13,10 @@ Feature: Tools Menu
       | "Characters" |
       | "Locations"  |
       | "Scenes"     |
+
+    @theme
+    Examples:
+      | item       |
       | "Themes"     |
 
   Scenario Outline: Open tools are checked
@@ -25,6 +29,10 @@ Feature: Tools Menu
       | "Characters" |
       | "Locations"  |
       | "Scenes"     |
+
+    @theme
+    Examples:
+      | option       |
       | "Themes"     |
 
   Scenario Outline: Closed tools are unchecked
@@ -37,6 +45,10 @@ Feature: Tools Menu
       | "Characters" |
       | "Locations"  |
       | "Scenes"     |
+
+    @theme
+    Examples:
+      | option       |
       | "Themes"     |
 
   Scenario Outline: Toggle tool open
@@ -50,6 +62,10 @@ Feature: Tools Menu
       | "Characters" |
       | "Locations"  |
       | "Scenes"     |
+
+    @theme
+    Examples:
+      | option       |
       | "Themes"     |
 
   Scenario Outline: Toggle tool closed
@@ -63,4 +79,8 @@ Feature: Tools Menu
       | "Characters" |
       | "Locations"  |
       | "Scenes"     |
+
+    @theme
+    Examples:
+      | option       |
       | "Themes"     |

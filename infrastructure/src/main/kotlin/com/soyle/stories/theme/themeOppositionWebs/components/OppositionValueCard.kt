@@ -1,104 +1,108 @@
 package com.soyle.stories.theme.themeOppositionWebs.components
 
-import com.soyle.stories.common.components.PopOutEditBox
-import com.soyle.stories.common.components.popOutEditBox
+import com.soyle.stories.common.components.EditableText
+import com.soyle.stories.common.components.editableText
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.theme.themeOppositionWebs.Styles
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.valueOppositionWebs.OppositionValueViewModel
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListener
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ObservableValue
-import javafx.collections.ObservableList
-import javafx.event.ActionEvent
-import javafx.event.EventHandler
+import de.jensd.fx.glyphs.materialicons.MaterialIcon
+import de.jensd.fx.glyphs.materialicons.MaterialIconView
+import javafx.beans.property.Property
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Parent
 import javafx.scene.layout.GridPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
-import javafx.stage.Popup
 import tornadofx.*
-import tornadofx.Stylesheet.Companion.contextMenu
 
 internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebsModel, viewListener: ValueOppositionWebsViewListener) {
     val widthProperty = widthProperty()
     val oppositionValue = model.oppositionValues.select { it.getOrNull(index).toProperty() }
     val oppositionValueId = oppositionValue.stringBinding { it?.oppositionValueId }
-    val oppositionValueName = oppositionValue.stringBinding { it?.oppositionValueName }
-    val isEditing = model.editingProperty.isEqualTo(oppositionValueId)
-    val isErrorSource = oppositionValueId.isEqualTo(model.errorSource)
     val node = vbox {
         addClass(Styles.oppositionCard)
         isFillWidth = true
         gridpaneConstraints {
             fillWidth = true
-            widthProperty.onChange {
-                if (it < 300) {
-                    rowIndex = index
-                    columnIndex = 0
-                    applyToNode(this@vbox)
-                } else {
-                    rowIndex = index / 2
-                    columnIndex = index % 2
-                    applyToNode(this@vbox)
-                }
+            widthProperty.onChangeUntil(isNull(oppositionValue)) {
+                if (oppositionValue.value == null || it == null) return@onChangeUntil
+                calculateResponsiveLayout(index, it.toInt())
+                applyToNode(this@vbox)
             }
-            if (widthProperty.value < 300) {
-                rowIndex = index
-                columnIndex = 0
-            } else {
-                rowIndex = index / 2
-                columnIndex = index % 2
-            }
+            calculateResponsiveLayout(index, widthProperty.intValue())
         }
-        hbox(spacing = 5.0, alignment = Pos.CENTER_LEFT) {
-            padding = Insets(5.0)
-            hyperlink(oppositionValueName) {
-                action {
-                    model.editingProperty.set(oppositionValueId.valueSafe)
-                }
-                popOutEditBox(textProperty()) {
-                    setOnAction {
-                        val id = oppositionValueId.value ?: return@setOnAction
-                        viewListener.renameOppositionValue(id, textInput.text)
-                    }
-                    setOnCloseRequest {
-                        if (isEditing.value) {
-                            model.editingProperty.set(null)
-                        }
-                    }
-                    oppositionValueName.onChange {
-                        hide()
-                    }
-                    isEditing.onChange {
-                        if (it) {
-                            if (isErrorSource.value) {
-                                model.errorSource.set(null)
-                            }
-                            popup()
-                        }
-                    }
-                }
-                isErrorSource.onChange {
-                    val decoratedNode = popOutEditBox?.takeIf { it.isShowing }?.textInput ?: this
-                    println("is error source $it")
-                    println("decorated node: $decoratedNode")
-                    decoratedNode.decorators.toList().forEach { it.undecorate(decoratedNode) }
-                    if (it) {
-                        decoratedNode.addDecorator(SimpleMessageDecorator(model.errorMessage.value ?: "", ValidationSeverity.Error))
-                    }
+        cardHeader {
+            cardName(oppositionValue, model) {
+                Priority.SOMETIMES
+                setOnAction {
+                    val id = oppositionValueId.value ?: return@setOnAction
+                    val text = editedText ?: return@setOnAction
+                    viewListener.renameOppositionValue(id, text)
                 }
             }
             spacer()
-            button("Add Symbol") {
+            button("Remove") {
                 hgrow = Priority.NEVER
+                usePrefWidth = true
+                graphic = MaterialIconView(MaterialIcon.DELETE_FOREVER, "1.5em")
+                widthProperty.onChangeUntil(isNull(oppositionValue)) {
+                    if (oppositionValue.value == null || it == null) return@onChangeUntil
+                    text = if (it.toInt() < 300) ""
+                    else "Remove"
+                }
+                action {
+                    val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@action
+                    val oppositionValueId = oppositionValueId.value ?: return@action
+                    viewListener.removeOpposition(valueWebId, oppositionValueId)
+                }
             }
         }
     }
-    oppositionValue.onChangeUntil({ it == null }) {
+    oppositionValue.onChangeUntil(isNull(oppositionValue)) {
         if (it == null) node.removeFromParent()
     }
-    if (oppositionValue.value?.isNew == true) model.editingProperty.set(oppositionValueId.valueSafe)
+}
+
+private fun GridPaneConstraint.calculateResponsiveLayout(index: Int, width: Int) {
+    if (width < 300) {
+        rowIndex = index
+        columnIndex = 0
+    } else {
+        rowIndex = index / 2
+        columnIndex = index % 2
+    }
+}
+
+private inline fun Parent.cardHeader(crossinline build: HBox.() -> Unit) = hbox(spacing = 5.0, alignment = Pos.CENTER_LEFT) {
+    padding = Insets(5.0)
+    build()
+}
+
+private fun Parent.cardName(
+    oppositionValue: Property<OppositionValueViewModel?>,
+    model: ValueOppositionWebsModel,
+    op: EditableText.() -> Unit
+): EditableText {
+    val oppositionValueName = oppositionValue.stringBinding { it?.oppositionValueName }
+    val isErrorSource = oppositionValue.stringBinding { it?.oppositionValueId }.isEqualTo(model.errorSource)
+
+    return editableText(oppositionValueName) {
+        if (oppositionValue.value?.isNew == true) show()
+        oppositionValueName.onChangeUntil(isNull(oppositionValue)) { hide() }
+        onShowing {
+            if (isErrorSource.value) { model.errorSource.set(null) }
+        }
+        isErrorSource.onChangeUntil(isNull(oppositionValue)) {
+            errorMessageProperty.value = if (it == true) model.errorMessage.value
+            else null
+        }
+        op()
+    }
+}
+
+private fun <T> isNull(property: Property<*>) = fun (t: T): Boolean {
+    return property.value == null
 }

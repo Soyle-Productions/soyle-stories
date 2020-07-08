@@ -3,9 +3,13 @@ package com.soyle.stories.common.components
 import com.soyle.stories.common.onChangeUntil
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ObjectPropertyBase
+import javafx.beans.property.ReadOnlyBooleanProperty
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.value.ObservableValue
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
+import javafx.geometry.Bounds
+import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.TextInputControl
@@ -22,14 +26,16 @@ class PopOutEditBox(
     val node: Node,
     private val textProperty: ObservableValue<String>,
     val preferSingleLine: Boolean = true
-) : Stage(StageStyle.UNDECORATED) {
+) : Stage(StageStyle.UNDECORATED){
 
     companion object {
         private val helperText = Text("")
+        private val paddingSize = 2.0
     }
 
     val textInput: TextInputControl = if (preferSingleLine) textfield {
-        action {
+        this.setOnAction {
+            it.consume()
             this@PopOutEditBox.commit()
         }
     } else textarea {
@@ -38,19 +44,10 @@ class PopOutEditBox(
 
     init {
         scene = Scene(HBox(textInput))
-        textInput.style {
-            backgroundColor += Color.WHITE
-        }
-        focusedProperty().onChange {
-            if (!it) {
-                complete()
-            }
-        }
         addEventFilter(KeyEvent.KEY_PRESSED) {
             if (it.code == KeyCode.ESCAPE) cancel()
         }
         initModality(Modality.NONE)
-        initOwner(node.scene.window)
         scene.fill = Color.TRANSPARENT
 
         textInput.prefWidthProperty().onChange {
@@ -58,19 +55,21 @@ class PopOutEditBox(
                 sizeToScene()
             }
         }
-        textInput.prefWidthProperty().bind(
-            textInput.textProperty().doubleBinding {
-                helperText.text = it ?: ""
-                helperText.layoutBounds.width + textInput.padding.left + textInput.padding.right + 2.0
-            }
-        )
-        setOnHidden {
-            textInput.decorators.toList().forEach { it.undecorate(textInput) }
+        textInput.textProperty().onChange {
+            helperText.text = it ?: ""
+            textInput.prefWidthProperty().set(calculateTextInputPrefWidth())
         }
+        textInput.paddingLeftProperty.onChange { textInput.prefWidthProperty().set(calculateTextInputPrefWidth()) }
+        textInput.paddingRightProperty.onChange { textInput.prefWidthProperty().set(calculateTextInputPrefWidth()) }
+    }
+
+    private fun calculateTextInputPrefWidth(): Double
+    {
+        return helperText.layoutBounds.width + textInput.padding.left + textInput.padding.right + 2.0
     }
 
     private fun commit() {
-        this@PopOutEditBox.fireEvent(ActionEvent())
+        fireEvent(ActionEvent())
     }
 
     fun complete() {
@@ -114,43 +113,67 @@ class PopOutEditBox(
     }
 
     fun popup() {
+        node.localToScreen(node.boundsInLocal)?.let {
+            setAvailableBounds(it)
+        }
+
+        if (owner == null) {
+            val nodeScene = node.scene
+            if (nodeScene != null) {
+                initOwner(nodeScene.window)
+                show()
+            } else {
+                node.sceneProperty().onChangeUntil({ node.scene != null || isShowing }) {
+                    if (owner == null && it != null) {
+                        initOwner(it.window)
+                        show()
+                    }
+                }
+            }
+        } else {
+            show()
+        }
+
         node.boundsInLocalProperty().onChangeUntil({ !isShowing }) { bounds ->
             if (bounds == null || ! isShowing) return@onChangeUntil
             val nodeBounds = node.localToScreen(bounds)
-            textInput.minWidth = nodeBounds.width
-            textInput.minHeight = nodeBounds.height
-            x = nodeBounds.minX
-            y = nodeBounds.minY
-
-            val screen = Screen.getScreensForRectangle(nodeBounds.minX, nodeBounds.minY, nodeBounds.width, nodeBounds.height).find {
-                it.bounds.contains(nodeBounds.minX, nodeBounds.minY)
-            } ?: throw Error("Node is not on any screen.  $node $nodeBounds")
-
-            textInput.maxWidth = screen.bounds.width - nodeBounds.minX
-            textInput.maxHeight = screen.bounds.height - nodeBounds.minY
+            setAvailableBounds(nodeBounds)
         }
-
-        node.localToScreen(node.boundsInLocal).let {
-            textInput.minWidth = it.width
-            textInput.minHeight = it.height
-            x = it.minX
-            y = it.minY
-        }
-
-        show()
         helperText.font = textInput.font
         textInput.text = textProperty.value
+
         textInput.requestFocus()
+        focusedProperty().onChangeUntil({ !isShowing }) {
+            if (it == false && isShowing) {
+                complete()
+            }
+        }
         textInput.selectAll()
+
+    }
+
+    private fun setAvailableBounds(nodeBounds: Bounds) {
+        textInput.minWidth = nodeBounds.width
+        textInput.minHeight = nodeBounds.height
+        x = nodeBounds.minX
+        y = nodeBounds.minY
+
+        val screen = Screen.getScreensForRectangle(nodeBounds.minX, nodeBounds.minY, nodeBounds.width, nodeBounds.height).find {
+            it.bounds.contains(nodeBounds.minX, nodeBounds.minY)
+        } ?: throw Error("Node is not on any screen.  $node $nodeBounds")
+
+        textInput.maxWidth = screen.bounds.width - nodeBounds.minX
+        textInput.maxHeight = screen.bounds.height - nodeBounds.minY
     }
 }
 
 
 fun Node.popOutEditBox(initialText: String, op: PopOutEditBox.() -> Unit = {}) = popOutEditBox(initialText.toProperty(), op)
-fun Node.popOutEditBox(textProperty: ObservableValue<String>, op: PopOutEditBox.() -> Unit = {}) {
+fun Node.popOutEditBox(textProperty: ObservableValue<String>, op: PopOutEditBox.() -> Unit = {}): PopOutEditBox {
     val popOutEditBox = this.popOutEditBox ?: PopOutEditBox(this, textProperty)
     popOutEditBox.op()
     this.popOutEditBox = popOutEditBox
+    return popOutEditBox
 }
 
 var Node.popOutEditBox: PopOutEditBox?

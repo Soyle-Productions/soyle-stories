@@ -1,9 +1,13 @@
 package com.soyle.stories.theme.themeOppositionWebs
 
+import com.soyle.stories.common.components.editableText
 import com.soyle.stories.common.components.emptyListDisplay
+import com.soyle.stories.common.components.popOutEditBox
+import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
+import com.soyle.stories.theme.deleteValueWebDialog.DeleteValueWebDialog
 import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
 import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.valueWebList
 import com.soyle.stories.theme.themeOppositionWebs.components.oppositionValueCard
@@ -18,6 +22,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ObservableList
+import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
@@ -47,6 +52,8 @@ class ValueOppositionWebs : View() {
     private val targetX = SimpleDoubleProperty(0.0)
     private val splitPointX = SimpleDoubleProperty(0.0)
 
+    private val selectedValueWebName = model.selectedValueWeb.select { it.valueWebName.toProperty() }
+
     private var menu by singleAssign<Region>()
 
     override val root: Parent = stackpane {
@@ -63,7 +70,7 @@ class ValueOppositionWebs : View() {
             hiddenWhen { model.valueWebs.select { it.isEmpty().toProperty() } }
             vbox {
                 hgrow = Priority.ALWAYS
-                addClass(".content-pane")
+                addClass("content-pane")
                 hbox(spacing = 5.0, alignment = Pos.CENTER_LEFT) {
                     padding = Insets(10.0)
                     button {
@@ -75,42 +82,88 @@ class ValueOppositionWebs : View() {
                             else targetX.set(-menu.width)
                         }
                     }
-                    label(model.selectedValueWeb.select { it.valueWebName.toProperty() }) {
+                    editableText(selectedValueWebName) {
+                        id = "ValueWebName"
+                        setOnAction {
+                            val selectedValueWeb = model.selectedValueWeb.value ?: return@setOnAction
+                            val text = editedText ?: ""
+                            if (text == selectedValueWeb.valueWebName) {
+                                hide()
+                                return@setOnAction
+                            }
+                            viewListener.renameValueWeb(selectedValueWeb.valueWebId, text)
+                        }
+                        onShowing {
+                            if (model.errorSource.value == model.selectedValueWeb.value?.valueWebId) { model.errorSource.set(null) }
+                        }
+                        onShown {
+                            model.errorSource.onChangeUntil({ !isShowing }) {
+                                errorMessage = if (it == model.selectedValueWeb.value?.valueWebId) model.errorMessage.value
+                                else null
+                            }
+                        }
+                        selectedValueWebName.onChange {
+                            hide()
+                        }
                     }
                     spacer()
-                    button("Add Opposition") {
+                    menubutton("Actions") {
                         visibleWhen { model.selectedValueWeb.isNotNull }
-                        action {
-                            val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@action
-                            viewListener.addOpposition(valueWebId)
+                        item("Delete") {
+                            action {
+                                val selectedValueWeb = model.selectedValueWeb.value ?: return@action
+                                scope.projectScope.get<DeleteValueWebDialog>().show(selectedValueWeb.valueWebId, selectedValueWeb.valueWebName)
+                            }
                         }
                     }
                 }
-                gridpane {
-                    vgap = 10.0
-                    hgap = 10.0
-                    padding = Insets(10.0)
-                    columnConstraints.add(ColumnConstraints().apply {
-                        hgrow = Priority.ALWAYS
-                        isFillWidth = true
-                    })
-                   val secondColumnConstraint = ColumnConstraints().apply {
-                        hgrow = Priority.ALWAYS
-                        isFillWidth = true
+                button("Add Opposition") {
+                    visibleWhen { model.selectedValueWeb.isNotNull }
+                    action {
+                        val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@action
+                        viewListener.addOpposition(valueWebId)
                     }
-                    widthProperty().onChange {
-                        if (it < 300 && columnConstraints.size == 2) columnConstraints.remove(secondColumnConstraint)
-                        else if (it >= 300 && columnConstraints.size == 1) columnConstraints.add(secondColumnConstraint)
+                }
+                stackpane {
+                    visibleWhen { model.selectedValueWeb.isNotNull }
+                    emptyListDisplay(
+                        model.oppositionValues.select { it.isNotEmpty().toProperty() },
+                        "".toProperty(),
+                        "Create First Opposition Value".toProperty()
+                    ) {
+                        val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@emptyListDisplay
+                        viewListener.addOpposition(valueWebId)
                     }
-                    if (width >= 300) {
-                        columnConstraints.add(secondColumnConstraint)
-                    }
-                    model.oppositionValues.addListener { oppositionValues, old, new ->
-                        val oldSize = old?.size ?: 0
-                        val newSize = new?.size ?: 0
-                        if (oldSize < newSize) {
-                            repeat(newSize - oldSize) {
-                                oppositionValueCard(it + oldSize, model, viewListener)
+                    gridpane {
+                        hiddenWhen { model.oppositionValues.select { it.isEmpty().toProperty() } }
+                        vgap = 10.0
+                        hgap = 10.0
+                        padding = Insets(10.0)
+                        columnConstraints.add(ColumnConstraints().apply {
+                            hgrow = Priority.SOMETIMES
+                            isFillWidth = true
+                        })
+                        val secondColumnConstraint = ColumnConstraints().apply {
+                            hgrow = Priority.SOMETIMES
+                            isFillWidth = true
+                        }
+                        widthProperty().onChange { w ->
+                            if (w < 300 && columnConstraints.size == 2) columnConstraints.remove(secondColumnConstraint)
+                            else if (w >= 300 && columnConstraints.size == 1) columnConstraints.add(secondColumnConstraint)
+                            columnConstraints.forEach {
+                                it.maxWidth = w / columnConstraints.size
+                            }
+                        }
+                        if (width >= 300) {
+                            columnConstraints.add(secondColumnConstraint)
+                        }
+                        model.oppositionValues.addListener { oppositionValues, old, new ->
+                            val oldSize = old?.size ?: 0
+                            val newSize = new?.size ?: 0
+                            if (oldSize < newSize) {
+                                repeat(newSize - oldSize) {
+                                    oppositionValueCard(it + oldSize, model, viewListener)
+                                }
                             }
                         }
                     }
