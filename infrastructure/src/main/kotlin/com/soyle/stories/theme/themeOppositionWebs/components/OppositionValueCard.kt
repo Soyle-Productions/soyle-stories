@@ -1,11 +1,14 @@
 package com.soyle.stories.theme.themeOppositionWebs.components
 
-import com.soyle.stories.common.components.EditableText
-import com.soyle.stories.common.components.editableText
+import com.soyle.stories.common.components.*
 import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.di.get
+import com.soyle.stories.theme.addSymbolDialog.AddSymbolDialog
 import com.soyle.stories.theme.themeOppositionWebs.Styles
+import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebs
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.valueOppositionWebs.OppositionValueViewModel
+import com.soyle.stories.theme.valueOppositionWebs.SymbolicItemViewModel
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListener
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
@@ -16,13 +19,20 @@ import javafx.scene.Parent
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
+import javafx.scene.layout.VBox
+import kotlinx.coroutines.flow.flow
 import tornadofx.*
 
 internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebsModel, viewListener: ValueOppositionWebsViewListener) {
     val widthProperty = widthProperty()
     val oppositionValue = model.oppositionValues.select { it.getOrNull(index).toProperty() }
     val oppositionValueId = oppositionValue.stringBinding { it?.oppositionValueId }
-    val node = vbox {
+    val symbolicItems = observableListOf<SymbolicItemViewModel>()
+    oppositionValue.select { it.symbolicItems.toProperty() }.onChangeUntil(isNull(oppositionValue)) {
+        if (it == null) symbolicItems.clear()
+        else symbolicItems.setAll(it)
+    }
+    val node = card {
         addClass(Styles.oppositionCard)
         isFillWidth = true
         gridpaneConstraints {
@@ -30,7 +40,7 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
             widthProperty.onChangeUntil(isNull(oppositionValue)) {
                 if (oppositionValue.value == null || it == null) return@onChangeUntil
                 calculateResponsiveLayout(index, it.toInt())
-                applyToNode(this@vbox)
+                applyToNode(this@card)
             }
             calculateResponsiveLayout(index, widthProperty.intValue())
         }
@@ -50,13 +60,29 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
                 graphic = MaterialIconView(MaterialIcon.DELETE_FOREVER, "1.5em")
                 widthProperty.onChangeUntil(isNull(oppositionValue)) {
                     if (oppositionValue.value == null || it == null) return@onChangeUntil
-                    text = if (it.toInt() < 300) ""
+                    text = if (it.toInt() < ValueOppositionWebs.smallBoundary) ""
                     else "Remove"
                 }
                 action {
                     val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@action
                     val oppositionValueId = oppositionValueId.value ?: return@action
                     viewListener.removeOpposition(valueWebId, oppositionValueId)
+                }
+            }
+        }
+        cardBody {
+            button("Add Symbol") {
+                action {
+                    val oppositionValueId = oppositionValueId.value ?: return@action
+                    model.scope.projectScope.get<AddSymbolDialog>().show(model.scope.themeId.toString(), oppositionValueId)
+                }
+            }
+            flowpane {
+                hgap = 8.0
+                vgap = 8.0
+                padding = Insets(8.0, 4.0, 4.0, 4.0)
+                bindChildren(symbolicItems) {
+                    chip(it.itemName.toProperty(), onDelete={  }).node
                 }
             }
         }
@@ -67,18 +93,13 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
 }
 
 private fun GridPaneConstraint.calculateResponsiveLayout(index: Int, width: Int) {
-    if (width < 300) {
+    if (width < ValueOppositionWebs.smallBoundary) {
         rowIndex = index
         columnIndex = 0
     } else {
         rowIndex = index / 2
         columnIndex = index % 2
     }
-}
-
-private inline fun Parent.cardHeader(crossinline build: HBox.() -> Unit) = hbox(spacing = 5.0, alignment = Pos.CENTER_LEFT) {
-    padding = Insets(5.0)
-    build()
 }
 
 private fun Parent.cardName(

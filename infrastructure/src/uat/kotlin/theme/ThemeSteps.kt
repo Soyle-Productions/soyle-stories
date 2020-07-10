@@ -17,9 +17,11 @@ import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeValueWebFromTheme.RemoveValueWebFromThemeController
+import com.soyle.stories.theme.renameSymbol.RenameSymbolController
 import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
+import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import io.cucumber.java8.En
 import io.cucumber.java8.HookBody
 import io.cucumber.messages.internal.com.google.protobuf.Value
@@ -107,12 +109,30 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             return getTheme(uuid.toString(), scope)!!
         }
 
-        fun createSymbol(scope: ProjectScope, themeId: String)
+        fun createSymbol(scope: ProjectScope, themeId: String, name: String? = null)
         {
             val controller = scope.get<AddSymbolToThemeController>()
             interact {
-                controller.addSymbolToTheme(themeId, "New Symbol ${UUID.randomUUID()}") { throw it }
+                controller.addSymbolToTheme(themeId, name ?: "New Symbol ${UUID.randomUUID()}") { throw it }
             }
+        }
+
+        fun getSymbolWithNameInTheme(scope: ProjectScope, name: String, themeId: String): Symbol?
+        {
+            val repo = scope.get<ThemeRepository>()
+            return runBlocking {
+                repo.getThemeById(Theme.Id(UUID.fromString(themeId)))?.symbols?.find { it.name == name }
+            }
+        }
+
+        fun givenASymbolHasBeenCreatedForTheme(double: SoyleStoriesTestDouble, themeId: String, name: String? = null): Symbol
+        {
+            val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+            val existing = if (name == null) getTheme(themeId, scope)?.symbols?.firstOrNull() else getSymbolWithNameInTheme(scope, name, themeId)
+            return existing ?: kotlin.run {
+                createSymbol(scope, themeId, name)
+                if (name == null) getTheme(themeId, scope)?.symbols?.firstOrNull() else getSymbolWithNameInTheme(scope, name, themeId)
+            }!!
         }
 
         fun givenANumberOfSymbolsHaveBeenCreated(count: Int, themeId: String, scope: ProjectScope): List<Symbol>
@@ -209,6 +229,7 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
     }
 
     init {
+        AddSymbolDialogSteps(en, double)
         CreateThemeDialogSteps(en, double)
         DeleteThemeDialogSteps(en, double)
         CreateSymbolDialogSteps(en, double)
@@ -235,6 +256,9 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             }
             Given("a Theme has been created") {
                 givenANumberOfThemesHaveBeenCreated(1, double)
+            }
+            Given("a theme called {string} has been created") { themeName: String ->
+                givenAThemeHasBeenCreatedWithTheName(double, themeName)
             }
             Given("{int} value webs have been created in the theme open in the Value Opposition Web Tool") { count: Int ->
                 val theme = givenANumberOfThemesHaveBeenCreated(1, double).first()
@@ -274,6 +298,18 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 }
                 assertFalse(getValueWebWithName(valueWebName, scope)!!.oppositions.isEmpty())
             }
+            Given("a symbol has been created for the {string} theme") { themeName: String ->
+                val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                givenANumberOfSymbolsHaveBeenCreated(1, theme.id.uuid.toString(),
+                    ProjectSteps.givenProjectHasBeenOpened(double)
+                )
+            }
+            Given("a symbol called {string} has been created for the {string} theme") {
+                symbolName: String, themeName: String ->
+
+                val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                givenASymbolHasBeenCreatedForTheme(double, theme.id.uuid.toString(), symbolName)
+            }
 
             When("a theme is created") {
                 createTheme(double)
@@ -290,6 +326,15 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val projectScope = ProjectSteps.getProjectScope(double)!!
                 val theme = getCreatedThemes(double).first()
                 createSymbol(projectScope, theme.id.uuid.toString())
+            }
+            When("a symbol is created for the {string} theme") { themeName: String ->
+                val theme = getThemeWithName(double, themeName)!!
+                createSymbol(ProjectSteps.getProjectScope(double)!!, theme.id.uuid.toString())
+            }
+            When("a symbol called {string} is created for the {string} theme") { symbolName: String, themeName: String ->
+
+                val theme = getThemeWithName(double, themeName)!!
+                createSymbol(ProjectSteps.getProjectScope(double)!!, theme.id.uuid.toString(), name = symbolName)
             }
             When("a theme is renamed") {
                 val theme = getCreatedThemes(double).first()
@@ -323,6 +368,32 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val valueWeb = getValueWebWithName(valueWebName, projectScope)!!
                 interact {
                     controller.removeValueWeb(valueWeb.id.uuid.toString())
+                }
+            }
+            When("the symbol {string} is renamed to {string}") { ogName: String, newName: String ->
+                val projectScope = ProjectSteps.getProjectScope(double)!!
+                val repo = projectScope.get<ThemeRepository>()
+                val symbol = runBlocking {
+                    repo.listThemesInProject(Project.Id(projectScope.projectId)).asSequence()
+                        .flatMap { it.symbols.asSequence() }
+                        .find { it.name == ogName }!!
+                }
+                val controller = projectScope.get<RenameSymbolController>()
+                interact {
+                    controller.renameSymbol(symbol.id.uuid.toString(), newName) { throw it }
+                }
+            }
+            When("the symbol {string} is removed from the story") { symbolName: String ->
+                val projectScope = ProjectSteps.getProjectScope(double)!!
+                val repo = projectScope.get<ThemeRepository>()
+                val symbol = runBlocking {
+                    repo.listThemesInProject(Project.Id(projectScope.projectId)).asSequence()
+                        .flatMap { it.symbols.asSequence() }
+                        .find { it.name == symbolName }!!
+                }
+                val controller = projectScope.get<RemoveSymbolFromThemeController>()
+                interact {
+                    controller.removeSymbolFromTheme(symbol.id.uuid.toString())
                 }
             }
 
@@ -369,6 +440,36 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             Then("the value web should not be deleted") {
                 val valueWebId = DeleteValueWebDialogSteps.requestedValueWebId!!
                 assertNotNull(getCreatedThemes(double).flatMap { it.valueWebs }.find { it.id == valueWebId })
+            }
+            Then("the character {string} should be listed as a symbol in the value opposition") { characterName: String ->
+                val (themeId, oppositionId) = AddSymbolDialogSteps.dialogDataIds!!
+                val theme = getTheme(themeId.uuid.toString(), ProjectSteps.getProjectScope(double)!!)!!
+                val opposition = theme.valueWebs.asSequence().flatMap { it.oppositions.asSequence() }.find { it.id == oppositionId }!!
+                assertNotNull(opposition.representations.find {
+                    it.name == characterName
+                })
+            }
+            Then("the location {string} should be listed as a symbol in the value opposition") { locationName: String ->
+                val (themeId, oppositionId) = AddSymbolDialogSteps.dialogDataIds!!
+                val theme = getTheme(themeId.uuid.toString(), ProjectSteps.getProjectScope(double)!!)!!
+                val opposition = theme.valueWebs.asSequence().flatMap { it.oppositions.asSequence() }.find { it.id == oppositionId }!!
+                assertNotNull(opposition.representations.find {
+                    it.name == locationName
+                })
+            }
+            Then("the symbol {string} should be listed as a symbol in the value opposition") { symbolName: String ->
+                val (themeId, oppositionId) = AddSymbolDialogSteps.dialogDataIds!!
+                val theme = getTheme(themeId.uuid.toString(), ProjectSteps.getProjectScope(double)!!)!!
+                val opposition = theme.valueWebs.asSequence().flatMap { it.oppositions.asSequence() }.find { it.id == oppositionId }!!
+                assertNotNull(opposition.representations.find {
+                    it.name == symbolName
+                })
+            }
+            Then("nothing should be listed as a symbol in the value opposition") {
+                val (themeId, oppositionId) = AddSymbolDialogSteps.dialogDataIds!!
+                val theme = getTheme(themeId.uuid.toString(), ProjectSteps.getProjectScope(double)!!)!!
+                val opposition = theme.valueWebs.asSequence().flatMap { it.oppositions.asSequence() }.find { it.id == oppositionId }!!
+                assertTrue(opposition.representations.isEmpty())
             }
         }
     }

@@ -36,6 +36,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.util.Duration
 import tornadofx.*
+import kotlin.math.floor
 import kotlin.math.max
 
 class ValueOppositionWebs : View() {
@@ -46,7 +47,7 @@ class ValueOppositionWebs : View() {
 
     private val toolWidth = SimpleDoubleProperty(0.0)
 
-    private val isLarge = toolWidth.greaterThanOrEqualTo(900.0)
+    private val isLarge = toolWidth.greaterThanOrEqualTo(largeBoundary)
 
     private val animatedMenuX = SimpleDoubleProperty(0.0)
     private val targetX = SimpleDoubleProperty(0.0)
@@ -148,13 +149,17 @@ class ValueOppositionWebs : View() {
                             isFillWidth = true
                         }
                         widthProperty().onChange { w ->
-                            if (w < 300 && columnConstraints.size == 2) columnConstraints.remove(secondColumnConstraint)
-                            else if (w >= 300 && columnConstraints.size == 1) columnConstraints.add(secondColumnConstraint)
+                            val currentColumnCount = columnConstraints.size
+                            if (w < smallBoundary && currentColumnCount == 2) columnConstraints.remove(secondColumnConstraint)
+                            else if (w >= smallBoundary && currentColumnCount == 1) columnConstraints.add(secondColumnConstraint)
+                            if (columnConstraints.size != currentColumnCount) {
+                                minWidth = columnConstraints.sumByDouble { it.minWidth } + 20.0 + ((columnConstraints.size -1) * 10.0)
+                            }
                             columnConstraints.forEach {
                                 it.maxWidth = w / columnConstraints.size
                             }
                         }
-                        if (width >= 300) {
+                        if (width >= smallBoundary) {
                             columnConstraints.add(secondColumnConstraint)
                         }
                         model.oppositionValues.addListener { oppositionValues, old, new ->
@@ -241,5 +246,10 @@ class ValueOppositionWebs : View() {
         model.selectedValueWeb.onChange {
             if (it != null) viewListener.selectValueWeb(it.valueWebId)
         }
+    }
+
+    companion object {
+        const val smallBoundary = 581
+        const val largeBoundary = 900
     }
 }

@@ -85,6 +85,9 @@ class SoyleUATSteps : En, ApplicationTest() {
 			// LocationRepoDriver.givenNumberHaveBeenCreated(double, count)
 			LocationSteps.givenNumberOfLocationsHaveBeenCreated(double, int1)
 		}
+		Given("a location called {string} has been created") { locationName: String ->
+			LocationSteps.givenLocationCreatedWithName(double, locationName)
+		}
 		Given("a location has been selected") {
 			// LocationListDriver.givenLocationHasBeenSelected(double)
 			LocationSteps.givenLocationIsSelectedInLocationListTool(double)
@@ -223,8 +226,23 @@ class SoyleUATSteps : En, ApplicationTest() {
 		When("the Location is renamed") {
 			LocationSteps.whenLocationIsRenamed(double)
 		}
+		When("the location {string} is renamed to {string}") { ogName: String, newName: String ->
+			val scope = ProjectSteps.getProjectScope(double)!!
+			val location = LocationSteps.getLocationByName(scope, ogName)!!
+			interact {
+				LocationSteps.whenLocationIsRenamed(double, location.id, newName)
+			}
+		}
 		When("the Location is deleted") {
 			LocationSteps.whenLocationIsDeleted(double)
+		}
+		When("the location {string} is removed from the story") { locationName: String ->
+			val scope = ProjectSteps.getProjectScope(double)!!
+			val location = LocationSteps.getLocationByName(scope, locationName)!!
+
+			interact {
+				LocationSteps.whenLocationIsDeleted(double, location.id)
+			}
 		}
 		When("the user clicks the location list tool right-click menu delete button") {
 			LocationSteps.whenLocationListToolRightClickMenuButtonIsClicked(double, "delete")

@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.themeOppositionWebs
 
+import com.soyle.stories.common.components.ComponentsStyles
 import javafx.scene.layout.BorderStrokeStyle
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
@@ -33,7 +34,9 @@ class Styles : Stylesheet()
             fontWeight = FontWeight.BOLD
         }
         oppositionCard {
-            backgroundColor += Color.LIGHTGREY
+            ComponentsStyles.cardBody {
+                padding = box(0.px, 16.px, 16.px, 16.px)
+            }
         }
     }
 }

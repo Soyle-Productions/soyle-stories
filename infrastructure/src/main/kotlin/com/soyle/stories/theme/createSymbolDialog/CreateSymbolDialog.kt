@@ -4,6 +4,9 @@ import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.event.ActionEvent
+import javafx.event.Event
+import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Parent
@@ -24,6 +27,7 @@ class CreateSymbolDialog : Fragment() {
     private val symbolName = SimpleStringProperty("")
     private val preSelectedThemeId = SimpleStringProperty(null)
     private val themeId = SimpleStringProperty(null)
+    private val oppositionId = SimpleStringProperty(null)
 
     override val root: Parent = form {
         fieldset(labelPosition = Orientation.VERTICAL) {
@@ -108,10 +112,11 @@ class CreateSymbolDialog : Fragment() {
         titleProperty.bind(model.title)
     }
 
-    fun show(themeId: String?, parentWindow: Window? = null) {
+    fun show(themeId: String?, linkToOpposition: String? = null, parentWindow: Window? = null) {
         if (currentStage?.isShowing == true) return
         preSelectedThemeId.set(themeId)
         this.themeId.set(themeId)
+        this.oppositionId.set(linkToOpposition)
         openModal(
             StageStyle.DECORATED,
             Modality.APPLICATION_MODAL,
@@ -129,8 +134,14 @@ class CreateSymbolDialog : Fragment() {
                 minWidth = minimumWindowWidth!!
             }
         }
-        model.created.onChangeUntil({ it == true || currentStage?.isShowing != true }) {
-            if (it == true) close()
+        model.createdId.onChangeUntil({ it != null || currentStage?.isShowing != true }) {
+            if (it != null) {
+                close()
+                val oppositionId = this.oppositionId.get()
+                if (oppositionId != null) {
+                    viewListener.linkToOpposition(it, oppositionId)
+                }
+            }
         }
         model.itemProperty.onChangeUntil({ currentStage?.isShowing != true }) {
             if (it?.themes.isNullOrEmpty()) selectingExistingTheme.set(false)

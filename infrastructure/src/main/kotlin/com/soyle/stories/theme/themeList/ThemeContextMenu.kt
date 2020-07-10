@@ -29,7 +29,7 @@ internal fun ThemeList.themeItemContextMenu(model: ThemeListModel, viewListener:
         action {
             val selectedItem = model.selectedItem.value
             if (selectedItem is ThemeListItemViewModel) {
-                scope.get<CreateSymbolDialog>().show(selectedItem.themeId, currentWindow)
+                scope.get<CreateSymbolDialog>().show(selectedItem.themeId, null, currentWindow)
             }
         }
     }

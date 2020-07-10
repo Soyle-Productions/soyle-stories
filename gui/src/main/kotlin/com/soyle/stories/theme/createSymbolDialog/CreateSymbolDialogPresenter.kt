@@ -29,7 +29,7 @@ class CreateSymbolDialogPresenter(
                 themes = response.themes.map {
                     ThemeItemViewModel(it.themeId.toString(), it.themeName)
                 }.sortedBy { it.themeName },
-                created = false
+                createdId = null
             )
         }
     }
@@ -84,7 +84,7 @@ class CreateSymbolDialogPresenter(
 
     override suspend fun addedSymbolToTheme(response: SymbolAddedToTheme) {
         view.update {
-            CreateSymbolDialogViewModel("", "", null, null, emptyList(), created = true)
+            CreateSymbolDialogViewModel("", "", null, null, emptyList(), createdId = response.symbolId.toString())
         }
     }
 

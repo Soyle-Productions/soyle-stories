@@ -2,6 +2,7 @@ package com.soyle.stories.theme.createSymbolDialog
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
+import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.listThemes.ListThemes
@@ -13,7 +14,8 @@ class CreateSymbolDialogController(
     private val presenter: CreateSymbolDialogPresenter,
     private val listThemes: ListThemes,
     private val addSymbolToThemeController: AddSymbolToThemeController,
-    private val createThemeController: CreateThemeController
+    private val createThemeController: CreateThemeController,
+    private val addSymbolicItemToOppositionController: AddSymbolicItemToOppositionController
 ) : CreateSymbolDialogViewListener {
 
     private val projectId = UUID.fromString(projectId)
@@ -33,6 +35,10 @@ class CreateSymbolDialogController(
 
     override fun createSymbol(themeId: String, name: String) {
         addSymbolToThemeController.addSymbolToTheme(themeId, name, presenter::presentError)
+    }
+
+    override fun linkToOpposition(symbolId: String, oppositionId: String) {
+        addSymbolicItemToOppositionController.addSymbolToOpposition(oppositionId, symbolId)
     }
 
 }

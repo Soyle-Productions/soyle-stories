@@ -122,7 +122,7 @@ class ThemeList : View() {
                 button(model.createSymbolButtonLabel) {
                     isDisable = false
                     action {
-                        scope.get<CreateSymbolDialog>().show((model.selectedItem.value as? ThemeListItemViewModel)?.themeId, currentWindow)
+                        scope.get<CreateSymbolDialog>().show((model.selectedItem.value as? ThemeListItemViewModel)?.themeId, null, currentWindow)
                     }
                     isMnemonicParsing = false
                 }

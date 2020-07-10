@@ -4,6 +4,8 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.theme.OppositionValueNameCannotBeBlank
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.OppositionAddedToValueWeb
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.ValueWebAddedToTheme
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWeb
@@ -28,7 +30,8 @@ class ValueOppositionWebsPresenter(
     RenameOppositionValue.OutputPort,
     RenameValueWeb.OutputPort,
     RemoveValueWebFromTheme.OutputPort,
-    RemoveOppositionFromValueWeb.OutputPort {
+    RemoveOppositionFromValueWeb.OutputPort,
+    AddSymbolicItemToOpposition.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -87,7 +90,9 @@ class ValueOppositionWebsPresenter(
         view.updateOrInvalidated {
             copy(
                 oppositionValues = response.oppositions.map {
-                    OppositionValueViewModel(it.oppositionValueId.toString(), it.oppositionValueName, false)
+                    OppositionValueViewModel(it.oppositionValueId.toString(), it.oppositionValueName, false, it.symbols.map {
+                        SymbolicItemViewModel(it.symbolicId.toString(), it.name)
+                    })
                 }
             )
         }
@@ -103,7 +108,8 @@ class ValueOppositionWebsPresenter(
                 oppositionValues = oppositionValues + OppositionValueViewModel(
                     response.oppositionValueId.toString(),
                     response.oppositionValueName,
-                    true
+                    true,
+                    listOf()
                 )
             )
         }
@@ -138,6 +144,24 @@ class ValueOppositionWebsPresenter(
             copy(
                 oppositionValues = oppositionValues.filterNot {
                     it.oppositionValueId == oppositionValueId
+                }
+            )
+        }
+    }
+
+    override suspend fun addedSymbolicItemToOpposition(response: SymbolicRepresentationAddedToOpposition) {
+        if (themeId != response.themeId) return
+        val oppositionId = response.oppositionId.toString()
+        view.updateOrInvalidated {
+            if (selectedValueWeb == null || selectedValueWeb.valueWebId != response.valueWebId.toString()) {
+                return@updateOrInvalidated this
+            }
+            copy(
+                oppositionValues = oppositionValues.map {
+                    if (it.oppositionValueId == oppositionId) it.copy(
+                        symbolicItems = it.symbolicItems + SymbolicItemViewModel(response.itemId().toString(), response.itemName)
+                    )
+                    else it
                 }
             )
         }

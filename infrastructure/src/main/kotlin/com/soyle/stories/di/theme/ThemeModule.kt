@@ -1,16 +1,27 @@
 package com.soyle.stories.di.theme
 
+import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalStoryNotifier
+import com.soyle.stories.characterarc.eventbus.RenameCharacterNotifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.location.events.CreateNewLocationNotifier
+import com.soyle.stories.location.events.DeleteLocationNotifier
+import com.soyle.stories.location.events.RenameLocationNotifier
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebControllerImpl
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebNotifier
+import com.soyle.stories.theme.addSymbolDialog.*
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeControllerImpl
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeNotifier
+import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
+import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionControllerImpl
+import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionNotifier
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeControllerImpl
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeNotifier
@@ -63,6 +74,8 @@ import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToV
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWebUseCase
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToThemeUseCase
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOppositionUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
@@ -73,6 +86,8 @@ import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOpposition
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWebUseCase
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByThemeUseCase
+import com.soyle.stories.theme.usecases.listSymbolsInTheme.ListSymbolsInTheme
+import com.soyle.stories.theme.usecases.listSymbolsInTheme.ListSymbolsInThemeUseCase
 import com.soyle.stories.theme.usecases.listThemes.ListThemes
 import com.soyle.stories.theme.usecases.listThemes.ListThemesUseCase
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInTheme
@@ -126,6 +141,8 @@ object ThemeModule {
         provide<RemoveValueWebFromTheme> { RemoveValueWebFromThemeUseCase(get()) }
         provide<RenameValueWeb> { RenameValueWebUseCase(get()) }
         provide<RemoveOppositionFromValueWeb> { RemoveOppositionFromValueWebUseCase(get()) }
+        provide<ListSymbolsInTheme> { ListSymbolsInThemeUseCase(get()) }
+        provide<AddSymbolicItemToOpposition> { AddSymbolicItemToOppositionUseCase(get(), get(), get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -165,6 +182,9 @@ object ThemeModule {
         }
         provide(RemoveOppositionFromValueWeb.OutputPort::class) {
             RemoveOppositionFromValueWebNotifier()
+        }
+        provide(AddSymbolicItemToOpposition.OutputPort::class) {
+            AddSymbolicItemToOppositionNotifier()
         }
     }
 
@@ -206,6 +226,9 @@ object ThemeModule {
         provide<RemoveOppositionFromValueWebController> {
             RemoveOppositionFromValueWebControllerImpl(applicationScope.get(), get(), get())
         }
+        provide<AddSymbolicItemToOppositionController> {
+            AddSymbolicItemToOppositionControllerImpl(applicationScope.get(), get(), get())
+        }
     }
 
     private fun InScope<ProjectScope>.gui()
@@ -237,6 +260,7 @@ object ThemeModule {
                 projectId.toString(),
                 applicationScope.get(),
                 presenter,
+                get(),
                 get(),
                 get(),
                 get()
@@ -336,6 +360,7 @@ object ThemeModule {
                 presenter listensTo projectScope.get<RenameValueWebNotifier>()
                 presenter listensTo projectScope.get<RemoveValueWebFromThemeNotifier>()
                 presenter listensTo projectScope.get<RemoveOppositionFromValueWebNotifier>()
+                presenter listensTo projectScope.get<AddSymbolicItemToOppositionNotifier>()
 
                 ValueOppositionWebsController(
                     themeId.toString(),
@@ -362,6 +387,41 @@ object ThemeModule {
                 presenter,
                 get()
             )
+        }
+
+        scoped<AddSymbolDialogScope> {
+            provide<AddSymbolDialogViewListener> {
+                val presenter = AddSymbolDialogPresenter(
+                    themeId,
+                    oppositionId,
+                    get<AddSymbolDialogModel>()
+                )
+
+                presenter listensTo projectScope.get<BuildNewCharacterNotifier>()
+                presenter listensTo projectScope.get<RenameCharacterNotifier>()
+                presenter listensTo projectScope.get<RemoveCharacterFromLocalStoryNotifier>()
+
+                presenter listensTo projectScope.get<CreateNewLocationNotifier>()
+                presenter listensTo projectScope.get<RenameLocationNotifier>()
+                presenter listensTo projectScope.get<DeleteLocationNotifier>()
+
+                presenter listensTo projectScope.get<AddSymbolToThemeNotifier>()
+                presenter listensTo projectScope.get<RenameSymbolNotifier>()
+                presenter listensTo projectScope.get<RemoveSymbolFromThemeNotifier>()
+
+                presenter listensTo projectScope.get<AddSymbolicItemToOppositionNotifier>()
+
+                AddSymbolDialogController(
+                    themeId,
+                    oppositionId,
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    presenter,
+                    projectScope.get()
+                )
+            }
         }
     }
 }

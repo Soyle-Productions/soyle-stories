@@ -22,6 +22,7 @@ import com.soyle.stories.location.locationDetails.LocationDetailsScope
 import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
 import com.soyle.stories.location.repositories.LocationRepository
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.soylestories.ApplicationScope
@@ -156,6 +157,33 @@ object LocationSteps : ApplicationTest() {
 			}
 		}
 		assertThat(getNumberOfLocationsCreated(double)).isGreaterThanOrEqualTo(number)
+	}
+
+	fun getLocationByName(projectScope: ProjectScope, name: String): Location?
+	{
+		val repo = projectScope.get<LocationRepository>()
+		return runBlocking {
+			repo.getAllLocationsInProject(Project.Id(projectScope.projectId)).find { it.name == name }
+		}
+	}
+
+	fun createLocationWithName(projectScope: ProjectScope, name: String)
+	{
+		val controller = projectScope.get<CreateNewLocationController>()
+		interact {
+			runBlocking {
+				controller.createNewLocation(name, "")
+			}
+		}
+	}
+
+	fun givenLocationCreatedWithName(double: SoyleStoriesTestDouble, name: String): Location
+	{
+		val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+		return getLocationByName(scope, name) ?: kotlin.run {
+			createLocationWithName(scope, name)
+			getLocationByName(scope, name)!!
+		}
 	}
 
 	fun givenNoLocationsHaveBeenCreated(double: SoyleStoriesTestDouble) {
@@ -454,27 +482,31 @@ object LocationSteps : ApplicationTest() {
 		return text!!.isVisible && text!!.text.isNotBlank()
 	}
 
-	fun whenLocationIsDeleted(double: SoyleStoriesTestDouble): Location {
+	fun whenLocationIsDeleted(double: SoyleStoriesTestDouble, locationId: Location.Id? = null): Location {
 		ProjectSteps.checkProjectHasBeenOpened(double)
 		val scope = ProjectSteps.getProjectScope(double)!!
+		val repo = scope.get<LocationRepository>()
 		var firstLocation: Location? = null
 		interact {
 			async(scope.applicationScope) {
-				firstLocation = DI.resolve<LocationRepository>(scope).getAllLocationsInProject(Project.Id(scope.projectId)).first()
+				firstLocation = locationId?.let {
+					repo.getLocationById(it)!!
+				} ?: repo.getAllLocationsInProject(Project.Id(scope.projectId)).first()
+
 				DI.resolve<DeleteLocationController>(scope).deleteLocation(firstLocation!!.id.uuid.toString())
 			}
 		}
 		return firstLocation!!
 	}
 
-	fun whenLocationIsRenamed(double: SoyleStoriesTestDouble) {
+	fun whenLocationIsRenamed(double: SoyleStoriesTestDouble, locationId: Location.Id? = null, newName: String? = null) {
 		ProjectSteps.checkProjectHasBeenOpened(double)
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val repo = scope.get<LocationRepository>()
 		val controller = scope.get<RenameLocationController>()
 		runBlocking {
-			val firstLocation = repo.getAllLocationsInProject(Project.Id(scope.projectId)).first()
-			controller.renameLocation(firstLocation.id.uuid.toString(), "Renamed Location")
+			val locationToRename = locationId ?: repo.getAllLocationsInProject(Project.Id(scope.projectId)).first().id
+			controller.renameLocation(locationToRename.uuid.toString(), newName ?: "Renamed Location")
 		}
 	}
 

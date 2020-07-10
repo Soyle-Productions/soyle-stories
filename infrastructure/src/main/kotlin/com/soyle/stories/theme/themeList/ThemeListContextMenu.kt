@@ -16,7 +16,7 @@ internal fun ThemeList.themeListContextMenu() = ContextMenu().apply {
     }
     item("Create New Symbol") {
         action {
-            scope.get<CreateSymbolDialog>().show(null, currentWindow)
+            scope.get<CreateSymbolDialog>().show(null, null, currentWindow)
         }
     }
 }

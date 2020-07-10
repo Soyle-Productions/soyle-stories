@@ -6,10 +6,12 @@ import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import io.cucumber.java8.En
+import javafx.event.ActionEvent
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Button
 import javafx.scene.control.MenuButton
+import javafx.scene.control.TextField
 import javafx.scene.control.TextInputControl
 import javafx.scene.layout.HBox
 import org.junit.jupiter.api.Assertions.*
@@ -68,9 +70,9 @@ class CreateSymbolDialogSteps(en: En, double: SoyleStoriesTestDouble) {
             return from(dialog.root).lookup(".theme-link .menu-button").query()
         }
 
-        fun getThemeNameField(dialog: CreateSymbolDialog): TextInputControl
+        fun getThemeNameField(dialog: CreateSymbolDialog): TextField
         {
-            return from(dialog.root).lookup(".theme-link .text-field").queryTextInputControl()
+            return from(dialog.root).lookup(".theme-link .text-field").queryTextInputControl() as TextField
         }
 
     }
@@ -122,6 +124,13 @@ class CreateSymbolDialogSteps(en: En, double: SoyleStoriesTestDouble) {
                     firstItem.fire()
                 }
             }
+            Given("{string} has been entered into the Create Symbol Dialog name field") { name: String ->
+                val dialog = getOpenDialog()!!
+                val textfield = from(dialog.root).lookup(".text-field").queryTextInputControl()
+                interact {
+                    textfield.text = name
+                }
+            }
 
             When("the Create Symbol Dialog is opened with a Theme") {
                 val themeId = ThemeSteps.getCreatedThemes(double).first().id.uuid.toString()
@@ -129,6 +138,13 @@ class CreateSymbolDialogSteps(en: En, double: SoyleStoriesTestDouble) {
             }
             When("the Create Symbol Dialog is opened without a Theme") {
                 openDialog(double)
+            }
+            When("the creation is commited in the Create Symbol Dialog") {
+                val dialog = getOpenDialog()!!
+                val textfield = from(dialog.root).lookup(".text-field").query<TextField>()
+                interact {
+                    textfield.onAction!!.handle(ActionEvent())
+                }
             }
 
             Then("the Create Symbol Dialog Theme field should not be visible") {

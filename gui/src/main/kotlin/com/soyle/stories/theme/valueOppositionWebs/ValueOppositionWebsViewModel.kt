@@ -9,4 +9,5 @@ data class ValueOppositionWebsViewModel(
 )
 
 class ValueWebItemViewModel(val valueWebId: String, val valueWebName: String)
-data class OppositionValueViewModel(val oppositionValueId: String, val oppositionValueName: String, val isNew: Boolean)
+data class OppositionValueViewModel(val oppositionValueId: String, val oppositionValueName: String, val isNew: Boolean, val symbolicItems: List<SymbolicItemViewModel>)
+data class SymbolicItemViewModel(val itemId: String, val itemName: String)

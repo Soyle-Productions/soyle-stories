@@ -6,7 +6,7 @@ data class CreateSymbolDialogViewModel(
     val errorMessage: String?,
     val errorCause: String?,
     val themes: List<ThemeItemViewModel>,
-    val created: Boolean
+    val createdId: String?
 )
 
 class ThemeItemViewModel(val themeId: String, val themeName: String)
