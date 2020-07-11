@@ -52,6 +52,10 @@ class PlanNewCharacterArcTest {
                 TODO("Not yet implemented")
             }
 
+            override suspend fun getThemeContainingOppositionsWithSymbolicEntityId(symbolicId: UUID): List<Theme> {
+                TODO("Not yet implemented")
+            }
+
             override suspend fun addNewTheme(theme: Theme) {
                 addNewTheme.invoke(theme)
                 themes[theme.id] = theme
@@ -61,6 +65,10 @@ class PlanNewCharacterArcTest {
             override suspend fun updateTheme(theme: Theme) {
                 addNewTheme.invoke(theme)
                 themes[theme.id] = theme
+            }
+
+            override suspend fun updateThemes(themes: List<Theme>) {
+                TODO("Not yet implemented")
             }
 
             override suspend fun addTheme(theme: Theme) {

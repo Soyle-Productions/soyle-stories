@@ -5,6 +5,7 @@ import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
+import java.util.*
 
 /**
  * Created by Brendan
@@ -17,7 +18,9 @@ interface ThemeRepository {
     suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme?
     suspend fun getThemeContainingValueWebWithId(valueWebId: ValueWeb.Id): Theme?
     suspend fun getThemeContainingOppositionValueWithId(oppositionValueId: OppositionValue.Id): Theme?
+    suspend fun getThemeContainingOppositionsWithSymbolicEntityId(symbolicId: UUID): List<Theme>
     suspend fun addTheme(theme: Theme)
     suspend fun updateTheme(theme: Theme)
+    suspend fun updateThemes(themes: List<Theme>)
     suspend fun deleteTheme(theme: Theme)
 }

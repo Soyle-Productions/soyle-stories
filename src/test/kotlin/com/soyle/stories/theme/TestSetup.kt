@@ -13,6 +13,7 @@ import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
+import java.util.*
 
 fun setupContext(
     initialThemes: List<Theme> = emptyList(),
@@ -105,8 +106,16 @@ fun setupContext(
         init {
             themes.putAll(initialThemes.map { it.id to it })
         }
+        override suspend fun updateThemes(themes: List<Theme>) {
+            TODO("Not yet implemented")
+        }
+
 
         override suspend fun addTheme(theme: Theme) {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun getThemeContainingOppositionsWithSymbolicEntityId(symbolicId: UUID): List<Theme> {
             TODO("Not yet implemented")
         }
 
