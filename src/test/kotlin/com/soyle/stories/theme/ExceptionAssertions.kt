@@ -66,3 +66,10 @@ fun valueWebAlreadyHasName(valueWebId: UUID, name: String): (Any?) -> Unit = { a
     assertEquals(valueWebId, actual.valueWebId)
     assertEquals(name, actual.valueWebName)
 }
+
+fun symbolicRepresentationNotInOppositionValue(oppositionValueId: UUID, symbolicEntityId: UUID) = fun (actual: Any?) {
+    actual as SymbolicRepresentationNotInOppositionValue
+    assertEquals(oppositionValueId, actual.oppositionValueId)
+    assertEquals(symbolicEntityId, actual.symbolicRepresentationId)
+    assertEquals(symbolicEntityId, actual.entityId)
+}
