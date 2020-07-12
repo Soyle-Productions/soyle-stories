@@ -25,3 +25,6 @@ inline infix fun <A, B, T> Either<A, B>.thenFailWith(expectedFailure: () -> T) {
 fun Any?.mustEqual(expected: Any?, message: () -> String = { "" }) = assertEquals(expected, this) { message() }
 
 infix fun Any?.shouldBe(assertion: (Any?) -> Unit) = assertion(this)
+
+operator fun <T> Map<Boolean, T>.component1() = this[true]
+operator fun <T> Map<Boolean, T>.component2() = this[false]

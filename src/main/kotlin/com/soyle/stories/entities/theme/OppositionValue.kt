@@ -24,6 +24,10 @@ class OppositionValue(
     fun withRepresentation(representation: SymbolicRepresentation) = copy(representations = representations + representation)
     fun withoutRepresentation(representation: SymbolicRepresentation) = copy(representations = representations - representation)
 
+    private val representationIds by lazy { representations.map { it.entityUUID }.toSet() }
+
+    fun hasEntityAsRepresentation(entityId: UUID) = representationIds.contains(entityId)
+
     data class Id(val uuid: UUID = UUID.randomUUID())
 
 }

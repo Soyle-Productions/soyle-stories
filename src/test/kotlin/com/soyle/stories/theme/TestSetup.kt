@@ -99,6 +99,7 @@ fun setupContext(
             characters.putAll(initialCharacters.map { it.id to it })
         }
         override suspend fun getCharacterById(characterId: Character.Id): Character? = characters[characterId]
+        override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> = characters.values.filter { it.projectId == projectId }
 
     }
     override val themeRepository: ThemeRepository = object : ThemeRepository {
