@@ -6,40 +6,36 @@ import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
+import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listSymbolsInTheme.ListSymbolsInTheme
 import java.util.*
 
 class AddSymbolDialogController(
-    themeId: String,
-    private val oppositionId: String,
+    oppositionId: String,
     private val threadTransformer: ThreadTransformer,
-    private val listAllCharacterArcs: ListAllCharacterArcs,
-    private val listAllLocations: ListAllLocations,
-    private val listSymbolsInTheme: ListSymbolsInTheme,
+    private val listAvailableEntitiesToAddToOpposition: ListAvailableEntitiesToAddToOpposition,
     private val presenter: AddSymbolDialogPresenter,
     private val addSymbolicItemToOppositionController: AddSymbolicItemToOppositionController
 ) : AddSymbolDialogViewListener {
 
-    private val themeId = UUID.fromString(themeId)
+    private val oppositionId = UUID.fromString(oppositionId)
 
     override fun getValidState() {
         threadTransformer.async {
-            listAllCharacterArcs.invoke(presenter)
-            listAllLocations.invoke(presenter)
-            listSymbolsInTheme.invoke(themeId, presenter)
+            listAvailableEntitiesToAddToOpposition.invoke(oppositionId, presenter)
         }
     }
 
     override fun selectCharacter(characterId: String) {
-        addSymbolicItemToOppositionController.addCharacterToOpposition(oppositionId, characterId)
+        addSymbolicItemToOppositionController.addCharacterToOpposition(oppositionId.toString(), characterId)
     }
 
     override fun selectLocation(locationId: String) {
-        addSymbolicItemToOppositionController.addLocationToOpposition(oppositionId, locationId)
+        addSymbolicItemToOppositionController.addLocationToOpposition(oppositionId.toString(), locationId)
     }
 
     override fun selectSymbol(symbolId: String) {
-        addSymbolicItemToOppositionController.addSymbolToOpposition(oppositionId, symbolId)
+        addSymbolicItemToOppositionController.addSymbolToOpposition(oppositionId.toString(), symbolId)
     }
 
 }

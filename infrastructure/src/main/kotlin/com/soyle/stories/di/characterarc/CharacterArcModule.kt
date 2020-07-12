@@ -49,6 +49,8 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
+import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
+import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestionUseCase
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
@@ -151,6 +153,7 @@ object CharacterArcModule {
 				override val removeCharacterFromStory: Notifier<RemoveCharacterFromStory.OutputPort> =
 				  RemoveCharacterFromLocalStoryNotifier().also {
 					  get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
+					  get<RemoveSymbolicItemControllerImpl>() listensTo it
 				  }
 				override val changeStoryFunction: Notifier<ChangeStoryFunction.OutputPort> =
 				  ChangeStoryFunctionNotifier()
@@ -165,7 +168,9 @@ object CharacterArcModule {
 				override val removeCharacterFromLocalComparison: Notifier<RemoveCharacterFromComparison.OutputPort> =
 				  RemoveCharacterFromLocalComparisonNotifier()
 				override val renameCharacter: Notifier<RenameCharacter.OutputPort> =
-				  RenameCharacterNotifier()
+				  RenameCharacterNotifier().also {
+					  get<RenameSymbolicItemController>() listensTo it
+				  }
 				override val renameCharacterArc: Notifier<RenameCharacterArc.OutputPort> =
 				  RenameCharacterArcNotifier()
 				override val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort> =

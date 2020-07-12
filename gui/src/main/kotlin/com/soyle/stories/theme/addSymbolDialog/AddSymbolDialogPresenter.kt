@@ -19,6 +19,8 @@ import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
+import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.EntitiesAvailableToAddToOpposition
+import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listSymbolsInTheme.ListSymbolsInTheme
 import com.soyle.stories.theme.usecases.listSymbolsInTheme.SymbolsInTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
@@ -32,7 +34,7 @@ class AddSymbolDialogPresenter(
     themeId: String,
     oppositionId: String,
     private val view: View.Nullable<AddSymbolDialogViewModel>
-) : ListAllCharacterArcs.OutputPort, ListAllLocations.OutputPort, ListSymbolsInTheme.OutputPort,
+) : ListAvailableEntitiesToAddToOpposition.OutputPort,
     BuildNewCharacter.OutputPort, RenameCharacter.OutputPort, RemoveCharacterFromStory.OutputPort,
     CreateNewLocation.OutputPort, RenameLocation.OutputPort, DeleteLocation.OutputPort, AddSymbolToTheme.OutputPort,
     RenameSymbol.OutputPort, RemoveSymbolFromTheme.OutputPort, AddSymbolicItemToOpposition.OutputPort {
@@ -40,30 +42,16 @@ class AddSymbolDialogPresenter(
     private val themeId = UUID.fromString(themeId)
     private val oppositionId = UUID.fromString(oppositionId)
 
-    override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
+    override suspend fun availableEntitiesListedToAddToOpposition(response: EntitiesAvailableToAddToOpposition) {
         view.update {
             copyOrDefault(
-                characters = response.characters.keys.map {
+                characters = response.characters.map {
                     CharacterItemViewModel(
                         it.characterId.toString(),
                         it.characterName
                     )
-                }.sortedBy { it.characterName }
-            )
-        }
-    }
-
-    override fun receiveListAllLocationsResponse(response: ListAllLocations.ResponseModel) {
-        view.update {
-            copyOrDefault(
-                locations = response.locations.map { LocationItemViewModel(it) }.sortedBy { it.name }
-            )
-        }
-    }
-
-    override suspend fun symbolsListedInTheme(response: SymbolsInTheme) {
-        view.update {
-            copyOrDefault(
+                }.sortedBy { it.characterName },
+                locations = response.locations.map { LocationItemViewModel(it) }.sortedBy { it.name },
                 symbols = response.symbols.map { SymbolListItemViewModel(it.symbolId.toString(), it.symbolName) }
                     .sortedBy { it.symbolName }
             )

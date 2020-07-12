@@ -126,6 +126,9 @@ class AddSymbolDialogSteps(en: En, double: SoyleStoriesTestDouble) {
             }
 
 
+            Then("the Add Symbol to Opposition Dialog should be open") {
+                assertNotNull(getOpenDialog())
+            }
             Then("the Add Symbol to Opposition Dialog should be closed") {
                 assertNull(getOpenDialog())
             }

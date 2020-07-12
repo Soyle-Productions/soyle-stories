@@ -3,6 +3,7 @@ package com.soyle.stories.theme.valueOppositionWebs
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
+import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemController
 import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueController
 import com.soyle.stories.theme.renameValueWeb.RenameValueWebController
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
@@ -19,6 +20,7 @@ class ValueOppositionWebsController(
     private val renameOppositionValueController: RenameOppositionValueController,
     private val renameValueWebController: RenameValueWebController,
     private val removeOppositionFromValueWebController: RemoveOppositionFromValueWebController,
+    private val removeSymbolicItemController: RemoveSymbolicItemController,
     private val presenter: ValueOppositionWebsPresenter
 ) : ValueOppositionWebsViewListener {
 
@@ -63,4 +65,9 @@ class ValueOppositionWebsController(
         removeOppositionFromValueWebController.removeOpposition(oppositionId, valueWebId)
     }
 
+    override fun removeSymbolicItem(oppositionId: String, itemId: String) {
+        removeSymbolicItemController.removeItemFromOpposition(oppositionId, itemId) {
+            presenter.presentError(itemId, it)
+        }
+    }
 }

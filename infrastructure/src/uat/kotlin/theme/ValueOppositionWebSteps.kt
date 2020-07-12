@@ -1,5 +1,6 @@
 package com.soyle.stories.theme
 
+import com.soyle.stories.common.components.ComponentsStyles.Companion.cardBody
 import com.soyle.stories.common.components.PopOutEditBox
 import com.soyle.stories.common.components.popOutEditBox
 import com.soyle.stories.di.get
@@ -16,12 +17,10 @@ import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
 import io.cucumber.java8.En
 import javafx.scene.Node
 import javafx.scene.Parent
-import javafx.scene.control.Button
-import javafx.scene.control.Hyperlink
-import javafx.scene.control.MenuButton
-import javafx.scene.control.TextInputControl
+import javafx.scene.control.*
 import javafx.scene.input.ContextMenuEvent
 import javafx.scene.input.KeyCode
+import javafx.scene.layout.FlowPane
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.contextmenu
@@ -311,6 +310,33 @@ class ValueOppositionWebSteps(en: En, double: SoyleStoriesTestDouble) {
                     button.fire()
                 }
             }
+            When("the value opposition {string} button is selected") { buttonName: String ->
+                val tool = getOpenTool(double)!!
+                val card = from(tool.root).lookup(".${Styles.oppositionCard.name}").query<Node>()
+                val button = from(card).lookup(buttonName).queryButton()
+                interact {
+                    button.fire()
+                }
+            }
+            When("the symbolic item {string} is removed from the {string} theme's {string} value web's first opposition") {
+                    itemName: String, themeName: String, valueWebName: String ->
+
+                val theme = ThemeSteps.getThemeWithName(double, themeName)!!
+                val tool = givenToolHasBeenOpenedForTheme(double, theme)
+                val valueWebLinks = from(tool.root).lookup(".${Styles.valueWebList.name} .hyperlink").queryAll<Hyperlink>()
+                val valueWebLink = valueWebLinks.find { it.text == valueWebName }!!
+                interact {
+                    valueWebLink.fire()
+                }
+                val card = from(tool.root).lookup(".${Styles.oppositionCard.name}").query<Node>()
+                val chips = from(card).lookup(".${cardBody.name} .chips").query<FlowPane>()
+                val chipBtn = chips.children.asSequence()
+                    .filter { from(it).lookup(".label").queryAll<Label>().any { it.text == itemName } }
+                    .map { from(it).lookup(".button").query<Button>() }
+                    .first()
+                interact { chipBtn.fire() }
+            }
+
 
             Then("the Value Web Tool should be open") {
                 assertNotNull(getOpenTool(double))

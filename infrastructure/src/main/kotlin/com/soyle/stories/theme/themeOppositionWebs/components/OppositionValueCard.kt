@@ -78,11 +78,15 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
                 }
             }
             flowpane {
+                addClass("chips")
                 hgap = 8.0
                 vgap = 8.0
                 padding = Insets(8.0, 4.0, 4.0, 4.0)
                 bindChildren(symbolicItems) {
-                    chip(it.itemName.toProperty(), onDelete={  }).node
+                    chip(it.itemName.toProperty(), onDelete={
+                        val oppositionValueId = oppositionValueId.value ?: return@chip
+                        viewListener.removeSymbolicItem(oppositionValueId, it.itemId)
+                    }).node
                 }
             }
         }
@@ -118,6 +122,10 @@ private fun Parent.cardName(
         }
         isErrorSource.onChangeUntil(isNull(oppositionValue)) {
             errorMessageProperty.value = if (it == true) model.errorMessage.value
+            else null
+        }
+        model.errorMessage.onChangeUntil(isNull(oppositionValue)) {
+            errorMessageProperty.value = if (isErrorSource.get()) it
             else null
         }
         op()

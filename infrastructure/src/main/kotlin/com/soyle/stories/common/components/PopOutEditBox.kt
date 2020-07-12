@@ -35,6 +35,7 @@ class PopOutEditBox(
 
     val textInput: TextInputControl = if (preferSingleLine) textfield {
         this.setOnAction {
+            println("popup textinput action")
             it.consume()
             this@PopOutEditBox.commit()
         }
@@ -70,6 +71,7 @@ class PopOutEditBox(
     }
 
     private fun commit() {
+        println("popout commit")
         fireEvent(ActionEvent())
     }
 

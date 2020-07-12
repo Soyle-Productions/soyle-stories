@@ -5,6 +5,7 @@ import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.DeleteLocationController
 import com.soyle.stories.location.controllers.RenameLocationController
@@ -28,6 +29,8 @@ import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
 import com.soyle.stories.location.usecases.renameLocation.RenameLocation
 import com.soyle.stories.location.usecases.renameLocation.RenameLocationUseCase
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
+import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
 
 object LocationModule {
 
@@ -57,10 +60,14 @@ object LocationModule {
 			CreateNewLocationNotifier()
 		}
 		provide(DeleteLocation.OutputPort::class) {
-			DeleteLocationNotifier()
+			DeleteLocationNotifier().also {
+				get<RemoveSymbolicItemControllerImpl>() listensTo it
+			}
 		}
 		provide(RenameLocation.OutputPort::class) {
-			RenameLocationNotifier()
+			RenameLocationNotifier().also {
+				get<RenameSymbolicItemController>() listensTo it
+			}
 		}
 		provide(ReDescribeLocation.OutputPort::class) {
 			ReDescribeLocationNotifier()

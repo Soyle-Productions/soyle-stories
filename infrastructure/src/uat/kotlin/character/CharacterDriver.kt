@@ -77,12 +77,12 @@ object CharacterDriver : ApplicationTest() {
 
 	fun getNumberOfCharactersCreated(double: SoyleStoriesTestDouble): Int = getCharactersCreated(double).size
 
-	fun whenCharacterIsCreated(double: SoyleStoriesTestDouble): Character {
+	fun whenCharacterIsCreated(double: SoyleStoriesTestDouble, name: String = "New Character ${UUID.randomUUID()}"): Character {
 		val scope = ProjectSteps.getProjectScope(double)!!
 		val repo = scope.get<CharacterRepository>()
 		return runBlocking {
 			val existingCharacters = repo.listCharactersInProject(Project.Id(scope.projectId)).toSet()
-			scope.get<CreateCharacterDialogViewListener>().createCharacter("New Character ${UUID.randomUUID()}")
+			scope.get<CreateCharacterDialogViewListener>().createCharacter(name)
 			repo.listCharactersInProject(Project.Id(scope.projectId)).find { it !in existingCharacters }!!
 		}
 	}
@@ -92,6 +92,14 @@ object CharacterDriver : ApplicationTest() {
 			setNumberOfCharactersCreated(double, atLeast)
 		}
 		assertTrue(getNumberOfCharactersCreated(double) >= atLeast)
+	}
+
+	fun givenACharacterHasBeenCreatedWithTheName(double: SoyleStoriesTestDouble, name: String): Character
+	{
+		return getCharactersCreated(double).find { it.name == name } ?: run {
+			whenCharacterIsCreated(double, name)
+			getCharactersCreated(double).find { it.name == name }!!
+		}
 	}
 
 	fun setCharacterListToolOpen(double: SoyleStoriesTestDouble) {

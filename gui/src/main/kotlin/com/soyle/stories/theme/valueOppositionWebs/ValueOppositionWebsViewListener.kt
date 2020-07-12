@@ -10,5 +10,6 @@ interface ValueOppositionWebsViewListener {
     fun removeOpposition(valueWebId: String, oppositionId: String)
     fun renameOppositionValue(oppositionId: String, name: String)
     fun renameValueWeb(valueWebId: String, name: String)
+    fun removeSymbolicItem(oppositionId: String, itemId: String)
 
 }

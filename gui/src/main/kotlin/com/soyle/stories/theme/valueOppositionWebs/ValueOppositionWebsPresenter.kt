@@ -14,10 +14,14 @@ import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThem
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ValueWebList
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.OppositionRemovedFromValueWeb
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
+import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
+import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromTheme
 import com.soyle.stories.theme.usecases.removeValueWebFromTheme.ValueWebRemovedFromTheme
 import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValue
 import com.soyle.stories.theme.usecases.renameOppositionValue.RenamedOppositionValue
+import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItem
+import com.soyle.stories.theme.usecases.renameSymbolicItems.RenamedSymbolicItem
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenamedValueWeb
 import java.util.*
@@ -31,7 +35,9 @@ class ValueOppositionWebsPresenter(
     RenameValueWeb.OutputPort,
     RemoveValueWebFromTheme.OutputPort,
     RemoveOppositionFromValueWeb.OutputPort,
-    AddSymbolicItemToOpposition.OutputPort {
+    AddSymbolicItemToOpposition.OutputPort,
+    RenameSymbolicItem.OutputPort,
+    RemoveSymbolicItem.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -162,6 +168,54 @@ class ValueOppositionWebsPresenter(
                         symbolicItems = it.symbolicItems + SymbolicItemViewModel(response.itemId().toString(), response.itemName)
                     )
                     else it
+                }
+            )
+        }
+    }
+
+    override suspend fun symbolicItemRenamed(response: List<RenamedSymbolicItem>) {
+        val updates = response.filter { it.themeId == themeId }
+        if (updates.isEmpty()) return
+        view.updateOrInvalidated {
+            if (selectedValueWeb == null) return@updateOrInvalidated this
+            val valueWebUpdates = updates.filter { it.valueWebId.toString() == selectedValueWeb.valueWebId }
+            if (valueWebUpdates.isEmpty()) return@updateOrInvalidated this
+            val oppositionUpdates = valueWebUpdates.groupBy { it.oppositionId.toString() }
+            copy(
+                oppositionValues = oppositionValues.map {
+                    if (it.oppositionValueId in oppositionUpdates) {
+                        val itemUpdates = oppositionUpdates.getValue(it.oppositionValueId).associateBy { it.symbolicItemId.toString() }
+                        it.copy(
+                            symbolicItems = it.symbolicItems.map {
+                                if (it.itemId in itemUpdates) {
+                                    it.copy(itemName = itemUpdates[it.itemId]!!.newName)
+                                } else it
+                            }
+                        )
+                    } else it
+                }
+            )
+        }
+    }
+
+    override suspend fun symbolicItemsRemoved(response: List<RemovedSymbolicItem>) {
+        val updates = response.filter { it.themeId == themeId }
+        if (updates.isEmpty()) return
+        view.updateOrInvalidated {
+            if (selectedValueWeb == null) return@updateOrInvalidated this
+            val valueWebUpdates = updates.filter { it.valueWebId.toString() == selectedValueWeb.valueWebId }
+            if (valueWebUpdates.isEmpty()) return@updateOrInvalidated this
+            val oppositionUpdates = valueWebUpdates.groupBy { it.oppositionValueId.toString() }
+            copy(
+                oppositionValues = oppositionValues.map {
+                    if (it.oppositionValueId in oppositionUpdates) {
+                        val itemsRemoved = oppositionUpdates.getValue(it.oppositionValueId).associateBy { it.symbolicItemId.toString() }
+                        it.copy(
+                            symbolicItems = it.symbolicItems.filterNot {
+                                it.itemId in itemsRemoved
+                            }
+                        )
+                    } else it
                 }
             )
         }

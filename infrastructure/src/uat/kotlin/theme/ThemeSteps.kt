@@ -1,16 +1,23 @@
 package com.soyle.stories.theme
 
+import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.entities.theme.SymbolicRepresentation
 import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.location.LocationListDriver
+import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
+import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
@@ -226,6 +233,37 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
             val oppositions = getValueWeb(valueWebId, scope)!!.oppositions
             assertTrue(oppositions.size >= count)
         }
+
+        fun getSymbolicItem(scope: ProjectScope, oppositionId: OppositionValue.Id, itemId: UUID): SymbolicRepresentation?
+        {
+            val repo = scope.get<ThemeRepository>()
+            return runBlocking {
+                repo.getThemeContainingOppositionValueWithId(oppositionId)?.valueWebs?.asSequence()
+                    ?.flatMap { it.oppositions.asSequence() }
+                    ?.flatMap { it.representations.asSequence() }
+                    ?.find { it.entityUUID == itemId }
+            }
+        }
+
+        fun createSymbolicRepresentation(scope: ProjectScope, oppositionId: OppositionValue.Id, entityId: UUID, type: String)
+        {
+            val controller = scope.get<AddSymbolicItemToOppositionController>()
+            interact {
+                when (type) {
+                    "character" -> controller.addCharacterToOpposition(oppositionId.uuid.toString(), entityId.toString())
+                    "location" -> controller.addLocationToOpposition(oppositionId.uuid.toString(), entityId.toString())
+                    "symbol" -> controller.addSymbolToOpposition(oppositionId.uuid.toString(), entityId.toString())
+                }
+            }
+        }
+
+        fun givenItemHasBeenSymbolicallyAdded(scope: ProjectScope, oppositionId: OppositionValue.Id, entityId: UUID, type: String): SymbolicRepresentation
+        {
+            return getSymbolicItem(scope, oppositionId, entityId) ?: kotlin.run {
+                createSymbolicRepresentation(scope, oppositionId, entityId, type)
+                getSymbolicItem(scope, oppositionId, entityId)!!
+            }
+        }
     }
 
     init {
@@ -310,6 +348,37 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
                 givenASymbolHasBeenCreatedForTheme(double, theme.id.uuid.toString(), symbolName)
             }
+            Given("the character {string} has been symbolically added to the {string} theme's {string} value web's first opposition") {
+                characterName: String, themeName: String, valueWebName: String ->
+
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                val valueWeb = givenAValueWebHasBeenCreatedWithTheName(double, theme.id.uuid.toString(), valueWebName)
+                val opposition = givenANumberOfOppositionsHaveBeenCreated(1, valueWeb.id.uuid.toString(), scope).first()
+                val character: Character = CharacterDriver.givenACharacterHasBeenCreatedWithTheName(double, characterName)
+                givenItemHasBeenSymbolicallyAdded(scope, opposition.id, character.id.uuid, "character")
+            }
+            Given("the location {string} has been symbolically added to the {string} theme's {string} value web's first opposition") {
+                    locationName: String, themeName: String, valueWebName: String ->
+
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                val valueWeb = givenAValueWebHasBeenCreatedWithTheName(double, theme.id.uuid.toString(), valueWebName)
+                val opposition = givenANumberOfOppositionsHaveBeenCreated(1, valueWeb.id.uuid.toString(), scope).first()
+                val location: Location = LocationSteps.givenLocationCreatedWithName(double, locationName)
+                givenItemHasBeenSymbolicallyAdded(scope, opposition.id, location.id.uuid, "location")
+            }
+            Given("the symbol {string} has been symbolically added to the {string} theme's {string} value web's first opposition") {
+                    symbolName: String, themeName: String, valueWebName: String ->
+
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                val valueWeb = givenAValueWebHasBeenCreatedWithTheName(double, theme.id.uuid.toString(), valueWebName)
+                val opposition = givenANumberOfOppositionsHaveBeenCreated(1, valueWeb.id.uuid.toString(), scope).first()
+                val symbol: Symbol = givenASymbolHasBeenCreatedForTheme(double, theme.id.uuid.toString(), symbolName)
+                givenItemHasBeenSymbolicallyAdded(scope, opposition.id, symbol.id.uuid, "symbol")
+            }
+
 
             When("a theme is created") {
                 createTheme(double)
@@ -470,6 +539,25 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val theme = getTheme(themeId.uuid.toString(), ProjectSteps.getProjectScope(double)!!)!!
                 val opposition = theme.valueWebs.asSequence().flatMap { it.oppositions.asSequence() }.find { it.id == oppositionId }!!
                 assertTrue(opposition.representations.isEmpty())
+            }
+            Then("the symbolic item {string} should not in the {string} theme's {string} value web's first opposition") {
+                symbolicName: String, themeName: String, valueWebName: String ->
+
+                val scope = ProjectSteps.getProjectScope(double)!!
+                val theme = getThemeWithName(double, themeName)!!
+                val valueWeb = theme.valueWebs.find { it.name == valueWebName }!!
+                val opposition = valueWeb.oppositions.first()
+                assertNull(opposition.representations.find { it.name == symbolicName })
+            }
+            Then("the symbolic item {string} in the {string} theme's {string} value web's first opposition should be named {string}") {
+                    symbolicName: String, themeName: String, valueWebName: String, newName: String ->
+
+                val scope = ProjectSteps.getProjectScope(double)!!
+                val theme = getThemeWithName(double, themeName)!!
+                val valueWeb = theme.valueWebs.find { it.name == valueWebName }!!
+                val opposition = valueWeb.oppositions.first()
+                assertNotNull(opposition.representations.find { it.name == newName })
+
             }
         }
     }

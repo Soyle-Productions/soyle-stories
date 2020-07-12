@@ -189,7 +189,7 @@ Feature: Value Opposition Web Tool
       | Pressing Enter | rename text box        |
       | Clicking Away  | name                   |
 
-  @add-symbol-to-value-web @new
+  @add-symbol-to-value-web
   Scenario: Add Symbol to Value Opposition
     Given the Value Opposition Web Tool has been opened
     And a value web has been created for the theme open in the Value Opposition Web Tool
@@ -198,17 +198,65 @@ Feature: Value Opposition Web Tool
     When the value opposition "Add Symbol" button is selected
     Then the Add Symbol to Opposition Dialog should be open
 
-  @add-symbol-to-value-web @new
-  Scenario: React to Symbol Added to Value Opposition
-    Given the Value Opposition Web Tool has been opened
-    And a value web has been created for the theme open in the Value Opposition Web Tool
-    And a value opposition has been created for the value web
-    And the value web in the Value Opposition Web Tool has been selected
-    When a symbol is added to a value opposition in the selected value web
-    Then the symbol should be listed in the value opposition card
+  @delete-character
+  Scenario: Remove Character
+    Given a theme called "Growing Up" has been created
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And a Character called "Bob" has been created
+    And the character "Bob" has been symbolically added to the "Growing Up" theme's "Justice" value web's first opposition
+    When the character "Bob" is removed from the story
+    Then the symbolic item "Bob" should not in the "Growing Up" theme's "Justice" value web's first opposition
 
-  @delete-symbol @new @excluded
-  Scenario: React to Symbol Deleted
+  @delete-location
+  Scenario: Remove Location
+    Given a theme called "Growing Up" has been created
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And a location called "Home" has been created
+    And the location "Home" has been symbolically added to the "Growing Up" theme's "Justice" value web's first opposition
+    When the location "Home" is removed from the story
+    Then the symbolic item "Home" should not in the "Growing Up" theme's "Justice" value web's first opposition
 
-  @rename-symbol @new @excluded
-  Scenario: React to Symbol Renamed
+  @delete-symbol
+  Scenario: Remove Symbol
+    Given a theme called "Growing Up" has been created
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And a symbol called "The Ring" has been created for the "Growing Up" theme
+    And the symbol "The Ring" has been symbolically added to the "Growing Up" theme's "Justice" value web's first opposition
+    When the symbol "The Ring" is removed from the story
+    Then the symbolic item "The Ring" should not in the "Growing Up" theme's "Justice" value web's first opposition
+
+  @remove-symbolic-item
+  Scenario: Remove Symbolic Item
+    Given a theme called "Growing Up" has been created
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And a Character called "Bob" has been created
+    And the character "Bob" has been symbolically added to the "Growing Up" theme's "Justice" value web's first opposition
+    When the symbolic item "Bob" is removed from the "Growing Up" theme's "Justice" value web's first opposition
+    Then the symbolic item "Bob" should not in the "Growing Up" theme's "Justice" value web's first opposition
+
+  @rename-character
+  Scenario: Rename Character
+    Given a theme called "Growing Up" has been created
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And a Character called "Bob" has been created
+    And the character "Bob" has been symbolically added to the "Growing Up" theme's "Justice" value web's first opposition
+    When the character "Bob" is renamed to "Frank"
+    Then the symbolic item "Bob" in the "Growing Up" theme's "Justice" value web's first opposition should be named "Frank"
+
+  @rename-location
+  Scenario: Rename Location
+    Given a theme called "Growing Up" has been created
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And a location called "Home" has been created
+    And the location "Home" has been symbolically added to the "Growing Up" theme's "Justice" value web's first opposition
+    When the location "Home" is renamed to "Work"
+    Then the symbolic item "Home" in the "Growing Up" theme's "Justice" value web's first opposition should be named "Work"
+
+  @rename-symbol
+  Scenario: Rename Symbol
+    Given a theme called "Growing Up" has been created
+    And a value web called "Justice" has been created for the "Growing Up" theme
+    And a symbol called "The Ring" has been created for the "Growing Up" theme
+    And the symbol "The Ring" has been symbolically added to the "Growing Up" theme's "Justice" value web's first opposition
+    When the symbol "The Ring" is renamed to "A Ring"
+    Then the symbolic item "The Ring" in the "Growing Up" theme's "Justice" value web's first opposition should be named "A Ring"

@@ -7,6 +7,7 @@ import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
+import java.util.*
 
 class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositories.ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository {
 	val themes = mutableMapOf<Theme.Id, Theme>()
@@ -23,6 +24,18 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 	override suspend fun getThemeById(themeId: Theme.Id): Theme? = themes[themeId]
 	override suspend fun updateTheme(theme: Theme) {
 		themes[theme.id] = theme
+	}
+
+	override suspend fun getThemeContainingOppositionsWithSymbolicEntityId(symbolicId: UUID): List<Theme> {
+		return themes.values.filter {
+			it.valueWebs.any {
+				it.oppositions.any {
+					it.representations.any {
+						it.entityUUID == symbolicId
+					}
+				}
+			}
+		}
 	}
 
 	override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {

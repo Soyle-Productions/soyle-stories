@@ -86,12 +86,14 @@ class ValueOppositionWebs : View() {
                     editableText(selectedValueWebName) {
                         id = "ValueWebName"
                         setOnAction {
+                            println("value web name action")
                             val selectedValueWeb = model.selectedValueWeb.value ?: return@setOnAction
                             val text = editedText ?: ""
                             if (text == selectedValueWeb.valueWebName) {
                                 hide()
                                 return@setOnAction
                             }
+                            println("value web name rename")
                             viewListener.renameValueWeb(selectedValueWeb.valueWebId, text)
                         }
                         onShowing {
@@ -99,7 +101,15 @@ class ValueOppositionWebs : View() {
                         }
                         onShown {
                             model.errorSource.onChangeUntil({ !isShowing }) {
+                                println("error source changed")
+                                println("error message ${model.errorMessage.value}")
                                 errorMessage = if (it == model.selectedValueWeb.value?.valueWebId) model.errorMessage.value
+                                else null
+                            }
+                            model.errorMessage.onChangeUntil({ !isShowing }) {
+                                println("error message changed")
+                                println("error source ${model.errorSource.value}")
+                                errorMessage = if (model.errorSource.value == model.selectedValueWeb.value?.valueWebId) it
                                 else null
                             }
                         }
@@ -118,11 +128,14 @@ class ValueOppositionWebs : View() {
                         }
                     }
                 }
-                button("Add Opposition") {
-                    visibleWhen { model.selectedValueWeb.isNotNull }
-                    action {
-                        val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@action
-                        viewListener.addOpposition(valueWebId)
+                hbox {
+                    padding = Insets(0.0, 0.0, 0.0, 10.0)
+                    button("Add Opposition") {
+                        visibleWhen { model.selectedValueWeb.isNotNull }
+                        action {
+                            val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@action
+                            viewListener.addOpposition(valueWebId)
+                        }
                     }
                 }
                 stackpane {

@@ -14,6 +14,7 @@ import javafx.event.EventTarget
 import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.Node
+import javafx.scene.control.Labeled
 import javafx.scene.layout.Region
 import javafx.scene.paint.Color
 import tornadofx.*
@@ -58,6 +59,9 @@ fun EventTarget.chip(
             visibleWhen(chip.onDeleteProperty.isNotNull)
             managedProperty().bind(visibleProperty())
             isPickOnBounds = true
+            action {
+                onDelete?.invoke()
+            }
         }
     }
     chip.op()
