@@ -51,7 +51,8 @@ class IncludeCharacterInComparisonUseCase(
                     it.characters.map {
                         com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem(
                             it.id.uuid,
-                            it.name
+                            it.name,
+                            null
                         )
                     }
                 )

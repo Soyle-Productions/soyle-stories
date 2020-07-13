@@ -63,7 +63,7 @@ class ListAvailableEntitiesToAddToOppositionUseCase(
         symbols: List<Symbol>
     ): EntitiesAvailableToAddToOpposition {
         return EntitiesAvailableToAddToOpposition(
-            characters.map { CharacterItem(it.id.uuid, it.name) },
+            characters.map { CharacterItem(it.id.uuid, it.name, null) },
             locations.map { LocationItem(it.id.uuid, it.name) },
             symbols.map { SymbolItem(it.id.uuid, it.name) }
         )

@@ -12,6 +12,7 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -86,6 +87,7 @@ class BuildNewCharacterTest {
 		})
 		useCase(providedName)
 		assertEquals(providedName, persistedCharacter!!.name)
+		assertNull(persistedCharacter!!.media)
 	}
 
 	@Test
@@ -96,6 +98,7 @@ class BuildNewCharacterTest {
 		})
 		val (result) = useCase(providedName) as Either.Right
 		assertEquals(persistedCharacter!!.id.uuid, result.characterId)
+		assertEquals(persistedCharacter!!.media?.uuid, result.mediaId)
 	}
 
 }

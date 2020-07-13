@@ -1,5 +1,6 @@
 package com.soyle.stories.characterarc.usecases.listAllCharacterArcs
 
+import com.soyle.stories.entities.Character
 import java.util.*
 
 /**
@@ -9,5 +10,10 @@ import java.util.*
  */
 class CharacterItem(
     val characterId: UUID,
-    val characterName: String
-)
+    val characterName: String,
+    val mediaId: UUID?
+) {
+
+    constructor(character: Character) : this(character.id.uuid, character.name, character.media?.uuid)
+
+}

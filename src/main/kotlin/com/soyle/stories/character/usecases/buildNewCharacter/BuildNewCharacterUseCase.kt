@@ -35,7 +35,8 @@ class BuildNewCharacterUseCase(
 
         return CharacterItem(
           character.id.uuid,
-          character.name
+          character.name,
+            character.media?.uuid
         )
     }
 }

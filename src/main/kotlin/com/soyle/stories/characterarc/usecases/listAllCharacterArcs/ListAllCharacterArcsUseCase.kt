@@ -1,5 +1,9 @@
 package com.soyle.stories.characterarc.usecases.listAllCharacterArcs
 
+import com.soyle.stories.characterarc.repositories.CharacterRepository
+import com.soyle.stories.characterarc.repositories.CharacterArcRepository
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.Project
 import java.util.*
 
@@ -9,33 +13,27 @@ import java.util.*
  * Time: 5:38 PM
  */
 class ListAllCharacterArcsUseCase(
-    projectId: UUID,
-    private val characterRepository: com.soyle.stories.characterarc.repositories.CharacterRepository,
-    private val characterArcRepository: com.soyle.stories.characterarc.repositories.CharacterArcRepository
+    private val characterRepository: CharacterRepository,
+    private val characterArcRepository: CharacterArcRepository
 ) : ListAllCharacterArcs {
 
-    private val projectId = Project.Id(projectId)
+    override suspend fun invoke(projectId: UUID, outputPort: ListAllCharacterArcs.OutputPort) {
+        val (characters, arcs) = getCharactersAndArcsInProject(Project.Id(projectId))
+        val groupedArcs = groupArcsByCharacter(arcs, characters)
+        val response = CharacterArcsByCharacter(groupedArcs)
+        outputPort.receiveCharacterArcList(response)
+    }
 
-    override suspend fun invoke(outputPort: ListAllCharacterArcs.OutputPort) {
-        val characters = characterRepository.listCharactersInProject(projectId)
-        val arcs = characterArcRepository.listAllCharacterArcsInProject(projectId)
-
-        val groupedArcs = arcs.groupBy { it.characterId }
-
-        outputPort.receiveCharacterArcList(
-            ListAllCharacterArcs.ResponseModel(
-                characters.associate {
-                    CharacterItem(
-                        it.id.uuid,
-                        it.name
-                    ) to groupedArcs.getOrDefault(it.id, emptyList()).map {
-                        CharacterArcItem(
-                            it.characterId.uuid,
-                            it.name,
-                            it.themeId.uuid
-                        )
-                    }
-                })
+    private suspend fun getCharactersAndArcsInProject(projectId: Project.Id): Pair<List<Character>, List<CharacterArc>> {
+        return characterRepository.listCharactersInProject(projectId) to characterArcRepository.listAllCharacterArcsInProject(
+            projectId
         )
+    }
+
+    private fun groupArcsByCharacter(arcs: List<CharacterArc>, characters: List<Character>): List<Pair<CharacterItem, List<CharacterArcItem>>> {
+        val groupedArcs = arcs.groupBy { it.characterId }
+        return characters.map {
+            CharacterItem(it) to groupedArcs.getOrDefault(it.id, emptyList()).map(::CharacterArcItem)
+        }
     }
 }

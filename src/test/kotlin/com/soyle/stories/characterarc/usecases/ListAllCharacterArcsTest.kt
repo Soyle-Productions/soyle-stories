@@ -1,16 +1,13 @@
 package com.soyle.stories.characterarc.usecases
 
-import arrow.core.Either
-import arrow.core.right
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.*
+import com.soyle.stories.common.shouldBe
+import com.soyle.stories.entities.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.util.*
 
 /**
  * Created by Brendan
@@ -19,109 +16,96 @@ import java.util.*
  */
 class ListAllCharacterArcsTest {
 
-	val characters = List(5) {
-		Character.buildNewCharacter(Project.Id(), UUID.randomUUID().toString())
+	private val projectId = Project.Id()
+
+	private var result: Any? = null
+
+	@Test
+	fun `no characters`() {
+		listAllCharacterArcs()
+		result shouldBe ::emptyResult
 	}
-	val characterArcs = List(8) {
-		val characterId = characters.random().id
-		(CharacterArc.planNewCharacterArc(characterId, Theme.Id(UUID.randomUUID()), characterId.uuid.toString() + it) as Either.Right).b
+
+	@Test
+	fun `characters without arcs`() {
+		givenCharacters(count = 4)
+		listAllCharacterArcs()
+		result shouldBe responseModel(expectedCount = 4)
 	}
 
-	fun given(characters: List<Character>, characterArcs: List<CharacterArc>): () -> Either<*, com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs.ResponseModel> {
-		val repo = object : com.soyle.stories.characterarc.repositories.CharacterRepository,
-            com.soyle.stories.characterarc.repositories.CharacterArcRepository {
-			override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> = characters
-			override suspend fun getCharacterById(characterId: Character.Id): Character? = null
-			override suspend fun listAllCharacterArcsInProject(projectId: Project.Id): List<CharacterArc> = characterArcs
-			override suspend fun addNewCharacterArc(characterArc: CharacterArc) = Unit
-			override suspend fun getCharacterArcByCharacterAndThemeId(
-                characterId: Character.Id,
-                themeId: Theme.Id
-			): CharacterArc? = null
+	@Test
+	fun `characters with arcs`() {
+		givenCharacters(count = 3, arcsPerCharacter = 4)
+		listAllCharacterArcs()
+		result shouldBe responseModel(expectedCount = 3, expectedTotalArcCount = 12)
+	}
 
-			override suspend fun updateCharacterArc(characterArc: CharacterArc) {
+	private val characterArcRepository = CharacterRepositoryDouble()
 
-			}
-		}
-		val output = object : com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs.OutputPort {
-			var result: Either<*, com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs.ResponseModel>? = null
-			override fun receiveCharacterArcList(response: com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs.ResponseModel) {
-				result = response.right()
-			}
-		}
-		val useCase =
-            com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcsUseCase(
-                UUID.randomUUID(),
-                repo,
-                repo
-            )
-		return {
-			runBlocking {
-				useCase(output)
-				if (output.result == null) error("Output not received")
-				output.result!!
+	private fun givenCharacters(count: Int, arcsPerCharacter: Int = 0)
+	{
+		repeat(count) { _ ->
+			val id = Character.Id()
+			characterArcRepository.characters[id] = Character(id, projectId, "", Media.Id())
+			repeat(arcsPerCharacter) { _ ->
+				val themeId = Theme.Id()
+				characterArcRepository.characterArcs.getOrPut(id) { mutableMapOf() }[themeId] = CharacterArc(id, CharacterArcTemplate(listOf()), themeId, "")
 			}
 		}
 	}
 
-	@Nested
-	inner class GivenNoCharacters {
-
-		val useCase = given(emptyList(), emptyList())
-
-		@Test
-		fun `output should be empty`() {
-			val (result) = useCase() as Either.Right
-			assert(result.characters.isEmpty())
+	private fun listAllCharacterArcs()
+	{
+		val useCase: ListAllCharacterArcs = ListAllCharacterArcsUseCase(characterArcRepository, characterArcRepository)
+		val output = object : ListAllCharacterArcs.OutputPort {
+			override suspend fun receiveCharacterArcList(response: CharacterArcsByCharacter) {
+				result = response
+			}
 		}
-
+		runBlocking {
+			useCase.invoke(projectId.uuid, output)
+		}
 	}
 
-	@Nested
-	inner class GivenNoCharacterArcs {
-
-		val useCase = given(characters, emptyList())
-
-		@Test
-		fun `all characters should be in output`() {
-			val(result) = useCase() as Either.Right
-			assertEquals(characters.size, result.characters.size)
-		}
-
-		@Test
-		fun `each character in output should be empty`() {
-			val (result) = useCase() as Either.Right
-			result.characters.values.forEach {
-				assert(it.isEmpty())
-			}
-		}
-
+	private fun emptyResult(actual: Any?) {
+		actual as CharacterArcsByCharacter
+		assertTrue(actual.characters.isEmpty())
 	}
 
-	@Nested
-	inner class GivenCharacterArcs {
+	private fun responseModel(expectedCount: Int, expectedTotalArcCount: Int = 0) = fun (actual: Any?) {
+		actual as CharacterArcsByCharacter
+		assertEquals(expectedCount, actual.characters.size)
+		assertEquals(expectedTotalArcCount, actual.characters.flatMap { it.arcs }.size)
+		assertCharactersHaveCorrectNames(actual.characters.map { it.character })
+		assertCharactersHaveCorrectMediaIds(actual.characters.map { it.character })
+		assertCharacterArcsHaveCorrectNames(actual.characters.flatMap { it.arcs })
+	}
 
-		val useCase = given(characters, characterArcs)
-
-		@Test
-		fun `character arcs are grouped by character`() {
-			val (result) = useCase() as Either.Right
-			val resultGroups = result.characters.mapKeys { it.key.characterId }
-			val expectedGroups = characterArcs.groupBy { it.characterId }
-			expectedGroups.forEach {
-				assertEquals(it.value.size, resultGroups.getValue(it.key.uuid).size)
-			}
+	private fun assertCharactersHaveCorrectNames(items: List<CharacterItem>) {
+		items.forEach {
+			assertEquals(
+				characterArcRepository.characters[Character.Id(it.characterId)]!!.name,
+				it.characterName
+			)
 		}
+	}
 
-		@Test
-		fun `should output character arc names`() {
-			val (result) = useCase() as Either.Right
-			val characterArcsByIds = characterArcs.associateBy { it.characterId.uuid to it.themeId.uuid }
-			result.characters.values.flatten().forEach {
-				assertEquals(characterArcsByIds.getValue(it.characterId to it.themeId).name, it.characterArcName)
-			}
+	private fun assertCharactersHaveCorrectMediaIds(items: List<CharacterItem>) {
+		items.forEach {
+			assertEquals(
+				characterArcRepository.characters[Character.Id(it.characterId)]!!.media?.uuid,
+				it.mediaId
+			)
 		}
+	}
 
+	private fun assertCharacterArcsHaveCorrectNames(items: List<CharacterArcItem>) {
+		items.forEach {
+			assertEquals(
+				characterArcRepository.characterArcs[Character.Id(it.characterId)]!![Theme.Id(it.themeId)]!!.name,
+				it.characterArcName
+			)
+		}
 	}
 
 }
