@@ -12,7 +12,8 @@ class Character(
   override val id: Id,
   val projectId: Project.Id,
   // Characters have a name
-  val name: String
+  val name: String,
+  val media: Media.Id? = null
 ) : Entity<Character.Id> {
 
 	fun withName(name: String): Character {
