@@ -40,6 +40,10 @@ class BuildNewCharacterTest {
 			override suspend fun updateCharacter(character: Character) {
 
 			}
+
+			override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
+				TODO("Not yet implemented")
+			}
 		}
 		val useCase =
             BuildNewCharacterUseCase(

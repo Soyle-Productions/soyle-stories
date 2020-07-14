@@ -43,6 +43,10 @@ class RemoveCharacterFromStoryTest {
 
             }
 
+            override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
+                TODO("Not yet implemented")
+            }
+
             override suspend fun getThemesWithCharacterIncluded(characterId: Character.Id): List<Theme> =
                 themes.filter {
                     it.containsCharacter(characterId)

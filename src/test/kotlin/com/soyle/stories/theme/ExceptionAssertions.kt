@@ -17,7 +17,7 @@ fun themeNameCannotBeBlank(actual: Any?) {
 
 fun themeDoesNotExist(themeId: UUID): (Any?) -> Unit = { actual ->
     actual as ThemeDoesNotExist
-    assertEquals(themeId, actual.themeId)
+    assertEquals(themeId, actual.themeId) { "Unexpected theme id for ThemeDoesNotExist error" }
 }
 fun symbolNameCannotBeBlank(actual: Any?)
 {

@@ -1,6 +1,7 @@
 package com.soyle.stories.character.repositories
 
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 
 /**
  * Created by Brendan
@@ -9,6 +10,7 @@ import com.soyle.stories.entities.Character
  */
 interface CharacterRepository {
     suspend fun addNewCharacter(character: Character)
+    suspend fun listCharactersInProject(projectId: Project.Id): List<Character>
     suspend fun getCharacterById(characterId: Character.Id): Character?
     suspend fun updateCharacter(character: Character)
     suspend fun deleteCharacterWithId(characterId: Character.Id)

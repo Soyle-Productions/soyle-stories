@@ -3,6 +3,7 @@ package com.soyle.stories.character
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.repositories.ThemeRepository
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 
 class TestContext(
@@ -47,6 +48,10 @@ class TestContext(
 			_persistedItems.add(PersistenceLog("updateCharacter", character))
 			updateCharacter.invoke(character)
 			characters[character.id] = character
+		}
+
+		override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
+			TODO("Not yet implemented")
 		}
 	}
 
