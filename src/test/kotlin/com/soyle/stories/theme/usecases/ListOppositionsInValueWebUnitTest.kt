@@ -33,7 +33,7 @@ class ListOppositionsInValueWebUnitTest {
 
     @Test
     fun `value web exists`() {
-        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, "", listOf())))
+        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, themeId, "", listOf())))
         repo.themes[themeId] = theme
         listOppositionsInValueWeb()
         result shouldBe ::emptyResponseModel
@@ -42,7 +42,7 @@ class ListOppositionsInValueWebUnitTest {
     @Test
     fun `value web has oppositions`() {
         val oppositions = List(5) { OppositionValue(it.toString()) }
-        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, "", oppositions)))
+        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, themeId, "", oppositions)))
         repo.themes[themeId] = theme
         listOppositionsInValueWeb()
         result shouldBe responseModel(oppositions)
@@ -57,7 +57,7 @@ class ListOppositionsInValueWebUnitTest {
                 else -> SymbolicRepresentation(Symbol.Id().uuid, "Symbol $it")
             }
         }) }
-        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, "", oppositions)))
+        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, themeId, "", oppositions)))
         repo.themes[themeId] = theme
         listOppositionsInValueWeb()
         result shouldBe responseModel(oppositions)

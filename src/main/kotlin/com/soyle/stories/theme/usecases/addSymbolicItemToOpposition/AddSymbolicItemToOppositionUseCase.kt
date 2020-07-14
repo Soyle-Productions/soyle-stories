@@ -1,9 +1,11 @@
 package com.soyle.stories.theme.usecases.addSymbolicItemToOpposition
 
+import arrow.core.Either
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.theme.OppositionValueDoesNotExist
 import com.soyle.stories.character.repositories.CharacterRepository
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Theme
@@ -11,8 +13,11 @@ import com.soyle.stories.entities.theme.SymbolicRepresentation
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.repositories.LocationRepository
+import com.soyle.stories.theme.CharacterAlreadyRepresentationValueInValueWeb
 import com.soyle.stories.theme.SymbolDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import java.util.*
 
 class AddSymbolicItemToOppositionUseCase(
@@ -32,15 +37,38 @@ class AddSymbolicItemToOppositionUseCase(
         val character = getCharacter(characterId)
         val representation = SymbolicRepresentation(characterId, character.name)
 
-        addRepresentationToTheme(oppositionId, representation, valueWeb, theme)
+        val characterIncludedInTheme: CharacterIncludedInTheme?
+        val themeWithCharacter = if (!theme.containsCharacter(character.id)) {
+            (theme.includeCharacter(character, listOf()) as Either.Right).b.also {
+                characterIncludedInTheme = CharacterIncludedInTheme(
+                    theme.id.uuid,
+                    characterId,
+                    it.characters.map {
+                        CharacterItem(it.id.uuid, it.name, null)
+                    }
+                )
+            }
+        } else {
+            characterIncludedInTheme = null
+            theme
+        }
+        val removed = addRepresentationToTheme(oppositionId, representation, valueWeb, themeWithCharacter)
 
-        output.addedSymbolicItemToOpposition(CharacterAddedToOpposition(
-            theme.id.uuid,
-            valueWeb.id.uuid,
-            oppositionId,
-            representation.name,
-            representation.entityUUID
-        ))
+        output.addedSymbolicItemToOpposition(
+            AddSymbolicItemToOpposition.ResponseModel(
+                CharacterAddedToOpposition(
+                    theme.id.uuid,
+                    valueWeb.id.uuid,
+                    valueWeb.name,
+                    oppositionId,
+                    valueWeb.oppositions.find { it.id.uuid == oppositionId }!!.name,
+                    representation.name,
+                    representation.entityUUID
+                ),
+                listOfNotNull(removed),
+                listOfNotNull(characterIncludedInTheme)
+            )
+        )
     }
 
     override suspend fun addLocationAsSymbol(
@@ -54,15 +82,23 @@ class AddSymbolicItemToOppositionUseCase(
         val location = getLocation(locationId)
         val representation = SymbolicRepresentation(locationId, location.name)
 
-        addRepresentationToTheme(oppositionId, representation, valueWeb, theme)
+        val removed = addRepresentationToTheme(oppositionId, representation, valueWeb, theme)
 
-        output.addedSymbolicItemToOpposition(LocationAddedToOpposition(
-            theme.id.uuid,
-            valueWeb.id.uuid,
-            oppositionId,
-            representation.name,
-            representation.entityUUID
-        ))
+        output.addedSymbolicItemToOpposition(
+            AddSymbolicItemToOpposition.ResponseModel(
+                LocationAddedToOpposition(
+                    theme.id.uuid,
+                    valueWeb.id.uuid,
+                    valueWeb.name,
+                    oppositionId,
+                    valueWeb.oppositions.find { it.id.uuid == oppositionId }!!.name,
+                    representation.name,
+                    representation.entityUUID
+                ),
+                listOfNotNull(removed),
+                emptyList()
+            )
+        )
     }
 
     override suspend fun addSymbolAsSymbol(
@@ -77,15 +113,23 @@ class AddSymbolicItemToOppositionUseCase(
             ?: throw SymbolDoesNotExist(symbolId)
         val representation = SymbolicRepresentation(symbolId, symbol.name)
 
-        addRepresentationToTheme(oppositionId, representation, valueWeb, theme)
+        val removed = addRepresentationToTheme(oppositionId, representation, valueWeb, theme)
 
-        output.addedSymbolicItemToOpposition(SymbolAddedToOpposition(
-            theme.id.uuid,
-            valueWeb.id.uuid,
-            oppositionId,
-            representation.name,
-            representation.entityUUID
-        ))
+        output.addedSymbolicItemToOpposition(
+            AddSymbolicItemToOpposition.ResponseModel(
+                SymbolAddedToOpposition(
+                    theme.id.uuid,
+                    valueWeb.id.uuid,
+                    valueWeb.name,
+                    oppositionId,
+                    valueWeb.oppositions.find { it.id.uuid == oppositionId }!!.name,
+                    representation.name,
+                    representation.entityUUID
+                ),
+                listOfNotNull(removed),
+                emptyList()
+            )
+        )
     }
 
     private fun getValueWeb(
@@ -100,12 +144,24 @@ class AddSymbolicItemToOppositionUseCase(
         representation: SymbolicRepresentation,
         valueWeb: ValueWeb,
         theme: Theme
-    ) {
-        val oppositionValue = valueWeb.oppositions.find { it.id.uuid == oppositionId }!!
-        val updatedOpposition = oppositionValue.withRepresentation(representation)
-        val updatedValueWeb = valueWeb.withoutOpposition(oppositionValue.id).withOpposition(updatedOpposition)
+    ): RemovedSymbolicItem? {
+
+        val (updatedValueWeb, removedItem) = try {
+            valueWeb.withRepresentationOf(representation, OppositionValue.Id(oppositionId)) to null
+        } catch (duplicate: CharacterAlreadyRepresentationValueInValueWeb) {
+            valueWeb.withoutRepresentation(representation)
+                .withRepresentationOf(representation, OppositionValue.Id(oppositionId)) to
+                    RemovedSymbolicItem(
+                        duplicate.themeId,
+                        duplicate.valueWebId,
+                        duplicate.oppositionValueId,
+                        duplicate.characterId
+                    )
+        }
+
         val updatedTheme = theme.withoutValueWeb(valueWeb.id).withValueWeb(updatedValueWeb)
         themeRepository.updateTheme(updatedTheme)
+        return removedItem
     }
 
     private suspend fun getTheme(oppositionId: UUID): Theme {

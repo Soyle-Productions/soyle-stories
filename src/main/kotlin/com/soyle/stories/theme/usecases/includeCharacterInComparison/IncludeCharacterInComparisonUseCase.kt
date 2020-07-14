@@ -2,6 +2,7 @@ package com.soyle.stories.theme.usecases.includeCharacterInComparison
 
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.CharacterException
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
@@ -35,7 +36,7 @@ class IncludeCharacterInComparisonUseCase(
     private suspend fun includeCharacterInComparison(
         characterId: UUID,
         themeId: UUID
-    ): IncludeCharacterInComparison.ResponseModel {
+    ): CharacterIncludedInTheme {
         val character = getCharacterById(characterId)
         val theme = getThemeById(themeId)
         val initialSections = createCharacterArcSectionsForCharacterInTheme(character, theme)
@@ -45,11 +46,11 @@ class IncludeCharacterInComparisonUseCase(
             {
                 characterArcSectionRepository.addNewCharacterArcSections(initialSections)
                 themeRepository.updateTheme(it)
-                IncludeCharacterInComparison.ResponseModel(
+                CharacterIncludedInTheme(
                     themeId,
                     characterId,
                     it.characters.map {
-                        com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem(
+                        CharacterItem(
                             it.id.uuid,
                             it.name,
                             null

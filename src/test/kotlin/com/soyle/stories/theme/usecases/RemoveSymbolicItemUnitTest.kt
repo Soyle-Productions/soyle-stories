@@ -72,7 +72,7 @@ class RemoveSymbolicItemUnitTest {
             }
             result shouldBe {
                 it as List<*>
-                it.single() shouldBe removedSymbolicItem(themeId.uuid, valueWebId.uuid, oppositionId.uuid)
+                it.single() shouldBe removedSymbolicItem(themeId.uuid, valueWebId.uuid, oppositionId.uuid, symbolicItemId)
             }
         }
 
@@ -186,14 +186,6 @@ class RemoveSymbolicItemUnitTest {
         }
     }
 
-    private fun removedSymbolicItem(themeId: UUID, valueWebId: UUID, oppositionId: UUID) = fun (actual: Any?) {
-        actual as RemovedSymbolicItem
-        assertEquals(themeId, actual.themeId)
-        assertEquals(valueWebId, actual.valueWebId)
-        assertEquals(oppositionId, actual.oppositionValueId)
-        assertEquals(symbolicItemId, actual.symbolicItemId)
-    }
-
     private fun emptyResponse(actual: Any?) {
         actual as List<*>
         assertTrue(actual.isEmpty())
@@ -238,4 +230,12 @@ class RemoveSymbolicItemUnitTest {
             .filter { it.entityUUID == symbolicItemId }
             .toList().isEmpty())
     }
+}
+
+fun removedSymbolicItem(themeId: UUID, valueWebId: UUID, oppositionId: UUID, symbolicItemId: UUID) = fun (actual: Any?) {
+    actual as RemovedSymbolicItem
+    assertEquals(themeId, actual.themeId)
+    assertEquals(valueWebId, actual.valueWebId)
+    assertEquals(oppositionId, actual.oppositionValueId)
+    assertEquals(symbolicItemId, actual.symbolicItemId)
 }

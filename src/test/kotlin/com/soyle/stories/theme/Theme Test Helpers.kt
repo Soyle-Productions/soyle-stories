@@ -30,9 +30,10 @@ fun makeTheme(
 
 fun makeValueWeb(
 	id: ValueWeb.Id = ValueWeb.Id(),
+	themeId: Theme.Id = Theme.Id(),
 	name: String = "",
 	oppositions: List<OppositionValue> = listOf()
-) = ValueWeb(id, name, oppositions)
+) = ValueWeb(id, themeId, name, oppositions)
 
 fun makeOppositionValue(
 	id: OppositionValue.Id = OppositionValue.Id(),

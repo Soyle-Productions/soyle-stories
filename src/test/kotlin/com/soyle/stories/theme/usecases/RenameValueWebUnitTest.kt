@@ -66,7 +66,7 @@ class RenameValueWebUnitTest {
 
     private fun givenValueWeb()
     {
-        themeRepository.themes[themeId] = makeTheme(themeId, valueWebs = listOf(makeValueWeb(valueWebId, originalName)))
+        themeRepository.themes[themeId] = makeTheme(themeId, valueWebs = listOf(makeValueWeb(valueWebId, themeId, originalName)))
     }
 
     private fun renameValueWeb(name: String = "")

@@ -87,7 +87,7 @@ class AddValueWebToThemeUnitTest {
     private fun givenThemeExists(valueWebCount: Int = 0)
     {
         themeRepository.themes[themeId] = makeTheme(themeId, valueWebs = List(valueWebCount) {
-            ValueWeb("Value Web $it")
+            ValueWeb(themeId, "Value Web $it")
         })
     }
 

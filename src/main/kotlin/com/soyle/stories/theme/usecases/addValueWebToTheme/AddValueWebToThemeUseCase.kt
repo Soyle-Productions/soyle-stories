@@ -32,7 +32,7 @@ class AddValueWebToThemeUseCase(
     }
 
     private suspend fun createValueWeb(name: String, theme: Theme): ValueWeb {
-        val valueWeb = ValueWeb(name)
+        val valueWeb = ValueWeb(theme.id, name)
         themeRepository.updateTheme(theme.withValueWeb(valueWeb))
         return valueWeb
     }

@@ -5,10 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.common.Entity
 import com.soyle.stories.entities.theme.*
-import com.soyle.stories.theme.CharacterAlreadyIncludedInTheme
-import com.soyle.stories.theme.CharacterNotInTheme
-import com.soyle.stories.theme.StoryFunctionAlreadyApplied
-import com.soyle.stories.theme.ThemeException
+import com.soyle.stories.theme.*
 import com.soyle.stories.translators.asMinorCharacter
 import com.soyle.stories.translators.asThematicSection
 import java.util.*

@@ -47,7 +47,7 @@ class ListValueWebsInThemeUnitTest {
     private fun givenThemeExists(valueWebs: List<String> = emptyList())
     {
         themeRepository.themes[themeId] = makeTheme(themeId, valueWebs = valueWebs.map {
-            val web = ValueWeb(it)
+            val web = ValueWeb(themeId, it)
             uuidToIdentifier[web.id.uuid] = it
             web
         })

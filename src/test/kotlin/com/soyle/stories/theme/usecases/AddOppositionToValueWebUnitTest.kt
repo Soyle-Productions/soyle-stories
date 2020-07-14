@@ -60,7 +60,7 @@ class AddOppositionToValueWebUnitTest {
     private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = { updatedTheme = it })
 
     private fun givenValueWebExists(valueWebName: String, existingOppositionCount: Int = 0): Theme {
-        val theme = makeTheme(valueWebs = listOf(makeValueWeb(valueWebId, valueWebName, List(existingOppositionCount) { OppositionValue("") })))
+        val theme = makeTheme(valueWebs = listOf(makeValueWeb(valueWebId, name = valueWebName, oppositions = List(existingOppositionCount) { OppositionValue("") })))
         themeRepository.themes[theme.id] = theme
         return theme
     }

@@ -57,3 +57,11 @@ class ValueWebDoesNotContainOppositionValue(val valueWebId: UUID, val opposition
 class ValueWebAlreadyHasName(val valueWebId: UUID, val valueWebName: String) : DuplicateOperationException()
 
 class SymbolicRepresentationNotInOppositionValue(val oppositionValueId: UUID, val symbolicRepresentationId: UUID) : EntityNotFoundException(symbolicRepresentationId)
+
+class CharacterAlreadyRepresentationValueInValueWeb(
+    val themeId: UUID,
+    val valueWebId: UUID,
+    val oppositionValueId: UUID,
+    val attemptedOppositionValueId: UUID,
+    val characterId: UUID
+) : DuplicateOperationException()

@@ -12,6 +12,7 @@ import com.soyle.stories.theme.CharacterAlreadyIncludedInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.setupContext
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparisonUseCase
 import com.soyle.stories.translators.asMinorCharacter
@@ -33,7 +34,7 @@ class IncludeCharacterInComparisonTest {
         themes: List<Theme>,
         updateTheme: (Theme) -> Unit = {},
         addNewArcSections: (List<CharacterArcSection>) -> Unit = {}
-    ): (UUID, UUID) -> Either<*, IncludeCharacterInComparison.ResponseModel> {
+    ): (UUID, UUID) -> Either<*, CharacterIncludedInTheme> {
         val context = setupContext(
             initialCharacters = characters,
             initialThemes = themes,
@@ -46,12 +47,12 @@ class IncludeCharacterInComparisonTest {
             context.characterArcSectionRepository
         )
         val output = object : IncludeCharacterInComparison.OutputPort {
-            var result: Either<Exception, IncludeCharacterInComparison.ResponseModel>? = null
+            var result: Either<Exception, CharacterIncludedInTheme>? = null
             override fun receiveIncludeCharacterInComparisonFailure(failure: Exception) {
                 result = failure.left()
             }
 
-            override fun receiveIncludeCharacterInComparisonResponse(response: IncludeCharacterInComparison.ResponseModel) {
+            override fun receiveIncludeCharacterInComparisonResponse(response: CharacterIncludedInTheme) {
                 result = response.right()
             }
         }
