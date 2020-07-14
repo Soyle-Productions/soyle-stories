@@ -201,8 +201,17 @@ internal class PopulatedDisplay : View() {
             vgap = 8.0
             padding = Insets(8.0)
             rowValignment = VPos.TOP
-            bindChildren(model.characters) {
-                characterCard(it)
+            repeat(model.characters.size) { i ->
+                characterCard(this, model.characters.select { it.getOrNull(i).toProperty() })
+            }
+            model.characters.addListener { _, oldValue, newValue ->
+                val oldSize = oldValue?.size ?: 0
+                val newSize = newValue?.size ?: 0
+                if (newSize > oldSize) {
+                    repeat(newSize - oldSize) { i ->
+                        characterCard(this, model.characters.select { it.getOrNull(i + oldSize).toProperty() })
+                    }
+                }
             }
         }
         this += find<ActionBar> {
