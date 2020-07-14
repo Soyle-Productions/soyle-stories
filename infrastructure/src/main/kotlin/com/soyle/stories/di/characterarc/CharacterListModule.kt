@@ -14,45 +14,47 @@ import com.soyle.stories.project.ProjectScope
 
 internal object CharacterListModule {
 
-	init {
+    init {
 
-		scoped<ProjectScope> {
+        scoped<ProjectScope> {
 
-			provide {
-				LiveCharacterList(
-				  applicationScope.get(),
-				  get(),
-				  get<BuildNewCharacterNotifier>(),
-				  get<RemoveCharacterFromLocalStoryNotifier>(),
-				  get<RenameCharacterNotifier>()
-				)
-			}
+            provide {
+                LiveCharacterList(
+                    projectId.toString(),
+                    applicationScope.get(),
+                    get(),
+                    get<BuildNewCharacterNotifier>(),
+                    get<RemoveCharacterFromLocalStoryNotifier>(),
+                    get<RenameCharacterNotifier>()
+                )
+            }
 
-			provide<CharacterListViewListener> {
-				val characterListPresenter = CharacterListPresenter(
-				  applicationScope.get(),
-				  get<CharacterListModel>(),
-				  get(),
-				  get()
-				)
+            provide<CharacterListViewListener> {
+                val characterListPresenter = CharacterListPresenter(
+                    applicationScope.get(),
+                    get<CharacterListModel>(),
+                    get(),
+                    get()
+                )
 
-				CharacterListController(
-				  applicationScope.get(),
-				  get(),
-				  characterListPresenter,
-				  get(),
-				  get(),
-				  get(),
-				  get(),
-				  get(),
-				  get(),
-				  get(),
-				  get(),
-				  get()
-				)
-			}
+                CharacterListController(
+                    projectId.toString(),
+                    applicationScope.get(),
+                    get(),
+                    characterListPresenter,
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get()
+                )
+            }
 
-		}
+        }
 
-	}
+    }
 }

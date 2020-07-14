@@ -4,6 +4,7 @@ import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.character.characterList.LiveCharacterList
 import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcItem
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcsByCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
@@ -49,6 +50,7 @@ class CharacterListPresenter(
 					CharacterTreeItemViewModel(
 					  characterId,
 					  it.characterName,
+						"",
 					  existingCharacter?.isExpanded ?: false,
 					  existingCharacter?.arcs ?: emptyList()
 					)
@@ -58,7 +60,7 @@ class CharacterListPresenter(
 		}
 	}
 
-	override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
+	override suspend fun receiveCharacterArcList(response: CharacterArcsByCharacter) {
 		threadTransformer.gui {
 			view.displayNewViewModel(
 			  CharacterListViewModel(
@@ -67,6 +69,7 @@ class CharacterListPresenter(
 					CharacterTreeItemViewModel(
 					  characterId,
 					  it.characterName,
+						"",
 					  false,
 					  arcs.map {
 						  CharacterArcItemViewModel(

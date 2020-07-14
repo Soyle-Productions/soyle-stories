@@ -92,6 +92,9 @@ class EditableText : Fragment() {
         }
     }
 
+    fun focusedProperty() = root.focusedProperty()
+    val isFocused get() = root.isFocused
+
     var id by root.idProperty()
 
     private val popup = root.popOutEditBox(textProperty) {
@@ -120,8 +123,11 @@ class EditableText : Fragment() {
             }
         }
         errorMessageProperty.onChange {
-            if (isShowing) displayError(popup.textInput)
-            else displayError(root)
+            if (it == null) clearError(popup.textInput, root)
+            else {
+                if (isShowing) displayError(popup.textInput)
+                else displayError(root)
+            }
         }
     }
 
@@ -139,6 +145,12 @@ class EditableText : Fragment() {
     fun hide() {
         if (!showingProperty.isBound) {
             isShowing = false
+        }
+    }
+
+    private fun clearError(vararg nodes: Node) {
+        nodes.forEach { decoratedNode ->
+            decoratedNode.decorators.toList().forEach { it.undecorate(decoratedNode) }
         }
     }
 

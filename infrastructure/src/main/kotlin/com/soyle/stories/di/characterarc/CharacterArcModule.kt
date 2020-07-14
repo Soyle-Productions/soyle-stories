@@ -76,7 +76,7 @@ object CharacterArcModule {
 
 	private fun InScope<ProjectScope>.useCases() {
 		provide<ListAllCharacterArcs> {
-			ListAllCharacterArcsUseCase(projectId, get(), get())
+			ListAllCharacterArcsUseCase(get(), get())
 		}
 		provide<BuildNewCharacter> {
 			BuildNewCharacterUseCase(Project.Id(projectId), get())

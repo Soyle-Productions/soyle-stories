@@ -4,12 +4,16 @@ import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcsByCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.character
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
+import java.util.*
 
 class LiveCharacterList(
+	projectId: String,
   threadTransformer: ThreadTransformer,
   listAllCharacterArcs: ListAllCharacterArcs,
   buildNewCharacterNotifier: Notifier<BuildNewCharacter.OutputPort>,
@@ -17,9 +21,11 @@ class LiveCharacterList(
   renameCharacterNotifier: Notifier<RenameCharacter.OutputPort>
 ): Notifier<CharacterListListener>() {
 
+	private val projectId = UUID.fromString(projectId)
+
 	private val loader = lazy {
 		threadTransformer.async {
-			listAllCharacterArcs.invoke(outputs)
+			listAllCharacterArcs.invoke(this@LiveCharacterList.projectId, outputs)
 		}
 	}
 	private var characters: List<CharacterItem>? = null
@@ -30,8 +36,8 @@ class LiveCharacterList(
 	  RemoveCharacterFromStory.OutputPort,
 	  RenameCharacter.OutputPort
 	{
-		override fun receiveCharacterArcList(response: ListAllCharacterArcs.ResponseModel) {
-			val characters = response.characters.keys.toList()
+		override suspend fun receiveCharacterArcList(response: CharacterArcsByCharacter) {
+			val characters = response.characters.map { it.character }
 			this@LiveCharacterList.characters = characters
 			notifyAll { it.receiveCharacterListUpdate(characters) }
 		}
@@ -49,7 +55,7 @@ class LiveCharacterList(
 		}
 
 		override fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {
-			val characters = characters!!.filterNot { it.characterId == response.characterId } + CharacterItem(response.characterId, response.newName)
+			val characters = characters!!.filterNot { it.characterId == response.characterId } + CharacterItem(response.characterId, response.newName, null)
 			this@LiveCharacterList.characters = characters
 			notifyAll { it.receiveCharacterListUpdate(characters) }
 		}

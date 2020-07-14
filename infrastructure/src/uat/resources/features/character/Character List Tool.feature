@@ -93,3 +93,8 @@ Feature: Character List Tool
     Then the Character rename input box should be visible
     And the Character rename input box should show an error message
 
+  Scenario: Display a default image
+    Given a character called "John" has been created
+    And the character "John" does not have an image associated with them
+    When the character list tool is opened
+    Then the character "John" should display a default image in the character list tool

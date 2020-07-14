@@ -10,19 +10,19 @@ import tornadofx.addClass
 import tornadofx.hbox
 import tornadofx.vbox
 
-inline fun EventTarget.card(crossinline op: VBox.() -> Unit) = vbox {
+fun EventTarget.card(op: VBox.() -> Unit) = vbox {
     addClass(ComponentsStyles.card)
     op()
 }
 
-inline fun EventTarget.cardHeader(
-    crossinline op: HBox.() -> Unit
+fun EventTarget.cardHeader(
+    op: HBox.() -> Unit
 ) = hbox(spacing = 16, alignment = Pos.CENTER_LEFT) {
     addClass(ComponentsStyles.cardHeader)
     op()
 }
-inline fun EventTarget.cardBody(
-    crossinline op: VBox.() -> Unit
+fun EventTarget.cardBody(
+    op: VBox.() -> Unit
 ) = vbox {
     addClass(ComponentsStyles.cardBody)
     op()

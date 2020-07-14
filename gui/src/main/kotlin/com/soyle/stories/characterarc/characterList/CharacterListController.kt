@@ -10,6 +10,7 @@ import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacte
 import java.util.*
 
 class CharacterListController(
+    projectId: String,
     private val threadTransformer: ThreadTransformer,
     private val listAllCharacterArcs: ListAllCharacterArcs,
     private val listAllCharacterArcsOutputPort: ListAllCharacterArcs.OutputPort,
@@ -24,9 +25,11 @@ class CharacterListController(
     private val renameCharacterArcOutputPort: RenameCharacterArc.OutputPort
 ) : CharacterListViewListener {
 
+    private val projectId = UUID.fromString(projectId)
+
     override fun getList() {
         threadTransformer.async {
-            listAllCharacterArcs.invoke(listAllCharacterArcsOutputPort)
+            listAllCharacterArcs.invoke(projectId, listAllCharacterArcsOutputPort)
         }
     }
 

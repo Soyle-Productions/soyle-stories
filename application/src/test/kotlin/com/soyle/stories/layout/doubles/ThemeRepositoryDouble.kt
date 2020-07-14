@@ -6,6 +6,7 @@ import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.repositories.ThemeRepository
+import java.util.*
 
 class ThemeRepositoryDouble(
   initialThemes: List<Theme> = listOf(),
@@ -19,6 +20,7 @@ class ThemeRepositoryDouble(
 	override suspend fun getThemeById(id: Theme.Id): Theme? {
 		return themes[id]
 	}
+
 	override suspend fun updateTheme(theme: Theme) {
 		themes[theme.id] = theme
 		onUpdateTheme(theme)
@@ -46,6 +48,14 @@ class ThemeRepositoryDouble(
 	}
 
 	override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {
+		TODO("Not yet implemented")
+	}
+
+	override suspend fun getThemeContainingOppositionsWithSymbolicEntityId(symbolicId: UUID): List<Theme> {
+		TODO("Not yet implemented")
+	}
+
+	override suspend fun updateThemes(themes: List<Theme>) {
 		TODO("Not yet implemented")
 	}
 }

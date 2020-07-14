@@ -28,7 +28,7 @@ class CharacterListModel : ItemViewModel<CharacterListViewModel>(), CharacterLis
             val itemValue = it.value
             if (itemValue !is CharacterTreeItemViewModel) null
             else {
-                CharacterTreeItemViewModel(itemValue.id, itemValue.name, it.isExpanded, itemValue.arcs)
+                CharacterTreeItemViewModel(itemValue.id, itemValue.name, itemValue.imageResource, it.isExpanded, itemValue.arcs)
             }
         }
     )
