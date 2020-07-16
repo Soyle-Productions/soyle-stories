@@ -11,7 +11,8 @@ class CharacterComparedWithValues(
     val characterId: UUID,
     val characterName: String,
     val characterArchetype: String,
-    val characterValues: List<CharacterValue>
+    val characterValues: List<CharacterValue>,
+    val isMajorCharacter: Boolean
 )
 
 class CharacterValue(

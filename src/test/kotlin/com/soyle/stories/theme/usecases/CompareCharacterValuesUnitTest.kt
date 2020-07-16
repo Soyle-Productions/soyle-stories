@@ -11,8 +11,7 @@ import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterV
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValuesUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import java.util.*
 
 class CompareCharacterValuesUnitTest {
@@ -75,6 +74,19 @@ class CompareCharacterValuesUnitTest {
             result shouldBe characterValueComparison {
                 it.characters.forEach {
                     assertEquals(idToCharacter[it.characterId]!!.archetype, it.characterArchetype)
+                }
+            }
+        }
+
+        @Test
+        fun `check characters are labelled as major or minor characters`() {
+            result shouldBe characterValueComparison {
+                it.characters.forEach {
+                    val characterInTheme = idToCharacter[it.characterId]!!
+                    when (characterInTheme){
+                        is MajorCharacter -> assertTrue(it.isMajorCharacter)
+                        else -> assertFalse(it.isMajorCharacter)
+                    }
                 }
             }
         }

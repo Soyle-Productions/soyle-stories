@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.usecases.compareCharacterValues
 
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.MajorCharacter
 import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.ThemeDoesNotExist
@@ -41,7 +42,8 @@ class CompareCharacterValuesUseCase(
                 oppositions
                     .filter { (op, _) -> op.hasEntityAsRepresentation(it.id.uuid) }
                     .map { (op, web) -> CharacterValue(web.id.uuid, web.name, op.id.uuid, op.name) }
-                    .toList()
+                    .toList(),
+                it is MajorCharacter
             )
         }
     }
