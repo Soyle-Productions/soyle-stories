@@ -83,6 +83,23 @@ class Theme(
         )
     }
 
+    fun withoutCharacter(characterId: Character.Id): Theme {
+        if (! containsCharacter(characterId)) {
+            throw CharacterNotInTheme(id.uuid, characterId.uuid)
+        }
+        val minorCharacters = includedCharacters.values.filterIsInstance<MinorCharacter>()
+        val majorCharacters = includedCharacters.values.filterIsInstance<MajorCharacter>().map {
+            it.ignoreCharacter(characterId)
+        }
+        val characters = minorCharacters + majorCharacters
+        return copy(
+            includedCharacters = characters.filterNot { it.id == characterId }.associateBy { it.id },
+            similaritiesBetweenCharacters = similaritiesBetweenCharacters.filterNot {
+                it.key.contains(characterId)
+            }
+        )
+    }
+
     fun removeCharacter(characterId: Character.Id): Either<ThemeException, Theme> {
 		verifyCharacterInTheme(characterId)?.let { return it.left() }
         return copy(

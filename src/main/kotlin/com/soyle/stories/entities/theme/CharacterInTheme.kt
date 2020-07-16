@@ -72,6 +72,9 @@ class MajorCharacter(
     fun perceiveCharacter(characterId: Character.Id): MajorCharacter =
         copy(perspective = perspective.perceiveCharacter(characterId))
 
+    internal fun ignoreCharacter(characterId: Character.Id): MajorCharacter =
+        copy(perspective = perspective.ignoreCharacter(characterId))
+
     fun getStoryFunctionsForCharacter(characterId: Character.Id) =
         perspective.storyFunctions[characterId]
 

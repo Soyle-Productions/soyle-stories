@@ -18,6 +18,12 @@ class CharacterPerspective(
             attacks + (characterId to "")
         )
 
+    internal fun ignoreCharacter(characterId: Character.Id) =
+        CharacterPerspective(
+            storyFunctions - characterId,
+            attacks - characterId
+        )
+
     fun applyStoryFunction(characterId: Character.Id, function: StoryFunction) =
         CharacterPerspective(
             storyFunctions.minus(characterId).plus(characterId to storyFunctions.getValue(characterId) + function),

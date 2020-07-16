@@ -19,6 +19,13 @@ fun themeDoesNotExist(themeId: UUID): (Any?) -> Unit = { actual ->
     actual as ThemeDoesNotExist
     assertEquals(themeId, actual.themeId) { "Unexpected theme id for ThemeDoesNotExist error" }
 }
+
+fun characterNotInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
+    actual as CharacterNotInTheme
+    assertEquals(themeId, actual.themeId)
+    assertEquals(characterId, actual.characterId)
+}
+
 fun symbolNameCannotBeBlank(actual: Any?)
 {
     actual as SymbolNameCannotBeBlank
