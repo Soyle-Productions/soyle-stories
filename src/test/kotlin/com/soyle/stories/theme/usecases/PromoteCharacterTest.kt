@@ -7,6 +7,7 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.MajorCharacter
 import com.soyle.stories.entities.theme.MinorCharacter
@@ -173,7 +174,7 @@ class PromoteCharacterTest {
 
         val themes = themeReps.map { rep ->
             val charactersToInclude = rep.includedCharacters.map {
-                (Character(
+                (makeCharacter(
                     Character.Id(
                         it.first
                     ), Project.Id(), "Bob"
@@ -182,10 +183,10 @@ class PromoteCharacterTest {
             val theme = makeTheme(Theme.Id(rep.uuid))
             if (charactersToInclude.isNotEmpty()) {
                 charactersToInclude.fold(theme) { currentTheme, (character, promoted) ->
-                    (currentTheme.includeCharacter(character).let {
+                    currentTheme.withCharacterIncluded(character.id, character.name, character.media).let {
                         if (!promoted) it
-                        else it.flatMap { it.promoteCharacter(it.getMinorCharacterById(character.id) as MinorCharacter) }
-                    } as Either.Right).b
+                        else (it.promoteCharacter(it.getMinorCharacterById(character.id) as MinorCharacter) as Either.Right).b
+                    }
                 }
             } else theme
         }

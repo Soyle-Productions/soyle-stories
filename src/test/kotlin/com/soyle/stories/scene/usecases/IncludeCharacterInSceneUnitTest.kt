@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
@@ -87,13 +88,13 @@ class IncludeCharacterInSceneUnitTest {
 	private fun givenCharacterExists()
 	{
 		runBlocking {
-			characterRepository.addNewCharacter(Character(Character.Id(characterId), projectId, characterName))
+			characterRepository.addNewCharacter(makeCharacter(Character.Id(characterId), projectId, characterName))
 		}
 	}
 
 	private fun givenSceneIncludesCharacter()
 	{
-		sceneRepository.scenes[Scene.Id(sceneId)]!!.withCharacterIncluded(Character(Character.Id(characterId), Project.Id(), characterName)).let {
+		sceneRepository.scenes[Scene.Id(sceneId)]!!.withCharacterIncluded(makeCharacter(Character.Id(characterId), Project.Id(), characterName)).let {
 			sceneRepository.scenes[it.id] = it
 		}
 	}

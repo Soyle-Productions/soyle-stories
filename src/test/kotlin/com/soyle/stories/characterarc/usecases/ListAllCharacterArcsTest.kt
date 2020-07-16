@@ -1,6 +1,7 @@
 package com.soyle.stories.characterarc.usecases
 
 import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.*
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.*
@@ -46,7 +47,7 @@ class ListAllCharacterArcsTest {
 	{
 		repeat(count) { _ ->
 			val id = Character.Id()
-			characterArcRepository.characters[id] = Character(id, projectId, "", Media.Id())
+			characterArcRepository.characters[id] = makeCharacter(id, projectId, "", Media.Id())
 			repeat(arcsPerCharacter) { _ ->
 				val themeId = Theme.Id()
 				characterArcRepository.characterArcs.getOrPut(id) { mutableMapOf() }[themeId] = CharacterArc(id, CharacterArcTemplate(listOf()), themeId, "")

@@ -3,6 +3,7 @@ package com.soyle.stories.theme
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.right
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
@@ -24,11 +25,12 @@ import java.util.*
 class CharacterPerspectiveTest {
 
 	val otherCharacters = List(5) { Character.Id(UUID.randomUUID()) }
-		.map { Character(it, Project.Id(), it.uuid.toString()) }
+		.map { makeCharacter(it, Project.Id(), it.uuid.toString()) }
 
 	tailrec fun Theme.includeCharacters(characters: List<Character>): Either<ThemeException, Theme> {
 		if (characters.isEmpty()) return this.right()
-		val result = includeCharacter(characters.first())
+        val character = characters.first()
+        val result = withCharacterIncluded(character.id, character.name, character.media).right()
 		if (result !is Either.Right) return result
 		return result.b.includeCharacters(characters.drop(1))
 	}
@@ -86,7 +88,7 @@ class CharacterPerspectiveTest {
 		  as Either.Right
 
 		listOf(
-			theme.getMajorCharacterById(newCharacter.id) as MajorCharacter to Character(
+			theme.getMajorCharacterById(newCharacter.id) as MajorCharacter to makeCharacter(
                 Character.Id(UUID.randomUUID()),
                  Project.Id(),
                 "Name"
@@ -170,7 +172,7 @@ class CharacterPerspectiveTest {
 		  as Either.Right
 
 		listOf(
-			theme.getMajorCharacterById(newCharacter.id) as MajorCharacter to Character(
+			theme.getMajorCharacterById(newCharacter.id) as MajorCharacter to makeCharacter(
                 Character.Id(UUID.randomUUID()),
 			  Project.Id(),
                 "Name"

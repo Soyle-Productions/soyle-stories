@@ -7,6 +7,7 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.MinorCharacter
 import com.soyle.stories.entities.theme.ThematicTemplate
@@ -152,18 +153,21 @@ class DemoteCharacterTest {
 
         private val initialThemes = themeIds.map { uuid ->
             val charactersToInclude = includedCharacters[uuid]?.map {
-                Character(
+                makeCharacter(
                     Character.Id(it.first),
-                  Project.Id(),
+                    Project.Id(),
                     "Bob"
                 ) to it.second
             }
             val theme = makeTheme(Theme.Id(uuid))
             if (charactersToInclude.isNullOrEmpty()) return@map theme
             charactersToInclude.fold(theme) { currentTheme, (character, promote) ->
-                ((if (!promote) currentTheme.includeCharacter(character)
-                else currentTheme.includeCharacter(character)
-                    .flatMap { it.promoteCharacter(it.getMinorCharacterById(character.id) as MinorCharacter) }) as Either.Right).b
+                val themeWithCharacter =
+                    currentTheme.withCharacterIncluded(character.id, character.name, character.media)
+                if (promote) (themeWithCharacter
+                    .promoteCharacter(themeWithCharacter.getMinorCharacterById(character.id) as MinorCharacter) as Either.Right).b
+                else themeWithCharacter
+
             }
         }
 
@@ -185,7 +189,15 @@ class DemoteCharacterTest {
 
             val context = setupContext(
                 initialThemes = initialThemes,
-                initialCharacterArcSections = initialThemes.flatMap { it.characters.flatMap { it.thematicSections.map { it.asCharacterArcSection(null) } } },
+                initialCharacterArcSections = initialThemes.flatMap {
+                    it.characters.flatMap {
+                        it.thematicSections.map {
+                            it.asCharacterArcSection(
+                                null
+                            )
+                        }
+                    }
+                },
                 removeCharacterArc = { themeId: Theme.Id, characterId: Character.Id ->
                     removedCharacterArc = themeId.uuid to characterId.uuid
                 },

@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.usecases
 
 import arrow.core.toT
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -232,7 +233,7 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
 
     private fun idOf(scene: String): Scene.Id = sceneIdMap.getOrPut(scene) { Scene.Id() }
     private fun characterFor(character: String): Character = characterIdMap.getOrPut(character) { Character.Id() }
-        .let { characterMap.getOrPut(it) { Character(it, projectId, "") } }
+        .let { characterMap.getOrPut(it) { makeCharacter(it, projectId, "") } }
 
     private fun potentialChangesForMoving(scene: String, to: Int = 0)
     {

@@ -2,6 +2,7 @@ package com.soyle.stories.characterarc.usecases
 
 import arrow.core.identity
 import com.soyle.stories.character.CharacterDoesNotExist
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.CharacterArcDoesNotExist
 import com.soyle.stories.characterarc.CharacterArcNameCannotBeBlank
 import com.soyle.stories.characterarc.TestContext
@@ -104,7 +105,7 @@ class RenameCharacterArcUnitTest {
 	private fun givenNoThemes() = given(characterWithId = characterId)
 
 	private fun given(characterWithId: UUID? = null, andThemeWithId: UUID? = null, andThemeHasCharacter: Boolean = false, andCharacterIsMajorCharacter: Boolean = false) {
-		val character = characterWithId?.let { Character(Character.Id(characterWithId), Project.Id(), "Bob") }
+		val character = characterWithId?.let { makeCharacter(Character.Id(characterWithId), Project.Id(), "Bob") }
 		context = TestContext(
 		  initialCharacters = listOfNotNull(
 			character
@@ -112,7 +113,9 @@ class RenameCharacterArcUnitTest {
 		  initialThemes = listOfNotNull(
 			andThemeWithId?.let {
 				val theme = takeNoteOfTheme(andThemeWithId)
-				if (andThemeHasCharacter) theme.includeCharacter(character!!, emptyList()).fold({ throw it }, ::identity)
+				if (andThemeHasCharacter) {
+					theme.withCharacterIncluded(character!!.id, character.name, character.media)
+				}
 				else theme
 			}
 		  ),

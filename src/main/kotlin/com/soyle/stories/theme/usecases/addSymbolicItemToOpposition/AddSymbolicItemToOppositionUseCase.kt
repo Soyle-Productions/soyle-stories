@@ -39,7 +39,7 @@ class AddSymbolicItemToOppositionUseCase(
 
         val characterIncludedInTheme: CharacterIncludedInTheme?
         val themeWithCharacter = if (!theme.containsCharacter(character.id)) {
-            (theme.includeCharacter(character, listOf()) as Either.Right).b.also {
+            theme.withCharacterIncluded(character.id, character.name, character.media).also {
                 characterIncludedInTheme = CharacterIncludedInTheme(
                     theme.id.uuid,
                     characterId,

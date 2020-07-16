@@ -11,6 +11,7 @@ import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.translators.asCharacterArcSection
 import com.soyle.stories.translators.asCharacterArcTemplateSection
 import java.util.*
 
@@ -39,23 +40,22 @@ class IncludeCharacterInComparisonUseCase(
     ): CharacterIncludedInTheme {
         val character = getCharacterById(characterId)
         val theme = getThemeById(themeId)
-        val initialSections = createCharacterArcSectionsForCharacterInTheme(character, theme)
 
-        return theme.includeCharacter(character, initialSections).fold(
-            { throw it },
-            {
-                characterArcSectionRepository.addNewCharacterArcSections(initialSections)
-                themeRepository.updateTheme(it)
-                CharacterIncludedInTheme(
-                    themeId,
-                    characterId,
-                    it.characters.map {
-                        CharacterItem(
-                            it.id.uuid,
-                            it.name,
-                            null
-                        )
-                    }
+        val themeWithCharacter = theme.withCharacterIncluded(character.id, character.name, character.media)
+        val includedCharacter = themeWithCharacter.getMinorCharacterById(character.id)!!
+
+        characterArcSectionRepository.addNewCharacterArcSections(includedCharacter.thematicSections.map {
+            it.asCharacterArcSection()
+        })
+        themeRepository.updateTheme(themeWithCharacter)
+        return CharacterIncludedInTheme(
+            themeId,
+            characterId,
+            themeWithCharacter.characters.map {
+                CharacterItem(
+                    it.id.uuid,
+                    it.name,
+                    null
                 )
             }
         )
@@ -69,16 +69,4 @@ class IncludeCharacterInComparisonUseCase(
         themeRepository.getThemeById(Theme.Id(themeId))
             ?: throw ThemeDoesNotExist(themeId)
 
-    private fun createCharacterArcSectionsForCharacterInTheme(
-        character: Character,
-        theme: Theme
-    ): List<CharacterArcSection> =
-        theme.thematicTemplate.sections.map {
-            CharacterArcSection(
-                CharacterArcSection.Id(UUID.randomUUID()),
-                character.id, theme.id, it.asCharacterArcTemplateSection(),
-              null,
-                ""
-            )
-        }
 }

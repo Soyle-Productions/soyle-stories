@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases
 
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.*
 import com.soyle.stories.scene.characterMotivations
@@ -35,7 +36,7 @@ class GetSceneDetailsUnitTest {
 		  projectId,
 		  "Scene Name: " + UUID.randomUUID().toString(),
 		  StoryEvent.Id()
-		).withCharacterIncluded(Character(it.characterId, projectId, it.characterName))
+		).withCharacterIncluded(makeCharacter(it.characterId, projectId, it.characterName))
 		  .withMotivationForCharacter(it.characterId, UUID.randomUUID().toString())
 	}
 

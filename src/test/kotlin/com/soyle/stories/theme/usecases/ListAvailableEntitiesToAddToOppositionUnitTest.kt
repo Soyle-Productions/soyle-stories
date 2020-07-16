@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.usecases
 
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.component1
 import com.soyle.stories.common.component2
 import com.soyle.stories.common.shouldBe
@@ -77,7 +78,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
         private fun givenANumberOfCharactersExist(number: Int, projectId: Project.Id? = null) {
             repeat(number) {
                 val id = Character.Id()
-                characterRepository.characters[id] = Character(id, projectId ?: Project.Id(), "Character ${UUID.randomUUID()}")
+                characterRepository.characters[id] = makeCharacter(id, projectId ?: Project.Id(), "Character ${UUID.randomUUID()}")
             }
         }
     }

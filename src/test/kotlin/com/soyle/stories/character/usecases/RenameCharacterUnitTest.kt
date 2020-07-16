@@ -1,10 +1,7 @@
 package com.soyle.stories.character.usecases
 
 import arrow.core.identity
-import com.soyle.stories.character.CharacterDoesNotExist
-import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.CharacterNameCannotBeBlank
-import com.soyle.stories.character.TestContext
+import com.soyle.stories.character.*
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
 import com.soyle.stories.common.mustEqual
@@ -98,7 +95,7 @@ class RenameCharacterUnitTest {
 	}
 
 	fun givenCharacterWithId(characterId: UUID? = null, andName: String? = null, andThemeId: UUID? = null, andThemeHasCharacter: Boolean = false) {
-		val character = characterId?.let { Character(Character.Id(it), Project.Id(), andName ?: "Original Name") }
+		val character = characterId?.let { makeCharacter(Character.Id(it), Project.Id(), andName ?: "Original Name") }
 		context = TestContext(
 		  initialCharacters = listOfNotNull(
 			character
@@ -106,7 +103,9 @@ class RenameCharacterUnitTest {
 		  initialThemes = listOfNotNull(
 			andThemeId?.let { expectedId ->
 				val theme = makeTheme(id = Theme.Id(expectedId))
-				if (andThemeHasCharacter) theme.includeCharacter(character!!, emptyList()).fold({ throw it}, ::identity)
+				if (andThemeHasCharacter) {
+					theme.withCharacterIncluded(character!!.id, character.name, character.media)
+				}
 				else theme
 			}
 		  ),

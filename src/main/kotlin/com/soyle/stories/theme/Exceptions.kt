@@ -65,3 +65,8 @@ class CharacterAlreadyRepresentationValueInValueWeb(
     val attemptedOppositionValueId: UUID,
     val characterId: UUID
 ) : DuplicateOperationException()
+
+class CharacterAlreadyPromotedInTheme(
+    val themeId: UUID,
+    val characterId: UUID
+) : DuplicateOperationException()

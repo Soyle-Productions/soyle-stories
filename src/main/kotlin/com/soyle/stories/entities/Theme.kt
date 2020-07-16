@@ -61,32 +61,26 @@ class Theme(
         ).right()
     }
 
-    fun includeCharacter(
-        character: Character,
-        initialSections: List<CharacterArcSection>
-    ): Either<ThemeException, Theme> {
-        if (includedCharacters.containsKey(character.id)) return CharacterAlreadyIncludedInTheme(
-            character.id.uuid,
-            id.uuid
-        ).left()
-
-        val characterArcSections = initialSections.map {
-            it.asThematicSection()
+    fun withCharacterIncluded(characterId: Character.Id, characterName: String, characterMediaId: Media.Id?): Theme
+    {
+        if (containsCharacter(characterId)) {
+            throw CharacterAlreadyIncludedInTheme(characterId.uuid, id.uuid)
         }
-        val newCharacter = character.asMinorCharacter(characterArcSections)
+        val newCharacter = MinorCharacter(characterId, characterName, "", "", thematicTemplate.sections.map {
+            ThematicSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, id, it)
+        })
         val minorCharacters = includedCharacters.values.filterIsInstance<MinorCharacter>()
         val majorCharacters = includedCharacters.values.filterIsInstance<MajorCharacter>().map {
-            it.perceiveCharacter(character.id)
+            it.perceiveCharacter(characterId)
         }
-
         val characters = minorCharacters + majorCharacters
 
         return copy(
             includedCharacters = (characters + newCharacter).associateBy { it.id },
             similaritiesBetweenCharacters = similaritiesBetweenCharacters + characters.map {
-                setOf(it.id, character.id) to ""
+                setOf(it.id, characterId) to ""
             }
-        ).right()
+        )
     }
 
     fun removeCharacter(characterId: Character.Id): Either<ThemeException, Theme> {
@@ -165,6 +159,27 @@ class Theme(
                 .minus(character.id)
                 .plus(character.id to character.changeVariationOnMoral(variation))
         ).right()
+    }
+
+    fun withCharacterPromoted(characterId: Character.Id): Theme
+    {
+        if (! containsCharacter(characterId)) {
+            throw CharacterNotInTheme(id.uuid, characterId.uuid)
+        }
+        if (characterIsMajorCharacter(characterId)) {
+            throw CharacterAlreadyPromotedInTheme(id.uuid, characterId.uuid)
+        }
+        val minorCharacter = getMinorCharacterById(characterId)!!
+        val thematicSectionTemplateIds = thematicTemplate.sections.map { it.characterArcTemplateSectionId }.toSet()
+        return copy(
+            includedCharacters = includedCharacters
+                .minus(characterId)
+                .plus(characterId to minorCharacter.promote(CharacterArcTemplate.default().sections.filterNot {
+                    it.id in thematicSectionTemplateIds
+                }.map {
+                    CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, id, it, null, "")
+                }))
+        )
     }
 
     fun promoteCharacter(
@@ -265,6 +280,8 @@ class Theme(
         )
         else null
     }
+
+    fun characterIsMajorCharacter(characterId: Character.Id) = includedCharacters[characterId] is MajorCharacter
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

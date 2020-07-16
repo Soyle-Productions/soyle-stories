@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
@@ -78,7 +79,10 @@ class CompareCharactersTest {
 	fun `character must be major character`() {
 		val focusCharacterId = UUID.randomUUID()
 		val (theme) = Theme.takeNoteOf(Project.Id(), "")
-			.flatMap { it.includeCharacter(Character(Character.Id(focusCharacterId), Project.Id(), "Bob")) } as Either.Right
+			.flatMap {
+                val character = makeCharacter(Character.Id(focusCharacterId), Project.Id(), "Bob")
+                it.withCharacterIncluded(character.id, character.name, character.media).right()
+            } as Either.Right
 		val themes = listOf(theme)
 		val themeId = theme.id.uuid
 		val result = given(themes).testWith(themeId, focusCharacterId)
@@ -90,14 +94,14 @@ class CompareCharactersTest {
 	inner class GivenSuccessfulExecution {
 
 		val majorCharacters = List(3) { Character.Id(UUID.randomUUID()) }.map {
-            Character(
+			makeCharacter(
                 it,
 			  Project.Id(),
                 it.uuid.toString()
             )
         }
 		val minorCharacters = List(3) { Character.Id(UUID.randomUUID()) }.map {
-            Character(
+			makeCharacter(
                 it,
 			  Project.Id(),
                 it.uuid.toString()
@@ -118,12 +122,30 @@ class CompareCharactersTest {
 
 		init {
 			val (themeTemp) = Theme.takeNoteOf(Project.Id(), "", centralMoralQuestion)
-				.flatMap { it.includeCharacter(majorCharacters[0]) }
-				.flatMap { it.includeCharacter(majorCharacters[1]) }
-				.flatMap { it.includeCharacter(majorCharacters[2]) }
-				.flatMap { it.includeCharacter(minorCharacters[0]) }
-				.flatMap { it.includeCharacter(minorCharacters[1]) }
-				.flatMap { it.includeCharacter(minorCharacters[2]) }
+				.flatMap {
+                    val character = majorCharacters[0]
+                    it.withCharacterIncluded(character.id, character.name, character.media).right()
+                }
+				.flatMap {
+                    val character = majorCharacters[1]
+                    it.withCharacterIncluded(character.id, character.name, character.media).right()
+                }
+				.flatMap {
+                    val character = majorCharacters[2]
+                    it.withCharacterIncluded(character.id, character.name, character.media).right()
+                }
+				.flatMap {
+                    val character = minorCharacters[0]
+                    it.withCharacterIncluded(character.id, character.name, character.media).right()
+                }
+				.flatMap {
+                    val character = minorCharacters[1]
+                    it.withCharacterIncluded(character.id, character.name, character.media).right()
+                }
+				.flatMap {
+                    val character = minorCharacters[2]
+                    it.withCharacterIncluded(character.id, character.name, character.media).right()
+                }
 				.flatMap { it.promoteCharacter(it.getMinorCharacterById(majorCharacters[0].id) as MinorCharacter) }
 				.flatMap { it.promoteCharacter(it.getMinorCharacterById(majorCharacters[1].id) as MinorCharacter) }
 				.flatMap { it.promoteCharacter(it.getMinorCharacterById(majorCharacters[2].id) as MinorCharacter) }

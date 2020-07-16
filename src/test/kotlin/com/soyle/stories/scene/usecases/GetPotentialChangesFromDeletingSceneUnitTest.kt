@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases
 
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -296,7 +297,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
 	private fun givenScenes(sceneIds: List<String>, vararg characterMotives: List<String>)
 	{
 		val characters = characterMotives.map {
-			Character(Character.Id(), projectId, "Bob")
+			makeCharacter(Character.Id(), projectId, "Bob")
 		}
 		val scenes = sceneIds.map {
 			Scene(projectId, it, StoryEvent.Id())

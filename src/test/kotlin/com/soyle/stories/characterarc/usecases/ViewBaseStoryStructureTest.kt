@@ -2,6 +2,8 @@ package com.soyle.stories.characterarc.usecases
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.right
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.TestContext
 import com.soyle.stories.characterarc.repositories.ThemeRepository
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
@@ -14,17 +16,12 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.*
 
-/**
- * Created by Brendan
- * Date: 2/9/2020
- * Time: 10:48 AM
- */
 class ViewBaseStoryStructureTest {
 
     val characterUUID = UUID.randomUUID()
     val themeUUID = UUID.randomUUID()
     val locationUUID = UUID.randomUUID()
-    val character = Character(
+    val character = makeCharacter(
       Character.Id(characterUUID), Project.Id(), "Character Name"
     )
 
@@ -99,7 +96,8 @@ class ViewBaseStoryStructureTest {
             val initialTheme = takeNoteOfTheme(uuid)
             if (includedCharacterIds.isNotEmpty()) {
                 includedCharacterIds.fold(initialTheme) { theme, (id, isPromoted) ->
-                    val included = theme.includeCharacter(Character(Character.Id(id), Project.Id(), "Bob"))
+                    val character1 = makeCharacter(Character.Id(id), Project.Id(), "Bob")
+                    val included = theme.withCharacterIncluded(character1.id, character1.name, character1.media).right()
                     ((if (isPromoted) {
                         included.flatMap {
                             it.promoteCharacter(it.getMinorCharacterById(Character.Id(id))!!)

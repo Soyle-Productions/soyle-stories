@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.usecases
 
 import arrow.core.identity
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
@@ -106,7 +107,10 @@ class ChangeCharacterPropertyValueUnitTest {
     private fun givenThemeWithId(themeId: UUID, andCharacter: UUID? = null) {
         val theme = makeTheme(Theme.Id(themeId)).let {
             if (andCharacter == null) it
-            else it.includeCharacter(Character(Character.Id(andCharacter), Project.Id(), "Bob")).fold({ throw it }, ::identity)
+            else {
+                val character = makeCharacter(Character.Id(andCharacter), Project.Id(), "Bob")
+                it.withCharacterIncluded(character.id, character.name, character.media)
+            }
         }
         context = setupContext(
             initialThemes = listOf(theme),

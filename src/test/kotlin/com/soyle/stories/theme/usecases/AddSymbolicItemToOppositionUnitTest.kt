@@ -2,6 +2,7 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
@@ -81,21 +82,32 @@ class AddSymbolicItemToOppositionUnitTest {
             val preExistingOppositionId = OppositionValue.Id()
             givenCharacter(characterId, characterName)
             givenThemes(
-                makeTheme(themeId, valueWebs = listOf(
-                    makeValueWeb(valueWebId, themeId, oppositions = listOf(
-                        makeOppositionValue(preExistingOppositionId, representations = listOf(SymbolicRepresentation(characterId.uuid, characterName))),
-                        makeOppositionValue(oppositionId)
-                    ))
-                ))
+                makeTheme(
+                    themeId, valueWebs = listOf(
+                        makeValueWeb(
+                            valueWebId, themeId, oppositions = listOf(
+                                makeOppositionValue(
+                                    preExistingOppositionId,
+                                    representations = listOf(SymbolicRepresentation(characterId.uuid, characterName))
+                                ),
+                                makeOppositionValue(oppositionId)
+                            )
+                        )
+                    )
+                )
             )
             addCharacterToOpposition()
             updatedTheme shouldBe ::themeWithCharacterAsSymbol
             result shouldBe ::characterAddedToOpposition
-            removedItem shouldBe removedSymbolicItem(themeId.uuid, valueWebId.uuid, preExistingOppositionId.uuid, characterId.uuid)
+            removedItem shouldBe removedSymbolicItem(
+                themeId.uuid,
+                valueWebId.uuid,
+                preExistingOppositionId.uuid,
+                characterId.uuid
+            )
         }
 
-        private fun addCharacterToOpposition()
-        {
+        private fun addCharacterToOpposition() {
             addSymbolicItemToOpposition { output ->
                 addCharacterAsSymbol(oppositionId.uuid, characterId.uuid, output)
             }
@@ -144,8 +156,7 @@ class AddSymbolicItemToOppositionUnitTest {
             result shouldBe ::locationAddedToOpposition
         }
 
-        private fun addLocationToOpposition()
-        {
+        private fun addLocationToOpposition() {
             addSymbolicItemToOpposition { output ->
                 addLocationAsSymbol(oppositionId.uuid, locationId.uuid, output)
             }
@@ -203,8 +214,7 @@ class AddSymbolicItemToOppositionUnitTest {
             result shouldBe ::symbolAddedToOpposition
         }
 
-        private fun addSymbolToOpposition()
-        {
+        private fun addSymbolToOpposition() {
             addSymbolicItemToOpposition { output ->
                 addSymbolAsSymbol(oppositionId.uuid, symbolId.uuid, output)
             }
@@ -230,29 +240,35 @@ class AddSymbolicItemToOppositionUnitTest {
             themeRepository.themes[it.id] = it
         }
     }
+
     private fun givenOppositionValue() {
-        themeRepository.themes[themeId] = makeTheme(themeId, valueWebs = listOf(
-            makeValueWeb(valueWebId, oppositions = listOf(
-                makeOppositionValue(oppositionId)
-            ))
-        ))
+        themeRepository.themes[themeId] = makeTheme(
+            themeId, valueWebs = listOf(
+                makeValueWeb(
+                    valueWebId, oppositions = listOf(
+                        makeOppositionValue(oppositionId)
+                    )
+                )
+            )
+        )
     }
-    private fun givenCharacter(characterId: Character.Id, name: String, inTheme: Boolean = false)
-    {
-        val character = Character(characterId, Project.Id(), name)
+
+    private fun givenCharacter(characterId: Character.Id, name: String, inTheme: Boolean = false) {
+        val character = makeCharacter(characterId, Project.Id(), name)
         characterRepository.characters[characterId] = character
         if (inTheme) {
-            themeRepository.themes[themeId]!!.includeCharacter(character).map {
-                themeRepository.themes[themeId] = it
-            }
+            themeRepository.themes[themeId]!!.withCharacterIncluded(character.id, character.name, character.media)
+                .let {
+                    themeRepository.themes[themeId] = it
+                }
         }
     }
-    private fun givenLocation(locationId: Location.Id, name: String)
-    {
+
+    private fun givenLocation(locationId: Location.Id, name: String) {
         locationRepository.locations[locationId] = Location(locationId, Project.Id(), name)
     }
-    private fun givenSymbol(symbolId: Symbol.Id, name: String, inSameTheme: Boolean = false)
-    {
+
+    private fun givenSymbol(symbolId: Symbol.Id, name: String, inSameTheme: Boolean = false) {
         val symbol = Symbol(symbolId, name)
         if (inSameTheme) {
             val theme = themeRepository.themes[themeId]!!
@@ -265,7 +281,8 @@ class AddSymbolicItemToOppositionUnitTest {
     }
 
     private fun addSymbolicItemToOpposition(block: suspend AddSymbolicItemToOpposition.(AddSymbolicItemToOpposition.OutputPort) -> Unit) {
-        val useCase: AddSymbolicItemToOpposition = AddSymbolicItemToOppositionUseCase(themeRepository, characterRepository, locationRepository)
+        val useCase: AddSymbolicItemToOpposition =
+            AddSymbolicItemToOppositionUseCase(themeRepository, characterRepository, locationRepository)
         val output = object : AddSymbolicItemToOpposition.OutputPort {
             override suspend fun addedSymbolicItemToOpposition(response: AddSymbolicItemToOpposition.ResponseModel) {
                 result = response.addedSymbolicItem
@@ -284,7 +301,7 @@ class AddSymbolicItemToOppositionUnitTest {
         result shouldBe oppositionValueDoesNotExist(oppositionId.uuid)
     }
 
-    private fun themeWithSymbolicRepresentation(entityUUID: UUID, entityName: String) = fun (actual: Any?): Unit {
+    private fun themeWithSymbolicRepresentation(entityUUID: UUID, entityName: String) = fun(actual: Any?): Unit {
         actual as Theme
         assertEquals(themeId, actual.id)
         val updatedValueWeb = actual.valueWebs.find { it.id == valueWebId }!!
@@ -295,7 +312,7 @@ class AddSymbolicItemToOppositionUnitTest {
         assertEquals(entityName, representation.name)
     }
 
-    private fun themeWithCharacterIncluded(characterId: Character.Id, characterName: String) = fun (actual: Any?) {
+    private fun themeWithCharacterIncluded(characterId: Character.Id, characterName: String) = fun(actual: Any?) {
         actual as Theme
         assertEquals(themeId, actual.id)
         assertEquals(

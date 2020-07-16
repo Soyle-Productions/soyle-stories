@@ -8,6 +8,7 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.theme.MinorCharacter
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
@@ -98,7 +99,7 @@ class ListCharactersAvailableToIncludeInThemeUnitTest {
 
     private fun givenCharacters(ids: List<Character.Id>) {
         ids.forEach {
-            characterRepository.characters[it] = Character(it, projectId, "Character ${UUID.randomUUID().toString().take(2)}", null)
+            characterRepository.characters[it] = makeCharacter(it, projectId, "Character ${UUID.randomUUID().toString().take(2)}")
         }
     }
 

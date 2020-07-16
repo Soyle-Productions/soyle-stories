@@ -10,8 +10,8 @@ import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
-import com.soyle.stories.theme.includeCharacter
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
@@ -85,6 +85,10 @@ class RemoveCharacterFromStoryTest {
             override suspend fun updateCharacterArcSection(characterArcSection: CharacterArcSection) {
                 TODO("Not yet implemented")
             }
+
+            override suspend fun getThemeById(id: Theme.Id): Theme? {
+                TODO("Not yet implemented")
+            }
         }
         val useCase: com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory =
             com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase(
@@ -129,24 +133,48 @@ class RemoveCharacterFromStoryTest {
     @Nested
     inner class OnSuccess {
 
-        fun buildCharacter() = Character(
+        fun buildCharacter() = makeCharacter(
             Character.Id(UUID.randomUUID()),
             Project.Id(),
             "Character Name"
         )
 
-        val character = Character(
+        val character = makeCharacter(
             Character.Id(characterUUID),
           Project.Id(),
             "Character Name"
         )
 
-        val themeWithOnlyCharacter = (Theme.takeNoteOf(Project.Id(), "").flatMap { it.includeCharacter(character) } as Either.Right).b
+        val themeWithOnlyCharacter = (Theme.takeNoteOf(Project.Id(), "").flatMap {
+            it.withCharacterIncluded(
+                character.id,
+                character.name,
+                character.media
+            ).right()
+        } as Either.Right).b
         val themesWithCharacter = listOf(
-            (Theme.takeNoteOf(Project.Id(), "").flatMap { it.includeCharacter(character) }
-                .flatMap { it.includeCharacter(buildCharacter()) } as Either.Right).b,
-            (Theme.takeNoteOf(Project.Id(), "").flatMap { it.includeCharacter(character) }
-                .flatMap { it.includeCharacter(buildCharacter()) } as Either.Right).b
+            (Theme.takeNoteOf(Project.Id(), "").flatMap {
+                it.withCharacterIncluded(
+                    character.id,
+                    character.name,
+                    character.media
+                ).right()
+            }
+                .flatMap {
+                    val character1 = buildCharacter()
+                    it.withCharacterIncluded(character1.id, character1.name, character1.media).right()
+                } as Either.Right).b,
+            (Theme.takeNoteOf(Project.Id(), "").flatMap {
+                it.withCharacterIncluded(
+                    character.id,
+                    character.name,
+                    character.media
+                ).right()
+            }
+                .flatMap {
+                    val character1 = buildCharacter()
+                    it.withCharacterIncluded(character1.id, character1.name, character1.media).right()
+                } as Either.Right).b
         )
         val allThemesWithCharacter = (themesWithCharacter + themeWithOnlyCharacter).onEach {
             assertTrue(it.containsCharacter(character.id))

@@ -2,16 +2,12 @@ package com.soyle.stories.theme
 
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.right
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.*
 import com.soyle.stories.translators.asCharacterArcTemplateSection
 import java.util.*
-
-/**
- * Created by Brendan
- * Date: 2/22/2020
- * Time: 4:39 PM
- */
 
 fun takeNoteOfTheme(): Theme = (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b
 
@@ -44,14 +40,14 @@ fun makeOppositionValue(
 fun takeNoteOfTheme(expectedId: UUID): Theme =
 	makeTheme(id = Theme.Id(expectedId))
 
-val newCharacter = Character(
+val newCharacter = makeCharacter(
     Character.Id(UUID.randomUUID()), Project.Id(), "Name"
 )
 val newArchetype = "Artist"
 val newVariationOnMoral = "When you look at it this way..."
 
 val themeWithCharacter = (Theme.takeNoteOf(Project.Id(), "")
-	.flatMap { it.includeCharacter(newCharacter) } as Either.Right).b
+	.flatMap { it.withCharacterIncluded(newCharacter.id, newCharacter.name, newCharacter.media).right() } as Either.Right).b
 
 val themeWithoutCharacter = (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b
 
@@ -60,14 +56,6 @@ fun promoteCharacter(): Either<ThemeException, Theme> {
 	return themeWithCharacter
 		.promoteCharacter(characterInTheme)
 }
-
-fun Theme.includeCharacter(character: Character) = includeCharacter(character, thematicTemplate.sections.map {
-	CharacterArcSection(
-		CharacterArcSection.Id(
-			UUID.randomUUID()
-		), character.id, id, it.asCharacterArcTemplateSection(), null, ""
-	)
-})
 
 fun ThematicSection.asCharacterArcSection(linkedLocation: Location.Id?) = CharacterArcSection(
 	characterArcSectionId,
