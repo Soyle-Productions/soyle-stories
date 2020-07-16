@@ -116,7 +116,9 @@ class TestContext(
         }
         override suspend fun getCharacterById(characterId: Character.Id): Character? = characters[characterId]
         override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> = characters.values.filter { it.projectId == projectId }
-
+        override suspend fun updateCharacter(character: Character) {
+            characters[character.id] = character
+        }
     }
     override val themeRepository: ThemeRepository = object : ThemeRepository {
         val themes = mutableMapOf<Theme.Id, Theme>()

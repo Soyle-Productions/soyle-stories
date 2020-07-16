@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.usecases.deleteTheme
 
+import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import java.util.*
 
 interface DeleteTheme {
@@ -8,6 +9,7 @@ interface DeleteTheme {
 
     interface OutputPort {
         fun themeDeleted(response: DeletedTheme)
+        suspend fun characterArcsDeleted(response: List<DeletedCharacterArc>)
     }
 
 }

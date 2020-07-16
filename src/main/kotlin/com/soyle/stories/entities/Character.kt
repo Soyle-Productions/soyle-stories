@@ -40,6 +40,9 @@ class Character(
 		return copy(characterArcs = characterArcs + newArc)
 	}
 
+	fun withoutCharacterArc(themeId: Theme.Id): Character =
+		copy(characterArcs = characterArcs.filterNot { it.themeId == themeId })
+
 	data class Id(val uuid: UUID = UUID.randomUUID())
 
 	companion object {
