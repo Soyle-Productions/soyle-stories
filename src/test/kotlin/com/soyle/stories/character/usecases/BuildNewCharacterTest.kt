@@ -4,16 +4,23 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterException
+import com.soyle.stories.character.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Theme
+import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.theme.makeTheme
+import com.soyle.stories.theme.themeDoesNotExist
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.*
 import java.util.*
 
 /**
@@ -23,6 +30,7 @@ import java.util.*
  */
 class BuildNewCharacterTest {
 
+	private val projectId = Project.Id()
 	val providedName = "Character Name"
 	val blankNames = listOf(
 		"",
@@ -32,9 +40,14 @@ class BuildNewCharacterTest {
 		"\r\n  \r"
 	)
 
+	private var createdCharacter: Character? = null
+
 	fun given(addNewCharacter: (Character) -> Unit = {}): (String) -> Either<*, CharacterItem> {
 		val repo = object : CharacterRepository {
-			override suspend fun addNewCharacter(character: Character) = addNewCharacter.invoke(character)
+			override suspend fun addNewCharacter(character: Character) {
+				createdCharacter = character
+				addNewCharacter.invoke(character)
+			}
 			override suspend fun getCharacterById(characterId: Character.Id): Character? = null
 			override suspend fun deleteCharacterWithId(characterId: Character.Id) = Unit
 			override suspend fun updateCharacter(character: Character) {
@@ -45,10 +58,7 @@ class BuildNewCharacterTest {
 				TODO("Not yet implemented")
 			}
 		}
-		val useCase =
-            BuildNewCharacterUseCase(
-                Project.Id(UUID.randomUUID()), repo
-            )
+		val useCase = BuildNewCharacterUseCase(repo, ThemeRepositoryDouble())
 		val output = object : BuildNewCharacter.OutputPort {
 			var result: Either<*, CharacterItem>? = null
 			override fun receiveBuildNewCharacterFailure(failure: CharacterException) {
@@ -58,10 +68,14 @@ class BuildNewCharacterTest {
 			override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
 				result = response.right()
 			}
+
+			override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+				error("Should not include character in theme when simply creating a new character")
+			}
 		}
 		return {
 			runBlocking {
-				useCase(it, output)
+				useCase(projectId.uuid, it, output)
 			}
 			output.result!!
 		}
@@ -72,6 +86,7 @@ class BuildNewCharacterTest {
 	@Test
 	fun `character should have provided name`() {
 		val character: CharacterItem = (useCase(providedName) as Either.Right).b
+		assertEquals(projectId, createdCharacter!!.projectId)
 		assertEquals(providedName, character.characterName)
 	}
 
@@ -85,24 +100,111 @@ class BuildNewCharacterTest {
 
 	@Test
 	fun `new character should be persisted`() {
-		var persistedCharacter: Character? = null
-		val useCase = given(addNewCharacter = {
-			persistedCharacter = it
-		})
+		val useCase = given()
 		useCase(providedName)
-		assertEquals(providedName, persistedCharacter!!.name)
-		assertNull(persistedCharacter!!.media)
+		assertEquals(providedName, createdCharacter!!.name)
+		assertNull(createdCharacter!!.media)
 	}
 
 	@Test
 	fun `output character should have id from created character`() {
-		var persistedCharacter: Character? = null
-		val useCase = given(addNewCharacter = {
-			persistedCharacter = it
-		})
+		val useCase = given()
 		val (result) = useCase(providedName) as Either.Right
-		assertEquals(persistedCharacter!!.id.uuid, result.characterId)
-		assertEquals(persistedCharacter!!.media?.uuid, result.mediaId)
+		assertEquals(createdCharacter!!.id.uuid, result.characterId)
+		assertEquals(createdCharacter!!.media?.uuid, result.mediaId)
+	}
+
+	@Nested
+	inner class `Include in Theme` {
+
+		private val themeId = Theme.Id()
+
+		private var updatedTheme: Theme? = null
+
+		private var includedCharacterResult: CharacterIncludedInTheme? = null
+		private var characterItemResult: CharacterItem? = null
+
+		@Nested
+		@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+		inner class `Theme doesn't exist` {
+
+			init {
+				assertThrows<ThemeDoesNotExist> {
+					buildCharacterToIncludeInTheme(providedName)
+				} shouldBe themeDoesNotExist(themeId.uuid)
+			}
+
+			@Test
+			fun `check character is not created`() {
+				assertNull(createdCharacter)
+			}
+
+		}
+
+		@Nested
+		@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+		inner class `Theme exists` {
+
+			init {
+				givenTheme()
+				buildCharacterToIncludeInTheme(providedName)
+			}
+
+			@Test
+			fun `check character created with proper name`() {
+				val createdCharacter = createdCharacter!!
+				assertEquals(projectId, createdCharacter.projectId)
+				assertEquals(providedName, createdCharacter.name)
+			}
+
+			@Test
+			fun `check theme updated to include new character`() {
+				val createdCharacter = createdCharacter!!
+				val updatedTheme = updatedTheme!!
+				assertTrue(updatedTheme.containsCharacter(createdCharacter.id))
+				val minorCharacter = updatedTheme.getMinorCharacterById(createdCharacter.id)!!
+				assertEquals(providedName, minorCharacter.name)
+			}
+
+			@Test
+			fun `check character included event is output`() {
+				val includedCharacterResult = includedCharacterResult!!
+				assertEquals(themeId.uuid, includedCharacterResult.themeId)
+				assertEquals(createdCharacter!!.id.uuid, includedCharacterResult.characterId)
+			}
+
+		}
+
+		private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = {
+			updatedTheme = it
+		})
+
+		private fun givenTheme() {
+			themeRepository.themes[themeId] = makeTheme(themeId, projectId = projectId)
+		}
+
+		private fun buildCharacterToIncludeInTheme(name: String) {
+			val useCase: BuildNewCharacter = BuildNewCharacterUseCase(CharacterRepositoryDouble(onAddNewCharacter = {
+				createdCharacter = it
+			}), themeRepository)
+			val output = object : BuildNewCharacter.OutputPort {
+				override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
+					characterItemResult = response
+				}
+
+				override fun receiveBuildNewCharacterFailure(failure: CharacterException) {
+					throw failure
+				}
+
+				override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+					includedCharacterResult = response
+				}
+			}
+			runBlocking {
+				useCase.createAndIncludeInTheme(name, themeId.uuid, output)
+			}
+		}
+
 	}
 
 }

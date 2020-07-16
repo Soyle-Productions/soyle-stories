@@ -76,6 +76,10 @@ class TestContext(
 				this.themes[it.id] = it
 			}
 		}
+
+		override suspend fun getThemeById(id: Theme.Id): Theme? {
+			return themes[id]
+		}
 	}
 
 }

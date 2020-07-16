@@ -1,28 +1,18 @@
 package com.soyle.stories.characterarc.usecases.planNewCharacterArc
 
-import arrow.core.Either
-import arrow.core.flatMap
 import com.soyle.stories.character.CharacterDoesNotExist
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.theme.ThemeException
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcItem
+import com.soyle.stories.entities.*
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
-import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
-import com.soyle.stories.translators.asCharacterArcTemplateSection
+import com.soyle.stories.theme.usecases.ThemeItem
+import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
+import com.soyle.stories.translators.asCharacterArcSection
 import java.util.*
 
-/**
- * Created by Brendan
- * Date: 2/26/2020
- * Time: 3:39 PM
- */
 class PlanNewCharacterArcUseCase(
-    private val characterRepository: com.soyle.stories.characterarc.repositories.CharacterRepository,
+    private val characterRepository: com.soyle.stories.character.repositories.CharacterRepository,
     private val themeRepository: com.soyle.stories.characterarc.repositories.ThemeRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository,
-    private val promoteMinorCharacter: PromoteMinorCharacter
+    private val characterArcSectionRepository: CharacterArcSectionRepository
 ) : PlanNewCharacterArc {
 
     override suspend fun invoke(
@@ -30,64 +20,40 @@ class PlanNewCharacterArcUseCase(
         name: String,
         outputPort: PlanNewCharacterArc.OutputPort
     ) {
-        val character = getCharacterById(characterId) {
-            return outputPort.receivePlanNewCharacterArcFailure(it)
-        }
+        val character = getCharacter(characterId)
+        val theme = Theme(character.projectId, name, emptyList(), "")
 
-        val creationResult = Theme.takeNoteOf(Project.Id(), name)
-            .map { theme ->
-                theme to theme.thematicTemplate.sections.map {
-                    CharacterArcSection(
-                        CharacterArcSection.Id(
-                            UUID.randomUUID()
-                        ), character.id, theme.id, it.asCharacterArcTemplateSection(), null, ""
-                    )
-                }
-            }.flatMap { (theme, initialSections) ->
-                theme.includeCharacter(character, initialSections).map {
-                    it to initialSections
-                }
-            }
+        val (characterWithArc, themeWithCharacter) = addArcToCharacter(character, name, theme)
 
-        // cannot wrap in a map {  } call because repositories use suspend functions and map {  } breaks the suspend scope
-        if (creationResult is Either.Right) {
-            val (theme, initialSections) = creationResult.b
-            themeRepository.addNewTheme(theme)
-            characterArcSectionRepository.addNewCharacterArcSections(initialSections)
-            promoteMinorCharacter.invoke(
-                PromoteMinorCharacter.RequestModel(
-                    theme.id.uuid,
-                    characterId,
-                    name
-                ),
-                object : PromoteMinorCharacter.OutputPort {
-                    override fun receivePromoteMinorCharacterFailure(failure: ThemeException) {
-                        outputPort.receivePlanNewCharacterArcFailure(failure)
-                    }
+        val initialSections = themeWithCharacter.getMajorCharacterById(character.id)!!.thematicSections
 
-                    override fun receivePromoteMinorCharacterResponse(response: PromoteMinorCharacter.ResponseModel) {
-                        outputPort.receivePlanNewCharacterArcResponse(
-                            com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcItem(
-                                response.characterId,
-                                response.characterArcName,
-                                response.themeId
-                            )
-                        )
-                    }
-                }
-            )
-        }
+        characterRepository.updateCharacter(characterWithArc)
+        themeRepository.addNewTheme(themeWithCharacter)
+        characterArcSectionRepository.addNewCharacterArcSections(initialSections.map { it.asCharacterArcSection() })
 
-    }
-
-    private suspend inline fun getCharacterById(
-        characterId: UUID,
-        ifNotFound: (CharacterDoesNotExist) -> Character
-    ): Character {
-        return characterRepository.getCharacterById(Character.Id(characterId)) ?: ifNotFound(
-            CharacterDoesNotExist(
-                characterId
+        outputPort.themeNoted(CreatedTheme(theme.projectId.uuid, theme.id.uuid, theme.name))
+        outputPort.characterArcPlanned(
+            CharacterArcItem(
+                characterId,
+                name,
+                theme.id.uuid
             )
         )
+
     }
+
+    private fun addArcToCharacter(
+        character: Character,
+        name: String,
+        theme: Theme
+    ): Pair<Character, Theme> {
+        val characterWithArc = character.withCharacterArc(name, theme.id)
+        val themeWithCharacter = theme.withCharacterIncluded(character.id, character.name, character.media)
+            .withCharacterPromoted(character.id)
+        return Pair(characterWithArc, themeWithCharacter)
+    }
+
+    private suspend fun getCharacter(characterId: UUID) =
+        characterRepository.getCharacterById(Character.Id(characterId))
+            ?: throw CharacterDoesNotExist(characterId)
 }

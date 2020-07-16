@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.doubles
 
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.OppositionValue
@@ -12,7 +13,7 @@ class ThemeRepositoryDouble(
     private val onAddTheme: (Theme) -> Unit = {},
     private val onUpdateTheme: (Theme) -> Unit = {},
     private val onDeleteTheme: (Theme) -> Unit = {}
-) : ThemeRepository
+) : ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository, com.soyle.stories.characterarc.repositories.ThemeRepository
 {
     val themes = mutableMapOf<Theme.Id, Theme>()
 
@@ -66,4 +67,14 @@ class ThemeRepositoryDouble(
         themes.remove(theme.id)
         onDeleteTheme(theme)
     }
+
+    override suspend fun addNewTheme(theme: Theme) = addTheme(theme)
+    override suspend fun deleteThemes(themes: List<Theme>) {
+        themes.forEach {
+            deleteTheme(it)
+        }
+    }
+
+    override suspend fun getThemesWithCharacterIncluded(characterId: Character.Id): List<Theme> =
+        themes.values.filter { it.containsCharacter(characterId) }
 }
