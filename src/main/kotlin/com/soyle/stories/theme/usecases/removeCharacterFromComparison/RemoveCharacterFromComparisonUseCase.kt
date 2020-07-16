@@ -28,10 +28,9 @@ class RemoveCharacterFromComparisonUseCase(
         val theme = getTheme(themeId)
         val needToRemoveCharacterArc = determineIfCharacterArcMustBeRemoved(theme, characterId)
         val updatedTheme = getThemeAfterCharacterRemoved(theme, characterId)
-        val shouldDelete = determineIfThemeShouldBeDeleted(updatedTheme)
-        persistTheme(updatedTheme, shouldDelete)
+        persistTheme(updatedTheme)
         removeCharacterArcIfNecessary(theme.id, Character.Id(characterId), needToRemoveCharacterArc)
-        return ResponseModel(themeId, characterId, shouldDelete)
+        return ResponseModel(themeId, characterId, false)
     }
 
     private suspend fun getTheme(themeId: UUID): Theme
@@ -51,18 +50,9 @@ class RemoveCharacterFromComparisonUseCase(
         return theme.getMajorCharacterById(Character.Id(characterId)) != null
     }
 
-    private fun determineIfThemeShouldBeDeleted(theme: Theme): Boolean
+    private suspend fun persistTheme(theme: Theme)
     {
-        return theme.characters.none { it is MajorCharacter }
-    }
-
-    private suspend fun persistTheme(theme: Theme, delete: Boolean)
-    {
-        if (delete) {
-            context.themeRepository.deleteTheme(theme)
-        } else {
-            context.themeRepository.updateTheme(theme)
-        }
+        context.themeRepository.updateTheme(theme)
     }
 
     private suspend fun removeCharacterArcIfNecessary(themeId: Theme.Id, characterId: Character.Id, isNecessary: Boolean) {

@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.usecases
 
 import arrow.core.identity
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
@@ -20,7 +21,6 @@ class RemoveCharacterFromComparisonUnitTest {
 
     private lateinit var context: Context
     private var updatedTheme: Theme? = null
-    private var deletedThemeId: Theme.Id? = null
     private var deletedCharacterArcId: Pair<Theme.Id, Character.Id>? = null
     private var result: Any? = null
 
@@ -28,7 +28,6 @@ class RemoveCharacterFromComparisonUnitTest {
     fun clear() {
         context = setupContext()
         updatedTheme = null
-        deletedThemeId = null
         result = null
         deletedCharacterArcId = null
     }
@@ -71,14 +70,7 @@ class RemoveCharacterFromComparisonUnitTest {
         givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId))
         whenUseCaseIsExecuted()
         val result = result as RemoveCharacterFromComparison.ResponseModel
-        assertTrue(result.themeDeleted)
-    }
-
-    @Test
-    fun `last remaining character persisted`() {
-        givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId))
-        whenUseCaseIsExecuted()
-        assertNotNull(deletedThemeId)
+        assertFalse(result.themeDeleted) // no longer delete theme when last character is removed.
     }
 
     @Test
@@ -104,14 +96,7 @@ class RemoveCharacterFromComparisonUnitTest {
         givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId, UUID.randomUUID()))
         whenUseCaseIsExecuted()
         val result = result as RemoveCharacterFromComparison.ResponseModel
-        assertTrue(result.themeDeleted)
-    }
-
-    @Test
-    fun `last remaining major character persisted`() {
-        givenThemeWith(themeId = themeId, andCharacterIds = *arrayOf(characterId, UUID.randomUUID()))
-        whenUseCaseIsExecuted()
-        assertNotNull(deletedThemeId)
+        assertFalse(result.themeDeleted) // no longer delete theme when last character is removed.
     }
 
     @Test
@@ -127,8 +112,8 @@ class RemoveCharacterFromComparisonUnitTest {
         val theme = themeId?.let {
             val initialTheme = makeTheme(Theme.Id(themeId))
             val themeWithCharacters = andCharacterIds.fold(initialTheme) { nextTheme, characterId ->
-                nextTheme.includeCharacter(Character(Character.Id(characterId), Project.Id(), "Bob"))
-                    .fold({ throw it }, ::identity)
+                val character = makeCharacter(Character.Id(characterId), Project.Id(), "Bob")
+                nextTheme.withCharacterIncluded(character.id, character.name, character.media)
             }
             andMajorCharacterIds.fold(themeWithCharacters) { nextTheme, characterId ->
                 nextTheme.promoteCharacter(nextTheme.getMinorCharacterById(Character.Id(characterId))!!)
@@ -141,7 +126,7 @@ class RemoveCharacterFromComparisonUnitTest {
                 updatedTheme = it
             },
             deleteTheme = {
-                deletedThemeId = it.id
+                error("Theme should never be deleted when removing a character.  $it")
             },
             removeCharacterArc = { theme, character ->
                 deletedCharacterArcId = theme to character
@@ -166,7 +151,7 @@ class RemoveCharacterFromComparisonUnitTest {
     }
 
     private fun assertPersisted() {
-        assertTrue(updatedTheme != null || deletedThemeId != null)
+        assertTrue(updatedTheme != null)
     }
 
 

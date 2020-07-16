@@ -6,7 +6,9 @@ import java.util.*
 interface RemoveCharacterFromComparison {
     suspend operator fun invoke(themeId: UUID, characterId: UUID, outputPort: OutputPort)
 
-    class ResponseModel(val themeId: UUID, val characterId: UUID, val themeDeleted: Boolean)
+    class ResponseModel(val themeId: UUID, val characterId: UUID,
+                        @Deprecated(message = "This is now always false.")
+                        val themeDeleted: Boolean)
 
     interface OutputPort {
         fun receiveRemoveCharacterFromComparisonFailure(failure: ThemeException)
