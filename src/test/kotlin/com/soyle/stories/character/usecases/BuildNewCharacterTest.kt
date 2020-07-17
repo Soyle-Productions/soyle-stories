@@ -21,7 +21,6 @@ import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIn
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import java.util.*
 
 /**
  * Created by Brendan

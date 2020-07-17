@@ -109,7 +109,7 @@ class AddSymbolicItemToOppositionUnitTest {
 
         private fun addCharacterToOpposition() {
             addSymbolicItemToOpposition { output ->
-                addCharacterAsSymbol(oppositionId.uuid, characterId.uuid, output)
+                invoke(oppositionId.uuid, CharacterId(characterId.uuid), output)
             }
         }
 
@@ -158,7 +158,7 @@ class AddSymbolicItemToOppositionUnitTest {
 
         private fun addLocationToOpposition() {
             addSymbolicItemToOpposition { output ->
-                addLocationAsSymbol(oppositionId.uuid, locationId.uuid, output)
+                invoke(oppositionId.uuid, LocationId(locationId.uuid), output)
             }
         }
 
@@ -216,7 +216,7 @@ class AddSymbolicItemToOppositionUnitTest {
 
         private fun addSymbolToOpposition() {
             addSymbolicItemToOpposition { output ->
-                addSymbolAsSymbol(oppositionId.uuid, symbolId.uuid, output)
+                invoke(oppositionId.uuid, SymbolId(symbolId.uuid), output)
             }
         }
 

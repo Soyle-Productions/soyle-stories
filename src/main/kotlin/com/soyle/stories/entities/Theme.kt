@@ -6,6 +6,7 @@ import arrow.core.right
 import com.soyle.stories.common.Entity
 import com.soyle.stories.entities.theme.*
 import com.soyle.stories.theme.*
+import com.soyle.stories.theme.usecases.validateValueWebName
 import com.soyle.stories.translators.asMinorCharacter
 import com.soyle.stories.translators.asThematicSection
 import java.util.*
@@ -54,6 +55,12 @@ class Theme(
     fun withoutSymbol(symbolId: Symbol.Id) = copy(symbols = symbols.filterNot { it.id == symbolId })
     fun withValueWeb(valueWeb: ValueWeb) = copy(valueWebs = valueWebs + valueWeb)
     fun withoutValueWeb(valueWebId: ValueWeb.Id) = copy(valueWebs = valueWebs.filterNot { it.id == valueWebId })
+
+    fun withValueWeb(name: String): Pair<Theme, ValueWeb> {
+        validateValueWebName(name)
+        val valueWeb = ValueWeb(id, name)
+        return copy(valueWebs = valueWebs + valueWeb) to valueWeb
+    }
 
     fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> {
         return copy(

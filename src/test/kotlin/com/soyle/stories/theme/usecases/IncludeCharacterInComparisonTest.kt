@@ -145,11 +145,6 @@ class IncludeCharacterInComparisonTest {
         }
 
         @Test
-        fun `should contain list of characters in theme`() {
-            assertEquals(1, result.includedCharacters.size)
-        }
-
-        @Test
         fun `should updated theme`() {
             var updatedTheme: Theme? = null
             given(

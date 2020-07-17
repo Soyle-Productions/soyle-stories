@@ -1,43 +1,66 @@
 package com.soyle.stories.theme.usecases
 
+import com.soyle.stories.character.CharacterDoesNotExist
+import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.shouldBe
-import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.storyevent.characterDoesNotExist
+import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.doubles.CharacterRepositoryDouble
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.themeDoesNotExist
-import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
-import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToThemeUseCase
-import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
+import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme.RequestModel
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.ValueWebAddedToTheme
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.*
 
 class AddValueWebToThemeUnitTest {
 
     private val themeId = Theme.Id()
 
+
+
     private var updatedTheme: Theme? = null
-    private var result: Any? = null
+
+    private var result: AddValueWebToTheme.ResponseModel? = null
+    private val addedValueWeb: ValueWebAddedToTheme?
+        get() = result?.addedValueWeb
+    private val includedCharacter: CharacterIncludedInTheme?
+        get() = result?.includedCharacter
+    private val symbolicItemAdded: SymbolicRepresentationAddedToOpposition?
+        get() = result?.symbolicItemAdded
 
     @Test
     fun `theme does not exist`() {
-        whenValueWebIsAddedToTheme()
-        result shouldBe themeDoesNotExist(themeId.uuid)
+        assertThrows<ThemeDoesNotExist> {
+            whenValueWebIsAddedToTheme()
+        } shouldBe themeDoesNotExist(themeId.uuid)
+        assertNull(updatedTheme)
+        assertNull(result)
     }
 
     @Test
     fun `blank value web name`() {
         givenThemeExists()
-        whenValueWebIsAddedToTheme()
-        result shouldBe ::valueWebNameCannotBeBlank
+        assertThrows<ValueWebNameCannotBeBlank> {
+            whenValueWebIsAddedToTheme()
+        } shouldBe ::valueWebNameCannotBeBlank
+        assertNull(updatedTheme)
+        assertNull(result)
     }
 
     @Nested
@@ -52,17 +75,18 @@ class AddValueWebToThemeUnitTest {
 
         @Test
         fun `check value web created correctly`() {
-            val updatedTheme = updatedTheme!!
-            assertEquals(themeId, updatedTheme.id)
-            val createdValueWeb = updatedTheme.valueWebs.single()
-            assertEquals(name, createdValueWeb.name)
-            val firstOpposition = createdValueWeb.oppositions.single()
-            assertEquals(name, firstOpposition.name)
+            updatedTheme!! shouldBe {
+                assertEquals(themeId, it.id)
+                val createdValueWeb = it.valueWebs.single()
+                assertEquals(name, createdValueWeb.name)
+                val firstOpposition = createdValueWeb.oppositions.single()
+                assertEquals(name, firstOpposition.name)
+            }
         }
 
         @Test
         fun `check output`() {
-            val actual = result as ValueWebAddedToTheme
+            val actual = addedValueWeb as ValueWebAddedToTheme
             assertEquals(themeId.uuid, actual.themeId)
             val createdValueWeb = updatedTheme!!.valueWebs.single()
             assertEquals(createdValueWeb.id.uuid, actual.valueWebId)
@@ -82,32 +106,135 @@ class AddValueWebToThemeUnitTest {
         assertEquals(existingValueWebCount + 1, updatedTheme!!.valueWebs.size)
     }
 
-    private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = { updatedTheme = it })
+    @Nested
+    inner class `Add Character as Representation` {
 
-    private fun givenThemeExists(valueWebCount: Int = 0)
+        private val characterId = Character.Id()
+
+        @Test
+        fun `character doesn't exist`() {
+            givenThemeExists()
+            assertThrows<CharacterDoesNotExist> {
+                whenValueWebIsAddedToTheme("Valid Name", withCharacter = characterId)
+            } shouldBe characterDoesNotExist(characterId.uuid)
+            assertNull(updatedTheme) { "Should not persist on failure" }
+            assertNull(result)
+        }
+
+        @Test
+        fun `character exists`() {
+            givenThemeExists()
+            givenCharacterExists()
+            whenValueWebIsAddedToTheme("Valid Name", withCharacter = characterId)
+            val character = characterRepository.characters[characterId]!!
+            val createdValueWeb = updatedTheme!!.valueWebs.single()
+            updatedTheme!! shouldBe {
+                assertCharacterInTheme(character, it)
+                assertValueWebHasSymbolicItem(createdValueWeb, character.id.uuid, character.name)
+            }
+            includedCharacter!! shouldBe {
+                assertEquals(themeId.uuid, it.themeId)
+                assertEquals(updatedTheme!!.name, it.themeName)
+                assertEquals(characterId.uuid, it.characterId)
+                assertEquals(character.name, it.characterName)
+                assertFalse(it.isMajorCharacter)
+            }
+            symbolicItemAdded!! shouldBe {
+                it as CharacterAddedToOpposition
+                assertEquals(themeId.uuid, it.themeId)
+                assertEquals(createdValueWeb.id.uuid, it.valueWebId)
+                assertEquals(createdValueWeb.name, it.valueWebName)
+                val firstOpposition = createdValueWeb.oppositions.single()
+                assertEquals(firstOpposition.id.uuid, it.oppositionId)
+                assertEquals(firstOpposition.name, it.oppositionName)
+                assertEquals(character.id.uuid, it.characterId)
+                assertEquals(character.name, it.itemName)
+            }
+        }
+
+        @Test
+        fun `character already in theme`() {
+            givenCharacterExists()
+            givenThemeExists(withCharacterIncluded = characterId)
+            whenValueWebIsAddedToTheme("Valid Name", withCharacter = characterId)
+            val character = characterRepository.characters[characterId]!!
+            val createdValueWeb = updatedTheme!!.valueWebs.single()
+            updatedTheme!! shouldBe {
+                assertCharacterInTheme(character, it)
+                assertValueWebHasSymbolicItem(createdValueWeb, character.id.uuid, character.name)
+            }
+            assertNull(includedCharacter)
+            symbolicItemAdded!! shouldBe {
+                it as CharacterAddedToOpposition
+                assertEquals(themeId.uuid, it.themeId)
+                assertEquals(createdValueWeb.id.uuid, it.valueWebId)
+                assertEquals(createdValueWeb.name, it.valueWebName)
+                val firstOpposition = createdValueWeb.oppositions.single()
+                assertEquals(firstOpposition.id.uuid, it.oppositionId)
+                assertEquals(firstOpposition.name, it.oppositionName)
+                assertEquals(character.id.uuid, it.characterId)
+                assertEquals(character.name, it.itemName)
+            }
+        }
+
+        private fun givenCharacterExists() {
+            characterRepository.characters[characterId] = makeCharacter(characterId)
+        }
+
+    }
+
+    private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = { updatedTheme = it })
+    private val characterRepository = CharacterRepositoryDouble()
+
+    private fun givenThemeExists(valueWebCount: Int = 0, withCharacterIncluded: Character.Id? = null)
     {
         themeRepository.themes[themeId] = makeTheme(themeId, valueWebs = List(valueWebCount) {
             ValueWeb(themeId, "Value Web $it")
         })
+        if (withCharacterIncluded != null) {
+            val character = characterRepository.characters[withCharacterIncluded]!!
+            themeRepository.themes[themeId] = themeRepository.themes[themeId]!!.withCharacterIncluded(
+                character.id,
+                character.name,
+                character.media
+            )
+        }
     }
 
-    private fun whenValueWebIsAddedToTheme(name: String = "")
+    private fun whenValueWebIsAddedToTheme(name: String = "", withCharacter: Character.Id? = null)
     {
-        val useCase: AddValueWebToTheme = AddValueWebToThemeUseCase(themeRepository)
+        val useCase: AddValueWebToTheme = AddValueWebToThemeUseCase(themeRepository, characterRepository)
         val output = object : AddValueWebToTheme.OutputPort {
-            override suspend fun addedValueWebToTheme(response: ValueWebAddedToTheme) {
+            override suspend fun addedValueWebToTheme(response: AddValueWebToTheme.ResponseModel) {
                 result = response
             }
         }
         runBlocking {
-            try { useCase.invoke(themeId.uuid, name, output) }
-            catch (t: Throwable) { result = t }
+            useCase.invoke(RequestModel(themeId.uuid, name, withCharacter?.let { CharacterId(it.uuid) }), output)
         }
     }
 
     private fun valueWebNameCannotBeBlank(actual: Any?)
     {
         actual as ValueWebNameCannotBeBlank
+    }
+
+    private fun assertCharacterInTheme(character: Character, theme: Theme)
+    {
+        assertTrue(theme.containsCharacter(character.id)) { "Theme does not contain character" }
+        val characterInTheme = theme.getIncludedCharacterById(character.id)!!
+        assertEquals(character.name, characterInTheme.name)
+    }
+
+    private fun assertValueWebHasSymbolicItem(valueWeb: ValueWeb, itemId: UUID, name: String)
+    {
+        val opposition = valueWeb.oppositions.single {
+            it.hasEntityAsRepresentation(itemId)
+        }
+        val representation = opposition.representations.single {
+            it.entityUUID == itemId
+        }
+        assertEquals(name, representation.name)
     }
 
 }

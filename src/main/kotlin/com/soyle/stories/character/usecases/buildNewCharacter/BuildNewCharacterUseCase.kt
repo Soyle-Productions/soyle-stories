@@ -43,9 +43,18 @@ class BuildNewCharacterUseCase(
         )
         themeRepository.updateThemes(listOf(themeWithCharacter))
 
-        outputPort.characterIncludedInTheme(CharacterIncludedInTheme(theme.id.uuid, characterItem.characterId, themeWithCharacter.characters.map {
+        themeWithCharacter.characters.map {
             CharacterItem(it.id.uuid, it.name, null)
-        }))
+        }
+        outputPort.characterIncludedInTheme(
+            CharacterIncludedInTheme(
+                theme.id.uuid,
+                "",
+                characterItem.characterId,
+                "",
+                false
+            )
+        )
         outputPort.receiveBuildNewCharacterResponse(characterItem)
     }
 

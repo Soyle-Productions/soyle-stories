@@ -4,7 +4,6 @@ import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.CharacterException
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.ThemeException
@@ -12,7 +11,6 @@ import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.translators.asCharacterArcSection
-import com.soyle.stories.translators.asCharacterArcTemplateSection
 import java.util.*
 
 class IncludeCharacterInComparisonUseCase(
@@ -50,14 +48,10 @@ class IncludeCharacterInComparisonUseCase(
         themeRepository.updateTheme(themeWithCharacter)
         return CharacterIncludedInTheme(
             themeId,
+            "",
             characterId,
-            themeWithCharacter.characters.map {
-                CharacterItem(
-                    it.id.uuid,
-                    it.name,
-                    null
-                )
-            }
+            "",
+            false
         )
     }
 

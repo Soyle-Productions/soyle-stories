@@ -1,6 +1,5 @@
 package com.soyle.stories.theme.usecases.addSymbolicItemToOpposition
 
-import arrow.core.Either
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.theme.OppositionValueDoesNotExist
@@ -26,6 +25,18 @@ class AddSymbolicItemToOppositionUseCase(
     private val locationRepository: LocationRepository
 ) : AddSymbolicItemToOpposition {
 
+    override suspend fun invoke(
+        oppositionId: UUID,
+        symbolicItemId: SymbolicItemId,
+        output: AddSymbolicItemToOpposition.OutputPort
+    ) {
+        when (symbolicItemId) {
+            is CharacterId -> addCharacterAsSymbol(oppositionId, symbolicItemId.characterId, output)
+            is LocationId -> addLocationAsSymbol(oppositionId, symbolicItemId.locationId, output)
+            is SymbolId -> addSymbolAsSymbol(oppositionId, symbolicItemId.symbolId, output)
+        }
+    }
+
     override suspend fun addCharacterAsSymbol(
         oppositionId: UUID,
         characterId: UUID,
@@ -42,10 +53,10 @@ class AddSymbolicItemToOppositionUseCase(
             theme.withCharacterIncluded(character.id, character.name, character.media).also {
                 characterIncludedInTheme = CharacterIncludedInTheme(
                     theme.id.uuid,
+                    "",
                     characterId,
-                    it.characters.map {
-                        CharacterItem(it.id.uuid, it.name, null)
-                    }
+                    "",
+                    false
                 )
             }
         } else {
