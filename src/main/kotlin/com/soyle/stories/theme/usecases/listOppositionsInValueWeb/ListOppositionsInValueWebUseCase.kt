@@ -16,7 +16,7 @@ class ListOppositionsInValueWebUseCase(
         val valueWeb = theme.valueWebs.find { it.id.uuid == valueWebId }!!
 
         output.oppositionsListedInValueWeb(OppositionsInValueWeb(valueWeb.oppositions.map {
-            OppositionValueItem(it.id.uuid, it.name, it.representations.map {
+            OppositionValueWithSymbols(it.id.uuid, it.name, it.representations.map {
                 SymbolicItem(it.entityUUID, it.name)
             })
         }))

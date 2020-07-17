@@ -87,7 +87,7 @@ class ListOppositionsInValueWebUnitTest {
     private fun responseModel(expectedOppositions: List<OppositionValue>): (Any?) -> Unit = { actual ->
         actual as OppositionsInValueWeb
         assertEquals(expectedOppositions.map {
-            OppositionValueItem(it.id.uuid, it.name, it.representations.map {
+            OppositionValueWithSymbols(it.id.uuid, it.name, it.representations.map {
                 SymbolicItem(it.entityUUID, it.name)
             })
         }, actual.oppositions)

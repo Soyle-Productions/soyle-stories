@@ -13,11 +13,11 @@ import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacte
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.OppositionValuesAvailableForCharacterInTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.util.*
 
 class ListAvailableOppositionValuesForCharacterInThemeUnitTest {
 
@@ -99,7 +99,7 @@ class ListAvailableOppositionValuesForCharacterInThemeUnitTest {
 
             private val expectedOppositionValues = expectedValueWebs.associate {
                 it.id to List((1..6).random()) {
-                    makeOppositionValue()
+                    makeOppositionValue(name = "Opposition Value ${UUID.randomUUID().toString().take(3)}")
                 }
             }
 
@@ -135,7 +135,9 @@ class ListAvailableOppositionValuesForCharacterInThemeUnitTest {
                     val opsWithRepresentationByWebId = opsWithRepresentation.toMap()
                     it.filter { it.characterRepresentsAnOpposition }.forEach {
                         val opposition = opsWithRepresentationByWebId.getValue(ValueWeb.Id(it.valueWebId))
-                        assertEquals(opposition.id.uuid, it.single { it.characterRepresentsValue }.oppositionValueId)
+                        assertNull(it.singleOrNull { it.oppositionValueId == opposition.id.uuid }) { "Should not include the opposition value this character represents" }
+                        assertEquals(opposition.id.uuid, it.oppositionCharacterRepresents!!.oppositionValueId)
+                        assertEquals(opposition.name, it.oppositionCharacterRepresents!!.oppositionValueName)
                     }
                 }
             }

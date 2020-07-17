@@ -7,7 +7,6 @@ import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.OppositionValueItem
-import com.soyle.stories.theme.usecases.listValueWebsInTheme.ValueWebItem
 import java.util.*
 
 class ListAvailableOppositionValuesForCharacterInThemeUseCase(
@@ -55,15 +54,17 @@ class ListAvailableOppositionValuesForCharacterInThemeUseCase(
             AvailableValueWebForCharacterInTheme(
                 it.id.uuid,
                 it.name,
-                it.oppositions.map {
-                    AvailableOppositionValueForCharacterInTheme(
-                        it.id.uuid,
-                        "",
-                        it.hasEntityAsRepresentation(characterId)
-                    )
-                }
+                it.oppositions.find { it.hasEntityAsRepresentation(characterId) }?.let { OppositionValueItem(it.id.uuid, it.name) },
+                it.oppositions.asSequence()
+                    .filterNot { it.hasEntityAsRepresentation(characterId) }
+                    .map {
+                        AvailableOppositionValueForCharacterInTheme(
+                            it.id.uuid,
+                            it.name
+                        )
+                    }
+                    .toList()
             )
         }
     }
-
 }

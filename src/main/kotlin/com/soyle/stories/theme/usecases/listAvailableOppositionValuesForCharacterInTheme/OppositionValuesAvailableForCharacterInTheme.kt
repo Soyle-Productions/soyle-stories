@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme
 
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.OppositionValueItem
+import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.OppositionValueWithSymbols
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ValueWebItem
 import java.util.*
 
@@ -13,16 +14,17 @@ class OppositionValuesAvailableForCharacterInTheme(
 class AvailableValueWebForCharacterInTheme(
     valueWebId: UUID,
     valueWebName: String,
+    val oppositionCharacterRepresents: OppositionValueItem?,
     private val oppositionValues: List<AvailableOppositionValueForCharacterInTheme>
 ) : ValueWebItem(valueWebId, valueWebName), List<AvailableOppositionValueForCharacterInTheme> by oppositionValues {
 
-    val characterRepresentsAnOpposition: Boolean by lazy {
-        oppositionValues.any { it.characterRepresentsValue }
-    }
+    val characterRepresentsAnOpposition: Boolean
+        get() = oppositionCharacterRepresents != null
 }
 
+
+
 class AvailableOppositionValueForCharacterInTheme(
-    val oppositionValueId: UUID,
-    val oppositionValueName: String,
-    val characterRepresentsValue: Boolean
-)
+    oppositionValueId: UUID,
+    oppositionValueName: String
+) : OppositionValueItem(oppositionValueId, oppositionValueName)
