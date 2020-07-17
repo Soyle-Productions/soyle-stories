@@ -8,4 +8,4 @@ class ValueWebList(val valueWebs: List<ValueWebItem> = listOf()) {
 
 }
 
-class ValueWebItem(val valueWebId: UUID, val valueWebName: String)
+open class ValueWebItem(val valueWebId: UUID, val valueWebName: String)

@@ -27,7 +27,7 @@ fun makeTheme(
 fun makeValueWeb(
 	id: ValueWeb.Id = ValueWeb.Id(),
 	themeId: Theme.Id = Theme.Id(),
-	name: String = "",
+	name: String = "Value Web ${UUID.randomUUID().toString().take(3)}",
 	oppositions: List<OppositionValue> = listOf()
 ) = ValueWeb(id, themeId, name, oppositions)
 
