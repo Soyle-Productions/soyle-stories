@@ -4,6 +4,7 @@ import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicItemId
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import java.util.*
 
 interface AddOppositionToValueWeb {
@@ -27,6 +28,7 @@ interface AddOppositionToValueWeb {
 
     class ResponseModel(
         oppositionAddedToValueWeb: OppositionAddedToValueWeb,
+        val symbolicRepresentationRemoved: RemovedSymbolicItem?,
         val symbolicRepresentationAddedToOpposition: SymbolicRepresentationAddedToOpposition?,
         val characterIncludedInTheme: CharacterIncludedInTheme?
     ) : OppositionAddedToValueWeb(

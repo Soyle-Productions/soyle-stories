@@ -5,10 +5,7 @@ import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
-import com.soyle.stories.entities.theme.MinorCharacter
-import com.soyle.stories.entities.theme.OppositionValue
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.*
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.doubles.CharacterRepositoryDouble
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
@@ -117,6 +114,7 @@ class AddOppositionToValueWebUnitTest {
             it.characterIncludedInTheme shouldBe characterIncludedInTheme(
                 theme.id.uuid, theme.name, character.id.uuid, character.name, false
             )
+            assertNull(it.symbolicRepresentationRemoved)
             assertNotNull(it.characterIncludedInTheme)
         }
     }
@@ -138,7 +136,30 @@ class AddOppositionToValueWebUnitTest {
                 theme.id.uuid, valueWebId.uuid, valueWebName, createdOpposition()!!.id.uuid, "Horrible Bread",
                 character.id.uuid, character.name
             )
+            assertNull(it.symbolicRepresentationRemoved)
             assertNull(it.characterIncludedInTheme)
+        }
+    }
+
+    @Test
+    fun `character represents other value opposition`() {
+        val character = givenCharacterExists(UUID.randomUUID())
+        val theme = givenValueWebExists(valueWebName, existingOppositionCount = 2, includeCharacter = character)
+        themeRepository.themes[theme.id] = themeRepository.themes[theme.id]!!.let {
+            it.withReplacedValueWeb(it.valueWebs.single { it.id == valueWebId }.let {
+                it.withRepresentationOf(
+                    SymbolicRepresentation(character.id.uuid, character.name), it.oppositions.first().id
+                )
+            })
+        }
+        addOppositionToValueWeb(name = "Horrible Bread", itemId = CharacterId(character.id.uuid))
+        result!! shouldBe {
+            it.symbolicRepresentationRemoved!! shouldBe {
+                assertEquals(theme.id.uuid, it.themeId)
+                assertEquals(valueWebId.uuid, it.valueWebId)
+                assertEquals(theme.valueWebs.single { it.id == valueWebId }.oppositions.first().id.uuid, it.oppositionValueId)
+                assertEquals(character.id.uuid, it.symbolicItemId)
+            }
         }
     }
 
