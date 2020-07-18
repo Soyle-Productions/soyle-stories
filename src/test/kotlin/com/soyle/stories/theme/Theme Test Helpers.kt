@@ -14,7 +14,7 @@ fun takeNoteOfTheme(): Theme = (Theme.takeNoteOf(Project.Id(), "") as Either.Rig
 fun makeTheme(
 	id: Theme.Id = Theme.Id(),
 	projectId: Project.Id = Project.Id(),
-	name: String = "",
+	name: String = "Theme ${UUID.randomUUID().toString().take(3)}",
 	symbols: List<Symbol> = listOf(),
 	centralMoralQuestion: String = "",
 	includedCharacters: Map<Character.Id, CharacterInTheme> = mapOf(),
@@ -33,7 +33,7 @@ fun makeValueWeb(
 
 fun makeOppositionValue(
 	id: OppositionValue.Id = OppositionValue.Id(),
-	name: String = "",
+	name: String = "Opposition Value ${UUID.randomUUID().toString().take(3)}",
 	representations: List<SymbolicRepresentation> = listOf()
 ) = OppositionValue(id, name, representations)
 

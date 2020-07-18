@@ -7,6 +7,7 @@ import com.soyle.stories.theme.OppositionValueAlreadyHasName
 import com.soyle.stories.theme.OppositionValueDoesNotExist
 import com.soyle.stories.theme.OppositionValueNameCannotBeBlank
 import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.theme.usecases.validateOppositionValueName
 import java.util.*
 
 class RenameOppositionValueUseCase(
@@ -26,10 +27,6 @@ class RenameOppositionValueUseCase(
     private suspend fun getThemeWIthOppositionValue(oppositionValueId: UUID) =
         (themeRepository.getThemeContainingOppositionValueWithId(OppositionValue.Id(oppositionValueId))
             ?: throw OppositionValueDoesNotExist(oppositionValueId))
-
-    private fun validateOppositionValueName(name: String) {
-        if (name.isBlank()) throw OppositionValueNameCannotBeBlank
-    }
 
     private fun getValueWebAndOppositionValue(
         theme: Theme,

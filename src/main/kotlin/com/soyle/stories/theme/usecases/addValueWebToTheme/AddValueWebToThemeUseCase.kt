@@ -103,7 +103,8 @@ class AddValueWebToThemeUseCase(
             valueWeb.themeId.uuid,
             valueWeb.id.uuid,
             valueWeb.oppositions.single().id.uuid,
-            valueWeb.oppositions.single().name
+            valueWeb.oppositions.single().name,
+            false
         )
     )
 

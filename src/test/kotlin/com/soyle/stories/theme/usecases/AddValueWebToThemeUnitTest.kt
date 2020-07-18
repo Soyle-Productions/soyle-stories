@@ -95,6 +95,7 @@ class AddValueWebToThemeUnitTest {
             assertEquals(createdValueWeb.id.uuid, actual.oppositionAddedToValueWeb.valueWebId)
             assertEquals(createdValueWeb.oppositions.single().id.uuid, actual.oppositionAddedToValueWeb.oppositionValueId)
             assertEquals(name, actual.oppositionAddedToValueWeb.oppositionValueName)
+            assertFalse(actual.oppositionAddedToValueWeb.needsName)
         }
     }
 
