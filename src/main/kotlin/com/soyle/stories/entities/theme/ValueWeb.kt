@@ -42,6 +42,10 @@ class ValueWeb(
             .withoutRepresentation(representation)
         return withoutOpposition(opposition.id).withOpposition(opposition)
     }
+    fun hasRepresentation(representation: SymbolicRepresentation): Boolean
+    {
+        return oppositionWithRepresentation[representation.entityUUID] != null
+    }
 
     private val oppositionsById by lazy {
         oppositions.associateBy { it.id }

@@ -1,10 +1,8 @@
 package com.soyle.stories.theme.usecases.addOppositionToValueWeb
 
 import com.soyle.stories.character.CharacterDoesNotExist
-import com.soyle.stories.common.PairOf
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
 import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.SymbolicRepresentation
 import com.soyle.stories.entities.theme.ValueWeb
@@ -13,10 +11,11 @@ import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import com.soyle.stories.theme.usecases.validateOppositionValueName
+import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb.*
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicItemId
 import java.util.*
 
 class AddOppositionToValueWebUseCase(
@@ -24,141 +23,152 @@ class AddOppositionToValueWebUseCase(
     private val characterRepository: CharacterRepository
 ) : AddOppositionToValueWeb {
 
-
     @Suppress("OverridingDeprecatedMember")
-    override suspend fun invoke(valueWebId: UUID, output: AddOppositionToValueWeb.OutputPort) {
-        invoke(AddOppositionToValueWeb.RequestModel(valueWebId), output)
+    override suspend fun invoke(valueWebId: UUID, output: OutputPort) {
+        invoke(RequestModel(valueWebId), output)
     }
 
     override suspend fun invoke(
-        request: AddOppositionToValueWeb.RequestModel,
-        output: AddOppositionToValueWeb.OutputPort
+        request: RequestModel,
+        output: OutputPort
     ) {
-        val (theme, valueWeb) = getThemeAndValueWeb(request.valueWebId)
-        val firstRepresentation = createSymbolicItemIfRequested(request)
-        val (themeWithCharacter, characterInTheme) = includeCharacterInThemeIfNeeded(theme, firstRepresentation)
-        val oppositionValue = createOpposition(themeWithCharacter, valueWeb, request.name, firstRepresentation)
-
-        val response = AddOppositionToValueWeb.ResponseModel(
-            oppositionAddedToValueWeb(oppositionValue, theme.id, request),
-            firstRepresentation?.let { getRemovedSymbolicItem(theme, valueWeb, it) },
-            firstRepresentation?.let { characterAddedToOpposition(it, valueWeb, oppositionValue) },
-            characterInTheme?.let { characterIncludedInTheme(it, themeWithCharacter) }
-        )
-
-        output.addedOppositionToValueWeb(response)
+        val theme = getThemeContainingValueWeb(request.valueWebId)
+        val executor = Executor(theme, ValueWeb.Id(request.valueWebId))
+            .createOpposition(request.name)
+            .createSymbolicItemIfRequested(request.firstLinkedItem)
+        persistThemeUpdate(executor.theme)
+        output.addedOppositionToValueWeb(executor.response!!)
     }
 
-    private suspend fun getThemeAndValueWeb(valueWebId: UUID): Pair<Theme, ValueWeb> {
-        val theme = themeRepository.getThemeContainingValueWebWithId(ValueWeb.Id(valueWebId))
+
+    private suspend fun getThemeContainingValueWeb(valueWebId: UUID): Theme {
+        return themeRepository.getThemeContainingValueWebWithId(ValueWeb.Id(valueWebId))
             ?: throw ValueWebDoesNotExist(valueWebId)
-
-        return theme to theme.valueWebs.find { it.id.uuid == valueWebId }!!
     }
 
-    private fun includeCharacterInThemeIfNeeded(
-        theme: Theme,
-        representation: SymbolicRepresentation?
-    ): Pair<Theme, CharacterInTheme?> {
-        val characterId = representation?.let { Character.Id(it.entityUUID) } ?: return Pair(theme, null)
-        return if (theme.containsCharacter(characterId)) {
-            theme to null
-        } else {
-            val updatedTheme = theme.withCharacterIncluded(characterId, representation.name, null)
-            updatedTheme to updatedTheme.getIncludedCharacterById(characterId)
-        }
-    }
-
-    private suspend fun createOpposition(
-        theme: Theme,
-        valueWeb: ValueWeb,
-        name: String?,
-        firstRepresentation: SymbolicRepresentation?
-    ): OppositionValue {
-        if (name != null) validateOppositionValueName(name)
-        val oppositionValue = OppositionValue(name ?: "${valueWeb.name} ${valueWeb.oppositions.size + 1}")
-        val updatedValueWeb = valueWeb.withOpposition(oppositionValue).let {
-            if (firstRepresentation != null) {
-                addRepresentationToValueWeb(it, firstRepresentation, oppositionValue)
-            }
-            else it
-        }
-
-        themeRepository.updateTheme(theme.withReplacedValueWeb(updatedValueWeb))
-        return updatedValueWeb.oppositions.find { it isSameEntityAs oppositionValue }!!
-    }
-
-    private fun addRepresentationToValueWeb(
-        valueWeb: ValueWeb,
-        firstRepresentation: SymbolicRepresentation,
-        oppositionValue: OppositionValue
-    ): ValueWeb {
-        return if (valueWebHasRepresentation(valueWeb, firstRepresentation)) {
-            valueWeb.withoutRepresentation(firstRepresentation)
-                .withRepresentationOf(firstRepresentation, oppositionValue.id)
-        } else valueWeb.withRepresentationOf(firstRepresentation, oppositionValue.id)
-    }
-
-    private fun valueWebHasRepresentation(
-        valueWeb: ValueWeb,
-        firstRepresentation: SymbolicRepresentation
-    ) = valueWeb.oppositions.any { it.hasEntityAsRepresentation(firstRepresentation.entityUUID) }
-
-    private suspend fun createSymbolicItemIfRequested(
-        request: AddOppositionToValueWeb.RequestModel
-    ): SymbolicRepresentation? {
-        return if (request.firstLinkedItem == null) null
-        else {
-            val character = getCharacter(request.firstLinkedItem)
-            SymbolicRepresentation(character.id.uuid, character.name)
-        }
+    private suspend fun persistThemeUpdate(theme: Theme) {
+        themeRepository.updateTheme(theme)
     }
 
     private suspend fun getCharacter(firstLinkedItem: CharacterId) =
         (characterRepository.getCharacterById(Character.Id(firstLinkedItem.characterId))
             ?: throw CharacterDoesNotExist(firstLinkedItem.characterId))
 
-    private fun getRemovedSymbolicItem(theme: Theme, valueWeb: ValueWeb, representation: SymbolicRepresentation): RemovedSymbolicItem?
-    {
-        return valueWeb.oppositions.find { it.hasEntityAsRepresentation(representation.entityUUID) }?.let {
-            RemovedSymbolicItem(theme.id.uuid, valueWeb.id.uuid, it.id.uuid, representation.entityUUID)
+    private inner class Executor(
+        val theme: Theme,
+        val valueWebId: ValueWeb.Id,
+        val oppositionValueId: OppositionValue.Id? = null,
+        val response: ResponseModel? = null
+    ) {
+
+        val valueWeb by lazy {
+            theme.valueWebs.find { it.id == valueWebId }!!
+        }
+
+        fun createOpposition(name: String?): Executor {
+            if (name != null) validateOppositionValueName(name)
+
+            val oppositionValue = OppositionValue(name ?: "${valueWeb.name} ${valueWeb.oppositions.size + 1}")
+
+            return Executor(
+                theme.withReplacedValueWeb(valueWeb.withOpposition(oppositionValue)),
+                valueWeb.id,
+                oppositionValue.id,
+                ResponseModel(
+                    OppositionAddedToValueWeb(
+                        themeId = theme.id.uuid,
+                        valueWebId = valueWeb.id.uuid,
+                        oppositionValueId = oppositionValue.id.uuid,
+                        oppositionValueName = oppositionValue.name,
+                        needsName = name == null
+                    ),
+                    null,
+                    null,
+                    null
+                )
+            )
+        }
+
+        suspend fun createSymbolicItemIfRequested(firstLinkedItem: SymbolicItemId?): Executor {
+            return if (firstLinkedItem is CharacterId) {
+                val character = getCharacter(firstLinkedItem)
+                val executorWithCharacter = includeCharacterInThemeIfNeeded(character)
+                val symbolicItem = SymbolicRepresentation(character.id.uuid, character.name)
+
+                val executorWithoutRepresentation = if (valueWeb.hasRepresentation(symbolicItem)) {
+                    executorWithCharacter.removeSymbolicItemFromValueWeb(symbolicItem)
+                } else executorWithCharacter
+
+                executorWithoutRepresentation.addSymbolicItem(symbolicItem)
+            } else this
+        }
+
+        private fun removeSymbolicItemFromValueWeb(symbolicItem: SymbolicRepresentation): Executor {
+            val currentOppositionValueWithSymbolicItem =
+                valueWeb.oppositions.find { it.hasEntityAsRepresentation(symbolicItem.entityUUID) }!!
+            return Executor(
+                theme.withReplacedValueWeb(valueWeb.withoutRepresentation(symbolicItem)),
+                valueWeb.id,
+                oppositionValueId,
+                response!!.let {
+                    ResponseModel(
+                        it,
+                        RemovedSymbolicItem(
+                            theme.id.uuid,
+                            valueWeb.id.uuid,
+                            currentOppositionValueWithSymbolicItem.id.uuid,
+                            symbolicItem.entityUUID
+                        ),
+                        it.symbolicRepresentationAddedToOpposition,
+                        it.characterIncludedInTheme
+                    )
+                }
+            )
+        }
+
+        private fun addSymbolicItem(symbolicItem: SymbolicRepresentation): Executor
+        {
+            return Executor(
+                theme.withReplacedValueWeb(valueWeb.withRepresentationOf(symbolicItem, oppositionValueId!!)),
+                valueWeb.id,
+                oppositionValueId,
+                response!!.let {
+                    ResponseModel(
+                        it,
+                        it.symbolicRepresentationRemoved,
+                        CharacterAddedToOpposition(
+                            theme.id.uuid,
+                            valueWeb.id.uuid,
+                            valueWeb.name,
+                            it.oppositionValueId,
+                            it.oppositionValueName,
+                            symbolicItem.name,
+                            symbolicItem.entityUUID
+                        ),
+                        it.characterIncludedInTheme
+                    )
+                }
+            )
+        }
+
+        fun includeCharacterInThemeIfNeeded(character: Character): Executor {
+            return if (theme.containsCharacter(character.id)) this
+            else {
+                Executor(
+                    theme.withCharacterIncluded(character.id, character.name, character.media),
+                    valueWebId,
+                    oppositionValueId,
+                    response!!.let {
+                        ResponseModel(
+                            it,
+                            it.symbolicRepresentationRemoved,
+                            it.symbolicRepresentationAddedToOpposition,
+                            CharacterIncludedInTheme(theme.id.uuid, theme.name, character.id.uuid, character.name, false)
+                        )
+                    }
+                )
+            }
         }
     }
 
-    private fun oppositionAddedToValueWeb(
-        oppositionValue: OppositionValue,
-        themeId: Theme.Id,
-        request: AddOppositionToValueWeb.RequestModel
-    ): OppositionAddedToValueWeb
-    {
-        return OppositionAddedToValueWeb(
-            themeId = themeId.uuid,
-            valueWebId = request.valueWebId,
-            oppositionValueId = oppositionValue.id.uuid,
-            oppositionValueName = oppositionValue.name,
-            needsName = request.name == null
-        )
-    }
-
-    private fun characterAddedToOpposition(
-        symbolicRepresentation: SymbolicRepresentation,
-        valueWeb: ValueWeb,
-        oppositionValue: OppositionValue
-    ): SymbolicRepresentationAddedToOpposition
-    {
-        return CharacterAddedToOpposition(
-            themeId = valueWeb.themeId.uuid,
-            valueWebId = valueWeb.id.uuid,
-            valueWebName = valueWeb.name,
-            oppositionId = oppositionValue.id.uuid,
-            oppositionName = oppositionValue.name,
-            itemName = symbolicRepresentation.name,
-            characterId = symbolicRepresentation.entityUUID
-        )
-    }
-
-    private fun characterIncludedInTheme(characterInTheme: CharacterInTheme, theme: Theme): CharacterIncludedInTheme
-    {
-        return CharacterIncludedInTheme(theme.id.uuid, theme.name, characterInTheme.id.uuid, characterInTheme.name, false)
-    }
 }
