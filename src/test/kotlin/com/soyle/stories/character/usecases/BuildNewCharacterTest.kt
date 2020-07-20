@@ -110,6 +110,7 @@ class BuildNewCharacterTest {
 		val useCase = given()
 		val (result) = useCase(providedName) as Either.Right
 		assertEquals(createdCharacter!!.id.uuid, result.characterId)
+		assertEquals(providedName, result.characterName)
 		assertEquals(createdCharacter!!.media?.uuid, result.mediaId)
 	}
 
@@ -170,6 +171,7 @@ class BuildNewCharacterTest {
 				val includedCharacterResult = includedCharacterResult!!
 				assertEquals(themeId.uuid, includedCharacterResult.themeId)
 				assertEquals(createdCharacter!!.id.uuid, includedCharacterResult.characterId)
+				assertEquals(providedName, includedCharacterResult.characterName)
 			}
 
 		}

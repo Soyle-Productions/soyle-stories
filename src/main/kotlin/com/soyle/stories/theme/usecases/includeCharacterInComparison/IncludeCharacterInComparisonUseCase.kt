@@ -50,7 +50,7 @@ class IncludeCharacterInComparisonUseCase(
             themeId,
             "",
             characterId,
-            "",
+            character.name,
             false
         )
     }

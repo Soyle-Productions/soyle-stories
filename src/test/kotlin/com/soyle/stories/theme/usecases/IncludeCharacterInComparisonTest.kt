@@ -142,6 +142,7 @@ class IncludeCharacterInComparisonTest {
         @Test
         fun `should contain character id`() {
             assertEquals(characterUUID, result.characterId)
+            assertEquals(characterName, result.characterName)
         }
 
         @Test

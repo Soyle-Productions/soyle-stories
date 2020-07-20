@@ -51,7 +51,7 @@ class BuildNewCharacterUseCase(
                 theme.id.uuid,
                 "",
                 characterItem.characterId,
-                "",
+                characterItem.characterName,
                 false
             )
         )
