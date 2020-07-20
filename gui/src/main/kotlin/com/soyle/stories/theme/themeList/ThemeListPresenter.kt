@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.themeList
 
+import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.usecases.SymbolItem
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
@@ -127,6 +128,10 @@ class ThemeListPresenter(
                 }
             )
         }
+    }
+
+    override suspend fun characterArcsDeleted(response: List<DeletedCharacterArc>) {
+        // do nothing
     }
 
     private fun sortedThemes(themes: List<ThemeListItemViewModel>) = themes.sortedBy { it.themeName.toLowerCase() }

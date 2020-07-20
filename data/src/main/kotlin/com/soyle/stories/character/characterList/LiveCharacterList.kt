@@ -10,6 +10,7 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllChara
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.character
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import java.util.*
 
 class LiveCharacterList(
@@ -58,6 +59,10 @@ class LiveCharacterList(
 			val characters = characters!!.filterNot { it.characterId == response.characterId } + CharacterItem(response.characterId, response.newName, null)
 			this@LiveCharacterList.characters = characters
 			notifyAll { it.receiveCharacterListUpdate(characters) }
+		}
+
+		override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+			// do nothing
 		}
 
 		override fun receiveBuildNewCharacterFailure(failure: CharacterException) {}

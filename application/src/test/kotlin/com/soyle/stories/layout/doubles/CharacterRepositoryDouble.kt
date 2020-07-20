@@ -2,6 +2,7 @@ package com.soyle.stories.layout.doubles
 
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 
 class CharacterRepositoryDouble(
   initialCharacters: List<Character> = emptyList(),
@@ -27,5 +28,9 @@ class CharacterRepositoryDouble(
 	override suspend fun updateCharacter(character: Character) {
 		onUpdateCharacter.invoke(character)
 		characters[character.id] = character
+	}
+
+	override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
+		return characters.values.filter { it.projectId == projectId }
 	}
 }

@@ -1,18 +1,12 @@
-/**
- * Created by Brendan
- * Date: 3/1/2020
- * Time: 4:31 PM
- */
 package com.soyle.stories.characterarc.createCharacterDialog
 
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
+import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
 
 class CreateCharacterDialogController(
-    private val buildNewCharacter: BuildNewCharacter,
-    private val buildNewCharacterOutputPort: BuildNewCharacter.OutputPort
+    private val buildNewCharacterController: BuildNewCharacterController
 ) : CreateCharacterDialogViewListener {
 
-    override suspend fun createCharacter(name: String) {
-        buildNewCharacter.invoke(name, buildNewCharacterOutputPort)
+    override fun createCharacter(name: String, includeInTheme: String?) {
+        buildNewCharacterController.buildNewCharacter(name, includeInTheme) { throw it }
     }
 }

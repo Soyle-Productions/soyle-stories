@@ -30,7 +30,7 @@ class ThemeListController(
     }
 
     override fun openCharacterComparison(themeId: String) {
-        openToolController.openCharacterComparison(themeId, null)
+        openToolController.openCharacterValueComparison(themeId)
     }
 
     override fun renameTheme(themeId: String, newName: String) {

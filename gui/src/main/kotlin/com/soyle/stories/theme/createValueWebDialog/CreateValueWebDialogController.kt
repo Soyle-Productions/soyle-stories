@@ -15,4 +15,8 @@ class CreateValueWebDialogController(
         addValueWebToThemeController.addValueWebToTheme(themeId, name, presenter::presentError)
     }
 
+    override fun createValueWebAndLinkCharacter(themeId: String, name: String, characterId: String) {
+        addValueWebToThemeController.addValueWebToThemeWithCharacter(themeId, name, characterId, presenter::presentError)
+    }
+
 }

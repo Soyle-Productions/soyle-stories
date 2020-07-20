@@ -11,6 +11,7 @@ import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharac
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.ThemeException
+import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 
@@ -87,13 +88,16 @@ class CharacterListPresenter(
 		}
 	}
 
-
-	override fun receivePlanNewCharacterArcResponse(response: CharacterArcItem) {
+	override suspend fun characterArcPlanned(response: CharacterArcItem) {
 		CharacterArcItemViewModel(
-		  response.characterId.toString(),
-		  response.themeId.toString(),
-		  response.characterArcName
+			response.characterId.toString(),
+			response.themeId.toString(),
+			response.characterArcName
 		).let(this::addNewCharacterArcItem)
+	}
+
+	override suspend fun themeNoted(response: CreatedTheme) {
+		// do nothing
 	}
 
 	override fun receivePromoteMinorCharacterResponse(response: PromoteMinorCharacter.ResponseModel) {
@@ -167,7 +171,6 @@ class CharacterListPresenter(
 		}
 	}
 
-	override fun receivePlanNewCharacterArcFailure(failure: Exception) {}
 	override fun receivePromoteMinorCharacterFailure(failure: ThemeException) {}
 	override fun receiveDemoteMajorCharacterFailure(failure: Exception) {}
 	override fun receiveRenameCharacterArcFailure(failure: Exception) {}

@@ -16,28 +16,29 @@ internal object CharacterComparisonModule {
 
             provide<CharacterComparisonViewListener> {
 
-                val characterComparisonPresenter= CharacterComparisonPresenter(
-                  get<CharacterComparisonModel>(),
-                  themeId,
-                  projectScope.get(),
-                  projectScope.get()
+                val characterComparisonPresenter = CharacterComparisonPresenter(
+                    get<CharacterComparisonModel>(),
+                    themeId,
+                    projectScope.get(),
+                    projectScope.get()
                 )
 
                 CharacterComparisonViewListenerImpl(
-                  CharacterComparisonController(
                     themeId,
+                    CharacterComparisonController(
+                        themeId,
+                        projectScope.get(),
+                        characterComparisonPresenter
+                    ),
                     projectScope.get(),
-                    characterComparisonPresenter
-                  ),
-                  projectScope.get(),
-                  get(),
-                  get(),
-                  get(),
-                  get(),
-                  get(),
-                  get(),
-                  get(),
-                  get()
+                    projectScope.get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get()
                 )
             }
         }

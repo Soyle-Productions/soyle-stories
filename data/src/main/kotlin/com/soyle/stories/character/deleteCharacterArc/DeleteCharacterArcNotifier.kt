@@ -1,14 +1,10 @@
-/**
- * Created by Brendan
- * Date: 3/5/2020
- * Time: 6:46 PM
- */
-package com.soyle.stories.characterarc.eventbus
+package com.soyle.stories.character.deleteCharacterArc
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 
-class DeleteLocalCharacterArcNotifier : DemoteMajorCharacter.OutputPort, Notifier<DemoteMajorCharacter.OutputPort>() {
+class DeleteCharacterArcNotifier : Notifier<DemoteMajorCharacter.OutputPort>(), DemoteMajorCharacter.OutputPort {
+
     override fun receiveDemoteMajorCharacterResponse(response: DemoteMajorCharacter.ResponseModel) {
         notifyAll { it.receiveDemoteMajorCharacterResponse(response) }
     }

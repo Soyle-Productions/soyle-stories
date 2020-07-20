@@ -31,88 +31,90 @@ import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.scene.deleteScene.DeleteSceneNotifier
 import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
+import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
 import tornadofx.find
 
 object LayoutModule {
 
-	init {
-		scoped<ProjectScope> {
+    init {
+        scoped<ProjectScope> {
 
-			usecases@ run {
-				provide<GetSavedLayout> {
-					GetSavedLayoutUseCase(get(), ::defaultLayout)
-				}
-				provide<ToggleToolOpened> {
-					ToggleToolOpenedUseCase(projectId, get())
-				}
-				provide<OpenTool> {
-					OpenToolUseCase(projectId, get(), get())
-				}
-				provide<CloseTool> {
-					CloseToolUseCase(projectId, get())
-				}
-				provide<RemoveToolsWithId> {
-					RemoveToolsWithIdUseCase(projectId, get())
-				}
-			}
+            usecases@ run {
+                provide<GetSavedLayout> {
+                    GetSavedLayoutUseCase(get(), ::defaultLayout)
+                }
+                provide<ToggleToolOpened> {
+                    ToggleToolOpenedUseCase(projectId, get())
+                }
+                provide<OpenTool> {
+                    OpenToolUseCase(projectId, get(), get())
+                }
+                provide<CloseTool> {
+                    CloseToolUseCase(projectId, get())
+                }
+                provide<RemoveToolsWithId> {
+                    RemoveToolsWithIdUseCase(projectId, get())
+                }
+            }
 
-			events@ run {
-				provide(GetSavedLayout.OutputPort::class) {
-					GetSavedLayoutNotifier()
-				}
-				provide(ToggleToolOpened.OutputPort::class) {
-					ToggleToolOpenedNotifier()
-				}
-				provide(OpenTool.OutputPort::class) {
-					OpenToolNotifier()
-				}
-				provide(CloseTool.OutputPort::class) {
-					CloseToolNotifier()
-				}
-				provide(RemoveToolsWithId.OutputPort::class) {
-					RemoveToolsWithIdNotifier()
-				}
-			}
+            events@ run {
+                provide(GetSavedLayout.OutputPort::class) {
+                    GetSavedLayoutNotifier()
+                }
+                provide(ToggleToolOpened.OutputPort::class) {
+                    ToggleToolOpenedNotifier()
+                }
+                provide(OpenTool.OutputPort::class) {
+                    OpenToolNotifier()
+                }
+                provide(CloseTool.OutputPort::class) {
+                    CloseToolNotifier()
+                }
+                provide(RemoveToolsWithId.OutputPort::class) {
+                    RemoveToolsWithIdNotifier()
+                }
+            }
 
-			provide(OpenToolController::class) {
-				OpenToolControllerImpl(applicationScope.get(), applicationScope.get(), get(), get())
-			}
-			provide(CloseToolController::class) {
-				CloseToolControllerImpl(applicationScope.get(), get(), get())
-			}
-			provide {
-				RemoveToolsWithIdController(applicationScope.get(), get(), get()).also {
-					get<DeleteSceneNotifier>().addListener(it)
-				}
-			}
+            provide(OpenToolController::class) {
+                OpenToolControllerImpl(applicationScope.get(), applicationScope.get(), get(), get())
+            }
+            provide(CloseToolController::class) {
+                CloseToolControllerImpl(applicationScope.get(), get(), get())
+            }
+            provide {
+                RemoveToolsWithIdController(applicationScope.get(), get(), get()).also {
+                    get<DeleteSceneNotifier>().addListener(it)
+                    get<DeleteThemeNotifier>().addListener(it)
+                }
+            }
 
-			provide<LayoutViewListener> {
-				get<RemoveToolsWithIdController>()
-				LayoutController(
-				  applicationScope.get(),
-				  get(),
-				  get(),
-				  get(),
-				  get(),
-				  get(),
-				  get(),
-				  LayoutPresenter(
-					get(),
-					get<GetSavedLayoutNotifier>(),
-					get<ToggleToolOpenedNotifier>(),
-					get<OpenToolNotifier>(),
-					get<CloseToolNotifier>(),
-					  get<RemoveToolsWithIdNotifier>(),
-					ToolModule
-				  )
-				)
-			}
+            provide<LayoutViewListener> {
+                get<RemoveToolsWithIdController>()
+                LayoutController(
+                    applicationScope.get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    LayoutPresenter(
+                        get(),
+                        get<GetSavedLayoutNotifier>(),
+                        get<ToggleToolOpenedNotifier>(),
+                        get<OpenToolNotifier>(),
+                        get<CloseToolNotifier>(),
+                        get<RemoveToolsWithIdNotifier>(),
+                        ToolModule
+                    )
+                )
+            }
 
-			provide<LayoutView> {
-				find<WorkBenchModel>(scope = this)
-			}
+            provide<LayoutView> {
+                find<WorkBenchModel>(scope = this)
+            }
 
-		}
-	}
+        }
+    }
 
 }

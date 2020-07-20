@@ -32,6 +32,7 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
         if (it == null) symbolicItems.clear()
         else symbolicItems.setAll(it)
     }
+    symbolicItems.setAll(oppositionValue.value?.symbolicItems ?: listOf())
     val node = card {
         addClass(Styles.oppositionCard)
         isFillWidth = true

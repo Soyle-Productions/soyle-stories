@@ -55,11 +55,11 @@ class ValueOppositionWebsPresenter(
         }
     }
 
-    override suspend fun addedValueWebToTheme(response: ValueWebAddedToTheme) {
-        if (themeId != response.themeId) return
+    override suspend fun addedValueWebToTheme(response: AddValueWebToTheme.ResponseModel) {
+        if (themeId != response.addedValueWeb.themeId) return
         view.updateOrInvalidated {
             copy(
-                valueWebs = valueWebs + ValueWebItemViewModel(response.valueWebId.toString(), response.valueWebName)
+                valueWebs = valueWebs + ValueWebItemViewModel(response.addedValueWeb.valueWebId.toString(), response.addedValueWeb.valueWebName)
             )
         }
     }
@@ -104,7 +104,7 @@ class ValueOppositionWebsPresenter(
         }
     }
 
-    override suspend fun addedOppositionToValueWeb(response: OppositionAddedToValueWeb) {
+    override suspend fun addedOppositionToValueWeb(response: AddOppositionToValueWeb.ResponseModel) {
         if (themeId != response.themeId) return
         view.updateOrInvalidated {
             if (selectedValueWeb == null || selectedValueWeb.valueWebId != response.valueWebId.toString()) {
@@ -114,7 +114,7 @@ class ValueOppositionWebsPresenter(
                 oppositionValues = oppositionValues + OppositionValueViewModel(
                     response.oppositionValueId.toString(),
                     response.oppositionValueName,
-                    true,
+                    response.needsName,
                     listOf()
                 )
             )
@@ -155,17 +155,18 @@ class ValueOppositionWebsPresenter(
         }
     }
 
-    override suspend fun addedSymbolicItemToOpposition(response: SymbolicRepresentationAddedToOpposition) {
-        if (themeId != response.themeId) return
-        val oppositionId = response.oppositionId.toString()
+    override suspend fun addedSymbolicItemToOpposition(response: AddSymbolicItemToOpposition.ResponseModel) {
+        val addedItem = response.addedSymbolicItem
+        if (themeId != addedItem.themeId) return
+        val oppositionId = addedItem.oppositionId.toString()
         view.updateOrInvalidated {
-            if (selectedValueWeb == null || selectedValueWeb.valueWebId != response.valueWebId.toString()) {
+            if (selectedValueWeb == null || selectedValueWeb.valueWebId != addedItem.valueWebId.toString()) {
                 return@updateOrInvalidated this
             }
             copy(
                 oppositionValues = oppositionValues.map {
                     if (it.oppositionValueId == oppositionId) it.copy(
-                        symbolicItems = it.symbolicItems + SymbolicItemViewModel(response.itemId().toString(), response.itemName)
+                        symbolicItems = it.symbolicItems + SymbolicItemViewModel(addedItem.itemId().toString(), addedItem.itemName)
                     )
                     else it
                 }

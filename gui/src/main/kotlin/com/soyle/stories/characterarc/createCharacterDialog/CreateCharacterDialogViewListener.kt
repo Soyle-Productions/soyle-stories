@@ -2,6 +2,6 @@ package com.soyle.stories.characterarc.createCharacterDialog
 
 interface CreateCharacterDialogViewListener {
 
-    suspend fun createCharacter(name: String)
+    fun createCharacter(name: String, includeInTheme: String? = null)
 
 }

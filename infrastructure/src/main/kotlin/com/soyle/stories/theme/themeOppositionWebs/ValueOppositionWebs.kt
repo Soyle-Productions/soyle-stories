@@ -72,6 +72,7 @@ class ValueOppositionWebs : View() {
             vbox {
                 hgrow = Priority.ALWAYS
                 addClass("content-pane")
+                visibleWhen { model.selectedValueWeb.isNotNull }
                 hbox(spacing = 5.0, alignment = Pos.CENTER_LEFT) {
                     padding = Insets(10.0)
                     button {
@@ -119,7 +120,6 @@ class ValueOppositionWebs : View() {
                     }
                     spacer()
                     menubutton("Actions") {
-                        visibleWhen { model.selectedValueWeb.isNotNull }
                         item("Delete") {
                             action {
                                 val selectedValueWeb = model.selectedValueWeb.value ?: return@action
@@ -131,7 +131,6 @@ class ValueOppositionWebs : View() {
                 hbox {
                     padding = Insets(0.0, 0.0, 0.0, 10.0)
                     button("Add Opposition") {
-                        visibleWhen { model.selectedValueWeb.isNotNull }
                         action {
                             val valueWebId = model.selectedValueWeb.value?.valueWebId ?: return@action
                             viewListener.addOpposition(valueWebId)

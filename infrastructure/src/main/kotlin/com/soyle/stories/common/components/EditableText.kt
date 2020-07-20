@@ -6,7 +6,9 @@ import javafx.css.PseudoClass
 import javafx.event.*
 import javafx.scene.Node
 import javafx.scene.Parent
+import javafx.scene.control.ContentDisplay
 import javafx.scene.control.MenuButton
+import javafx.scene.paint.Color
 import tornadofx.*
 
 class EditableText : Fragment() {
@@ -38,12 +40,18 @@ class EditableText : Fragment() {
         val ON_HIDDEN = EventType(Event.ANY, "EDITABLE_TEXT_ON_HIDDEN")
 
 
-        private const val DEFAULT_STYLE_CLASS = "editable-text"
+        const val DEFAULT_STYLE_CLASS = "editable-text"
         private val PSEUDO_CLASS_SHOWING = PseudoClass.getPseudoClass("showing")
     }
 
-    val textProperty: StringProperty = SimpleStringProperty(this, "text", "")
+    val textProperty: StringProperty = titleProperty
     var text: String? by textProperty
+
+    val graphicProperty = iconProperty
+    var graphic: Node? by graphicProperty
+
+    val placeholderTextProperty: StringProperty = SimpleStringProperty(this, "placeholderText", "")
+    var placeholderText: String? by placeholderTextProperty
 
     private val editedTextProperty: ReadOnlyStringWrapper = ReadOnlyStringWrapper(this, "editedText", "")
     fun editedTextProperty(): ReadOnlyStringProperty = editedTextProperty.readOnlyProperty
@@ -82,8 +90,15 @@ class EditableText : Fragment() {
     var onHidden: EventHandler<Event>? by onHiddenProperty
     fun onHidden(value: (Event) -> Unit) { onHidden = EventHandler(value) }
 
-    override val root: Parent = hyperlink(textProperty) {
+    override val root: Parent = hyperlink {
+        this@EditableText.textProperty.select { it.isNullOrBlank().toProperty() }.onChange {
+            if (it != true) textProperty().cleanBind(this@EditableText.textProperty) else textProperty().cleanBind(this@EditableText.placeholderTextProperty)
+        }
+        if (! this@EditableText.text.isNullOrBlank()) textProperty().cleanBind(this@EditableText.textProperty) else textProperty().cleanBind(this@EditableText.placeholderTextProperty)
         addClass(DEFAULT_STYLE_CLASS)
+        graphicProperty().bind(this@EditableText.graphicProperty)
+        contentDisplay = ContentDisplay.RIGHT
+
         showingProperty.onChange {
             togglePseudoClass(PSEUDO_CLASS_SHOWING.pseudoClassName, it)
         }
@@ -129,6 +144,20 @@ class EditableText : Fragment() {
                 else displayError(root)
             }
         }
+        textProperty.onChange {
+            styleBasedOnText(it)
+        }
+        styleBasedOnText(text)
+    }
+
+    private fun styleBasedOnText(text: String?) {
+        if (text.isNullOrBlank()) {
+            root.style {
+                textFill = Color.GREY
+            }
+        } else {
+            root.style = ""
+        }
     }
 
     private val onActionProperty: ObjectProperty<EventHandler<ActionEvent>> = popup.onActionProperty()
@@ -164,10 +193,17 @@ class EditableText : Fragment() {
 
 }
 
-inline fun EventTarget.editableText(text: String? = null, op: EditableText.() -> Unit = {}) = editableText(text?.toProperty(), op)
-inline fun EventTarget.editableText(textProperty: ObservableValue<String>? = null, op: EditableText.() -> Unit = {}): EditableText = find<EditableText>(FX.defaultScope)
+fun EventTarget.editableText(text: String = "", op: EditableText.() -> Unit = {}) = find<EditableText>(FX.defaultScope)
     .apply {
-        textProperty?.let { this.textProperty.bind(it) }
+        this.text = text
+        op()
+    }
+    .also {
+        opcr(this, it.root)
+    }
+fun EventTarget.editableText(textProperty: ObservableValue<String>, op: EditableText.() -> Unit = {}): EditableText = find<EditableText>(FX.defaultScope)
+    .apply {
+        this.textProperty.bind(textProperty)
         op()
     }
     .also {

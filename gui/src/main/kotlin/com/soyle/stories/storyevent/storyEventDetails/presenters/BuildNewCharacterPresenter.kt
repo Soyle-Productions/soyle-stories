@@ -6,6 +6,7 @@ import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.gui.View
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsViewModel
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 
 class BuildNewCharacterPresenter(
   private val view: View.Nullable<StoryEventDetailsViewModel>
@@ -20,6 +21,10 @@ class BuildNewCharacterPresenter(
 			  }
 			)
 		}
+	}
+
+	override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+		// do nothing
 	}
 
 	override fun receiveBuildNewCharacterFailure(failure: CharacterException) {

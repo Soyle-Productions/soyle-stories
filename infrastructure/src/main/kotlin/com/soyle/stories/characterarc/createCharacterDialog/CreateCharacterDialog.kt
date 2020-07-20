@@ -16,6 +16,8 @@ class CreateCharacterDialog : Fragment("New Character") {
     override val scope: ProjectScope = super.scope as ProjectScope
     val createCharacterDialogViewListener = resolve<CreateCharacterDialogViewListener>()
 
+    internal var themeId: String? by singleAssign()
+
     private val errorMessage = SimpleStringProperty("")
 
     override val root = form {
@@ -30,16 +32,15 @@ class CreateCharacterDialog : Fragment("New Character") {
                     addDecorator(errorDecorator)
                     return@EventHandler
                 }
-                async(scope) {
-                    createCharacterDialogViewListener.createCharacter(text)
-                }
+                createCharacterDialogViewListener.createCharacter(text, includeInTheme = themeId)
                 close()
             }
         }
     }
 
 }
-fun createCharacterDialog(scope: ProjectScope): CreateCharacterDialog = scope.get<CreateCharacterDialog>().apply {
+fun createCharacterDialog(scope: ProjectScope, includeInTheme: String? = null): CreateCharacterDialog = scope.get<CreateCharacterDialog>().apply {
+    themeId = includeInTheme
     openModal(StageStyle.UTILITY, Modality.APPLICATION_MODAL, escapeClosesWindow = true, owner = scope.get<WorkBench>().currentWindow)?.apply {
         centerOnScreen()
     }

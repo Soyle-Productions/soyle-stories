@@ -37,8 +37,8 @@ class CharacterListController(
         openToolController.openBaseStoryStructureTool(themeId, characterId)
     }
 
-    override fun openCharacterComparison(characterId: String, themeId: String) {
-        openToolController.openCharacterComparison(themeId, characterId)
+    override fun openCharacterValueComparison(themeId: String) {
+        openToolController.openCharacterValueComparison(themeId)
     }
 
     override fun renameCharacter(characterId: String, newName: String) {

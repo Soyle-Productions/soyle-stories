@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.createSymbolDialog
 
+import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.common.ValidationException
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeNameCannotBeBlank
@@ -86,6 +87,10 @@ class CreateSymbolDialogPresenter(
         view.update {
             CreateSymbolDialogViewModel("", "", null, null, emptyList(), createdId = response.symbolId.toString())
         }
+    }
+
+    override suspend fun characterArcsDeleted(response: List<DeletedCharacterArc>) {
+        // do nothing
     }
 
 }

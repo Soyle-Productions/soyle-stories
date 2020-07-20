@@ -19,12 +19,15 @@ import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.EntitiesAvailableToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listSymbolsInTheme.ListSymbolsInTheme
 import com.soyle.stories.theme.usecases.listSymbolsInTheme.SymbolsInTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
+import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
+import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
 import java.util.*
@@ -157,9 +160,10 @@ class AddSymbolDialogPresenter(
         }
     }
 
-    override suspend fun addedSymbolicItemToOpposition(response: SymbolicRepresentationAddedToOpposition) {
-        if (response.themeId != themeId) return
-        if (response.oppositionId != oppositionId) return
+    override suspend fun addedSymbolicItemToOpposition(response: AddSymbolicItemToOpposition.ResponseModel) {
+        val addedItem = response.addedSymbolicItem
+        if (addedItem.themeId != themeId) return
+        if (addedItem.oppositionId != oppositionId) return
         view.updateOrInvalidated {
             copyOrDefault(completed = true)
         }
@@ -183,4 +187,7 @@ class AddSymbolDialogPresenter(
     override fun receiveCreateNewLocationFailure(failure: LocationException) {}
     override fun receiveRenameLocationFailure(failure: LocationException) {}
     override fun receiveDeleteLocationFailure(failure: LocationException) {}
+    override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+        // do nothing
+    }
 }

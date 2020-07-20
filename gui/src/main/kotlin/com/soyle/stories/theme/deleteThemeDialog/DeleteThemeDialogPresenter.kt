@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.deleteThemeDialog
 
+import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
@@ -45,6 +46,10 @@ class DeleteThemeDialogPresenter(
                 errorMessage = failure.localizedMessage?.takeUnless { it.isBlank() } ?: "Failed to retrieve dialog preferences: ${failure::class.simpleName ?: failure::class}"
             )
         }
+    }
+
+    override suspend fun characterArcsDeleted(response: List<DeletedCharacterArc>) {
+        // do nothing
     }
 
 }

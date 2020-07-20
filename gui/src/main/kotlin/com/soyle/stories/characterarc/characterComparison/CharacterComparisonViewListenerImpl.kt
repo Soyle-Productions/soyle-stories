@@ -2,18 +2,20 @@ package com.soyle.stories.characterarc.characterComparison
 
 import com.soyle.stories.characterarc.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
 import com.soyle.stories.characterarc.usecaseControllers.*
+import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonController
 
 class CharacterComparisonViewListenerImpl(
+	private val themeId: String,
   private val characterComparisonController: CharacterComparisonController,
   private val changeThematicSectionValueController: ChangeThematicSectionValueController,
-  private val includeCharacterInComparisonController: IncludeCharacterInComparisonController,
+  private val includeCharacterInComparisonController: com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController,
   private val promoteMinorCharacterController: PromoteMinorCharacterController,
   private val deleteLocalCharacterArcController: DeleteLocalCharacterArcController,
   private val changeStoryFunctionController: ChangeStoryFunctionController,
   private val changeCentralMoralQuestionController: ChangeCentralMoralQuestionController,
   private val changeCharacterPropertyController: ChangeCharacterPropertyController,
   private val changeCharacterPerspectivePropertyController: ChangeCharacterPerspectivePropertyController,
-  private val removeCharacterFromLocalComparisonController: RemoveCharacterFromLocalComparisonController
+  private val removeCharacterFromComparisonController: RemoveCharacterFromComparisonController
 ) : CharacterComparisonViewListener {
 
 	override suspend fun getCharacterComparison(characterId: String?) {
@@ -21,7 +23,7 @@ class CharacterComparisonViewListenerImpl(
 	}
 
 	override suspend fun addCharacterToComparison(characterId: String) {
-		includeCharacterInComparisonController.addCharacterToComparison(characterId)
+		includeCharacterInComparisonController.includeCharacterInTheme(themeId, characterId)
 	}
 
 	override suspend fun promoteCharacter(characterId: String) {
@@ -70,6 +72,6 @@ class CharacterComparisonViewListenerImpl(
 	}
 
 	override suspend fun removeCharacterFromComparison(characterId: String) {
-		removeCharacterFromLocalComparisonController.removeCharacterFromComparison(characterId)
+		removeCharacterFromComparisonController.removeCharacter(themeId, characterId)
 	}
 }

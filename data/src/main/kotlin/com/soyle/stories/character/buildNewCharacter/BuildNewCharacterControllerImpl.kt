@@ -2,17 +2,26 @@ package com.soyle.stories.character.buildNewCharacter
 
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.common.ThreadTransformer
+import java.util.*
 
 class BuildNewCharacterControllerImpl(
+    projectId: String,
     private val threadTransformer: ThreadTransformer,
     private val buildNewCharacter: BuildNewCharacter,
     private val buildNewCharacterOutputPort: BuildNewCharacter.OutputPort
 ) : BuildNewCharacterController {
 
-    override fun buildNewCharacter(name: String, onError: (Throwable) -> Unit) {
+    private val projectId = UUID.fromString(projectId)
+
+    override fun buildNewCharacter(name: String, includeInTheme: String?, onError: (Throwable) -> Unit) {
+        val preparedThemeId = includeInTheme?.let(UUID::fromString)
         threadTransformer.async {
             try {
-                buildNewCharacter.invoke(name, buildNewCharacterOutputPort)
+                if (preparedThemeId != null) {
+                    buildNewCharacter.createAndIncludeInTheme(name, preparedThemeId, buildNewCharacterOutputPort)
+                } else {
+                    buildNewCharacter.invoke(projectId, name, buildNewCharacterOutputPort)
+                }
             } catch (t: Throwable) { onError(t) }
         }
     }

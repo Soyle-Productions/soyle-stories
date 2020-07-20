@@ -3,6 +3,7 @@ package com.soyle.stories.di.characterarc
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterControllerImpl
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
+import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
@@ -22,6 +23,9 @@ import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLoca
 import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
+import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
+import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcControllerImpl
+import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcNotifier
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionController
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionControllerImpl
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
@@ -47,8 +51,11 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.entities.Project
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
+import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonNotifier
+import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonController
+import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonControllerImpl
+import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonNotifier
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
@@ -79,10 +86,10 @@ object CharacterArcModule {
 			ListAllCharacterArcsUseCase(get(), get())
 		}
 		provide<BuildNewCharacter> {
-			BuildNewCharacterUseCase(Project.Id(projectId), get())
+			BuildNewCharacterUseCase(get(), get())
 		}
 		provide<PlanNewCharacterArc> {
-			PlanNewCharacterArcUseCase(get(), get(), get(), get())
+			PlanNewCharacterArcUseCase(get(), get(), get())
 		}
 		provide<ViewBaseStoryStructure> {
 			ViewBaseStoryStructureUseCase(get(), get())
@@ -121,7 +128,7 @@ object CharacterArcModule {
 			ChangeCharacterPerspectivePropertyValueUseCase(get())
 		}
 		provide<RemoveCharacterFromComparison> {
-			RemoveCharacterFromComparisonUseCase(get())
+			RemoveCharacterFromComparisonUseCase(get(), get())
 		}
 		provide<RenameCharacter> {
 			RenameCharacterUseCase(get(), get())
@@ -140,16 +147,16 @@ object CharacterArcModule {
 	private fun InScope<ProjectScope>.events() {
 		provide<CharacterArcEvents> {
 			object : CharacterArcEvents {
-				override val buildNewCharacter: Notifier<BuildNewCharacter.OutputPort> =
-				  BuildNewCharacterNotifier()
 				override val planNewCharacterArc: Notifier<PlanNewCharacterArc.OutputPort> =
-				  PlanNewCharacterArcNotifier()
-				override val includeCharacterInComparison: Notifier<IncludeCharacterInComparison.OutputPort> =
-				  IncludeCharacterInComparisonNotifier()
+                    PlanNewCharacterArcNotifier(get())
+				override val includeCharacterInComparison: IncludeCharacterInComparisonNotifier =
+                    IncludeCharacterInComparisonNotifier()
+				override val buildNewCharacter: Notifier<BuildNewCharacter.OutputPort> =
+					BuildNewCharacterNotifier(includeCharacterInComparison)
 				override val promoteMinorCharacter: Notifier<PromoteMinorCharacter.OutputPort> =
 				  PromoteMinorCharacterNotifier()
-				override val deleteLocalCharacterArc: Notifier<DemoteMajorCharacter.OutputPort> =
-				  DeleteLocalCharacterArcNotifier()
+				override val deleteLocalCharacterArc: DeleteCharacterArcNotifier =
+				  DeleteCharacterArcNotifier()
 				override val removeCharacterFromStory: Notifier<RemoveCharacterFromStory.OutputPort> =
 				  RemoveCharacterFromLocalStoryNotifier().also {
 					  get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
@@ -166,7 +173,7 @@ object CharacterArcModule {
 				override val changeCharacterPerspectivePropertyValue: Notifier<ChangeCharacterPerspectivePropertyValue.OutputPort> =
 				  ChangeCharacterPerspectivePropertyValueNotifier()
 				override val removeCharacterFromLocalComparison: Notifier<RemoveCharacterFromComparison.OutputPort> =
-				  RemoveCharacterFromLocalComparisonNotifier()
+				  RemoveCharacterFromComparisonNotifier(deleteLocalCharacterArc)
 				override val renameCharacter: Notifier<RenameCharacter.OutputPort> =
 				  RenameCharacterNotifier().also {
 					  get<RenameSymbolicItemController>() listensTo it
@@ -184,14 +191,14 @@ object CharacterArcModule {
 		provide(PlanNewCharacterArc.OutputPort::class) { get<CharacterArcEvents>().planNewCharacterArc as PlanNewCharacterArcNotifier }
 		provide(IncludeCharacterInComparison.OutputPort::class) { get<CharacterArcEvents>().includeCharacterInComparison as IncludeCharacterInComparisonNotifier }
 		provide(PromoteMinorCharacter.OutputPort::class) { get<CharacterArcEvents>().promoteMinorCharacter as PromoteMinorCharacterNotifier }
-		provide(DemoteMajorCharacter.OutputPort::class) { get<CharacterArcEvents>().deleteLocalCharacterArc as DeleteLocalCharacterArcNotifier }
+		provide(DemoteMajorCharacter.OutputPort::class) { get<CharacterArcEvents>().deleteLocalCharacterArc as DeleteCharacterArcNotifier }
 		provide(RemoveCharacterFromStory.OutputPort::class) { get<CharacterArcEvents>().removeCharacterFromStory as RemoveCharacterFromLocalStoryNotifier }
 		provide(ChangeStoryFunction.OutputPort::class) { get<CharacterArcEvents>().changeStoryFunction as ChangeStoryFunctionNotifier }
 		provide(ChangeThematicSectionValue.OutputPort::class) { get<CharacterArcEvents>().changeThematicSectionValue as ChangeThematicSectionValueNotifier }
 		provide(ChangeCentralMoralQuestion.OutputPort::class) { get<CharacterArcEvents>().changeCentralMoralQuestion as ChangeCentralMoralQuestionNotifier }
 		provide(ChangeCharacterPropertyValue.OutputPort::class) { get<CharacterArcEvents>().changeCharacterPropertyValue as ChangeCharacterPropertyValueNotifier }
 		provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) { get<CharacterArcEvents>().changeCharacterPerspectivePropertyValue as ChangeCharacterPerspectivePropertyValueNotifier }
-		provide(RemoveCharacterFromComparison.OutputPort::class) { get<CharacterArcEvents>().removeCharacterFromLocalComparison as RemoveCharacterFromLocalComparisonNotifier }
+		provide(RemoveCharacterFromComparison.OutputPort::class) { get<CharacterArcEvents>().removeCharacterFromLocalComparison as RemoveCharacterFromComparisonNotifier }
 		provide(RenameCharacter.OutputPort::class) { get<CharacterArcEvents>().renameCharacter as RenameCharacterNotifier }
 		provide(RenameCharacterArc.OutputPort::class) { get<CharacterArcEvents>().renameCharacterArc as RenameCharacterArcNotifier }
 		provide(LinkLocationToCharacterArcSection.OutputPort::class) { get<CharacterArcEvents>().linkLocationToCharacterArcSection as LinkLocationToCharacterArcSectionNotifier }
@@ -199,22 +206,25 @@ object CharacterArcModule {
 	}
 
 	private fun InScope<ProjectScope>.controllers() {
-
-		provide<BuildNewCharacterController> { BuildNewCharacterControllerImpl(applicationScope.get(), get(), get()) }
+		provide<PlanNewCharacterArcController> { PlanNewCharacterArcControllerImpl(applicationScope.get(), get(), get()) }
+		provide<BuildNewCharacterController> { BuildNewCharacterControllerImpl(projectId.toString(), applicationScope.get(), get(), get()) }
 		provide { ChangeThematicSectionValueController(applicationScope.get(), get(), get()) }
 		provide<LinkLocationToCharacterArcSectionController> { LinkLocationToCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
 		provide<UnlinkLocationFromCharacterArcSectionController> { UnlinkLocationFromCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
 		provide<RenameCharacterController> { RenameCharacterControllerImpl(applicationScope.get(), get(), get()) }
+		provide<RemoveCharacterFromComparisonController> {
+			RemoveCharacterFromComparisonControllerImpl(applicationScope.get(), get(), get())
+		}
 	}
 
 
 
 	private fun InScope<ProjectScope>.viewListeners() {
 		provide<CreateCharacterDialogViewListener> {
-			CreateCharacterDialogController(get(), get())
+			CreateCharacterDialogController(get())
 		}
 		provide<PlanCharacterArcDialogViewListener> {
-			PlanCharacterArcDialogController(get(), get())
+			PlanCharacterArcDialogController(get())
 		}
 	}
 
@@ -234,9 +244,6 @@ object CharacterArcModule {
 
 		scoped<CharacterComparisonScope> {
 			provide {
-				IncludeCharacterInComparisonController(themeId, projectScope.get(), projectScope.get())
-			}
-			provide {
 				PromoteMinorCharacterController(themeId, projectScope.get(), projectScope.get())
 			}
 			provide {
@@ -253,9 +260,6 @@ object CharacterArcModule {
 			}
 			provide {
 				ChangeCharacterPerspectivePropertyController(themeId, projectScope.get(), projectScope.get())
-			}
-			provide {
-				RemoveCharacterFromLocalComparisonController(projectScope.get(), projectScope.get())
 			}
 		}
 

@@ -4,7 +4,7 @@ interface OpenToolController {
 
 	fun openLocationDetailsTool(locationId: String)
 	fun openBaseStoryStructureTool(themeId: String, characterId: String)
-	fun openCharacterComparison(themeId: String, characterId: String?)
+	fun openCharacterValueComparison(themeId: String)
 	fun openStoryEventDetailsTool(storyEventId: String)
 	fun openDeleteSceneRamificationsTool(sceneId: String)
 	fun openReorderSceneRamificationsTool(sceneId: String, newIndex: Int)

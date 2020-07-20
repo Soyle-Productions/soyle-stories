@@ -30,7 +30,7 @@ class CreateValueWebDialogPresenter(
         }
     }
 
-    override suspend fun addedValueWebToTheme(response: ValueWebAddedToTheme) {
+    override suspend fun addedValueWebToTheme(response: AddValueWebToTheme.ResponseModel) {
         view.update {
             CreateValueWebDialogViewModel("", "", null, created = true)
         }

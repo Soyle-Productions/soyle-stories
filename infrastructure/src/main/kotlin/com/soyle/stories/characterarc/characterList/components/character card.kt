@@ -1,9 +1,9 @@
 package com.soyle.stories.characterarc.characterList.components
 
 import com.soyle.stories.character.usecases.validateCharacterName
+import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.characterList.PopulatedDisplay
-import com.soyle.stories.characterarc.characterList.PopulatedDisplay.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.components.ComponentsStyles.Companion.liftedCard
@@ -250,6 +250,9 @@ class CharacterArcItem : ItemFragment<CharacterArcItemViewModel>()
         item("Base Story Structure") {
             action { openBaseStoryStructure() }
         }
+        item("Compare Character") {
+            action { openCharacterValueComparison() }
+        }
         item("Delete") {
             action { deleteCharacterArc() }
         }
@@ -258,6 +261,11 @@ class CharacterArcItem : ItemFragment<CharacterArcItemViewModel>()
     private fun openBaseStoryStructure() {
         val arcItem = item ?: return
         viewListener.openBaseStoryStructureTool(arcItem.characterId, arcItem.themeId)
+    }
+
+    private fun openCharacterValueComparison() {
+        val arcItem = item ?: return
+        viewListener.openCharacterValueComparison(arcItem.themeId)
     }
 
     private fun deleteCharacterArc() {

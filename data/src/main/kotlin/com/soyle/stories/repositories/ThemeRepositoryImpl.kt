@@ -21,7 +21,7 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 		return themes.values.find { it.symbols.any { it.id == symbolId } }
 	}
 
-	override suspend fun getThemeById(themeId: Theme.Id): Theme? = themes[themeId]
+	override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]
 	override suspend fun updateTheme(theme: Theme) {
 		themes[theme.id] = theme
 	}

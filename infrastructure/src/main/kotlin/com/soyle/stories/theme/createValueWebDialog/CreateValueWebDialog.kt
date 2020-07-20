@@ -17,6 +17,7 @@ class CreateValueWebDialog : Fragment() {
     private val model = resolve<CreateValueWebDialogModel>()
 
     private lateinit var themeId: String
+    private var characterId: String? = null
 
     override val root: Parent = form {
         fieldset(labelPosition = Orientation.VERTICAL) {
@@ -28,7 +29,11 @@ class CreateValueWebDialog : Fragment() {
                         if (it != null) addDecorator(SimpleMessageDecorator(it, ValidationSeverity.Error))
                     }
                     action {
-                        viewListener.createValueWeb(themeId, text)
+                        if (characterId != null) {
+                            viewListener.createValueWebAndLinkCharacter(themeId, text, characterId!!)
+                        } else {
+                            viewListener.createValueWeb(themeId, text)
+                        }
                     }
                 }
             }
@@ -63,6 +68,12 @@ class CreateValueWebDialog : Fragment() {
             if (it == true) close()
         }
         viewListener.getValidState()
+    }
+    fun showToAutoLinkCharacter(themeId: String, characterId: String? = null, parentWindow: Window? = null)
+    {
+        if (currentStage?.isShowing == true) return
+        this.characterId = characterId
+        show(themeId, parentWindow)
     }
 
     companion object {

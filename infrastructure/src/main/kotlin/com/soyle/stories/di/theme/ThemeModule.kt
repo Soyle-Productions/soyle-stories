@@ -1,7 +1,10 @@
 package com.soyle.stories.di.theme
 
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
+import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInThemeUseCase
+import com.soyle.stories.characterarc.eventbus.ChangeCharacterPropertyValueNotifier
+import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonNotifier
 import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalStoryNotifier
 import com.soyle.stories.characterarc.eventbus.RenameCharacterNotifier
 import com.soyle.stories.common.listensTo
@@ -25,6 +28,13 @@ import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppo
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeControllerImpl
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeNotifier
+import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
+import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValueControllerImpl
+import com.soyle.stories.theme.characterValueComparison.*
+import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogController
+import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogModel
+import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogPresenter
+import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogViewListener
 import com.soyle.stories.theme.createSymbolDialog.*
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeControllerImpl
@@ -43,6 +53,9 @@ import com.soyle.stories.theme.deleteTheme.DeleteThemeControllerImpl
 import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
 import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.deleteValueWebDialog.*
+import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController
+import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonControllerImpl
+import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonNotifier
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebControllerImpl
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebNotifier
@@ -83,12 +96,16 @@ import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicI
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOppositionUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
+import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
+import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValuesUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateThemeUseCase
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
+import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
+import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInThemeUseCase
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWeb
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWebUseCase
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
@@ -138,16 +155,16 @@ object ThemeModule {
     {
         provide<CreateTheme> { CreateThemeUseCase(get()) }
         provide<ListSymbolsByTheme> { ListSymbolsByThemeUseCase(get()) }
-        provide<DeleteTheme> { DeleteThemeUseCase(get()) }
+        provide<DeleteTheme> { DeleteThemeUseCase(get(), get()) }
         provide<RenameTheme> { RenameThemeUseCase(get()) }
         provide<AddSymbolToTheme> { AddSymbolToThemeUseCase(get()) }
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
-        provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get()) }
+        provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get(), get()) }
         provide<RemoveSymbolFromTheme> { RemoveSymbolFromThemeUseCase(get()) }
         provide<RenameSymbol> { RenameSymbolUseCase(get()) }
         provide<ListOppositionsInValueWeb> { ListOppositionsInValueWebUseCase(get()) }
-        provide<AddOppositionToValueWeb> { AddOppositionToValueWebUseCase(get()) }
+        provide<AddOppositionToValueWeb> { AddOppositionToValueWebUseCase(get(), get()) }
         provide<RenameOppositionValue> { RenameOppositionValueUseCase(get()) }
         provide<RemoveValueWebFromTheme> { RemoveValueWebFromThemeUseCase(get()) }
         provide<RenameValueWeb> { RenameValueWebUseCase(get()) }
@@ -157,6 +174,9 @@ object ThemeModule {
         provide<RenameSymbolicItem> { RenameSymbolicItemUseCase(get()) }
         provide<RemoveSymbolicItem> { RemoveSymbolicItemUseCase(get()) }
         provide<ListAvailableEntitiesToAddToOpposition> { ListAvailableEntitiesToAddToOppositionUseCase(get(), get(), get()) }
+        provide<CompareCharacterValues> { CompareCharacterValuesUseCase(get()) }
+        provide<ListCharactersAvailableToIncludeInTheme> { ListCharactersAvailableToIncludeInThemeUseCase(get(), get()) }
+        provide<ListAvailableOppositionValuesForCharacterInTheme> { ListAvailableOppositionValuesForCharacterInThemeUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -165,7 +185,7 @@ object ThemeModule {
             CreateThemeNotifier(get())
         }
         provide(DeleteTheme.OutputPort::class) {
-            DeleteThemeNotifier()
+            DeleteThemeNotifier(get())
         }
         provide(RenameTheme.OutputPort::class) {
             RenameThemeNotifier()
@@ -174,7 +194,7 @@ object ThemeModule {
             AddSymbolToThemeNotifier()
         }
         provide(AddValueWebToTheme.OutputPort::class) {
-            AddValueWebToThemeNotifier()
+            AddValueWebToThemeNotifier(get())
         }
         provide(RemoveSymbolFromTheme.OutputPort::class) {
             RemoveSymbolFromThemeNotifier().also {
@@ -187,7 +207,7 @@ object ThemeModule {
             }
         }
         provide(AddOppositionToValueWeb.OutputPort::class) {
-            AddOppositionToValueWebNotifier()
+            AddOppositionToValueWebNotifier(get())
         }
         provide(RenameOppositionValue.OutputPort::class) {
             RenameOppositionValueNotifier()
@@ -202,7 +222,7 @@ object ThemeModule {
             RemoveOppositionFromValueWebNotifier()
         }
         provide(AddSymbolicItemToOpposition.OutputPort::class) {
-            AddSymbolicItemToOppositionNotifier()
+            AddSymbolicItemToOppositionNotifier(get(), get())
         }
         provide(RenameSymbolicItem.OutputPort::class) {
             RenameSymbolicItemNotifier()
@@ -256,6 +276,12 @@ object ThemeModule {
         provide { RenameSymbolicItemController(applicationScope.get(), get(), get()) }
         provide(RemoveSymbolicItemController::class) {
             RemoveSymbolicItemControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<IncludeCharacterInComparisonController> {
+            IncludeCharacterInComparisonControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<ChangeCharacterPropertyController> {
+            ChangeCharacterPropertyValueControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -314,6 +340,19 @@ object ThemeModule {
                 presenter,
                 get(),
                 get(),
+                get()
+            )
+        }
+
+        provide<CreateOppositionValueDialogViewListener> {
+            val presenter = CreateOppositionValueDialogPresenter(
+                get<CreateOppositionValueDialogModel>()
+            )
+
+            presenter listensTo get<AddOppositionToValueWebNotifier>()
+
+            CreateOppositionValueDialogController(
+                presenter,
                 get()
             )
         }
@@ -383,11 +422,13 @@ object ThemeModule {
                 )
 
                 presenter listensTo projectScope.get<AddValueWebToThemeNotifier>()
-                presenter listensTo projectScope.get<AddOppositionToValueWebNotifier>()
-                presenter listensTo projectScope.get<RenameOppositionValueNotifier>()
                 presenter listensTo projectScope.get<RenameValueWebNotifier>()
                 presenter listensTo projectScope.get<RemoveValueWebFromThemeNotifier>()
+
+                presenter listensTo projectScope.get<AddOppositionToValueWebNotifier>()
+                presenter listensTo projectScope.get<RenameOppositionValueNotifier>()
                 presenter listensTo projectScope.get<RemoveOppositionFromValueWebNotifier>()
+
                 presenter listensTo projectScope.get<AddSymbolicItemToOppositionNotifier>()
                 presenter listensTo projectScope.get<RenameSymbolicItemNotifier>()
                 presenter listensTo projectScope.get<RemoveSymbolicItemNotifier>()
@@ -403,6 +444,38 @@ object ThemeModule {
                     projectScope.get(),
                     projectScope.get(),
                     presenter
+                )
+            }
+        }
+
+        scoped<CharacterValueComparisonScope> {
+            provide<CharacterValueComparisonViewListener> {
+                val presenter = CharacterValueComparisonPresenter(
+                    type.themeId.toString(),
+                    get<CharacterValueComparisonModel>()
+                )
+
+                presenter listensTo projectScope.get<AddSymbolicItemToOppositionNotifier>()
+                presenter listensTo projectScope.get<RemoveSymbolicItemNotifier>()
+                presenter listensTo projectScope.get<IncludeCharacterInComparisonNotifier>()
+                presenter listensTo projectScope.get<RemoveCharacterFromComparisonNotifier>()
+                presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()
+
+                CharacterValueComparisonController(
+                    type.themeId.toString(),
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    presenter,
+                    projectScope.get(),
+                    presenter,
+                    projectScope.get(),
+                    presenter,
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get()
                 )
             }
         }

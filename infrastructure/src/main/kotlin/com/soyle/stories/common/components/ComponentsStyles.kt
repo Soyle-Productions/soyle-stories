@@ -1,5 +1,6 @@
 package com.soyle.stories.common.components
 
+import de.jensd.fx.glyphs.GlyphIcon
 import javafx.scene.effect.BlurType
 import javafx.scene.effect.DropShadow
 import javafx.scene.paint.Color
@@ -11,10 +12,21 @@ class ComponentsStyles : Stylesheet() {
         val liftedCard by cssclass()
         val cardHeader by cssclass()
         val cardBody by cssclass()
+        val firstChild by csspseudoclass("first-child")
+        val notFirstChild by csspseudoclass("not-first-child")
 
         val buttonCombo by cssclass()
         val arrowIconButton by cssclass()
         val iconButton by cssclass()
+
+        val editableText by cssclass(value = EditableText.DEFAULT_STYLE_CLASS)
+
+        val glyphIcon by cssclass("glyph-icon")
+        val noDisableStyle by cssclass()
+        val noSelectionMenuItem by cssclass()
+        val contextMenuSectionHeaderItem by cssclass()
+        val contextMenuSectionedItem by cssclass()
+        val discouragedSelection by cssclass()
 
         init {
             importStylesheet<ComponentsStyles>()
@@ -35,9 +47,15 @@ class ComponentsStyles : Stylesheet() {
         }
         cardHeader {
             padding = box(16.px)
+            and(notFirstChild) {
+                padding = box(0.px, 16.px, 16.px, 16.px)
+            }
         }
         cardBody {
             padding = box(16.px)
+            and(notFirstChild) {
+                padding = box(0.px, 16.px, 16.px, 16.px)
+            }
         }
 
         buttonCombo {
@@ -63,6 +81,70 @@ class ComponentsStyles : Stylesheet() {
             }
             hover {
                 backgroundColor += Color(0.0, 0.0, 0.0, 0.2)
+            }
+        }
+
+        editableText {
+            underline = false
+            glyphIcon {
+                visibility = FXVisibility.HIDDEN
+            }
+            and(focused) {
+                glyphIcon {
+                    visibility = FXVisibility.VISIBLE
+                }
+            }
+            and(hover) {
+                glyphIcon {
+                    visibility = FXVisibility.VISIBLE
+                }
+            }
+        }
+
+        noDisableStyle {
+            and(disabled) {
+                opacity = 1.0
+            }
+        }
+
+        noSelectionMenuItem {
+            and(hover) {
+                label {
+                    textFill = Color.BLACK
+                }
+                backgroundColor = multi(Color.TRANSPARENT)
+            }
+            and(focused) {
+                label {
+                    textFill = Color.BLACK
+                }
+                backgroundColor = multi(Color.TRANSPARENT)
+            }
+        }
+        contextMenuSectionHeaderItem {
+            label {
+                fontSize = 1.2.em
+                textFill = Color.DARKGRAY
+            }
+            and(hover) {
+                label {
+                    textFill = Color.DARKGRAY
+                }
+            }
+            and(focused) {
+                label {
+                    textFill = Color.DARKGRAY
+                }
+            }
+        }
+        contextMenuSectionedItem {
+            label {
+                translateX = 8.px
+            }
+        }
+        discouragedSelection {
+            label {
+                textFill = Color.DARKGRAY
             }
         }
     }

@@ -36,10 +36,9 @@ class OpenToolControllerImpl(
 		}
 	}
 
-	override fun openCharacterComparison(themeId: String, characterId: String?) {
-		val request = CharacterComparison(
-		  UUID.fromString(themeId),
-			characterId?.let(UUID::fromString)
+	override fun openCharacterValueComparison(themeId: String) {
+		val request = CharacterValueComparison(
+			UUID.fromString(themeId)
 		)
 		threadTransformer.async {
 			openTool.invoke(request, openToolOutputPort)

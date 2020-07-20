@@ -2,6 +2,9 @@ package com.soyle.stories.theme.addSymbolicItemToOpposition
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.LocationId
+import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolId
 import java.util.*
 
 class AddSymbolicItemToOppositionControllerImpl(
@@ -14,10 +17,9 @@ class AddSymbolicItemToOppositionControllerImpl(
         val preparedOppositionId = prepareOppositionId(oppositionId)
         val preparedCharacterId = UUID.fromString(characterId)
         threadTransformer.async {
-            addSymbolicItemToOpposition.addCharacterAsSymbol(
+            addSymbolicItemToOpposition.invoke(
                 preparedOppositionId,
-                preparedCharacterId,
-                addSymbolicItemToOppositionOutputPort
+                CharacterId(preparedCharacterId), addSymbolicItemToOppositionOutputPort
             )
         }
     }
@@ -26,10 +28,9 @@ class AddSymbolicItemToOppositionControllerImpl(
         val preparedOppositionId = prepareOppositionId(oppositionId)
         val preparedLocationId = UUID.fromString(locationId)
         threadTransformer.async {
-            addSymbolicItemToOpposition.addLocationAsSymbol(
+            addSymbolicItemToOpposition.invoke(
                 preparedOppositionId,
-                preparedLocationId,
-                addSymbolicItemToOppositionOutputPort
+                LocationId(preparedLocationId), addSymbolicItemToOppositionOutputPort
             )
         }
     }
@@ -38,10 +39,9 @@ class AddSymbolicItemToOppositionControllerImpl(
         val preparedOppositionId = prepareOppositionId(oppositionId)
         val preparedSymbolId = UUID.fromString(symbolId)
         threadTransformer.async {
-            addSymbolicItemToOpposition.addSymbolAsSymbol(
+            addSymbolicItemToOpposition.invoke(
                 preparedOppositionId,
-                preparedSymbolId,
-                addSymbolicItemToOppositionOutputPort
+                SymbolId(preparedSymbolId), addSymbolicItemToOppositionOutputPort
             )
         }
     }

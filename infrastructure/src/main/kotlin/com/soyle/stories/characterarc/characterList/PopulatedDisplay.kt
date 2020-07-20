@@ -1,6 +1,7 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.character.usecases.validateCharacterName
+import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.components.characterCard
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
@@ -84,6 +85,14 @@ internal class PopulatedDisplay : View() {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterArcItemViewModel) {
                     characterListViewListener.openBaseStoryStructureTool(selectedItem.characterId, selectedItem.themeId)
+                }
+            }
+        }
+        item("Compare Characters") {
+            action {
+                val selectedItem = model.selectedItem.value
+                if (selectedItem is CharacterArcItemViewModel) {
+                    characterListViewListener.openCharacterValueComparison(selectedItem.themeId)
                 }
             }
         }
@@ -217,13 +226,6 @@ internal class PopulatedDisplay : View() {
         this += find<ActionBar> {
             root.visibleWhen(viewStyle)
             root.managedProperty().bind(visibleProperty())
-        }
-    }
-
-
-    companion object {
-        val defaultCharacterImage by lazy {
-            MaterialIcon.PERM_IDENTITY
         }
     }
 }

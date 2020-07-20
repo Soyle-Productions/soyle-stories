@@ -21,6 +21,8 @@ import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppo
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
+import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController
+import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonController
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeValueWebFromTheme.RemoveValueWebFromThemeController
@@ -29,6 +31,7 @@ import com.soyle.stories.theme.renameTheme.RenameThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
+import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import io.cucumber.java8.HookBody
 import io.cucumber.messages.internal.com.google.protobuf.Value
@@ -102,7 +105,11 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
         fun getThemeWithName(double: SoyleStoriesTestDouble, themeName: String): Theme?
         {
             val scope = ProjectSteps.getProjectScope(double) ?: return null
-            val uuid = uatNameToUUID["Theme($themeName)"] ?: return null
+            val uuid = uatNameToUUID["Theme($themeName)"] ?: run {
+                val theme = getCreatedThemes(double).find { it.name == themeName } ?: return null
+                uatNameToUUID["Theme($themeName)"] = theme.id.uuid
+                theme.id.uuid
+            }
             return getTheme(uuid.toString(), scope)
         }
 
@@ -303,7 +310,7 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val currentCount = theme.valueWebs.size
                 if (currentCount < count) {
                     val updatedTheme = (currentCount until count).fold(theme) { currentTheme, it ->
-                        currentTheme.withValueWeb(ValueWeb(""))
+                        currentTheme.withValueWeb(ValueWeb(currentTheme.id, ""))
                     }
                     val scope = ProjectSteps.getProjectScope(double)!!
                     val repo = scope.get<ThemeRepository>()
@@ -377,6 +384,29 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                 val opposition = givenANumberOfOppositionsHaveBeenCreated(1, valueWeb.id.uuid.toString(), scope).first()
                 val symbol: Symbol = givenASymbolHasBeenCreatedForTheme(double, theme.id.uuid.toString(), symbolName)
                 givenItemHasBeenSymbolicallyAdded(scope, opposition.id, symbol.id.uuid, "symbol")
+            }
+            Given("the following characters have been included in the {string} theme") { themeName: String, table: DataTable ->
+                val characterNames = table.asList()
+
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                val controller = scope.get<IncludeCharacterInComparisonController>()
+                interact {
+                    characterNames.forEach {
+                        val characterId = CharacterDriver.getCharacterIdByIdentifier(double, it)!!
+                        controller.includeCharacterInTheme(theme.id.uuid.toString(), characterId.uuid.toString())
+                    }
+                }
+            }
+            Given("the character {string} has been included in the {string} theme") { characterName: String, themeName: String ->
+
+                val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val theme = givenAThemeHasBeenCreatedWithTheName(double, themeName)
+                val controller = scope.get<IncludeCharacterInComparisonController>()
+                interact {
+                    val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterName)!!
+                    controller.includeCharacterInTheme(theme.id.uuid.toString(), characterId.uuid.toString())
+                }
             }
 
 
@@ -465,6 +495,29 @@ class ThemeSteps(en: En, double: SoyleStoriesTestDouble) {
                     controller.removeSymbolFromTheme(symbol.id.uuid.toString())
                 }
             }
+            When("the character {string} is included in the {string} theme") {
+                characterName: String, themeName: String ->
+
+                val character = CharacterDriver.getCharacterByIdentifier(double, characterName)!!
+                val theme = getThemeWithName(double, themeName)!!
+                val scope = ProjectSteps.getProjectScope(double)!!
+                val controller = scope.get<IncludeCharacterInComparisonController>()
+                interact {
+                    controller.includeCharacterInTheme(theme.id.uuid.toString(), character.id.uuid.toString())
+                }
+            }
+            When("the character {string} is removed from the {string} theme") { characterName: String, themeName: String ->
+
+                val scope = ProjectSteps.getProjectScope(double)!!
+                val theme = getThemeWithName(double, themeName)!!
+                val controller = scope.get<RemoveCharacterFromComparisonController>()
+                interact {
+                    val characterId = CharacterDriver.getCharacterIdByIdentifier(double, characterName)!!
+                    controller.removeCharacter(theme.id.uuid.toString(), characterId.uuid.toString())
+                }
+            }
+
+
 
             Then("the Theme should be deleted") {
                 val themeId = DeleteThemeDialogSteps.requestedThemeId!!

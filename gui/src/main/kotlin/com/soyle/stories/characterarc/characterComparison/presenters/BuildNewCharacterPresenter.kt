@@ -6,6 +6,7 @@ import com.soyle.stories.characterarc.characterComparison.CharacterComparisonVie
 import com.soyle.stories.characterarc.characterComparison.CharacterComparisonViewModel
 import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import java.util.*
 
 internal class BuildNewCharacterPresenter(
@@ -26,6 +27,10 @@ internal class BuildNewCharacterPresenter(
 
 	private fun CharacterComparisonViewModel.hasCharacter(characterId: String): Boolean {
 		return subTools.getOrNull(0)?.items?.find { it.characterId == characterId } != null
+	}
+
+	override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+		// do nothing
 	}
 
 	override fun receiveBuildNewCharacterFailure(failure: CharacterException) {}
