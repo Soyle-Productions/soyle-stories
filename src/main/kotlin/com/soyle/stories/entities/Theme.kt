@@ -16,6 +16,7 @@ class Theme(
     val projectId: Project.Id,
     val name: String,
     val symbols: List<Symbol>,
+    val centralConflict: String,
     val centralMoralQuestion: String,
     private val includedCharacters: Map<Character.Id, CharacterInTheme>,
     val similaritiesBetweenCharacters: Map<Set<Character.Id>, String>,
@@ -26,8 +27,9 @@ class Theme(
         projectId: Project.Id,
         name: String,
         symbols: List<Symbol> = listOf(),
+        centralConflict: String = "",
         centralMoralQuestion: String = ""
-    ) : this(Id(), projectId, name, symbols, centralMoralQuestion, mapOf(), mapOf(), listOf())
+    ) : this(Id(), projectId, name, symbols, centralConflict, centralMoralQuestion, mapOf(), mapOf(), listOf())
 
     val thematicTemplate: ThematicTemplate
         get() = ThematicTemplate.default()
@@ -35,6 +37,7 @@ class Theme(
     private fun copy(
         name: String = this.name,
         symbols: List<Symbol> = this.symbols,
+        centralConflict: String = this.centralConflict,
         centralMoralQuestion: String = this.centralMoralQuestion,
         includedCharacters: Map<Character.Id, CharacterInTheme> = this.includedCharacters,
         similaritiesBetweenCharacters: Map<Set<Character.Id>, String> = this.similaritiesBetweenCharacters,
@@ -44,6 +47,7 @@ class Theme(
         projectId,
         name,
         symbols,
+        centralConflict,
         centralMoralQuestion,
         includedCharacters,
         similaritiesBetweenCharacters,
@@ -355,6 +359,7 @@ class Theme(
                 projectId,
                 name,
                 listOf(),
+                "",
                 centralMoralQuestion,
                 mapOf(),
                 mapOf(),
