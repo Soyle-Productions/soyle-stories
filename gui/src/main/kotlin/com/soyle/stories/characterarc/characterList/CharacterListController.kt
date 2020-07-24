@@ -41,6 +41,10 @@ class CharacterListController(
         openToolController.openCharacterValueComparison(themeId)
     }
 
+    override fun openCentralConflict(themeId: String, characterId: String) {
+        openToolController.openCentralConflict(themeId, characterId)
+    }
+
     override fun renameCharacter(characterId: String, newName: String) {
         threadTransformer.async {
             renameCharacter.invoke(

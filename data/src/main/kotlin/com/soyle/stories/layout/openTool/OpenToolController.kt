@@ -10,5 +10,6 @@ interface OpenToolController {
 	fun openReorderSceneRamificationsTool(sceneId: String, newIndex: Int)
 	fun openSceneDetailsTool(sceneId: String)
 	fun openValueOppositionWeb(themeId: String)
+	fun openCentralConflict(themeId: String, characterId: String?)
 
 }

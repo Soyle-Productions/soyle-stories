@@ -7,6 +7,7 @@ import com.soyle.stories.entities.Project
 class CharacterRepositoryImpl : CharacterRepository, com.soyle.stories.character.repositories.CharacterRepository, com.soyle.stories.theme.repositories.CharacterRepository {
 
 	val characters = mutableMapOf<Character.Id, Character>()
+
 	override suspend fun getCharacterById(characterId: Character.Id): Character? = characters[characterId]
 
 	override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> = characters.values.toList()

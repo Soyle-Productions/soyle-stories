@@ -35,6 +35,7 @@ object ToolModule : RegisteredToolsConfig {
         SceneDetailsConfig.getRegistration(),
         ValueOppositionWebsConfig.getRegistration(),
         CharacterValueComparison.getRegistration(),
+        CharacterConflict.getRegistration(),
         /**
          * Temporary Tools
          */

@@ -45,6 +45,7 @@ class CharacterComparisonPresenter(
 	}
 
 	override fun receiveCharacterComparison(response: CompareCharacters.ResponseModel) {
+		/*
 		val focusCharacterId = response.focusedCharacterId?.toString()
 		view.update {
 
@@ -61,7 +62,7 @@ class CharacterComparisonPresenter(
 			  availableCharactersToAdd = characters.filterNot { it.characterId in includedIds },
 			  isInvalid = false
 			)
-		}
+		}*/
 	}
 
 	override fun receiveCharacterListUpdate(characters: List<CharacterItem>) {
@@ -84,6 +85,7 @@ class CharacterComparisonPresenter(
 	}
 
 	private fun createSubTools(response: CompareCharacters.ResponseModel): List<SubToolViewModel> {
+		TODO()/*
 		val comparisonItems = response.characterSummaries.values
 		  .let(::sortSummariesByStoryFunction)
 		  .let { mapCharacterSummariesToComparisonItems(it, response) }
@@ -92,7 +94,7 @@ class CharacterComparisonPresenter(
 		  createComparisonSubTool(response, comparisonItems),
 		  createMoralProblemSubTool(response, comparisonItems),
 		  createCharacterChangeSubTool(response, comparisonItems)
-		)
+		)*/
 	}
 
 	private fun sortSummariesByStoryFunction(summaries: Collection<CompareCharacters.CharacterComparisonSummary>): List<CompareCharacters.CharacterComparisonSummary>
@@ -111,10 +113,14 @@ class CharacterComparisonPresenter(
 	}
 
 	private fun mapCharacterSummariesToComparisonItems(summaries: List<CompareCharacters.CharacterComparisonSummary>, response: CompareCharacters.ResponseModel): List<ComparisonItem> {
+		TODO()
+		/*
 		val majorCharacterIds = response.majorCharacterIds.toSet()
 		return summaries.map {
 			convertCharacterCompSummaryToViewModel(it, majorCharacterIds, response.comparisonSections)
 		}
+
+		 */
 	}
 
 	private fun convertCharacterCompSummaryToViewModel(summary: CompareCharacters.CharacterComparisonSummary, majorCharacterIds: Set<UUID>, comparisonSections: List<String>): ComparisonItem {
@@ -155,7 +161,7 @@ class CharacterComparisonPresenter(
 		  "Opponent Attack on Hero's Weakness" to PropertyValue("Attack", summary.attackAgainstHero, true)
 		)
 	}
-
+/*
 	private fun createComparisonSubTool(response: CompareCharacters.ResponseModel, comparisonItems: List<ComparisonItem>): CompSubToolViewModel {
 		return CompSubToolViewModel(
 		  label = "Comparisons",
@@ -199,7 +205,7 @@ class CharacterComparisonPresenter(
 		  ),
 		  items = comparisonItems.filter { it.storyFunctions.contains("Antagonist") }
 		)
-	}
+	}*/
 
 	private fun CompareCharacters.CharacterComparisonSummary.toFocusCharacterOption(): CharacterItemViewModel {
 		return CharacterItemViewModel(id.toString(), name)

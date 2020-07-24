@@ -45,6 +45,15 @@ class OpenToolControllerImpl(
 		}
 	}
 
+	override fun openCentralConflict(themeId: String, characterId: String?) {
+		val request = CharacterConflict(
+			UUID.fromString(themeId)
+		)
+		threadTransformer.async {
+			openTool.invoke(request, openToolOutputPort)
+		}
+	}
+
 	override fun openStoryEventDetailsTool(storyEventId: String) {
 		threadTransformer.async {
 			openTool.invoke(

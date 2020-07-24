@@ -30,6 +30,7 @@ import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeControllerIm
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeNotifier
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValueControllerImpl
+import com.soyle.stories.theme.characterConflict.*
 import com.soyle.stories.theme.characterValueComparison.*
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogController
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogModel
@@ -102,6 +103,8 @@ import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreateThemeUseCase
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
+import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
+import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
@@ -177,6 +180,7 @@ object ThemeModule {
         provide<CompareCharacterValues> { CompareCharacterValuesUseCase(get()) }
         provide<ListCharactersAvailableToIncludeInTheme> { ListCharactersAvailableToIncludeInThemeUseCase(get(), get()) }
         provide<ListAvailableOppositionValuesForCharacterInTheme> { ListAvailableOppositionValuesForCharacterInThemeUseCase(get()) }
+        provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers()
@@ -521,6 +525,23 @@ object ThemeModule {
                     projectScope.get(),
                     presenter,
                     projectScope.get()
+                )
+            }
+        }
+
+        scoped<CharacterConflictScope> {
+            provide<CharacterConflictViewListener> {
+
+                val presenter = CharacterConflictPresenter(
+                    themeId,
+                    get<CharacterConflictModel>()
+                )
+
+                CharacterConflictController(
+                    themeId,
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    presenter
                 )
             }
         }

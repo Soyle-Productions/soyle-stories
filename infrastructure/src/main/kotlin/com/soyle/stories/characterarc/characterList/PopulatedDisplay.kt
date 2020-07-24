@@ -96,6 +96,14 @@ internal class PopulatedDisplay : View() {
                 }
             }
         }
+        item("Examine Character Change") {
+            action {
+                val selectedItem = model.selectedItem.value
+                if (selectedItem is CharacterArcItemViewModel) {
+                    characterListViewListener.openCentralConflict(selectedItem.themeId, selectedItem.characterId)
+                }
+            }
+        }
         item("Delete") {
             action {
                 val selectedItem = model.selectedItem.value

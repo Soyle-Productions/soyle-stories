@@ -17,11 +17,11 @@ internal fun ThemeList.themeItemContextMenu(model: ThemeListModel, viewListener:
             }
         }
     }
-    item("Compare Characters") {
+    item("Examine Central Conflict") {
         action {
             val selectedItem = model.selectedItem.value
             if (selectedItem is ThemeListItemViewModel) {
-                viewListener.openCharacterComparison(selectedItem.themeId)
+                viewListener.openCentralConflict(selectedItem.themeId)
             }
         }
     }

@@ -5,6 +5,7 @@ interface ThemeListViewListener {
     fun getValidState()
     fun openValueWeb(themeId: String)
     fun openCharacterComparison(themeId: String)
+    fun openCentralConflict(themeId: String)
     fun renameTheme(themeId: String, newName: String)
     fun renameSymbol(symbolId: String, newName: String)
 

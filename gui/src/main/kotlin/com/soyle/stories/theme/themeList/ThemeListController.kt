@@ -33,6 +33,10 @@ class ThemeListController(
         openToolController.openCharacterValueComparison(themeId)
     }
 
+    override fun openCentralConflict(themeId: String) {
+        openToolController.openCentralConflict(themeId, null)
+    }
+
     override fun renameTheme(themeId: String, newName: String) {
         renameThemeController.renameTheme(themeId, newName)
     }
