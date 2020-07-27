@@ -92,9 +92,9 @@ class ListCharactersAvailableToIncludeInThemeUnitTest {
     private val characterRepository = CharacterRepositoryDouble()
 
     private fun givenTheme(withCharactersIncluded: List<Character> = listOf()) {
-        themeRepository.themes[themeId] = makeTheme(themeId, projectId = projectId, includedCharacters = withCharactersIncluded.associate {
-            it.id to MinorCharacter(it.id, it.name, "", "", listOf())
-        })
+        themeRepository.themes[themeId] = withCharactersIncluded.fold(makeTheme(themeId, projectId = projectId)) { theme, character ->
+            theme.withCharacterIncluded(character.id, character.name, character.media)
+        }
     }
 
     private fun givenCharacters(ids: List<Character.Id>) {

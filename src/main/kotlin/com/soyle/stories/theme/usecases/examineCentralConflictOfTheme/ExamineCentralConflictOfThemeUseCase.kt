@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.usecases.examineCentralConflictOfTheme
 
+import arrow.core.extensions.set.monoidal.identity
 import com.soyle.stories.common.Desire
 import com.soyle.stories.common.MoralWeakness
 import com.soyle.stories.common.PsychologicalWeakness
@@ -20,7 +21,11 @@ class ExamineCentralConflictOfThemeUseCase(
     private val characterArcSectionRepository: CharacterArcSectionRepository
 ) : ExamineCentralConflictOfTheme {
 
-    override suspend fun invoke(themeId: UUID, characterId: UUID?, outputPort: ExamineCentralConflictOfTheme.OutputPort) {
+    override suspend fun invoke(
+        themeId: UUID,
+        characterId: UUID?,
+        outputPort: ExamineCentralConflictOfTheme.OutputPort
+    ) {
         val theme = getTheme(themeId)
 
         val characterChange = if (characterId != null) {
@@ -37,10 +42,11 @@ class ExamineCentralConflictOfThemeUseCase(
         themeMustContainCharacter(theme, characterId)
         val majorCharacter = getMajorCharacter(theme, characterId)
         val characterArcSections = getArcSectionsByTemplate(majorCharacter, theme)
-        return examineCharacterChange(majorCharacter, characterArcSections)
+        return examineCharacterChange(theme, majorCharacter, characterArcSections)
     }
 
     private fun examineCharacterChange(
+        theme: Theme,
         majorCharacter: MajorCharacter,
         characterArcSections: Map<CharacterArcTemplateSection, CharacterArcSection>
     ): ExaminedCharacterChange {
@@ -50,8 +56,25 @@ class ExamineCentralConflictOfThemeUseCase(
             characterArcSections[Desire]?.value ?: "",
             characterArcSections[PsychologicalWeakness]?.value ?: "",
             characterArcSections[MoralWeakness]?.value ?: "",
-            majorCharacter.characterChange
+            majorCharacter.characterChange,
+            getOpponents(majorCharacter, theme)
         )
+    }
+
+    private fun getOpponents(
+        majorCharacter: MajorCharacter,
+        theme: Theme
+    ): CharacterChangeOpponents {
+        return CharacterChangeOpponents(majorCharacter.getOpponents().map {
+            val opponent = theme.getIncludedCharacterById(it.key)!!
+            CharacterChangeOpponent(
+                it.key.uuid,
+                opponent.name,
+                majorCharacter.getAttacksByCharacter(opponent.id) ?: "",
+                theme.getSimilarities(majorCharacter.id, opponent.id).fold({ "" }, { it }),
+                opponent.position
+            )
+        })
     }
 
     private suspend fun getTheme(themeId: UUID) = (themeRepository.getThemeById(Theme.Id(themeId))

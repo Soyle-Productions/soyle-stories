@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.common.Entity
+import com.soyle.stories.common.PairOf
 import com.soyle.stories.entities.theme.*
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.validateValueWebName
@@ -78,7 +79,7 @@ class Theme(
     {
         mustNotContainCharacter(characterId)
 
-        val newCharacter = MinorCharacter(characterId, characterName, "", "", thematicTemplate.sections.map {
+        val newCharacter = MinorCharacter(characterId, characterName, "", "", "", thematicTemplate.sections.map {
             ThematicSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, id, it)
         })
         val minorCharacters = includedCharacters.values.filterIsInstance<MinorCharacter>()
@@ -113,14 +114,81 @@ class Theme(
     fun withCharacterChangeAs(characterId: Character.Id, change: String): Theme
     {
         mustContainCharacter(characterId)
-        val majorCharacter = getMajorCharacterById(characterId)
-            ?: throw CharacterIsNotMajorCharacterInTheme(characterId.uuid, id.uuid)
+        val majorCharacter = getMajorCharacter(characterId)
 
         return copy(
             includedCharacters = characters
                 .filterNot { it.id == characterId }
                 .plus(majorCharacter.withCharacterChangeAs(change))
                 .associateBy { it.id }
+        )
+    }
+
+    /**
+     * Sets the story function for the character with the provided [characterId] from the perspective of the
+     * character with the provided [majorCharacterId].  If either character is not in the theme, it will throw a
+     * [CharacterNotInTheme] error.  If the [majorCharacterId] does not represent a major character in this theme,
+     * a [CharacterIsNotMajorCharacterInTheme] error will be thrown.
+     *
+     * @return A copy of this [Theme] with the story function applied to the character with the [characterId] from the
+     * perspective of the character with the provided [majorCharacterId]
+     *
+     * @throws CharacterIsNotMajorCharacterInTheme if either character is not in this theme
+     * @throws CharacterNotInTheme if the [majorCharacterId] does not represent a major character in this theme
+     */
+    fun withCharacterAsStoryFunctionForMajorCharacter(characterId: Character.Id, storyFunction: StoryFunction, majorCharacterId: Character.Id): Theme
+    {
+        mustContainCharacter(characterId)
+        mustContainCharacter(majorCharacterId)
+        val majorCharacter = getMajorCharacter(majorCharacterId)
+
+        if (majorCharacter.hasStoryFunctionForTargetCharacter(storyFunction, characterId)) {
+            throw StoryFunctionAlreadyApplied(
+                id.uuid,
+                majorCharacter.id.uuid,
+                characterId.uuid,
+                storyFunction
+            )
+        }
+        return copy(
+            includedCharacters = includedCharacters
+                .minus(majorCharacter.id)
+                .plus(majorCharacter.id to majorCharacter.applyStoryFunction(characterId, storyFunction))
+        )
+    }
+
+    fun withCharacterAttackingMajorCharacter(characterId: Character.Id, attack: String, majorCharacterId: Character.Id): Theme
+    {
+        mustContainCharacter(characterId)
+        mustContainCharacter(majorCharacterId)
+        val majorCharacter = getMajorCharacter(majorCharacterId)
+
+        return copy(
+            includedCharacters = includedCharacters
+                .minus(majorCharacter.id)
+                .plus(majorCharacter.id to majorCharacter.changeAttack(characterId, attack))
+        )
+    }
+
+    fun withCharactersSimilarToEachOther(characterIds: PairOf<Character.Id>, similarities: String): Theme
+    {
+        mustContainCharacter(characterIds.first)
+        mustContainCharacter(characterIds.second)
+        val key = setOf(characterIds.first, characterIds.second)
+        return copy(
+            similaritiesBetweenCharacters = similaritiesBetweenCharacters
+                .minus(key = key)
+                .plus(key to similarities)
+        )
+    }
+
+    fun withCharacterHoldingPosition(characterId: Character.Id, position: String): Theme
+    {
+        mustContainCharacter(characterId)
+        return copy(
+            includedCharacters = includedCharacters
+                .minus(characterId)
+                .plus(characterId to getIncludedCharacterById(characterId)!!.changePosition(position))
         )
     }
 
@@ -135,6 +203,10 @@ class Theme(
             throw CharacterNotInTheme(id.uuid, characterId.uuid)
         }
     }
+
+    private fun getMajorCharacter(characterId: Character.Id) =
+        (getMajorCharacterById(characterId)
+            ?: throw CharacterIsNotMajorCharacterInTheme(characterId.uuid, id.uuid))
 
     fun removeCharacter(characterId: Character.Id): Either<ThemeException, Theme> {
 		verifyCharacterInTheme(characterId)?.let { return it.left() }
@@ -249,7 +321,7 @@ class Theme(
 
     private fun MinorCharacter.promote(additionalSections: List<CharacterArcSection>) =
         MajorCharacter(
-            id, name, archetype, variationOnMoral, thematicSections + additionalSections.map { it.asThematicSection() },
+            id, name, archetype, variationOnMoral, "", thematicSections + additionalSections.map { it.asThematicSection() },
             CharacterPerspective(
                 includedCharacters.keys.toList().minus(id).associateWith {
                     @Suppress("RemoveExplicitTypeArguments")
@@ -274,9 +346,11 @@ class Theme(
             name,
             archetype,
             variationOnMoral,
+            position,
             thematicSections
         )
 
+    @Deprecated(message = "Outdated api.", replaceWith = ReplaceWith("this.withCharacterAsStoryFunctionForMajorCharacter(characterId, function, majorCharacter.id)"))
     fun applyStoryFunction(
         majorCharacter: MajorCharacter,
         characterId: Character.Id,

@@ -171,10 +171,8 @@ class AddOppositionToValueWebUnitTest {
         val themeId = Theme.Id()
         val theme = makeTheme(
             id = themeId,
-            valueWebs = listOf(makeValueWeb(valueWebId, themeId = themeId, name = valueWebName, oppositions = List(existingOppositionCount) { OppositionValue("") })),
-            includedCharacters = listOfNotNull(includeCharacter).map { MinorCharacter(it.id, it.name, "", "", listOf()) }
-                .associateBy { it.id }
-        )
+            valueWebs = listOf(makeValueWeb(valueWebId, themeId = themeId, name = valueWebName, oppositions = List(existingOppositionCount) { OppositionValue("") }))
+        ).let { if (includeCharacter != null) it.withCharacterIncluded(includeCharacter.id, includeCharacter.name, includeCharacter.media) else it }
         themeRepository.themes[theme.id] = theme
         return theme
     }

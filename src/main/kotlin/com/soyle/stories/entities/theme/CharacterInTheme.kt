@@ -12,11 +12,13 @@ sealed class CharacterInTheme {
     abstract val name: String
     abstract val archetype: String
     abstract val variationOnMoral: String
+    abstract val position: String
     abstract val thematicSections: List<ThematicSection>
 
     abstract fun changeName(name: String): CharacterInTheme
     abstract fun changeArchetype(archetype: String): CharacterInTheme
     abstract fun changeVariationOnMoral(variationOnMoral: String): CharacterInTheme
+    abstract fun changePosition(position: String): CharacterInTheme
 
 }
 
@@ -25,6 +27,7 @@ class MinorCharacter(
     override val name: String,
     override val archetype: String,
     override val variationOnMoral: String,
+    override val position: String,
     override val thematicSections: List<ThematicSection>
 ) : CharacterInTheme() {
 
@@ -32,8 +35,9 @@ class MinorCharacter(
         name: String = this.name,
         archetype: String = this.archetype,
         variationOnMoral: String = this.variationOnMoral,
-        thematicSections: List<ThematicSection> = this.thematicSections
-    ) = MinorCharacter(id, name, archetype, variationOnMoral, thematicSections)
+        thematicSections: List<ThematicSection> = this.thematicSections,
+        position: String = this.position
+    ) = MinorCharacter(id, name, archetype, variationOnMoral, position, thematicSections)
 
     override fun changeName(name: String): MinorCharacter {
         return copy(name = name)
@@ -47,6 +51,10 @@ class MinorCharacter(
         return copy(variationOnMoral = variationOnMoral)
     }
 
+    override fun changePosition(position: String): MinorCharacter {
+        return copy(position = position)
+    }
+
 }
 
 class MajorCharacter(
@@ -54,6 +62,7 @@ class MajorCharacter(
     override val name: String,
     override val archetype: String,
     override val variationOnMoral: String,
+    override val position: String,
     override val thematicSections: List<ThematicSection>,
     private val perspective: CharacterPerspective,
     val characterChange: String
@@ -63,10 +72,11 @@ class MajorCharacter(
         name: String = this.name,
         archetype: String = this.archetype,
         variationOnMoral: String = this.variationOnMoral,
+        position: String = this.position,
         thematicSections: List<ThematicSection> = this.thematicSections,
         perspective: CharacterPerspective = this.perspective,
         characterChange: String = this.characterChange
-    ) = MajorCharacter(id, name, archetype, variationOnMoral, thematicSections, perspective, characterChange)
+    ) = MajorCharacter(id, name, archetype, variationOnMoral, position, thematicSections, perspective, characterChange)
 
     override fun changeName(name: String): MajorCharacter =
       copy(name = name)
@@ -77,8 +87,14 @@ class MajorCharacter(
     internal fun ignoreCharacter(characterId: Character.Id): MajorCharacter =
         copy(perspective = perspective.ignoreCharacter(characterId))
 
+    override fun changePosition(position: String): MajorCharacter {
+        return copy(position = position)
+    }
+
     fun getStoryFunctionsForCharacter(characterId: Character.Id) =
         perspective.storyFunctions[characterId]
+
+    fun getOpponents() = perspective.storyFunctions.filter { it.value.contains(StoryFunction.Antagonist) || it.value.contains(StoryFunction.FakeAllyAntagonist) }
 
     fun hasStoryFunctionForTargetCharacter(function: StoryFunction, characterId: Character.Id) =
         getStoryFunctionsForCharacter(characterId)?.contains(function) == true

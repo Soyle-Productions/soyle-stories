@@ -153,9 +153,9 @@ class CompareCharacterValuesUnitTest {
             val name = "Character ${UUID.randomUUID().toString().takeLast(3)}"
             val archetype = "Archetype [${UUID.randomUUID().toString().takeLast(3)}]"
             if (it % 2 == 0) {
-                MinorCharacter(Character.Id(), name, archetype, "", listOf())
+                MinorCharacter(Character.Id(), name, archetype, "", "", listOf())
             } else {
-                MajorCharacter(Character.Id(), name, archetype, "", listOf(), CharacterPerspective(mapOf(), mapOf()), "")
+                MajorCharacter(Character.Id(), name, archetype, "", "", listOf(), CharacterPerspective(mapOf(), mapOf()), "")
             }
         }.associateBy { it.id })
     }

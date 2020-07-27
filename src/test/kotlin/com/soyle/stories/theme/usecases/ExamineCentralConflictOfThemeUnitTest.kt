@@ -1,7 +1,12 @@
 package com.soyle.stories.theme.usecases
 
+import arrow.core.Either
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.*
 import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.MajorCharacter
+import com.soyle.stories.entities.theme.MinorCharacter
+import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
@@ -86,6 +91,7 @@ class ExamineCentralConflictOfThemeUnitTest {
                     assertEquals("", it.psychologicalWeakness)
                     assertEquals("", it.moralWeakness)
                     assertEquals("", it.changeAtEnd)
+                    assertTrue(it.opponents.isEmpty())
                 }
             }
         }
@@ -111,6 +117,61 @@ class ExamineCentralConflictOfThemeUnitTest {
                     assertEquals(psychologicalWeakness, it.psychologicalWeakness)
                     assertEquals(moralWeakness, it.moralWeakness)
                     assertEquals(changeAtEnd, it.changeAtEnd)
+                    assertTrue(it.opponents.isEmpty())
+                }
+            }
+        }
+
+        @Test
+        fun `character has opponents`() {
+            givenThemeHasCharacter(isMajorCharacter = true)
+            givenCharacterHasOpponents(count = 4)
+            examineCentralConflictOfTheme(characterId = characterId.uuid)
+            examinedConflictOfTheme!! shouldBe {
+                it.characterChange!! shouldBe {
+                    assertFalse(it.opponents.isEmpty())
+                    assertEquals(4, it.opponents.size)
+                    val theme = themeRepository.themes[themeId]!!
+                    val opponents = theme.getMajorCharacterById(characterId)!!.getOpponents().map {
+                        theme.getIncludedCharacterById(it.key)!!
+                    }.associateBy { it.id.uuid }
+                    it.opponents.forEach {
+                        val character = opponents.getValue(it.characterId)
+                        assertEquals(character.name, it.characterName)
+                        assertEquals("", it.attack)
+                        assertEquals("", it.similarities)
+                        assertEquals("", it.powerStatusOrAbility)
+                    }
+                }
+            }
+        }
+
+        @Test
+        fun `opponents have values for conflict fields`() {
+            givenThemeHasCharacter(isMajorCharacter = true)
+            givenCharacterHasOpponents(
+                count = 4,
+                generateAttack = { "Attack $it" },
+                generateSimilarities = { "We're Similar $it" },
+                generatePosition = { "Position $it" }
+            )
+            examineCentralConflictOfTheme(characterId = characterId.uuid)
+            examinedConflictOfTheme!! shouldBe {
+                it.characterChange!! shouldBe {
+                    assertFalse(it.opponents.isEmpty())
+                    assertEquals(4, it.opponents.size)
+                    val theme = themeRepository.themes[themeId]!!
+                    val majorCharacter = theme.getMajorCharacterById(characterId)!!
+                    val opponents = majorCharacter.getOpponents().map {
+                        theme.getIncludedCharacterById(it.key)!!
+                    }.associateBy { it.id.uuid }
+                    it.opponents.forEach {
+                        val character = opponents.getValue(it.characterId)
+                        assertEquals(character.name, it.characterName)
+                        assertEquals(majorCharacter.getAttacksByCharacter(character.id)!!, it.attack)
+                        assertEquals((theme.getSimilarities(characterId, character.id) as Either.Right).b, it.similarities)
+                        assertEquals(character.position, it.powerStatusOrAbility)
+                    }
                 }
             }
         }
@@ -140,6 +201,19 @@ class ExamineCentralConflictOfThemeUnitTest {
                     ))
                 }
                 theme.withCharacterChangeAs(characterId, changeAtEnd)
+            }
+        }
+
+        private fun givenCharacterHasOpponents(count: Int, generateAttack: (Int) -> String = { "" }, generateSimilarities: (Int) -> String = { "" }, generatePosition: (Int) -> String = { "" }) {
+            themeRepository.themes[themeId] = themeRepository.themes.getValue(themeId).let {
+                (1..count).fold(it) { theme, i ->
+                    val opponent = makeCharacter()
+                    theme.withCharacterIncluded(opponent.id, opponent.name, opponent.media)
+                        .withCharacterAsStoryFunctionForMajorCharacter(opponent.id, StoryFunction.Antagonist, characterId)
+                        .withCharacterAttackingMajorCharacter(opponent.id, generateAttack(i), characterId)
+                        .withCharactersSimilarToEachOther(opponent.id to characterId, generateSimilarities(i))
+                        .withCharacterHoldingPosition(opponent.id, generatePosition(i))
+                }
             }
         }
 

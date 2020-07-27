@@ -15,6 +15,7 @@ fun Character.asMinorCharacter(thematicSections: List<ThematicSection>): MinorCh
         name,
         "",
         "",
+        "",
         thematicSections
     )
 }

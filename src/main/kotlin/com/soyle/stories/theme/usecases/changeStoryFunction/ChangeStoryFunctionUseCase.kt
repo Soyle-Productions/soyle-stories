@@ -93,8 +93,12 @@ class ChangeStoryFunctionUseCase(
         targetCharacterId: Character.Id,
         storyFunction: StoryFunction
     ) = clearStoryFunctions(majorCharacter, targetCharacterId)
-        .flatMap {
+        .map {
             val updatedPerceivedCharacter = it.getMajorCharacterById(majorCharacter.id)!!
-            it.applyStoryFunction(updatedPerceivedCharacter, targetCharacterId, storyFunction)
+            it.withCharacterAsStoryFunctionForMajorCharacter(
+                targetCharacterId,
+                storyFunction,
+                updatedPerceivedCharacter.id
+            )
         }
 }
