@@ -109,6 +109,8 @@ import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.L
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInThemeUseCase
+import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
+import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharactersUseCase
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWeb
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWebUseCase
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
@@ -154,8 +156,7 @@ object ThemeModule {
 
     }
 
-    private fun InScope<ProjectScope>.usecases()
-    {
+    private fun InScope<ProjectScope>.usecases() {
         provide<CreateTheme> { CreateThemeUseCase(get()) }
         provide<ListSymbolsByTheme> { ListSymbolsByThemeUseCase(get()) }
         provide<DeleteTheme> { DeleteThemeUseCase(get(), get()) }
@@ -176,15 +177,30 @@ object ThemeModule {
         provide<AddSymbolicItemToOpposition> { AddSymbolicItemToOppositionUseCase(get(), get(), get()) }
         provide<RenameSymbolicItem> { RenameSymbolicItemUseCase(get()) }
         provide<RemoveSymbolicItem> { RemoveSymbolicItemUseCase(get()) }
-        provide<ListAvailableEntitiesToAddToOpposition> { ListAvailableEntitiesToAddToOppositionUseCase(get(), get(), get()) }
+        provide<ListAvailableEntitiesToAddToOpposition> {
+            ListAvailableEntitiesToAddToOppositionUseCase(
+                get(),
+                get(),
+                get()
+            )
+        }
         provide<CompareCharacterValues> { CompareCharacterValuesUseCase(get()) }
-        provide<ListCharactersAvailableToIncludeInTheme> { ListCharactersAvailableToIncludeInThemeUseCase(get(), get()) }
-        provide<ListAvailableOppositionValuesForCharacterInTheme> { ListAvailableOppositionValuesForCharacterInThemeUseCase(get()) }
-        provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get()) }
+        provide<ListCharactersAvailableToIncludeInTheme> {
+            ListCharactersAvailableToIncludeInThemeUseCase(
+                get(),
+                get()
+            )
+        }
+        provide<ListAvailableOppositionValuesForCharacterInTheme> {
+            ListAvailableOppositionValuesForCharacterInThemeUseCase(
+                get()
+            )
+        }
+        provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get(), get()) }
+        provide<ListAvailablePerspectiveCharacters> { ListAvailablePerspectiveCharactersUseCase(get()) }
     }
 
-    private fun InScope<ProjectScope>.notifiers()
-    {
+    private fun InScope<ProjectScope>.notifiers() {
         provide(CreateTheme.OutputPort::class) {
             CreateThemeNotifier(get())
         }
@@ -236,8 +252,7 @@ object ThemeModule {
         }
     }
 
-    private fun InScope<ProjectScope>.controllers()
-    {
+    private fun InScope<ProjectScope>.controllers() {
         provide<CreateThemeController> {
             CreateThemeControllerImpl(projectId.toString(), applicationScope.get(), get(), get())
         }
@@ -289,8 +304,7 @@ object ThemeModule {
         }
     }
 
-    private fun InScope<ProjectScope>.gui()
-    {
+    private fun InScope<ProjectScope>.gui() {
         provide<CreateThemeDialogViewListener> {
             val presenter = CreateThemeDialogPresenter(
                 get<CreateThemeDialogModel>()
@@ -540,6 +554,8 @@ object ThemeModule {
                 CharacterConflictController(
                     themeId,
                     projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    presenter,
                     projectScope.get(),
                     presenter
                 )
