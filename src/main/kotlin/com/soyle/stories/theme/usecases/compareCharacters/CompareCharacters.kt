@@ -13,11 +13,8 @@ interface CompareCharacters {
     suspend operator fun invoke(themeId: UUID, focusCharacterId: UUID?, outputPort: OutputPort)
 
     class ResponseModel(
-        val characterSummaries: CharacterSummaries,
-        val majorCharacterIds: List<UUID>,
-        val focusedCharacterId: UUID?,
-        val centralQuestion: String,
-        val comparisonSections: List<String>
+        val themeId: UUID,
+        val comparedCharacters: List<Unit>
     )
 
     class CharacterSummaries(private val summaries: Map<UUID, CharacterComparisonSummary>) {

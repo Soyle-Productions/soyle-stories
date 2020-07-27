@@ -155,7 +155,7 @@ class CompareCharacterValuesUnitTest {
             if (it % 2 == 0) {
                 MinorCharacter(Character.Id(), name, archetype, "", listOf())
             } else {
-                MajorCharacter(Character.Id(), name, archetype, "", listOf(), CharacterPerspective(mapOf(), mapOf()))
+                MajorCharacter(Character.Id(), name, archetype, "", listOf(), CharacterPerspective(mapOf(), mapOf()), "")
             }
         }.associateBy { it.id })
     }

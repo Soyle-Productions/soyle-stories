@@ -227,7 +227,8 @@ class ChangeStoryFunctionTest {
                             CharacterPerspective(characters.filterNot { it.first == characterUUID }.associate {
                                 Character.Id(it.first) to (functions?.map { StoryFunction.valueOf(it) }
                                     ?: emptyList<StoryFunction>())
-                            }, mapOf())
+                            }, mapOf()),
+                            ""
                         ) else MinorCharacter(characterId, "Bob", "", "", listOf())
                     }
                 )

@@ -6,6 +6,7 @@ import arrow.core.right
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.*
+import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
 import com.soyle.stories.translators.asCharacterArcTemplateSection
 import java.util.*
 
@@ -16,12 +17,13 @@ fun makeTheme(
 	projectId: Project.Id = Project.Id(),
 	name: String = "Theme ${UUID.randomUUID().toString().take(3)}",
 	symbols: List<Symbol> = listOf(),
+	centralConflict: String = "",
 	centralMoralQuestion: String = "",
 	includedCharacters: Map<Character.Id, CharacterInTheme> = mapOf(),
 	similaritiesBetweenCharacters: Map<Set<Character.Id>, String> = mapOf(),
 	valueWebs: List<ValueWeb> = listOf()
 ): Theme = Theme(
-	id, projectId, name, symbols, centralMoralQuestion, includedCharacters, similaritiesBetweenCharacters, valueWebs
+	id, projectId, name, symbols, centralConflict, centralMoralQuestion, includedCharacters, similaritiesBetweenCharacters, valueWebs
 )
 
 fun makeValueWeb(

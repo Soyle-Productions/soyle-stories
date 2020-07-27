@@ -25,11 +25,7 @@ internal class CharacterComparor(
 
     fun compareCharacters(): CompareCharacters.ResponseModel {
         return CompareCharacters.ResponseModel(
-            centralQuestion = theme.centralMoralQuestion,
-            focusedCharacterId = focusCharacter?.id?.uuid,
-            majorCharacterIds = majorCharacterIds(),
-            comparisonSections = thematicTemplateSectionNames(),
-            characterSummaries = summarizeCharacters()
+            UUID.randomUUID(), listOf()
         )
     }
 

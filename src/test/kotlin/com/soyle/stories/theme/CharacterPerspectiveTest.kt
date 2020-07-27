@@ -99,7 +99,8 @@ class CharacterPerspectiveTest {
 				"",
 				"",
 				listOf(),
-				CharacterPerspective(mapOf(), mapOf())
+				CharacterPerspective(mapOf(), mapOf()),
+				""
 			) to otherCharacters.first()
 		).forEach { (characterInTheme, targetCharacter) ->
 			val (error) = theme.applyStoryFunction(characterInTheme, targetCharacter.id, StoryFunction.Antagonist) as Either.Left
@@ -183,7 +184,8 @@ class CharacterPerspectiveTest {
 				"",
 				"",
 				listOf(),
-				CharacterPerspective(mapOf(), mapOf())
+				CharacterPerspective(mapOf(), mapOf()),
+				""
 			) to otherCharacters.first()
 		).forEach { (characterInTheme, targetCharacter) ->
 			val (error) = theme.changeAttack(characterInTheme, targetCharacter.id, "") as Either.Left

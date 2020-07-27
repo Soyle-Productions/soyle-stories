@@ -22,8 +22,14 @@ fun themeDoesNotExist(themeId: UUID): (Any?) -> Unit = { actual ->
 
 fun characterNotInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
     actual as CharacterNotInTheme
-    assertEquals(themeId, actual.themeId)
-    assertEquals(characterId, actual.characterId)
+    assertEquals(themeId, actual.themeId) { "Character not in theme exception does not have expected theme id" }
+    assertEquals(characterId, actual.characterId) { "Character not in theme exception does not have expected character id" }
+}
+
+fun characterIsNotMajorCharacterInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
+    actual as CharacterIsNotMajorCharacterInTheme
+    assertEquals(themeId, actual.themeId) { "Character not major character in theme exception does not have expected theme id" }
+    assertEquals(characterId, actual.characterId) { "Character not major character in theme exception does not have expected character id" }
 }
 
 fun symbolNameCannotBeBlank(actual: Any?)

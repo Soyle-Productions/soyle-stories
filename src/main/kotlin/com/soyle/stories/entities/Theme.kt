@@ -76,9 +76,8 @@ class Theme(
 
     fun withCharacterIncluded(characterId: Character.Id, characterName: String, characterMediaId: Media.Id?): Theme
     {
-        if (containsCharacter(characterId)) {
-            throw CharacterAlreadyIncludedInTheme(characterId.uuid, id.uuid)
-        }
+        mustNotContainCharacter(characterId)
+
         val newCharacter = MinorCharacter(characterId, characterName, "", "", thematicTemplate.sections.map {
             ThematicSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, id, it)
         })
@@ -97,9 +96,7 @@ class Theme(
     }
 
     fun withoutCharacter(characterId: Character.Id): Theme {
-        if (! containsCharacter(characterId)) {
-            throw CharacterNotInTheme(id.uuid, characterId.uuid)
-        }
+        mustContainCharacter(characterId)
         val minorCharacters = includedCharacters.values.filterIsInstance<MinorCharacter>()
         val majorCharacters = includedCharacters.values.filterIsInstance<MajorCharacter>().map {
             it.ignoreCharacter(characterId)
@@ -111,6 +108,32 @@ class Theme(
                 it.key.contains(characterId)
             }
         )
+    }
+
+    fun withCharacterChangeAs(characterId: Character.Id, change: String): Theme
+    {
+        mustContainCharacter(characterId)
+        val majorCharacter = getMajorCharacterById(characterId)
+            ?: throw CharacterIsNotMajorCharacterInTheme(characterId.uuid, id.uuid)
+
+        return copy(
+            includedCharacters = characters
+                .filterNot { it.id == characterId }
+                .plus(majorCharacter.withCharacterChangeAs(change))
+                .associateBy { it.id }
+        )
+    }
+
+    private fun mustNotContainCharacter(characterId: Character.Id) {
+        if (containsCharacter(characterId)) {
+            throw CharacterAlreadyIncludedInTheme(characterId.uuid, id.uuid)
+        }
+    }
+
+    private fun mustContainCharacter(characterId: Character.Id) {
+        if (! containsCharacter(characterId)) {
+            throw CharacterNotInTheme(id.uuid, characterId.uuid)
+        }
     }
 
     fun removeCharacter(characterId: Character.Id): Either<ThemeException, Theme> {
@@ -232,7 +255,8 @@ class Theme(
                     @Suppress("RemoveExplicitTypeArguments")
                     emptyList<StoryFunction>()
                 }, emptyMap()
-            )
+            ),
+            ""
         )
 
     fun demoteCharacter(character: MajorCharacter): Either<ThemeException, Theme> {

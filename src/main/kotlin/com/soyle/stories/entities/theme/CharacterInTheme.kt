@@ -55,7 +55,8 @@ class MajorCharacter(
     override val archetype: String,
     override val variationOnMoral: String,
     override val thematicSections: List<ThematicSection>,
-    private val perspective: CharacterPerspective
+    private val perspective: CharacterPerspective,
+    val characterChange: String
 ) : CharacterInTheme() {
 
     private fun copy(
@@ -63,8 +64,9 @@ class MajorCharacter(
         archetype: String = this.archetype,
         variationOnMoral: String = this.variationOnMoral,
         thematicSections: List<ThematicSection> = this.thematicSections,
-        perspective: CharacterPerspective = this.perspective
-    ) = MajorCharacter(id, name, archetype, variationOnMoral, thematicSections, perspective)
+        perspective: CharacterPerspective = this.perspective,
+        characterChange: String = this.characterChange
+    ) = MajorCharacter(id, name, archetype, variationOnMoral, thematicSections, perspective, characterChange)
 
     override fun changeName(name: String): MajorCharacter =
       copy(name = name)
@@ -98,5 +100,8 @@ class MajorCharacter(
 
     fun getAttacksByCharacter(characterId: Character.Id) =
         perspective.attacks[characterId]
+
+    fun withCharacterChangeAs(change: String): MajorCharacter =
+        copy(characterChange = change)
 
 }
