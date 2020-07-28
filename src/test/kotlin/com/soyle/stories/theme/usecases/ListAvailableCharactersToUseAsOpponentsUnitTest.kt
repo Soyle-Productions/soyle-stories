@@ -4,9 +4,11 @@ import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.*
+import com.soyle.stories.theme.doubles.CharacterRepositoryDouble
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.AvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.assertThrows
 
 class ListAvailableCharactersToUseAsOpponentsUnitTest {
 
+    private val projectId = Project.Id()
     private val themeId = Theme.Id()
     private val perspectiveCharacterId = Character.Id()
 
@@ -75,10 +78,20 @@ class ListAvailableCharactersToUseAsOpponentsUnitTest {
         availableCharacters!! shouldBe listWithAllCharactersInThemeExceptPerspectiveCharacter(1)
     }
 
+    @Test
+    fun `more characters not already in theme`() {
+        givenThemeExists()
+        givenCharacterInTheme(perspectiveCharacterId, isMajorCharacter = true)
+        givenOtherCharactersNotInTheme(count = 4)
+        listAvailableCharactersToUseAsOpponents()
+        availableCharacters!! shouldBe listWithAllCharactersNotInTheme(4)
+    }
+
     private val themeRepository = ThemeRepositoryDouble()
+    private val characterRepository = CharacterRepositoryDouble()
 
     private fun givenThemeExists() {
-        themeRepository.themes[themeId] = makeTheme(themeId)
+        themeRepository.themes[themeId] = makeTheme(themeId, projectId = projectId)
     }
     private fun givenCharacterInTheme(characterId: Character.Id, isMajorCharacter: Boolean = false)
     {
@@ -91,7 +104,7 @@ class ListAvailableCharactersToUseAsOpponentsUnitTest {
     private fun givenOtherCharactersInTheme(count: Int)
     {
         themeRepository.themes[themeId] = (1..count).fold(themeRepository.themes.getValue(themeId)) { theme, _ ->
-            val baseCharacter = makeCharacter()
+            val baseCharacter = makeCharacter(projectId = projectId)
             theme.withCharacterIncluded(baseCharacter.id, baseCharacter.name, baseCharacter.media)
         }
     }
@@ -105,9 +118,17 @@ class ListAvailableCharactersToUseAsOpponentsUnitTest {
         }
     }
 
+    private fun givenOtherCharactersNotInTheme(count: Int)
+    {
+        repeat(count) {
+            val character = makeCharacter(projectId = projectId)
+            characterRepository.characters[character.id] = character
+        }
+    }
+
     private fun listAvailableCharactersToUseAsOpponents()
     {
-        val useCase: ListAvailableCharactersToUseAsOpponents = ListAvailableCharactersToUseAsOpponentsUseCase(themeRepository)
+        val useCase: ListAvailableCharactersToUseAsOpponents = ListAvailableCharactersToUseAsOpponentsUseCase(themeRepository, characterRepository)
         val output = object : ListAvailableCharactersToUseAsOpponents.OutputPort {
             override suspend fun receiveAvailableCharactersToUseAsOpponents(response: AvailableCharactersToUseAsOpponents) {
                 availableCharacters = response
@@ -130,8 +151,21 @@ class ListAvailableCharactersToUseAsOpponentsUnitTest {
         assertEquals(perspectiveCharacterId.uuid, response.perspectiveCharacterId)
         val theme = themeRepository.themes.getValue(themeId)
         val expectedBackingCharacters = theme.characters.filterNot { it.id == perspectiveCharacterId }.associateBy { it.id.uuid }
-        assertEquals(expectedCount, response.size)
-        response.forEach {
+        val list = response.filter { it.includedInTheme }
+        assertEquals(expectedCount, list.size)
+        list.forEach {
+            val backingCharacter = expectedBackingCharacters.getValue(it.characterId)
+            assertEquals(backingCharacter.name, it.characterName)
+        }
+    }
+
+    private fun listWithAllCharactersNotInTheme(expectedCount: Int) = fun (response: AvailableCharactersToUseAsOpponents) {
+        assertEquals(themeId.uuid, response.themeId)
+        assertEquals(perspectiveCharacterId.uuid, response.perspectiveCharacterId)
+        val expectedBackingCharacters = characterRepository.characters.mapKeys { it.key.uuid }
+        val list = response.filterNot { it.includedInTheme }
+        assertEquals(expectedCount, list.size)
+        list.forEach {
             val backingCharacter = expectedBackingCharacters.getValue(it.characterId)
             assertEquals(backingCharacter.name, it.characterName)
         }
