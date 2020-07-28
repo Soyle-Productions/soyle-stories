@@ -3,6 +3,7 @@ package com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
@@ -31,7 +32,10 @@ class ListAvailableCharactersToUseAsOpponentsUseCase(
             AvailableCharactersToUseAsOpponents(
                 theme.id.uuid,
                 perspectiveCharacter.id.uuid,
-                theme.characters.asSequence().filterNot { it.id == perspectiveCharacter.id }.map(::CharacterItem).toList()
+                theme.characters.asSequence()
+                    .filterNot { it.id == perspectiveCharacter.id }
+                    .filterNot { perspectiveCharacter.getStoryFunctionsForCharacter(it.id) == StoryFunction.Antagonist }
+                    .map(::CharacterItem).toList()
             )
         )
     }
