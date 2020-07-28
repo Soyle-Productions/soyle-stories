@@ -94,10 +94,10 @@ class MajorCharacter(
     fun getStoryFunctionsForCharacter(characterId: Character.Id) =
         perspective.storyFunctions[characterId]
 
-    fun getOpponents() = perspective.storyFunctions.filter { it.value.contains(StoryFunction.Antagonist) || it.value.contains(StoryFunction.FakeAllyAntagonist) }
+    fun getOpponents() = perspective.storyFunctions.filter { it.value == StoryFunction.Antagonist || it.value == StoryFunction.FakeAllyAntagonist }
 
     fun hasStoryFunctionForTargetCharacter(function: StoryFunction, characterId: Character.Id) =
-        getStoryFunctionsForCharacter(characterId)?.contains(function) == true
+        getStoryFunctionsForCharacter(characterId) == function
 
     fun applyStoryFunction(characterId: Character.Id, function: StoryFunction): MajorCharacter =
         copy(perspective = perspective.applyStoryFunction(characterId, function))

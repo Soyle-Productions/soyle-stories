@@ -36,35 +36,6 @@ class CharacterPerspectiveTest {
         return result.b.includeCharacters(characters.drop(1))
     }
 
-    @Nested
-    inner class `Each character in the theme serves a story function` {
-
-        fun assertAllCharactersHaveStoryFunctions(theme: Theme) {
-            val characterInTheme = theme.getMajorCharacterById(newCharacter.id)
-            characterInTheme as MajorCharacter
-
-            otherCharacters.forEach {
-                assertNotNull(characterInTheme.getStoryFunctionsForCharacter(it.id))
-            }
-        }
-
-        @Test
-        fun `when included, all should have functions`() {
-            val (theme) = promoteCharacter()
-                .flatMap { it.includeCharacters(otherCharacters) } as Either.Right
-            assertAllCharactersHaveStoryFunctions(theme)
-        }
-
-        @Test
-        fun `when promoted, all should have functions`() {
-            val (theme) = themeWithCharacter.includeCharacters(otherCharacters)
-                .flatMap { it.promoteCharacter(it.getMinorCharacterById(newCharacter.id) as MinorCharacter) }
-                    as Either.Right
-            assertAllCharactersHaveStoryFunctions(theme)
-        }
-
-    }
-
     @Test
     fun `can apply story functions to characters`() {
         val (theme) = promoteCharacter()

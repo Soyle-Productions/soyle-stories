@@ -88,9 +88,9 @@ internal class CharacterComparor(
     }
 
     private fun MajorCharacter.getResponseStoryFunctionsForCharacter(targetCharacterId: Character.Id): List<CompareCharacters.StoryFunction> {
-        return getStoryFunctionsForCharacter(targetCharacterId)!!.map {
+        return listOfNotNull(getStoryFunctionsForCharacter(targetCharacterId)?.let {
             CompareCharacters.StoryFunction.valueOf(it.name)
-        }
+        })
     }
 
     private fun List<ThematicSection>.valuesInThematicTemplate(): List<Pair<UUID, String>> {

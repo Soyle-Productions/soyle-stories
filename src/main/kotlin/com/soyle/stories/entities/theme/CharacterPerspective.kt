@@ -8,13 +8,13 @@ import com.soyle.stories.entities.Character
  * Time: 4:43 PM
  */
 class CharacterPerspective(
-    val storyFunctions: Map<Character.Id, List<StoryFunction>>,
+    val storyFunctions: Map<Character.Id, StoryFunction?>,
     val attacks: Map<Character.Id, String>
 ) {
 
     fun perceiveCharacter(characterId: Character.Id) =
         CharacterPerspective(
-            storyFunctions + (characterId to listOf()),
+            storyFunctions + (characterId to null),
             attacks + (characterId to "")
         )
 
@@ -26,13 +26,13 @@ class CharacterPerspective(
 
     fun applyStoryFunction(characterId: Character.Id, function: StoryFunction) =
         CharacterPerspective(
-            storyFunctions.minus(characterId).plus(characterId to storyFunctions.getValue(characterId) + function),
+            storyFunctions.minus(characterId).plus(characterId to function),
             attacks
         )
 
     fun clearStoryFunctions(characterId: Character.Id) =
         CharacterPerspective(
-            storyFunctions.minus(characterId).plus(characterId to emptyList()),
+            storyFunctions.minus(characterId).plus(characterId to null),
             attacks
         )
 

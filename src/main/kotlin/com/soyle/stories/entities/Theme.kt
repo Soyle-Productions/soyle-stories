@@ -325,7 +325,7 @@ class Theme(
             CharacterPerspective(
                 includedCharacters.keys.toList().minus(id).associateWith {
                     @Suppress("RemoveExplicitTypeArguments")
-                    emptyList<StoryFunction>()
+                    null as StoryFunction?
                 }, emptyMap()
             ),
             ""

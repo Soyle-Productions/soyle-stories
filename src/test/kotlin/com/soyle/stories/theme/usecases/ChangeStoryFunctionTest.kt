@@ -213,7 +213,7 @@ class ChangeStoryFunctionTest {
                 persistedPerspectiveCharacter.getStoryFunctionsForCharacter(
                     Character.Id(targetCharacterId)
                 )!!
-            persistedTargetCharacterStoryFunctions.single()
+            persistedTargetCharacterStoryFunctions
                 .mustEqual(StoryFunction.valueOf(storyFunction)) { "Story function was not applied." }
 
         }
