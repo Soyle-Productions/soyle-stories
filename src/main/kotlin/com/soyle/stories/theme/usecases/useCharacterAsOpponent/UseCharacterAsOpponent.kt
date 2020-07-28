@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.usecases.useCharacterAsOpponent
 
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import java.util.*
 
 interface UseCharacterAsOpponent {
@@ -12,8 +13,13 @@ interface UseCharacterAsOpponent {
 
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
+    class ResponseModel(
+        val characterAsOpponent: OpponentCharacter,
+        val includedCharacter: CharacterIncludedInTheme?
+    )
+
     interface OutputPort {
-        suspend fun characterIsOpponent(response: OpponentCharacter)
+        suspend fun characterIsOpponent(response: ResponseModel)
     }
 
 }
