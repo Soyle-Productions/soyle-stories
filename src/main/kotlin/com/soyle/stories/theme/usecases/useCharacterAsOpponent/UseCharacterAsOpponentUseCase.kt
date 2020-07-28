@@ -21,7 +21,7 @@ class UseCharacterAsOpponentUseCase(
         val perspectiveCharacter = getPerspectiveCharacter(theme, request.perspectiveCharacterId)
         val opponentCharacter = getCharacterInTheme(theme, request.opponentId)
         setCharacterAsOpponentForPerspectiveCharacter(theme, opponentCharacter, perspectiveCharacter)
-        output.characterIsOpponent(opponentCharacter(opponentCharacter, perspectiveCharacter))
+        output.characterIsOpponent(opponentCharacter(theme, opponentCharacter, perspectiveCharacter))
     }
 
     private suspend fun getTheme(themeId: UUID) =
@@ -47,13 +47,15 @@ class UseCharacterAsOpponentUseCase(
     }
 
     private fun opponentCharacter(
+        theme: Theme,
         opponentCharacter: CharacterInTheme,
         perspectiveCharacter: MajorCharacter
     ): OpponentCharacter {
         return OpponentCharacter(
             opponentCharacter.id.uuid,
             opponentCharacter.name,
-            perspectiveCharacter.id.uuid
+            perspectiveCharacter.id.uuid,
+            theme.id.uuid
         )
     }
 

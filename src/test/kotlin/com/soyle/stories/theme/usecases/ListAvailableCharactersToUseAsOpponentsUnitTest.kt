@@ -100,10 +100,14 @@ class ListAvailableCharactersToUseAsOpponentsUnitTest {
 
     private fun empty(response: AvailableCharactersToUseAsOpponents)
     {
+        assertEquals(themeId.uuid, response.themeId)
+        assertEquals(perspectiveCharacterId.uuid, response.perspectiveCharacterId)
         assertTrue(response.isEmpty())
     }
 
     private fun listWithAllCharactersInThemeExceptPerspectiveCharacter(response: AvailableCharactersToUseAsOpponents) {
+        assertEquals(themeId.uuid, response.themeId)
+        assertEquals(perspectiveCharacterId.uuid, response.perspectiveCharacterId)
         val theme = themeRepository.themes.getValue(themeId)
         val expectedBackingCharacters = theme.characters.filterNot { it.id == perspectiveCharacterId }.associateBy { it.id.uuid }
         assertEquals(expectedBackingCharacters.size, response.size)

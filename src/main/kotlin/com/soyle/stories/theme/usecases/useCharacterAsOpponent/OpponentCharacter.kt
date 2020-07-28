@@ -5,5 +5,6 @@ import java.util.*
 class OpponentCharacter(
     val characterId: UUID,
     val characterName: String,
-    val opponentOfCharacterId: UUID
+    val opponentOfCharacterId: UUID,
+    val themeId: UUID
 )

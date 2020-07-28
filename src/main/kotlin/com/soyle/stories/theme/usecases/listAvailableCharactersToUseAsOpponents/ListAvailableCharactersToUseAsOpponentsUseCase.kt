@@ -29,6 +29,8 @@ class ListAvailableCharactersToUseAsOpponentsUseCase(
 
         output.receiveAvailableCharactersToUseAsOpponents(
             AvailableCharactersToUseAsOpponents(
+                theme.id.uuid,
+                perspectiveCharacter.id.uuid,
                 theme.characters.asSequence().filterNot { it.id == perspectiveCharacter.id }.map(::CharacterItem).toList()
             )
         )

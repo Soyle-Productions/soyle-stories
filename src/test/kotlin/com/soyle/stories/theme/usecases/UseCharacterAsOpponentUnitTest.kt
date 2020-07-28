@@ -123,6 +123,7 @@ class UseCharacterAsOpponentUnitTest {
         assertEquals(opponent.id.uuid, actual.characterId)
         assertEquals(opponent.name, actual.characterName)
         assertEquals(perspectiveCharacter.id.uuid, actual.opponentOfCharacterId)
+        assertEquals(themeId.uuid, actual.themeId)
     }
 
 }
