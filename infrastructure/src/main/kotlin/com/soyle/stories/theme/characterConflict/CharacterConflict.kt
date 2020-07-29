@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.characterConflict
 
+import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.components.*
@@ -74,10 +75,40 @@ class CharacterConflict : View() {
                                     }
                                     else -> {
                                         //items.add(createCharacterItem)
-                                        it.forEach {
+                                        item("Major Characters") {
+                                            addClass(ComponentsStyles.contextMenuSectionHeaderItem)
+                                            isDisable = true
+                                        }
+                                        it.filter { it.isMajorCharacter }.forEach {
                                             item(it.characterName) {
+                                                addClass(ComponentsStyles.contextMenuSectionedItem)
                                                 action {
-                                                    model.selectedPerspectiveCharacter.value = it
+                                                    model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName)
+                                                    viewListener.getValidState(it.characterId)
+                                                }
+                                            }
+                                        }
+                                        item("Minor Characters") {
+                                            addClass(ComponentsStyles.contextMenuSectionHeaderItem)
+                                            isDisable = true
+                                        }
+                                        it.filterNot { it.isMajorCharacter }.forEach {
+                                            customitem {
+                                                addClass(ComponentsStyles.contextMenuSectionedItem)
+                                                addClass(ComponentsStyles.discouragedSelection)
+                                                content = label(it.characterName) {
+                                                    tooltip {
+                                                        showDelay = Duration.seconds(0.0)
+                                                        hideDelay = Duration.seconds(0.0)
+                                                        style { fontSize = 1.em }
+                                                        text = "${it.characterName} is a minor character in this theme." +
+                                                                "  By selecting this character, they will be promoted" +
+                                                                " to a major character in the theme.  This means they" +
+                                                                " will gain a character arc."
+                                                    }
+                                                }
+                                                action {
+                                                    model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName)
                                                     viewListener.getValidState(it.characterId)
                                                 }
                                             }

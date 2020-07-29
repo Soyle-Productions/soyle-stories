@@ -27,7 +27,7 @@ class CharacterComparisonViewListenerImpl(
 	}
 
 	override suspend fun promoteCharacter(characterId: String) {
-		promoteMinorCharacterController.promoteCharacter(characterId)
+		promoteMinorCharacterController.promoteCharacter(themeId, characterId)
 	}
 
 	override suspend fun demoteCharacter(characterId: String) {

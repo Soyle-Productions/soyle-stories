@@ -577,6 +577,7 @@ object ThemeModule {
                     presenter,
                     projectScope.get(),
                     presenter,
+                    projectScope.get(),
                     projectScope.get()
                 )
             }

@@ -1,6 +1,8 @@
 package com.soyle.stories.theme.characterConflict
 
+import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterController
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.AvailableCharactersToUseAsOpponents
@@ -18,7 +20,8 @@ class CharacterConflictController(
     private val getAvailablePerspectiveCharactersOutputPort: ListAvailablePerspectiveCharacters.OutputPort,
     private val listAvailableCharactersToUseAsOpponents: ListAvailableCharactersToUseAsOpponents,
     private val listAvailableCharactersToUseAsOpponentsOutputPort: ListAvailableCharactersToUseAsOpponents.OutputPort,
-    private val useCharacterAsOpponentController: UseCharacterAsOpponentController
+    private val useCharacterAsOpponentController: UseCharacterAsOpponentController,
+    private val promoteMinorCharacterController: PromoteMinorCharacterController
 ) : CharacterConflictViewListener {
 
     private val themeId = UUID.fromString(themeId)
@@ -26,7 +29,14 @@ class CharacterConflictController(
     override fun getValidState(characterId: String?) {
         val preparedCharacterId = characterId?.let(UUID::fromString)
         threadTransformer.async {
-            examineCentralConflict.invoke(themeId, preparedCharacterId, examineCentralConflictOutputPort)
+            try {
+                examineCentralConflict.invoke(themeId, preparedCharacterId, examineCentralConflictOutputPort)
+            } catch(e: CharacterIsNotMajorCharacterInTheme) {
+                if (preparedCharacterId != null && e.characterId == preparedCharacterId) {
+                    promoteMinorCharacterController.promoteCharacter(themeId.toString(), preparedCharacterId.toString())
+                    examineCentralConflict.invoke(themeId, preparedCharacterId, examineCentralConflictOutputPort)
+                } else throw e
+            }
         }
     }
 

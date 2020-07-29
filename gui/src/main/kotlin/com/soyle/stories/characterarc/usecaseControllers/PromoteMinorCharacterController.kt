@@ -4,17 +4,16 @@ import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharac
 import java.util.*
 
 class PromoteMinorCharacterController(
-  themeId: String,
   private val promoteMinorCharacter: PromoteMinorCharacter,
   private val promoteMinorCharacterOutputPort: PromoteMinorCharacter.OutputPort
 ) {
 
-	private val themeId: UUID = UUID.fromString(themeId)
-
-	suspend fun promoteCharacter(characterId: String) {
+	suspend fun promoteCharacter(themeId: String, characterId: String) {
+		val preparedThemeId = UUID.fromString(themeId)
+		val preparedCharacterId = UUID.fromString(characterId)
 		PromoteMinorCharacter.RequestModel(
-		  themeId,
-		  UUID.fromString(characterId)
+			preparedThemeId,
+			preparedCharacterId
 		)
 		  .let { promoteMinorCharacter.invoke(it, promoteMinorCharacterOutputPort) }
 	}

@@ -64,7 +64,7 @@ class CharacterConflictPresenter(
         view.updateOrInvalidated {
             copy(
                 availablePerspectiveCharacters = response.map {
-                    CharacterItemViewModel(it.characterId.toString(), it.characterName)
+                    AvailablePerspectiveCharacterViewModel(it.characterId.toString(), it.characterName, it.isMajorCharacter)
                 }
             )
         }

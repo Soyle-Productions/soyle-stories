@@ -14,7 +14,7 @@ class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictVi
     val centralConflict = bind(CharacterConflictViewModel::centralConflict)
     val perspectiveCharacterLabel = bind(CharacterConflictViewModel::perspectiveCharacterLabel)
     val selectedPerspectiveCharacter = SimpleObjectProperty<CharacterItemViewModel?>(null)
-    val availablePerspectiveCharacters = SimpleObjectProperty<List<CharacterItemViewModel>?>(null)
+    val availablePerspectiveCharacters = SimpleObjectProperty<List<AvailablePerspectiveCharacterViewModel>?>(null)
     val desireLabel = bind(CharacterConflictViewModel::desireLabel)
     val desire = bind(CharacterConflictViewModel::desire)
     val psychologicalWeaknessLabel = bind(CharacterConflictViewModel::psychologicalWeaknessLabel)

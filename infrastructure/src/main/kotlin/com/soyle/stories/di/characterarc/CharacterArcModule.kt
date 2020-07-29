@@ -217,6 +217,9 @@ object CharacterArcModule {
 		provide<RemoveCharacterFromComparisonController> {
 			RemoveCharacterFromComparisonControllerImpl(applicationScope.get(), get(), get())
 		}
+		provide {
+			PromoteMinorCharacterController(get(), get())
+		}
 	}
 
 
@@ -245,9 +248,6 @@ object CharacterArcModule {
 		}
 
 		scoped<CharacterComparisonScope> {
-			provide {
-				PromoteMinorCharacterController(themeId, projectScope.get(), projectScope.get())
-			}
 			provide {
 				DeleteLocalCharacterArcController(themeId, projectScope.get(), projectScope.get())
 			}

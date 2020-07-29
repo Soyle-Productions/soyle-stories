@@ -8,7 +8,7 @@ data class CharacterConflictViewModel(
     val centralConflict: String,
     val perspectiveCharacterLabel: String,
     val selectedPerspectiveCharacter: CharacterItemViewModel?,
-    val availablePerspectiveCharacters: List<CharacterItemViewModel>?,
+    val availablePerspectiveCharacters: List<AvailablePerspectiveCharacterViewModel>?,
     val desireLabel: String,
     val desire: String,
     val psychologicalWeaknessLabel: String,
@@ -23,6 +23,12 @@ data class CharacterConflictViewModel(
     val powerStatusOrAbilitiesLabel: String,
     val opponents: List<CharacterChangeOpponentViewModel>,
     val availableOpponents: List<AvailableOpponentViewModel>?
+)
+
+class AvailablePerspectiveCharacterViewModel(
+    val characterId: String,
+    val characterName: String,
+    val isMajorCharacter: Boolean
 )
 
 class CharacterChangeOpponentViewModel(
