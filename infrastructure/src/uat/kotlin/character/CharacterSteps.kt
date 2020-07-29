@@ -1,25 +1,14 @@
 package com.soyle.stories.character
 
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
-import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
-import com.soyle.stories.characterarc.repositories.CharacterRepository
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.ThemeSteps
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.fail
 import org.testfx.framework.junit5.ApplicationTest
-import java.util.*
 
 class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 
@@ -80,7 +69,7 @@ class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 					val scope = ProjectSteps.givenProjectHasBeenOpened(double)
 					val controller = scope.get<BuildNewCharacterController>()
 					interact {
-						controller.buildNewCharacter(characterName, null) { throw it }
+						controller.createCharacter(characterName) { throw it }
 					}
 				}
 			}
@@ -99,7 +88,7 @@ class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 				val controller = scope.get<BuildNewCharacterController>()
 				interact {
 					characterNames.forEach { characterName ->
-						controller.buildNewCharacter(characterName, null) { throw it }
+						controller.createCharacter(characterName) { throw it }
 					}
 				}
 			}
@@ -121,7 +110,7 @@ class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 				val scope = ProjectSteps.getProjectScope(double)!!
 				val controller = scope.get<BuildNewCharacterController>()
 				interact {
-					controller.buildNewCharacter(characterName, null) { throw it }
+					controller.createCharacter(characterName) { throw it }
 				}
 			}
 			When("the character {string} is renamed to {string}") { ogName: String, newName: String ->
@@ -143,7 +132,7 @@ class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 				val theme = ThemeSteps.getThemeWithName(double, themeName)!!
 				val controller = scope.get<BuildNewCharacterController>()
 				interact {
-					controller.buildNewCharacter(characterName, theme.id.uuid.toString()) { throw it }
+					controller.createCharacterAndIncludeInTheme(characterName, theme.id.uuid.toString()) { throw it }
 				}
 			}
 

@@ -2,8 +2,10 @@ package com.soyle.stories.theme.characterConflict
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
+import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.AvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
@@ -14,7 +16,8 @@ import java.util.*
 class CharacterConflictPresenter(
     themeId: String,
     private val view: View.Nullable<CharacterConflictViewModel>
-) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort, ListAvailableCharactersToUseAsOpponents.OutputPort, UseCharacterAsOpponent.OutputPort {
+) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
+    ListAvailableCharactersToUseAsOpponents.OutputPort, UseCharacterAsOpponent.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -41,9 +44,12 @@ class CharacterConflictPresenter(
                 moralWeakness = response.characterChange?.moralWeakness ?: "",
                 characterChangeLabel = "Character Change",
                 characterChange = response.characterChange?.changeAtEnd ?: "",
-                opponentSectionsLabel = response.characterChange?.let { "Opponents to ${it.characterName}" } ?: "Opponents",
-                attackSectionLabel = response.characterChange?.let { "How They Attack ${it.characterName}" } ?: "Attacks",
-                similaritiesSectionLabel = response.characterChange?.let { "Similarities to ${it.characterName}" } ?: "Similarities",
+                opponentSectionsLabel = response.characterChange?.let { "Opponents to ${it.characterName}" }
+                    ?: "Opponents",
+                attackSectionLabel = response.characterChange?.let { "How They Attack ${it.characterName}" }
+                    ?: "Attacks",
+                similaritiesSectionLabel = response.characterChange?.let { "Similarities to ${it.characterName}" }
+                    ?: "Similarities",
                 powerStatusOrAbilitiesLabel = "Power / Status / Abilities",
                 opponents = response.characterChange?.opponents?.map {
                     CharacterChangeOpponentViewModel(
@@ -64,7 +70,11 @@ class CharacterConflictPresenter(
         view.updateOrInvalidated {
             copy(
                 availablePerspectiveCharacters = response.map {
-                    AvailablePerspectiveCharacterViewModel(it.characterId.toString(), it.characterName, it.isMajorCharacter)
+                    AvailablePerspectiveCharacterViewModel(
+                        it.characterId.toString(),
+                        it.characterName,
+                        it.isMajorCharacter
+                    )
                 }
             )
         }

@@ -6,7 +6,19 @@ class CreateCharacterDialogController(
     private val buildNewCharacterController: BuildNewCharacterController
 ) : CreateCharacterDialogViewListener {
 
-    override fun createCharacter(name: String, includeInTheme: String?, useAsOpponentForCharacter: String?) {
-        buildNewCharacterController.buildNewCharacter(name, includeInTheme, useAsOpponentForCharacter) { throw it }
+    override fun createCharacter(name: String) {
+        buildNewCharacterController.createCharacter(name) { throw it }
+    }
+
+    override fun createCharacterAndIncludeInTheme(name: String, includeInTheme: String) {
+        buildNewCharacterController.createCharacterAndIncludeInTheme(name, includeInTheme) { throw it }
+    }
+
+    override fun createCharacterAsMajorCharacter(name: String, includeInTheme: String) {
+        buildNewCharacterController.createCharacterAsMajorCharacter(name, includeInTheme) { throw it }
+    }
+
+    override fun createCharacterForUseAsOpponent(name: String, includeInTheme: String, opponentForCharacter: String) {
+        buildNewCharacterController.createCharacterForUseAsOpponent(name, includeInTheme, opponentForCharacter) { throw it }
     }
 }

@@ -1,7 +1,9 @@
 package com.soyle.stories.theme.addSymbolDialog
 
 import com.soyle.stories.character.CharacterException
+import com.soyle.stories.character.buildNewCharacter.CreatedCharacterReceiver
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
+import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
@@ -40,7 +42,7 @@ class AddSymbolDialogPresenter(
     oppositionId: String,
     private val view: View.Nullable<AddSymbolDialogViewModel>
 ) : ListAvailableEntitiesToAddToOpposition.OutputPort,
-    BuildNewCharacter.OutputPort, RenameCharacter.OutputPort, RemoveCharacterFromStory.OutputPort,
+    CreatedCharacterReceiver, RenameCharacter.OutputPort, RemoveCharacterFromStory.OutputPort,
     CreateNewLocation.OutputPort, RenameLocation.OutputPort, DeleteLocation.OutputPort, SymbolAddedToThemeReceiver,
     RenameSymbol.OutputPort, RemoveSymbolFromTheme.OutputPort, AddSymbolicItemToOpposition.OutputPort {
 
@@ -64,12 +66,12 @@ class AddSymbolDialogPresenter(
         }
     }
 
-    override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
+    override suspend fun receiveCreatedCharacter(createdCharacter: CreatedCharacter) {
         view.updateOrInvalidated {
             copyOrDefault(
                 characters = characters + CharacterItemViewModel(
-                    response.characterId.toString(),
-                    response.characterName,
+                    createdCharacter.characterId.toString(),
+                    createdCharacter.characterName,
                     ""
                 )
             )
@@ -185,18 +187,9 @@ class AddSymbolDialogPresenter(
         completed = completed
     )
 
-    override fun receiveBuildNewCharacterFailure(failure: CharacterException) {}
     override fun receiveRenameCharacterFailure(failure: CharacterException) {}
     override fun receiveRemoveCharacterFromStoryFailure(failure: Exception) {}
     override fun receiveCreateNewLocationFailure(failure: LocationException) {}
     override fun receiveRenameLocationFailure(failure: LocationException) {}
     override fun receiveDeleteLocationFailure(failure: LocationException) {}
-    override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
-        // do nothing
-    }
-
-    override suspend fun characterIsOpponent(response: OpponentCharacter) {
-
-        // do nothing
-    }
 }

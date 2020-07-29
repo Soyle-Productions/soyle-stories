@@ -3,8 +3,10 @@ package com.soyle.stories.theme.characterConflict
 import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterController
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
+import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.AvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
@@ -22,7 +24,7 @@ class CharacterConflictController(
     private val listAvailableCharactersToUseAsOpponentsOutputPort: ListAvailableCharactersToUseAsOpponents.OutputPort,
     private val useCharacterAsOpponentController: UseCharacterAsOpponentController,
     private val promoteMinorCharacterController: PromoteMinorCharacterController
-) : CharacterConflictViewListener {
+) : CharacterConflictViewListener, CharacterIncludedInThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -59,6 +61,12 @@ class CharacterConflictController(
 
     override fun addOpponent(perspectiveCharacterId: String, characterId: String) {
         useCharacterAsOpponentController.useCharacterAsOpponent(themeId.toString(), perspectiveCharacterId, characterId)
+    }
+
+    override suspend fun receiveCharacterIncludedInTheme(characterIncludedInTheme: CharacterIncludedInTheme) {
+        if (characterIncludedInTheme.themeId != themeId) return
+        if (! characterIncludedInTheme.isMajorCharacter) return
+        getValidState(characterIncludedInTheme.characterId.toString())
     }
 
 }

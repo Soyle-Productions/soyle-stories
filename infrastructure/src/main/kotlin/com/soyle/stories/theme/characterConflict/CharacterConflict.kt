@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
+import javafx.scene.control.MenuItem
 import javafx.scene.layout.Priority
 import javafx.scene.text.FontWeight
 import javafx.util.Duration
@@ -47,22 +48,28 @@ class CharacterConflict : View() {
                             maxWidth = Double.MAX_VALUE
                             val loadingItem = item("Loading...") {
                                 isDisable = true
-                            }/*
+                            }
                             val createCharacterItem = MenuItem("[Create New Character]").apply {
                                 action {
-                                    createCharacterDialog(scope.projectScope, scope.type.themeId.toString())
+                                    createCharacterDialog(
+                                        model.scope.projectScope,
+                                        model.scope.themeId,
+                                        true
+                                    )
                                 }
-                            }*/
+                            }
                             model.availablePerspectiveCharacters.onChange {
                                 items.clear()
                                 when {
                                     it == null -> items.add(loadingItem)
                                     it.isEmpty() -> {
-                                        //items.add(createCharacterItem)
+                                        items.add(createCharacterItem.apply {
+                                            if (hasClass(ComponentsStyles.contextMenuSectionedItem))
+                                                removeClass(ComponentsStyles.contextMenuSectionedItem)
+                                        })
                                         item("No available characters") { isDisable = true }
                                     }
                                     else -> {
-                                        //items.add(createCharacterItem)
                                         item("Major Characters") {
                                             addClass(ComponentsStyles.contextMenuSectionHeaderItem)
                                             isDisable = true
@@ -71,7 +78,8 @@ class CharacterConflict : View() {
                                             item(it.characterName) {
                                                 addClass(ComponentsStyles.contextMenuSectionedItem)
                                                 action {
-                                                    model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName, "")
+                                                    model.selectedPerspectiveCharacter.value =
+                                                        CharacterItemViewModel(it.characterId, it.characterName, "")
                                                     viewListener.getValidState(it.characterId)
                                                 }
                                             }
@@ -89,18 +97,28 @@ class CharacterConflict : View() {
                                                         showDelay = Duration.seconds(0.0)
                                                         hideDelay = Duration.seconds(0.0)
                                                         style { fontSize = 1.em }
-                                                        text = "${it.characterName} is a minor character in this theme." +
-                                                                "  By selecting this character, they will be promoted" +
-                                                                " to a major character in the theme.  This means they" +
-                                                                " will gain a character arc."
+                                                        text =
+                                                            "${it.characterName} is a minor character in this theme." +
+                                                                    "  By selecting this character, they will be promoted" +
+                                                                    " to a major character in the theme.  This means they" +
+                                                                    " will gain a character arc."
                                                     }
                                                 }
                                                 action {
-                                                    model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName, "")
+                                                    model.selectedPerspectiveCharacter.value =
+                                                        CharacterItemViewModel(it.characterId, it.characterName, "")
                                                     viewListener.getValidState(it.characterId)
                                                 }
                                             }
                                         }
+                                        item("Remaining Characters in Story") {
+                                            addClass(ComponentsStyles.contextMenuSectionHeaderItem)
+                                            isDisable = true
+                                        }
+                                        items.add(createCharacterItem.apply {
+                                            if (!hasClass(ComponentsStyles.contextMenuSectionedItem))
+                                                addClass(ComponentsStyles.contextMenuSectionedItem)
+                                        })
                                     }
                                 }
                             }
@@ -122,7 +140,7 @@ class CharacterConflict : View() {
                             hgrow = Priority.ALWAYS
                             maxWidth = Double.MAX_VALUE
                             action {
-                                if (! isSelected) isSelected = true
+                                if (!isSelected) isSelected = true
                                 tabSelection.cleanBind(model.characterChangeLabel)
                             }
                         }
@@ -130,7 +148,7 @@ class CharacterConflict : View() {
                             hgrow = Priority.ALWAYS
                             maxWidth = Double.MAX_VALUE
                             action {
-                                if (! isSelected) isSelected = true
+                                if (!isSelected) isSelected = true
                                 tabSelection.cleanBind(model.opponentSectionsLabel)
                             }
                         }
@@ -144,7 +162,15 @@ class CharacterConflict : View() {
                     }
                 }
                 responsiveBox(isSmallProperty, hSpacing = 8.0, vSpacing = 8.0) {
-                    visibleWhen { model.selectedPerspectiveCharacter.isNotNull.and(isLargeProperty.or(tabSelection.isEqualTo(model.characterChangeLabel as SimpleStringProperty))) }
+                    visibleWhen {
+                        model.selectedPerspectiveCharacter.isNotNull.and(
+                            isLargeProperty.or(
+                                tabSelection.isEqualTo(
+                                    model.characterChangeLabel as SimpleStringProperty
+                                )
+                            )
+                        )
+                    }
                     managedProperty().bind(visibleProperty())
                     listOf(
                         model.desireLabel to model.desire,
@@ -163,13 +189,24 @@ class CharacterConflict : View() {
                 }
                 vbox {
                     isFillWidth = true
-                    visibleWhen { model.selectedPerspectiveCharacter.isNotNull.and(isLargeProperty.or(tabSelection.isEqualTo(model.opponentSectionsLabel as SimpleStringProperty))) }
+                    visibleWhen {
+                        model.selectedPerspectiveCharacter.isNotNull.and(
+                            isLargeProperty.or(
+                                tabSelection.isEqualTo(
+                                    model.opponentSectionsLabel as SimpleStringProperty
+                                )
+                            )
+                        )
+                    }
                     managedProperty().bind(visibleProperty())
                     val selectedColumn = SimpleStringProperty("")
                     selectedColumn.cleanBind(model.attackSectionLabel)
-                    val attackColumnSelected = selectedColumn.isEqualTo(model.attackSectionLabel as SimpleStringProperty)
-                    val similaritiesColumnSelected = selectedColumn.isEqualTo(model.similaritiesSectionLabel as SimpleStringProperty)
-                    val powerStatusOrAbilitiesColumnSelected = selectedColumn.isEqualTo(model.powerStatusOrAbilitiesLabel as SimpleStringProperty)
+                    val attackColumnSelected =
+                        selectedColumn.isEqualTo(model.attackSectionLabel as SimpleStringProperty)
+                    val similaritiesColumnSelected =
+                        selectedColumn.isEqualTo(model.similaritiesSectionLabel as SimpleStringProperty)
+                    val powerStatusOrAbilitiesColumnSelected =
+                        selectedColumn.isEqualTo(model.powerStatusOrAbilitiesLabel as SimpleStringProperty)
                     hbox {
                         label(model.opponentSectionsLabel) {
                             visibleWhen(isLargeProperty)
@@ -191,12 +228,13 @@ class CharacterConflict : View() {
                                         item("No available characters") { isDisable = true }
                                         item("Create New Character") {
                                             action {
-                                                val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId
-                                                    ?: return@action
+                                                val perspectiveCharacterId =
+                                                    model.selectedPerspectiveCharacter.value?.characterId
+                                                        ?: return@action
                                                 createCharacterDialog(
                                                     model.scope.projectScope,
                                                     model.scope.themeId,
-                                                    perspectiveCharacterId
+                                                    useAsOpponentForCharacter = perspectiveCharacterId
                                                 )
                                             }
                                         }
@@ -210,8 +248,12 @@ class CharacterConflict : View() {
                                             item(it.characterName) {
                                                 addClass(ComponentsStyles.contextMenuSectionedItem)
                                                 action {
-                                                    val perspectiveCharacter = model.selectedPerspectiveCharacter.value ?: return@action
-                                                    viewListener.addOpponent(perspectiveCharacter.characterId, it.characterId)
+                                                    val perspectiveCharacter =
+                                                        model.selectedPerspectiveCharacter.value ?: return@action
+                                                    viewListener.addOpponent(
+                                                        perspectiveCharacter.characterId,
+                                                        it.characterId
+                                                    )
                                                 }
                                             }
                                         }
@@ -222,12 +264,13 @@ class CharacterConflict : View() {
                                         item("Create New Character") {
                                             addClass(ComponentsStyles.contextMenuSectionedItem)
                                             action {
-                                                val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId
-                                                    ?: return@action
+                                                val perspectiveCharacterId =
+                                                    model.selectedPerspectiveCharacter.value?.characterId
+                                                        ?: return@action
                                                 createCharacterDialog(
                                                     model.scope.projectScope,
                                                     model.scope.themeId,
-                                                    perspectiveCharacterId
+                                                    useAsOpponentForCharacter = perspectiveCharacterId
                                                 )
                                             }
                                         }
@@ -240,13 +283,18 @@ class CharacterConflict : View() {
                                                         showDelay = Duration.seconds(0.0)
                                                         hideDelay = Duration.seconds(0.0)
                                                         style { fontSize = 1.em }
-                                                        text = "${it.characterName} is not included in this theme.  By " +
-                                                                "selecting them, they will be included as a Minor Character."
+                                                        text =
+                                                            "${it.characterName} is not included in this theme.  By " +
+                                                                    "selecting them, they will be included as a Minor Character."
                                                     }
                                                 }
                                                 action {
-                                                    val perspectiveCharacter = model.selectedPerspectiveCharacter.value ?: return@action
-                                                    viewListener.addOpponent(perspectiveCharacter.characterId, it.characterId)
+                                                    val perspectiveCharacter =
+                                                        model.selectedPerspectiveCharacter.value ?: return@action
+                                                    viewListener.addOpponent(
+                                                        perspectiveCharacter.characterId,
+                                                        it.characterId
+                                                    )
                                                 }
                                             }
                                         }
@@ -255,7 +303,8 @@ class CharacterConflict : View() {
                             }
 
                             setOnShowing {
-                                val perspectiveCharacter = model.selectedPerspectiveCharacter.value ?: return@setOnShowing
+                                val perspectiveCharacter =
+                                    model.selectedPerspectiveCharacter.value ?: return@setOnShowing
                                 viewListener.getAvailableOpponents(perspectiveCharacter.characterId)
                             }
                             setOnHidden {

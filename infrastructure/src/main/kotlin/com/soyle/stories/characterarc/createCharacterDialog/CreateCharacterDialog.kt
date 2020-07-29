@@ -14,9 +14,10 @@ import tornadofx.*
 class CreateCharacterDialog : Fragment("New Character") {
 
     override val scope: ProjectScope = super.scope as ProjectScope
-    val createCharacterDialogViewListener = resolve<CreateCharacterDialogViewListener>()
+    val viewListener = resolve<CreateCharacterDialogViewListener>()
 
     internal var themeId: String? by singleAssign()
+    internal var includeAsMajorCharacter: Boolean by singleAssign()
     internal var useAsOpponentForCharacterId: String? by singleAssign()
 
     private val errorMessage = SimpleStringProperty("")
@@ -26,24 +27,50 @@ class CreateCharacterDialog : Fragment("New Character") {
             requestFocus()
             onAction = EventHandler {
                 it.consume()
-                if (text.isEmpty())
-                {
+                if (text.isEmpty()) {
                     val errorDecorator = SimpleMessageDecorator("Name cannot be blank", ValidationSeverity.Error)
                     decorators.toList().forEach { removeDecorator(it) }
                     addDecorator(errorDecorator)
                     return@EventHandler
                 }
-                createCharacterDialogViewListener.createCharacter(text, includeInTheme = themeId, useAsOpponentForCharacter = useAsOpponentForCharacterId)
+                val themeId = themeId
+                val includeAsMajorCharacter = includeAsMajorCharacter
+                val useAsOpponentForCharacterId = useAsOpponentForCharacterId
+                if (themeId != null) {
+                    when {
+                        useAsOpponentForCharacterId != null -> viewListener.createCharacterForUseAsOpponent(
+                            text,
+                            themeId,
+                            useAsOpponentForCharacterId
+                        )
+                        includeAsMajorCharacter -> viewListener.createCharacterAsMajorCharacter(text, themeId)
+                        else -> viewListener.createCharacterAndIncludeInTheme(text, themeId)
+                    }
+                } else {
+                    viewListener.createCharacter(text)
+                }
                 close()
             }
         }
     }
 
 }
-fun createCharacterDialog(scope: ProjectScope, includeInTheme: String? = null, useAsOpponentForCharacter: String? = null): CreateCharacterDialog = scope.get<CreateCharacterDialog>().apply {
+
+fun createCharacterDialog(
+    scope: ProjectScope,
+    includeInTheme: String? = null,
+    includeAsMajorCharacter: Boolean = false,
+    useAsOpponentForCharacter: String? = null
+): CreateCharacterDialog = scope.get<CreateCharacterDialog>().apply {
     themeId = includeInTheme
+    this.includeAsMajorCharacter = includeAsMajorCharacter
     useAsOpponentForCharacterId = useAsOpponentForCharacter
-    openModal(StageStyle.UTILITY, Modality.APPLICATION_MODAL, escapeClosesWindow = true, owner = scope.get<WorkBench>().currentWindow)?.apply {
+    openModal(
+        StageStyle.UTILITY,
+        Modality.APPLICATION_MODAL,
+        escapeClosesWindow = true,
+        owner = scope.get<WorkBench>().currentWindow
+    )?.apply {
         centerOnScreen()
     }
 }

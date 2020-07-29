@@ -126,6 +126,9 @@ class ComponentsStyles : Stylesheet() {
                 fontSize = 1.2.em
                 textFill = Color.DARKGRAY
             }
+            and(disabled) {
+                opacity = 1.0
+            }
             and(hover) {
                 label {
                     textFill = Color.DARKGRAY

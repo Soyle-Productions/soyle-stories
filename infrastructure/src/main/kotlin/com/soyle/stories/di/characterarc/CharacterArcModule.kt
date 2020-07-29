@@ -1,13 +1,13 @@
 package com.soyle.stories.di.characterarc
 
-import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
-import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterControllerImpl
-import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
+import com.soyle.stories.character.buildNewCharacter.*
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
+import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacter
+import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacterUseCase
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
@@ -46,7 +46,9 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
-import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonNotifier
+import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeNotifier
+import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonOutput
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonController
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonControllerImpl
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonNotifier
@@ -136,15 +138,18 @@ object CharacterArcModule {
 		provide<UnlinkLocationFromCharacterArcSection> {
 			UnlinkLocationFromCharacterArcSectionUseCase(get())
 		}
+		provide<CreatePerspectiveCharacter> { CreatePerspectiveCharacterUseCase(get(), get()) }
 	}
 
 	private fun InScope<ProjectScope>.events() {
 
+		provide(CreatedCharacterReceiver::class) { CreatedCharacterNotifier() }
 		provide(CreatedCharacterArcReceiver::class) { CreatedCharacterArcNotifier() }
 
-		provide(BuildNewCharacter.OutputPort::class) { BuildNewCharacterNotifier(get(), get()) }
+		provide(BuildNewCharacter.OutputPort::class) { BuildNewCharacterOutput(get(), get(), get()) }
+		provide(CreatePerspectiveCharacter.OutputPort::class) { CreatePerspectiveCharacterOutput(get(), get()) }
 		provide(PlanNewCharacterArc.OutputPort::class) { PlanNewCharacterArcOutput(get(), get()) }
-		provide(IncludeCharacterInComparison.OutputPort::class) { IncludeCharacterInComparisonNotifier() }
+		provide(IncludeCharacterInComparison.OutputPort::class) { IncludeCharacterInComparisonOutput(get()) }
 		provide(PromoteMinorCharacter.OutputPort::class) { PromoteMinorCharacterOutput(get()) }
 		provide(DemoteMajorCharacter.OutputPort::class) { DeleteCharacterArcNotifier() }
 		provide(RemoveCharacterFromStory.OutputPort::class) { RemoveCharacterFromLocalStoryNotifier().also {
@@ -168,7 +173,7 @@ object CharacterArcModule {
 
 	private fun InScope<ProjectScope>.controllers() {
 		provide<PlanNewCharacterArcController> { PlanNewCharacterArcControllerImpl(applicationScope.get(), get(), get()) }
-		provide<BuildNewCharacterController> { BuildNewCharacterControllerImpl(projectId.toString(), applicationScope.get(), get(), get()) }
+		provide<BuildNewCharacterController> { BuildNewCharacterControllerImpl(projectId.toString(), applicationScope.get(), get(), get(), get(), get()) }
 		provide { ChangeThematicSectionValueController(applicationScope.get(), get(), get()) }
 		provide<LinkLocationToCharacterArcSectionController> { LinkLocationToCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
 		provide<UnlinkLocationFromCharacterArcSectionController> { UnlinkLocationFromCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }

@@ -1,10 +1,10 @@
 package com.soyle.stories.di.theme
 
-import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
+import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterOutput
+import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInThemeUseCase
 import com.soyle.stories.characterarc.eventbus.ChangeCharacterPropertyValueNotifier
-import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonNotifier
 import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalStoryNotifier
 import com.soyle.stories.characterarc.eventbus.RenameCharacterNotifier
 import com.soyle.stories.common.listensTo
@@ -50,8 +50,7 @@ import com.soyle.stories.theme.deleteTheme.DeleteThemeControllerImpl
 import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
 import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.deleteValueWebDialog.*
-import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController
-import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonControllerImpl
+import com.soyle.stories.theme.includeCharacterInTheme.*
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonNotifier
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebControllerImpl
@@ -208,6 +207,7 @@ object ThemeModule {
     private fun InScope<ProjectScope>.notifiers() {
         provide(SymbolAddedToThemeReceiver::class) { SymbolAddedToThemeNotifier() }
         provide(CreatedThemeReceiver::class) { CreatedThemeNotifier() }
+        provide(CharacterIncludedInThemeReceiver::class) { CharacterIncludedInThemeNotifier() }
 
 
         provide(CreateTheme.OutputPort::class) {
@@ -490,7 +490,7 @@ object ThemeModule {
 
                 presenter listensTo projectScope.get<AddSymbolicItemToOppositionNotifier>()
                 presenter listensTo projectScope.get<RemoveSymbolicItemNotifier>()
-                presenter listensTo projectScope.get<IncludeCharacterInComparisonNotifier>()
+                presenter listensTo projectScope.get<CharacterIncludedInThemeNotifier>()
                 presenter listensTo projectScope.get<RemoveCharacterFromComparisonNotifier>()
                 presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()
 
@@ -534,7 +534,7 @@ object ThemeModule {
                     get<AddSymbolDialogModel>()
                 )
 
-                presenter listensTo projectScope.get<BuildNewCharacterNotifier>()
+                presenter listensTo projectScope.get<CreatedCharacterNotifier>()
                 presenter listensTo projectScope.get<RenameCharacterNotifier>()
                 presenter listensTo projectScope.get<RemoveCharacterFromLocalStoryNotifier>()
 
@@ -579,7 +579,9 @@ object ThemeModule {
                     presenter,
                     projectScope.get(),
                     projectScope.get()
-                )
+                ).also {
+                    it listensTo projectScope.get<CharacterIncludedInThemeNotifier>()
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeException
+import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
@@ -26,7 +27,7 @@ class CharacterValueComparisonPresenter(
     private val view: View.Nullable<CharacterValueComparisonViewModel>
 ) : CompareCharacterValues.OutputPort, ListCharactersAvailableToIncludeInTheme.OutputPort,
     RemoveSymbolicItem.OutputPort, AddSymbolicItemToOpposition.OutputPort,
-    IncludeCharacterInComparison.OutputPort, RemoveCharacterFromComparison.OutputPort,
+    RemoveCharacterFromComparison.OutputPort, CharacterIncludedInThemeReceiver,
     ChangeCharacterPropertyValue.OutputPort, ListAvailableOppositionValuesForCharacterInTheme.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
@@ -128,11 +129,11 @@ class CharacterValueComparisonPresenter(
         }
     }
 
-    override fun receiveIncludeCharacterInComparisonResponse(response: CharacterIncludedInTheme) {
-        if (response.themeId != themeId) return
+    override suspend fun receiveCharacterIncludedInTheme(characterIncludedInTheme: CharacterIncludedInTheme) {
+        if (characterIncludedInTheme.themeId != themeId) return
         val newCharacter = CharacterComparedWithValuesViewModel(
-            response.characterId.toString(),
-            response.characterName,
+            characterIncludedInTheme.characterId.toString(),
+            characterIncludedInTheme.characterName,
             ArchetypeLabel(""),
             valueSectionLabel,
             removeButtonLabel,
@@ -196,7 +197,6 @@ class CharacterValueComparisonPresenter(
         // do nothing
     }
 
-    override fun receiveIncludeCharacterInComparisonFailure(failure: Exception) {}
     override fun receiveChangeCharacterPropertyValueFailure(failure: ThemeException) {
 
     }

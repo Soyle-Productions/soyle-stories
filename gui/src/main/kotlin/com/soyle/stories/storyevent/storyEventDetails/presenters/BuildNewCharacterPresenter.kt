@@ -12,7 +12,7 @@ import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 class BuildNewCharacterPresenter(
   private val view: View.Nullable<StoryEventDetailsViewModel>
 ) : BuildNewCharacter.OutputPort {
-	override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
+	override suspend fun receiveBuildNewCharacterResponse(response: CharacterItem) {
 		view.updateOrInvalidated {
 			val characters = characters + CharacterItemViewModel(response.characterId.toString(), response.characterName, "")
 			copy(

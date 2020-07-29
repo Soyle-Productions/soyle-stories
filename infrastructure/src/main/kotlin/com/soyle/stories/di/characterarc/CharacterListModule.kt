@@ -1,6 +1,7 @@
 package com.soyle.stories.di.characterarc
 
-import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterNotifier
+import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterOutput
+import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.characterList.LiveCharacterList
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
 import com.soyle.stories.characterarc.characterList.CharacterListController
@@ -11,12 +12,10 @@ import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalStoryNoti
 import com.soyle.stories.characterarc.eventbus.RenameCharacterArcNotifier
 import com.soyle.stories.characterarc.eventbus.RenameCharacterNotifier
 import com.soyle.stories.characterarc.planNewCharacterArc.CreatedCharacterArcNotifier
-import com.soyle.stories.characterarc.planNewCharacterArc.CreatedCharacterArcReceiver
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 
 internal object CharacterListModule {
 
@@ -29,7 +28,7 @@ internal object CharacterListModule {
                     projectId.toString(),
                     applicationScope.get(),
                     get(),
-                    get<BuildNewCharacterNotifier>(),
+                    get<CreatedCharacterNotifier>(),
                     get<RemoveCharacterFromLocalStoryNotifier>(),
                     get<RenameCharacterNotifier>()
                 )
