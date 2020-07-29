@@ -7,6 +7,7 @@ import com.soyle.stories.characterarc.characterComparison.CharacterComparisonVie
 import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import java.util.*
 
 internal class BuildNewCharacterPresenter(
@@ -30,6 +31,10 @@ internal class BuildNewCharacterPresenter(
 	}
 
 	override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+		// do nothing
+	}
+
+	override suspend fun characterIsOpponent(response: OpponentCharacter) {
 		// do nothing
 	}
 

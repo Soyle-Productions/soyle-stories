@@ -47,7 +47,8 @@ class OpenToolControllerImpl(
 
 	override fun openCentralConflict(themeId: String, characterId: String?) {
 		val request = CharacterConflict(
-			UUID.fromString(themeId)
+			UUID.fromString(themeId),
+			characterId?.let(UUID::fromString)
 		)
 		threadTransformer.async {
 			openTool.invoke(request, openToolOutputPort)

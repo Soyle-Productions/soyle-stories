@@ -17,6 +17,7 @@ class CreateCharacterDialog : Fragment("New Character") {
     val createCharacterDialogViewListener = resolve<CreateCharacterDialogViewListener>()
 
     internal var themeId: String? by singleAssign()
+    internal var useAsOpponentForCharacterId: String? by singleAssign()
 
     private val errorMessage = SimpleStringProperty("")
 
@@ -32,15 +33,16 @@ class CreateCharacterDialog : Fragment("New Character") {
                     addDecorator(errorDecorator)
                     return@EventHandler
                 }
-                createCharacterDialogViewListener.createCharacter(text, includeInTheme = themeId)
+                createCharacterDialogViewListener.createCharacter(text, includeInTheme = themeId, useAsOpponentForCharacter = useAsOpponentForCharacterId)
                 close()
             }
         }
     }
 
 }
-fun createCharacterDialog(scope: ProjectScope, includeInTheme: String? = null): CreateCharacterDialog = scope.get<CreateCharacterDialog>().apply {
+fun createCharacterDialog(scope: ProjectScope, includeInTheme: String? = null, useAsOpponentForCharacter: String? = null): CreateCharacterDialog = scope.get<CreateCharacterDialog>().apply {
     themeId = includeInTheme
+    useAsOpponentForCharacterId = useAsOpponentForCharacter
     openModal(StageStyle.UTILITY, Modality.APPLICATION_MODAL, escapeClosesWindow = true, owner = scope.get<WorkBench>().currentWindow)?.apply {
         centerOnScreen()
     }

@@ -20,7 +20,7 @@ import tornadofx.tab
 import java.util.*
 import kotlin.reflect.KClass
 
-class CharacterConflict(val themeId: UUID) : DynamicTool() {
+class CharacterConflict(val themeId: UUID, val characterId: UUID? = null) : DynamicTool() {
 
     override suspend fun validate(context: OpenToolContext) {
         context.themeRepository.getThemeById(Theme.Id(themeId))

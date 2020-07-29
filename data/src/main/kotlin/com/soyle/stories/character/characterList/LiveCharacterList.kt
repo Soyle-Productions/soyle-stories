@@ -11,6 +11,7 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.character
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import java.util.*
 
 class LiveCharacterList(
@@ -62,6 +63,10 @@ class LiveCharacterList(
 		}
 
 		override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+			// do nothing
+		}
+
+		override suspend fun characterIsOpponent(response: OpponentCharacter) {
 			// do nothing
 		}
 

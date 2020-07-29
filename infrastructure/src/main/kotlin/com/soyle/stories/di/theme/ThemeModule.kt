@@ -89,6 +89,9 @@ import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
+import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
+import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentControllerImpl
+import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentNotifier
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWebUseCase
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
@@ -105,6 +108,8 @@ import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
+import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
+import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponentsUseCase
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
@@ -139,6 +144,8 @@ import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponentUseCase
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsController
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsPresenter
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListener
@@ -198,6 +205,8 @@ object ThemeModule {
         }
         provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get(), get()) }
         provide<ListAvailablePerspectiveCharacters> { ListAvailablePerspectiveCharactersUseCase(get()) }
+        provide<UseCharacterAsOpponent> { UseCharacterAsOpponentUseCase(get(), get()) }
+        provide<ListAvailableCharactersToUseAsOpponents> { ListAvailableCharactersToUseAsOpponentsUseCase(get(), get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers() {
@@ -250,6 +259,9 @@ object ThemeModule {
         provide(RemoveSymbolicItem.OutputPort::class) {
             RemoveSymbolicItemNotifier()
         }
+        provide(UseCharacterAsOpponent.OutputPort::class) {
+            UseCharacterAsOpponentNotifier(get())
+        }
     }
 
     private fun InScope<ProjectScope>.controllers() {
@@ -301,6 +313,9 @@ object ThemeModule {
         }
         provide<ChangeCharacterPropertyController> {
             ChangeCharacterPropertyValueControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<UseCharacterAsOpponentController> {
+            UseCharacterAsOpponentControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -551,13 +566,18 @@ object ThemeModule {
                     get<CharacterConflictModel>()
                 )
 
+                presenter listensTo projectScope.get<UseCharacterAsOpponentNotifier>()
+
                 CharacterConflictController(
                     themeId,
                     projectScope.applicationScope.get(),
                     projectScope.get(),
                     presenter,
                     projectScope.get(),
-                    presenter
+                    presenter,
+                    projectScope.get(),
+                    presenter,
+                    projectScope.get()
                 )
             }
         }

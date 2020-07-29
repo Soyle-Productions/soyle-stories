@@ -1,7 +1,10 @@
 package com.soyle.stories.theme.characterConflict
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
+import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.AvailableCharactersToUseAsOpponents
+import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
 import java.util.*
@@ -12,7 +15,10 @@ class CharacterConflictController(
     private val examineCentralConflict: ExamineCentralConflictOfTheme,
     private val examineCentralConflictOutputPort: ExamineCentralConflictOfTheme.OutputPort,
     private val getAvailablePerspectiveCharacters: ListAvailablePerspectiveCharacters,
-    private val getAvailablePerspectiveCharactersOutputPort: ListAvailablePerspectiveCharacters.OutputPort
+    private val getAvailablePerspectiveCharactersOutputPort: ListAvailablePerspectiveCharacters.OutputPort,
+    private val listAvailableCharactersToUseAsOpponents: ListAvailableCharactersToUseAsOpponents,
+    private val listAvailableCharactersToUseAsOpponentsOutputPort: ListAvailableCharactersToUseAsOpponents.OutputPort,
+    private val useCharacterAsOpponentController: UseCharacterAsOpponentController
 ) : CharacterConflictViewListener {
 
     private val themeId = UUID.fromString(themeId)
@@ -30,6 +36,19 @@ class CharacterConflictController(
                 themeId, getAvailablePerspectiveCharactersOutputPort
             )
         }
+    }
+
+    override fun getAvailableOpponents(characterId: String) {
+        val preparedCharacterId = UUID.fromString(characterId)
+        threadTransformer.async {
+            listAvailableCharactersToUseAsOpponents.invoke(
+                themeId, preparedCharacterId, listAvailableCharactersToUseAsOpponentsOutputPort
+            )
+        }
+    }
+
+    override fun addOpponent(perspectiveCharacterId: String, characterId: String) {
+        useCharacterAsOpponentController.useCharacterAsOpponent(themeId.toString(), perspectiveCharacterId, characterId)
     }
 
 }

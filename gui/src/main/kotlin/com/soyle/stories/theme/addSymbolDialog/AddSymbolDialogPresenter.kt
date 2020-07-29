@@ -30,6 +30,7 @@ import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import java.util.*
 import javax.xml.stream.Location
 
@@ -188,6 +189,11 @@ class AddSymbolDialogPresenter(
     override fun receiveRenameLocationFailure(failure: LocationException) {}
     override fun receiveDeleteLocationFailure(failure: LocationException) {}
     override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+        // do nothing
+    }
+
+    override suspend fun characterIsOpponent(response: OpponentCharacter) {
+
         // do nothing
     }
 }

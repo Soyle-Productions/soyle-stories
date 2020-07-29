@@ -58,6 +58,7 @@ import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFrom
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonNotifier
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
+import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentNotifier
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestionUseCase
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
@@ -147,62 +148,63 @@ object CharacterArcModule {
 	private fun InScope<ProjectScope>.events() {
 		provide<CharacterArcEvents> {
 			object : CharacterArcEvents {
-				override val planNewCharacterArc: Notifier<PlanNewCharacterArc.OutputPort> =
-                    PlanNewCharacterArcNotifier(get())
-				override val includeCharacterInComparison: IncludeCharacterInComparisonNotifier =
-                    IncludeCharacterInComparisonNotifier()
-				override val buildNewCharacter: Notifier<BuildNewCharacter.OutputPort> =
-					BuildNewCharacterNotifier(includeCharacterInComparison)
-				override val promoteMinorCharacter: Notifier<PromoteMinorCharacter.OutputPort> =
-				  PromoteMinorCharacterNotifier()
-				override val deleteLocalCharacterArc: DeleteCharacterArcNotifier =
-				  DeleteCharacterArcNotifier()
-				override val removeCharacterFromStory: Notifier<RemoveCharacterFromStory.OutputPort> =
-				  RemoveCharacterFromLocalStoryNotifier().also {
-					  get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
-					  get<RemoveSymbolicItemControllerImpl>() listensTo it
-				  }
-				override val changeStoryFunction: Notifier<ChangeStoryFunction.OutputPort> =
-				  ChangeStoryFunctionNotifier()
-				override val changeThematicSectionValue =
-				  ChangeThematicSectionValueNotifier()
-				override val changeCentralMoralQuestion: Notifier<ChangeCentralMoralQuestion.OutputPort> =
-				  ChangeCentralMoralQuestionNotifier()
-				override val changeCharacterPropertyValue: Notifier<ChangeCharacterPropertyValue.OutputPort> =
-				  ChangeCharacterPropertyValueNotifier()
-				override val changeCharacterPerspectivePropertyValue: Notifier<ChangeCharacterPerspectivePropertyValue.OutputPort> =
-				  ChangeCharacterPerspectivePropertyValueNotifier()
-				override val removeCharacterFromLocalComparison: Notifier<RemoveCharacterFromComparison.OutputPort> =
-				  RemoveCharacterFromComparisonNotifier(deleteLocalCharacterArc)
-				override val renameCharacter: Notifier<RenameCharacter.OutputPort> =
-				  RenameCharacterNotifier().also {
-					  get<RenameSymbolicItemController>() listensTo it
-				  }
-				override val renameCharacterArc: Notifier<RenameCharacterArc.OutputPort> =
-				  RenameCharacterArcNotifier()
-				override val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort> =
-				  LinkLocationToCharacterArcSectionNotifier()
-				override val unlinkLocationFromCharacterArcSection: Notifier<UnlinkLocationFromCharacterArcSection.OutputPort> =
-				  UnlinkLocationFromCharacterArcSectionNotifier()
+				override val planNewCharacterArc: PlanNewCharacterArcNotifier
+					get() = get()
+				override val includeCharacterInComparison: IncludeCharacterInComparisonNotifier
+					get() = get()
+				override val buildNewCharacter: BuildNewCharacterNotifier
+					get() = get()
+				override val promoteMinorCharacter: PromoteMinorCharacterNotifier
+					get() = get()
+				override val deleteLocalCharacterArc: DeleteCharacterArcNotifier
+					get() = get()
+				override val removeCharacterFromStory: RemoveCharacterFromLocalStoryNotifier
+					get() = get()
+				override val changeStoryFunction: ChangeStoryFunctionNotifier
+					get() = get()
+				override val changeThematicSectionValue: ChangeThematicSectionValueNotifier
+					get() = get()
+				override val changeCentralMoralQuestion: ChangeCentralMoralQuestionNotifier
+					get() = get()
+				override val changeCharacterPropertyValue: ChangeCharacterPropertyValueNotifier
+					get() = get()
+				override val changeCharacterPerspectivePropertyValue: ChangeCharacterPerspectivePropertyValueNotifier
+					get() = get()
+				override val removeCharacterFromLocalComparison: RemoveCharacterFromComparisonNotifier
+					get() = get()
+				override val renameCharacter: RenameCharacterNotifier
+					get() = get()
+				override val renameCharacterArc: RenameCharacterArcNotifier
+					get() = get()
+				override val linkLocationToCharacterArcSection: LinkLocationToCharacterArcSectionNotifier
+					get() = get()
+				override val unlinkLocationFromCharacterArcSection: UnlinkLocationFromCharacterArcSectionNotifier
+					get() = get()
 			}
 		}
 
-		provide(BuildNewCharacter.OutputPort::class) { get<CharacterArcEvents>().buildNewCharacter as BuildNewCharacterNotifier }
-		provide(PlanNewCharacterArc.OutputPort::class) { get<CharacterArcEvents>().planNewCharacterArc as PlanNewCharacterArcNotifier }
-		provide(IncludeCharacterInComparison.OutputPort::class) { get<CharacterArcEvents>().includeCharacterInComparison as IncludeCharacterInComparisonNotifier }
-		provide(PromoteMinorCharacter.OutputPort::class) { get<CharacterArcEvents>().promoteMinorCharacter as PromoteMinorCharacterNotifier }
-		provide(DemoteMajorCharacter.OutputPort::class) { get<CharacterArcEvents>().deleteLocalCharacterArc as DeleteCharacterArcNotifier }
-		provide(RemoveCharacterFromStory.OutputPort::class) { get<CharacterArcEvents>().removeCharacterFromStory as RemoveCharacterFromLocalStoryNotifier }
-		provide(ChangeStoryFunction.OutputPort::class) { get<CharacterArcEvents>().changeStoryFunction as ChangeStoryFunctionNotifier }
-		provide(ChangeThematicSectionValue.OutputPort::class) { get<CharacterArcEvents>().changeThematicSectionValue as ChangeThematicSectionValueNotifier }
-		provide(ChangeCentralMoralQuestion.OutputPort::class) { get<CharacterArcEvents>().changeCentralMoralQuestion as ChangeCentralMoralQuestionNotifier }
-		provide(ChangeCharacterPropertyValue.OutputPort::class) { get<CharacterArcEvents>().changeCharacterPropertyValue as ChangeCharacterPropertyValueNotifier }
-		provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) { get<CharacterArcEvents>().changeCharacterPerspectivePropertyValue as ChangeCharacterPerspectivePropertyValueNotifier }
-		provide(RemoveCharacterFromComparison.OutputPort::class) { get<CharacterArcEvents>().removeCharacterFromLocalComparison as RemoveCharacterFromComparisonNotifier }
-		provide(RenameCharacter.OutputPort::class) { get<CharacterArcEvents>().renameCharacter as RenameCharacterNotifier }
-		provide(RenameCharacterArc.OutputPort::class) { get<CharacterArcEvents>().renameCharacterArc as RenameCharacterArcNotifier }
-		provide(LinkLocationToCharacterArcSection.OutputPort::class) { get<CharacterArcEvents>().linkLocationToCharacterArcSection as LinkLocationToCharacterArcSectionNotifier }
-		provide(UnlinkLocationFromCharacterArcSection.OutputPort::class) { get<CharacterArcEvents>().unlinkLocationFromCharacterArcSection as UnlinkLocationFromCharacterArcSectionNotifier }
+		provide(BuildNewCharacter.OutputPort::class) { BuildNewCharacterNotifier(get(), get()) }
+		provide(PlanNewCharacterArc.OutputPort::class) { PlanNewCharacterArcNotifier(get()) }
+		provide(IncludeCharacterInComparison.OutputPort::class) { IncludeCharacterInComparisonNotifier() }
+		provide(PromoteMinorCharacter.OutputPort::class) { PromoteMinorCharacterNotifier() }
+		provide(DemoteMajorCharacter.OutputPort::class) { DeleteCharacterArcNotifier() }
+		provide(RemoveCharacterFromStory.OutputPort::class) { RemoveCharacterFromLocalStoryNotifier().also {
+			get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
+			get<RemoveSymbolicItemControllerImpl>() listensTo it
+		} }
+		provide(ChangeStoryFunction.OutputPort::class) { ChangeStoryFunctionNotifier() }
+		provide(ChangeThematicSectionValue.OutputPort::class) { ChangeThematicSectionValueNotifier() }
+		provide(ChangeCentralMoralQuestion.OutputPort::class) { ChangeCentralMoralQuestionNotifier() }
+		provide(ChangeCharacterPropertyValue.OutputPort::class) { ChangeCharacterPropertyValueNotifier() }
+		provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) { ChangeCharacterPerspectivePropertyValueNotifier() }
+		provide(RemoveCharacterFromComparison.OutputPort::class) { RemoveCharacterFromComparisonNotifier(get()) }
+
+		provide(RenameCharacter.OutputPort::class) { RenameCharacterNotifier().also {
+			get<RenameSymbolicItemController>() listensTo it
+		} }
+		provide(RenameCharacterArc.OutputPort::class) { RenameCharacterArcNotifier() }
+		provide(LinkLocationToCharacterArcSection.OutputPort::class) { LinkLocationToCharacterArcSectionNotifier() }
+		provide(UnlinkLocationFromCharacterArcSection.OutputPort::class) { UnlinkLocationFromCharacterArcSectionNotifier() }
 	}
 
 	private fun InScope<ProjectScope>.controllers() {
