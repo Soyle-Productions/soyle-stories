@@ -10,14 +10,14 @@ import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.common.str
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.*
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
-import com.soyle.stories.theme.makeTheme
-import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -71,6 +71,10 @@ class BuildNewCharacterTest {
 			override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
 				error("Should not include character in theme when simply creating a new character")
 			}
+
+			override suspend fun characterIsOpponent(response: OpponentCharacter) {
+				error("Should not include character in theme when simply creating a new character")
+			}
 		}
 		return {
 			runBlocking {
@@ -121,6 +125,7 @@ class BuildNewCharacterTest {
 
 		private var updatedTheme: Theme? = null
 
+		private var opponentCharacter: OpponentCharacter? = null
 		private var includedCharacterResult: CharacterIncludedInTheme? = null
 		private var characterItemResult: CharacterItem? = null
 
@@ -176,12 +181,88 @@ class BuildNewCharacterTest {
 
 		}
 
+		@Nested
+		inner class `And Use as Opponent to Character` {
+
+			private val perspectiveCharacterId = Character.Id()
+
+			@Test
+			fun `perspective character not in theme`() {
+				givenTheme()
+				assertThrows<CharacterNotInTheme> {
+					buildCharacterToUseAsOpponent(providedName)
+				} shouldBe characterNotInTheme(themeId.uuid, perspectiveCharacterId.uuid)
+			}
+
+			@Test
+			fun `perspective character is not major character`() {
+				givenTheme()
+				givenThemeHasCharacter(perspectiveCharacterId)
+				assertThrows<CharacterIsNotMajorCharacterInTheme> {
+					buildCharacterToUseAsOpponent(providedName)
+				} shouldBe characterIsNotMajorCharacterInTheme(themeId.uuid, perspectiveCharacterId.uuid)
+			}
+
+			@Test
+			fun `perspective character is major character`() {
+				givenTheme()
+				givenThemeHasCharacter(perspectiveCharacterId, asMajorCharacter = true)
+				buildCharacterToUseAsOpponent(providedName)
+				createdCharacter!!
+				updatedTheme!!
+				characterItemResult!!
+				includedCharacterResult!!
+				opponentCharacter!! shouldBe {
+					assertEquals(themeId.uuid, it.themeId)
+					assertEquals(perspectiveCharacterId.uuid, it.opponentOfCharacterId)
+					assertEquals(createdCharacter!!.id.uuid, it.characterId)
+					assertEquals(providedName, it.characterName)
+				}
+			}
+
+			private fun buildCharacterToUseAsOpponent(name: String) {
+				val useCase: BuildNewCharacter = BuildNewCharacterUseCase(CharacterRepositoryDouble(onAddNewCharacter = {
+					createdCharacter = it
+				}), themeRepository)
+				val output = object : BuildNewCharacter.OutputPort {
+					override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
+						characterItemResult = response
+					}
+
+					override fun receiveBuildNewCharacterFailure(failure: CharacterException) {
+						throw failure
+					}
+
+					override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
+						includedCharacterResult = response
+					}
+
+					override suspend fun characterIsOpponent(response: OpponentCharacter) {
+						opponentCharacter = response
+					}
+				}
+				runBlocking {
+					useCase.createAndUseAsOpponent(name, themeId.uuid, perspectiveCharacterId.uuid, output)
+				}
+			}
+
+		}
+
 		private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = {
 			updatedTheme = it
 		})
 
 		private fun givenTheme() {
 			themeRepository.themes[themeId] = makeTheme(themeId, projectId = projectId)
+		}
+
+		private fun givenThemeHasCharacter(characterId: Character.Id, asMajorCharacter: Boolean = false)
+		{
+			themeRepository.themes[themeId] = themeRepository.themes.getValue(themeId)
+				.withCharacterIncluded(characterId, str(), null).let {
+					if (asMajorCharacter) it.withCharacterPromoted(characterId)
+					else it
+				}
 		}
 
 		private fun buildCharacterToIncludeInTheme(name: String) {
@@ -200,12 +281,15 @@ class BuildNewCharacterTest {
 				override suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme) {
 					includedCharacterResult = response
 				}
+
+				override suspend fun characterIsOpponent(response: OpponentCharacter) {
+					opponentCharacter = response
+				}
 			}
 			runBlocking {
 				useCase.createAndIncludeInTheme(name, themeId.uuid, output)
 			}
 		}
-
 	}
 
 }
