@@ -31,12 +31,10 @@ class PlanNewCharacterArcUseCase(
         themeRepository.addNewTheme(themeWithCharacter)
         characterArcSectionRepository.addNewCharacterArcSections(initialSections.map { it.asCharacterArcSection() })
 
-        outputPort.themeNoted(CreatedTheme(theme.projectId.uuid, theme.id.uuid, theme.name))
         outputPort.characterArcPlanned(
-            CharacterArcItem(
-                characterId,
-                name,
-                theme.id.uuid
+            PlanNewCharacterArc.ResponseModel(
+                CreatedCharacterArc(theme.id.uuid, characterId, name),
+                CreatedTheme(theme.projectId.uuid, theme.id.uuid, theme.name)
             )
         )
 

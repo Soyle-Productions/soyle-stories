@@ -12,8 +12,12 @@ interface PlanNewCharacterArc {
         outputPort: OutputPort
     )
 
+    class ResponseModel(
+        val createdCharacterArc: CreatedCharacterArc,
+        val createdTheme: CreatedTheme
+    )
+
     interface OutputPort {
-        suspend fun themeNoted(response: CreatedTheme)
-        suspend fun characterArcPlanned(response: CharacterArcItem)
+        suspend fun characterArcPlanned(response: ResponseModel)
     }
 }

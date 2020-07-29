@@ -5,11 +5,14 @@ import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 
-class CharacterArcSectionRepositoryDouble : CharacterArcSectionRepository {
+class CharacterArcSectionRepositoryDouble(
+    private val onAddNewCharacterArcSections: (List<CharacterArcSection>) -> Unit = {}
+) : CharacterArcSectionRepository {
 
     val characterArcSections = mutableMapOf<CharacterArcSection.Id, CharacterArcSection>()
 
     override suspend fun addNewCharacterArcSections(characterArcSections: List<CharacterArcSection>) {
+        onAddNewCharacterArcSections(characterArcSections)
         characterArcSections.forEach {
             this.characterArcSections[it.id] = it
         }

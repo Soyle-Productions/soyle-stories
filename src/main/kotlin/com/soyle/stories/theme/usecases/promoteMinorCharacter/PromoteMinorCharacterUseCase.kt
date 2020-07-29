@@ -1,12 +1,8 @@
-/**
- * Created by Brendan
- * Date: 3/4/2020
- * Time: 10:38 PM
- */
 package com.soyle.stories.theme.usecases.promoteMinorCharacter
 
 import arrow.core.Either
 import arrow.core.flatMap
+import com.soyle.stories.characterarc.usecases.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.MinorCharacter
 import com.soyle.stories.theme.CharacterArcAlreadyExistsForCharacterInTheme
@@ -28,32 +24,26 @@ class PromoteMinorCharacterUseCase(
         output: PromoteMinorCharacter.OutputPort
     ) {
         val theme = themeRepository.getThemeById(Theme.Id(request.themeId))
-        if (theme == null) return output.receivePromoteMinorCharacterFailure(ThemeDoesNotExist(request.themeId))
+            ?: throw ThemeDoesNotExist(request.themeId)
         val characterInTheme = theme.getIncludedCharacterById(Character.Id(request.characterId))
-        if (characterInTheme == null) return output.receivePromoteMinorCharacterFailure(
-            CharacterNotInTheme(
+            ?: throw CharacterNotInTheme(
                 request.themeId,
                 request.characterId
             )
-        )
 
         if (characterInTheme !is MinorCharacter) {
-            return output.receivePromoteMinorCharacterFailure(
-                CharacterIsAlreadyMajorCharacterInTheme(
-                    request.characterId,
-                    request.themeId
-                )
+            throw CharacterIsAlreadyMajorCharacterInTheme(
+                request.characterId,
+                request.themeId
             )
         }
 
         val arcsInTheme = characterArcRepository.listCharacterArcsForTheme(theme.id)
         val existingArc = arcsInTheme.find { it.characterId == characterInTheme.id }
         if (existingArc != null) {
-            return output.receivePromoteMinorCharacterFailure(
-                CharacterArcAlreadyExistsForCharacterInTheme(
-                    request.characterId,
-                    request.themeId
-                )
+            throw CharacterArcAlreadyExistsForCharacterInTheme(
+                request.characterId,
+                request.themeId
             )
         }
         val thematicTemplateSectionIds =
@@ -65,16 +55,16 @@ class PromoteMinorCharacterUseCase(
                 CharacterArcSection(
                     CharacterArcSection.Id(UUID.randomUUID()),
                     characterInTheme.id, theme.id, it,
-                  null,
+                    null,
                     ""
                 )
             }
-        val promotionResult = theme.promoteCharacter(characterInTheme, newSections)
-            .flatMap { promotedTheme ->
+        val promotionResult = theme.withCharacterPromoted(characterInTheme.id)
+            .let { promotedTheme ->
                 CharacterArc.planNewCharacterArc(
                     characterInTheme.id,
                     theme.id,
-                    request.characterArcName ?: arcsInTheme.firstOrNull()?.name ?: ""
+                    theme.name
                 ).map { promotedTheme to it }
             }
         if (promotionResult is Either.Right) {
@@ -83,9 +73,11 @@ class PromoteMinorCharacterUseCase(
             characterArcSectionRepository.addNewCharacterArcSections(newSections)
             output.receivePromoteMinorCharacterResponse(
                 PromoteMinorCharacter.ResponseModel(
-                    request.themeId,
-                    request.characterId,
-                    promotionResult.b.second.name
+                    CreatedCharacterArc(
+                        request.themeId,
+                        request.characterId,
+                        promotionResult.b.second.name
+                    )
                 )
             )
         }

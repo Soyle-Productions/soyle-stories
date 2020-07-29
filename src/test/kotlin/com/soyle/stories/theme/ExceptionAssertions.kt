@@ -32,6 +32,12 @@ fun characterIsNotMajorCharacterInTheme(themeId: UUID, characterId: UUID) = fun 
     assertEquals(characterId, actual.characterId) { "Character not major character in theme exception does not have expected character id" }
 }
 
+fun characterIsAlreadyMajorCharacterInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
+    actual as CharacterIsAlreadyMajorCharacterInTheme
+    assertEquals(themeId, actual.themeId) { "Character is already major character in theme exception does not have expected theme id" }
+    assertEquals(characterId, actual.characterId) { "Character is already major character in theme exception does not have expected character id" }
+}
+
 fun symbolNameCannotBeBlank(actual: Any?)
 {
     actual as SymbolNameCannotBeBlank

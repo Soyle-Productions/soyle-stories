@@ -4,19 +4,24 @@ import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcItem
+import com.soyle.stories.characterarc.usecases.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.common.str
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.storyevent.characterDoesNotExist
+import com.soyle.stories.theme.doubles.CharacterArcRepositoryDouble
+import com.soyle.stories.theme.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -24,22 +29,28 @@ import java.util.*
 
 class PlanNewCharacterArcTest {
 
-    val projectId = Project.Id()
+    // provided data
+    private val projectId = Project.Id()
+    private val characterId = Character.Id()
+    private val characterArcName = "Character Arc ${str()}"
 
-    val characterId = UUID.randomUUID()
-    val characterArcName = "First character arc for character"
-
-    private var addedTheme: Theme? = null
+    // persisted data
+    private var createdTheme: Theme? = null
     private var updatedCharacter: Character? = null
+    private var createdArcSections: List<CharacterArcSection>? = null
 
-    private var plannedCharacterArcEvent: CharacterArcItem? = null
-    private var notedThemeEvent: CreatedTheme? = null
+    // output data
+    private var result: PlanNewCharacterArc.ResponseModel? = null
 
     @Test
     fun `character doesn't exist`() {
         assertThrows<CharacterDoesNotExist> {
-            given(emptyList()).invoke(characterId, characterArcName)
-        } shouldBe characterDoesNotExist(characterId)
+            planNewCharacterArc()
+        } shouldBe characterDoesNotExist(characterId.uuid)
+        assertNull(createdTheme)
+        assertNull(updatedCharacter)
+        assertNull(createdArcSections)
+        assertNull(result)
     }
 
     @Nested
@@ -47,15 +58,17 @@ class PlanNewCharacterArcTest {
 
         val characterName = "Bob the Builder"
         val character = makeCharacter(
-            Character.Id(characterId), projectId, characterName
+            characterId, projectId, characterName
         )
+
+        init {
+            givenCharacter(character)
+        }
 
         @Test
         fun `new theme is created`() {
-            val useCase = given(listOf(character))
-            useCase.invoke(characterId, characterArcName)
-            addedTheme shouldBe {
-                it as Theme
+            planNewCharacterArc()
+            createdTheme!! shouldBe {
                 assertEquals(projectId, it.projectId)
                 assertEquals(characterArcName, it.name)
             }
@@ -63,117 +76,81 @@ class PlanNewCharacterArcTest {
 
         @Test
         fun `character arc is persisted`() {
-            val useCase = given(listOf(character))
-            useCase.invoke(characterId, characterArcName)
+            planNewCharacterArc()
             updatedCharacter!!.characterArcs.single()
         }
 
         @Test
         fun `character is major character in theme`() {
-            val useCase = given(listOf(character))
-            useCase.invoke(characterId, characterArcName)
-            addedTheme!!.getMajorCharacterById(Character.Id(characterId))!!
+            planNewCharacterArc()
+            createdTheme!!.getMajorCharacterById(characterId)!!
         }
 
         @Test
         fun `character in theme has name of character`() {
-            val useCase = given(listOf(character))
-            useCase.invoke(characterId, characterArcName)
-            assertEquals(characterName, addedTheme!!.getIncludedCharacterById(Character.Id(characterId))!!.name)
+            planNewCharacterArc()
+            assertEquals(characterName, createdTheme!!.getIncludedCharacterById(characterId)!!.name)
         }
 
         @Test
         fun `character arc has name provided`() {
-            val useCase = given(listOf(character))
-            useCase.invoke(characterId, characterArcName)
+            planNewCharacterArc()
             assertEquals(characterArcName, updatedCharacter!!.characterArcs.single().name)
         }
 
         @Test
         fun `character arc should have required story sections and thematic sections`() {
-            val addedArcSections = mutableListOf<CharacterArcSection>()
-            val useCase = given(listOf(character), addNewCharacterArcSections = {
-                addedArcSections.addAll(it)
-            })
-            useCase.invoke(characterId, characterArcName)
+            planNewCharacterArc()
             val addedArc = updatedCharacter!!.characterArcs.single()
             val fullTemplate =
-                (addedArc.template.sections.map { it.id } + addedTheme!!.thematicTemplate.sections.map { it.characterArcTemplateSectionId }).toSet()
-            assertEquals(fullTemplate.size, addedArcSections.size)
+                (addedArc.template.sections.map { it.id } + createdTheme!!.thematicTemplate.sections.map { it.characterArcTemplateSectionId }).toSet()
+            assertEquals(fullTemplate.size, createdArcSections!!.size)
         }
 
         @Test
         fun `output should have name provided`() {
-            given(listOf(character)).invoke(characterId, characterArcName)
-            val result = plannedCharacterArcEvent as CharacterArcItem
-            assertEquals(characterArcName, result.characterArcName)
+            planNewCharacterArc()
+            assertEquals(characterArcName, result!!.createdCharacterArc.characterArcName)
         }
 
         @Test
         fun `output should have id of created theme`() {
-            val useCase = given(listOf(character))
-            useCase.invoke(characterId, characterArcName)
-            val result = plannedCharacterArcEvent as CharacterArcItem
-            assertEquals(addedTheme!!.id.uuid, result.themeId)
+            planNewCharacterArc()
+            assertEquals(createdTheme!!.id.uuid, result!!.createdCharacterArc.themeId)
         }
     }
 
-    fun given(
-        characters: List<Character>,
-        addNewCharacterArcSections: (List<CharacterArcSection>) -> Unit = {}
-    ): (UUID, String) -> Unit {
-        val characterRepo = CharacterRepositoryDouble(initialCharacters = characters, onUpdateCharacter = {
-            updatedCharacter = it
-        })
-        val themeRepo = ThemeRepositoryDouble(onAddTheme = { addedTheme = it })
-        val repo = object : CharacterArcSectionRepository {
-            override suspend fun addNewCharacterArcSections(characterArcSections: List<CharacterArcSection>) {
-                addNewCharacterArcSections.invoke(characterArcSections)
-            }
+    private val themeRepository = ThemeRepositoryDouble(onAddTheme = {
+        createdTheme = it
+    })
+    private val characterRepository = CharacterRepositoryDouble(onUpdateCharacter = {
+        updatedCharacter = it
+    })
+    private val characterArcSectionRepositoryDouble = CharacterArcSectionRepositoryDouble(onAddNewCharacterArcSections = {
+        createdArcSections = it
+    })
 
-            override suspend fun getCharacterArcSectionById(characterArcSectionId: CharacterArcSection.Id): CharacterArcSection? = null
-            override suspend fun getCharacterArcSectionsById(characterArcSectionIds: Set<CharacterArcSection.Id>): List<CharacterArcSection> {
-                TODO("Not yet implemented")
-            }
+    private fun givenCharacter(character: Character) {
+        characterRepository.characters[character.id] = character
+    }
 
-            override suspend fun removeArcSections(sections: List<CharacterArcSection>) {
-            }
-
-            override suspend fun updateCharacterArcSection(characterArcSection: CharacterArcSection) {
-
-            }
-
-            override suspend fun getCharacterArcSectionsForCharacter(characterId: Character.Id): List<CharacterArcSection> = emptyList()
-            override suspend fun getCharacterArcSectionsForTheme(themeId: Theme.Id): List<CharacterArcSection> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getCharacterArcSectionsForCharacterInTheme(
-                characterId: Character.Id,
-                themeId: Theme.Id
-            ): List<CharacterArcSection> {
-                return emptyList()
-            }
-        }
+    private fun planNewCharacterArc() {
         val useCase: PlanNewCharacterArc = PlanNewCharacterArcUseCase(
-            characterRepo,
-            themeRepo,
-            repo
+            characterRepository,
+            themeRepository,
+            characterArcSectionRepositoryDouble
         )
         val output = object : PlanNewCharacterArc.OutputPort {
-            override suspend fun characterArcPlanned(response: CharacterArcItem) {
-                plannedCharacterArcEvent = response
-            }
-
-            override suspend fun themeNoted(response: CreatedTheme) {
-                notedThemeEvent = response
+            override suspend fun characterArcPlanned(response: PlanNewCharacterArc.ResponseModel) {
+                result = response
             }
         }
-        return { uuid, name ->
-            runBlocking {
-                useCase.invoke(uuid, name, output)
-            }
+        runBlocking {
+            useCase.invoke(
+                characterId.uuid,
+                characterArcName,
+                output
+            )
         }
     }
-
 }
