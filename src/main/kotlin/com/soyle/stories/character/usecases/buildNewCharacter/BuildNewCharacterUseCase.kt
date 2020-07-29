@@ -9,6 +9,7 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Media
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
@@ -39,7 +40,9 @@ class BuildNewCharacterUseCase(
             ?: throw ThemeDoesNotExist(themeId)
 
         val characterItem = createCharacter(theme.projectId, name)
-        val includedCharacter = includeInTheme(theme, characterItem)
+        val (themeWithCharacter, includedCharacter) = includeInTheme(theme, characterItem)
+
+        themeRepository.updateThemes(listOf(themeWithCharacter))
 
         outputPort.characterIncludedInTheme(includedCharacter)
         outputPort.receiveBuildNewCharacterResponse(characterItem)
@@ -55,13 +58,19 @@ class BuildNewCharacterUseCase(
             ?: throw ThemeDoesNotExist(themeId)
 
         val characterItem = createCharacter(theme.projectId, name)
-        val characterIncluded = includeInTheme(theme, characterItem)
+        val (themeWithCharacter, characterIncluded) = includeInTheme(theme, characterItem)
 
         if (! theme.containsCharacter(Character.Id(opponentOfCharacterId)))
             throw CharacterNotInTheme(themeId, opponentOfCharacterId)
 
         theme.getMajorCharacterById(Character.Id(opponentOfCharacterId))
             ?: throw CharacterIsNotMajorCharacterInTheme(opponentOfCharacterId, themeId)
+
+        themeRepository.updateThemes(listOf(themeWithCharacter.withCharacterAsStoryFunctionForMajorCharacter(
+            Character.Id(characterItem.characterId),
+            StoryFunction.Antagonist,
+            Character.Id(opponentOfCharacterId)
+        )))
 
         outputPort.receiveBuildNewCharacterResponse(characterItem)
         outputPort.characterIncludedInTheme(characterIncluded)
@@ -73,20 +82,15 @@ class BuildNewCharacterUseCase(
         ))
     }
 
-    private suspend fun includeInTheme(theme: Theme, characterItem: CharacterItem): CharacterIncludedInTheme
+    private suspend fun includeInTheme(theme: Theme, characterItem: CharacterItem): Pair<Theme, CharacterIncludedInTheme>
     {
         val themeWithCharacter = theme.withCharacterIncluded(
             Character.Id(characterItem.characterId),
             characterItem.characterName,
             characterItem.mediaId?.let(Media::Id)
         )
-        themeRepository.updateThemes(listOf(themeWithCharacter))
 
-        themeWithCharacter.characters.map {
-            CharacterItem(it.id.uuid, it.name, null)
-        }
-
-        return CharacterIncludedInTheme(
+        return themeWithCharacter to CharacterIncludedInTheme(
             theme.id.uuid,
             "",
             characterItem.characterId,
