@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.characterConflict
 
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
-import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.CharacterChangeOpponent
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
+
 
 data class CharacterConflictViewModel(
     val centralConflictFieldLabel: String,

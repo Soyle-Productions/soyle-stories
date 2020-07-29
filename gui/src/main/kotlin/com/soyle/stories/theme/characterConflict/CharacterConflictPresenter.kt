@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.characterConflict
 
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
@@ -8,7 +8,6 @@ import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import java.util.*
 
@@ -29,7 +28,8 @@ class CharacterConflictPresenter(
                 selectedPerspectiveCharacter = response.characterChange?.let {
                     CharacterItemViewModel(
                         it.characterId.toString(),
-                        it.characterName
+                        it.characterName,
+                        ""
                     )
                 },
                 availablePerspectiveCharacters = null,

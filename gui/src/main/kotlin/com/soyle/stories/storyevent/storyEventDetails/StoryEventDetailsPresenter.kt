@@ -1,7 +1,7 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
 import com.soyle.stories.character.characterList.CharacterListListener
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
@@ -97,7 +97,7 @@ class StoryEventDetailsPresenter(
 	override fun receiveCharacterListUpdate(characters: List<CharacterItem>) {
 		view.update {
 
-			val viewModels = characters.map { CharacterItemViewModel(it.characterId.toString(), it.characterName) }
+			val viewModels = characters.map { CharacterItemViewModel(it.characterId.toString(), it.characterName, "") }
 
 			if (this != null) copy(
 			  availableCharacters = viewModels,

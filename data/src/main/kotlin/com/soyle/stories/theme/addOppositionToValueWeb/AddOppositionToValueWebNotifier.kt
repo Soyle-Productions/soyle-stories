@@ -1,13 +1,8 @@
 package com.soyle.stories.theme.addOppositionToValueWeb
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.common.Signaler
-import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionNotifier
-import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonNotifier
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
-import com.soyle.stories.theme.usecases.addOppositionToValueWeb.OppositionAddedToValueWeb
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
 import kotlin.coroutines.coroutineContext
 
 class AddOppositionToValueWebNotifier(

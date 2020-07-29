@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.characterConflict
 
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.Model
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.soylestories.ApplicationScope

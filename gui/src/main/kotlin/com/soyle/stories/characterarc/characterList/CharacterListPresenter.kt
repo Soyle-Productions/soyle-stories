@@ -2,18 +2,14 @@ package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.character.characterList.LiveCharacterList
-import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcItem
+import com.soyle.stories.characterarc.planNewCharacterArc.CreatedCharacterArcReceiver
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcsByCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
-import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
+import com.soyle.stories.characterarc.usecases.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.ThemeException
-import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
-import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 
 /**
  * Created by Brendan
@@ -23,17 +19,12 @@ import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharac
 class CharacterListPresenter(
   private val threadTransformer: ThreadTransformer,
   private val view: CharacterListView,
-  private val characterList: LiveCharacterList,
-  characterArcEvents: CharacterArcEvents
-) : PlanNewCharacterArc.OutputPort, CharacterListListener, ListAllCharacterArcs.OutputPort,
-  PromoteMinorCharacter.OutputPort, DemoteMajorCharacter.OutputPort, RenameCharacterArc.OutputPort {
+  characterList: LiveCharacterList
+) : CreatedCharacterArcReceiver, CharacterListListener, ListAllCharacterArcs.OutputPort,
+  DemoteMajorCharacter.OutputPort, RenameCharacterArc.OutputPort {
 
 	init {
 		characterList.addListener(this)
-		characterArcEvents.planNewCharacterArc.addListener(this)
-		characterArcEvents.promoteMinorCharacter.addListener(this)
-		characterArcEvents.deleteLocalCharacterArc.addListener(this)
-		characterArcEvents.renameCharacterArc.addListener(this)
 	}
 
 	override fun receiveCharacterListUpdate(characters: List<CharacterItem>) {
@@ -88,23 +79,11 @@ class CharacterListPresenter(
 		}
 	}
 
-	override suspend fun characterArcPlanned(response: CharacterArcItem) {
+	override suspend fun receiveCreatedCharacterArc(createdCharacterArc: CreatedCharacterArc) {
 		CharacterArcItemViewModel(
-			response.characterId.toString(),
-			response.themeId.toString(),
-			response.characterArcName
-		).let(this::addNewCharacterArcItem)
-	}
-
-	override suspend fun themeNoted(response: CreatedTheme) {
-		// do nothing
-	}
-
-	override fun receivePromoteMinorCharacterResponse(response: PromoteMinorCharacter.ResponseModel) {
-		CharacterArcItemViewModel(
-		  response.characterId.toString(),
-		  response.themeId.toString(),
-		  response.characterArcName
+			createdCharacterArc.characterId.toString(),
+			createdCharacterArc.themeId.toString(),
+			createdCharacterArc.characterArcName
 		).let(this::addNewCharacterArcItem)
 	}
 
@@ -171,7 +150,6 @@ class CharacterListPresenter(
 		}
 	}
 
-	override fun receivePromoteMinorCharacterFailure(failure: ThemeException) {}
 	override fun receiveDemoteMajorCharacterFailure(failure: Exception) {}
 	override fun receiveRenameCharacterArcFailure(failure: Exception) {}
 

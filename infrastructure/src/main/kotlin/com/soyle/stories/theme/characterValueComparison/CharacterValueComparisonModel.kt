@@ -1,14 +1,11 @@
 package com.soyle.stories.theme.characterValueComparison
 
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.Model
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.soylestories.ApplicationScope
-import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.OppositionValueItem
-import com.soyle.stories.theme.valueOppositionWebs.OppositionValueViewModel
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.onChange
-import tornadofx.toObservable
 
 class CharacterValueComparisonModel : Model<CharacterValueComparisonScope, CharacterValueComparisonViewModel>(CharacterValueComparisonScope::class) {
 

@@ -2,7 +2,7 @@ package com.soyle.stories.scene.sceneDetails
 
 import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.character.characterList.LiveCharacterList
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
@@ -91,7 +91,7 @@ class SceneDetailsPresenter(
 			val includedCharacterIds = this?.includedCharacters?.map { it.characterId }?.toSet()
 			  ?: setOf()
 			val characterViewModels = characters.map {
-				CharacterItemViewModel(it.characterId.toString(), it.characterName)
+				CharacterItemViewModel(it.characterId.toString(), it.characterName, "")
 			}
 			val characterNames = characterViewModels.associate { it.characterId to it.characterName }
 			copyOrDefault(
@@ -220,21 +220,21 @@ class SceneDetailsPresenter(
 	}
 
 	private fun SceneDetailsViewModel?.copyOrDefault(
-	  invalid: Boolean = this?.invalid ?: true,
-	  storyEventId: String? = this?.storyEventId,
-	  locationSectionLabel: String = this?.locationSectionLabel ?: "Setting",
-	  locationDropDownEmptyLabel: String = this?.locationDropDownEmptyLabel ?: "Select Location",
-	  selectedLocation: LocationItemViewModel? = this?.selectedLocation,
-	  availableLocations: List<LocationItemViewModel> = this?.availableLocations ?: listOf(),
-	  charactersSectionLabel: String = this?.charactersSectionLabel ?: "Characters",
-	  addCharacterButtonLabel: String = this?.addCharacterButtonLabel ?: "Add Character",
-	  includedCharacters: List<SceneDetailsCharacterViewModel> = this?.includedCharacters ?: listOf(),
-	  availableCharacters: List<CharacterItemViewModel> = this?.availableCharacters ?: listOf(),
-	  removeCharacterButtonLabel: String = this?.removeCharacterButtonLabel ?: "Remove Character",
-	  lastChangedTipLabel: String = this?.lastChangedTipLabel ?: "When was this last set?",
-	  resentButtonLabel: String = this?.resentButtonLabel ?: "Reset to last value.",
-	  characters: List<CharacterItemViewModel> = this?.characters ?: listOf(),
-	  locations: List<LocationItemViewModel> = this?.locations ?: listOf()
+		invalid: Boolean = this?.invalid ?: true,
+		storyEventId: String? = this?.storyEventId,
+		locationSectionLabel: String = this?.locationSectionLabel ?: "Setting",
+		locationDropDownEmptyLabel: String = this?.locationDropDownEmptyLabel ?: "Select Location",
+		selectedLocation: LocationItemViewModel? = this?.selectedLocation,
+		availableLocations: List<LocationItemViewModel> = this?.availableLocations ?: listOf(),
+		charactersSectionLabel: String = this?.charactersSectionLabel ?: "Characters",
+		addCharacterButtonLabel: String = this?.addCharacterButtonLabel ?: "Add Character",
+		includedCharacters: List<SceneDetailsCharacterViewModel> = this?.includedCharacters ?: listOf(),
+		availableCharacters: List<CharacterItemViewModel> = this?.availableCharacters ?: listOf(),
+		removeCharacterButtonLabel: String = this?.removeCharacterButtonLabel ?: "Remove Character",
+		lastChangedTipLabel: String = this?.lastChangedTipLabel ?: "When was this last set?",
+		resentButtonLabel: String = this?.resentButtonLabel ?: "Reset to last value.",
+		characters: List<CharacterItemViewModel> = this?.characters ?: listOf(),
+		locations: List<LocationItemViewModel> = this?.locations ?: listOf()
 	) = SceneDetailsViewModel(
 	  invalid,
 	  storyEventId,

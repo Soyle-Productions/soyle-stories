@@ -19,9 +19,7 @@ import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebCo
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebControllerImpl
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebNotifier
 import com.soyle.stories.theme.addSymbolDialog.*
-import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
-import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeControllerImpl
-import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeNotifier
+import com.soyle.stories.theme.addSymbolToTheme.*
 import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
 import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionControllerImpl
 import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionNotifier
@@ -37,9 +35,7 @@ import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValue
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogPresenter
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogViewListener
 import com.soyle.stories.theme.createSymbolDialog.*
-import com.soyle.stories.theme.createTheme.CreateThemeController
-import com.soyle.stories.theme.createTheme.CreateThemeControllerImpl
-import com.soyle.stories.theme.createTheme.CreateThemeNotifier
+import com.soyle.stories.theme.createTheme.*
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogController
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogModel
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogPresenter
@@ -210,8 +206,12 @@ object ThemeModule {
     }
 
     private fun InScope<ProjectScope>.notifiers() {
+        provide(SymbolAddedToThemeReceiver::class) { SymbolAddedToThemeNotifier() }
+        provide(CreatedThemeReceiver::class) { CreatedThemeNotifier() }
+
+
         provide(CreateTheme.OutputPort::class) {
-            CreateThemeNotifier(get())
+            CreateThemeOutput(get(), get())
         }
         provide(DeleteTheme.OutputPort::class) {
             DeleteThemeNotifier(get())
@@ -220,7 +220,7 @@ object ThemeModule {
             RenameThemeNotifier()
         }
         provide(AddSymbolToTheme.OutputPort::class) {
-            AddSymbolToThemeNotifier()
+            AddSymbolToThemeOutput(get())
         }
         provide(AddValueWebToTheme.OutputPort::class) {
             AddValueWebToThemeNotifier(get())
@@ -325,7 +325,7 @@ object ThemeModule {
                 get<CreateThemeDialogModel>()
             )
 
-            presenter listensTo get<CreateThemeNotifier>()
+            presenter listensTo get<CreatedThemeNotifier>()
 
             CreateThemeDialogController(
                 presenter,
@@ -338,8 +338,8 @@ object ThemeModule {
                 get<CreateSymbolDialogModel>()
             )
 
-            presenter listensTo get<AddSymbolToThemeNotifier>()
-            presenter listensTo get<CreateThemeNotifier>()
+            presenter listensTo get<SymbolAddedToThemeNotifier>()
+            presenter listensTo get<CreatedThemeNotifier>()
             presenter listensTo get<DeleteThemeNotifier>()
             presenter listensTo get<RenameThemeNotifier>()
 
@@ -359,10 +359,10 @@ object ThemeModule {
                 get<ThemeListModel>()
             )
 
-            presenter listensTo get<CreateThemeNotifier>()
+            presenter listensTo get<CreatedThemeNotifier>()
             presenter listensTo get<DeleteThemeNotifier>()
             presenter listensTo get<RenameThemeNotifier>()
-            presenter listensTo get<AddSymbolToThemeNotifier>()
+            presenter listensTo get<SymbolAddedToThemeNotifier>()
             presenter listensTo get<RemoveSymbolFromThemeNotifier>()
             presenter listensTo get<RenameSymbolNotifier>()
 
@@ -542,7 +542,7 @@ object ThemeModule {
                 presenter listensTo projectScope.get<RenameLocationNotifier>()
                 presenter listensTo projectScope.get<DeleteLocationNotifier>()
 
-                presenter listensTo projectScope.get<AddSymbolToThemeNotifier>()
+                presenter listensTo projectScope.get<SymbolAddedToThemeNotifier>()
                 presenter listensTo projectScope.get<RenameSymbolNotifier>()
                 presenter listensTo projectScope.get<RemoveSymbolFromThemeNotifier>()
 

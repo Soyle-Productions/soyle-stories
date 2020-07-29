@@ -2,13 +2,12 @@ package com.soyle.stories.theme.characterValueComparison
 
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.CharactersAvailableToIncludeInTheme
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
 import com.soyle.stories.theme.usecases.compareCharacterValues.CharacterValueComparison
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
@@ -80,7 +79,7 @@ class CharacterValueComparisonPresenter(
         view.updateOrInvalidated {
             copy(
                 availableCharacters = response.map {
-                    CharacterItemViewModel(it.characterId.toString(), it.characterName)
+                    CharacterItemViewModel(it.characterId.toString(), it.characterName, "")
                 }
             )
         }

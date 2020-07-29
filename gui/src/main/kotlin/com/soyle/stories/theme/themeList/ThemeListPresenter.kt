@@ -2,6 +2,8 @@ package com.soyle.stories.theme.themeList
 
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.gui.View
+import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
+import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
 import com.soyle.stories.theme.usecases.SymbolItem
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
@@ -24,10 +26,10 @@ import java.util.*
 class ThemeListPresenter(
     private val view: View.Nullable<ThemeListViewModel>
 ) : ListSymbolsByTheme.OutputPort,
-    CreateTheme.OutputPort,
+    CreatedThemeReceiver,
     DeleteTheme.OutputPort,
     RenameTheme.OutputPort,
-    AddSymbolToTheme.OutputPort,
+    SymbolAddedToThemeReceiver,
     RemoveSymbolFromTheme.OutputPort,
     RenameSymbol.OutputPort {
 
@@ -45,8 +47,8 @@ class ThemeListPresenter(
         view.update { viewModel }
     }
 
-    override suspend fun themeCreated(response: CreatedTheme) {
-        val newItem = themeItem(response.themeId, response.themeName)
+    override suspend fun receiveCreatedTheme(createdTheme: CreatedTheme) {
+        val newItem = themeItem(createdTheme.themeId, createdTheme.themeName)
         view.updateOrInvalidated {
             copy(
                 themes = sortedThemes(themes + newItem)
@@ -80,9 +82,9 @@ class ThemeListPresenter(
         }
     }
 
-    override suspend fun addedSymbolToTheme(response: SymbolAddedToTheme) {
-        val themeId = response.themeId.toString()
-        val newItem = symbolItem(response.symbolId, response.symbolName)
+    override suspend fun receiveSymbolAddedToTheme(symbolAddedToTheme: SymbolAddedToTheme) {
+        val themeId = symbolAddedToTheme.themeId.toString()
+        val newItem = symbolItem(symbolAddedToTheme.symbolId, symbolAddedToTheme.symbolName)
         view.updateOrInvalidated {
             copy(
                 themes = themes.map {

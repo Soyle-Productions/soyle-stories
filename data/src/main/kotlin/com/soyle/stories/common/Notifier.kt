@@ -60,9 +60,3 @@ infix fun <T : Any> T.listensTo(notifier: Notifier<T>): T {
 }
 
 infix fun <T : Any> T.isListeningTo(notifier: Notifier<T>): Boolean = notifier.hasListener(this)
-
-abstract class Signaler<T: Any> : Notifier<T>() {
-
-    fun emit(context: CoroutineContext, block: suspend (T) -> Unit) = notifyAll(context, block)
-
-}

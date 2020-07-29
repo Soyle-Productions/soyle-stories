@@ -4,7 +4,7 @@ import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.gui.View
@@ -14,6 +14,7 @@ import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.location.usecases.renameLocation.RenameLocation
+import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
 import com.soyle.stories.theme.themeList.SymbolListItemViewModel
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
@@ -40,7 +41,7 @@ class AddSymbolDialogPresenter(
     private val view: View.Nullable<AddSymbolDialogViewModel>
 ) : ListAvailableEntitiesToAddToOpposition.OutputPort,
     BuildNewCharacter.OutputPort, RenameCharacter.OutputPort, RemoveCharacterFromStory.OutputPort,
-    CreateNewLocation.OutputPort, RenameLocation.OutputPort, DeleteLocation.OutputPort, AddSymbolToTheme.OutputPort,
+    CreateNewLocation.OutputPort, RenameLocation.OutputPort, DeleteLocation.OutputPort, SymbolAddedToThemeReceiver,
     RenameSymbol.OutputPort, RemoveSymbolFromTheme.OutputPort, AddSymbolicItemToOpposition.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
@@ -52,7 +53,8 @@ class AddSymbolDialogPresenter(
                 characters = response.characters.map {
                     CharacterItemViewModel(
                         it.characterId.toString(),
-                        it.characterName
+                        it.characterName,
+                        ""
                     )
                 }.sortedBy { it.characterName },
                 locations = response.locations.map { LocationItemViewModel(it) }.sortedBy { it.name },
@@ -67,7 +69,8 @@ class AddSymbolDialogPresenter(
             copyOrDefault(
                 characters = characters + CharacterItemViewModel(
                     response.characterId.toString(),
-                    response.characterName
+                    response.characterName,
+                    ""
                 )
             )
         }
@@ -126,13 +129,13 @@ class AddSymbolDialogPresenter(
         }
     }
 
-    override suspend fun addedSymbolToTheme(response: SymbolAddedToTheme) {
-        if (response.themeId != themeId) return
+    override suspend fun receiveSymbolAddedToTheme(symbolAddedToTheme: SymbolAddedToTheme) {
+        if (symbolAddedToTheme.themeId != themeId) return
         view.updateOrInvalidated {
             copyOrDefault(
                 symbols = symbols + SymbolListItemViewModel(
-                    response.symbolId.toString(),
-                    response.symbolName
+                    symbolAddedToTheme.symbolId.toString(),
+                    symbolAddedToTheme.symbolName
                 )
             )
         }

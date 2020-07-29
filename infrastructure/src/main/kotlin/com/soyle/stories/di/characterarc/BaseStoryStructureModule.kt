@@ -1,11 +1,9 @@
-/**
- * Created by Brendan
- * Date: 3/2/2020
- * Time: 5:56 PM
- */
 package com.soyle.stories.di.characterarc
 
 import com.soyle.stories.characterarc.baseStoryStructure.*
+import com.soyle.stories.characterarc.eventbus.ChangeThematicSectionValueNotifier
+import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionNotifier
+import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.characterarc.viewBaseStoryStructure.ViewBaseStoryStructureController
 import com.soyle.stories.di.get
@@ -20,31 +18,33 @@ internal object BaseStoryStructureModule {
 
             provide(ViewBaseStoryStructure.OutputPort::class, ListAllLocations.OutputPort::class) {
                 BaseStoryStructurePresenter(
-                  get<BaseStoryStructureModel>(),
-                  projectScope.get(),
-                  projectScope.get()
+                    get<BaseStoryStructureModel>(),
+                    projectScope.get<ChangeThematicSectionValueNotifier>(),
+                    projectScope.get<LinkLocationToCharacterArcSectionNotifier>(),
+                    projectScope.get<UnlinkLocationFromCharacterArcSectionNotifier>(),
+                    projectScope.get()
                 )
             }
 
             provide {
                 ViewBaseStoryStructureController(
-                  projectScope.applicationScope.get(),
-                  projectScope.get(),
-                  get()
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    get()
                 )
             }
 
             provide<BaseStoryStructureViewListener> {
                 BaseStoryStructureController(
-                  projectScope.applicationScope.get(),
-                  type.themeId.toString(),
-                  type.characterId.toString(),
-                  projectScope.get(),
-                  get(),
-                  get(),
-                  projectScope.get(),
-                  projectScope.get(),
-                  projectScope.get()
+                    projectScope.applicationScope.get(),
+                    type.themeId.toString(),
+                    type.characterId.toString(),
+                    projectScope.get(),
+                    get(),
+                    get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get()
                 )
             }
 

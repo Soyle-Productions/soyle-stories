@@ -1,7 +1,5 @@
 package com.soyle.stories.layout.config.dynamic
 
-import com.soyle.stories.characterarc.characterComparison.CharacterComparison
-import com.soyle.stories.characterarc.characterComparison.CharacterComparisonScope
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.layout.config.ToolConfig

@@ -12,9 +12,7 @@ import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveChara
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
-import com.soyle.stories.characterarc.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
 import com.soyle.stories.characterarc.changeCentralMoralQuestion.ChangeCentralMoralQuestionNotifier
-import com.soyle.stories.characterarc.characterComparison.CharacterComparisonScope
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogController
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.eventbus.*
@@ -23,9 +21,7 @@ import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLoca
 import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
-import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
-import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcControllerImpl
-import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcNotifier
+import com.soyle.stories.characterarc.planNewCharacterArc.*
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionController
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionControllerImpl
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
@@ -44,12 +40,10 @@ import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSec
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionUseCase
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
-import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.Project
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
 import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonNotifier
@@ -58,7 +52,6 @@ import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFrom
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonNotifier
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
-import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentNotifier
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestionUseCase
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
@@ -146,47 +139,13 @@ object CharacterArcModule {
 	}
 
 	private fun InScope<ProjectScope>.events() {
-		provide<CharacterArcEvents> {
-			object : CharacterArcEvents {
-				override val planNewCharacterArc: PlanNewCharacterArcNotifier
-					get() = get()
-				override val includeCharacterInComparison: IncludeCharacterInComparisonNotifier
-					get() = get()
-				override val buildNewCharacter: BuildNewCharacterNotifier
-					get() = get()
-				override val promoteMinorCharacter: PromoteMinorCharacterNotifier
-					get() = get()
-				override val deleteLocalCharacterArc: DeleteCharacterArcNotifier
-					get() = get()
-				override val removeCharacterFromStory: RemoveCharacterFromLocalStoryNotifier
-					get() = get()
-				override val changeStoryFunction: ChangeStoryFunctionNotifier
-					get() = get()
-				override val changeThematicSectionValue: ChangeThematicSectionValueNotifier
-					get() = get()
-				override val changeCentralMoralQuestion: ChangeCentralMoralQuestionNotifier
-					get() = get()
-				override val changeCharacterPropertyValue: ChangeCharacterPropertyValueNotifier
-					get() = get()
-				override val changeCharacterPerspectivePropertyValue: ChangeCharacterPerspectivePropertyValueNotifier
-					get() = get()
-				override val removeCharacterFromLocalComparison: RemoveCharacterFromComparisonNotifier
-					get() = get()
-				override val renameCharacter: RenameCharacterNotifier
-					get() = get()
-				override val renameCharacterArc: RenameCharacterArcNotifier
-					get() = get()
-				override val linkLocationToCharacterArcSection: LinkLocationToCharacterArcSectionNotifier
-					get() = get()
-				override val unlinkLocationFromCharacterArcSection: UnlinkLocationFromCharacterArcSectionNotifier
-					get() = get()
-			}
-		}
+
+		provide(CreatedCharacterArcReceiver::class) { CreatedCharacterArcNotifier() }
 
 		provide(BuildNewCharacter.OutputPort::class) { BuildNewCharacterNotifier(get(), get()) }
-		provide(PlanNewCharacterArc.OutputPort::class) { PlanNewCharacterArcNotifier(get()) }
+		provide(PlanNewCharacterArc.OutputPort::class) { PlanNewCharacterArcOutput(get(), get()) }
 		provide(IncludeCharacterInComparison.OutputPort::class) { IncludeCharacterInComparisonNotifier() }
-		provide(PromoteMinorCharacter.OutputPort::class) { PromoteMinorCharacterNotifier() }
+		provide(PromoteMinorCharacter.OutputPort::class) { PromoteMinorCharacterOutput(get()) }
 		provide(DemoteMajorCharacter.OutputPort::class) { DeleteCharacterArcNotifier() }
 		provide(RemoveCharacterFromStory.OutputPort::class) { RemoveCharacterFromLocalStoryNotifier().also {
 			get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
@@ -247,26 +206,7 @@ object CharacterArcModule {
 			views()
 		}
 
-		scoped<CharacterComparisonScope> {
-			provide {
-				DeleteLocalCharacterArcController(themeId, projectScope.get(), projectScope.get())
-			}
-			provide {
-				ChangeStoryFunctionController(themeId, projectScope.get(), projectScope.get())
-			}
-			provide {
-				ChangeCentralMoralQuestionController(themeId, projectScope.get(), projectScope.get())
-			}
-			provide {
-				ChangeCharacterPropertyController(themeId, projectScope.get(), projectScope.get())
-			}
-			provide {
-				ChangeCharacterPerspectivePropertyController(themeId, projectScope.get(), projectScope.get())
-			}
-		}
-
 		BaseStoryStructureModule
-		CharacterComparisonModule
 		CharacterListModule
 
 	}

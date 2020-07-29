@@ -30,7 +30,6 @@ object ToolModule : RegisteredToolsConfig {
          * Dynamic Tools
          */
         BaseStoryStructureConfig.getRegistration(),
-        CharacterComparisonConfig.getRegistration(),
         LocationDetailsConfig.getRegistration(),
         SceneDetailsConfig.getRegistration(),
         ValueOppositionWebsConfig.getRegistration(),

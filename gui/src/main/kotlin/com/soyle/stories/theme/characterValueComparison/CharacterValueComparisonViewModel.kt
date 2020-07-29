@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.characterValueComparison
 
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
+
 
 data class CharacterValueComparisonViewModel(
     val openValueWebToolButtonLabel: String,

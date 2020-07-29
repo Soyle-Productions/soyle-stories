@@ -1,27 +1,15 @@
 package com.soyle.stories.theme.characterConflict
 
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
-import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.onChangeUntil
-import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
-import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
-import javafx.scene.Parent
-import javafx.scene.control.MenuItem
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
-import javafx.scene.layout.Region
-import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.util.Duration
 import tornadofx.*
@@ -31,8 +19,8 @@ class CharacterConflict : View() {
     private val viewListener = resolve<CharacterConflictViewListener>()
     private val model = resolve<CharacterConflictModel>()
 
-    val isSmallProperty = SimpleBooleanProperty()
-    val isLargeProperty = isSmallProperty.not()
+    private val isSmallProperty = SimpleBooleanProperty()
+    private val isLargeProperty = isSmallProperty.not()
 
     override val root: Form = form {
         widthProperty().onChange {
@@ -83,7 +71,7 @@ class CharacterConflict : View() {
                                             item(it.characterName) {
                                                 addClass(ComponentsStyles.contextMenuSectionedItem)
                                                 action {
-                                                    model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName)
+                                                    model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName, "")
                                                     viewListener.getValidState(it.characterId)
                                                 }
                                             }
@@ -108,7 +96,7 @@ class CharacterConflict : View() {
                                                     }
                                                 }
                                                 action {
-                                                    model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName)
+                                                    model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName, "")
                                                     viewListener.getValidState(it.characterId)
                                                 }
                                             }

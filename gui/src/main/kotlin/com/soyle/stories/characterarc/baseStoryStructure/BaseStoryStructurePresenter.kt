@@ -1,26 +1,31 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.characterarc.baseStoryStructure.presenters.*
-import com.soyle.stories.characterarc.eventbus.CharacterArcEvents
+import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
+import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
 
 class BaseStoryStructurePresenter(
   private val view: View.Nullable<BaseStoryStructureViewModel>,
-  characterArcEvents: CharacterArcEvents,
+  changeThematicSectionValueNotifier: Notifier<ChangeThematicSectionValue.OutputPort>,
+  linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort>,
+  unlinkLocationFromCharacterArcSection: Notifier<UnlinkLocationFromCharacterArcSection.OutputPort>,
   locationEvents: LocationEvents
 ) : ViewBaseStoryStructure.OutputPort, ListAllLocations.OutputPort {
 
     private val subPresenters = listOf(
-      ChangeThematicSectionValuePresenter(view) listensTo characterArcEvents.changeThematicSectionValue,
+      ChangeThematicSectionValuePresenter(view) listensTo changeThematicSectionValueNotifier,
       DeleteLocationPresenter(view) listensTo locationEvents.deleteLocation,
       CreateNewLocationPresenter(view) listensTo locationEvents.createNewLocation,
-      LinkLocationToCharacterArcSectionPresenter(view) listensTo characterArcEvents.linkLocationToCharacterArcSection,
-      UnlinkLocationFromCharacterArcSectionPresenter(view) listensTo characterArcEvents.unlinkLocationFromCharacterArcSection
+      LinkLocationToCharacterArcSectionPresenter(view) listensTo linkLocationToCharacterArcSection,
+      UnlinkLocationFromCharacterArcSectionPresenter(view) listensTo unlinkLocationFromCharacterArcSection
     )
 
     override fun receiveViewBaseStoryStructureResponse(response: ViewBaseStoryStructure.ResponseModel) {

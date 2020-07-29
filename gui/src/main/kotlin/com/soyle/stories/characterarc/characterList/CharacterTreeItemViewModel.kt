@@ -7,3 +7,9 @@ data class CharacterTreeItemViewModel(
     val isExpanded: Boolean,
     val arcs: List<CharacterArcItemViewModel>
 )
+
+data class CharacterItemViewModel(
+    val characterId: String,
+    val characterName: String,
+    val imageResource: String
+)

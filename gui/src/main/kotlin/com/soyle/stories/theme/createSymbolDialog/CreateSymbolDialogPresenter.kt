@@ -4,6 +4,8 @@ import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharact
 import com.soyle.stories.common.ValidationException
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeNameCannotBeBlank
+import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
+import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
 import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
@@ -18,7 +20,7 @@ import com.soyle.stories.theme.usecases.renameTheme.RenamedTheme
 
 class CreateSymbolDialogPresenter(
     private val view: View.Nullable<CreateSymbolDialogViewModel>
-) : ListThemes.OutputPort, CreateTheme.OutputPort, DeleteTheme.OutputPort, RenameTheme.OutputPort, AddSymbolToTheme.OutputPort {
+) : ListThemes.OutputPort, DeleteTheme.OutputPort, RenameTheme.OutputPort, CreatedThemeReceiver, SymbolAddedToThemeReceiver {
 
     override suspend fun themesListed(response: ThemeList) {
         view.update {
@@ -35,8 +37,8 @@ class CreateSymbolDialogPresenter(
         }
     }
 
-    override suspend fun themeCreated(response: CreatedTheme) {
-        val newItem = ThemeItemViewModel(response.themeId.toString(), response.themeName)
+    override suspend fun receiveCreatedTheme(createdTheme: CreatedTheme) {
+        val newItem = ThemeItemViewModel(createdTheme.themeId.toString(), createdTheme.themeName)
         view.updateOrInvalidated {
             copy(
                 themes = (themes + newItem).sortedBy { it.themeName }
@@ -83,9 +85,9 @@ class CreateSymbolDialogPresenter(
         }
     }
 
-    override suspend fun addedSymbolToTheme(response: SymbolAddedToTheme) {
+    override suspend fun receiveSymbolAddedToTheme(symbolAddedToTheme: SymbolAddedToTheme) {
         view.update {
-            CreateSymbolDialogViewModel("", "", null, null, emptyList(), createdId = response.symbolId.toString())
+            CreateSymbolDialogViewModel("", "", null, null, emptyList(), createdId = symbolAddedToTheme.symbolId.toString())
         }
     }
 

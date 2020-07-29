@@ -1,7 +1,6 @@
 package com.soyle.stories.theme.addSymbolDialog.components
 
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
-import com.soyle.stories.di.get
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.addSymbolDialog.AddSymbolDialogModel
 import com.soyle.stories.theme.addSymbolDialog.AddSymbolDialogViewListener

@@ -1,6 +1,6 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.location.items.LocationItemViewModel
 
 data class StoryEventDetailsViewModel(

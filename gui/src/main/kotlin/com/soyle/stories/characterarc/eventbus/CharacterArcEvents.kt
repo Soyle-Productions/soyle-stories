@@ -22,7 +22,7 @@ import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacte
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison
-
+/*
 interface CharacterArcEvents {
 
     val buildNewCharacter: Notifier<BuildNewCharacter.OutputPort>
@@ -42,4 +42,4 @@ interface CharacterArcEvents {
     val linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort>
     val unlinkLocationFromCharacterArcSection: Notifier<UnlinkLocationFromCharacterArcSection.OutputPort>
 
-}
+}*/
