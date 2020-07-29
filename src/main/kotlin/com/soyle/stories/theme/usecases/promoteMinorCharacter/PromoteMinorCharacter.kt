@@ -15,6 +15,6 @@ interface PromoteMinorCharacter {
     )
 
     interface OutputPort {
-        fun receivePromoteMinorCharacterResponse(response: ResponseModel)
+        suspend fun receivePromoteMinorCharacterResponse(response: ResponseModel)
     }
 }

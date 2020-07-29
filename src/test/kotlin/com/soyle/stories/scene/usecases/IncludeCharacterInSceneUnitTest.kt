@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.usecases
 
-import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project

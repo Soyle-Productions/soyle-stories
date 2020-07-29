@@ -1,10 +1,8 @@
 package com.soyle.stories.characterarc.usecases
 
 import com.soyle.stories.character.CharacterDoesNotExist
-import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcItem
-import com.soyle.stories.characterarc.usecases.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
 import com.soyle.stories.common.shouldBe
@@ -14,18 +12,14 @@ import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.storyevent.characterDoesNotExist
-import com.soyle.stories.theme.doubles.CharacterArcRepositoryDouble
-import com.soyle.stories.theme.doubles.CharacterArcSectionRepositoryDouble
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
-import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
+import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class PlanNewCharacterArcTest {
 
@@ -123,9 +117,10 @@ class PlanNewCharacterArcTest {
     private val themeRepository = ThemeRepositoryDouble(onAddTheme = {
         createdTheme = it
     })
-    private val characterRepository = CharacterRepositoryDouble(onUpdateCharacter = {
-        updatedCharacter = it
-    })
+    private val characterRepository =
+        CharacterRepositoryDouble(onUpdateCharacter = {
+            updatedCharacter = it
+        })
     private val characterArcSectionRepositoryDouble = CharacterArcSectionRepositoryDouble(onAddNewCharacterArcSections = {
         createdArcSections = it
     })

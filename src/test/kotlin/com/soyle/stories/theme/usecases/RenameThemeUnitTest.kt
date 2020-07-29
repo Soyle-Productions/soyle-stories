@@ -1,11 +1,9 @@
 package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.shouldBe
-import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeTheme
-import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.themeNameCannotBeBlank
 import com.soyle.stories.theme.usecases.renameTheme.RenameTheme

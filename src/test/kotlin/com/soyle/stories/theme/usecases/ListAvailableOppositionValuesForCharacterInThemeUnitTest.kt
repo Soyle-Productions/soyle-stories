@@ -7,7 +7,7 @@ import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.SymbolicRepresentation
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInThemeUseCase
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.OppositionValuesAvailableForCharacterInTheme

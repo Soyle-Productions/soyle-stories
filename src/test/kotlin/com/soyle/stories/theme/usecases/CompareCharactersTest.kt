@@ -1,25 +1,15 @@
 package com.soyle.stories.theme.usecases
 
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
-import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.MinorCharacter
-import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharactersUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*

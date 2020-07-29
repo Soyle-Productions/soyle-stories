@@ -1,17 +1,12 @@
 package com.soyle.stories.theme.usecases
 
-import arrow.core.Either
-import arrow.core.flatMap
-import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.MinorCharacter
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.CharacterArcRepositoryDouble
-import com.soyle.stories.theme.doubles.CharacterArcSectionRepositoryDouble
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
+import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacterUseCase
 import kotlinx.coroutines.runBlocking
@@ -19,7 +14,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class PromoteCharacterTest {
 
@@ -129,7 +123,7 @@ class PromoteCharacterTest {
             themeRepository, characterArcRepository, characterArcSectionRepository
         )
         val output = object : PromoteMinorCharacter.OutputPort {
-            override fun receivePromoteMinorCharacterResponse(response: PromoteMinorCharacter.ResponseModel) {
+            override suspend fun receivePromoteMinorCharacterResponse(response: PromoteMinorCharacter.ResponseModel) {
                 result = response
             }
         }

@@ -4,14 +4,13 @@ import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
 import com.soyle.stories.theme.usecases.renameValueWeb.RenamedValueWeb
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*

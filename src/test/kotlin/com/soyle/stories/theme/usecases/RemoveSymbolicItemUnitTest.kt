@@ -1,17 +1,15 @@
 package com.soyle.stories.theme.usecases
 
-import arrow.core.extensions.sequence.foldable.isEmpty
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.OppositionValue
 import com.soyle.stories.entities.theme.SymbolicRepresentation
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItemUseCase
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
-import com.soyle.stories.theme.usecases.renameSymbolicItems.RenamedSymbolicItem
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*

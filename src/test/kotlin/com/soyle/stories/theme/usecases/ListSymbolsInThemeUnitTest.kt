@@ -4,7 +4,7 @@ import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.theme.ThemeDoesNotExist
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.usecases.listSymbolsInTheme.ListSymbolsInTheme
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*
-import kotlin.math.exp
 
 class ListSymbolsInThemeUnitTest {
 

@@ -4,12 +4,10 @@ import arrow.core.Either
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.*
 import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.MinorCharacter
 import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.CharacterArcSectionRepositoryDouble
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict

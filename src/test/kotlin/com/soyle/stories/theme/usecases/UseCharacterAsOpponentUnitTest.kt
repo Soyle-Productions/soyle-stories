@@ -3,15 +3,13 @@ package com.soyle.stories.theme.usecases
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
-import com.soyle.stories.common.str
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.storyevent.characterDoesNotExist
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.CharacterRepositoryDouble
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
-import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent

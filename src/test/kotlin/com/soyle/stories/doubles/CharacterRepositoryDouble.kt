@@ -1,4 +1,4 @@
-package com.soyle.stories.character.doubles
+package com.soyle.stories.doubles
 
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.characterarc.repositories.CharacterArcRepository

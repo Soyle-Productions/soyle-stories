@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
@@ -16,7 +16,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import kotlinx.coroutines.runBlocking
@@ -230,9 +230,11 @@ class BuildNewCharacterTest {
 
             private fun buildCharacterToUseAsOpponent(name: String) {
                 val useCase: BuildNewCharacter =
-                    BuildNewCharacterUseCase(CharacterRepositoryDouble(onAddNewCharacter = {
-                        createdCharacter = it
-                    }), themeRepository)
+                    BuildNewCharacterUseCase(
+                        CharacterRepositoryDouble(
+                            onAddNewCharacter = {
+                                createdCharacter = it
+                            }), themeRepository)
                 val output = object : BuildNewCharacter.OutputPort {
                     override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
                         characterItemResult = response
@@ -274,9 +276,11 @@ class BuildNewCharacterTest {
         }
 
         private fun buildCharacterToIncludeInTheme(name: String) {
-            val useCase: BuildNewCharacter = BuildNewCharacterUseCase(CharacterRepositoryDouble(onAddNewCharacter = {
-                createdCharacter = it
-            }), themeRepository)
+            val useCase: BuildNewCharacter = BuildNewCharacterUseCase(
+                CharacterRepositoryDouble(
+                    onAddNewCharacter = {
+                        createdCharacter = it
+                    }), themeRepository)
             val output = object : BuildNewCharacter.OutputPort {
                 override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
                     characterItemResult = response

@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.usecases
 
-import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.*
 import com.soyle.stories.common.shouldBe

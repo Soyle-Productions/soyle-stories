@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.character.CharacterDoesNotExist
-import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
@@ -17,7 +17,7 @@ import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.locationDoesNotExist
 import com.soyle.stories.storyevent.characterDoesNotExist
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.*
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import kotlinx.coroutines.runBlocking

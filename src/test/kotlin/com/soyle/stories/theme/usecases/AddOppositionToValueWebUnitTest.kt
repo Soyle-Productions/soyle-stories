@@ -7,15 +7,14 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.*
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.doubles.CharacterRepositoryDouble
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb.RequestModel
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWebUseCase
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.OppositionAddedToValueWeb
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicItemId
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*

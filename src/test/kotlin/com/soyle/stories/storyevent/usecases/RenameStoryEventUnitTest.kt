@@ -1,6 +1,6 @@
 package com.soyle.stories.storyevent.usecases
 
-import com.soyle.stories.character.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.entities.Character
@@ -107,8 +107,8 @@ class RenameStoryEventUnitTest {
 		private fun makeCharacterRepository(characterIds: List<UUID>): CharacterRepository
 		{
 			return CharacterRepositoryDouble(initialCharacters = characterIds.map {
-				makeCharacter(Character.Id(it),  Project.Id(), "Bob")
-			})
+                makeCharacter(Character.Id(it), Project.Id(), "Bob")
+            })
 		}
 	}
 

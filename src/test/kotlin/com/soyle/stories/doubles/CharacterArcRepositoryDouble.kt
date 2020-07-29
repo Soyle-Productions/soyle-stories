@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.doubles
+package com.soyle.stories.doubles
 
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArc

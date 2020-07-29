@@ -1,10 +1,9 @@
 package com.soyle.stories.theme.usecases
 
-import arrow.core.extensions.list.align.empty
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeOppositionValue
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.makeValueWeb
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.*
-import kotlin.math.exp
 
 class RenameSymbolicItemUnitTest {
 

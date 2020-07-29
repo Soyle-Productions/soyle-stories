@@ -2,7 +2,7 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByThemeUseCase
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.SymbolsByTheme

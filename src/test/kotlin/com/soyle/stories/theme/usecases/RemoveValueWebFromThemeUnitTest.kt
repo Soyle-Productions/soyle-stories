@@ -4,7 +4,7 @@ import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.ValueWeb
 import com.soyle.stories.theme.ValueWebDoesNotExist
-import com.soyle.stories.theme.doubles.ThemeRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.makeValueWeb
 import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromTheme
