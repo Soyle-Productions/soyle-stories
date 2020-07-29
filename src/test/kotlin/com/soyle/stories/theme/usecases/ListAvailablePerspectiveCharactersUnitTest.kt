@@ -15,7 +15,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.math.exp
 
 class ListAvailablePerspectiveCharactersUnitTest {
 
@@ -34,37 +33,25 @@ class ListAvailablePerspectiveCharactersUnitTest {
     fun `no characters in theme`() {
         givenThemeExists()
         listAvailablePerspectiveCharacters()
-        availablePerspectiveCharacters!! shouldBe {
-            assertEquals(themeId.uuid, it.themeId)
-            assertTrue(it.isEmpty())
-        }
+        availablePerspectiveCharacters!! shouldBe listOfSize(0)
     }
 
     @Test
     fun `no major characters in theme`() {
         givenThemeExists(includedCharacterCount = 3)
         listAvailablePerspectiveCharacters()
-        availablePerspectiveCharacters!! shouldBe {
-            assertEquals(themeId.uuid, it.themeId)
-            assertTrue(it.isEmpty())
-        }
+        availablePerspectiveCharacters!! shouldBe listOfSize(3)
+        availablePerspectiveCharacters!! shouldBe listOfMinorCharacters(3)
+        availablePerspectiveCharacters!! shouldBe listOfMajorCharacters(0)
     }
 
     @Test
     fun `major characters in theme`() {
         givenThemeExists(majorCharacterCount = 4)
         listAvailablePerspectiveCharacters()
-        availablePerspectiveCharacters!! shouldBe {
-            assertEquals(themeId.uuid, it.themeId)
-            assertFalse(it.isEmpty())
-            assertEquals(4, it.size)
-            val expectedCharacters = themeRepository.themes[themeId]!!.characters.filterIsInstance<MajorCharacter>()
-                .associateBy { it.id.uuid }
-            it.forEach {
-                val expectedCharacter = expectedCharacters.getValue(it.characterId)
-                assertEquals(expectedCharacter.name, it.characterName)
-            }
-        }
+        availablePerspectiveCharacters!! shouldBe listOfSize(4)
+        availablePerspectiveCharacters!! shouldBe listOfMinorCharacters(0)
+        availablePerspectiveCharacters!! shouldBe listOfMajorCharacters(4)
     }
 
     private val themeRepository = ThemeRepositoryDouble()
@@ -84,15 +71,38 @@ class ListAvailablePerspectiveCharactersUnitTest {
         }
     }
 
-    private val useCase: ListAvailablePerspectiveCharacters = ListAvailablePerspectiveCharactersUseCase(themeRepository)
-    private val output = object : ListAvailablePerspectiveCharacters.OutputPort {
-        override suspend fun receiveAvailablePerspectiveCharacters(response: AvailablePerspectiveCharacters) {
-            availablePerspectiveCharacters = response
+    private fun listAvailablePerspectiveCharacters() {
+        val useCase: ListAvailablePerspectiveCharacters = ListAvailablePerspectiveCharactersUseCase(themeRepository)
+        val output = object : ListAvailablePerspectiveCharacters.OutputPort {
+            override suspend fun receiveAvailablePerspectiveCharacters(response: AvailablePerspectiveCharacters) {
+                availablePerspectiveCharacters = response
+            }
+        }
+        runBlocking {
+            useCase.invoke(themeId.uuid, output)
         }
     }
 
-    private fun listAvailablePerspectiveCharacters() = runBlocking {
-        useCase.invoke(themeId.uuid, output)
+    private fun listOfSize(expectedSize: Int): (AvailablePerspectiveCharacters) -> Unit {
+        return {
+            assertEquals(themeId.uuid, it.themeId)
+            assertEquals(expectedSize, it.size)
+            val expectedCharacters = themeRepository.themes[themeId]!!.characters.associateBy { it.id.uuid }
+            it.forEach {
+                val expectedCharacter = expectedCharacters.getValue(it.characterId)
+                assertEquals(expectedCharacter.name, it.characterName)
+            }
+        }
+    }
+
+    private fun listOfMinorCharacters(expectedSize: Int) = fun (list: AvailablePerspectiveCharacters) {
+        val minorCharacters = list.filterNot { it.isMajorCharacter }
+        assertEquals(expectedSize, minorCharacters.size)
+    }
+
+    private fun listOfMajorCharacters(expectedSize: Int) = fun (list: AvailablePerspectiveCharacters) {
+        val majorCharacters = list.filter { it.isMajorCharacter }
+        assertEquals(expectedSize, majorCharacters.size)
     }
 
 }

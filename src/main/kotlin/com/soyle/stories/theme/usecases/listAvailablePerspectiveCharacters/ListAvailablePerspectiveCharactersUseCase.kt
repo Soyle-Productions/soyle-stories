@@ -16,7 +16,7 @@ class ListAvailablePerspectiveCharactersUseCase(
 
         output.receiveAvailablePerspectiveCharacters(AvailablePerspectiveCharacters(
             themeId,
-            theme.characters.filterIsInstance<MajorCharacter>().map { CharacterItem(it) }
+            theme.characters.map { AvailablePerspectiveCharacter(it.id.uuid, it.name, it is MajorCharacter) }
         ))
     }
 
