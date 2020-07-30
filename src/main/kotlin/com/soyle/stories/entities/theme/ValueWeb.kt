@@ -4,6 +4,7 @@ import com.soyle.stories.common.Entity
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.CharacterAlreadyRepresentationValueInValueWeb
 import com.soyle.stories.theme.OppositionValueDoesNotExist
+import com.soyle.stories.theme.usecases.validateValueWebName
 import java.util.*
 
 class ValueWeb(
@@ -13,7 +14,9 @@ class ValueWeb(
     val oppositions: List<OppositionValue>
 ) : Entity<ValueWeb.Id> {
 
-    constructor(themeId: Theme.Id, name: String) : this(Id(), themeId, name, listOf(OppositionValue(name)))
+    constructor(themeId: Theme.Id, name: String) : this(Id(), themeId, name, listOf(OppositionValue(name))) {
+        validateValueWebName(name)
+    }
 
     private fun copy(
         name: String = this.name,
@@ -25,7 +28,10 @@ class ValueWeb(
         oppositions
     )
 
-    fun withName(name: String) = copy(name = name)
+    fun withName(name: String): ValueWeb {
+        validateValueWebName(name)
+        return copy(name = name)
+    }
     fun withOpposition(opposition: OppositionValue) = copy(oppositions = oppositions + opposition)
     fun withoutOpposition(oppositionId: OppositionValue.Id) = copy(oppositions = oppositions.filterNot { it.id == oppositionId })
 

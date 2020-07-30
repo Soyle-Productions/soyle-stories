@@ -64,7 +64,6 @@ class Theme(
     fun withReplacedValueWeb(valueWeb: ValueWeb) = copy(valueWebs = valueWebs.filterNot { it.id == valueWeb.id } + valueWeb)
 
     fun withValueWeb(name: String): Pair<Theme, ValueWeb> {
-        validateValueWebName(name)
         val valueWeb = ValueWeb(id, name)
         return copy(valueWebs = valueWebs + valueWeb) to valueWeb
     }
