@@ -56,6 +56,8 @@ class Theme(
     )
 
     fun withName(name: String) = copy(name = name)
+    fun withCentralConflict(centralConflict: String) = copy(centralConflict = centralConflict)
+
     fun withSymbol(symbol: Symbol) = copy(symbols = symbols + symbol)
     fun withoutSymbol(symbolId: Symbol.Id) = copy(symbols = symbols.filterNot { it.id == symbolId })
 
@@ -409,7 +411,6 @@ class Theme(
     }
 
     fun characterIsMajorCharacter(characterId: Character.Id) = includedCharacters[characterId] is MajorCharacter
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -420,6 +421,7 @@ class Theme(
         if (projectId != other.projectId) return false
         if (name != other.name) return false
         if (symbols != other.symbols) return false
+        if (centralConflict != other.centralConflict) return false
         if (centralMoralQuestion != other.centralMoralQuestion) return false
         if (includedCharacters != other.includedCharacters) return false
         if (similaritiesBetweenCharacters != other.similaritiesBetweenCharacters) return false
@@ -433,6 +435,7 @@ class Theme(
         result = 31 * result + projectId.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + symbols.hashCode()
+        result = 31 * result + centralConflict.hashCode()
         result = 31 * result + centralMoralQuestion.hashCode()
         result = 31 * result + includedCharacters.hashCode()
         result = 31 * result + similaritiesBetweenCharacters.hashCode()
@@ -441,7 +444,7 @@ class Theme(
     }
 
     override fun toString(): String {
-        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralMoralQuestion='$centralMoralQuestion', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
+        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralConflict='$centralConflict', centralMoralQuestion='$centralMoralQuestion', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
     }
 
 

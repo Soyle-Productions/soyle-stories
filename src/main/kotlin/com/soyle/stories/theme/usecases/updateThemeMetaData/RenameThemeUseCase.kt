@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.renameTheme
+package com.soyle.stories.theme.usecases.updateThemeMetaData
 
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.ThemeDoesNotExist

@@ -6,9 +6,9 @@ import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.themeNameCannotBeBlank
-import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
-import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
-import com.soyle.stories.theme.usecases.renameTheme.RenamedTheme
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameThemeUseCase
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenamedTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
