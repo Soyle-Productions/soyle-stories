@@ -97,7 +97,8 @@ class UseCharacterAsOpponentUseCase(
             opponentCharacter.id.uuid,
             opponentCharacter.name,
             perspectiveCharacter.id.uuid,
-            theme.id.uuid
+            theme.id.uuid,
+            false
         )
     }
 

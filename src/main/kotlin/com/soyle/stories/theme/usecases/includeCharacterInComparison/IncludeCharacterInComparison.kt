@@ -12,6 +12,6 @@ interface IncludeCharacterInComparison {
 
     interface OutputPort {
         fun receiveIncludeCharacterInComparisonFailure(failure: Exception)
-        fun receiveIncludeCharacterInComparisonResponse(response: CharacterIncludedInTheme)
+        suspend fun receiveIncludeCharacterInComparisonResponse(response: CharacterIncludedInTheme)
     }
 }

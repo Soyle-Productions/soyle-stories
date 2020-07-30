@@ -53,7 +53,7 @@ class IncludeCharacterInComparisonTest {
                 result = failure.left()
             }
 
-            override fun receiveIncludeCharacterInComparisonResponse(response: CharacterIncludedInTheme) {
+            override suspend fun receiveIncludeCharacterInComparisonResponse(response: CharacterIncludedInTheme) {
                 result = response.right()
             }
         }

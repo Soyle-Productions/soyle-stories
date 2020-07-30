@@ -78,7 +78,8 @@ class BuildNewCharacterUseCase(
             characterItem.characterId,
             characterItem.characterName,
             opponentOfCharacterId,
-            themeId
+            themeId,
+            false
         ))
     }
 

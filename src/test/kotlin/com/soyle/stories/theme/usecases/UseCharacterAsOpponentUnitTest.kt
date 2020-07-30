@@ -145,12 +145,12 @@ class UseCharacterAsOpponentUnitTest {
         )
     }
 
-    private fun opponent() = fun(actual: Any?) {
-        actual as OpponentCharacter
-        assertEquals(opponent.id.uuid, actual.characterId)
-        assertEquals(opponent.name, actual.characterName)
-        assertEquals(perspectiveCharacter.id.uuid, actual.opponentOfCharacterId)
-        assertEquals(themeId.uuid, actual.themeId)
-    }
+    private fun opponent() = opponent(
+        opponent.id.uuid,
+        opponent.name,
+        perspectiveCharacter.id.uuid,
+        themeId.uuid,
+        false
+    )
 
 }

@@ -14,7 +14,7 @@ interface BuildNewCharacter {
 
     interface OutputPort {
         fun receiveBuildNewCharacterFailure(failure: CharacterException)
-        fun receiveBuildNewCharacterResponse(response: CharacterItem)
+        suspend fun receiveBuildNewCharacterResponse(response: CharacterItem)
         suspend fun characterIncludedInTheme(response: CharacterIncludedInTheme)
         suspend fun characterIsOpponent(response: OpponentCharacter)
     }

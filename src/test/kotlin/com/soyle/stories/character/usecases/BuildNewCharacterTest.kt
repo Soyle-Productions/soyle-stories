@@ -66,7 +66,7 @@ class BuildNewCharacterTest {
                 result = failure.left()
             }
 
-            override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
+            override suspend fun receiveBuildNewCharacterResponse(response: CharacterItem) {
                 result = response.right()
             }
 
@@ -220,12 +220,13 @@ class BuildNewCharacterTest {
                 }
                 characterItemResult!!
                 includedCharacterResult!!
-                opponentCharacter!! shouldBe {
-                    assertEquals(themeId.uuid, it.themeId)
-                    assertEquals(perspectiveCharacterId.uuid, it.opponentOfCharacterId)
-                    assertEquals(createdCharacter!!.id.uuid, it.characterId)
-                    assertEquals(providedName, it.characterName)
-                }
+                opponentCharacter!! shouldBe opponent(
+                    createdCharacter!!.id.uuid,
+                    providedName,
+                    perspectiveCharacterId.uuid,
+                    themeId.uuid,
+                    false
+                )
             }
 
             private fun buildCharacterToUseAsOpponent(name: String) {
@@ -236,7 +237,7 @@ class BuildNewCharacterTest {
                                 createdCharacter = it
                             }), themeRepository)
                 val output = object : BuildNewCharacter.OutputPort {
-                    override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
+                    override suspend fun receiveBuildNewCharacterResponse(response: CharacterItem) {
                         characterItemResult = response
                     }
 
@@ -282,7 +283,7 @@ class BuildNewCharacterTest {
                         createdCharacter = it
                     }), themeRepository)
             val output = object : BuildNewCharacter.OutputPort {
-                override fun receiveBuildNewCharacterResponse(response: CharacterItem) {
+                override suspend fun receiveBuildNewCharacterResponse(response: CharacterItem) {
                     characterItemResult = response
                 }
 

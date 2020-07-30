@@ -6,5 +6,6 @@ class OpponentCharacter(
     val characterId: UUID,
     val characterName: String,
     val opponentOfCharacterId: UUID,
-    val themeId: UUID
+    val themeId: UUID,
+    val isMainOpponent: Boolean
 )

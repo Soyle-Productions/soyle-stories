@@ -6,5 +6,5 @@ package com.soyle.stories.entities.theme
  * Time: 11:17 PM
  */
 enum class StoryFunction {
-    Antagonist, Ally, FakeAllyAntagonist, FakeAntagonistAlly, Subplot
+    MainAntagonist, Antagonist, Ally, FakeAllyAntagonist, FakeAntagonistAlly, Subplot
 }
