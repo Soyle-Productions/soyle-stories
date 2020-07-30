@@ -15,6 +15,7 @@ import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.soylestories.SoyleStories
+import com.soyle.stories.soylestories.Styles
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
 import com.soyle.stories.writer.settingsDialog.SettingsDialog
@@ -152,7 +153,7 @@ class WorkBench : View() {
 
     private fun createWindow() {
         openWindow(escapeClosesWindow = false, owner = null, block = false, resizable = true)?.apply {
-            icons += SoyleStories.appIcon
+            icons += Styles.appIcon
             val primaryScreen = Screen.getScreensForRectangle(this.x, this.y, this.width, this.height)
             primaryScreen.firstOrNull()?.visualBounds?.let {
                 x = it.minX

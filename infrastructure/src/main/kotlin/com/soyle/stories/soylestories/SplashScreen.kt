@@ -1,5 +1,6 @@
 package com.soyle.stories.soylestories
 
+import com.soyle.stories.soylestories.Styles.Companion.appIcon
 import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.layout.AnchorPane
@@ -75,7 +76,7 @@ class SplashScreen : Fragment() {
             StageStyle.UNDECORATED, Modality.APPLICATION_MODAL,
             escapeClosesWindow = false, owner = null, block = false, resizable = false
         )?.apply {
-            icons += SoyleStories.appIcon
+            icons += appIcon
             centerOnScreen()
             isAlwaysOnTop = true
             model.isSplashScreenVisible.onChange {

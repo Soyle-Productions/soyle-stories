@@ -14,10 +14,10 @@ import tornadofx.*
 fun EventTarget.responsiveBox(isSmall: ObservableValue<Boolean>, hSpacing: Double = 0.0, vSpacing: Double = 0.0, op: Pane.() -> Unit) {
 
     val stackpane = stackpane()
-    val vBox = VBox(vSpacing)
-    val hBox = HBox(hSpacing)
-
     stackpane.op()
+
+    val vBox = VBox(vSpacing).apply { style = stackpane.style }
+    val hBox = HBox(hSpacing).apply { style = stackpane.style }
 
     val children = stackpane.childrenUnmodifiable.toList()
 
