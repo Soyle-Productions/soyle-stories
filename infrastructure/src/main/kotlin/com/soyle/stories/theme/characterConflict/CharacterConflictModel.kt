@@ -28,6 +28,7 @@ class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictVi
     val attackSectionLabel = bind(CharacterConflictViewModel::attackSectionLabel)
     val similaritiesSectionLabel = bind(CharacterConflictViewModel::similaritiesSectionLabel)
     val powerStatusOrAbilitiesLabel = bind(CharacterConflictViewModel::powerStatusOrAbilitiesLabel)
+    val mainOpponent = bind(CharacterConflictViewModel::mainOpponent)
     val opponents = bindImmutableList(CharacterConflictViewModel::opponents)
     val availableOpponents = SimpleObjectProperty<List<AvailableOpponentViewModel>?>(null)
 

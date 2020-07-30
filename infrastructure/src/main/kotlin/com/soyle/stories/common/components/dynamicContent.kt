@@ -40,10 +40,10 @@ fun <T> EventTarget.bindAndCacheChildren(sourceList: ObservableValue<List<T>>, r
 
 }
 
-fun <K, T> EventTarget.associateChildrenTo(sourceMap: ObservableValue<Map<K, T>>, removeOnNull: Boolean = true, converter: (Property<T?>) -> Node) {
+fun <K, T> EventTarget.associateChildrenTo(sourceMap: ObservableValue<Map<K, T>?>, removeOnNull: Boolean = true, converter: (Property<T?>) -> Node) {
 
     fun createChild(key: K) {
-        val property = sourceMap.select { SimpleObjectProperty(it[key]) }
+        val property = sourceMap.select { SimpleObjectProperty(it?.get(key)) }
         val node = converter(property)
         if (removeOnNull) {
             property.onChangeUntil({ it == null }) {
@@ -60,7 +60,7 @@ fun <K, T> EventTarget.associateChildrenTo(sourceMap: ObservableValue<Map<K, T>>
         }
     }
 
-    sourceMap.value.keys.forEach {
+    sourceMap.value?.keys?.forEach {
         createChild(it)
     }
 

@@ -3,6 +3,7 @@ package com.soyle.stories.theme.characterConflict
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.useCharacterAsOpponent.OpponentCharacterReceiver
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
@@ -10,6 +11,7 @@ import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import java.util.*
 
@@ -17,7 +19,7 @@ class CharacterConflictPresenter(
     themeId: String,
     private val view: View.Nullable<CharacterConflictViewModel>
 ) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
-    ListAvailableCharactersToUseAsOpponents.OutputPort, UseCharacterAsOpponent.OutputPort {
+    ListAvailableCharactersToUseAsOpponents.OutputPort, OpponentCharacterReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -51,7 +53,16 @@ class CharacterConflictPresenter(
                 similaritiesSectionLabel = response.characterChange?.let { "Similarities to ${it.characterName}" }
                     ?: "Similarities",
                 powerStatusOrAbilitiesLabel = "Power / Status / Abilities",
-                opponents = response.characterChange?.opponents?.map {
+                mainOpponent = response.characterChange?.opponents?.singleOrNull { it.isMainOpponent }?.let {
+                    CharacterChangeOpponentViewModel(
+                        it.characterId.toString(),
+                        it.characterName,
+                        it.attack,
+                        it.similarities,
+                        it.powerStatusOrAbility
+                    )
+                },
+                opponents = response.characterChange?.opponents?.filterNot { it.isMainOpponent }?.map {
                     CharacterChangeOpponentViewModel(
                         it.characterId.toString(),
                         it.characterName,
@@ -91,19 +102,29 @@ class CharacterConflictPresenter(
         }
     }
 
-    override suspend fun characterIsOpponent(response: UseCharacterAsOpponent.ResponseModel) {
-        val newOpponent = response.characterAsOpponent
-        if (newOpponent.themeId != themeId) return
+    override suspend fun receiveOpponentCharacter(opponentCharacter: OpponentCharacter) {
+        if (opponentCharacter.themeId != themeId) return
         view.updateOrInvalidated {
-            if (newOpponent.opponentOfCharacterId.toString() != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
+            if (opponentCharacter.opponentOfCharacterId.toString() != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
             copy(
-                opponents = opponents + CharacterChangeOpponentViewModel(
-                    newOpponent.characterId.toString(),
-                    newOpponent.characterName,
+                mainOpponent = when {
+                    opponentCharacter.isMainOpponent -> CharacterChangeOpponentViewModel(
+                        opponentCharacter.characterId.toString(),
+                        opponentCharacter.characterName,
+                        "",
+                        "",
+                        ""
+                    )
+                    opponentCharacter.characterId.toString() == mainOpponent?.characterId && !opponentCharacter.isMainOpponent -> null
+                    else -> mainOpponent
+                },
+                opponents = if (!opponentCharacter.isMainOpponent) opponents + CharacterChangeOpponentViewModel(
+                    opponentCharacter.characterId.toString(),
+                    opponentCharacter.characterName,
                     "",
                     "",
                     ""
-                )
+                ) else opponents.filterNot { it.characterId == opponentCharacter.characterId.toString() }
             )
         }
     }

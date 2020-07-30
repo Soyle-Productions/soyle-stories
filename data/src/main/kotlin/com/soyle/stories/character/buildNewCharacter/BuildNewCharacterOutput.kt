@@ -5,7 +5,7 @@ import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
-import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentNotifier
+import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentOutput
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
@@ -13,7 +13,7 @@ import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpp
 class BuildNewCharacterOutput(
     private val createdCharacterReceiver: CreatedCharacterReceiver,
     private val characterIncludedInThemeReceiver: CharacterIncludedInThemeReceiver,
-    private val useCharacterAsOpponentNotifier: UseCharacterAsOpponentNotifier
+    private val useCharacterAsOpponentNotifier: UseCharacterAsOpponentOutput
 ) : BuildNewCharacter.OutputPort {
 
     override fun receiveBuildNewCharacterFailure(failure: CharacterException) {

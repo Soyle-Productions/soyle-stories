@@ -4,6 +4,7 @@ import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterCo
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
 import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
@@ -23,7 +24,8 @@ class CharacterConflictController(
     private val listAvailableCharactersToUseAsOpponents: ListAvailableCharactersToUseAsOpponents,
     private val listAvailableCharactersToUseAsOpponentsOutputPort: ListAvailableCharactersToUseAsOpponents.OutputPort,
     private val useCharacterAsOpponentController: UseCharacterAsOpponentController,
-    private val promoteMinorCharacterController: PromoteMinorCharacterController
+    private val promoteMinorCharacterController: PromoteMinorCharacterController,
+    private val useCharacterAsMainOpponentController: UseCharacterAsMainOpponentController
 ) : CharacterConflictViewListener, CharacterIncludedInThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
@@ -61,6 +63,10 @@ class CharacterConflictController(
 
     override fun addOpponent(perspectiveCharacterId: String, characterId: String) {
         useCharacterAsOpponentController.useCharacterAsOpponent(themeId.toString(), perspectiveCharacterId, characterId)
+    }
+
+    override fun makeOpponentMainOpponent(perspectiveCharacterId: String, characterId: String) {
+        useCharacterAsMainOpponentController.useCharacterAsMainOpponent(themeId.toString(), perspectiveCharacterId, characterId)
     }
 
     override suspend fun receiveCharacterIncludedInTheme(characterIncludedInTheme: CharacterIncludedInTheme) {

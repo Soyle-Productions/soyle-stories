@@ -1,6 +1,5 @@
 package com.soyle.stories.di.theme
 
-import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterOutput
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInThemeUseCase
@@ -84,9 +83,10 @@ import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
-import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
-import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentControllerImpl
-import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentNotifier
+import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
+import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentControllerImpl
+import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentOutput
+import com.soyle.stories.theme.useCharacterAsOpponent.*
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWebUseCase
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
@@ -139,6 +139,8 @@ import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
 import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
+import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponent
+import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponentUseCase
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponentUseCase
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsController
@@ -201,6 +203,7 @@ object ThemeModule {
         provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get(), get()) }
         provide<ListAvailablePerspectiveCharacters> { ListAvailablePerspectiveCharactersUseCase(get()) }
         provide<UseCharacterAsOpponent> { UseCharacterAsOpponentUseCase(get(), get()) }
+        provide<UseCharacterAsMainOpponent> { UseCharacterAsMainOpponentUseCase(get()) }
         provide<ListAvailableCharactersToUseAsOpponents> { ListAvailableCharactersToUseAsOpponentsUseCase(get(), get()) }
     }
 
@@ -208,6 +211,7 @@ object ThemeModule {
         provide(SymbolAddedToThemeReceiver::class) { SymbolAddedToThemeNotifier() }
         provide(CreatedThemeReceiver::class) { CreatedThemeNotifier() }
         provide(CharacterIncludedInThemeReceiver::class) { CharacterIncludedInThemeNotifier() }
+        provide(OpponentCharacterReceiver::class) { OpponentCharacterNotifier() }
 
 
         provide(CreateTheme.OutputPort::class) {
@@ -260,7 +264,10 @@ object ThemeModule {
             RemoveSymbolicItemNotifier()
         }
         provide(UseCharacterAsOpponent.OutputPort::class) {
-            UseCharacterAsOpponentNotifier(get())
+            UseCharacterAsOpponentOutput(get(), get())
+        }
+        provide(UseCharacterAsMainOpponent.OutputPort::class) {
+            UseCharacterAsMainOpponentOutput(get())
         }
     }
 
@@ -316,6 +323,9 @@ object ThemeModule {
         }
         provide<UseCharacterAsOpponentController> {
             UseCharacterAsOpponentControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<UseCharacterAsMainOpponentController> {
+            UseCharacterAsMainOpponentControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -566,7 +576,7 @@ object ThemeModule {
                     get<CharacterConflictModel>()
                 )
 
-                presenter listensTo projectScope.get<UseCharacterAsOpponentNotifier>()
+                presenter listensTo projectScope.get<OpponentCharacterNotifier>()
 
                 CharacterConflictController(
                     themeId,
@@ -577,6 +587,7 @@ object ThemeModule {
                     presenter,
                     projectScope.get(),
                     presenter,
+                    projectScope.get(),
                     projectScope.get(),
                     projectScope.get()
                 ).also {

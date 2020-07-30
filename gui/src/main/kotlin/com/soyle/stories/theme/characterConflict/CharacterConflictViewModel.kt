@@ -21,6 +21,7 @@ data class CharacterConflictViewModel(
     val attackSectionLabel: String,
     val similaritiesSectionLabel: String,
     val powerStatusOrAbilitiesLabel: String,
+    val mainOpponent: CharacterChangeOpponentViewModel?,
     val opponents: List<CharacterChangeOpponentViewModel>,
     val availableOpponents: List<AvailableOpponentViewModel>?
 )
@@ -31,7 +32,7 @@ class AvailablePerspectiveCharacterViewModel(
     val isMajorCharacter: Boolean
 )
 
-class CharacterChangeOpponentViewModel(
+data class CharacterChangeOpponentViewModel(
     val characterId: String,
     val characterName: String,
     val attack: String,

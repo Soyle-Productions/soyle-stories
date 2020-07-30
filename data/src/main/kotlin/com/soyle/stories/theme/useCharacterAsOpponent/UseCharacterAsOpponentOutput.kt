@@ -5,14 +5,15 @@ import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInCompari
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import kotlin.coroutines.coroutineContext
 
-class UseCharacterAsOpponentNotifier(
-    private val includeCharacterInComparisonNotifier: IncludeCharacterInComparisonOutput
-) : Notifier<UseCharacterAsOpponent.OutputPort>(), UseCharacterAsOpponent.OutputPort {
+class UseCharacterAsOpponentOutput(
+    private val includeCharacterInComparisonNotifier: IncludeCharacterInComparisonOutput,
+    private val opponentCharacterReceiver: OpponentCharacterReceiver
+) : UseCharacterAsOpponent.OutputPort {
 
     override suspend fun characterIsOpponent(response: UseCharacterAsOpponent.ResponseModel) {
         response.includedCharacter?.let {
             includeCharacterInComparisonNotifier.receiveIncludeCharacterInComparisonResponse(it)
         }
-        notifyAll(coroutineContext) { it.characterIsOpponent(response) }
+        opponentCharacterReceiver.receiveOpponentCharacter(response.characterAsOpponent)
     }
 }

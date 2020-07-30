@@ -29,13 +29,17 @@ import javafx.scene.control.ScrollPane
 import javafx.scene.input.ClipboardContent
 import javafx.scene.input.DataFormat
 import javafx.scene.input.TransferMode
+import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
+import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
 import javafx.util.Duration
 import org.w3c.dom.events.EventTarget
 import tornadofx.*
+import tornadofx.ViewTransition.Direction
+import tornadofx.ViewTransition.Slide
 
 class CharacterConflict : View() {
 
@@ -66,7 +70,7 @@ class CharacterConflict : View() {
                             spacer()
                             addOpponentSelection(tabSelection)
                         }
-                        vbox {
+                        vbox(spacing = 0.0) {
                             isFillWidth = true
                             visibleWhen {
                                 model.selectedPerspectiveCharacter.isNotNull.and(
@@ -96,6 +100,73 @@ class CharacterConflict : View() {
             selectedColumn.isEqualTo(model.similaritiesSectionLabel as SimpleStringProperty)
         val powerStatusOrAbilitiesColumnSelected =
             selectedColumn.isEqualTo(model.powerStatusOrAbilitiesLabel as SimpleStringProperty)
+        vbox {
+            label("Main Opponent") {
+                style {
+                    fontSize = 1.25.em
+                }
+            }
+            hbox {
+                associateChildrenTo(model.mainOpponent.select {
+                    mapOf(it.characterId to it).toProperty()
+                }) { opponentModel ->
+                    card {
+                        val card = this
+                        val anyChildrenFocused = SimpleBooleanProperty(false)
+                        val childrenFocusProperties = mutableListOf<BooleanExpression>()
+                        hbox {
+                            vbox {
+                                cardHeader {
+                                    label(opponentModel.select { it?.characterName.toProperty() })
+                                }
+                                hbox(spacing = 8.0) {
+                                    addClass(ComponentsStyles.cardBody)
+                                    addClass(ComponentsStyles.notFirstChild)
+                                    textarea(opponentModel.select { it?.attack.toProperty() }) {
+                                        prefRowCount = 3
+                                        isWrapText = true
+                                        visibleWhen { isLargeProperty.or(attackColumnSelected) }
+                                        managedProperty().bind(visibleProperty())
+                                        hgrow = Priority.ALWAYS
+                                        childrenFocusProperties.add(focusedProperty())
+                                    }
+                                    textarea(opponentModel.select { it?.similarities.toProperty() }) {
+                                        prefRowCount = 3
+                                        isWrapText = true
+                                        visibleWhen { isLargeProperty.or(similaritiesColumnSelected) }
+                                        managedProperty().bind(visibleProperty())
+                                        hgrow = Priority.ALWAYS
+                                        childrenFocusProperties.add(focusedProperty())
+                                    }
+                                    textarea(opponentModel.select { it?.powerStatusOrAbilities.toProperty() }) {
+                                        prefRowCount = 3
+                                        isWrapText = true
+                                        visibleWhen {
+                                            isLargeProperty.or(
+                                                powerStatusOrAbilitiesColumnSelected
+                                            )
+                                        }
+                                        managedProperty().bind(visibleProperty())
+                                        hgrow = Priority.ALWAYS
+                                        childrenFocusProperties.add(focusedProperty())
+                                    }
+                                }
+                            }
+                        }
+                        anyChildrenFocused.bind(
+                            childrenFocusProperties.drop(1)
+                                .fold(childrenFocusProperties.first()) { prop, next ->
+                                    prop.or(next) as BooleanExpression
+                                })
+                    }
+                }
+            }
+            label("Minor Opponents") {
+                style {
+                    fontSize = 1.25.em
+                }
+            }
+        }
         vbox(spacing = 8.0) {
             val cardHolder = this
             associateChildrenTo(model.opponents.select {
@@ -110,6 +181,16 @@ class CharacterConflict : View() {
                         vbox {
                             cardHeader {
                                 label(opponentModel.select { it?.characterName.toProperty() })
+                                spacer()
+                                button("Main Opponent") {
+                                    visibleWhen(this@card.hoverProperty().or(anyChildrenFocused))
+                                    childrenFocusProperties.add(focusedProperty())
+                                    action {
+                                        val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@action
+                                        val opponentId = opponentModel.value?.characterId ?: return@action
+                                        viewListener.makeOpponentMainOpponent(perspectiveCharacterId, opponentId)
+                                    }
+                                }
                             }
                             hbox(spacing = 8.0) {
                                 addClass(ComponentsStyles.cardBody)
@@ -203,7 +284,7 @@ class CharacterConflict : View() {
                                 graphic = MaterialIconView(MaterialIcon.SWAP_VERT)
                                 childrenFocusProperties.add(focusedProperty())
                                 val listener = ListChangeListener<Node> {
-                                    isVisible = card != it.list.last()
+                                    isVisible = card != cardHolder.children.lastOrNull()
                                 }
                                 cardHolder.children.addListener(listener)
                                 opponentModel.onChangeUntil({ it == null }) {
@@ -247,13 +328,16 @@ class CharacterConflict : View() {
                     prefWidth = 0.0
                     minWidth = 0.0
                     label(it) {
-                        style { fontWeight = FontWeight.BOLD }
+                        style {
+                            fontWeight = FontWeight.BOLD
+                        }
                     }
                 }
             }
         }
         menubutton {
             visibleWhen(isSmallProperty)
+            managedProperty().bind(visibleProperty())
             textProperty().bind(selectedColumn)
             opponentPropertyLabels.forEach {
                 item("") {

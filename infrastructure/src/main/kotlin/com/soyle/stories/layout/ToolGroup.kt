@@ -6,12 +6,16 @@ import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
+import javafx.animation.Animation
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.geometry.Side
+import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import javafx.scene.layout.Pane
+import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import tornadofx.*
 

@@ -6,5 +6,6 @@ interface CharacterConflictViewListener {
     fun getAvailableCharacters()
     fun getAvailableOpponents(characterId: String)
     fun addOpponent(perspectiveCharacterId: String, characterId: String)
+    fun makeOpponentMainOpponent(perspectiveCharacterId: String, characterId: String)
 
 }
