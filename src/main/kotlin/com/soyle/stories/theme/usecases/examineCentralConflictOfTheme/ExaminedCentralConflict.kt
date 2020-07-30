@@ -25,5 +25,6 @@ class CharacterChangeOpponent(
     val characterName: String,
     val attack: String,
     val similarities: String,
-    val powerStatusOrAbility: String
+    val powerStatusOrAbility: String,
+    val isMainOpponent: Boolean
 )

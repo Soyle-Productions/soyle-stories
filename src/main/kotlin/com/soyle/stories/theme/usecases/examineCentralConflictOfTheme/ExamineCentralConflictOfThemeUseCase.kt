@@ -9,6 +9,7 @@ import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.CharacterArcTemplateSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.MajorCharacter
+import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
@@ -72,7 +73,8 @@ class ExamineCentralConflictOfThemeUseCase(
                 opponent.name,
                 majorCharacter.getAttacksByCharacter(opponent.id) ?: "",
                 theme.getSimilarities(majorCharacter.id, opponent.id).fold({ "" }, { it }),
-                opponent.position
+                opponent.position,
+                it.value == StoryFunction.MainAntagonist
             )
         })
     }

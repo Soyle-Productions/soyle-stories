@@ -8,6 +8,7 @@ import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.theme.CharacterInTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
@@ -139,6 +140,7 @@ class ExamineCentralConflictOfThemeUnitTest {
                         assertEquals("", it.attack)
                         assertEquals("", it.similarities)
                         assertEquals("", it.powerStatusOrAbility)
+                        assertEquals(false, it.isMainOpponent)
                     }
                 }
             }
@@ -153,6 +155,7 @@ class ExamineCentralConflictOfThemeUnitTest {
                 generateSimilarities = { "We're Similar $it" },
                 generatePosition = { "Position $it" }
             )
+            val mainOpponent = givenCharacterHasMainOpponent()
             examineCentralConflictOfTheme(characterId = characterId.uuid)
             examinedConflictOfTheme!! shouldBe {
                 it.characterChange!! shouldBe {
@@ -169,6 +172,7 @@ class ExamineCentralConflictOfThemeUnitTest {
                         assertEquals(majorCharacter.getAttacksByCharacter(character.id)!!, it.attack)
                         assertEquals((theme.getSimilarities(characterId, character.id) as Either.Right).b, it.similarities)
                         assertEquals(character.position, it.powerStatusOrAbility)
+                        assertEquals(character.id == mainOpponent.id, it.isMainOpponent)
                     }
                 }
             }
@@ -213,6 +217,18 @@ class ExamineCentralConflictOfThemeUnitTest {
                         .withCharacterHoldingPosition(opponent.id, generatePosition(i))
                 }
             }
+        }
+
+        private fun givenCharacterHasMainOpponent(): CharacterInTheme
+        {
+            val theme = themeRepository.themes.getValue(themeId)
+            val opponentCharacter = theme.characters.find { it.id != characterId }!!
+            themeRepository.themes[themeId] = theme.withCharacterAsStoryFunctionForMajorCharacter(
+                opponentCharacter.id,
+                StoryFunction.MainAntagonist,
+                characterId
+            )
+            return opponentCharacter
         }
 
     }

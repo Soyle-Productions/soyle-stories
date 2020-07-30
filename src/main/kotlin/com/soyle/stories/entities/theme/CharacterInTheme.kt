@@ -94,7 +94,7 @@ class MajorCharacter(
     fun getStoryFunctionsForCharacter(characterId: Character.Id) =
         perspective.storyFunctions[characterId]
 
-    fun getOpponents() = perspective.storyFunctions.filter { it.value == StoryFunction.Antagonist || it.value == StoryFunction.FakeAllyAntagonist }
+    fun getOpponents() = perspective.storyFunctions.filter { it.value == StoryFunction.Antagonist || it.value == StoryFunction.FakeAllyAntagonist || it.value == StoryFunction.MainAntagonist }
 
     fun hasStoryFunctionForTargetCharacter(function: StoryFunction, characterId: Character.Id) =
         getStoryFunctionsForCharacter(characterId) == function
