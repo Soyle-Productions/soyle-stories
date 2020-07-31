@@ -1,26 +1,24 @@
 package com.soyle.stories.theme.createSymbolDialog
 
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
-import com.soyle.stories.common.ValidationException
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeNameCannotBeBlank
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
 import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
+import com.soyle.stories.theme.updateThemeMetaData.RenamedThemeReceiver
 import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
-import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
-import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
 import com.soyle.stories.theme.usecases.listThemes.ListThemes
 import com.soyle.stories.theme.usecases.listThemes.ThemeList
-import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
-import com.soyle.stories.theme.usecases.renameTheme.RenamedTheme
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenamedTheme
 
 class CreateSymbolDialogPresenter(
     private val view: View.Nullable<CreateSymbolDialogViewModel>
-) : ListThemes.OutputPort, DeleteTheme.OutputPort, RenameTheme.OutputPort, CreatedThemeReceiver, SymbolAddedToThemeReceiver {
+) : ListThemes.OutputPort, DeleteTheme.OutputPort, RenamedThemeReceiver, CreatedThemeReceiver, SymbolAddedToThemeReceiver {
 
     override suspend fun themesListed(response: ThemeList) {
         view.update {
@@ -55,13 +53,13 @@ class CreateSymbolDialogPresenter(
         }
     }
 
-    override fun themeRenamed(response: RenamedTheme) {
-        val themeId = response.themeId.toString()
+    override suspend fun receiveRenamedTheme(renamedTheme: RenamedTheme) {
+        val themeId = renamedTheme.themeId.toString()
         view.updateOrInvalidated {
             copy(
                 themes = themes.map {
                     if (it.themeId != themeId) it
-                    else ThemeItemViewModel(it.themeId, response.newName)
+                    else ThemeItemViewModel(it.themeId, renamedTheme.newName)
                 }.sortedBy { it.themeName }
             )
         }

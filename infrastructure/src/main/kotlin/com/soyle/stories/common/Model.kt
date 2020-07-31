@@ -16,7 +16,7 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 
 	abstract val applicationScope: ApplicationScope
 
-	private val threadTransformer by lazy {
+	protected val threadTransformer by lazy {
 		resolve<ThreadTransformer>(applicationScope)
 	}
 

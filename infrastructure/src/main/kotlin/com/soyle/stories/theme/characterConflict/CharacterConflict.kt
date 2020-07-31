@@ -540,6 +540,9 @@ class CharacterConflict : View() {
             hgrow = Priority.ALWAYS
             textfield(model.centralConflict) {
                 hgrow = Priority.ALWAYS
+                focusedProperty().onChange {
+                    if (! it) viewListener.setCentralConflict(text)
+                }
             }
         }
     }

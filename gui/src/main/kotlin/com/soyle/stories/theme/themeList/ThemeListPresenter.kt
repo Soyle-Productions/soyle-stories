@@ -4,6 +4,7 @@ import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharact
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
 import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
+import com.soyle.stories.theme.updateThemeMetaData.RenamedThemeReceiver
 import com.soyle.stories.theme.usecases.SymbolItem
 import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
@@ -19,8 +20,8 @@ import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTh
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
-import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
-import com.soyle.stories.theme.usecases.renameTheme.RenamedTheme
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenamedTheme
 import java.util.*
 
 class ThemeListPresenter(
@@ -28,7 +29,7 @@ class ThemeListPresenter(
 ) : ListSymbolsByTheme.OutputPort,
     CreatedThemeReceiver,
     DeleteTheme.OutputPort,
-    RenameTheme.OutputPort,
+    RenamedThemeReceiver,
     SymbolAddedToThemeReceiver,
     RemoveSymbolFromTheme.OutputPort,
     RenameSymbol.OutputPort {
@@ -67,9 +68,9 @@ class ThemeListPresenter(
         }
     }
 
-    override fun themeRenamed(response: RenamedTheme) {
-        val themeId = response.themeId.toString()
-        val newName = response.newName
+    override suspend fun receiveRenamedTheme(renamedTheme: RenamedTheme) {
+        val themeId = renamedTheme.themeId.toString()
+        val newName = renamedTheme.newName
         view.updateOrInvalidated {
             copy(
                 themes = sortedThemes(themes.map {

@@ -4,6 +4,7 @@ import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterCo
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.updateThemeMetaData.ChangeCentralConflictController
 import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
 import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
@@ -25,7 +26,8 @@ class CharacterConflictController(
     private val listAvailableCharactersToUseAsOpponentsOutputPort: ListAvailableCharactersToUseAsOpponents.OutputPort,
     private val useCharacterAsOpponentController: UseCharacterAsOpponentController,
     private val promoteMinorCharacterController: PromoteMinorCharacterController,
-    private val useCharacterAsMainOpponentController: UseCharacterAsMainOpponentController
+    private val useCharacterAsMainOpponentController: UseCharacterAsMainOpponentController,
+    private val changeCentralConflictController: ChangeCentralConflictController
 ) : CharacterConflictViewListener, CharacterIncludedInThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
@@ -73,6 +75,10 @@ class CharacterConflictController(
         if (characterIncludedInTheme.themeId != themeId) return
         if (! characterIncludedInTheme.isMajorCharacter) return
         getValidState(characterIncludedInTheme.characterId.toString())
+    }
+
+    override fun setCentralConflict(centralConflict: String) {
+        changeCentralConflictController.changeCentralConflict(themeId.toString(), centralConflict)
     }
 
 }

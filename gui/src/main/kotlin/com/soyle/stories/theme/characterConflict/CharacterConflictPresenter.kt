@@ -3,6 +3,7 @@ package com.soyle.stories.theme.characterConflict
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.updateThemeMetaData.ThemeWithCentralConflictChangedReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.OpponentCharacterReceiver
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
@@ -11,6 +12,7 @@ import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
+import com.soyle.stories.theme.usecases.updateThemeMetaData.ThemeWithCentralConflictChanged
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import java.util.*
@@ -19,7 +21,7 @@ class CharacterConflictPresenter(
     themeId: String,
     private val view: View.Nullable<CharacterConflictViewModel>
 ) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
-    ListAvailableCharactersToUseAsOpponents.OutputPort, OpponentCharacterReceiver {
+    ListAvailableCharactersToUseAsOpponents.OutputPort, OpponentCharacterReceiver, ThemeWithCentralConflictChangedReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -125,6 +127,15 @@ class CharacterConflictPresenter(
                     "",
                     ""
                 ) else opponents.filterNot { it.characterId == opponentCharacter.characterId.toString() }
+            )
+        }
+    }
+
+    override suspend fun receiveThemeWithCentralConflictChanged(themeWithCentralConflictChanged: ThemeWithCentralConflictChanged) {
+        if (themeWithCentralConflictChanged.themeId != themeId) return
+        view.updateOrInvalidated {
+            copy(
+                centralConflict = themeWithCentralConflictChanged.centralConflict
             )
         }
     }

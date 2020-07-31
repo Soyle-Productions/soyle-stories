@@ -6,6 +6,7 @@ import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
+import tornadofx.View
 import tornadofx.onChange
 
 class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictViewModel>(CharacterConflictScope::class) {

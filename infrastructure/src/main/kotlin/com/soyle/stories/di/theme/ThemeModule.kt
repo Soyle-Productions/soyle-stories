@@ -71,9 +71,6 @@ import com.soyle.stories.theme.renameSymbol.RenameSymbolControllerImpl
 import com.soyle.stories.theme.renameSymbol.RenameSymbolNotifier
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemNotifier
-import com.soyle.stories.theme.renameTheme.RenameThemeController
-import com.soyle.stories.theme.renameTheme.RenameThemeControllerImpl
-import com.soyle.stories.theme.renameTheme.RenameThemeNotifier
 import com.soyle.stories.theme.renameValueWeb.RenameValueWebController
 import com.soyle.stories.theme.renameValueWeb.RenameValueWebControllerImpl
 import com.soyle.stories.theme.renameValueWeb.RenameValueWebNotifier
@@ -83,6 +80,7 @@ import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
+import com.soyle.stories.theme.updateThemeMetaData.*
 import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
 import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentControllerImpl
 import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentOutput
@@ -135,10 +133,12 @@ import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbolUseCase
 import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItem
 import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItemUseCase
-import com.soyle.stories.theme.usecases.renameTheme.RenameTheme
-import com.soyle.stories.theme.usecases.renameTheme.RenameThemeUseCase
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
+import com.soyle.stories.theme.usecases.updateThemeMetaData.ChangeCentralConflict
+import com.soyle.stories.theme.usecases.updateThemeMetaData.ChangeCentralConflictUseCase
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
+import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameThemeUseCase
 import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponentUseCase
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
@@ -205,6 +205,7 @@ object ThemeModule {
         provide<UseCharacterAsOpponent> { UseCharacterAsOpponentUseCase(get(), get()) }
         provide<UseCharacterAsMainOpponent> { UseCharacterAsMainOpponentUseCase(get()) }
         provide<ListAvailableCharactersToUseAsOpponents> { ListAvailableCharactersToUseAsOpponentsUseCase(get(), get()) }
+        provide<ChangeCentralConflict> { ChangeCentralConflictUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers() {
@@ -212,6 +213,8 @@ object ThemeModule {
         provide(CreatedThemeReceiver::class) { CreatedThemeNotifier() }
         provide(CharacterIncludedInThemeReceiver::class) { CharacterIncludedInThemeNotifier() }
         provide(OpponentCharacterReceiver::class) { OpponentCharacterNotifier() }
+        provide(RenamedThemeReceiver::class) { RenamedThemeNotifier() }
+        provide(ThemeWithCentralConflictChangedReceiver::class) { ThemeWithCentralConflictChangedNotifier() }
 
 
         provide(CreateTheme.OutputPort::class) {
@@ -220,8 +223,8 @@ object ThemeModule {
         provide(DeleteTheme.OutputPort::class) {
             DeleteThemeNotifier(get())
         }
-        provide(RenameTheme.OutputPort::class) {
-            RenameThemeNotifier()
+        provide(RenameTheme.OutputPort::class, ChangeCentralConflict.OutputPort::class) {
+            UpdateThemeMetaDataOutput(get(), get())
         }
         provide(AddSymbolToTheme.OutputPort::class) {
             AddSymbolToThemeOutput(get())
@@ -327,6 +330,9 @@ object ThemeModule {
         provide<UseCharacterAsMainOpponentController> {
             UseCharacterAsMainOpponentControllerImpl(applicationScope.get(), get(), get())
         }
+        provide<ChangeCentralConflictController> {
+            ChangeCentralConflictControllerImpl(applicationScope.get(), get(), get())
+        }
     }
 
     private fun InScope<ProjectScope>.gui() {
@@ -351,7 +357,7 @@ object ThemeModule {
             presenter listensTo get<SymbolAddedToThemeNotifier>()
             presenter listensTo get<CreatedThemeNotifier>()
             presenter listensTo get<DeleteThemeNotifier>()
-            presenter listensTo get<RenameThemeNotifier>()
+            presenter listensTo get<RenamedThemeNotifier>()
 
             CreateSymbolDialogController(
                 projectId.toString(),
@@ -371,7 +377,7 @@ object ThemeModule {
 
             presenter listensTo get<CreatedThemeNotifier>()
             presenter listensTo get<DeleteThemeNotifier>()
-            presenter listensTo get<RenameThemeNotifier>()
+            presenter listensTo get<RenamedThemeNotifier>()
             presenter listensTo get<SymbolAddedToThemeNotifier>()
             presenter listensTo get<RemoveSymbolFromThemeNotifier>()
             presenter listensTo get<RenameSymbolNotifier>()
@@ -577,6 +583,7 @@ object ThemeModule {
                 )
 
                 presenter listensTo projectScope.get<OpponentCharacterNotifier>()
+                presenter listensTo projectScope.get<ThemeWithCentralConflictChangedNotifier>()
 
                 CharacterConflictController(
                     themeId,
@@ -587,6 +594,7 @@ object ThemeModule {
                     presenter,
                     projectScope.get(),
                     presenter,
+                    projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),
                     projectScope.get()
