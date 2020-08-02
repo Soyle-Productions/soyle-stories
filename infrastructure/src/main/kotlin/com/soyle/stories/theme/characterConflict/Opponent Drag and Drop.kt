@@ -3,10 +3,19 @@ package com.soyle.stories.theme.characterConflict
 import com.soyle.stories.theme.characterConflict.Styles.Companion.dragAfter
 import com.soyle.stories.theme.characterConflict.Styles.Companion.dragBefore
 import javafx.scene.Node
+import javafx.scene.input.DataFormat
 import javafx.scene.input.DragEvent
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.Region
 import tornadofx.*
+
+internal val opponentIdFormat = DataFormat("opponent-id")
+
+internal fun Region.disableDragAndDrop() {
+    onDragOver = null
+    onDragExited = null
+    onDragDropped = null
+}
 
 internal fun Region.addDragAndDrop() {
     whenOtherCardIsDraggedOver { e, card ->

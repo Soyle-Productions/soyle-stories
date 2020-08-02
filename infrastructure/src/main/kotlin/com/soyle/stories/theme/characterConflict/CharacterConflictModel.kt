@@ -4,9 +4,10 @@ import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.Model
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.soylestories.ApplicationScope
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.View
+import tornadofx.cleanBind
 import tornadofx.onChange
 
 class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictViewModel>(CharacterConflictScope::class) {
@@ -32,6 +33,13 @@ class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictVi
     val mainOpponent = bind(CharacterConflictViewModel::mainOpponent)
     val opponents = bindImmutableList(CharacterConflictViewModel::opponents)
     val availableOpponents = SimpleObjectProperty<List<AvailableOpponentViewModel>?>(null)
+
+    val isSmall = SimpleBooleanProperty()
+    val isLarge = isSmall.not()
+
+    val selectedOpponentPropertyColumn = SimpleStringProperty().apply {
+        cleanBind(attackSectionLabel)
+    }
 
     override fun viewModel(): CharacterConflictViewModel? {
         item = item?.copy(

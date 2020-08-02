@@ -8,6 +8,9 @@ import tornadofx.*
 
 class ComponentsStyles : Stylesheet() {
     companion object {
+
+        const val baseSpace = 8.0
+
         val card by cssclass()
         val liftedCard by cssclass()
         val cardHeader by cssclass()

@@ -11,7 +11,7 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import tornadofx.*
 
-fun EventTarget.responsiveBox(isSmall: ObservableValue<Boolean>, hSpacing: Double = 0.0, vSpacing: Double = 0.0, op: Pane.() -> Unit) {
+fun EventTarget.responsiveBox(isSmall: ObservableValue<Boolean>, hSpacing: Double = 0.0, vSpacing: Double = 0.0, op: Pane.() -> Unit): Pane {
 
     val stackpane = stackpane()
     stackpane.op()
@@ -40,6 +40,8 @@ fun EventTarget.responsiveBox(isSmall: ObservableValue<Boolean>, hSpacing: Doubl
     }
 
     largeLayout()
+
+    return stackpane
 
 }
 fun EventTarget.responsiveBox(threshold: Int = 600, hSpacing: Double = 0.0, vSpacing: Double = 0.0, op: Pane.() -> Unit) {

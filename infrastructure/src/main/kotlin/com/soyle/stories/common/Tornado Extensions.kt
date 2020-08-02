@@ -10,13 +10,16 @@ import javafx.beans.property.SimpleMapProperty
 import javafx.beans.property.SimpleSetProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
+import javafx.event.EventTarget
 import javafx.geometry.Bounds
+import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.skin.TextAreaSkin
 import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
 import tornadofx.*
 import java.util.*
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
 /**
@@ -180,3 +183,11 @@ val TextArea.rowCountProperty
 
 val TextArea.rowCount
 	get() = rowCountProperty.get()
+
+fun <T : Node> T.existsWhen(expr: () -> ObservableValue<Boolean>): T {
+	visibleWhen(expr())
+	managedProperty().cleanBind(visibleProperty())
+	return this
+}
+
+fun Node.onLoseFocus(op: () -> Unit) = focusedProperty().onChange { if (! it) op() }
