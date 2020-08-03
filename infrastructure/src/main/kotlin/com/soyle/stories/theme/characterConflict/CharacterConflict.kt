@@ -175,7 +175,7 @@ class CharacterConflict : View() {
                 characterChangeField(model.desireLabel, model.desire, ::setDesire),
                 characterChangeField(model.psychologicalWeaknessLabel, model.psychologicalWeakness) {},
                 characterChangeField(model.moralWeaknessLabel, model.moralWeakness) {},
-                characterChangeField(model.characterChangeLabel, model.characterChange) {}
+                characterChangeField(model.characterChangeLabel, model.characterChange, ::setCharacterChange)
             ).onEach {
                 it.hgrow = Priority.ALWAYS
             }
@@ -186,6 +186,12 @@ class CharacterConflict : View() {
     {
         val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
         viewListener.setDesire(perspectiveCharacterId, desire)
+    }
+
+    private fun setCharacterChange(characterChange: String)
+    {
+        val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
+        viewListener.setCharacterChange(perspectiveCharacterId, characterChange)
     }
 
     private fun Parent.characterChangeField(

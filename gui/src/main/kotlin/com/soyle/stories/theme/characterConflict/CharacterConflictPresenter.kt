@@ -3,9 +3,11 @@ package com.soyle.stories.theme.characterConflict
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterDesireReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
+import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeReceiver
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.updateThemeMetaData.ThemeWithCentralConflictChangedReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.OpponentCharacterReceiver
+import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterDesire.ChangedCharacterDesire
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
@@ -24,7 +26,7 @@ class CharacterConflictPresenter(
     private val view: View.Nullable<CharacterConflictViewModel>
 ) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
     ListAvailableCharactersToUseAsOpponents.OutputPort, OpponentCharacterReceiver,
-    ThemeWithCentralConflictChangedReceiver, ChangedCharacterDesireReceiver {
+    ThemeWithCentralConflictChangedReceiver, ChangedCharacterDesireReceiver, ChangedCharacterChangeReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -151,6 +153,18 @@ class CharacterConflictPresenter(
 
             copy(
                 desire = changedCharacterDesire.newValue
+            )
+        }
+    }
+
+    override suspend fun receiveChangedCharacterChange(changedCharacterChange: ChangedCharacterChange) {
+        if (changedCharacterChange.themeId != themeId) return
+        view.updateOrInvalidated {
+            if (selectedPerspectiveCharacter?.characterId != changedCharacterChange.characterId.toString())
+                return@updateOrInvalidated this
+
+            copy(
+                characterChange = changedCharacterChange.characterChange
             )
         }
     }
