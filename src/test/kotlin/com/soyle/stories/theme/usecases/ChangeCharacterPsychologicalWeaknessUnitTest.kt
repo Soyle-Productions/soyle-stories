@@ -2,7 +2,7 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
 import com.soyle.stories.character.makeCharacter
-import com.soyle.stories.common.Desire
+import com.soyle.stories.common.PsychologicalWeakness
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
@@ -10,7 +10,8 @@ import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesireUseCase
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeaknessUseCase
 import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.translators.asCharacterArcSection
 import kotlinx.coroutines.runBlocking
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-class ChangeCharacterDesireUnitTest {
+class ChangeCharacterPsychologicalWeaknessUnitTest {
 
     // preconditions
     private val character = makeCharacter()
@@ -26,24 +27,24 @@ class ChangeCharacterDesireUnitTest {
         .withCharacterIncluded(character.id, character.name, character.media)
         .withCharacterPromoted(character.id)
     private val arcSection =
-        theme.getMajorCharacterById(character.id)!!.thematicSections.find { it.template.characterArcTemplateSectionId == Desire.id }!!
+        theme.getMajorCharacterById(character.id)!!.thematicSections.find { it.template.characterArcTemplateSectionId == PsychologicalWeakness.id }!!
             .asCharacterArcSection()
 
     // input
     private val themeId = theme.id.uuid
     private val characterId = character.id.uuid
-    private val providedDesire = "Desire ${str()}"
+    private val providedWeakness = "Psychological Weakness ${str()}"
 
     // post-conditions
     private var updatedArcSection: CharacterArcSection? = null
 
     // output
-    private var responseModel: ChangeCharacterDesire.ResponseModel? = null
+    private var responseModel: ChangeCharacterPsychologicalWeakness.ResponseModel? = null
 
     @Test
     fun `theme doesn't exist`() {
         assertThrows<ThemeDoesNotExist> {
-            changeCharacterDesire()
+            changeCharacterPsychologicalWeakness()
         } shouldBe themeDoesNotExist(themeId)
     }
 
@@ -51,7 +52,7 @@ class ChangeCharacterDesireUnitTest {
     fun `character not in theme`() {
         givenTheme()
         assertThrows<CharacterNotInTheme> {
-            changeCharacterDesire()
+            changeCharacterPsychologicalWeakness()
         } shouldBe characterNotInTheme(themeId, characterId)
     }
 
@@ -60,7 +61,7 @@ class ChangeCharacterDesireUnitTest {
         givenTheme()
         givenThemeHasCharacter()
         assertThrows<CharacterIsNotMajorCharacterInTheme> {
-            changeCharacterDesire()
+            changeCharacterPsychologicalWeakness()
         } shouldBe characterIsNotMajorCharacterInTheme(themeId, characterId)
     }
 
@@ -68,12 +69,12 @@ class ChangeCharacterDesireUnitTest {
     fun `happy path`() {
         givenTheme()
         givenThemeHasCharacter(asMajorCharacter = true)
-        changeCharacterDesire()
+        changeCharacterPsychologicalWeakness()
         updatedArcSection!! shouldBe {
             assertEquals(arcSection.id, it.id)
-            assertEquals(providedDesire, it.value)
+            assertEquals(providedWeakness, it.value)
         }
-        responseModel!!.changedCharacterDesire shouldBe ::changedCharacterDesire
+        responseModel!!.changedCharacterPsychologicalWeakness shouldBe ::changedCharacterPsychologicalWeakness
     }
 
     @Test
@@ -82,13 +83,13 @@ class ChangeCharacterDesireUnitTest {
         givenTheme()
         givenThemeHasCharacter(asMajorCharacter = true)
         givenArcSectionHasLinkedLocation(linkedLocationId)
-        changeCharacterDesire()
+        changeCharacterPsychologicalWeakness()
         updatedArcSection!! shouldBe {
             assertEquals(arcSection.id, it.id)
-            assertEquals(providedDesire, it.value)
+            assertEquals(providedWeakness, it.value)
             assertEquals(linkedLocationId, it.linkedLocation)
         }
-        responseModel!!.changedCharacterDesire shouldBe ::changedCharacterDesire
+        responseModel!!.changedCharacterPsychologicalWeakness shouldBe ::changedCharacterPsychologicalWeakness
     }
 
 
@@ -117,23 +118,23 @@ class ChangeCharacterDesireUnitTest {
         characterArcSectionRepository.characterArcSections[arcSection.id] = arcSection.withLinkedLocation(locationId)
     }
 
-    private fun changeCharacterDesire() {
-        val useCase: ChangeCharacterDesire =
-            ChangeCharacterDesireUseCase(themeRepository, characterArcSectionRepository)
-        val output = object : ChangeCharacterDesire.OutputPort {
-            override suspend fun characterDesireChanged(response: ChangeCharacterDesire.ResponseModel) {
+    private fun changeCharacterPsychologicalWeakness() {
+        val useCase: ChangeCharacterPsychologicalWeakness =
+            ChangeCharacterPsychologicalWeaknessUseCase(themeRepository, characterArcSectionRepository)
+        val output = object : ChangeCharacterPsychologicalWeakness.OutputPort {
+            override suspend fun characterPsychologicalWeaknessChanged(response: ChangeCharacterPsychologicalWeakness.ResponseModel) {
                 responseModel = response
             }
         }
         runBlocking {
-            useCase.invoke(ChangeCharacterDesire.RequestModel(themeId, characterId, providedDesire), output)
+            useCase.invoke(ChangeCharacterPsychologicalWeakness.RequestModel(themeId, characterId, providedWeakness), output)
         }
     }
 
-    private fun changedCharacterDesire(it: ChangedCharacterArcSectionValue) {
+    private fun changedCharacterPsychologicalWeakness(it: ChangedCharacterArcSectionValue) {
         assertEquals(themeId, it.themeId)
         assertEquals(characterId, it.characterId)
         assertEquals(arcSection.id.uuid, it.arcSectionId)
-        assertEquals(providedDesire, it.newValue)
+        assertEquals(providedWeakness, it.newValue)
     }
 }

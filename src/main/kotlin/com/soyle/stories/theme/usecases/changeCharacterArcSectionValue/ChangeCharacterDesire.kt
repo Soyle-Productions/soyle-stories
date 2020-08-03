@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.changeCharacterDesire
+package com.soyle.stories.theme.usecases.changeCharacterArcSectionValue
 
 import java.util.*
 
@@ -13,7 +13,7 @@ interface ChangeCharacterDesire {
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
     class ResponseModel(
-        val changedCharacterDesire: ChangedCharacterDesire
+        val changedCharacterDesire: ChangedCharacterArcSectionValue
     )
 
     interface OutputPort {

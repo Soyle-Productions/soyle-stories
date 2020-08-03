@@ -179,7 +179,7 @@ class ChangeCharacterPerspectivePropertyValueUnitTest {
                 result = failure
             }
 
-            override fun receiveChangeCharacterPerspectivePropertyValueResponse(response: ChangeCharacterPerspectivePropertyValue.ResponseModel) {
+            override suspend fun receiveChangeCharacterPerspectivePropertyValueResponse(response: ChangeCharacterPerspectivePropertyValue.ResponseModel) {
                 result = response
             }
         }

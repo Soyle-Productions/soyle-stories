@@ -1,8 +1,8 @@
-package com.soyle.stories.theme.usecases.changeCharacterDesire
+package com.soyle.stories.theme.usecases.changeCharacterArcSectionValue
 
 import java.util.*
 
-class ChangedCharacterDesire(
+class ChangedCharacterArcSectionValue(
     val arcSectionId: UUID,
     val characterId: UUID,
     val themeId: UUID,

@@ -26,6 +26,6 @@ interface ChangeCharacterPerspectivePropertyValue {
 
     interface OutputPort {
         fun receiveChangeCharacterPerspectivePropertyValueFailure(failure: ThemeException)
-        fun receiveChangeCharacterPerspectivePropertyValueResponse(response: ResponseModel)
+        suspend fun receiveChangeCharacterPerspectivePropertyValueResponse(response: ResponseModel)
     }
 }
