@@ -1,7 +1,7 @@
 package com.soyle.stories.di.characterarc
 
 import com.soyle.stories.characterarc.baseStoryStructure.*
-import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterDesireNotifier
+import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueNotifier
 import com.soyle.stories.characterarc.eventbus.ChangeThematicSectionValueNotifier
 import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
@@ -26,7 +26,7 @@ internal object BaseStoryStructureModule {
                     projectScope.get<UnlinkLocationFromCharacterArcSectionNotifier>(),
                     projectScope.get()
                 ).also {
-                    it listensTo projectScope.get<ChangedCharacterDesireNotifier>()
+                    it listensTo projectScope.get<ChangedCharacterArcSectionValueNotifier>()
                 }
             }
 

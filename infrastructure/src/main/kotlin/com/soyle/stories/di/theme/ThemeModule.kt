@@ -27,6 +27,9 @@ import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeControllerImpl
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeNotifier
 import com.soyle.stories.theme.changeCharacterChange.*
+import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyController
+import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyControllerImpl
+import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedNotifier
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValueControllerImpl
 import com.soyle.stories.theme.characterConflict.*
@@ -95,10 +98,9 @@ import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicI
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOppositionUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.*
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChangeUseCase
-import com.soyle.stories.theme.usecases.changeCharacterDesire.ChangeCharacterDesire
-import com.soyle.stories.theme.usecases.changeCharacterDesire.ChangeCharacterDesireUseCase
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValuesUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
@@ -213,6 +215,8 @@ object ThemeModule {
         provide<ListAvailableCharactersToUseAsOpponents> { ListAvailableCharactersToUseAsOpponentsUseCase(get(), get()) }
         provide<ChangeCentralConflict> { ChangeCentralConflictUseCase(get()) }
         provide<ChangeCharacterDesire> { ChangeCharacterDesireUseCase(get(), get()) }
+        provide<ChangeCharacterPsychologicalWeakness> { ChangeCharacterPsychologicalWeaknessUseCase(get(), get()) }
+        provide<ChangeCharacterMoralWeakness> { ChangeCharacterMoralWeaknessUseCase(get(), get()) }
         provide<ChangeCharacterChange> { ChangeCharacterChangeUseCase(get()) }
     }
 
@@ -223,7 +227,7 @@ object ThemeModule {
         provide(OpponentCharacterReceiver::class) { OpponentCharacterNotifier() }
         provide(RenamedThemeReceiver::class) { RenamedThemeNotifier() }
         provide(ThemeWithCentralConflictChangedReceiver::class) { ThemeWithCentralConflictChangedNotifier() }
-        provide(ChangedCharacterDesireReceiver::class) { ChangedCharacterDesireNotifier() }
+        provide(ChangedCharacterArcSectionValueReceiver::class) { ChangedCharacterArcSectionValueNotifier() }
         provide(ChangedCharacterChangeReceiver::class) { ChangedCharacterChangeNotifier() }
 
 
@@ -284,6 +288,12 @@ object ThemeModule {
         }
         provide(ChangeCharacterDesire.OutputPort::class) {
             ChangeCharacterDesireOutput(get())
+        }
+        provide(ChangeCharacterPsychologicalWeakness.OutputPort::class) {
+            ChangeCharacterPsychologicalWeaknessOutput(get())
+        }
+        provide(ChangeCharacterMoralWeakness.OutputPort::class) {
+            ChangeCharacterMoralWeaknessOutput(get())
         }
         provide(ChangeCharacterChange.OutputPort::class) {
             ChangeCharacterChangeOutput(get())
@@ -350,10 +360,13 @@ object ThemeModule {
             ChangeCentralConflictControllerImpl(applicationScope.get(), get(), get())
         }
         provide<ChangeSectionValueController> {
-            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get())
+            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get())
         }
         provide<ChangeCharacterChangeController> {
             ChangeCharacterChangeControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<ChangeCharacterPerspectivePropertyController> {
+            ChangeCharacterPerspectivePropertyControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -606,9 +619,10 @@ object ThemeModule {
 
                 presenter listensTo projectScope.get<OpponentCharacterNotifier>()
                 presenter listensTo projectScope.get<ThemeWithCentralConflictChangedNotifier>()
-                presenter listensTo projectScope.get<ChangedCharacterDesireNotifier>()
+                presenter listensTo projectScope.get<ChangedCharacterArcSectionValueNotifier>()
                 presenter listensTo projectScope.get<ChangedCharacterChangeNotifier>()
                 presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()
+                presenter listensTo projectScope.get<CharacterPerspectivePropertyChangedNotifier>()
 
                 CharacterConflictController(
                     themeId,
@@ -619,6 +633,7 @@ object ThemeModule {
                     presenter,
                     projectScope.get(),
                     presenter,
+                    projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),

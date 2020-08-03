@@ -46,6 +46,9 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
+import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyValueOutput
+import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedNotifier
+import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeNotifier
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonOutput
@@ -145,6 +148,7 @@ object CharacterArcModule {
 
 		provide(CreatedCharacterReceiver::class) { CreatedCharacterNotifier() }
 		provide(CreatedCharacterArcReceiver::class) { CreatedCharacterArcNotifier() }
+		provide(CharacterPerspectivePropertyChangedReceiver::class) { CharacterPerspectivePropertyChangedNotifier() }
 
 		provide(BuildNewCharacter.OutputPort::class) { BuildNewCharacterOutput(get(), get(), get()) }
 		provide(CreatePerspectiveCharacter.OutputPort::class) { CreatePerspectiveCharacterOutput(get(), get()) }
@@ -160,7 +164,7 @@ object CharacterArcModule {
 		provide(ChangeThematicSectionValue.OutputPort::class) { ChangeThematicSectionValueNotifier() }
 		provide(ChangeCentralMoralQuestion.OutputPort::class) { ChangeCentralMoralQuestionNotifier() }
 		provide(ChangeCharacterPropertyValue.OutputPort::class) { ChangeCharacterPropertyValueNotifier() }
-		provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) { ChangeCharacterPerspectivePropertyValueNotifier() }
+		provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) { ChangeCharacterPerspectivePropertyValueOutput(get()) }
 		provide(RemoveCharacterFromComparison.OutputPort::class) { RemoveCharacterFromComparisonNotifier(get()) }
 
 		provide(RenameCharacter.OutputPort::class) { RenameCharacterNotifier().also {

@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.characterarc.baseStoryStructure.presenters.*
-import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterDesireReceiver
+import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueReceiver
 import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
@@ -11,7 +11,7 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
-import com.soyle.stories.theme.usecases.changeCharacterDesire.ChangedCharacterDesire
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
 
 class BaseStoryStructurePresenter(
@@ -20,7 +20,7 @@ class BaseStoryStructurePresenter(
   linkLocationToCharacterArcSection: Notifier<LinkLocationToCharacterArcSection.OutputPort>,
   unlinkLocationFromCharacterArcSection: Notifier<UnlinkLocationFromCharacterArcSection.OutputPort>,
   locationEvents: LocationEvents
-) : ViewBaseStoryStructure.OutputPort, ListAllLocations.OutputPort, ChangedCharacterDesireReceiver {
+) : ViewBaseStoryStructure.OutputPort, ListAllLocations.OutputPort, ChangedCharacterArcSectionValueReceiver {
 
     private val subPresenters = listOf(
       ChangeThematicSectionValuePresenter(view) listensTo changeThematicSectionValueNotifier,
@@ -80,9 +80,9 @@ class BaseStoryStructurePresenter(
         }
     }
 
-    override suspend fun receiveChangedCharacterDesire(changedCharacterDesire: ChangedCharacterDesire) {
+    override suspend fun receiveChangedCharacterArcSectionValue(changedCharacterArcSectionValue: ChangedCharacterArcSectionValue) {
         subPresenters.filterIsInstance<ChangeThematicSectionValuePresenter>().single().receiveChangeThematicSectionValueResponse(
-            ChangeThematicSectionValue.ResponseModel(changedCharacterDesire.arcSectionId, changedCharacterDesire.newValue)
+            ChangeThematicSectionValue.ResponseModel(changedCharacterArcSectionValue.arcSectionId, changedCharacterArcSectionValue.newValue)
         )
     }
 

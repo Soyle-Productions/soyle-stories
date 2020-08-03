@@ -5,7 +5,9 @@ import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterCo
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.changeCharacterChange.ChangeCharacterChangeController
+import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyController
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
+import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValueControllerImpl
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.updateThemeMetaData.ChangeCentralConflictController
 import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
@@ -31,7 +33,8 @@ class CharacterConflictController(
     private val changeCentralConflictController: ChangeCentralConflictController,
     private val changeSectionValueController: ChangeSectionValueController,
     private val changeCharacterChangeController: ChangeCharacterChangeController,
-    private val changeCharacterPropertyController: ChangeCharacterPropertyController
+    private val changeCharacterPropertyController: ChangeCharacterPropertyController,
+    private val changeCharacterPerspectivePropertyController: ChangeCharacterPerspectivePropertyController
 ) : CharacterConflictViewListener, CharacterIncludedInThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
@@ -89,12 +92,35 @@ class CharacterConflictController(
         changeSectionValueController.changeDesire(themeId.toString(), characterId, desire)
     }
 
+    override fun setPsychologicalWeakness(characterId: String, weakness: String) {
+        changeSectionValueController.setPsychologicalWeakness(themeId.toString(), characterId, weakness)
+    }
+
+    override fun setMoralWeakness(characterId: String, weakness: String) {
+        changeSectionValueController.setMoralWeakness(themeId.toString(), characterId, weakness)
+    }
+
     override fun setCharacterChange(characterId: String, characterChange: String) {
         changeCharacterChangeController.changeCharacterChange(themeId.toString(), characterId, characterChange)
+    }
+
+    override fun setAttackFromOpponent(perspectiveCharacterId: String, opponentId: String, attack: String) {
+        changeCharacterPerspectivePropertyController.setAttackByOpponent(
+            themeId.toString(), perspectiveCharacterId, opponentId, attack
+        )
+    }
+
+    override fun setCharactersSimilarities(perspectiveCharacterId: String, opponentId: String, similarities: String) {
+        changeCharacterPerspectivePropertyController.setSimilaritiesBetweenCharacters(
+            themeId.toString(), perspectiveCharacterId, opponentId, similarities
+        )
     }
 
     override fun setCharacterAbilities(characterId: String, ability: String) {
         changeCharacterPropertyController.setAbility(themeId.toString(), characterId, ability)
     }
+
+
+
 
 }

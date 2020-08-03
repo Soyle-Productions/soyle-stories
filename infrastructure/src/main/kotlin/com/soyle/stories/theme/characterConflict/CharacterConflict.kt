@@ -173,8 +173,8 @@ class CharacterConflict : View() {
         return responsiveBox(model.isSmall, hSpacing = 8.0, vSpacing = 8.0) {
             listOf(
                 characterChangeField(model.desireLabel, model.desire, ::setDesire),
-                characterChangeField(model.psychologicalWeaknessLabel, model.psychologicalWeakness) {},
-                characterChangeField(model.moralWeaknessLabel, model.moralWeakness) {},
+                characterChangeField(model.psychologicalWeaknessLabel, model.psychologicalWeakness, ::setPsychologicalWeakness),
+                characterChangeField(model.moralWeaknessLabel, model.moralWeakness, ::setMoralWeakness),
                 characterChangeField(model.characterChangeLabel, model.characterChange, ::setCharacterChange)
             ).onEach {
                 it.hgrow = Priority.ALWAYS
@@ -186,6 +186,18 @@ class CharacterConflict : View() {
     {
         val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
         viewListener.setDesire(perspectiveCharacterId, desire)
+    }
+
+    private fun setPsychologicalWeakness(weakness: String)
+    {
+        val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
+        viewListener.setPsychologicalWeakness(perspectiveCharacterId, weakness)
+    }
+
+    private fun setMoralWeakness(weakness: String)
+    {
+        val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
+        viewListener.setMoralWeakness(perspectiveCharacterId, weakness)
     }
 
     private fun setCharacterChange(characterChange: String)
@@ -339,6 +351,18 @@ class CharacterConflict : View() {
             onOpponentSelectedToBeMain = listener@{
                 val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@listener
                 viewListener.makeOpponentMainOpponent(perspectiveCharacterId, it)
+            }
+            opponentAttack.onChange {
+                if (it == null) return@onChange
+                val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@onChange
+                val opponentId = opponentModel.value?.characterId ?: return@onChange
+                viewListener.setAttackFromOpponent(perspectiveCharacterId, opponentId, it)
+            }
+            opponentSimilarities.onChange {
+                if (it == null) return@onChange
+                val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@onChange
+                val opponentId = opponentModel.value?.characterId ?: return@onChange
+                viewListener.setCharactersSimilarities(perspectiveCharacterId, opponentId, it)
             }
             opponentAbility.onChange {
                 if (it == null) return@onChange

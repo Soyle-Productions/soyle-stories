@@ -33,6 +33,12 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
     private val model = resolve<CharacterConflictModel>()
 
     internal var onOpponentSelectedToBeMain: (String) -> Unit = {}
+    private val opponentAttackProperty = ReadOnlyStringWrapper("")
+    internal val opponentAttack: ReadOnlyStringProperty
+        get() = opponentAttackProperty.readOnlyProperty
+    private val opponentSimilaritiesProperty = ReadOnlyStringWrapper("")
+    internal val opponentSimilarities: ReadOnlyStringProperty
+        get() = opponentSimilaritiesProperty.readOnlyProperty
     private val opponentAbilityProperty = ReadOnlyStringWrapper("")
     internal val opponentAbility: ReadOnlyStringProperty
         get() = opponentAbilityProperty.readOnlyProperty
@@ -99,12 +105,12 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
                 opponentPropertyField(
                     model.attackSectionLabel as ObservableStringValue,
                     CharacterChangeOpponentViewModel::attack,
-                    {}
+                    opponentAttackProperty::set
                 ),
                 opponentPropertyField(
                     model.similaritiesSectionLabel as ObservableStringValue,
                     CharacterChangeOpponentViewModel::similarities,
-                    {}
+                    opponentSimilaritiesProperty::set
                 ),
                 opponentPropertyField(
                     model.powerStatusOrAbilitiesLabel as ObservableStringValue,

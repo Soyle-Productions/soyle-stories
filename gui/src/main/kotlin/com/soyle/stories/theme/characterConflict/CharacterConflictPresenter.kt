@@ -1,26 +1,26 @@
 package com.soyle.stories.theme.characterConflict
 
-import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterDesireReceiver
+import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeReceiver
-import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
 import com.soyle.stories.theme.updateThemeMetaData.ThemeWithCentralConflictChangedReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.OpponentCharacterReceiver
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ArcSectionType
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
-import com.soyle.stories.theme.usecases.changeCharacterDesire.ChangedCharacterDesire
+import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.AvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.updateThemeMetaData.ThemeWithCentralConflictChanged
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import java.util.*
 
 class CharacterConflictPresenter(
@@ -28,7 +28,8 @@ class CharacterConflictPresenter(
     private val view: View.Nullable<CharacterConflictViewModel>
 ) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
     ListAvailableCharactersToUseAsOpponents.OutputPort, OpponentCharacterReceiver,
-    ThemeWithCentralConflictChangedReceiver, ChangedCharacterDesireReceiver, ChangedCharacterChangeReceiver, ChangeCharacterPropertyValue.OutputPort {
+    ThemeWithCentralConflictChangedReceiver, ChangedCharacterArcSectionValueReceiver, ChangedCharacterChangeReceiver,
+    ChangeCharacterPropertyValue.OutputPort, CharacterPerspectivePropertyChangedReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -121,7 +122,7 @@ class CharacterConflictPresenter(
 
             copy(
                 mainOpponent = when {
-                    opponentCharacter.isMainOpponent -> existingOpponent?: CharacterChangeOpponentViewModel(
+                    opponentCharacter.isMainOpponent -> existingOpponent ?: CharacterChangeOpponentViewModel(
                         opponentCharacter.characterId.toString(),
                         opponentCharacter.characterName,
                         "",
@@ -131,13 +132,14 @@ class CharacterConflictPresenter(
                     opponentCharacter.characterId.toString() == mainOpponent?.characterId && !opponentCharacter.isMainOpponent -> null
                     else -> mainOpponent
                 },
-                opponents = if (!opponentCharacter.isMainOpponent) opponents + (existingOpponent ?: CharacterChangeOpponentViewModel(
-                    opponentCharacter.characterId.toString(),
-                    opponentCharacter.characterName,
-                    "",
-                    "",
-                    ""
-                )) else opponents.filterNot { it.characterId == opponentCharacter.characterId.toString() }
+                opponents = if (!opponentCharacter.isMainOpponent) opponents + (existingOpponent
+                    ?: CharacterChangeOpponentViewModel(
+                        opponentCharacter.characterId.toString(),
+                        opponentCharacter.characterName,
+                        "",
+                        "",
+                        ""
+                    )) else opponents.filterNot { it.characterId == opponentCharacter.characterId.toString() }
             )
         }
     }
@@ -147,18 +149,6 @@ class CharacterConflictPresenter(
         view.updateOrInvalidated {
             copy(
                 centralConflict = themeWithCentralConflictChanged.centralConflict
-            )
-        }
-    }
-
-    override suspend fun receiveChangedCharacterDesire(changedCharacterDesire: ChangedCharacterDesire) {
-        if (changedCharacterDesire.themeId != themeId) return
-        view.updateOrInvalidated {
-            if (selectedPerspectiveCharacter?.characterId != changedCharacterDesire.characterId.toString())
-                return@updateOrInvalidated this
-
-            copy(
-                desire = changedCharacterDesire.newValue
             )
         }
     }
@@ -190,6 +180,55 @@ class CharacterConflictPresenter(
                 } else mainOpponent,
                 opponents = opponents.map {
                     if (it.characterId == characterId) it.copy(powerStatusOrAbilities = response.newValue)
+                    else it
+                }
+            )
+        }
+    }
+
+    override suspend fun receiveChangedCharacterArcSectionValue(changedCharacterArcSectionValue: ChangedCharacterArcSectionValue) {
+        if (changedCharacterArcSectionValue.themeId != themeId) return
+        if (changedCharacterArcSectionValue.type !in setOf(
+                ArcSectionType.Desire,
+                ArcSectionType.PsychologicalWeakness,
+                ArcSectionType.MoralWeakness
+            )
+        ) return
+        view.updateOrInvalidated {
+            if (selectedPerspectiveCharacter?.characterId != changedCharacterArcSectionValue.characterId.toString())
+                return@updateOrInvalidated this
+
+            when (changedCharacterArcSectionValue.type) {
+                ArcSectionType.Desire -> copy(desire = changedCharacterArcSectionValue.newValue)
+                ArcSectionType.PsychologicalWeakness -> copy(psychologicalWeakness = changedCharacterArcSectionValue.newValue)
+                ArcSectionType.MoralWeakness -> copy(moralWeakness = changedCharacterArcSectionValue.newValue)
+            }
+        }
+    }
+
+    override suspend fun receiveCharacterPerspectivePropertyChanged(propertyChanged: ChangeCharacterPerspectivePropertyValue.ResponseModel) {
+        if (propertyChanged.themeId != themeId) return
+        if (propertyChanged.property !in setOf(
+                ChangeCharacterPerspectivePropertyValue.Property.Similarities,
+                ChangeCharacterPerspectivePropertyValue.Property.Attack
+            )
+        ) return
+        val opponentId = propertyChanged.targetCharacterId.toString()
+        view.updateOrInvalidated {
+            if (selectedPerspectiveCharacter?.characterId != propertyChanged.perspectiveCharacterId.toString())
+                return@updateOrInvalidated this
+
+            fun CharacterChangeOpponentViewModel.copyWithProperty() = copy(
+                attack = if (propertyChanged.property == ChangeCharacterPerspectivePropertyValue.Property.Attack) propertyChanged.newValue else attack,
+                similarities = if (propertyChanged.property == ChangeCharacterPerspectivePropertyValue.Property.Similarities) propertyChanged.newValue else similarities
+            )
+
+            copy(
+                mainOpponent = if (mainOpponent?.characterId == opponentId) {
+                    mainOpponent.copyWithProperty()
+                } else mainOpponent,
+                opponents = opponents.map {
+                    if (it.characterId == opponentId) it.copyWithProperty()
                     else it
                 }
             )

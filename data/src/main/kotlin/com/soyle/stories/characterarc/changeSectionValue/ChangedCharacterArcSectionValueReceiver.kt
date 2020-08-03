@@ -1,0 +1,9 @@
+package com.soyle.stories.characterarc.changeSectionValue
+
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+
+interface ChangedCharacterArcSectionValueReceiver {
+
+    suspend fun receiveChangedCharacterArcSectionValue(changedCharacterArcSectionValue: ChangedCharacterArcSectionValue)
+
+}
