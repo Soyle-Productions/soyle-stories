@@ -92,13 +92,12 @@ class UseCharacterAsOpponentUseCase(
         theme: Theme,
         opponentCharacter: CharacterInTheme,
         perspectiveCharacter: MajorCharacter
-    ): OpponentCharacter {
-        return OpponentCharacter(
+    ): CharacterUsedAsOpponent {
+        return CharacterUsedAsOpponent(
             opponentCharacter.id.uuid,
             opponentCharacter.name,
             perspectiveCharacter.id.uuid,
-            theme.id.uuid,
-            false
+            theme.id.uuid
         )
     }
 

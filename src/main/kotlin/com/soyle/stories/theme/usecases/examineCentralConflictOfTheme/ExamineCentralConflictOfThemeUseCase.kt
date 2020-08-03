@@ -49,14 +49,14 @@ class ExamineCentralConflictOfThemeUseCase(
     private fun examineCharacterChange(
         theme: Theme,
         majorCharacter: MajorCharacter,
-        characterArcSections: Map<CharacterArcTemplateSection, CharacterArcSection>
+        characterArcSections: Map<CharacterArcTemplateSection.Id, CharacterArcSection>
     ): ExaminedCharacterChange {
         return ExaminedCharacterChange(
             majorCharacter.id.uuid,
             majorCharacter.name,
-            characterArcSections[Desire]?.value ?: "",
-            characterArcSections[PsychologicalWeakness]?.value ?: "",
-            characterArcSections[MoralWeakness]?.value ?: "",
+            characterArcSections[Desire.id]?.value ?: "",
+            characterArcSections[PsychologicalWeakness.id]?.value ?: "",
+            characterArcSections[MoralWeakness.id]?.value ?: "",
             majorCharacter.characterChange,
             getOpponents(majorCharacter, theme)
         )
@@ -99,9 +99,9 @@ class ExamineCentralConflictOfThemeUseCase(
     private suspend fun getArcSectionsByTemplate(
         majorCharacter: MajorCharacter,
         theme: Theme
-    ): Map<CharacterArcTemplateSection, CharacterArcSection> {
+    ): Map<CharacterArcTemplateSection.Id, CharacterArcSection> {
         return characterArcSectionRepository.getCharacterArcSectionsForCharacterInTheme(
             majorCharacter.id, theme.id
-        ).associateBy { it.template }
+        ).associateBy { it.template.id }
     }
 }

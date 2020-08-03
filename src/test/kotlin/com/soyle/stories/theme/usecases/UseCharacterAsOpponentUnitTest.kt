@@ -11,7 +11,7 @@ import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponentUseCase
 import kotlinx.coroutines.runBlocking
@@ -28,7 +28,7 @@ class UseCharacterAsOpponentUnitTest {
     private val opponent = makeCharacter()
 
     private var updatedTheme: Theme? = null
-    private var opponentCharacter: OpponentCharacter? = null
+    private var opponentCharacter: CharacterUsedAsOpponent? = null
     private var includedCharacter: CharacterIncludedInTheme? = null
 
     @Nested

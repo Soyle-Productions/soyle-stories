@@ -14,7 +14,7 @@ import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import java.util.*
 
 class BuildNewCharacterUseCase(
@@ -74,12 +74,11 @@ class BuildNewCharacterUseCase(
 
         outputPort.receiveBuildNewCharacterResponse(characterItem)
         outputPort.characterIncludedInTheme(characterIncluded)
-        outputPort.characterIsOpponent(OpponentCharacter(
+        outputPort.characterIsOpponent(CharacterUsedAsOpponent(
             characterItem.characterId,
             characterItem.characterName,
             opponentOfCharacterId,
-            themeId,
-            false
+            themeId
         ))
     }
 

@@ -14,7 +14,7 @@ interface UseCharacterAsOpponent {
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
     class ResponseModel(
-        val characterAsOpponent: OpponentCharacter,
+        val characterAsOpponent: CharacterUsedAsOpponent,
         val includedCharacter: CharacterIncludedInTheme?
     )
 

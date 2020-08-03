@@ -3,7 +3,8 @@ package com.soyle.stories.theme
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.CharacterUsedAsMainOpponent
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.*
 
@@ -17,10 +18,17 @@ fun includedCharacterInTheme(baseCharacter: Character, theme: Theme, asMajorChar
 }
 
 fun opponent(expectedId: UUID, expectedName: String, expectedPerspectiveCharacterId: UUID, expectedThemeId: UUID, expectedToBeMain: Boolean) = fun(actual: Any?) {
-    actual as OpponentCharacter
-    assertEquals(expectedId, actual.characterId)
-    assertEquals(expectedName, actual.characterName)
-    assertEquals(expectedPerspectiveCharacterId, actual.opponentOfCharacterId)
-    assertEquals(expectedThemeId, actual.themeId)
-    assertEquals(expectedToBeMain, actual.isMainOpponent)
+    if (expectedToBeMain) {
+        actual as CharacterUsedAsMainOpponent
+        assertEquals(expectedId, actual.characterId)
+        assertEquals(expectedName, actual.characterName)
+        assertEquals(expectedPerspectiveCharacterId, actual.opponentOfCharacterId)
+        assertEquals(expectedThemeId, actual.themeId)
+    } else {
+        actual as CharacterUsedAsOpponent
+        assertEquals(expectedId, actual.characterId)
+        assertEquals(expectedName, actual.characterName)
+        assertEquals(expectedPerspectiveCharacterId, actual.opponentOfCharacterId)
+        assertEquals(expectedThemeId, actual.themeId)
+    }
 }

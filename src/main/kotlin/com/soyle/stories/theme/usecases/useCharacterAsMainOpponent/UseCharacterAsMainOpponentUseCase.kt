@@ -9,7 +9,7 @@ import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 
 class UseCharacterAsMainOpponentUseCase(
     private val themeRepository: ThemeRepository
@@ -117,9 +117,9 @@ class UseCharacterAsMainOpponentUseCase(
         opponentCharacter: CharacterInTheme,
         perspectiveCharacter: MajorCharacter,
         theme: Theme
-    ): OpponentCharacter {
-        return OpponentCharacter(
-            opponentCharacter.id.uuid, opponentCharacter.name, perspectiveCharacter.id.uuid, theme.id.uuid, true
+    ): CharacterUsedAsMainOpponent {
+        return CharacterUsedAsMainOpponent(
+            opponentCharacter.id.uuid, opponentCharacter.name, perspectiveCharacter.id.uuid, theme.id.uuid
         )
     }
 
@@ -128,8 +128,8 @@ class UseCharacterAsMainOpponentUseCase(
         perspectiveCharacter: MajorCharacter,
         theme: Theme
     ) = currentMainOpponent?.let {
-        OpponentCharacter(
-            it.id.uuid, it.name, perspectiveCharacter.id.uuid, theme.id.uuid, false
+        CharacterUsedAsOpponent(
+            it.id.uuid, it.name, perspectiveCharacter.id.uuid, theme.id.uuid
         )
     }
 

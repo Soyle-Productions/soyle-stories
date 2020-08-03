@@ -18,7 +18,7 @@ import com.soyle.stories.entities.theme.StoryFunction
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -74,7 +74,7 @@ class BuildNewCharacterTest {
                 error("Should not include character in theme when simply creating a new character")
             }
 
-            override suspend fun characterIsOpponent(response: OpponentCharacter) {
+            override suspend fun characterIsOpponent(response: CharacterUsedAsOpponent) {
                 error("Should not include character in theme when simply creating a new character")
             }
         }
@@ -127,7 +127,7 @@ class BuildNewCharacterTest {
 
         private var updatedTheme: Theme? = null
 
-        private var opponentCharacter: OpponentCharacter? = null
+        private var opponentCharacter: CharacterUsedAsOpponent? = null
         private var includedCharacterResult: CharacterIncludedInTheme? = null
         private var characterItemResult: CharacterItem? = null
 
@@ -249,7 +249,7 @@ class BuildNewCharacterTest {
                         includedCharacterResult = response
                     }
 
-                    override suspend fun characterIsOpponent(response: OpponentCharacter) {
+                    override suspend fun characterIsOpponent(response: CharacterUsedAsOpponent) {
                         opponentCharacter = response
                     }
                 }
@@ -295,7 +295,7 @@ class BuildNewCharacterTest {
                     includedCharacterResult = response
                 }
 
-                override suspend fun characterIsOpponent(response: OpponentCharacter) {
+                override suspend fun characterIsOpponent(response: CharacterUsedAsOpponent) {
                     opponentCharacter = response
                 }
             }

@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.usecases.useCharacterAsMainOpponent
 
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import java.util.*
 
 interface UseCharacterAsMainOpponent {
@@ -14,8 +14,8 @@ interface UseCharacterAsMainOpponent {
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
     class ResponseModel(
-        val mainOpponent: OpponentCharacter,
-        val previousMainOpponent: OpponentCharacter?
+        val mainOpponent: CharacterUsedAsMainOpponent,
+        val previousMainOpponent: CharacterUsedAsOpponent?
     )
 
     interface OutputPort {
