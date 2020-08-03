@@ -28,6 +28,11 @@ fun characterNotInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
 
 fun characterIsNotMajorCharacterInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
     actual as CharacterIsNotMajorCharacterInTheme
+    if (themeId == actual.characterId && characterId == actual.themeId) {
+        error("Character not major character in theme exception has characterId and themeId swapped.\n" +
+                "Should be themeId = $themeId and characterId = $characterId.\n" +
+                "Instead found themeId = $characterId and characterId = $themeId")
+    }
     assertEquals(themeId, actual.themeId) { "Character not major character in theme exception does not have expected theme id" }
     assertEquals(characterId, actual.characterId) { "Character not major character in theme exception does not have expected character id" }
 }

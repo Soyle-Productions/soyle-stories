@@ -57,7 +57,7 @@ class RenameThemeUnitTest {
     {
         val useCase: RenameTheme = RenameThemeUseCase(themeRepository)
         val output = object : RenameTheme.OutputPort {
-            override fun themeRenamed(response: RenamedTheme) {
+            override suspend fun themeRenamed(response: RenamedTheme) {
                 result = response
             }
         }
