@@ -87,6 +87,20 @@ class ChangeCharacterPropertyValueUnitTest {
             assertEquals(inputValue, persisted.getIncludedCharacterById(Character.Id(characterId))!!.variationOnMoral)
         }
 
+        @Test
+        fun `update ability`() {
+            whenUseCaseIsExecuted(Property.Ability)
+            val result = result.asValidResponseModel()
+            assertEquals(Property.Ability, result.property)
+        }
+
+        @Test
+        fun `persist ability`() {
+            whenUseCaseIsExecuted(Property.Ability)
+            val persisted = updatedTheme!!
+            assertEquals(inputValue, persisted.getIncludedCharacterById(Character.Id(characterId))!!.position)
+        }
+
         fun Any?.asValidResponseModel(): ChangeCharacterPropertyValue.ResponseModel {
             this as ChangeCharacterPropertyValue.ResponseModel
             assertEquals(this@ChangeCharacterPropertyValueUnitTest.themeId, this.themeId)
