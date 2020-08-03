@@ -9,10 +9,7 @@ import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterMoralWeaknessUseCase
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.*
 import com.soyle.stories.translators.asCharacterArcSection
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -135,6 +132,7 @@ class ChangeCharacterMoralWeaknessUnitTest {
         assertEquals(themeId, it.themeId)
         assertEquals(characterId, it.characterId)
         assertEquals(arcSection.id.uuid, it.arcSectionId)
+        assertEquals(ArcSectionType.MoralWeakness, it.type)
         assertEquals(providedWeakness, it.newValue)
     }
 }

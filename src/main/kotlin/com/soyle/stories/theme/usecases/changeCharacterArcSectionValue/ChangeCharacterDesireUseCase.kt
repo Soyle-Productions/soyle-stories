@@ -31,7 +31,7 @@ class ChangeCharacterDesireUseCase(
 
         output.characterDesireChanged(
             ResponseModel(
-                ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, request.desire)
+                ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, ArcSectionType.Desire, request.desire)
             )
         )
     }

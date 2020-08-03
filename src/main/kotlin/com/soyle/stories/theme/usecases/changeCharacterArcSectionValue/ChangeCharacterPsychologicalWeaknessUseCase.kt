@@ -36,7 +36,7 @@ class ChangeCharacterPsychologicalWeaknessUseCase(
 
         output.characterPsychologicalWeaknessChanged(
             ChangeCharacterPsychologicalWeakness.ResponseModel(
-                ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, request.psychologicalWeakness)
+                ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, ArcSectionType.PsychologicalWeakness, request.psychologicalWeakness)
             )
         )
     }

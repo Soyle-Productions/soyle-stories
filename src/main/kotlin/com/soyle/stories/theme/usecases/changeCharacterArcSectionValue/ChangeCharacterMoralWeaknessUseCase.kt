@@ -36,7 +36,7 @@ class ChangeCharacterMoralWeaknessUseCase(
 
         output.characterMoralWeaknessChanged(
             ChangeCharacterMoralWeakness.ResponseModel(
-                ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, request.moralWeakness)
+                ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, ArcSectionType.MoralWeakness, request.moralWeakness)
             )
         )
     }

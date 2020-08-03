@@ -9,6 +9,7 @@ import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.*
+import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ArcSectionType
 import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
 import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesireUseCase
 import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
@@ -134,6 +135,7 @@ class ChangeCharacterDesireUnitTest {
         assertEquals(themeId, it.themeId)
         assertEquals(characterId, it.characterId)
         assertEquals(arcSection.id.uuid, it.arcSectionId)
+        assertEquals(ArcSectionType.Desire, it.type)
         assertEquals(providedDesire, it.newValue)
     }
 }
