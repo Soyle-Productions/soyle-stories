@@ -6,5 +6,6 @@ import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeChara
 interface ChangeCharacterPropertyController {
 
     fun setArchetype(themeId: String, characterId: String, archetype: String)
+    fun setAbility(themeId: String, characterId: String, ability: String)
 
 }

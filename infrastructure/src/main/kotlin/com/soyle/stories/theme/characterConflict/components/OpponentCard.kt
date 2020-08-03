@@ -5,13 +5,17 @@ import com.soyle.stories.common.components.card
 import com.soyle.stories.common.components.cardHeader
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.characterConflict.*
 import com.soyle.stories.theme.characterConflict.addDragAndDrop
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.binding.BooleanExpression
+import javafx.beans.property.ReadOnlyStringProperty
+import javafx.beans.property.ReadOnlyStringWrapper
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableStringValue
 import javafx.collections.ListChangeListener
 import javafx.geometry.Pos
@@ -29,6 +33,9 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
     private val model = resolve<CharacterConflictModel>()
 
     internal var onOpponentSelectedToBeMain: (String) -> Unit = {}
+    private val opponentAbilityProperty = ReadOnlyStringWrapper("")
+    internal val opponentAbility: ReadOnlyStringProperty
+        get() = opponentAbilityProperty.readOnlyProperty
 
     private val isMainOpponent = SimpleBooleanProperty(false)
     private val isMinorOpponent = isMainOpponent.not()
@@ -47,7 +54,7 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
             if (it) disableDragAndDrop()
             else addDragAndDrop()
         }
-        if (! isMainOpponent.value) addDragAndDrop()
+        if (!isMainOpponent.value) addDragAndDrop()
     }
 
     init {
@@ -89,25 +96,41 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
             }
             if (isMinorOpponent.value) style { padding = box(0.px, 0.px, 16.px, 16.px) }
             listOf(
-                CharacterChangeOpponentViewModel::attack to model.attackSectionLabel as ObservableStringValue,
-                CharacterChangeOpponentViewModel::similarities to model.similaritiesSectionLabel as ObservableStringValue,
-                CharacterChangeOpponentViewModel::powerStatusOrAbilities to model.powerStatusOrAbilitiesLabel as ObservableStringValue
+                opponentPropertyField(
+                    model.attackSectionLabel as ObservableStringValue,
+                    CharacterChangeOpponentViewModel::attack,
+                    {}
+                ),
+                opponentPropertyField(
+                    model.similaritiesSectionLabel as ObservableStringValue,
+                    CharacterChangeOpponentViewModel::similarities,
+                    {}
+                ),
+                opponentPropertyField(
+                    model.powerStatusOrAbilitiesLabel as ObservableStringValue,
+                    CharacterChangeOpponentViewModel::powerStatusOrAbilities,
+                    opponentAbilityProperty::set
+                )
             ).forEach {
-                opponentPropertyField(it.second, it.first).apply {
-                    hgrow = Priority.ALWAYS
-                }
+                it.hgrow = Priority.ALWAYS
             }
         }
     }
 
     fun Parent.opponentPropertyField(
         columnLabelProperty: ObservableStringValue,
-        valueProperty: CharacterChangeOpponentViewModel.() -> String
+        valueProperty: CharacterChangeOpponentViewModel.() -> String,
+        onUpdate: (String) -> Unit
     ): Node =
         textarea(itemProperty.select { it?.valueProperty().toProperty() }) {
             prefRowCount = 3
             isWrapText = true
-            existsWhen { model.isLarge.or(model.selectedOpponentPropertyColumn.isEqualTo(columnLabelProperty)) }
+            onLoseFocus { onUpdate(text) }
+            existsWhen {
+                model.isLarge.or(model.selectedOpponentPropertyColumn.booleanBinding(columnLabelProperty) {
+                    it == columnLabelProperty.value
+                })
+            }
         }
 
     private fun Parent.reorderButtons() {
@@ -183,14 +206,16 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
         }
     private var isListening: Boolean = false
 
-    @Synchronized private fun stopListeningForMainOpponent() {
-        if (! isListening) return
+    @Synchronized
+    private fun stopListeningForMainOpponent() {
+        if (!isListening) return
         isListening = false
         itemProperty.removeListener(mainOpponentListener)
         model.mainOpponent.removeListener(mainOpponentListener)
     }
 
-    @Synchronized private fun addMainOpponentListenersIfNeeded() {
+    @Synchronized
+    private fun addMainOpponentListenersIfNeeded() {
         if (isListening) return
         isListening = true
         itemProperty.addListener(mainOpponentListener)

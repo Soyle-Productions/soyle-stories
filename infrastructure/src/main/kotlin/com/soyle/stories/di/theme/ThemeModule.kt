@@ -608,6 +608,7 @@ object ThemeModule {
                 presenter listensTo projectScope.get<ThemeWithCentralConflictChangedNotifier>()
                 presenter listensTo projectScope.get<ChangedCharacterDesireNotifier>()
                 presenter listensTo projectScope.get<ChangedCharacterChangeNotifier>()
+                presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()
 
                 CharacterConflictController(
                     themeId,
@@ -618,6 +619,7 @@ object ThemeModule {
                     presenter,
                     projectScope.get(),
                     presenter,
+                    projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),

@@ -26,5 +26,19 @@ class ChangeCharacterPropertyValueControllerImpl(
         }
     }
 
+    override fun setAbility(themeId: String, characterId: String, ability: String) {
+        val request = ChangeCharacterPropertyValue.RequestModel(
+            UUID.fromString(themeId),
+            UUID.fromString(characterId),
+            ChangeCharacterPropertyValue.Property.Ability,
+            ability
+        )
+        threadTransformer.async {
+            changeCharacterPropertyValue.invoke(
+                request, changeCharacterPropertyValueOutputPort
+            )
+        }
+    }
+
 
 }

@@ -10,5 +10,6 @@ interface CharacterConflictViewListener {
     fun setCentralConflict(centralConflict: String)
     fun setDesire(characterId: String, desire: String)
     fun setCharacterChange(characterId: String, characterChange: String)
+    fun setCharacterAbilities(characterId: String, ability: String)
 
 }

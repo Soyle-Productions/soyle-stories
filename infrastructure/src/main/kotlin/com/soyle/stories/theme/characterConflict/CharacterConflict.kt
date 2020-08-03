@@ -340,6 +340,11 @@ class CharacterConflict : View() {
                 val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@listener
                 viewListener.makeOpponentMainOpponent(perspectiveCharacterId, it)
             }
+            opponentAbility.onChange {
+                if (it == null) return@onChange
+                val opponentId = opponentModel.value?.characterId ?: return@onChange
+                viewListener.setCharacterAbilities(opponentId, it)
+            }
         }
         add(card)
         return card.root

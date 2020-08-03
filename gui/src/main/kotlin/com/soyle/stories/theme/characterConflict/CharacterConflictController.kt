@@ -5,15 +5,14 @@ import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterCo
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.changeCharacterChange.ChangeCharacterChangeController
+import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.updateThemeMetaData.ChangeCentralConflictController
 import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
 import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.AvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
-import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
 import java.util.*
 
@@ -31,7 +30,8 @@ class CharacterConflictController(
     private val useCharacterAsMainOpponentController: UseCharacterAsMainOpponentController,
     private val changeCentralConflictController: ChangeCentralConflictController,
     private val changeSectionValueController: ChangeSectionValueController,
-    private val changeCharacterChangeController: ChangeCharacterChangeController
+    private val changeCharacterChangeController: ChangeCharacterChangeController,
+    private val changeCharacterPropertyController: ChangeCharacterPropertyController
 ) : CharacterConflictViewListener, CharacterIncludedInThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
@@ -91,6 +91,10 @@ class CharacterConflictController(
 
     override fun setCharacterChange(characterId: String, characterChange: String) {
         changeCharacterChangeController.changeCharacterChange(themeId.toString(), characterId, characterChange)
+    }
+
+    override fun setCharacterAbilities(characterId: String, ability: String) {
+        changeCharacterPropertyController.setAbility(themeId.toString(), characterId, ability)
     }
 
 }
