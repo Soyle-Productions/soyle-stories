@@ -8,5 +8,6 @@ interface CharacterConflictViewListener {
     fun addOpponent(perspectiveCharacterId: String, characterId: String)
     fun makeOpponentMainOpponent(perspectiveCharacterId: String, characterId: String)
     fun setCentralConflict(centralConflict: String)
+    fun setDesire(characterId: String, desire: String)
 
 }

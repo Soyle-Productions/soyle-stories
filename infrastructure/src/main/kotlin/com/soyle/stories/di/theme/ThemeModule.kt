@@ -3,6 +3,7 @@ package com.soyle.stories.di.theme
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInThemeUseCase
+import com.soyle.stories.characterarc.changeSectionValue.*
 import com.soyle.stories.characterarc.eventbus.ChangeCharacterPropertyValueNotifier
 import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalStoryNotifier
 import com.soyle.stories.characterarc.eventbus.RenameCharacterNotifier
@@ -93,6 +94,8 @@ import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicI
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOppositionUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
+import com.soyle.stories.theme.usecases.changeCharacterDesire.ChangeCharacterDesire
+import com.soyle.stories.theme.usecases.changeCharacterDesire.ChangeCharacterDesireUseCase
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValuesUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
@@ -206,6 +209,7 @@ object ThemeModule {
         provide<UseCharacterAsMainOpponent> { UseCharacterAsMainOpponentUseCase(get()) }
         provide<ListAvailableCharactersToUseAsOpponents> { ListAvailableCharactersToUseAsOpponentsUseCase(get(), get()) }
         provide<ChangeCentralConflict> { ChangeCentralConflictUseCase(get()) }
+        provide<ChangeCharacterDesire> { ChangeCharacterDesireUseCase(get(), get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers() {
@@ -215,6 +219,7 @@ object ThemeModule {
         provide(OpponentCharacterReceiver::class) { OpponentCharacterNotifier() }
         provide(RenamedThemeReceiver::class) { RenamedThemeNotifier() }
         provide(ThemeWithCentralConflictChangedReceiver::class) { ThemeWithCentralConflictChangedNotifier() }
+        provide(ChangedCharacterDesireReceiver::class) { ChangedCharacterDesireNotifier() }
 
 
         provide(CreateTheme.OutputPort::class) {
@@ -271,6 +276,9 @@ object ThemeModule {
         }
         provide(UseCharacterAsMainOpponent.OutputPort::class) {
             UseCharacterAsMainOpponentOutput(get())
+        }
+        provide(ChangeCharacterDesire.OutputPort::class) {
+            ChangeCharacterDesireOutput(get())
         }
     }
 
@@ -332,6 +340,9 @@ object ThemeModule {
         }
         provide<ChangeCentralConflictController> {
             ChangeCentralConflictControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide<ChangeSectionValueController> {
+            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -584,6 +595,7 @@ object ThemeModule {
 
                 presenter listensTo projectScope.get<OpponentCharacterNotifier>()
                 presenter listensTo projectScope.get<ThemeWithCentralConflictChangedNotifier>()
+                presenter listensTo projectScope.get<ChangedCharacterDesireNotifier>()
 
                 CharacterConflictController(
                     themeId,
@@ -594,6 +606,7 @@ object ThemeModule {
                     presenter,
                     projectScope.get(),
                     presenter,
+                    projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),

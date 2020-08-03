@@ -172,29 +172,39 @@ class CharacterConflict : View() {
     private fun Parent.characterChangeFields(): Node {
         return responsiveBox(model.isSmall, hSpacing = 8.0, vSpacing = 8.0) {
             listOf(
-                characterChangeField(model.desireLabel, model.desire),
-                characterChangeField(model.psychologicalWeaknessLabel, model.psychologicalWeakness),
-                characterChangeField(model.moralWeaknessLabel, model.moralWeakness),
-                characterChangeField(model.characterChangeLabel, model.characterChange)
+                characterChangeField(model.desireLabel, model.desire, ::setDesire),
+                characterChangeField(model.psychologicalWeaknessLabel, model.psychologicalWeakness) {},
+                characterChangeField(model.moralWeaknessLabel, model.moralWeakness) {},
+                characterChangeField(model.characterChangeLabel, model.characterChange) {}
             ).onEach {
                 it.hgrow = Priority.ALWAYS
             }
         }
     }
 
+    private fun setDesire(desire: String)
+    {
+        val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
+        viewListener.setDesire(perspectiveCharacterId, desire)
+    }
+
     private fun Parent.characterChangeField(
         labelProperty: ObservableValue<String>,
-        valueProperty: ObservableValue<String>
+        valueProperty: ObservableValue<String>,
+        setCharacterChangeField: (String) -> Unit
     ): Field {
         return field {
             textProperty.bind(labelProperty)
             characterChangeInput(valueProperty).apply {
                 hgrow = Priority.ALWAYS
+                onLoseFocus {
+                    setCharacterChangeField(text)
+                }
             }
         }
     }
 
-    private fun Parent.characterChangeInput(valueProperty: ObservableValue<String>): Node {
+    private fun Parent.characterChangeInput(valueProperty: ObservableValue<String>): TextInputControl {
         return textfield(valueProperty)
     }
 

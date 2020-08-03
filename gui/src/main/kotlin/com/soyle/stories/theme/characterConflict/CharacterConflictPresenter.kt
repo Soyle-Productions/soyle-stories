@@ -1,10 +1,12 @@
 package com.soyle.stories.theme.characterConflict
 
+import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterDesireReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.updateThemeMetaData.ThemeWithCentralConflictChangedReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.OpponentCharacterReceiver
+import com.soyle.stories.theme.usecases.changeCharacterDesire.ChangedCharacterDesire
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
@@ -21,7 +23,8 @@ class CharacterConflictPresenter(
     themeId: String,
     private val view: View.Nullable<CharacterConflictViewModel>
 ) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
-    ListAvailableCharactersToUseAsOpponents.OutputPort, OpponentCharacterReceiver, ThemeWithCentralConflictChangedReceiver {
+    ListAvailableCharactersToUseAsOpponents.OutputPort, OpponentCharacterReceiver,
+    ThemeWithCentralConflictChangedReceiver, ChangedCharacterDesireReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -136,6 +139,18 @@ class CharacterConflictPresenter(
         view.updateOrInvalidated {
             copy(
                 centralConflict = themeWithCentralConflictChanged.centralConflict
+            )
+        }
+    }
+
+    override suspend fun receiveChangedCharacterDesire(changedCharacterDesire: ChangedCharacterDesire) {
+        if (changedCharacterDesire.themeId != themeId) return
+        view.updateOrInvalidated {
+            if (selectedPerspectiveCharacter?.characterId != changedCharacterDesire.characterId.toString())
+                return@updateOrInvalidated this
+
+            copy(
+                desire = changedCharacterDesire.newValue
             )
         }
     }

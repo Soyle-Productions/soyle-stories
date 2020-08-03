@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.characterConflict
 
+import com.soyle.stories.characterarc.changeSectionValue.ChangeSectionValueController
 import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterController
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
@@ -27,7 +28,8 @@ class CharacterConflictController(
     private val useCharacterAsOpponentController: UseCharacterAsOpponentController,
     private val promoteMinorCharacterController: PromoteMinorCharacterController,
     private val useCharacterAsMainOpponentController: UseCharacterAsMainOpponentController,
-    private val changeCentralConflictController: ChangeCentralConflictController
+    private val changeCentralConflictController: ChangeCentralConflictController,
+    private val changeSectionValueController: ChangeSectionValueController
 ) : CharacterConflictViewListener, CharacterIncludedInThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
@@ -79,6 +81,10 @@ class CharacterConflictController(
 
     override fun setCentralConflict(centralConflict: String) {
         changeCentralConflictController.changeCentralConflict(themeId.toString(), centralConflict)
+    }
+
+    override fun setDesire(characterId: String, desire: String) {
+        changeSectionValueController.changeDesire(themeId.toString(), characterId, desire)
     }
 
 }
