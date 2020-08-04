@@ -209,6 +209,7 @@ class Theme(
         (getMajorCharacterById(characterId)
             ?: throw CharacterIsNotMajorCharacterInTheme(characterId.uuid, id.uuid))
 
+
     fun removeCharacter(characterId: Character.Id): Either<ThemeException, Theme> {
 		verifyCharacterInTheme(characterId)?.let { return it.left() }
         return copy(

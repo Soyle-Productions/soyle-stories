@@ -7,7 +7,8 @@ import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 
 class CharacterArcSectionRepositoryDouble(
     private val onAddNewCharacterArcSections: (List<CharacterArcSection>) -> Unit = {},
-    private val onUpdateCharacterArcSections: (CharacterArcSection) -> Unit = {}
+    private val onUpdateCharacterArcSections: (CharacterArcSection) -> Unit = {},
+    private val onRemoveCharacterArcSections: (List<CharacterArcSection>) -> Unit = {}
 ) : CharacterArcSectionRepository {
 
     val characterArcSections = mutableMapOf<CharacterArcSection.Id, CharacterArcSection>()
@@ -40,6 +41,7 @@ class CharacterArcSectionRepositoryDouble(
         characterArcSections.values.filter { it.themeId == themeId }
 
     override suspend fun removeArcSections(sections: List<CharacterArcSection>) {
+        onRemoveCharacterArcSections(sections)
         sections.forEach {
             characterArcSections.remove(it.id)
         }

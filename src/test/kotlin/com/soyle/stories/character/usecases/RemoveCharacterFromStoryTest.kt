@@ -1,8 +1,3 @@
-/**
- * Created by Brendan
- * Date: 2/27/2020
- * Time: 10:31 PM
- */
 package com.soyle.stories.character.usecases
 
 import arrow.core.Either
@@ -11,270 +6,173 @@ import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
+import com.soyle.stories.common.shouldBe
+import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
+import com.soyle.stories.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
+import com.soyle.stories.storyevent.characterDoesNotExist
+import com.soyle.stories.theme.asCharacterArcSection
+import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.*
 
 class RemoveCharacterFromStoryTest {
 
-    private fun given(
-        characters: List<Character>,
-        themes: List<Theme>,
-		characterArcSections: List<CharacterArcSection> = emptyList(),
-        deleteCharacterWithId: (Character.Id) -> Unit = {},
-        updateThemes: (List<Theme>) -> Unit = {},
-        deleteThemes: (List<Theme>) -> Unit = {},
-        deleteCharacterArcSections: (List<CharacterArcSection>) -> Unit = {}
-    ): (UUID) -> Either<*, com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory.ResponseModel> {
-        val repo = object : com.soyle.stories.character.repositories.CharacterRepository,
-            com.soyle.stories.character.repositories.ThemeRepository, CharacterArcSectionRepository {
-            override suspend fun addNewCharacter(character: Character) = Unit
-            override suspend fun getCharacterById(characterId: Character.Id): Character? =
-                characters.find { it.id == characterId }
+    // pre conditions
+    private val themes = generateSequence { makeTheme() }
+    private val character = makeCharacter()
 
-            override suspend fun deleteCharacterWithId(characterId: Character.Id) =
-                deleteCharacterWithId.invoke(characterId)
+    // input
+    private val characterId = character.id.uuid
 
-            override suspend fun updateCharacter(character: Character) {
+    // post conditions
+    private var removedCharacter: Character.Id? = null
+    private var updatedThemes: List<Theme>? = null
+    private var removedArcSections: List<CharacterArcSection>? = null
 
-            }
-
-            override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getThemesWithCharacterIncluded(characterId: Character.Id): List<Theme> =
-                themes.filter {
-                    it.containsCharacter(characterId)
-                }
-
-            override suspend fun updateThemes(themes: List<Theme>) = updateThemes.invoke(themes)
-            override suspend fun deleteThemes(themes: List<Theme>) = deleteThemes.invoke(themes)
-            override suspend fun addNewCharacterArcSections(characterArcSections: List<CharacterArcSection>) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getCharacterArcSectionById(characterArcSectionId: CharacterArcSection.Id): CharacterArcSection? {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getCharacterArcSectionsById(characterArcSectionIds: Set<CharacterArcSection.Id>): List<CharacterArcSection> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getCharacterArcSectionsForCharacter(characterId: Character.Id): List<CharacterArcSection> = characterArcSections.filter { it.characterId == characterId }
-            override suspend fun getCharacterArcSectionsForTheme(themeId: Theme.Id): List<CharacterArcSection> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getCharacterArcSectionsForCharacterInTheme(
-                characterId: Character.Id,
-                themeId: Theme.Id
-            ): List<CharacterArcSection> {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun removeArcSections(sections: List<CharacterArcSection>) {
-                deleteCharacterArcSections.invoke(sections)
-            }
-
-            override suspend fun updateCharacterArcSection(characterArcSection: CharacterArcSection) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getThemeById(id: Theme.Id): Theme? {
-                TODO("Not yet implemented")
-            }
-        }
-        val useCase: com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory =
-            com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase(
-                repo,
-                repo,
-                repo
-            )
-        val output = object : com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory.OutputPort {
-            var result: Either<Exception, com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory.ResponseModel>? = null
-            override fun receiveRemoveCharacterFromStoryFailure(failure: Exception) {
-                result = failure.left()
-            }
-
-            override fun receiveRemoveCharacterFromStoryResponse(response: com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory.ResponseModel) {
-                result = response.right()
-            }
-        }
-        return {
-            runBlocking {
-                useCase.invoke(it, output)
-            }
-            output.result!!
-        }
-    }
-
-    val characterUUID = UUID.randomUUID()
+    // output
+    private var responseModel: RemoveCharacterFromStory.ResponseModel? = null
 
     @Nested
-    inner class GivenCharacterDoesNotExist {
+    inner class Degenerates {
 
-        val useCase = given(emptyList(), emptyList())
+        private inline fun <reified T : Throwable> degenerate(): T
+        {
+            val t = assertThrows<T> {
+                removeCharacterFromStory()
+            }
+            assertNull(removedCharacter)
+            assertNull(updatedThemes)
+            assertNull(responseModel)
+            return t
+        }
 
         @Test
-        fun `should output character does not exist error`() {
-            val (result) = useCase.invoke(characterUUID) as Either.Left
-            result as CharacterDoesNotExist
-            assertEquals(characterUUID, result.characterId)
+        fun `character doesn't exist`() {
+            degenerate<CharacterDoesNotExist>() shouldBe characterDoesNotExist(characterId)
         }
 
     }
 
     @Nested
-    inner class OnSuccess {
+    inner class `Happy Paths` {
 
-        fun buildCharacter() = makeCharacter(
-            Character.Id(UUID.randomUUID()),
-            Project.Id(),
-            "Character Name"
-        )
+        init {
+            givenCharacter()
+        }
 
-        val character = makeCharacter(
-            Character.Id(characterUUID),
-          Project.Id(),
-            "Character Name"
-        )
+        @AfterEach
+        fun `check post conditions`() {
+            assertEquals(character.id, removedCharacter)
+        }
 
-        val themeWithOnlyCharacter = (Theme.takeNoteOf(Project.Id(), "").flatMap {
-            it.withCharacterIncluded(
-                character.id,
-                character.name,
-                character.media
-            ).right()
-        } as Either.Right).b
-        val themesWithCharacter = listOf(
-            (Theme.takeNoteOf(Project.Id(), "").flatMap {
-                it.withCharacterIncluded(
-                    character.id,
-                    character.name,
-                    character.media
-                ).right()
+        @AfterEach
+        fun `check output`() {
+            responseModel!!.removedCharacter shouldBe {
+                assertEquals(characterId, it.characterId)
             }
-                .flatMap {
-                    val character1 = buildCharacter()
-                    it.withCharacterIncluded(character1.id, character1.name, character1.media).right()
-                } as Either.Right).b,
-            (Theme.takeNoteOf(Project.Id(), "").flatMap {
-                it.withCharacterIncluded(
-                    character.id,
-                    character.name,
-                    character.media
-                ).right()
+        }
+
+        @Test
+        fun `character unused anywhere else`() {
+            removeCharacterFromStory()
+            assertNull(updatedThemes)
+            assertTrue(responseModel!!.removedCharacterFromThemes.isEmpty())
+        }
+
+        @Test
+        fun `character included in a theme`() {
+            givenANumberOfThemesIncludeCharacter(1)
+            removeCharacterFromStory()
+            updatedThemes!! shouldBe {
+                assertEquals(themeRepository.themes.values.first().id, it.single().id)
+                it.single() shouldBe ::themeWithoutCharacter
             }
-                .flatMap {
-                    val character1 = buildCharacter()
-                    it.withCharacterIncluded(character1.id, character1.name, character1.media).right()
-                } as Either.Right).b
-        )
-        val allThemesWithCharacter = (themesWithCharacter + themeWithOnlyCharacter).onEach {
-            assertTrue(it.containsCharacter(character.id))
-        }
-        val themesWithoutCharacter = listOf(
-            (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b,
-            (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b
-        )
-        val useCase = given(
-            listOf(character),
-            themes = themesWithCharacter + themesWithoutCharacter
-        )
-
-        @Test
-        fun `output should include provided character id`() {
-            val (result) = useCase(characterUUID) as Either.Right
-            assertEquals(characterUUID, result.characterId)
-        }
-
-        @Test
-        fun `output should include ids of affected themes`() {
-            val (result) = useCase(characterUUID) as Either.Right
-            assertEquals(themesWithCharacter.map { it.id.uuid }.toSet(), result.affectedThemeIds.toSet())
-        }
-
-        @Test
-        fun `character should be deleted`() {
-            var deletedCharacterId: UUID? = null
-            val useCase = given(
-                listOf(character),
-                themes = allThemesWithCharacter + themesWithoutCharacter,
-                deleteCharacterWithId = {
-                    deletedCharacterId = it.uuid
-                }
-            )
-            useCase(characterUUID)
-            assertEquals(characterUUID, deletedCharacterId)
-        }
-
-        @Test
-        fun `themes with multiple characters should be updated`() {
-            var updatedThemes: List<Theme>? = null
-            val useCase = given(
-                listOf(character),
-                themes = allThemesWithCharacter + themesWithoutCharacter,
-                updateThemes = {
-                    updatedThemes = it
-                }
-            )
-            val (result) = useCase(characterUUID) as Either.Right
-            assertEquals(
-                themesWithCharacter.map { it.id }.toSet(),
-                updatedThemes!!.map { it.id }.toSet()
-            )
-            updatedThemes!!.forEach {
-                assertFalse(it.containsCharacter(character.id))
+            assertNull(removedArcSections)
+            responseModel!!.removedCharacterFromThemes.single().shouldBe {
+                assertEquals(themeRepository.themes.keys.first().uuid, it.themeId)
+                assertEquals(characterId, it.characterId)
             }
-            assertEquals(themesWithCharacter.map { it.id.uuid }.toSet(), result.affectedThemeIds.toSet())
         }
 
         @Test
-        fun `themes with only character should be deleted`() {
-            var deletedThemes: List<Theme>? = null
-            val useCase = given(
-                listOf(character),
-                themes = allThemesWithCharacter + themesWithoutCharacter,
-                deleteThemes = {
-                    deletedThemes = it
-                }
-            )
-            val (result) = useCase(characterUUID) as Either.Right
-            assertEquals(setOf(themeWithOnlyCharacter.id), deletedThemes!!.map { it.id }.toSet())
-            deletedThemes!!.forEach {
-                assertFalse(it.containsCharacter(character.id))
+        fun `character is major character in theme`() {
+            givenANumberOfThemesIncludeCharacter(1, asMajorCharacter = true)
+            removeCharacterFromStory()
+            updatedThemes!! shouldBe {
+                assertEquals(themeRepository.themes.values.first().id, it.single().id)
+                it.single() shouldBe ::themeWithoutCharacter
             }
-            assertEquals(setOf(themeWithOnlyCharacter.id.uuid), result.removedThemeIds.toSet())
+            removedArcSections!!
+            responseModel!!.removedCharacterFromThemes.single().shouldBe {
+                assertEquals(themeRepository.themes.keys.first().uuid, it.themeId)
+                assertEquals(characterId, it.characterId)
+            }
         }
 
-        @Test
-        fun `character arc sections for character should be deleted`() {
-			val sections = List(10) {
-				CharacterArcSection.planNewCharacterArcSection(
-					character.id, Theme.Id(UUID.randomUUID()), CharacterArcTemplateSection(
-						CharacterArcTemplateSection.Id(
-							UUID.randomUUID()
-						), ""
-					)
-				)
-			}
-            val deletedSections = mutableListOf<CharacterArcSection>()
-            given(
-                listOf(character),
-                themes = allThemesWithCharacter + themesWithoutCharacter,
-                characterArcSections = sections,
-				deleteCharacterArcSections = {
-                    deletedSections.addAll(it)
+    }
+
+    private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = {
+        updatedThemes = updatedThemes?.plus(it) ?: listOf(it)
+    })
+    private val characterRepository = CharacterRepositoryDouble(onDeleteCharacterWithId = {
+        removedCharacter = it
+    })
+    private val arcSectionRepository = CharacterArcSectionRepositoryDouble(onRemoveCharacterArcSections = {
+        removedArcSections = it
+    })
+
+    private fun givenCharacter() {
+        characterRepository.characters[character.id] = character
+    }
+    private fun givenANumberOfThemesIncludeCharacter(count: Int, asMajorCharacter: Boolean = false)
+    {
+        val themes = themes.take(count).map {
+            it.withCharacterIncluded(character.id, character.name, character.media)
+                .let {
+                    if (asMajorCharacter) it.withCharacterPromoted(character.id)
+                    else it
                 }
-            ).invoke(characterUUID)
-			assertEquals(sections.map { it.id }.toSet(), deletedSections.map { it.id }.toSet())
+        }.toList()
+        themeRepository.themes.putAll(themes.associateBy { it.id })
+        if (asMajorCharacter) {
+            arcSectionRepository.characterArcSections.putAll(
+                themes.flatMap {
+                    it.characters.flatMap { it.thematicSections }
+                }.map {
+                    it.asCharacterArcSection(null)
+                }.associateBy { it.id }
+            )
         }
+    }
+
+    private fun removeCharacterFromStory()
+    {
+        val useCase: RemoveCharacterFromStory = RemoveCharacterFromStoryUseCase(
+            characterRepository, themeRepository, arcSectionRepository
+        )
+        val output = object : RemoveCharacterFromStory.OutputPort {
+            override fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
+                responseModel = response
+            }
+        }
+        runBlocking {
+            useCase.invoke(characterId, output)
+        }
+    }
+
+    private fun themeWithoutCharacter(theme: Theme)
+    {
+        assertFalse(theme.containsCharacter(character.id))
 
     }
 
