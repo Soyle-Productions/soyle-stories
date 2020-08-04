@@ -9,7 +9,8 @@ import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.*
 
-fun ThemeDoesNotExist.themeIdMustEqual(value: Any) = assert(themeId == value) { "themeId of ThemeDoesNotExist does not equal $value" }
+fun ThemeDoesNotExist.themeIdMustEqual(value: Any) =
+    assert(themeId == value) { "themeId of ThemeDoesNotExist does not equal $value" }
 
 fun themeNameCannotBeBlank(actual: Any?) {
     actual as ThemeNameCannotBeBlank
@@ -20,31 +21,64 @@ fun themeDoesNotExist(themeId: UUID): (Any?) -> Unit = { actual ->
     assertEquals(themeId, actual.themeId) { "Unexpected theme id for ThemeDoesNotExist error" }
 }
 
-fun characterNotInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
+fun characterNotInTheme(themeId: UUID, characterId: UUID) = fun(actual: Any?) {
     actual as CharacterNotInTheme
     assertEquals(themeId, actual.themeId) { "Character not in theme exception does not have expected theme id" }
-    assertEquals(characterId, actual.characterId) { "Character not in theme exception does not have expected character id" }
+    assertEquals(
+        characterId,
+        actual.characterId
+    ) { "Character not in theme exception does not have expected character id" }
 }
 
-fun characterIsNotMajorCharacterInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
+fun characterIsNotMajorCharacterInTheme(themeId: UUID, characterId: UUID) = fun(actual: Any?) {
     actual as CharacterIsNotMajorCharacterInTheme
     if (themeId == actual.characterId && characterId == actual.themeId) {
-        error("Character not major character in theme exception has characterId and themeId swapped.\n" +
-                "Should be themeId = $themeId and characterId = $characterId.\n" +
-                "Instead found themeId = $characterId and characterId = $themeId")
+        error(
+            "Character not major character in theme exception has characterId and themeId swapped.\n" +
+                    "Should be themeId = $themeId and characterId = $characterId.\n" +
+                    "Instead found themeId = $characterId and characterId = $themeId"
+        )
     }
-    assertEquals(themeId, actual.themeId) { "Character not major character in theme exception does not have expected theme id" }
-    assertEquals(characterId, actual.characterId) { "Character not major character in theme exception does not have expected character id" }
+    assertEquals(
+        themeId,
+        actual.themeId
+    ) { "Character not major character in theme exception does not have expected theme id" }
+    assertEquals(
+        characterId,
+        actual.characterId
+    ) { "Character not major character in theme exception does not have expected character id" }
 }
 
-fun characterIsAlreadyMajorCharacterInTheme(themeId: UUID, characterId: UUID) = fun (actual: Any?) {
+fun characterIsNotAnOpponentOfPerspectiveCharacter(themeId: UUID, characterId: UUID, perspectiveCharacterId: UUID) =
+    fun(actual: Any?) {
+        actual as CharacterIsNotAnOpponentOfPerspectiveCharacter
+        assertEquals(
+            themeId,
+            actual.themeId
+        ) { "Character not opponent of perspective character exception does not have expected theme id" }
+        assertEquals(
+            characterId,
+            actual.characterId
+        ) { "Character not opponent of perspective character exception does not have expected character id" }
+        assertEquals(
+            perspectiveCharacterId,
+            actual.perspectiveCharacterId
+        ) { "Character not opponent of perspective character exception does not have expected perspective character id" }
+    }
+
+fun characterIsAlreadyMajorCharacterInTheme(themeId: UUID, characterId: UUID) = fun(actual: Any?) {
     actual as CharacterIsAlreadyMajorCharacterInTheme
-    assertEquals(themeId, actual.themeId) { "Character is already major character in theme exception does not have expected theme id" }
-    assertEquals(characterId, actual.characterId) { "Character is already major character in theme exception does not have expected character id" }
+    assertEquals(
+        themeId,
+        actual.themeId
+    ) { "Character is already major character in theme exception does not have expected theme id" }
+    assertEquals(
+        characterId,
+        actual.characterId
+    ) { "Character is already major character in theme exception does not have expected character id" }
 }
 
-fun symbolNameCannotBeBlank(actual: Any?)
-{
+fun symbolNameCannotBeBlank(actual: Any?) {
     actual as SymbolNameCannotBeBlank
 }
 
@@ -91,7 +125,7 @@ fun valueWebAlreadyHasName(valueWebId: UUID, name: String): (Any?) -> Unit = { a
     assertEquals(name, actual.valueWebName)
 }
 
-fun symbolicRepresentationNotInOppositionValue(oppositionValueId: UUID, symbolicEntityId: UUID) = fun (actual: Any?) {
+fun symbolicRepresentationNotInOppositionValue(oppositionValueId: UUID, symbolicEntityId: UUID) = fun(actual: Any?) {
     actual as SymbolicRepresentationNotInOppositionValue
     assertEquals(oppositionValueId, actual.oppositionValueId)
     assertEquals(symbolicEntityId, actual.symbolicRepresentationId)

@@ -375,6 +375,19 @@ class Theme(
         ).right()
     }
 
+    fun withoutCharacterAsStoryFunctionForPerspectiveCharacter(characterId: Character.Id, perspectiveCharacterId: Character.Id): Theme
+    {
+        mustContainCharacter(characterId)
+        mustContainCharacter(perspectiveCharacterId)
+        val majorCharacter = getMajorCharacter(perspectiveCharacterId)
+        return copy(
+            includedCharacters = includedCharacters
+                .minus(majorCharacter.id)
+                .plus(majorCharacter.id to majorCharacter.clearStoryFunctions(characterId))
+        )
+    }
+
+    @Deprecated("Outdated api.", ReplaceWith("this.withoutCharacterAsStoryFunctionForPerspectiveCharacter(characterId, characterInTheme.id)"))
     fun clearStoryFunctions(
         characterInTheme: MajorCharacter,
         characterId: Character.Id

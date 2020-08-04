@@ -20,6 +20,7 @@ object ThemeNameCannotBeBlank : Exception()
 
 class CharacterAlreadyIncludedInTheme(val characterId: UUID, override val themeId: UUID) : ThemeException()
 class CharacterNotInTheme(override val themeId: UUID, val characterId: UUID) : ThemeException()
+class CharacterIsNotAnOpponentOfPerspectiveCharacter(override val themeId: UUID, val characterId: UUID, val perspectiveCharacterId: UUID) : ThemeException()
 class StoryFunctionAlreadyApplied(
     override val themeId: UUID,
     val perspectiveCharacterId: UUID,

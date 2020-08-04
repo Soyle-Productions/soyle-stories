@@ -11,7 +11,7 @@ interface RenameCharacter {
 
 	interface OutputPort {
 		fun receiveRenameCharacterFailure(failure: CharacterException)
-		fun receiveRenameCharacterResponse(response: ResponseModel)
+		suspend fun receiveRenameCharacterResponse(response: ResponseModel)
 	}
 
 }

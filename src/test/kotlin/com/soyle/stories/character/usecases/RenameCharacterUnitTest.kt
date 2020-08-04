@@ -126,7 +126,7 @@ class RenameCharacterUnitTest {
 				result = failure
 			}
 
-			override fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {
+			override suspend fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {
 				result = response
 			}
 		}
