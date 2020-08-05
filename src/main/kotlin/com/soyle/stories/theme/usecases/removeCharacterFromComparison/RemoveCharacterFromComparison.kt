@@ -8,7 +8,7 @@ interface RemoveCharacterFromComparison {
     suspend operator fun invoke(themeId: UUID, characterId: UUID, outputPort: OutputPort)
 
     interface OutputPort {
-        fun receiveRemoveCharacterFromComparisonResponse(response: RemovedCharacterFromTheme)
+        suspend fun receiveRemoveCharacterFromComparisonResponse(response: RemovedCharacterFromTheme)
         suspend fun characterArcDeleted(response: DeletedCharacterArc)
     }
 }

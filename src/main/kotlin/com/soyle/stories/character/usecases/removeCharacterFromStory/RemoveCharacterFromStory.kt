@@ -12,6 +12,6 @@ interface RemoveCharacterFromStory {
     )
 
     interface OutputPort {
-        fun receiveRemoveCharacterFromStoryResponse(response: ResponseModel)
+        suspend fun receiveRemoveCharacterFromStoryResponse(response: ResponseModel)
     }
 }
