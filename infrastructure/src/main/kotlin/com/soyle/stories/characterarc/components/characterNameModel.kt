@@ -1,6 +1,7 @@
 package com.soyle.stories.characterarc.components
 
-import com.soyle.stories.characterarc.eventbus.RenameCharacterNotifier
+import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
+import com.soyle.stories.characterarc.eventbus.RenameCharacterOutput
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.get
 import com.soyle.stories.gui.View
@@ -27,6 +28,6 @@ fun ProjectScope.characterNameModel(characterId: String, characterName: String):
 {
 	val model = SimpleStringProperty(characterName)
 	val viewImpl = CharacterNameModel(this, characterId, model)
-	get<RenameCharacterNotifier>().addListener(viewImpl.presenter)
+	get<RenamedCharacterNotifier>().addListener(viewImpl.presenter)
 	return viewImpl
 }

@@ -7,7 +7,7 @@ import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterIte
 import com.soyle.stories.gui.View
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsViewModel
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 
 class BuildNewCharacterPresenter(
   private val view: View.Nullable<StoryEventDetailsViewModel>
@@ -32,8 +32,7 @@ class BuildNewCharacterPresenter(
 		// no-op
 	}
 
-	override suspend fun characterIsOpponent(response: OpponentCharacter) {
-
-		// do nothing
+	override suspend fun characterIsOpponent(response: CharacterUsedAsOpponent) {
+		/* no-op */
 	}
 }

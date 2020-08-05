@@ -9,12 +9,13 @@ import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveChar
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
 import kotlin.coroutines.coroutineContext
 
-class RemoveCharacterFromComparisonNotifier(
+class RemoveCharacterFromComparisonOutput(
+    private val removedCharacterFromThemeReceiver: RemovedCharacterFromThemeReceiver,
     private val deleteCharacterArcNotifier: DeleteCharacterArcNotifier
-) : Notifier<RemoveCharacterFromComparison.OutputPort>(), RemoveCharacterFromComparison.OutputPort {
+) : RemoveCharacterFromComparison.OutputPort {
 
-    override fun receiveRemoveCharacterFromComparisonResponse(response: RemovedCharacterFromTheme) {
-        notifyAll { it.receiveRemoveCharacterFromComparisonResponse(response) }
+    override suspend fun receiveRemoveCharacterFromComparisonResponse(response: RemovedCharacterFromTheme) {
+        removedCharacterFromThemeReceiver.receiveRemovedCharacterFromTheme(response)
     }
 
     override suspend fun characterArcDeleted(response: DeletedCharacterArc) {

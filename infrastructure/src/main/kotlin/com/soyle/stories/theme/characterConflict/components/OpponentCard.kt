@@ -1,12 +1,15 @@
 package com.soyle.stories.theme.characterConflict.components
 
+import com.soyle.stories.characterarc.components.CharacterNamePresenter
+import com.soyle.stories.common.NodeScope
 import com.soyle.stories.common.components.ComponentsStyles
-import com.soyle.stories.common.components.card
 import com.soyle.stories.common.components.cardHeader
 import com.soyle.stories.common.existsWhen
-import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.onLoseFocus
+import com.soyle.stories.di.DI
+import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.gui.View
 import com.soyle.stories.theme.characterConflict.*
 import com.soyle.stories.theme.characterConflict.addDragAndDrop
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
@@ -15,7 +18,6 @@ import javafx.beans.binding.BooleanExpression
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.ReadOnlyStringWrapper
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableStringValue
 import javafx.collections.ListChangeListener
 import javafx.geometry.Pos
@@ -33,6 +35,7 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
     private val model = resolve<CharacterConflictModel>()
 
     internal var onOpponentSelectedToBeMain: (String) -> Unit = {}
+    internal var onRemoveOpponent: (String) -> Unit = {}
     private val opponentAttackProperty = ReadOnlyStringWrapper("")
     internal val opponentAttack: ReadOnlyStringProperty
         get() = opponentAttackProperty.readOnlyProperty
@@ -42,6 +45,7 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
     private val opponentAbilityProperty = ReadOnlyStringWrapper("")
     internal val opponentAbility: ReadOnlyStringProperty
         get() = opponentAbilityProperty.readOnlyProperty
+
 
     private val isMainOpponent = SimpleBooleanProperty(false)
     private val isMinorOpponent = isMainOpponent.not()
@@ -87,6 +91,13 @@ class OpponentCard : ItemFragment<CharacterChangeOpponentViewModel?>() {
                 action {
                     val opponentId = itemProperty.value?.characterId ?: return@action
                     onOpponentSelectedToBeMain(opponentId)
+                }
+            }
+            button("Remove Opponent") {
+                childrenFocusProperties.add(focusedProperty())
+                action {
+                    val opponentId = itemProperty.value?.characterId ?: return@action
+                    onRemoveOpponent(opponentId)
                 }
             }
         }

@@ -1,6 +1,9 @@
 package com.soyle.stories.characterarc.characterList
 
+import com.soyle.stories.common.Model
 import com.soyle.stories.common.bindImmutableList
+import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
@@ -15,7 +18,10 @@ import tornadofx.toProperty
  * Date: 2/10/2020
  * Time: 10:41 AM
  */
-class CharacterListModel : ItemViewModel<CharacterListViewModel>(), CharacterListView {
+class CharacterListModel : Model<ProjectScope, CharacterListViewModel>(ProjectScope::class) {
+
+    override val applicationScope: ApplicationScope
+        get() = scope.applicationScope
 
     val selectedItem = SimpleObjectProperty<Any?>(null)
     val characters = bindImmutableList(CharacterListViewModel::characters)
@@ -23,7 +29,7 @@ class CharacterListModel : ItemViewModel<CharacterListViewModel>(), CharacterLis
     val hasCharacters: ReadOnlyBooleanProperty = bind { (!item?.characters.isNullOrEmpty()).toProperty() }
     val invalid = SimpleBooleanProperty(true)
 
-    fun viewModel() = CharacterListViewModel(
+    override fun viewModel() = CharacterListViewModel(
         characterTreeItems.mapNotNull {
             val itemValue = it.value
             if (itemValue !is CharacterTreeItemViewModel) null
@@ -32,16 +38,5 @@ class CharacterListModel : ItemViewModel<CharacterListViewModel>(), CharacterLis
             }
         }
     )
-
-    override suspend fun displayNewViewModel(list: CharacterListViewModel) {
-        item = list
-        invalid.set(false)
-    }
-
-    override suspend fun invalidate() {
-        invalid.set(true)
-    }
-
-    override suspend fun getViewModel(): CharacterListViewModel? = viewModel()
 
 }

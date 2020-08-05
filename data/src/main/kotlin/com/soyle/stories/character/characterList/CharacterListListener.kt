@@ -1,9 +1,7 @@
 package com.soyle.stories.character.characterList
 
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.character.buildNewCharacter.CreatedCharacterReceiver
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
+import com.soyle.stories.character.renameCharacter.RenamedCharacterReceiver
 
-interface CharacterListListener {
-
-	fun receiveCharacterListUpdate(characters: List<CharacterItem>)
-
-}
+interface CharacterListListener : CreatedCharacterReceiver, RenamedCharacterReceiver, RemovedCharacterReceiver

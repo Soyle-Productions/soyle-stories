@@ -1,12 +1,12 @@
 package com.soyle.stories.di.theme
 
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
+import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInThemeUseCase
 import com.soyle.stories.characterarc.changeSectionValue.*
 import com.soyle.stories.characterarc.eventbus.ChangeCharacterPropertyValueNotifier
-import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalStoryNotifier
-import com.soyle.stories.characterarc.eventbus.RenameCharacterNotifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
@@ -29,7 +29,6 @@ import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeNotifier
 import com.soyle.stories.theme.changeCharacterChange.*
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyController
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyControllerImpl
-import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedNotifier
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValueControllerImpl
 import com.soyle.stories.theme.characterConflict.*
@@ -55,7 +54,10 @@ import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
 import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.deleteValueWebDialog.*
 import com.soyle.stories.theme.includeCharacterInTheme.*
-import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonNotifier
+import com.soyle.stories.theme.removeCharacterAsOpponent.*
+import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonOutput
+import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeNotifier
+import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebControllerImpl
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebNotifier
@@ -86,9 +88,7 @@ import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
 import com.soyle.stories.theme.updateThemeMetaData.*
-import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
-import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentControllerImpl
-import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentOutput
+import com.soyle.stories.theme.useCharacterAsMainOpponent.*
 import com.soyle.stories.theme.useCharacterAsOpponent.*
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWebUseCase
@@ -127,6 +127,8 @@ import com.soyle.stories.theme.usecases.listThemes.ListThemes
 import com.soyle.stories.theme.usecases.listThemes.ListThemesUseCase
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInTheme
 import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInThemeUseCase
+import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.RemoveCharacterAsOpponent
+import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.RemoveCharacterAsOpponentUseCase
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWebUseCase
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
@@ -218,17 +220,21 @@ object ThemeModule {
         provide<ChangeCharacterPsychologicalWeakness> { ChangeCharacterPsychologicalWeaknessUseCase(get(), get()) }
         provide<ChangeCharacterMoralWeakness> { ChangeCharacterMoralWeaknessUseCase(get(), get()) }
         provide<ChangeCharacterChange> { ChangeCharacterChangeUseCase(get()) }
+        provide<RemoveCharacterAsOpponent> { RemoveCharacterAsOpponentUseCase(get()) }
     }
 
     private fun InScope<ProjectScope>.notifiers() {
         provide(SymbolAddedToThemeReceiver::class) { SymbolAddedToThemeNotifier() }
         provide(CreatedThemeReceiver::class) { CreatedThemeNotifier() }
         provide(CharacterIncludedInThemeReceiver::class) { CharacterIncludedInThemeNotifier() }
-        provide(OpponentCharacterReceiver::class) { OpponentCharacterNotifier() }
+        provide(CharacterUsedAsOpponentReceiver::class) { CharacterUsedAsOpponentNotifier() }
+        provide(CharacterUsedAsMainOpponentReceiver::class) { CharacterUsedAsMainOpponentNotifier() }
         provide(RenamedThemeReceiver::class) { RenamedThemeNotifier() }
         provide(ThemeWithCentralConflictChangedReceiver::class) { ThemeWithCentralConflictChangedNotifier() }
         provide(ChangedCharacterArcSectionValueReceiver::class) { ChangedCharacterArcSectionValueNotifier() }
         provide(ChangedCharacterChangeReceiver::class) { ChangedCharacterChangeNotifier() }
+        provide(CharacterRemovedAsOpponentReceiver::class) { CharacterRemovedAsOpponentNotifier() }
+        provide(RemovedCharacterFromThemeReceiver::class) { RemovedCharacterFromThemeNotifier() }
 
 
         provide(CreateTheme.OutputPort::class) {
@@ -284,7 +290,7 @@ object ThemeModule {
             UseCharacterAsOpponentOutput(get(), get())
         }
         provide(UseCharacterAsMainOpponent.OutputPort::class) {
-            UseCharacterAsMainOpponentOutput(get())
+            UseCharacterAsMainOpponentOutput(get(), get())
         }
         provide(ChangeCharacterDesire.OutputPort::class) {
             ChangeCharacterDesireOutput(get())
@@ -297,6 +303,9 @@ object ThemeModule {
         }
         provide(ChangeCharacterChange.OutputPort::class) {
             ChangeCharacterChangeOutput(get())
+        }
+        provide(RemoveCharacterAsOpponent.OutputPort::class) {
+            RemoveCharacterAsOpponentOutput(get())
         }
     }
 
@@ -367,6 +376,9 @@ object ThemeModule {
         }
         provide<ChangeCharacterPerspectivePropertyController> {
             ChangeCharacterPerspectivePropertyControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide(RemoveCharacterAsOpponentController::class) {
+            RemoveCharacterAsOpponentControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
@@ -542,7 +554,7 @@ object ThemeModule {
                 presenter listensTo projectScope.get<AddSymbolicItemToOppositionNotifier>()
                 presenter listensTo projectScope.get<RemoveSymbolicItemNotifier>()
                 presenter listensTo projectScope.get<CharacterIncludedInThemeNotifier>()
-                presenter listensTo projectScope.get<RemoveCharacterFromComparisonNotifier>()
+                presenter listensTo projectScope.get<RemovedCharacterFromThemeNotifier>()
                 presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()
 
                 CharacterValueComparisonController(
@@ -586,8 +598,8 @@ object ThemeModule {
                 )
 
                 presenter listensTo projectScope.get<CreatedCharacterNotifier>()
-                presenter listensTo projectScope.get<RenameCharacterNotifier>()
-                presenter listensTo projectScope.get<RemoveCharacterFromLocalStoryNotifier>()
+                presenter listensTo projectScope.get<RenamedCharacterNotifier>()
+                presenter listensTo projectScope.get<RemovedCharacterNotifier>()
 
                 presenter listensTo projectScope.get<CreateNewLocationNotifier>()
                 presenter listensTo projectScope.get<RenameLocationNotifier>()
@@ -609,42 +621,6 @@ object ThemeModule {
             }
         }
 
-        scoped<CharacterConflictScope> {
-            provide<CharacterConflictViewListener> {
-
-                val presenter = CharacterConflictPresenter(
-                    themeId,
-                    get<CharacterConflictModel>()
-                )
-
-                presenter listensTo projectScope.get<OpponentCharacterNotifier>()
-                presenter listensTo projectScope.get<ThemeWithCentralConflictChangedNotifier>()
-                presenter listensTo projectScope.get<ChangedCharacterArcSectionValueNotifier>()
-                presenter listensTo projectScope.get<ChangedCharacterChangeNotifier>()
-                presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()
-                presenter listensTo projectScope.get<CharacterPerspectivePropertyChangedNotifier>()
-
-                CharacterConflictController(
-                    themeId,
-                    projectScope.applicationScope.get(),
-                    projectScope.get(),
-                    presenter,
-                    projectScope.get(),
-                    presenter,
-                    projectScope.get(),
-                    presenter,
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get()
-                ).also {
-                    it listensTo projectScope.get<CharacterIncludedInThemeNotifier>()
-                }
-            }
-        }
+        CharacterConflictModule
     }
 }

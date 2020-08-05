@@ -1,15 +1,17 @@
 package com.soyle.stories.scene.deleteSceneRamifications.presenters
 
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamificationsViewModel
 
 internal class DeleteCharacterPresenter(
   private val view: View.Nullable<DeleteSceneRamificationsViewModel>
-) : RemoveCharacterFromStory.OutputPort {
+) : RemovedCharacterReceiver {
 
-	override fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
-		val characterId = response.characterId.toString()
+	override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
+		val characterId = characterRemoved.characterId.toString()
 		view.updateOrInvalidated {
 			copy(
 			  scenes = scenes.mapNotNull {
@@ -22,7 +24,5 @@ internal class DeleteCharacterPresenter(
 			)
 		}
 	}
-
-	override fun receiveRemoveCharacterFromStoryFailure(failure: Exception) {}
 
 }

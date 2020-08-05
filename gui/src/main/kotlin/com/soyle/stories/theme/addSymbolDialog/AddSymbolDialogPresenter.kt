@@ -2,9 +2,12 @@ package com.soyle.stories.theme.addSymbolDialog
 
 import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterReceiver
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
+import com.soyle.stories.character.renameCharacter.RenamedCharacterReceiver
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
@@ -33,7 +36,6 @@ import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
 import java.util.*
 import javax.xml.stream.Location
 
@@ -42,7 +44,7 @@ class AddSymbolDialogPresenter(
     oppositionId: String,
     private val view: View.Nullable<AddSymbolDialogViewModel>
 ) : ListAvailableEntitiesToAddToOpposition.OutputPort,
-    CreatedCharacterReceiver, RenameCharacter.OutputPort, RemoveCharacterFromStory.OutputPort,
+    CreatedCharacterReceiver, RenamedCharacterReceiver, RemovedCharacterReceiver,
     CreateNewLocation.OutputPort, RenameLocation.OutputPort, DeleteLocation.OutputPort, SymbolAddedToThemeReceiver,
     RenameSymbol.OutputPort, RemoveSymbolFromTheme.OutputPort, AddSymbolicItemToOpposition.OutputPort {
 
@@ -78,20 +80,20 @@ class AddSymbolDialogPresenter(
         }
     }
 
-    override fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {
-        val characterId = response.characterId.toString()
+    override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
+        val characterId = renamedCharacter.characterId.toString()
         view.updateOrInvalidated {
             copyOrDefault(
                 characters = characters.map {
-                    if (it.characterId == characterId) it.copy(characterName = response.newName)
+                    if (it.characterId == characterId) it.copy(characterName = renamedCharacter.newName)
                     else it
                 }
             )
         }
     }
 
-    override fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
-        val characterId = response.characterId.toString()
+    override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
+        val characterId = characterRemoved.characterId.toString()
         view.updateOrInvalidated {
             copyOrDefault(
                 characters = characters.filterNot { it.characterId == characterId }
@@ -187,8 +189,6 @@ class AddSymbolDialogPresenter(
         completed = completed
     )
 
-    override fun receiveRenameCharacterFailure(failure: CharacterException) {}
-    override fun receiveRemoveCharacterFromStoryFailure(failure: Exception) {}
     override fun receiveCreateNewLocationFailure(failure: LocationException) {}
     override fun receiveRenameLocationFailure(failure: LocationException) {}
     override fun receiveDeleteLocationFailure(failure: LocationException) {}

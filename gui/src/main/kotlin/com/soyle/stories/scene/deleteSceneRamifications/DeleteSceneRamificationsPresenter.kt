@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.deleteSceneRamifications
 
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
@@ -14,7 +15,7 @@ import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMoti
 class DeleteSceneRamificationsPresenter(
   private val view: View.Nullable<DeleteSceneRamificationsViewModel>,
   sceneDeleted: Notifier<DeleteScene.OutputPort>,
-  characterDeleted: Notifier<RemoveCharacterFromStory.OutputPort>,
+  characterDeleted: Notifier<RemovedCharacterReceiver>,
   characterMotivationSet: Notifier<SetMotivationForCharacterInScene.OutputPort>
 ) : GetPotentialChangesFromDeletingScene.OutputPort {
 

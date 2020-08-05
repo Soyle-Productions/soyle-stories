@@ -1,6 +1,6 @@
 package com.soyle.stories.di.scene
 
-import com.soyle.stories.characterarc.eventbus.RemoveCharacterFromLocalStoryNotifier
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
@@ -268,7 +268,7 @@ object SceneModule {
                     DeleteSceneRamificationsPresenter(
                         get<DeleteSceneRamificationsModel>(),
                         projectScope.get<DeleteSceneNotifier>(),
-                        projectScope.get<RemoveCharacterFromLocalStoryNotifier>(),
+                        projectScope.get<RemovedCharacterNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),
                     projectScope.get(),

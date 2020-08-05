@@ -2,6 +2,9 @@ package com.soyle.stories.scene.sceneDetails
 
 import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.character.characterList.LiveCharacterList
+import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.Notifier
@@ -41,7 +44,7 @@ class SceneDetailsPresenter(
 	private val sceneId = UUID.fromString(sceneId)
 
 	init {
-		this listensTo characterList
+		characterList.addListener(this)
 		this listensTo locationList
 		this listensTo characterIncludedInScene
 		this listensTo locationLinkedToScene
@@ -86,29 +89,49 @@ class SceneDetailsPresenter(
 		}
 	}
 
-	override fun receiveCharacterListUpdate(characters: List<CharacterItem>) {
-		view.update {
-			val includedCharacterIds = this?.includedCharacters?.map { it.characterId }?.toSet()
-			  ?: setOf()
-			val characterViewModels = characters.map {
-				CharacterItemViewModel(it.characterId.toString(), it.characterName, "")
-			}
-			val characterNames = characterViewModels.associate { it.characterId to it.characterName }
+	override suspend fun receiveCreatedCharacter(createdCharacter: CreatedCharacter) {
+		view.updateOrInvalidated {
+			val includedCharacterIds = includedCharacters.map { it.characterId }.toSet()
+			val characterViewModels = characters + CharacterItemViewModel(
+				createdCharacter.characterId.toString(), createdCharacter.characterName, createdCharacter.mediaId?.toString() ?: ""
+			)
 			copyOrDefault(
-			  characters = characterViewModels,
-			  includedCharacters = (this?.includedCharacters ?: listOf()).mapNotNull {
-				  if (it.characterId !in characterNames) return@mapNotNull null
-				  SceneDetailsCharacterViewModel(
-					it.characterId,
-					characterNames.getValue(it.characterId),
-					it.motivation,
-					it.previousMotivationSource,
-					it.canReset
-				  )
-			  },
-			  availableCharacters = characterViewModels.filter {
-				  it.characterId !in includedCharacterIds
-			  }
+				characters = characterViewModels,
+				availableCharacters = characterViewModels.filter {
+					it.characterId !in includedCharacterIds
+				}
+			)
+		}
+	}
+
+	override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
+		val renamedCharacterId = renamedCharacter.characterId.toString()
+		view.updateOrInvalidated {
+			copyOrDefault(
+				characters = characters.map {
+					if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+					else it
+				},
+				includedCharacters = includedCharacters.map {
+					if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+					else it
+				},
+				availableCharacters = availableCharacters.map {
+
+					if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+					else it
+				}
+			)
+		}
+	}
+
+	override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
+		val removedCharacterId = characterRemoved.characterId.toString()
+		view.updateOrInvalidated {
+			copyOrDefault(
+				characters = characters.filterNot { it.characterId == removedCharacterId },
+				includedCharacters = includedCharacters.filterNot { it.characterId == removedCharacterId },
+				availableCharacters = availableCharacters.filterNot { it.characterId == removedCharacterId }
 			)
 		}
 	}

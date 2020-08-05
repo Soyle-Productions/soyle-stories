@@ -21,7 +21,7 @@ class SceneDetailsViewModel(
   internal val locations: List<LocationItemViewModel>
 )
 
-class SceneDetailsCharacterViewModel(
+data class SceneDetailsCharacterViewModel(
   val characterId: String,
   val characterName: String,
   val motivation: String,

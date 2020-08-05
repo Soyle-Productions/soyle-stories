@@ -2,8 +2,11 @@ package com.soyle.stories.di.characterarc
 
 import com.soyle.stories.character.buildNewCharacter.*
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
+import com.soyle.stories.character.removeCharacterFromStory.*
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
+import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
+import com.soyle.stories.character.renameCharacter.RenamedCharacterReceiver
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
 import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacter
@@ -49,12 +52,10 @@ import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacte
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyValueOutput
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedNotifier
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
-import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeNotifier
-import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonOutput
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonController
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonControllerImpl
-import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonNotifier
+import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonOutput
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
@@ -80,143 +81,184 @@ import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveChar
 
 object CharacterArcModule {
 
-	private fun InScope<ProjectScope>.useCases() {
-		provide<ListAllCharacterArcs> {
-			ListAllCharacterArcsUseCase(get(), get())
-		}
-		provide<BuildNewCharacter> {
-			BuildNewCharacterUseCase(get(), get())
-		}
-		provide<PlanNewCharacterArc> {
-			PlanNewCharacterArcUseCase(get(), get(), get())
-		}
-		provide<ViewBaseStoryStructure> {
-			ViewBaseStoryStructureUseCase(get(), get())
-		}
-		provide<CompareCharacters> {
-			CompareCharactersUseCase(get())
-		}
-		provide<IncludeCharacterInComparison> {
-			IncludeCharacterInComparisonUseCase(get(), get(), get())
-		}
-		provide<PromoteMinorCharacter> {
-			PromoteMinorCharacterUseCase(get(), get(), get())
-		}
-		provide<DemoteMajorCharacter> {
-			DemoteMajorCharacterUseCase(get())
-		}
-		provide<RemoveCharacterFromStory> {
-			RemoveCharacterFromStoryUseCase(get(), get(), get())
-		}
-		provide<DeleteCharacterArc> {
-			DeleteCharacterArcUseCase(get())
-		}
-		provide<ChangeThematicSectionValue> {
-			ChangeThematicSectionValueUseCase(get())
-		}
-		provide<ChangeStoryFunction> {
-			ChangeStoryFunctionUseCase(get())
-		}
-		provide<ChangeCentralMoralQuestion> {
-			ChangeCentralMoralQuestionUseCase(get())
-		}
-		provide<ChangeCharacterPropertyValue> {
-			ChangeCharacterPropertyValueUseCase(get())
-		}
-		provide<ChangeCharacterPerspectivePropertyValue> {
-			ChangeCharacterPerspectivePropertyValueUseCase(get())
-		}
-		provide<RemoveCharacterFromComparison> {
-			RemoveCharacterFromComparisonUseCase(get(), get())
-		}
-		provide<RenameCharacter> {
-			RenameCharacterUseCase(get(), get())
-		}
-		provide<RenameCharacterArc> {
-			RenameCharacterArcUseCase(get(), get(), get())
-		}
-		provide<LinkLocationToCharacterArcSection> {
-			LinkLocationToCharacterArcSectionUseCase(get(), get())
-		}
-		provide<UnlinkLocationFromCharacterArcSection> {
-			UnlinkLocationFromCharacterArcSectionUseCase(get())
-		}
-		provide<CreatePerspectiveCharacter> { CreatePerspectiveCharacterUseCase(get(), get()) }
-	}
+    private fun InScope<ProjectScope>.useCases() {
+        provide<ListAllCharacterArcs> {
+            ListAllCharacterArcsUseCase(get(), get())
+        }
+        provide<BuildNewCharacter> {
+            BuildNewCharacterUseCase(get(), get())
+        }
+        provide<PlanNewCharacterArc> {
+            PlanNewCharacterArcUseCase(get(), get(), get())
+        }
+        provide<ViewBaseStoryStructure> {
+            ViewBaseStoryStructureUseCase(get(), get())
+        }
+        provide<CompareCharacters> {
+            CompareCharactersUseCase(get())
+        }
+        provide<IncludeCharacterInComparison> {
+            IncludeCharacterInComparisonUseCase(get(), get(), get())
+        }
+        provide<PromoteMinorCharacter> {
+            PromoteMinorCharacterUseCase(get(), get(), get())
+        }
+        provide<DemoteMajorCharacter> {
+            DemoteMajorCharacterUseCase(get())
+        }
+        provide<RemoveCharacterFromStory> {
+            RemoveCharacterFromStoryUseCase(get(), get(), get())
+        }
+        provide<DeleteCharacterArc> {
+            DeleteCharacterArcUseCase(get())
+        }
+        provide<ChangeThematicSectionValue> {
+            ChangeThematicSectionValueUseCase(get())
+        }
+        provide<ChangeStoryFunction> {
+            ChangeStoryFunctionUseCase(get())
+        }
+        provide<ChangeCentralMoralQuestion> {
+            ChangeCentralMoralQuestionUseCase(get())
+        }
+        provide<ChangeCharacterPropertyValue> {
+            ChangeCharacterPropertyValueUseCase(get())
+        }
+        provide<ChangeCharacterPerspectivePropertyValue> {
+            ChangeCharacterPerspectivePropertyValueUseCase(get())
+        }
+        provide<RemoveCharacterFromComparison> {
+            RemoveCharacterFromComparisonUseCase(get(), get())
+        }
+        provide<RenameCharacter> {
+            RenameCharacterUseCase(get(), get())
+        }
+        provide<RenameCharacterArc> {
+            RenameCharacterArcUseCase(get(), get(), get())
+        }
+        provide<LinkLocationToCharacterArcSection> {
+            LinkLocationToCharacterArcSectionUseCase(get(), get())
+        }
+        provide<UnlinkLocationFromCharacterArcSection> {
+            UnlinkLocationFromCharacterArcSectionUseCase(get())
+        }
+        provide<CreatePerspectiveCharacter> { CreatePerspectiveCharacterUseCase(get(), get()) }
+    }
 
-	private fun InScope<ProjectScope>.events() {
+    private fun InScope<ProjectScope>.events() {
 
-		provide(CreatedCharacterReceiver::class) { CreatedCharacterNotifier() }
-		provide(CreatedCharacterArcReceiver::class) { CreatedCharacterArcNotifier() }
-		provide(CharacterPerspectivePropertyChangedReceiver::class) { CharacterPerspectivePropertyChangedNotifier() }
+        provide(CreatedCharacterReceiver::class) { CreatedCharacterNotifier() }
+        provide(CreatedCharacterArcReceiver::class) { CreatedCharacterArcNotifier() }
+        provide(CharacterPerspectivePropertyChangedReceiver::class) { CharacterPerspectivePropertyChangedNotifier() }
+        provide(RenamedCharacterReceiver::class) {
+            RenamedCharacterNotifier().also {
+                get<RenameSymbolicItemController>() listensTo it
+            }
+        }
+        provide(RemovedCharacterReceiver::class) {
+            RemovedCharacterNotifier().also {
+                get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
+                get<RemoveSymbolicItemControllerImpl>() listensTo it
+            }
+        }
 
-		provide(BuildNewCharacter.OutputPort::class) { BuildNewCharacterOutput(get(), get(), get()) }
-		provide(CreatePerspectiveCharacter.OutputPort::class) { CreatePerspectiveCharacterOutput(get(), get()) }
-		provide(PlanNewCharacterArc.OutputPort::class) { PlanNewCharacterArcOutput(get(), get()) }
-		provide(IncludeCharacterInComparison.OutputPort::class) { IncludeCharacterInComparisonOutput(get()) }
-		provide(PromoteMinorCharacter.OutputPort::class) { PromoteMinorCharacterOutput(get()) }
-		provide(DemoteMajorCharacter.OutputPort::class) { DeleteCharacterArcNotifier() }
-		provide(RemoveCharacterFromStory.OutputPort::class) { RemoveCharacterFromLocalStoryNotifier().also {
-			get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
-			get<RemoveSymbolicItemControllerImpl>() listensTo it
-		} }
-		provide(ChangeStoryFunction.OutputPort::class) { ChangeStoryFunctionNotifier() }
-		provide(ChangeThematicSectionValue.OutputPort::class) { ChangeThematicSectionValueNotifier() }
-		provide(ChangeCentralMoralQuestion.OutputPort::class) { ChangeCentralMoralQuestionNotifier() }
-		provide(ChangeCharacterPropertyValue.OutputPort::class) { ChangeCharacterPropertyValueNotifier() }
-		provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) { ChangeCharacterPerspectivePropertyValueOutput(get()) }
-		provide(RemoveCharacterFromComparison.OutputPort::class) { RemoveCharacterFromComparisonNotifier(get()) }
+        provide(BuildNewCharacter.OutputPort::class) { BuildNewCharacterOutput(get(), get(), get()) }
+        provide(CreatePerspectiveCharacter.OutputPort::class) { CreatePerspectiveCharacterOutput(get(), get()) }
+        provide(PlanNewCharacterArc.OutputPort::class) { PlanNewCharacterArcOutput(get(), get()) }
+        provide(IncludeCharacterInComparison.OutputPort::class) { IncludeCharacterInComparisonOutput(get()) }
+        provide(PromoteMinorCharacter.OutputPort::class) { PromoteMinorCharacterOutput(get()) }
+        provide(DemoteMajorCharacter.OutputPort::class) { DeleteCharacterArcNotifier() }
+        provide(RemoveCharacterFromStory.OutputPort::class) {
+            RemoveCharacterFromStoryOutput(get(), get())
+        }
+        provide(ChangeStoryFunction.OutputPort::class) { ChangeStoryFunctionNotifier() }
+        provide(ChangeThematicSectionValue.OutputPort::class) { ChangeThematicSectionValueNotifier() }
+        provide(ChangeCentralMoralQuestion.OutputPort::class) { ChangeCentralMoralQuestionNotifier() }
+        provide(ChangeCharacterPropertyValue.OutputPort::class) { ChangeCharacterPropertyValueNotifier() }
+        provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) {
+            ChangeCharacterPerspectivePropertyValueOutput(
+                get()
+            )
+        }
+        provide(RemoveCharacterFromComparison.OutputPort::class) { RemoveCharacterFromComparisonOutput(get(), get()) }
 
-		provide(RenameCharacter.OutputPort::class) { RenameCharacterNotifier().also {
-			get<RenameSymbolicItemController>() listensTo it
-		} }
-		provide(RenameCharacterArc.OutputPort::class) { RenameCharacterArcNotifier() }
-		provide(LinkLocationToCharacterArcSection.OutputPort::class) { LinkLocationToCharacterArcSectionNotifier() }
-		provide(UnlinkLocationFromCharacterArcSection.OutputPort::class) { UnlinkLocationFromCharacterArcSectionNotifier() }
-	}
+        provide(RenameCharacter.OutputPort::class) { RenameCharacterOutput(get()) }
+        provide(RenameCharacterArc.OutputPort::class) { RenameCharacterArcNotifier() }
+        provide(LinkLocationToCharacterArcSection.OutputPort::class) { LinkLocationToCharacterArcSectionNotifier() }
+        provide(UnlinkLocationFromCharacterArcSection.OutputPort::class) { UnlinkLocationFromCharacterArcSectionNotifier() }
+    }
 
-	private fun InScope<ProjectScope>.controllers() {
-		provide<PlanNewCharacterArcController> { PlanNewCharacterArcControllerImpl(applicationScope.get(), get(), get()) }
-		provide<BuildNewCharacterController> { BuildNewCharacterControllerImpl(projectId.toString(), applicationScope.get(), get(), get(), get(), get()) }
-		provide { ChangeThematicSectionValueController(applicationScope.get(), get(), get()) }
-		provide<LinkLocationToCharacterArcSectionController> { LinkLocationToCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
-		provide<UnlinkLocationFromCharacterArcSectionController> { UnlinkLocationFromCharacterArcSectionControllerImpl(applicationScope.get(), get(), get()) }
-		provide<RenameCharacterController> { RenameCharacterControllerImpl(applicationScope.get(), get(), get()) }
-		provide<RemoveCharacterFromComparisonController> {
-			RemoveCharacterFromComparisonControllerImpl(applicationScope.get(), get(), get())
-		}
-		provide {
-			PromoteMinorCharacterController(get(), get())
-		}
-	}
+    private fun InScope<ProjectScope>.controllers() {
+        provide<PlanNewCharacterArcController> {
+            PlanNewCharacterArcControllerImpl(
+                applicationScope.get(),
+                get(),
+                get()
+            )
+        }
+        provide<BuildNewCharacterController> {
+            BuildNewCharacterControllerImpl(
+                projectId.toString(),
+                applicationScope.get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
+        provide { ChangeThematicSectionValueController(applicationScope.get(), get(), get()) }
+        provide<LinkLocationToCharacterArcSectionController> {
+            LinkLocationToCharacterArcSectionControllerImpl(
+                applicationScope.get(),
+                get(),
+                get()
+            )
+        }
+        provide<UnlinkLocationFromCharacterArcSectionController> {
+            UnlinkLocationFromCharacterArcSectionControllerImpl(
+                applicationScope.get(),
+                get(),
+                get()
+            )
+        }
+        provide<RenameCharacterController> { RenameCharacterControllerImpl(applicationScope.get(), get(), get()) }
+        provide<RemoveCharacterFromComparisonController> {
+            RemoveCharacterFromComparisonControllerImpl(applicationScope.get(), get(), get())
+        }
+        provide {
+            PromoteMinorCharacterController(get(), get())
+        }
+        provide<RemoveCharacterFromStoryController> {
+            RemoveCharacterFromStoryControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
 
 
+    private fun InScope<ProjectScope>.viewListeners() {
+        provide<CreateCharacterDialogViewListener> {
+            CreateCharacterDialogController(get())
+        }
+        provide<PlanCharacterArcDialogViewListener> {
+            PlanCharacterArcDialogController(get())
+        }
+    }
 
-	private fun InScope<ProjectScope>.viewListeners() {
-		provide<CreateCharacterDialogViewListener> {
-			CreateCharacterDialogController(get())
-		}
-		provide<PlanCharacterArcDialogViewListener> {
-			PlanCharacterArcDialogController(get())
-		}
-	}
+    private fun InScope<ProjectScope>.views() {
 
-	private fun InScope<ProjectScope>.views() {
+    }
 
-	}
+    init {
 
-	init {
+        scoped<ProjectScope> {
+            useCases()
+            events()
+            controllers()
+            viewListeners()
+            views()
+        }
 
-		scoped<ProjectScope> {
-			useCases()
-			events()
-			controllers()
-			viewListeners()
-			views()
-		}
+        BaseStoryStructureModule
+        CharacterListModule
 
-		BaseStoryStructureModule
-		CharacterListModule
-
-	}
+    }
 }

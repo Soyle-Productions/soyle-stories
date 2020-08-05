@@ -1,6 +1,8 @@
 package com.soyle.stories.theme.removeSymbolicItem
 
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
@@ -13,7 +15,7 @@ class RemoveSymbolicItemControllerImpl(
     private val threadTransformer: ThreadTransformer,
     private val removeSymbolicItem: RemoveSymbolicItem,
     private val removeSymbolicItemOutputPort: RemoveSymbolicItem.OutputPort
-) : RemoveSymbolicItemController, RemoveCharacterFromStory.OutputPort,
+) : RemoveSymbolicItemController, RemovedCharacterReceiver,
     DeleteLocation.OutputPort, RemoveSymbolFromTheme.OutputPort {
 
     override fun removeItemFromOpposition(oppositionId: String, itemId: String, onError: (Throwable) -> Unit) {
@@ -30,10 +32,10 @@ class RemoveSymbolicItemControllerImpl(
         }
     }
 
-    override fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
+    override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
         threadTransformer.async {
             removeSymbolicItem.removeSymbolicItemFromAllThemes(
-                response.characterId,
+                characterRemoved.characterId,
                 removeSymbolicItemOutputPort
             )
         }
@@ -55,7 +57,6 @@ class RemoveSymbolicItemControllerImpl(
         )
     }
 
-    override fun receiveRemoveCharacterFromStoryFailure(failure: Exception) {}
     override fun receiveDeleteLocationFailure(failure: LocationException) {}
 
 }

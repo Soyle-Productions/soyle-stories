@@ -5,15 +5,16 @@ import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentOutput
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 
 class BuildNewCharacterOutput(
     private val createdCharacterReceiver: CreatedCharacterReceiver,
     private val characterIncludedInThemeReceiver: CharacterIncludedInThemeReceiver,
-    private val useCharacterAsOpponentNotifier: UseCharacterAsOpponentOutput
+    private val useCharacterAsOpponentReceiver: CharacterUsedAsOpponentReceiver
 ) : BuildNewCharacter.OutputPort {
 
     override fun receiveBuildNewCharacterFailure(failure: CharacterException) {
@@ -30,9 +31,7 @@ class BuildNewCharacterOutput(
         characterIncludedInThemeReceiver.receiveCharacterIncludedInTheme(response)
     }
 
-    override suspend fun characterIsOpponent(response: OpponentCharacter) {
-        useCharacterAsOpponentNotifier.characterIsOpponent(UseCharacterAsOpponent.ResponseModel(
-            response, null
-        ))
+    override suspend fun characterIsOpponent(response: CharacterUsedAsOpponent) {
+        useCharacterAsOpponentReceiver.receiveCharacterUsedAsOpponent(response)
     }
 }

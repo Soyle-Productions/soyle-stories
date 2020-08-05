@@ -7,6 +7,7 @@ interface CharacterConflictViewListener {
     fun getAvailableOpponents(characterId: String)
     fun addOpponent(perspectiveCharacterId: String, characterId: String)
     fun makeOpponentMainOpponent(perspectiveCharacterId: String, characterId: String)
+    fun removeOpponent(perspectiveCharacterId: String, opponentId: String)
     fun setCentralConflict(centralConflict: String)
     fun setDesire(characterId: String, desire: String)
     fun setPsychologicalWeakness(characterId: String, weakness: String)

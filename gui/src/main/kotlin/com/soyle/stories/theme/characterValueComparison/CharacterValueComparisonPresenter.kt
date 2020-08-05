@@ -7,6 +7,7 @@ import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharact
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
@@ -27,7 +28,7 @@ class CharacterValueComparisonPresenter(
     private val view: View.Nullable<CharacterValueComparisonViewModel>
 ) : CompareCharacterValues.OutputPort, ListCharactersAvailableToIncludeInTheme.OutputPort,
     RemoveSymbolicItem.OutputPort, AddSymbolicItemToOpposition.OutputPort,
-    RemoveCharacterFromComparison.OutputPort, CharacterIncludedInThemeReceiver,
+    RemovedCharacterFromThemeReceiver, CharacterIncludedInThemeReceiver,
     ChangeCharacterPropertyValue.OutputPort, ListAvailableOppositionValuesForCharacterInTheme.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
@@ -148,9 +149,9 @@ class CharacterValueComparisonPresenter(
         }
     }
 
-    override fun receiveRemoveCharacterFromComparisonResponse(response: RemovedCharacterFromTheme) {
-        if (response.themeId != themeId) return
-        val characterId = response.characterId.toString()
+    override suspend fun receiveRemovedCharacterFromTheme(removedCharacterFromTheme: RemovedCharacterFromTheme) {
+        if (removedCharacterFromTheme.themeId != themeId) return
+        val characterId = removedCharacterFromTheme.characterId.toString()
         view.updateOrInvalidated {
             copy(
                 characters = characters.filterNot { it.characterId == characterId }
@@ -191,10 +192,6 @@ class CharacterValueComparisonPresenter(
                 }
             )
         }
-    }
-
-    override suspend fun characterArcDeleted(response: DeletedCharacterArc) {
-        // do nothing
     }
 
     override fun receiveChangeCharacterPropertyValueFailure(failure: ThemeException) {

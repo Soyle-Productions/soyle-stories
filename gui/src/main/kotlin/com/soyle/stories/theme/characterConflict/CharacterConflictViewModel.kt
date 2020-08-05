@@ -26,7 +26,7 @@ data class CharacterConflictViewModel(
     val availableOpponents: List<AvailableOpponentViewModel>?
 )
 
-class AvailablePerspectiveCharacterViewModel(
+data class AvailablePerspectiveCharacterViewModel(
     val characterId: String,
     val characterName: String,
     val isMajorCharacter: Boolean
@@ -40,7 +40,7 @@ data class CharacterChangeOpponentViewModel(
     val powerStatusOrAbilities: String
 )
 
-class AvailableOpponentViewModel(
+data class AvailableOpponentViewModel(
     val characterId: String,
     val characterName: String,
     val isInTheme: Boolean

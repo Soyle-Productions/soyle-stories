@@ -1,13 +1,18 @@
 package com.soyle.stories.theme.characterConflict
 
+import com.soyle.stories.character.renameCharacter.RenamedCharacterReceiver
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeReceiver
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
+import com.soyle.stories.theme.removeCharacterAsOpponent.CharacterRemovedAsOpponentReceiver
+import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
 import com.soyle.stories.theme.updateThemeMetaData.ThemeWithCentralConflictChangedReceiver
-import com.soyle.stories.theme.useCharacterAsOpponent.OpponentCharacterReceiver
+import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentReceiver
+import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
 import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ArcSectionType
 import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
@@ -19,17 +24,22 @@ import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.
 import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
+import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.CharacterRemovedAsOpponent
+import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
 import com.soyle.stories.theme.usecases.updateThemeMetaData.ThemeWithCentralConflictChanged
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.OpponentCharacter
+import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.CharacterUsedAsMainOpponent
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import java.util.*
 
 class CharacterConflictPresenter(
     themeId: String,
     private val view: View.Nullable<CharacterConflictViewModel>
 ) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
-    ListAvailableCharactersToUseAsOpponents.OutputPort, OpponentCharacterReceiver,
+    ListAvailableCharactersToUseAsOpponents.OutputPort, CharacterUsedAsOpponentReceiver,
+    CharacterUsedAsMainOpponentReceiver,
     ThemeWithCentralConflictChangedReceiver, ChangedCharacterArcSectionValueReceiver, ChangedCharacterChangeReceiver,
-    ChangeCharacterPropertyValue.OutputPort, CharacterPerspectivePropertyChangedReceiver {
+    ChangeCharacterPropertyValue.OutputPort, CharacterPerspectivePropertyChangedReceiver, RenamedCharacterReceiver,
+    CharacterRemovedAsOpponentReceiver, RemovedCharacterFromThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -112,34 +122,45 @@ class CharacterConflictPresenter(
         }
     }
 
-    override suspend fun receiveOpponentCharacter(opponentCharacter: OpponentCharacter) {
-        if (opponentCharacter.themeId != themeId) return
+    override suspend fun receiveCharacterUsedAsMainOpponent(characterUsedAsMainOpponent: CharacterUsedAsMainOpponent) {
+        if (characterUsedAsMainOpponent.themeId != themeId) return
+        val opponentId = characterUsedAsMainOpponent.characterId.toString()
         view.updateOrInvalidated {
-            if (opponentCharacter.opponentOfCharacterId.toString() != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
+            if (characterUsedAsMainOpponent.opponentOfCharacterId.toString() != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
 
-            val existingOpponent = mainOpponent?.takeIf { it.characterId == opponentCharacter.characterId.toString() }
-                ?: opponents.find { it.characterId == opponentCharacter.characterId.toString() }
+            val existingOpponent = opponents.find { it.characterId == opponentId }
 
             copy(
-                mainOpponent = when {
-                    opponentCharacter.isMainOpponent -> existingOpponent ?: CharacterChangeOpponentViewModel(
-                        opponentCharacter.characterId.toString(),
-                        opponentCharacter.characterName,
-                        "",
-                        "",
-                        ""
-                    )
-                    opponentCharacter.characterId.toString() == mainOpponent?.characterId && !opponentCharacter.isMainOpponent -> null
-                    else -> mainOpponent
-                },
-                opponents = if (!opponentCharacter.isMainOpponent) opponents + (existingOpponent
+                mainOpponent = existingOpponent ?: CharacterChangeOpponentViewModel(
+                    opponentId,
+                    characterUsedAsMainOpponent.characterName,
+                    "",
+                    "",
+                    ""
+                ),
+                opponents = opponents.filterNot { it.characterId == opponentId }
+            )
+        }
+    }
+
+    override suspend fun receiveCharacterUsedAsOpponent(characterUsedAsOpponent: CharacterUsedAsOpponent) {
+        if (characterUsedAsOpponent.themeId != themeId) return
+        val opponentId = characterUsedAsOpponent.characterId.toString()
+        view.updateOrInvalidated {
+            if (characterUsedAsOpponent.opponentOfCharacterId.toString() != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
+
+            val existingOpponent = mainOpponent?.takeIf { it.characterId == opponentId }
+
+            copy(
+                mainOpponent = if (mainOpponent?.characterId == opponentId) null else mainOpponent,
+                opponents = opponents + (existingOpponent
                     ?: CharacterChangeOpponentViewModel(
-                        opponentCharacter.characterId.toString(),
-                        opponentCharacter.characterName,
+                        opponentId,
+                        characterUsedAsOpponent.characterName,
                         "",
                         "",
                         ""
-                    )) else opponents.filterNot { it.characterId == opponentCharacter.characterId.toString() }
+                    ))
             )
         }
     }
@@ -232,6 +253,64 @@ class CharacterConflictPresenter(
                     else it
                 }
             )
+        }
+    }
+
+    override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
+        val renamedCharacterId = renamedCharacter.characterId.toString()
+        view.updateOrInvalidated {
+            copy(
+                selectedPerspectiveCharacter = if (selectedPerspectiveCharacter?.characterId == renamedCharacterId) {
+                    selectedPerspectiveCharacter.copy(characterName = renamedCharacter.newName)
+                } else selectedPerspectiveCharacter,
+                availablePerspectiveCharacters = availablePerspectiveCharacters?.map {
+                    if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+                    else it
+                },
+                availableOpponents = availableOpponents?.map {
+                    if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+                    else it
+                },
+                mainOpponent = if (mainOpponent?.characterId == renamedCharacterId) {
+                    mainOpponent.copy(characterName = renamedCharacter.newName)
+                } else mainOpponent,
+                opponents = opponents.map {
+                    if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+                    else it
+                }
+            )
+        }
+    }
+
+    override suspend fun receiveCharacterRemovedAsOpponent(characterRemovedAsOpponent: CharacterRemovedAsOpponent) {
+        if (characterRemovedAsOpponent.themeId != themeId) return
+        val removedCharacterId = characterRemovedAsOpponent.characterId.toString()
+        view.updateOrInvalidated {
+            if (selectedPerspectiveCharacter?.characterId != characterRemovedAsOpponent.opponentOfCharacterId.toString())
+                return@updateOrInvalidated this
+
+            copy(
+                mainOpponent = mainOpponent?.takeUnless { it.characterId == removedCharacterId },
+                opponents = opponents.filterNot {
+                    it.characterId == removedCharacterId
+                }
+            )
+        }
+    }
+
+    override suspend fun receiveRemovedCharacterFromTheme(removedCharacterFromTheme: RemovedCharacterFromTheme) {
+        if (removedCharacterFromTheme.themeId != themeId) return
+        val removedCharacterId = removedCharacterFromTheme.characterId.toString()
+        view.updateOrInvalidated {
+            if (selectedPerspectiveCharacter?.characterId == removedCharacterId)
+                copy(selectedPerspectiveCharacter = null, mainOpponent = null, opponents = emptyList())
+            else
+                copy(
+                    mainOpponent = mainOpponent?.takeUnless { it.characterId == removedCharacterId },
+                    opponents = opponents.filterNot {
+                        it.characterId == removedCharacterId
+                    }
+                )
         }
     }
 

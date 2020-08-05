@@ -9,6 +9,7 @@ import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacte
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValueControllerImpl
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.removeCharacterAsOpponent.RemoveCharacterAsOpponentController
 import com.soyle.stories.theme.updateThemeMetaData.ChangeCentralConflictController
 import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
 import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
@@ -34,7 +35,8 @@ class CharacterConflictController(
     private val changeSectionValueController: ChangeSectionValueController,
     private val changeCharacterChangeController: ChangeCharacterChangeController,
     private val changeCharacterPropertyController: ChangeCharacterPropertyController,
-    private val changeCharacterPerspectivePropertyController: ChangeCharacterPerspectivePropertyController
+    private val changeCharacterPerspectivePropertyController: ChangeCharacterPerspectivePropertyController,
+    private val removeCharacterAsOpponentController: RemoveCharacterAsOpponentController
 ) : CharacterConflictViewListener, CharacterIncludedInThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
@@ -76,6 +78,10 @@ class CharacterConflictController(
 
     override fun makeOpponentMainOpponent(perspectiveCharacterId: String, characterId: String) {
         useCharacterAsMainOpponentController.useCharacterAsMainOpponent(themeId.toString(), perspectiveCharacterId, characterId)
+    }
+
+    override fun removeOpponent(perspectiveCharacterId: String, opponentId: String) {
+        removeCharacterAsOpponentController.removeCharacterAsOpponent(themeId.toString(), perspectiveCharacterId, opponentId)
     }
 
     override suspend fun receiveCharacterIncludedInTheme(characterIncludedInTheme: CharacterIncludedInTheme) {

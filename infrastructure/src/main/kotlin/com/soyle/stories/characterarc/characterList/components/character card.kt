@@ -70,10 +70,13 @@ class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
             }
         }
         nodeProperty.addListener { observable, oldValue, newValue ->
-            if (oldValue == null) {
-                getChildList()?.add(0, newValue)
+            when {
+                oldValue == null -> {
+                    getChildList()?.add(0, newValue)
+                }
+                newValue != null -> oldValue.replaceWith(newValue)
+                else -> oldValue?.removeFromParent()
             }
-            else oldValue.replaceWith(newValue)
         }
     }
 

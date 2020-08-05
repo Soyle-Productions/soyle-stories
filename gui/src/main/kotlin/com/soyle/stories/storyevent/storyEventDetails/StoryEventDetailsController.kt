@@ -26,6 +26,10 @@ class StoryEventDetailsController(
   private val removeCharacterFromStoryEventController: RemoveCharacterFromStoryEventController
 ) : StoryEventDetailsViewListener {
 
+	init {
+		liveCharacterList.addListener(characterListListener)
+	}
+
 	override fun getValidState() {
 		threadTransformer.async {
 			getStoryEventDetails.invoke(UUID.fromString(storyEventId), getStoryEventDetailsOutputPort)
@@ -34,10 +38,7 @@ class StoryEventDetailsController(
 			liveLocationList.removeListener(locationListListener)
 		}
 		liveLocationList.addListener(locationListListener)
-		if (characterListListener isListeningTo liveCharacterList) {
-			liveCharacterList.removeListener(characterListListener)
-		}
-		liveCharacterList.addListener(characterListListener)
+		// TODO get character list
 	}
 
 	override fun deselectLocation() {

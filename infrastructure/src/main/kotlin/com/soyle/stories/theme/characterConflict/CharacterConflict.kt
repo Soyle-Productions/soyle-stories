@@ -352,6 +352,10 @@ class CharacterConflict : View() {
                 val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@listener
                 viewListener.makeOpponentMainOpponent(perspectiveCharacterId, it)
             }
+            onRemoveOpponent = listener@{
+                val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@listener
+                viewListener.removeOpponent(perspectiveCharacterId, it)
+            }
             opponentAttack.onChange {
                 if (it == null) return@onChange
                 val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@onChange

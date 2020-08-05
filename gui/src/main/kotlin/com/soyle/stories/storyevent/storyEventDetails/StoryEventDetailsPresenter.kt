@@ -1,6 +1,9 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
 import com.soyle.stories.character.characterList.CharacterListListener
+import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.Notifier
@@ -94,31 +97,44 @@ class StoryEventDetailsPresenter(
 		}
 	}
 
-	override fun receiveCharacterListUpdate(characters: List<CharacterItem>) {
-		view.update {
-
-			val viewModels = characters.map { CharacterItemViewModel(it.characterId.toString(), it.characterName, "") }
-
-			if (this != null) copy(
-			  availableCharacters = viewModels,
-			  includedCharacters = viewModels.filter {
-				  it.characterId in includedCharacterIds
-			  },
-			  characters = viewModels
+	override suspend fun receiveCreatedCharacter(createdCharacter: CreatedCharacter) {
+		val newCharacter = CharacterItemViewModel(
+			createdCharacter.characterId.toString(),
+			createdCharacter.characterName,
+			createdCharacter.mediaId?.toString() ?: ""
+		)
+		view.updateOrInvalidated {
+			copy(
+				availableCharacters = availableCharacters + newCharacter,
+				characters = characters + newCharacter
 			)
-			else {
-				StoryEventDetailsViewModel(
-				  title = "Story Event Details - [TODO]",
-				  locationSelectionButtonLabel = "Select Location",
-				  selectedLocationId = null,
-				  selectedLocation = null,
-				  includedCharacterIds = emptySet(),
-				  includedCharacters = emptyList(),
-				  locations = emptyList(),
-				  availableCharacters = viewModels,
-				  characters = viewModels
-				)
-			}
+		}
+	}
+
+	override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
+		val renamedCharacterId= renamedCharacter.characterId.toString()
+		view.updateOrInvalidated {
+			copy(
+				availableCharacters = availableCharacters.map {
+					if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+					else it
+				},
+				characters = characters.map {
+					if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+					else it
+				}
+			)
+		}
+	}
+
+	override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
+		val removedCharacterId= characterRemoved.characterId.toString()
+		view.updateOrInvalidated {
+			copy(
+				availableCharacters = availableCharacters.filterNot { it.characterId == removedCharacterId },
+				includedCharacters = includedCharacters.filterNot { it.characterId == removedCharacterId },
+				characters = characters.filterNot { it.characterId == removedCharacterId }
+			)
 		}
 	}
 
