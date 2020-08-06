@@ -1,11 +1,14 @@
 package com.soyle.stories.theme.usecases
 
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.*
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.CharacterArcTemplate
 import com.soyle.stories.theme.usecases.compareCharacterValues.CharacterValueComparison
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValuesUseCase
@@ -83,7 +86,7 @@ class CompareCharacterValuesUnitTest {
             result shouldBe characterValueComparison {
                 it.characters.forEach {
                     val characterInTheme = idToCharacter[it.characterId]!!
-                    when (characterInTheme){
+                    when (characterInTheme) {
                         is MajorCharacter -> assertTrue(it.isMajorCharacter)
                         else -> assertFalse(it.isMajorCharacter)
                     }
@@ -150,12 +153,21 @@ class CompareCharacterValuesUnitTest {
 
     private fun givenTheme(characterCount: Int = 0) {
         themeRepository.themes[themeId] = makeTheme(themeId, includedCharacters = List(characterCount) {
-            val name = "Character ${UUID.randomUUID().toString().takeLast(3)}"
+            val character = makeCharacter()
             val archetype = "Archetype [${UUID.randomUUID().toString().takeLast(3)}]"
             if (it % 2 == 0) {
-                MinorCharacter(Character.Id(), name, archetype, "", "", listOf())
+                MinorCharacter(character.id, character.name, archetype, "", "", listOf())
             } else {
-                MajorCharacter(Character.Id(), name, archetype, "", "", listOf(), CharacterPerspective(mapOf(), mapOf()), "")
+                MajorCharacter(
+                    character.id, character.name,
+                    archetype,
+                    "",
+                    "",
+                    listOf(),
+                    CharacterPerspective(mapOf(), mapOf()),
+                    CharacterArc(character.id, CharacterArcTemplate.default(), themeId, "Theme"),
+                    ""
+                )
             }
         }.associateBy { it.id })
     }

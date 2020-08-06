@@ -1,6 +1,5 @@
 package com.soyle.stories.characterarc.usecases
 
-import arrow.core.identity
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.CharacterArcDoesNotExist
@@ -12,10 +11,12 @@ import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.takeNoteOfTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import java.util.*
@@ -28,38 +29,40 @@ class RenameCharacterArcUnitTest {
 
 	private var inputName = "New Name"
 	private lateinit var context: TestContext
-	private var result: Any? = null
-	private var updatedCharacterArc: CharacterArc? = null
+	private var result: RenameCharacterArc.ResponseModel? = null
+	private var updatedTheme: Theme? = null
 
 	@BeforeEach
 	fun clear() {
 		inputName = "New Name"
 		result = null
 		context = TestContext()
-		updatedCharacterArc = null
 	}
 
 	@Test
 	fun `character does not exist`() {
 		givenNoCharacters()
-		whenUseCaseIsExecuted()
-		val result = result as CharacterDoesNotExist
+		val result = assertThrows<CharacterDoesNotExist> {
+			whenUseCaseIsExecuted()
+		}
 		result.characterId.mustEqual(characterId)
 	}
 
 	@Test
 	fun `theme does not exist`() {
 		givenNoThemes()
-		whenUseCaseIsExecuted()
-		val result = result as ThemeDoesNotExist
+		val result = assertThrows<ThemeDoesNotExist> {
+			whenUseCaseIsExecuted()
+		}
 		result.themeId.mustEqual(themeId)
 	}
 
 	@Test
 	fun `character not in theme`() {
 		given(characterWithId = characterId, andThemeWithId = themeId)
-		whenUseCaseIsExecuted()
-		val result = result as CharacterNotInTheme
+		val result = assertThrows<CharacterNotInTheme> {
+			whenUseCaseIsExecuted()
+		}
 		result.characterId.mustEqual(characterId)
 		result.themeId.mustEqual(themeId)
 	}
@@ -67,8 +70,9 @@ class RenameCharacterArcUnitTest {
 	@Test
 	fun `character arc does not exist`() {
 		given(characterWithId = characterId, andThemeWithId = themeId, andThemeHasCharacter = true)
-		whenUseCaseIsExecuted()
-		val result = result as CharacterArcDoesNotExist
+		val result = assertThrows<CharacterArcDoesNotExist> {
+			whenUseCaseIsExecuted()
+		}
 		result.characterId.mustEqual(characterId)
 		result.themeId.mustEqual(themeId)
 	}
@@ -78,8 +82,9 @@ class RenameCharacterArcUnitTest {
 	fun `name is blank`(inputName: String) {
 		given(characterWithId = characterId, andThemeWithId = themeId, andThemeHasCharacter = true, andCharacterIsMajorCharacter = true)
 		this.inputName = inputName
-		whenUseCaseIsExecuted()
-		val result = result as CharacterArcNameCannotBeBlank
+		val result = assertThrows<CharacterArcNameCannotBeBlank> {
+			whenUseCaseIsExecuted()
+		}
 		result.characterId.mustEqual(characterId)
 		result.themeId.mustEqual(themeId)
 	}
@@ -90,7 +95,7 @@ class RenameCharacterArcUnitTest {
 		inputName = characterArcName
 		whenUseCaseIsExecuted()
 		assertResultIsResponseModel()
-		updatedCharacterArc.mustEqual(null) { "Character arc should not have been updated" }
+		updatedTheme.mustEqual(null) { "Theme should not have been updated" }
 	}
 
 	@Test
@@ -98,7 +103,7 @@ class RenameCharacterArcUnitTest {
 		given(characterWithId = characterId, andThemeWithId = themeId, andThemeHasCharacter = true, andCharacterIsMajorCharacter = true)
 		whenUseCaseIsExecuted()
 		assertResultIsResponseModel()
-		assertCharacterArcWasUpdated()
+		assertThemeHasCharacterWithRenamedCharacterArc()
 	}
 
 	private fun givenNoCharacters() = given()
@@ -112,31 +117,25 @@ class RenameCharacterArcUnitTest {
 		  ),
 		  initialThemes = listOfNotNull(
 			andThemeWithId?.let {
-				val theme = takeNoteOfTheme(andThemeWithId)
+				val theme = makeTheme(Theme.Id(andThemeWithId), name = characterArcName)
 				if (andThemeHasCharacter) {
-					theme.withCharacterIncluded(character!!.id, character.name, character.media)
+					theme.withCharacterIncluded(character!!.id, character.name, character.media).let {
+						if (andCharacterIsMajorCharacter) it.withCharacterPromoted(character.id)
+						else it
+					}
 				}
 				else theme
 			}
 		  ),
-		  initialCharacterArcs = listOfNotNull(
-			Unit.takeIf { andCharacterIsMajorCharacter }?.let {
-				CharacterArc(Character.Id(characterWithId!!), CharacterArcTemplate.default(), Theme.Id(andThemeWithId!!), characterArcName)
+			onUpdateTheme = {
+				updatedTheme = it
 			}
-		  ),
-		  updateCharacterArc = {
-			  updatedCharacterArc = it
-		  }
 		)
 	}
 
 	private fun whenUseCaseIsExecuted() {
-		val useCase: RenameCharacterArc = RenameCharacterArcUseCase(context.characterRepository, context.themeRepository, context.characterArcRepository)
+		val useCase: RenameCharacterArc = RenameCharacterArcUseCase(context.characterRepository, context.themeRepository)
 		val output = object : RenameCharacterArc.OutputPort {
-			override fun receiveRenameCharacterArcFailure(failure: Exception) {
-				result = failure
-			}
-
 			override fun receiveRenameCharacterArcResponse(response: RenameCharacterArc.ResponseModel) {
 				result = response
 			}
@@ -154,9 +153,9 @@ class RenameCharacterArcUnitTest {
 		result.newName.mustEqual(inputName)
 	}
 
-	private fun assertCharacterArcWasUpdated() {
-		val updatedCharacterArc = updatedCharacterArc!!
-		updatedCharacterArc.name.mustEqual(inputName)
+	private fun assertThemeHasCharacterWithRenamedCharacterArc() {
+		val updatedTheme = updatedTheme!!
+		updatedTheme.getMajorCharacterById(Character.Id(characterId))!!.characterArc.name.mustEqual(inputName)
 	}
 
 }

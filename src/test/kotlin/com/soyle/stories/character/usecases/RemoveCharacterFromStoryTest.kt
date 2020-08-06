@@ -161,7 +161,7 @@ class RemoveCharacterFromStoryTest {
             characterRepository, themeRepository, arcSectionRepository
         )
         val output = object : RemoveCharacterFromStory.OutputPort {
-            override fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
+            override suspend fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
                 responseModel = response
             }
         }

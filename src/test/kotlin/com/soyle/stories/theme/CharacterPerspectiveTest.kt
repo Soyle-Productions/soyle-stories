@@ -4,9 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.right
 import com.soyle.stories.character.makeCharacter
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.CharacterPerspective
 import com.soyle.stories.entities.theme.MajorCharacter
 import com.soyle.stories.entities.theme.MinorCharacter
@@ -73,16 +71,19 @@ class CharacterPerspectiveTest {
                 Project.Id(),
                 "Name"
             ),
-            MajorCharacter(
-                Character.Id(UUID.randomUUID()),
-                "Name",
-                "",
-                "",
-                "",
-                listOf(),
-                CharacterPerspective(mapOf(), mapOf()),
-                ""
-            ) to otherCharacters.first()
+            Character.Id(UUID.randomUUID()).let { id ->
+                MajorCharacter(
+                    id,
+                    "Name",
+                    "",
+                    "",
+                    "",
+                    listOf(),
+                    CharacterPerspective(mapOf(), mapOf()),
+                    CharacterArc(id, CharacterArcTemplate.default(), theme.id, theme.name),
+                    ""
+                )
+            } to otherCharacters.first()
         ).forEach { (characterInTheme, targetCharacter) ->
             assertThrows<CharacterNotInTheme> {
                 theme.withCharacterAsStoryFunctionForMajorCharacter(
@@ -171,16 +172,19 @@ class CharacterPerspectiveTest {
                 Project.Id(),
                 "Name"
             ),
-            MajorCharacter(
-                Character.Id(UUID.randomUUID()),
-                "Name",
-                "",
-                "",
-                "",
-                listOf(),
-                CharacterPerspective(mapOf(), mapOf()),
-                ""
-            ) to otherCharacters.first()
+            Character.Id(UUID.randomUUID()).let { id ->
+                MajorCharacter(
+                    id,
+                    "Name",
+                    "",
+                    "",
+                    "",
+                    listOf(),
+                    CharacterPerspective(mapOf(), mapOf()),
+                    CharacterArc(id, CharacterArcTemplate.default(), theme.id, theme.name),
+                    ""
+                )
+            } to otherCharacters.first()
         ).forEach { (characterInTheme, targetCharacter) ->
             val (error) = theme.changeAttack(characterInTheme, targetCharacter.id, "") as Either.Left
             assert(error is CharacterNotInTheme)

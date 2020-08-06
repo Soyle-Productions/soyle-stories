@@ -4,7 +4,9 @@ import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.*
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
+import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -41,23 +43,26 @@ class ListAllCharacterArcsTest {
 		result shouldBe responseModel(expectedCount = 3, expectedTotalArcCount = 12)
 	}
 
+	private val themeRepository = ThemeRepositoryDouble()
 	private val characterArcRepository = CharacterRepositoryDouble()
 
 	private fun givenCharacters(count: Int, arcsPerCharacter: Int = 0)
 	{
 		repeat(count) { _ ->
-			val id = Character.Id()
-			characterArcRepository.characters[id] = makeCharacter(id, projectId, "", Media.Id())
+			val character = makeCharacter(projectId = projectId, media = Media.Id())
+			characterArcRepository.characters[character.id] = character
 			repeat(arcsPerCharacter) { _ ->
 				val themeId = Theme.Id()
-				characterArcRepository.characterArcs.getOrPut(id) { mutableMapOf() }[themeId] = CharacterArc(id, CharacterArcTemplate(listOf()), themeId, "")
+				themeRepository.themes[themeId] = makeTheme(themeId, projectId = projectId)
+					.withCharacterIncluded(character.id, character.name, character.media)
+					.withCharacterPromoted(character.id)
 			}
 		}
 	}
 
 	private fun listAllCharacterArcs()
 	{
-		val useCase: ListAllCharacterArcs = ListAllCharacterArcsUseCase(characterArcRepository, characterArcRepository)
+		val useCase: ListAllCharacterArcs = ListAllCharacterArcsUseCase(characterArcRepository, themeRepository)
 		val output = object : ListAllCharacterArcs.OutputPort {
 			override suspend fun receiveCharacterArcList(response: CharacterArcsByCharacter) {
 				result = response
@@ -103,7 +108,7 @@ class ListAllCharacterArcsTest {
 	private fun assertCharacterArcsHaveCorrectNames(items: List<CharacterArcItem>) {
 		items.forEach {
 			assertEquals(
-				characterArcRepository.characterArcs[Character.Id(it.characterId)]!![Theme.Id(it.themeId)]!!.name,
+				themeRepository.themes[Theme.Id(it.themeId)]!!.name,
 				it.characterArcName
 			)
 		}

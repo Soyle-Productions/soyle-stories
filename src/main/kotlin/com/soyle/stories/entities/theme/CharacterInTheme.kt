@@ -1,6 +1,7 @@
 package com.soyle.stories.entities.theme
 
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
 
 /**
  * Created by Brendan
@@ -65,6 +66,7 @@ class MajorCharacter(
     override val position: String,
     override val thematicSections: List<ThematicSection>,
     private val perspective: CharacterPerspective,
+    val characterArc: CharacterArc,
     val characterChange: String
 ) : CharacterInTheme() {
 
@@ -75,8 +77,9 @@ class MajorCharacter(
         position: String = this.position,
         thematicSections: List<ThematicSection> = this.thematicSections,
         perspective: CharacterPerspective = this.perspective,
+        characterArc: CharacterArc = this.characterArc,
         characterChange: String = this.characterChange
-    ) = MajorCharacter(id, name, archetype, variationOnMoral, position, thematicSections, perspective, characterChange)
+    ) = MajorCharacter(id, name, archetype, variationOnMoral, position, thematicSections, perspective, characterArc, characterChange)
 
     override fun changeName(name: String): MajorCharacter =
       copy(name = name)
@@ -119,5 +122,8 @@ class MajorCharacter(
 
     fun withCharacterChangeAs(change: String): MajorCharacter =
         copy(characterChange = change)
+
+    fun withCharacterArcRenamed(name: String): MajorCharacter =
+        copy(characterArc = characterArc.withNewName(name))
 
 }

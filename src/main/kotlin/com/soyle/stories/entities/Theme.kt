@@ -193,6 +193,17 @@ class Theme(
         )
     }
 
+    fun withCharacterArcRenamed(characterId: Character.Id, newName: String): Theme
+    {
+        mustContainCharacter(characterId)
+        val majorCharacter = getMajorCharacter(characterId)
+        return copy(
+            includedCharacters = includedCharacters
+                .minus(majorCharacter.id)
+                .plus(majorCharacter.id to majorCharacter.withCharacterArcRenamed(newName))
+        )
+    }
+
     private fun mustNotContainCharacter(characterId: Character.Id) {
         if (containsCharacter(characterId)) {
             throw CharacterAlreadyIncludedInTheme(characterId.uuid, id.uuid)
@@ -330,6 +341,7 @@ class Theme(
                     null as StoryFunction?
                 }, emptyMap()
             ),
+            CharacterArc(id, CharacterArcTemplate.default(), this@Theme.id, this@Theme.name),
             ""
         )
 

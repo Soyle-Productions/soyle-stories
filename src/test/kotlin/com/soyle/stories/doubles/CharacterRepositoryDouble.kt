@@ -1,7 +1,6 @@
 package com.soyle.stories.doubles
 
 import com.soyle.stories.character.repositories.CharacterRepository
-import com.soyle.stories.characterarc.repositories.CharacterArcRepository
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.Project
@@ -14,7 +13,7 @@ class CharacterRepositoryDouble(
   private val onAddNewCharacter: (Character) -> Unit = {},
   private val onUpdateCharacter: (Character) -> Unit = {},
   private val onDeleteCharacterWithId: (Character.Id) -> Unit = {}
-) : CharacterRepository, com.soyle.stories.characterarc.repositories.CharacterRepository, com.soyle.stories.theme.repositories.CharacterRepository, CharacterArcRepository {
+) : CharacterRepository, com.soyle.stories.characterarc.repositories.CharacterRepository, com.soyle.stories.theme.repositories.CharacterRepository {
 
 	val characters = initialCharacters.associateBy { it.id }.toMutableMap()
 	val characterArcs: MutableMap<Character.Id, MutableMap<Theme.Id, CharacterArc>> = WeakHashMap()
@@ -41,30 +40,7 @@ class CharacterRepositoryDouble(
 		characters[character.id] = character
 	}
 
-	override suspend fun addNewCharacterArc(characterArc: CharacterArc) {
-		val arcMap = characterArcs.getOrPut(characterArc.characterId) { mutableMapOf() }
-		arcMap[characterArc.themeId] = characterArc
-	}
-
-	override suspend fun getCharacterArcByCharacterAndThemeId(
-		characterId: Character.Id,
-		themeId: Theme.Id
-	): CharacterArc? = characterArcs[characterId]?.get(themeId)
-
-	override suspend fun listAllCharacterArcsInProject(projectId: Project.Id): List<CharacterArc> {
-		return characters.values
-			.asSequence()
-			.filter { it.projectId == projectId }
-			.mapNotNull { characterArcs[it.id] }
-			.flatMap { it.values.asSequence() }.toList()
-	}
-
 	override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
 		return characters.values.filter { it.projectId == projectId }
-	}
-
-	override suspend fun updateCharacterArc(characterArc: CharacterArc) {
-		val arcMap = characterArcs.getOrPut(characterArc.characterId) { mutableMapOf() }
-		arcMap[characterArc.themeId] = characterArc
 	}
 }

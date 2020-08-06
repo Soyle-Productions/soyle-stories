@@ -109,7 +109,7 @@ class RemoveCharacterFromComparisonUnitTest {
     private fun removeCharacterFromComparison() {
         val useCase: RemoveCharacterFromComparison = RemoveCharacterFromComparisonUseCase(themeRepository, characterRepository)
         val output = object : RemoveCharacterFromComparison.OutputPort {
-            override fun receiveRemoveCharacterFromComparisonResponse(response: RemovedCharacterFromTheme) {
+            override suspend fun receiveRemoveCharacterFromComparisonResponse(response: RemovedCharacterFromTheme) {
                 assertNull(removedCharacter) // should not receive multiple removed characters
                 removedCharacter = response
                 result = response

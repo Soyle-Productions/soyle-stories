@@ -21,6 +21,8 @@ class ThemeRepositoryDouble(
         return themes.values.filter { it.projectId == projectId }
     }
 
+    override suspend fun listAllThemesInProject(projectId: Project.Id): List<Theme> = listThemesInProject(projectId)
+
     override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]
 
     override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
