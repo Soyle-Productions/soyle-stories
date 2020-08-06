@@ -7,6 +7,5 @@ fun makeCharacter(
     id: Character.Id = Character.Id(),
     projectId: Project.Id = Project.Id(),
     name: String = "Character ${UUID.randomUUID().toString().take(3)}",
-    media: Media.Id? = null,
-    characterArcs: List<CharacterArc> = listOf()
-) = Character(id, projectId, name, media, characterArcs)
+    media: Media.Id? = null
+) = Character(id, projectId, name, media)

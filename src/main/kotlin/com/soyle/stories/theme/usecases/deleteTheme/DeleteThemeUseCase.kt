@@ -18,16 +18,15 @@ class DeleteThemeUseCase(
         val theme = themeRepository.getThemeById(Theme.Id(themeId))
             ?: throw ThemeDoesNotExist(themeId)
 
-        val majorCharacters = theme.characters.filterIsInstance<MajorCharacter>().onEach {
-            val baseCharacter = characterRepository.getCharacterById(it.id)!!
-            characterRepository.updateCharacter(baseCharacter.withoutCharacterArc(theme.id))
+        val deletedCharacterArcs = theme.characters.filterIsInstance<MajorCharacter>().map {
+            it.characterArc
         }
 
         themeRepository.deleteTheme(theme)
 
-        if (majorCharacters.isNotEmpty()) {
-            output.characterArcsDeleted(majorCharacters.map {
-                DeletedCharacterArc(it.id.uuid, theme.id.uuid)
+        if (deletedCharacterArcs.isNotEmpty()) {
+            output.characterArcsDeleted(deletedCharacterArcs.map {
+                DeletedCharacterArc(it.characterId.uuid, theme.id.uuid)
             })
         }
         output.themeDeleted(DeletedTheme(themeId))

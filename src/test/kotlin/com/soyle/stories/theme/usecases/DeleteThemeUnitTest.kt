@@ -6,6 +6,7 @@ import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.entities.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.theme.MajorCharacter
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
@@ -64,10 +65,7 @@ class DeleteThemeUnitTest {
         inner class `Theme has Major Characters` {
 
             private val majorCharacters = List(4) { i ->
-                val og = makeCharacter(media = Media.Id().takeIf { i % 2 == 0 })
-                List(i) {Unit}.fold(og) { character, _ ->
-                    character.withCharacterArc("Arc ${UUID.randomUUID().toString().take(3)}", Theme.Id())
-                }.withCharacterArc("Arc ${UUID.randomUUID().toString().take(3)}", themeId)
+                makeCharacter(media = Media.Id().takeIf { i % 2 == 0 })
             }
             private val minorCharacterCount = 2
 
@@ -80,22 +78,9 @@ class DeleteThemeUnitTest {
             }
 
             @Test
-            fun `check character arcs deleted`() {
-                assertEquals(majorCharacters.size, characterRepository.updatedCharacters.size)
-                val majorCharactersById = majorCharacters.associateBy { it.id }
-                characterRepository.updatedCharacters.forEach {
-                    val character = majorCharactersById.getValue(it.id)
-                    assertEquals(character.name, it.name)
-                    assertEquals(character.media, it.media)
-                    assertEquals(character.characterArcs.size - 1, it.characterArcs.size)
-                }
-            }
-
-            @Test
             fun `check deleted character arcs were output`() {
                 val deletedArcs = deletedCharacterArcs!!.associateBy { it.characterId }
                 majorCharacters.forEach {
-                    val arc = it.characterArcs.single { it.themeId == themeId }
                     val deletedArc = deletedArcs.getValue(it.id.uuid)
                     assertEquals(themeId.uuid, deletedArc.themeId)
                 }

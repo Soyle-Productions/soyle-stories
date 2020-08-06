@@ -40,14 +40,13 @@ class RemoveCharacterFromComparisonUseCase(
         theme.getIncludedCharacterById(Character.Id(characterId))
             ?: throw CharacterNotInTheme(theme.id.uuid, characterId)
 
-    private suspend fun removeCharacterArcFromMajorCharacter(
+    private fun removeCharacterArcFromMajorCharacter(
         characterInTheme: CharacterInTheme,
         themeId: Theme.Id
     ): DeletedCharacterArc? {
         if (characterInTheme is MajorCharacter) {
-            val baseCharacter = characterRepository.getCharacterById(characterInTheme.id)!!
-            characterRepository.updateCharacter(baseCharacter.withoutCharacterArc(themeId))
-            return DeletedCharacterArc(baseCharacter.id.uuid, themeId.uuid)
+            val characterArc = characterInTheme.characterArc
+            return DeletedCharacterArc(characterArc.characterId.uuid, themeId.uuid)
         }
         return null
     }

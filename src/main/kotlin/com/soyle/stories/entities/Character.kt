@@ -15,33 +15,17 @@ class Character(
   val projectId: Project.Id,
   // Characters have a name
   val name: String,
-  val media: Media.Id?,
-  val characterArcs: List<CharacterArc>
+  val media: Media.Id?
 ) : Entity<Character.Id> {
 
-	constructor(projectId: Project.Id, name: String, media: Media.Id? = null) : this(Id(), projectId, name, media, listOf())
+	constructor(projectId: Project.Id, name: String, media: Media.Id? = null) : this(Id(), projectId, name, media)
 
 	private fun copy(
 		name: String = this.name,
-		media: Media.Id? = this.media,
-		characterArcs: List<CharacterArc> = this.characterArcs
-	) = Character(id, projectId, name, media, characterArcs)
+		media: Media.Id? = this.media
+	) = Character(id, projectId, name, media)
 
 	fun withName(name: String): Character = copy(name = name)
-
-	fun withCharacterArc(
-		name: String,
-		themeId: Theme.Id
-	): Character {
-		if (characterArcs.any { it.themeId == themeId }) {
-			throw ValidationException("Character cannot have multiple arcs for the same theme")
-		}
-		val newArc = CharacterArc(id, CharacterArcTemplate.default(), themeId, name)
-		return copy(characterArcs = characterArcs + newArc)
-	}
-
-	fun withoutCharacterArc(themeId: Theme.Id): Character =
-		copy(characterArcs = characterArcs.filterNot { it.themeId == themeId })
 
 	data class Id(val uuid: UUID = UUID.randomUUID())
 

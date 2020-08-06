@@ -69,15 +69,17 @@ class PlanNewCharacterArcTest {
         }
 
         @Test
-        fun `character arc is persisted`() {
-            planNewCharacterArc()
-            updatedCharacter!!.characterArcs.single()
-        }
-
-        @Test
         fun `character is major character in theme`() {
             planNewCharacterArc()
             createdTheme!!.getMajorCharacterById(characterId)!!
+        }
+
+        @Test
+        fun `character arc has name provided`() {
+            planNewCharacterArc()
+            createdTheme!!.getMajorCharacterById(characterId)!!.characterArc shouldBe {
+                assertEquals(characterArcName, it.name)
+            }
         }
 
         @Test
@@ -87,15 +89,9 @@ class PlanNewCharacterArcTest {
         }
 
         @Test
-        fun `character arc has name provided`() {
-            planNewCharacterArc()
-            assertEquals(characterArcName, updatedCharacter!!.characterArcs.single().name)
-        }
-
-        @Test
         fun `character arc should have required story sections and thematic sections`() {
             planNewCharacterArc()
-            val addedArc = updatedCharacter!!.characterArcs.single()
+            val addedArc = createdTheme!!.getMajorCharacterById(characterId)!!.characterArc
             val fullTemplate =
                 (addedArc.template.sections.map { it.id } + createdTheme!!.thematicTemplate.sections.map { it.characterArcTemplateSectionId }).toSet()
             assertEquals(fullTemplate.size, createdArcSections!!.size)
