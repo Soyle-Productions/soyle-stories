@@ -14,6 +14,12 @@ plugins {
 apply from: "$rootDir/$SUBPROJECT_CONFIG"
 
 sourceSets {
+    integration {
+        kotlin.srcDirs += 'src/integration/kotlin'
+        java.srcDirs += 'src/integration/java'
+        compileClasspath += sourceSets.main.output + sourceSets.test.output
+        runtimeClasspath += output + compileClasspath
+    }
     uat {
         kotlin.srcDirs += 'src/uat/kotlin'
         java.srcDirs += 'src/uat/java'
@@ -23,6 +29,11 @@ sourceSets {
 }
 
 configurations {
+    integrationRuntime.extendsFrom testImplementation
+
+    integrationCompile.extendsFrom testCompile
+    integrationImplementation.extendsFrom testImplementation
+
     uatRuntime.extendsFrom testImplementation
 
     uatCompile.extendsFrom testCompile
@@ -33,6 +44,11 @@ configurations {
     }
 }
 
+compileIntegrationKotlin {
+    kotlinOptions {
+        jvmTarget = "$JAVA_VERSION"
+    }
+}
 compileUatKotlin {
     kotlinOptions {
         jvmTarget = "$JAVA_VERSION"
@@ -70,6 +86,8 @@ dependencies {
     uatImplementation 'io.cucumber:cucumber-java8:6.1.1'
     uatImplementation 'io.cucumber:cucumber-junit:6.1.1'
 
+    testImplementation libraries.junit
+    testImplementation libraries.junitEngine
     testImplementation libraries.assertj
 
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
@@ -132,15 +150,31 @@ tasks["runtime"].doLast {
 
 idea {
     module {
+        testSourceDirs += file('src/integration/java')
+        testSourceDirs += file('src/integration/kotlin')
+        scopes.TEST.plus += [configurations.integrationCompile]
+
         testSourceDirs += file('src/uat/java')
         testSourceDirs += file('src/uat/kotlin')
         scopes.TEST.plus += [configurations.uatCompile]
 
         settings {
             packagePrefix["src/test/kotlin"] = "com.soyle.stories"
+            packagePrefix["src/integration/kotlin"] = "com.soyle.stories"
             packagePrefix["src/uat/kotlin"] = "com.soyle.stories"
         }
     }
+}
+
+task integration(type: Test) {
+    group "verification"
+
+    useJUnitPlatform()
+
+    testClassesDirs = sourceSets.integration.output.classesDirs
+    classpath = sourceSets.integration.runtimeClasspath
+
+    outputs.upToDateWhen { false }
 }
 
 task uat(type: Test) {
@@ -161,4 +195,5 @@ task uat(type: Test) {
 }
 
 check.dependsOn uat
-uat.mustRunAfter test
+integration.mustRunAfter test
+uat.mustRunAfter integration
