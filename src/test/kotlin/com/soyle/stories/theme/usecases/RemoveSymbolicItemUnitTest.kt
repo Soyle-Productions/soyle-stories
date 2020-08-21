@@ -2,9 +2,9 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
@@ -138,7 +138,7 @@ class RemoveSymbolicItemUnitTest {
             givenThemes(themeCount = 3, valueWebCount = 4, oppositionCount = 5, withEntity = true)
             removeSymbolicItemFromAllThemes()
             updatedThemes shouldBe listOfThemesOfSize(3)
-            result shouldBe responseModel(60)
+            result shouldBe responseModel(12)
         }
 
         @Test
@@ -147,7 +147,7 @@ class RemoveSymbolicItemUnitTest {
             givenThemes(themeCount = 3, valueWebCount = 4, oppositionCount = 5, withEntity = false)
             removeSymbolicItemFromAllThemes()
             updatedThemes shouldBe listOfThemesOfSize(2)
-            result shouldBe responseModel(24)
+            result shouldBe responseModel(6)
         }
 
         private fun removeSymbolicItemFromAllThemes()
@@ -170,7 +170,7 @@ class RemoveSymbolicItemUnitTest {
                         makeValueWeb(
                             oppositions = List(oppositionCount) {
                                 makeOppositionValue(representations = listOfNotNull(
-                                    if (withEntity) SymbolicRepresentation(symbolicItemId, "") else null
+                                    if (withEntity && it == 0) SymbolicRepresentation(symbolicItemId, "") else null
                                 ))
                             }
                         )

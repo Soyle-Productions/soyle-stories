@@ -1,4 +1,4 @@
-package com.soyle.stories.entities.theme
+package com.soyle.stories.entities.theme.characterInTheme
 
 /**
  * Created by Brendan

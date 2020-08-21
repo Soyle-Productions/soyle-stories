@@ -9,11 +9,13 @@ import com.soyle.stories.entities.theme.*
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb.RequestModel
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWebUseCase
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.OppositionAddedToValueWeb
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
+import com.soyle.stories.entities.theme.oppositionValue.CharacterAddedToOpposition
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import kotlinx.coroutines.runBlocking
@@ -42,7 +44,7 @@ class AddOppositionToValueWebUnitTest {
         addOppositionToValueWeb()
         val createdOpposition = createdOpposition()!!
         assertEquals("$valueWebName 1", createdOpposition.name)
-        result shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition.id.uuid,
+        result!!.oppositionAddedToValueWeb shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition.id.uuid,
             createdOpposition.name, true
         )
     }
@@ -53,7 +55,7 @@ class AddOppositionToValueWebUnitTest {
         addOppositionToValueWeb()
         val createdOpposition = createdOpposition()!!
         assertEquals("$valueWebName 6", createdOpposition.name)
-        result shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition.id.uuid,
+        result!!.oppositionAddedToValueWeb shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition.id.uuid,
             createdOpposition.name, true
         )
     }
@@ -74,7 +76,7 @@ class AddOppositionToValueWebUnitTest {
         addOppositionToValueWeb(name = "Horrible Bread")
         val createdOpposition = createdOpposition()!!
         assertEquals("Horrible Bread", createdOpposition.name)
-        result shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition.id.uuid,
+        result!!.oppositionAddedToValueWeb shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition.id.uuid,
             createdOpposition.name, false
         )
     }
@@ -102,7 +104,7 @@ class AddOppositionToValueWebUnitTest {
             assertEquals(character.id, it.characters.single().id)
             assertEquals(character.name, it.characters.single().name)
         }
-        result!! shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition()!!.id.uuid,
+        result!!.oppositionAddedToValueWeb shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition()!!.id.uuid,
             createdOpposition()!!.name, false
         )
         result!! shouldBe {
@@ -127,7 +129,7 @@ class AddOppositionToValueWebUnitTest {
             assertEquals(character.id.uuid, it.representations.single().entityUUID)
             assertEquals(character.name, it.representations.single().name)
         }
-        result!! shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition()!!.id.uuid,
+        result!!.oppositionAddedToValueWeb shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition()!!.id.uuid,
             createdOpposition()!!.name, false
         )
         result!! shouldBe {
@@ -170,7 +172,9 @@ class AddOppositionToValueWebUnitTest {
         val themeId = Theme.Id()
         val theme = makeTheme(
             id = themeId,
-            valueWebs = listOf(makeValueWeb(valueWebId, themeId = themeId, name = valueWebName, oppositions = List(existingOppositionCount) { OppositionValue("") }))
+            valueWebs = listOf(makeValueWeb(valueWebId, themeId = themeId, name = valueWebName, oppositions = List(existingOppositionCount) {
+                makeOppositionValue()
+            }))
         ).let { if (includeCharacter != null) it.withCharacterIncluded(includeCharacter.id, includeCharacter.name, includeCharacter.media) else it }
         themeRepository.themes[theme.id] = theme
         return theme

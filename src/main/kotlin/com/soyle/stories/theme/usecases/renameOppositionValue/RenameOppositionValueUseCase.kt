@@ -1,11 +1,11 @@
 package com.soyle.stories.theme.usecases.renameOppositionValue
 
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
+import com.soyle.stories.entities.theme.oppositionValue.RenamedOppositionValue
 import com.soyle.stories.theme.OppositionValueAlreadyHasName
 import com.soyle.stories.theme.OppositionValueDoesNotExist
-import com.soyle.stories.theme.OppositionValueNameCannotBeBlank
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.validateOppositionValueName
 import java.util.*
@@ -20,7 +20,14 @@ class RenameOppositionValueUseCase(
         val (valueWeb, oppositionValue) = getValueWebAndOppositionValue(theme, oppositionValueId)
         if (oppositionValue.name == name) throw OppositionValueAlreadyHasName(oppositionValue.id.uuid, name)
         updateOppositionValueName(oppositionValue, name, valueWeb, theme)
-        output.oppositionValueRenamed(RenamedOppositionValue(theme.id.uuid, valueWeb.id.uuid, oppositionValue.id.uuid, name))
+        output.oppositionValueRenamed(
+            RenamedOppositionValue(
+                theme.id.uuid,
+                valueWeb.id.uuid,
+                oppositionValue.id.uuid,
+                name
+            )
+        )
 
     }
 
@@ -45,8 +52,7 @@ class RenameOppositionValueUseCase(
         valueWeb: ValueWeb,
         theme: Theme
     ) {
-        val updatedOpposition = oppositionValue.withName(name)
-        val updatedValueWeb = valueWeb.withoutOpposition(oppositionValue.id).withOpposition(updatedOpposition)
+        val updatedValueWeb = valueWeb.withOppositionRenamedTo(oppositionValue.id, name)
         val updatedTheme = theme.withoutValueWeb(valueWeb.id).withValueWeb(updatedValueWeb)
         themeRepository.updateTheme(updatedTheme)
     }

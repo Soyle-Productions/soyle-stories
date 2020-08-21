@@ -56,35 +56,33 @@ class RenameSymbolicItemUnitTest {
 
     @Test
     fun `all oppositions per value web per theme should be output`() {
-        givenOppositionWithEntity(themeCount = 3, valueWebCount = 4, oppositionCount = 5)
+        givenOppositionWithEntity(themeCount = 3, valueWebCount = 4)
         renameSymbolicItem()
         updatedThemes shouldBe listOfThemesOfSize(3)
-        result shouldBe responseModel(60)
+        result shouldBe responseModel(12)
     }
 
     @Test
     fun `only oppositions with entity output`() {
-        givenOppositionWithEntity(themeCount = 2, valueWebCount = 3, oppositionCount = 4)
+        givenOppositionWithEntity(themeCount = 2, valueWebCount = 3)
         givenThemes(themeCount = 3, valueWebCount = 4, oppositionCount = 5)
         renameSymbolicItem()
         updatedThemes shouldBe listOfThemesOfSize(2)
-        result shouldBe responseModel(24)
+        result shouldBe responseModel(6)
     }
 
     private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = {
         updatedThemes = (updatedThemes ?: listOf()) + it
     })
 
-    private fun givenOppositionWithEntity(themeCount: Int = 1, valueWebCount: Int = 1, oppositionCount: Int = 1) {
+    private fun givenOppositionWithEntity(themeCount: Int = 1, valueWebCount: Int = 1) {
         List(themeCount) {
             makeTheme(
                 valueWebs = List(valueWebCount) {
                     makeValueWeb(
-                        oppositions = List(oppositionCount) {
-                            makeOppositionValue(
-                                representations = listOf(SymbolicRepresentation(symbolicEntityId, originalName))
-                            )
-                        }
+                        oppositions = listOf(makeOppositionValue(
+                            representations = listOf(SymbolicRepresentation(symbolicEntityId, originalName))
+                        ))
                     )
                 }
             )

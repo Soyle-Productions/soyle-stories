@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.usecases.addSymbolicItemToOpposition
 
+import com.soyle.stories.entities.theme.oppositionValue.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import java.util.*

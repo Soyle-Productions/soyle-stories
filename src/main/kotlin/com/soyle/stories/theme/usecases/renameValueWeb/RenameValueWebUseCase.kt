@@ -1,11 +1,11 @@
 package com.soyle.stories.theme.usecases.renameValueWeb
 
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.ValueWebAlreadyHasName
 import com.soyle.stories.theme.ValueWebDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
-import com.soyle.stories.theme.usecases.validateValueWebName
+import com.soyle.stories.entities.theme.valueWeb.validateValueWebName
 import java.util.*
 
 class RenameValueWebUseCase(

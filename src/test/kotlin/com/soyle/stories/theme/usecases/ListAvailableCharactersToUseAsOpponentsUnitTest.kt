@@ -6,7 +6,7 @@ import com.soyle.stories.common.str
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.StoryFunction
+import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble

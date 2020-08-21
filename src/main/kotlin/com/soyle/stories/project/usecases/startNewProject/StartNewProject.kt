@@ -14,6 +14,6 @@ interface StartNewProject {
 
     interface OutputPort {
         fun receiveStartNewProjectFailure(failure: Throwable)
-        fun receiveStartNewProjectResponse(response: ResponseModel)
+        suspend fun receiveStartNewProjectResponse(response: ResponseModel)
     }
 }

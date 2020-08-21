@@ -1,7 +1,10 @@
-package com.soyle.stories.entities.theme
+package com.soyle.stories.entities.theme.characterInTheme
 
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.ThematicSection
+import com.soyle.stories.entities.theme.ThematicTemplate
+import com.soyle.stories.translators.asThematicTemplateSection
+import java.util.*
 
 /**
  * Created by Brendan
@@ -32,13 +35,36 @@ class MinorCharacter(
     override val thematicSections: List<ThematicSection>
 ) : CharacterInTheme() {
 
+    constructor(themeId: Theme.Id, characterId: Character.Id, name: String, thematicTemplate: ThematicTemplate) : this(
+        characterId,
+        name,
+        "",
+        "",
+        "",
+        thematicTemplate.sections.map {
+            ThematicSection(
+                CharacterArcSection.Id(UUID.randomUUID()),
+                characterId,
+                themeId,
+                it
+            )
+        }
+    )
+
     private fun copy(
         name: String = this.name,
         archetype: String = this.archetype,
         variationOnMoral: String = this.variationOnMoral,
         thematicSections: List<ThematicSection> = this.thematicSections,
         position: String = this.position
-    ) = MinorCharacter(id, name, archetype, variationOnMoral, position, thematicSections)
+    ) = MinorCharacter(
+        id,
+        name,
+        archetype,
+        variationOnMoral,
+        position,
+        thematicSections
+    )
 
     override fun changeName(name: String): MinorCharacter {
         return copy(name = name)
@@ -56,6 +82,24 @@ class MinorCharacter(
         return copy(position = position)
     }
 
+    fun promote(
+        otherCharacters: List<Character.Id>,
+        themeId: Theme.Id,
+        themeName: String,
+        characterArcTemplate: CharacterArcTemplate
+    ): MajorCharacter = MajorCharacter(
+        id,
+        name,
+        archetype,
+        variationOnMoral,
+        position,
+        thematicSections,
+        otherCharacters,
+        themeId,
+        themeName,
+        characterArcTemplate
+    )
+
 }
 
 class MajorCharacter(
@@ -70,6 +114,36 @@ class MajorCharacter(
     val characterChange: String
 ) : CharacterInTheme() {
 
+    constructor(
+        id: Character.Id,
+        name: String,
+        archetype: String,
+        variationOnMoral: String,
+        position: String,
+        thematicSections: List<ThematicSection>,
+        otherCharacters: List<Character.Id>,
+        themeId: Theme.Id,
+        themeName: String,
+        characterArcTemplate: CharacterArcTemplate
+    ) : this(
+        id,
+        name,
+        archetype,
+        variationOnMoral,
+        position,
+        thematicSections.let {
+            val thematicSectionsIds = it.map { it.template.characterArcTemplateSectionId }.toSet()
+            thematicSections + characterArcTemplate.sections.filterNot {
+                it.id in thematicSectionsIds
+            }.map {
+                ThematicSection(CharacterArcSection.Id(UUID.randomUUID()), id, themeId, it.asThematicTemplateSection())
+            }
+        },
+        CharacterPerspective(otherCharacters),
+        CharacterArc(id, characterArcTemplate, themeId, themeName),
+        ""
+    )
+
     private fun copy(
         name: String = this.name,
         archetype: String = this.archetype,
@@ -79,10 +153,20 @@ class MajorCharacter(
         perspective: CharacterPerspective = this.perspective,
         characterArc: CharacterArc = this.characterArc,
         characterChange: String = this.characterChange
-    ) = MajorCharacter(id, name, archetype, variationOnMoral, position, thematicSections, perspective, characterArc, characterChange)
+    ) = MajorCharacter(
+        id,
+        name,
+        archetype,
+        variationOnMoral,
+        position,
+        thematicSections,
+        perspective,
+        characterArc,
+        characterChange
+    )
 
     override fun changeName(name: String): MajorCharacter =
-      copy(name = name)
+        copy(name = name)
 
     fun perceiveCharacter(characterId: Character.Id): MajorCharacter =
         copy(perspective = perspective.perceiveCharacter(characterId))
@@ -97,7 +181,10 @@ class MajorCharacter(
     fun getStoryFunctionsForCharacter(characterId: Character.Id) =
         perspective.storyFunctions[characterId]
 
-    fun getOpponents() = perspective.storyFunctions.filter { it.value == StoryFunction.Antagonist || it.value == StoryFunction.FakeAllyAntagonist || it.value == StoryFunction.MainAntagonist }
+    fun getOpponents() =
+        perspective.storyFunctions.filter {
+            it.value == StoryFunction.Antagonist || it.value == StoryFunction.FakeAllyAntagonist || it.value == StoryFunction.MainAntagonist
+        }
 
     fun hasStoryFunctionForTargetCharacter(function: StoryFunction, characterId: Character.Id) =
         getStoryFunctionsForCharacter(characterId) == function

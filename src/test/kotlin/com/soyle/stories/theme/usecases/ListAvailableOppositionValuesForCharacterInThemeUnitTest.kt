@@ -1,13 +1,15 @@
 package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.common.str
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.AvailableValueWebForCharacterInTheme
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInThemeUseCase
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.OppositionValuesAvailableForCharacterInTheme
@@ -97,14 +99,19 @@ class ListAvailableOppositionValuesForCharacterInThemeUnitTest {
         @Nested
         inner class `Value Webs have opposition values` {
 
-            private val expectedOppositionValues = expectedValueWebs.associate {
-                it.id to List((1..6).random()) {
-                    makeOppositionValue(name = "Opposition Value ${UUID.randomUUID().toString().take(3)}")
-                }
-            }
+            private val expectedOppositionValues: Map<ValueWeb.Id, List<OppositionValue>>
 
             init {
-                givenValueWebsHaveOppositions(expectedOppositionValues)
+                val valueWebsWithOpposiitonValues = expectedValueWebs.map {
+                    List((1..6).random()) { Unit }.fold(it) { a, _ ->
+                        a.withOpposition("Opposition Value ${str()}")
+                    }
+                }
+                givenValueWebsHaveOppositions(valueWebsWithOpposiitonValues)
+                expectedOppositionValues = valueWebsWithOpposiitonValues.associate {
+                    it.id to it.oppositions
+                }
+
             }
 
             @Test
@@ -129,13 +136,12 @@ class ListAvailableOppositionValuesForCharacterInThemeUnitTest {
                 val opsWithRepresentation = expectedOppositionValues.entries.take(2).map { it.key to it.value.first() }
                 givenCharacterRepresentsOppositionValues(opsWithRepresentation)
                 listAvailableOppositionValuesForCharacterInTheme()
-                result shouldBe {
-                    it!!
+                result!! shouldBe {
                     assertEquals(opsWithRepresentation.size, it.filter { it.characterRepresentsAnOpposition }.size)
                     val opsWithRepresentationByWebId = opsWithRepresentation.toMap()
-                    it.filter { it.characterRepresentsAnOpposition }.forEach {
+                    it.filter(AvailableValueWebForCharacterInTheme::characterRepresentsAnOpposition).forEach {
                         val opposition = opsWithRepresentationByWebId.getValue(ValueWeb.Id(it.valueWebId))
-                        assertNull(it.singleOrNull { it.oppositionValueId == opposition.id.uuid }) { "Should not include the opposition value this character represents" }
+                        assertNull(it.find { it.oppositionValueId == opposition.id.uuid }) { "Should not include the opposition value this character represents" }
                         assertEquals(opposition.id.uuid, it.oppositionCharacterRepresents!!.oppositionValueId)
                         assertEquals(opposition.name, it.oppositionCharacterRepresents!!.oppositionValueName)
                     }
@@ -162,13 +168,10 @@ class ListAvailableOppositionValuesForCharacterInThemeUnitTest {
         }
     }
 
-    private fun givenValueWebsHaveOppositions(oppositionValues: Map<ValueWeb.Id, List<OppositionValue>>) {
+    private fun givenValueWebsHaveOppositions(valueWebs: List<ValueWeb>) {
         themeRepository.themes[themeId] =
-            oppositionValues.entries.fold(themeRepository.themes[themeId]!!) { theme, (webId, ops) ->
-                theme.withoutValueWeb(webId)
-                    .withValueWeb(ops.fold(theme.valueWebs.find { it.id == webId }!!) { web, op ->
-                        web.withOpposition(op)
-                    })
+            valueWebs.fold(themeRepository.themes[themeId]!!) { theme, web ->
+                theme.withoutValueWeb(web.id).withValueWeb(web)
             }
     }
 
@@ -178,8 +181,7 @@ class ListAvailableOppositionValuesForCharacterInThemeUnitTest {
                 val valueWeb = theme.valueWebs.find { it.id == webId }!!
                 theme.withoutValueWeb(webId)
                     .withValueWeb(
-                        valueWeb.withoutOpposition(op.id)
-                            .withOpposition(op.withRepresentation(SymbolicRepresentation(characterId.uuid, "")))
+                        valueWeb.withRepresentationOf(SymbolicRepresentation(characterId.uuid, ""), op.id)
                     )
             }
     }

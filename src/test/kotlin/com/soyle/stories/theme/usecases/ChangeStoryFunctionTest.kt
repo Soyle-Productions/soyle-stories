@@ -7,12 +7,9 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterPerspective
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.MinorCharacter
-import com.soyle.stories.entities.theme.StoryFunction
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
 import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunctionUseCase

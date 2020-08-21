@@ -4,8 +4,8 @@ import com.soyle.stories.common.Desire
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
-import com.soyle.stories.entities.theme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository

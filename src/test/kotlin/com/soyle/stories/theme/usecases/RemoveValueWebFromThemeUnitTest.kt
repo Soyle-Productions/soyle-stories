@@ -2,7 +2,7 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.ValueWebDoesNotExist
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeTheme

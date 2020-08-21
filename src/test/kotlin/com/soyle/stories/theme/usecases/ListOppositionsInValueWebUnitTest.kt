@@ -7,7 +7,10 @@ import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.*
 import com.soyle.stories.theme.ValueWebDoesNotExist
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.makeTheme
+import com.soyle.stories.theme.makeValueWeb
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.*
 import com.soyle.stories.theme.valueWebDoesNotExist
 import kotlinx.coroutines.runBlocking
@@ -33,7 +36,12 @@ class ListOppositionsInValueWebUnitTest {
 
     @Test
     fun `value web exists`() {
-        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, themeId, "", listOf())))
+        val theme = makeTheme(themeId, valueWebs = listOf(
+            makeValueWeb(
+                valueWebId,
+                themeId
+            )
+        ))
         repo.themes[themeId] = theme
         listOppositionsInValueWeb()
         result shouldBe ::emptyResponseModel
@@ -41,8 +49,18 @@ class ListOppositionsInValueWebUnitTest {
 
     @Test
     fun `value web has oppositions`() {
-        val oppositions = List(5) { OppositionValue(it.toString()) }
-        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, themeId, "", oppositions)))
+        val oppositions = List(5) {
+            OppositionValue(
+                it.toString()
+            )
+        }
+        val theme = makeTheme(themeId, valueWebs = listOf(
+            makeValueWeb(
+                valueWebId,
+                themeId,
+                oppositions = oppositions
+            )
+        ))
         repo.themes[themeId] = theme
         listOppositionsInValueWeb()
         result shouldBe responseModel(oppositions)
@@ -50,14 +68,25 @@ class ListOppositionsInValueWebUnitTest {
 
     @Test
     fun `oppositions have symbolic representations`() {
-        val oppositions = List(5) { OppositionValue(OppositionValue.Id(), it.toString(), List(it*it) {
-            when {
-                it % 2 == 0 -> SymbolicRepresentation(Character.Id().uuid, "Character $it")
-                it % 3 == 0 -> SymbolicRepresentation(Location.Id().uuid, "Location $it")
-                else -> SymbolicRepresentation(Symbol.Id().uuid, "Symbol $it")
-            }
-        }) }
-        val theme = makeTheme(themeId, valueWebs = listOf(ValueWeb(valueWebId, themeId, "", oppositions)))
+        val oppositions = List(5) {
+            OppositionValue(
+                OppositionValue.Id(),
+                it.toString(),
+                List(it * it) {
+                    when {
+                        it % 2 == 0 -> SymbolicRepresentation(Character.Id().uuid, "Character $it")
+                        it % 3 == 0 -> SymbolicRepresentation(Location.Id().uuid, "Location $it")
+                        else -> SymbolicRepresentation(Symbol.Id().uuid, "Symbol $it")
+                    }
+                })
+        }
+        val theme = makeTheme(themeId, valueWebs = listOf(
+            makeValueWeb(
+                valueWebId,
+                themeId,
+                oppositions = oppositions
+            )
+        ))
         repo.themes[themeId] = theme
         listOppositionsInValueWeb()
         result shouldBe responseModel(oppositions)

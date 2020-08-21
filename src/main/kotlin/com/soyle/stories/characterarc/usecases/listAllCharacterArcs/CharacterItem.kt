@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.usecases.listAllCharacterArcs
 
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.theme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import java.util.*
 
 /**

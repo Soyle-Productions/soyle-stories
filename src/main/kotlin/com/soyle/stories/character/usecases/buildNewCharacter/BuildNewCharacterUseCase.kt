@@ -9,7 +9,7 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Media
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.StoryFunction
+import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist

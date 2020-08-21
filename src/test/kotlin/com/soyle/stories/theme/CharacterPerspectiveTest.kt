@@ -5,13 +5,10 @@ import arrow.core.flatMap
 import arrow.core.right
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.CharacterPerspective
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.MinorCharacter
-import com.soyle.stories.entities.theme.StoryFunction
+import com.soyle.stories.entities.theme.characterInTheme.CharacterPerspective
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*
@@ -79,7 +76,10 @@ class CharacterPerspectiveTest {
                     "",
                     "",
                     listOf(),
-                    CharacterPerspective(mapOf(), mapOf()),
+                    CharacterPerspective(
+                        mapOf(),
+                        mapOf()
+                    ),
                     CharacterArc(id, CharacterArcTemplate.default(), theme.id, theme.name),
                     ""
                 )
@@ -143,7 +143,7 @@ class CharacterPerspectiveTest {
         val characterInTheme = theme.getMajorCharacterById(newCharacter.id)
         characterInTheme as MajorCharacter
 
-        val (updatedCharacter) = theme
+        val updatedCharacter = theme
             .withCharacterAsStoryFunctionForMajorCharacter(
                 otherCharacters.first().id,
                 StoryFunction.Antagonist,
@@ -151,9 +151,9 @@ class CharacterPerspectiveTest {
             )
             .let {
                 val updatedCharacter = it.getMajorCharacterById(newCharacter.id) as MajorCharacter
-                it.changeAttack(updatedCharacter, otherCharacters.first().id, newAttack)
+                it.withCharacterAttackingMajorCharacter(otherCharacters.first().id, newAttack, updatedCharacter.id)
+                    .getMajorCharacterById(newCharacter.id)
             }
-            .map { it.getMajorCharacterById(newCharacter.id) } as Either.Right
         updatedCharacter as MajorCharacter
 
         assertEquals(newAttack, updatedCharacter.getAttacksByCharacter(otherCharacters.first().id))
@@ -180,14 +180,18 @@ class CharacterPerspectiveTest {
                     "",
                     "",
                     listOf(),
-                    CharacterPerspective(mapOf(), mapOf()),
+                    CharacterPerspective(
+                        mapOf(),
+                        mapOf()
+                    ),
                     CharacterArc(id, CharacterArcTemplate.default(), theme.id, theme.name),
                     ""
                 )
             } to otherCharacters.first()
         ).forEach { (characterInTheme, targetCharacter) ->
-            val (error) = theme.changeAttack(characterInTheme, targetCharacter.id, "") as Either.Left
-            assert(error is CharacterNotInTheme)
+            assertThrows<CharacterNotInTheme> {
+                theme.withCharacterAttackingMajorCharacter(targetCharacter.id, "", characterInTheme.id)
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
 package com.soyle.stories.theme.usecases.compareCharacterValues
 
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.OppositionValue
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*

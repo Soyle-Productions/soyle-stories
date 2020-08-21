@@ -2,13 +2,13 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValue
 import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValueUseCase
-import com.soyle.stories.theme.usecases.renameOppositionValue.RenamedOppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.RenamedOppositionValue
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested

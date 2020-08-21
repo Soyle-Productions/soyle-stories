@@ -1,18 +1,20 @@
 package com.soyle.stories.theme.usecases.addSymbolicItemToOpposition
 
 import com.soyle.stories.character.CharacterDoesNotExist
-import com.soyle.stories.entities.theme.OppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.theme.OppositionValueDoesNotExist
 import com.soyle.stories.character.repositories.CharacterRepository
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
+import com.soyle.stories.entities.theme.oppositionValue.CharacterAddedToOpposition
+import com.soyle.stories.entities.theme.oppositionValue.LocationAddedToOpposition
+import com.soyle.stories.entities.theme.oppositionValue.SymbolAddedToOpposition
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.repositories.LocationRepository
-import com.soyle.stories.theme.CharacterAlreadyRepresentationValueInValueWeb
+import com.soyle.stories.entities.theme.valueWeb.CharacterAlreadyRepresentationValueInValueWeb
 import com.soyle.stories.theme.SymbolDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
@@ -160,7 +162,7 @@ class AddSymbolicItemToOppositionUseCase(
         val (updatedValueWeb, removedItem) = try {
             valueWeb.withRepresentationOf(representation, OppositionValue.Id(oppositionId)) to null
         } catch (duplicate: CharacterAlreadyRepresentationValueInValueWeb) {
-            valueWeb.withoutRepresentation(representation)
+            valueWeb.withoutRepresentation(representation.entityUUID)
                 .withRepresentationOf(representation, OppositionValue.Id(oppositionId)) to
                     RemovedSymbolicItem(
                         duplicate.themeId,

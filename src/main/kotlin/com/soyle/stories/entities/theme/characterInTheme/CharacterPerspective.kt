@@ -1,4 +1,4 @@
-package com.soyle.stories.entities.theme
+package com.soyle.stories.entities.theme.characterInTheme
 
 import com.soyle.stories.entities.Character
 
@@ -11,6 +11,11 @@ class CharacterPerspective(
     val storyFunctions: Map<Character.Id, StoryFunction?>,
     val attacks: Map<Character.Id, String>
 ) {
+
+    constructor(characterIds: List<Character.Id>) : this(
+        characterIds.associateWith { null },
+        characterIds.associateWith { "" }
+    )
 
     fun perceiveCharacter(characterId: Character.Id) =
         CharacterPerspective(

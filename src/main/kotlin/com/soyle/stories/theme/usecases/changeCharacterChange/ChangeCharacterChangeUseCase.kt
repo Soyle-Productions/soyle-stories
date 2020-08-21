@@ -2,11 +2,10 @@ package com.soyle.stories.theme.usecases.changeCharacterChange
 
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
-import com.soyle.stories.entities.theme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
-import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.repositories.getThemeOrError
 import java.util.*

@@ -1,11 +1,9 @@
 package com.soyle.stories.theme.usecases.compareCharacters
 
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.CharacterNotInTheme
-import com.soyle.stories.theme.Context
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.repositories.ThemeRepository

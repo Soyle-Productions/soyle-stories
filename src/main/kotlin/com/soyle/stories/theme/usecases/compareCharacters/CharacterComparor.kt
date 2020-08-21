@@ -4,8 +4,8 @@ import arrow.core.Either
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
-import com.soyle.stories.entities.theme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.entities.theme.ThematicSection
 import com.soyle.stories.entities.theme.ThematicTemplateSection
 import java.util.*

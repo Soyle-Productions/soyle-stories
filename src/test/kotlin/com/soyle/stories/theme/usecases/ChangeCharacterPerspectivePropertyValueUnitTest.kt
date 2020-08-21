@@ -160,8 +160,7 @@ class ChangeCharacterPerspectivePropertyValueUnitTest {
             }
         }.let { theme ->
             if (andMajorCharacter != null) theme.getMinorCharacterById(Character.Id(andMajorCharacter))?.let {
-                theme.promoteCharacter(it)
-                    .fold({ throw it }, ::identity)
+                theme.withCharacterPromoted(it.id)
             } ?: theme else theme
         }
         context = setupContext(

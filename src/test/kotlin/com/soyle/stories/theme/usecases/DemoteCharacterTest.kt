@@ -6,10 +6,9 @@
 package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
-import arrow.core.flatMap
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.MinorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.MinorCharacter
 import com.soyle.stories.entities.theme.ThematicTemplate
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
@@ -164,8 +163,7 @@ class DemoteCharacterTest {
             charactersToInclude.fold(theme) { currentTheme, (character, promote) ->
                 val themeWithCharacter =
                     currentTheme.withCharacterIncluded(character.id, character.name, character.media)
-                if (promote) (themeWithCharacter
-                    .promoteCharacter(themeWithCharacter.getMinorCharacterById(character.id) as MinorCharacter) as Either.Right).b
+                if (promote) themeWithCharacter.withCharacterPromoted(character.id)
                 else themeWithCharacter
 
             }

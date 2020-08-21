@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.usecases.addOppositionToValueWeb
 
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicItemId
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
+import com.soyle.stories.entities.theme.oppositionValue.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import java.util.*
@@ -27,16 +26,10 @@ interface AddOppositionToValueWeb {
     suspend operator fun invoke(valueWebId: UUID, output: OutputPort)
 
     class ResponseModel(
-        oppositionAddedToValueWeb: OppositionAddedToValueWeb,
+        val oppositionAddedToValueWeb: OppositionAddedToValueWeb,
         val symbolicRepresentationRemoved: RemovedSymbolicItem?,
         val symbolicRepresentationAddedToOpposition: SymbolicRepresentationAddedToOpposition?,
         val characterIncludedInTheme: CharacterIncludedInTheme?
-    ) : OppositionAddedToValueWeb(
-        oppositionAddedToValueWeb.themeId,
-        oppositionAddedToValueWeb.valueWebId,
-        oppositionAddedToValueWeb.oppositionValueId,
-        oppositionAddedToValueWeb.oppositionValueName,
-        oppositionAddedToValueWeb.needsName
     )
 
     interface OutputPort {

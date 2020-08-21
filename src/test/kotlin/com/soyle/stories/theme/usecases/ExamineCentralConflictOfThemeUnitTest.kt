@@ -4,11 +4,11 @@ import arrow.core.Either
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.*
 import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.StoryFunction
+import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
-import com.soyle.stories.entities.theme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
@@ -213,7 +213,7 @@ class ExamineCentralConflictOfThemeUnitTest {
                     theme.withCharacterIncluded(opponent.id, opponent.name, opponent.media)
                         .withCharacterAsStoryFunctionForMajorCharacter(opponent.id, StoryFunction.Antagonist, characterId)
                         .withCharacterAttackingMajorCharacter(opponent.id, generateAttack(i), characterId)
-                        .withCharactersSimilarToEachOther(opponent.id to characterId, generateSimilarities(i))
+                        .withCharactersSimilarToEachOther(coupleOf(opponent.id, characterId), generateSimilarities(i))
                         .withCharacterHoldingPosition(opponent.id, generatePosition(i))
                 }
             }

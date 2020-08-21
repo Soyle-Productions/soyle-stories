@@ -1,9 +1,9 @@
 package com.soyle.stories.theme.usecases.renameSymbolicItems
 
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*
 
@@ -17,7 +17,7 @@ class RenameSymbolicItemUseCase(
         themeRepository.updateThemes(themes.map {
             it.valueWebs.fold(it) { a, b ->
                 a.withoutValueWeb(b.id).withValueWeb(
-                    b.renameRepresentations(symbolicEntityId, newName)
+                    b.withRepresentationRenamedTo(symbolicEntityId, newName)
                 )
             }
         })
@@ -46,17 +46,5 @@ class RenameSymbolicItemUseCase(
         newName
     )
 
-    private fun ValueWeb.renameRepresentations(matchingId: UUID, newName: String) =
-        oppositions.fold(this) { value, op ->
-            value.withoutOpposition(op.id).withOpposition(op.renameRepresentations(matchingId, newName))
-        }
-
-    private fun OppositionValue.renameRepresentations(matchingId: UUID, newName: String) =
-        representations.fold(this) { op, rep ->
-            if (rep.entityUUID == matchingId) {
-                op.withoutRepresentation(rep)
-                    .withRepresentation(rep.copy(name = newName))
-            } else op
-        }
 
 }

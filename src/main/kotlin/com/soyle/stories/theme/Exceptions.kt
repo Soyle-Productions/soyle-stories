@@ -2,9 +2,8 @@ package com.soyle.stories.theme
 
 import com.soyle.stories.common.DuplicateOperationException
 import com.soyle.stories.common.EntityNotFoundException
-import com.soyle.stories.common.SoyleStoriesException
 import com.soyle.stories.common.ValidationException
-import com.soyle.stories.entities.theme.StoryFunction
+import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import java.util.*
 
 /**
@@ -54,18 +53,9 @@ class ValueWebDoesNotExist(val valueWebId: UUID) : EntityNotFoundException(value
 class OppositionValueDoesNotExist(val oppositionValueId: UUID) : EntityNotFoundException(oppositionValueId)
 object OppositionValueNameCannotBeBlank : ValidationException()
 class OppositionValueAlreadyHasName(val oppositionValueId: UUID, val oppositionValueName: String) : DuplicateOperationException()
-class ValueWebDoesNotContainOppositionValue(val valueWebId: UUID, val oppositionValueId: UUID) : EntityNotFoundException(oppositionValueId)
 class ValueWebAlreadyHasName(val valueWebId: UUID, val valueWebName: String) : DuplicateOperationException()
 
 class SymbolicRepresentationNotInOppositionValue(val oppositionValueId: UUID, val symbolicRepresentationId: UUID) : EntityNotFoundException(symbolicRepresentationId)
-
-class CharacterAlreadyRepresentationValueInValueWeb(
-    val themeId: UUID,
-    val valueWebId: UUID,
-    val oppositionValueId: UUID,
-    val attemptedOppositionValueId: UUID,
-    val characterId: UUID
-) : DuplicateOperationException()
 
 class CharacterAlreadyPromotedInTheme(
     val themeId: UUID,

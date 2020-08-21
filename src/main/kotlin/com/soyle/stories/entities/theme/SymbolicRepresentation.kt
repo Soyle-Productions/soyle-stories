@@ -1,7 +1,16 @@
 package com.soyle.stories.entities.theme
 
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
 import java.util.*
 
-data class SymbolicRepresentation(val entityUUID: UUID, val name: String)
+class SymbolicRepresentation(val entityUUID: UUID, val name: String) {
+    override fun equals(other: Any?): Boolean =
+        other is SymbolicRepresentation &&
+                other.entityUUID == entityUUID &&
+                other.name == name
+
+    override fun hashCode(): Int {
+        var result = entityUUID.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
+    }
+}

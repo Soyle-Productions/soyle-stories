@@ -2,7 +2,7 @@ package com.soyle.stories.theme.usecases.changeCharacterPropertyValue
 
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.Context
 import com.soyle.stories.theme.ThemeDoesNotExist

@@ -1,9 +1,9 @@
 package com.soyle.stories.theme.usecases.removeOppositionFromValueWeb
 
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
-import com.soyle.stories.entities.theme.ValueWeb
-import com.soyle.stories.theme.ValueWebDoesNotContainOppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWebDoesNotContainOppositionValue
 import com.soyle.stories.theme.ValueWebDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*
@@ -47,5 +47,8 @@ class RemoveOppositionFromValueWebUseCase(
         valueWeb: ValueWeb,
         oppositionId: UUID
     ) = (valueWeb.oppositions.find { it.id.uuid == oppositionId }
-        ?: throw ValueWebDoesNotContainOppositionValue(valueWeb.id.uuid, oppositionId))
+        ?: throw ValueWebDoesNotContainOppositionValue(
+            valueWeb.id.uuid,
+            oppositionId
+        ))
 }

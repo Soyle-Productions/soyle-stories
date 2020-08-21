@@ -4,15 +4,15 @@ import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.OppositionAddedToValueWeb
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
+import com.soyle.stories.entities.theme.oppositionValue.CharacterAddedToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicItemId
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
+import com.soyle.stories.entities.theme.oppositionValue.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import java.util.*
 
@@ -51,15 +51,16 @@ class AddValueWebToThemeUseCase(
         }
         valueWeb = valueWeb.withRepresentationOf(representation, valueWeb.oppositions.first().id)
         theme = theme.withoutValueWeb(valueWeb.id).withValueWeb(valueWeb)
-        symbolicItemAdded = CharacterAddedToOpposition(
-            theme.id.uuid,
-            valueWeb.id.uuid,
-            valueWeb.name,
-            valueWeb.oppositions.first().id.uuid,
-            valueWeb.oppositions.first().name,
-            representation.name,
-            representation.entityUUID
-        )
+        symbolicItemAdded =
+            CharacterAddedToOpposition(
+                theme.id.uuid,
+                valueWeb.id.uuid,
+                valueWeb.name,
+                valueWeb.oppositions.first().id.uuid,
+                valueWeb.oppositions.first().name,
+                representation.name,
+                representation.entityUUID
+            )
     }
 
     private suspend fun getRepresentationForItemId(symbolicItemId: SymbolicItemId): SymbolicRepresentation

@@ -5,7 +5,7 @@ import com.soyle.stories.characterarc.repositories.ThemeRepository
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import java.util.*
 
 /**

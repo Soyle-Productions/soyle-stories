@@ -3,13 +3,13 @@ package com.soyle.stories.theme.usecases.addOppositionToValueWeb
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.ValueWebDoesNotExist
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterAddedToOpposition
+import com.soyle.stories.entities.theme.oppositionValue.CharacterAddedToOpposition
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
@@ -68,10 +68,12 @@ class AddOppositionToValueWebUseCase(
         fun createOpposition(name: String?): Executor {
             if (name != null) validateOppositionValueName(name)
 
-            val oppositionValue = OppositionValue(name ?: "${valueWeb.name} ${valueWeb.oppositions.size + 1}")
+            val newValueWeb = valueWeb.withOpposition(name)
+
+            val oppositionValue = newValueWeb.oppositions.last()
 
             return Executor(
-                theme.withReplacedValueWeb(valueWeb.withOpposition(oppositionValue)),
+                theme.withReplacedValueWeb(newValueWeb),
                 valueWeb.id,
                 oppositionValue.id,
                 ResponseModel(
@@ -95,7 +97,7 @@ class AddOppositionToValueWebUseCase(
                 val executorWithCharacter = includeCharacterInThemeIfNeeded(character)
                 val symbolicItem = SymbolicRepresentation(character.id.uuid, character.name)
 
-                val executorWithoutRepresentation = if (valueWeb.hasRepresentation(symbolicItem)) {
+                val executorWithoutRepresentation = if (valueWeb.hasRepresentation(symbolicItem.entityUUID)) {
                     executorWithCharacter.removeSymbolicItemFromValueWeb(symbolicItem)
                 } else executorWithCharacter
 
@@ -107,12 +109,12 @@ class AddOppositionToValueWebUseCase(
             val currentOppositionValueWithSymbolicItem =
                 valueWeb.oppositions.find { it.hasEntityAsRepresentation(symbolicItem.entityUUID) }!!
             return Executor(
-                theme.withReplacedValueWeb(valueWeb.withoutRepresentation(symbolicItem)),
+                theme.withReplacedValueWeb(valueWeb.withoutRepresentation(symbolicItem.entityUUID)),
                 valueWeb.id,
                 oppositionValueId,
                 response!!.let {
                     ResponseModel(
-                        it,
+                        it.oppositionAddedToValueWeb,
                         RemovedSymbolicItem(
                             theme.id.uuid,
                             valueWeb.id.uuid,
@@ -134,14 +136,14 @@ class AddOppositionToValueWebUseCase(
                 oppositionValueId,
                 response!!.let {
                     ResponseModel(
-                        it,
+                        it.oppositionAddedToValueWeb,
                         it.symbolicRepresentationRemoved,
                         CharacterAddedToOpposition(
                             theme.id.uuid,
                             valueWeb.id.uuid,
                             valueWeb.name,
-                            it.oppositionValueId,
-                            it.oppositionValueName,
+                            it.oppositionAddedToValueWeb.oppositionValueId,
+                            it.oppositionAddedToValueWeb.oppositionValueName,
                             symbolicItem.name,
                             symbolicItem.entityUUID
                         ),
@@ -160,7 +162,7 @@ class AddOppositionToValueWebUseCase(
                     oppositionValueId,
                     response!!.let {
                         ResponseModel(
-                            it,
+                            it.oppositionAddedToValueWeb,
                             it.symbolicRepresentationRemoved,
                             it.symbolicRepresentationAddedToOpposition,
                             CharacterIncludedInTheme(theme.id.uuid, theme.name, character.id.uuid, character.name, false)

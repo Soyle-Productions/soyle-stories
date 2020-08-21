@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.addSymbolicItemToOpposition
+package com.soyle.stories.entities.theme.oppositionValue
 
 import java.util.*
 

@@ -2,9 +2,8 @@ package com.soyle.stories.theme.usecases.removeCharacterAsOpponent
 
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.StoryFunction
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.CharacterIsNotAnOpponentOfPerspectiveCharacter
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme

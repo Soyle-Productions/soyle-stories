@@ -2,9 +2,10 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.theme.valueWeb.ValueWebNameCannotBeBlank
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
 import com.soyle.stories.theme.usecases.renameValueWeb.RenamedValueWeb

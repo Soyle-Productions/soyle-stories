@@ -1,6 +1,5 @@
 package com.soyle.stories.theme.usecases.examineCentralConflictOfTheme
 
-import arrow.core.extensions.set.monoidal.identity
 import com.soyle.stories.common.Desire
 import com.soyle.stories.common.MoralWeakness
 import com.soyle.stories.common.PsychologicalWeakness
@@ -8,8 +7,8 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.CharacterArcTemplateSection
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.StoryFunction
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist

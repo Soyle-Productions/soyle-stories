@@ -6,7 +6,6 @@ import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.entities.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
-import com.soyle.stories.entities.theme.MajorCharacter
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.themeDoesNotExist
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.util.*
 
 class DeleteThemeUnitTest {
 

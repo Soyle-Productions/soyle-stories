@@ -99,8 +99,8 @@ class ViewBaseStoryStructureTest {
                     val character1 = makeCharacter(Character.Id(id), Project.Id(), "Bob")
                     val included = theme.withCharacterIncluded(character1.id, character1.name, character1.media).right()
                     ((if (isPromoted) {
-                        included.flatMap {
-                            it.promoteCharacter(it.getMinorCharacterById(Character.Id(id))!!)
+                        included.map {
+                            it.withCharacterPromoted(Character.Id(id))
                         }
                     } else included) as Either.Right).b
                 }

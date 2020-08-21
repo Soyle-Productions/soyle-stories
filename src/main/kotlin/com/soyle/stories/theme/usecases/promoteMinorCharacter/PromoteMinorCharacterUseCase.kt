@@ -1,10 +1,9 @@
 package com.soyle.stories.theme.usecases.promoteMinorCharacter
 
 import arrow.core.Either
-import arrow.core.flatMap
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.MinorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.MinorCharacter
 import com.soyle.stories.theme.CharacterArcAlreadyExistsForCharacterInTheme
 import com.soyle.stories.theme.CharacterIsAlreadyMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme

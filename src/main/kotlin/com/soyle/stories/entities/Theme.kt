@@ -1,14 +1,14 @@
 package com.soyle.stories.entities
 
 import arrow.core.Either
+import arrow.core.Try
 import arrow.core.left
 import arrow.core.right
-import com.soyle.stories.common.Entity
-import com.soyle.stories.common.PairOf
+import com.soyle.stories.common.*
 import com.soyle.stories.entities.theme.*
+import com.soyle.stories.entities.theme.characterInTheme.*
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.usecases.validateValueWebName
-import com.soyle.stories.translators.asMinorCharacter
 import com.soyle.stories.translators.asThematicSection
 import java.util.*
 
@@ -20,7 +20,7 @@ class Theme(
     val centralConflict: String,
     val centralMoralQuestion: String,
     private val includedCharacters: Map<Character.Id, CharacterInTheme>,
-    val similaritiesBetweenCharacters: Map<Set<Character.Id>, String>,
+    val similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String>,
     val valueWebs: List<ValueWeb>
 ) : Entity<Theme.Id> {
 
@@ -41,7 +41,7 @@ class Theme(
         centralConflict: String = this.centralConflict,
         centralMoralQuestion: String = this.centralMoralQuestion,
         includedCharacters: Map<Character.Id, CharacterInTheme> = this.includedCharacters,
-        similaritiesBetweenCharacters: Map<Set<Character.Id>, String> = this.similaritiesBetweenCharacters,
+        similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String> = this.similaritiesBetweenCharacters,
         valueWebs: List<ValueWeb> = this.valueWebs
     ) = Theme(
         id,
@@ -80,9 +80,12 @@ class Theme(
     {
         mustNotContainCharacter(characterId)
 
-        val newCharacter = MinorCharacter(characterId, characterName, "", "", "", thematicTemplate.sections.map {
-            ThematicSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, id, it)
-        })
+        val newCharacter = MinorCharacter(
+            id,
+            characterId,
+            characterName,
+            thematicTemplate
+        )
         val minorCharacters = includedCharacters.values.filterIsInstance<MinorCharacter>()
         val majorCharacters = includedCharacters.values.filterIsInstance<MajorCharacter>().map {
             it.perceiveCharacter(characterId)
@@ -92,7 +95,7 @@ class Theme(
         return copy(
             includedCharacters = (characters + newCharacter).associateBy { it.id },
             similaritiesBetweenCharacters = similaritiesBetweenCharacters + characters.map {
-                setOf(it.id, characterId) to ""
+                coupleOf(it.id, characterId) to ""
             }
         )
     }
@@ -108,6 +111,10 @@ class Theme(
             includedCharacters = characters.filterNot { it.id == characterId }.associateBy { it.id },
             similaritiesBetweenCharacters = similaritiesBetweenCharacters.filterNot {
                 it.key.contains(characterId)
+            },
+            valueWebs = valueWebs.map {
+                if (it.hasRepresentation(characterId.uuid)) it.withoutRepresentation(characterId.uuid)
+                else it
             }
         )
     }
@@ -171,15 +178,15 @@ class Theme(
         )
     }
 
-    fun withCharactersSimilarToEachOther(characterIds: PairOf<Character.Id>, similarities: String): Theme
+    fun withCharactersSimilarToEachOther(characterIds: CoupleOf<Character.Id>, similarities: String): Theme
     {
-        mustContainCharacter(characterIds.first)
-        mustContainCharacter(characterIds.second)
-        val key = setOf(characterIds.first, characterIds.second)
+        characterIds.forBoth {
+            mustContainCharacter(it)
+        }
         return copy(
             similaritiesBetweenCharacters = similaritiesBetweenCharacters
-                .minus(key = key)
-                .plus(key to similarities)
+                .minus(key = characterIds)
+                .plus(characterIds to similarities)
         )
     }
 
@@ -222,7 +229,11 @@ class Theme(
 
 
     fun removeCharacter(characterId: Character.Id): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(characterId)?.let { return it.left() }
+		try {
+            mustContainCharacter(characterId)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
+        }
         return copy(
             includedCharacters = includedCharacters.minus(characterId)
         ).right()
@@ -249,18 +260,24 @@ class Theme(
         get() = includedCharacters.values
 
     fun getSimilarities(characterA: Character.Id, characterB: Character.Id): Either<ThemeException, String> {
-		verifyCharacterInTheme(characterA)?.let { return it.left() }
-		verifyCharacterInTheme(characterB)?.let { return it.left() }
-        val similarities = similaritiesBetweenCharacters[setOf(characterA, characterB)]
-        if (similarities == null) {
-            throw error("Could not find similarities between $characterA and $characterB")
+		try {
+            mustContainCharacter(characterA)
+            mustContainCharacter(characterB)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
         }
+        val similarities = similaritiesBetweenCharacters[coupleOf(characterA, characterB)]
+            ?: throw error("Could not find similarities between $characterA and $characterB")
         return similarities.right()
     }
 
     fun withCharacterRenamed(character: CharacterInTheme, newName: String): Either<ThemeException, Theme>
     {
-        verifyCharacterInTheme(character.id)?.let { return it.left() }
+        try {
+            mustContainCharacter(character.id)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
+        }
         return copy(
           includedCharacters = includedCharacters.minus(character.id).plus(character.id to character.changeName(newName))
         ).right()
@@ -271,9 +288,13 @@ class Theme(
         characterB: Character.Id,
         similarities: String
     ): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(characterA)?.let { return it.left() }
-		verifyCharacterInTheme(characterB)?.let { return it.left() }
-        val key = setOf(characterA, characterB)
+		try {
+            mustContainCharacter(characterA)
+            mustContainCharacter(characterB)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
+        }
+        val key = coupleOf(characterA, characterB)
         return copy(
             similaritiesBetweenCharacters = similaritiesBetweenCharacters
                 .minus(key = key)
@@ -282,7 +303,11 @@ class Theme(
     }
 
     fun changeArchetype(character: CharacterInTheme, archetype: String): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(character.id)?.let { return it.left() }
+		try {
+            mustContainCharacter(character.id)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
+        }
         return copy(
             includedCharacters = includedCharacters
                 .minus(character.id)
@@ -291,7 +316,11 @@ class Theme(
     }
 
     fun changeVariationOnMoral(character: CharacterInTheme, variation: String): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(character.id)?.let { return it.left() }
+		try {
+            mustContainCharacter(character.id)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
+        }
         return copy(
             includedCharacters = includedCharacters
                 .minus(character.id)
@@ -308,45 +337,19 @@ class Theme(
             throw CharacterAlreadyPromotedInTheme(id.uuid, characterId.uuid)
         }
         val minorCharacter = getMinorCharacterById(characterId)!!
-        val thematicSectionTemplateIds = thematicTemplate.sections.map { it.characterArcTemplateSectionId }.toSet()
         return copy(
             includedCharacters = includedCharacters
                 .minus(characterId)
-                .plus(characterId to minorCharacter.promote(CharacterArcTemplate.default().sections.filterNot {
-                    it.id in thematicSectionTemplateIds
-                }.map {
-                    CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, id, it, null, "")
-                }))
+                .plus(characterId to minorCharacter.promote(includedCharacters.keys.toList(), id, name, CharacterArcTemplate.default()))
         )
     }
-
-    fun promoteCharacter(
-        character: MinorCharacter,
-        additionalSections: List<CharacterArcSection>
-    ): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(character.id)?.let { return it.left() }
-        return copy(
-            includedCharacters = includedCharacters
-                .minus(character.id)
-                .plus(character.id to character.promote(additionalSections))
-        ).right()
-    }
-
-    private fun MinorCharacter.promote(additionalSections: List<CharacterArcSection>) =
-        MajorCharacter(
-            id, name, archetype, variationOnMoral, "", thematicSections + additionalSections.map { it.asThematicSection() },
-            CharacterPerspective(
-                includedCharacters.keys.toList().minus(id).associateWith {
-                    @Suppress("RemoveExplicitTypeArguments")
-                    null as StoryFunction?
-                }, emptyMap()
-            ),
-            CharacterArc(id, CharacterArcTemplate.default(), this@Theme.id, this@Theme.name),
-            ""
-        )
 
     fun demoteCharacter(character: MajorCharacter): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(character.id)?.let { return it.left() }
+		try {
+            mustContainCharacter(character.id)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
+        }
         return copy(
             includedCharacters = includedCharacters
                 .minus(character.id)
@@ -370,8 +373,12 @@ class Theme(
         characterId: Character.Id,
         function: StoryFunction
     ): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(majorCharacter.id)?.let { return it.left() }
-		verifyCharacterInTheme(characterId)?.let { return it.left() }
+		try {
+            mustContainCharacter(majorCharacter.id)
+            mustContainCharacter(characterId)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
+        }
 
         if (majorCharacter.hasStoryFunctionForTargetCharacter(function, characterId)) {
             return StoryFunctionAlreadyApplied(
@@ -405,8 +412,12 @@ class Theme(
         characterInTheme: MajorCharacter,
         characterId: Character.Id
     ): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(characterInTheme.id)?.let { return it.left() }
-		verifyCharacterInTheme(characterId)?.let { return it.left() }
+		try {
+            mustContainCharacter(characterInTheme.id)
+            mustContainCharacter(characterId)
+        } catch (c: CharacterNotInTheme) {
+            return c.left()
+        }
         return copy(
             includedCharacters = includedCharacters
                 .minus(characterInTheme.id)
@@ -414,29 +425,8 @@ class Theme(
         ).right()
     }
 
-    fun changeAttack(
-        characterInTheme: MajorCharacter,
-        characterId: Character.Id,
-        attack: String
-    ): Either<ThemeException, Theme> {
-		verifyCharacterInTheme(characterInTheme.id)?.let { return it.left() }
-		verifyCharacterInTheme(characterId)?.let { return it.left() }
-        return copy(
-            includedCharacters = includedCharacters
-                .minus(characterInTheme.id)
-                .plus(characterInTheme.id to characterInTheme.changeAttack(characterId, attack))
-        ).right()
-    }
-
-    private fun verifyCharacterInTheme(characterId: Character.Id): CharacterNotInTheme? {
-        return if (!includedCharacters.containsKey(characterId)) CharacterNotInTheme(
-            id.uuid,
-            characterId.uuid
-        )
-        else null
-    }
-
     fun characterIsMajorCharacter(characterId: Character.Id) = includedCharacters[characterId] is MajorCharacter
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

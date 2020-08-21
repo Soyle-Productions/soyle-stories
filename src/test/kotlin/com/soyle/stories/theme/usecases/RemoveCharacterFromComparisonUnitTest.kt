@@ -101,8 +101,7 @@ class RemoveCharacterFromComparisonUnitTest {
             }
         themeRepository.themes[themeId] = andMajorCharacterIds
             .fold(themeRepository.themes[themeId]!!) { nextTheme, characterId ->
-                nextTheme.promoteCharacter(nextTheme.getMinorCharacterById(Character.Id(characterId))!!)
-                .fold({ throw it }, ::identity)
+                nextTheme.withCharacterPromoted(Character.Id(characterId))
             }
     }
 

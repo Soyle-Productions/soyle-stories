@@ -2,13 +2,16 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
-import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.*
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcTemplate
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.CharacterPerspective
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.MinorCharacter
 import com.soyle.stories.theme.usecases.compareCharacterValues.CharacterValueComparison
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValuesUseCase
@@ -156,7 +159,14 @@ class CompareCharacterValuesUnitTest {
             val character = makeCharacter()
             val archetype = "Archetype [${UUID.randomUUID().toString().takeLast(3)}]"
             if (it % 2 == 0) {
-                MinorCharacter(character.id, character.name, archetype, "", "", listOf())
+                MinorCharacter(
+                    character.id,
+                    character.name,
+                    archetype,
+                    "",
+                    "",
+                    listOf()
+                )
             } else {
                 MajorCharacter(
                     character.id, character.name,
@@ -164,7 +174,10 @@ class CompareCharacterValuesUnitTest {
                     "",
                     "",
                     listOf(),
-                    CharacterPerspective(mapOf(), mapOf()),
+                    CharacterPerspective(
+                        mapOf(),
+                        mapOf()
+                    ),
                     CharacterArc(character.id, CharacterArcTemplate.default(), themeId, "Theme"),
                     ""
                 )
@@ -189,10 +202,9 @@ class CompareCharacterValuesUnitTest {
                 val valueWeb = currentTheme.valueWebs.find { it.oppositions.any { it.name == opposition } }!!
                 val oppositionValue = valueWeb.oppositions.find { it.name == opposition }!!
                 currentTheme.withoutValueWeb(valueWeb.id).withValueWeb(
-                    valueWeb.withoutOpposition(oppositionValue.id).withOpposition(
-                        oppositionValue.withRepresentation(
-                            SymbolicRepresentation(character.id.uuid, character.name)
-                        )
+                    valueWeb.withRepresentationOf(
+                        SymbolicRepresentation(character.id.uuid, character.name),
+                        oppositionValue.id
                     )
                 )
             }

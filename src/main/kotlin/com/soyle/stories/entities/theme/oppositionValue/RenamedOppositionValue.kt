@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.renameOppositionValue
+package com.soyle.stories.entities.theme.oppositionValue
 
 import java.util.*
 

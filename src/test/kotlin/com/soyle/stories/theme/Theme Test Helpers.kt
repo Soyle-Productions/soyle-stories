@@ -4,9 +4,13 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.right
 import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.common.CoupleOf
 import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.*
-import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.MinorCharacter
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.translators.asCharacterArcTemplateSection
 import java.util.*
 
@@ -20,7 +24,7 @@ fun makeTheme(
 	centralConflict: String = "",
 	centralMoralQuestion: String = "",
 	includedCharacters: Map<Character.Id, CharacterInTheme> = mapOf(),
-	similaritiesBetweenCharacters: Map<Set<Character.Id>, String> = mapOf(),
+	similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String> = mapOf(),
 	valueWebs: List<ValueWeb> = listOf()
 ): Theme = Theme(
 	id, projectId, name, symbols, centralConflict, centralMoralQuestion, includedCharacters, similaritiesBetweenCharacters, valueWebs
@@ -34,9 +38,9 @@ fun makeValueWeb(
 ) = ValueWeb(id, themeId, name, oppositions)
 
 fun makeOppositionValue(
-	id: OppositionValue.Id = OppositionValue.Id(),
-	name: String = "Opposition Value ${UUID.randomUUID().toString().take(3)}",
-	representations: List<SymbolicRepresentation> = listOf()
+    id: OppositionValue.Id = OppositionValue.Id(),
+    name: String = "Opposition Value ${UUID.randomUUID().toString().take(3)}",
+    representations: List<SymbolicRepresentation> = listOf()
 ) = OppositionValue(id, name, representations)
 
 fun takeNoteOfTheme(expectedId: UUID): Theme =
@@ -55,8 +59,7 @@ val themeWithoutCharacter = (Theme.takeNoteOf(Project.Id(), "") as Either.Right)
 
 fun promoteCharacter(): Either<ThemeException, Theme> {
 	val characterInTheme = themeWithCharacter.getMinorCharacterById(newCharacter.id)!!
-	return themeWithCharacter
-		.promoteCharacter(characterInTheme)
+	return themeWithCharacter.withCharacterPromoted(characterInTheme.id).right()
 }
 
 fun ThematicSection.asCharacterArcSection(linkedLocation: Location.Id?) = CharacterArcSection(
@@ -72,11 +75,3 @@ private val sectionDifference = run {
 	val thematicTemplateIds = ThematicTemplate.default().sections.map { it.characterArcTemplateSectionId }.toSet()
 	CharacterArcTemplate.default().sections.filterNot { it.id in thematicTemplateIds }
 }
-
-fun Theme.promoteCharacter(minorCharacter: MinorCharacter) = promoteCharacter(minorCharacter, sectionDifference.map {
-	CharacterArcSection(
-		CharacterArcSection.Id(
-			UUID.randomUUID()
-		), minorCharacter.id, id, it, null, ""
-	)
-})
