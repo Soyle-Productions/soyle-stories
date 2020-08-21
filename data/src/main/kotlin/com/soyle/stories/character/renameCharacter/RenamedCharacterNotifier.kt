@@ -7,7 +7,7 @@ import kotlin.coroutines.coroutineContext
 class RenamedCharacterNotifier : RenamedCharacterReceiver, Notifier<RenamedCharacterReceiver>() {
 
     override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
-        notifyAll(coroutineContext) { it.receiveRenamedCharacter(renamedCharacter) }
+        notifyAll { it.receiveRenamedCharacter(renamedCharacter) }
     }
 
 }

@@ -10,11 +10,12 @@ internal class OpenProjectOutputContinuation(private val continuation: Continuat
     override fun receiveOpenProjectFailure(failure: ProjectException) {
         continuation.resumeWith(Result.failure(ProjectFailure(failure)))
     }
-    override fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
+
+    override suspend fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
         continuation.resumeWith(Result.success(response))
     }
 
-    override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
+    override suspend fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
     }
 
     override fun receiveCloseProjectFailure(failure: Exception) {

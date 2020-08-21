@@ -1,12 +1,9 @@
-
 package com.soyle.stories.common
 
 import com.soyle.stories.soylestories.ApplicationScope
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
+import tornadofx.FX
 
 
 class AsyncThreadTransformer(val applicationScope: ApplicationScope) : ThreadTransformer {
@@ -19,8 +16,10 @@ class AsyncThreadTransformer(val applicationScope: ApplicationScope) : ThreadTra
     }
 
     override fun gui(update: suspend CoroutineScope.() -> Unit) {
-        applicationScope.launch(Dispatchers.JavaFx) {
-            update()
+        FX.runAndWait {
+            runBlocking {
+                update()
+            }
         }
     }
 }

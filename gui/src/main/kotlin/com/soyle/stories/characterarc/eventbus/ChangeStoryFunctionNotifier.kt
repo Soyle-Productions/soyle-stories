@@ -6,14 +6,19 @@
 package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
 
-class ChangeStoryFunctionNotifier : Notifier<ChangeStoryFunction.OutputPort>(), ChangeStoryFunction.OutputPort {
+class ChangeStoryFunctionNotifier(private val threadTransformer: ThreadTransformer) : Notifier<ChangeStoryFunction.OutputPort>(), ChangeStoryFunction.OutputPort {
     override fun receiveChangeStoryFunctionFailure(failure: Exception) {
-        notifyAll { it.receiveChangeStoryFunctionFailure(failure) }
+        threadTransformer.async {
+            notifyAll { it.receiveChangeStoryFunctionFailure(failure) }
+        }
     }
 
     override fun receiveChangeStoryFunctionResponse(response: ChangeStoryFunction.ResponseModel) {
-        notifyAll { it.receiveChangeStoryFunctionResponse(response) }
+        threadTransformer.async {
+            notifyAll { it.receiveChangeStoryFunctionResponse(response) }
+        }
     }
 }

@@ -6,6 +6,6 @@ import kotlin.coroutines.coroutineContext
 
 class CreatedThemeNotifier : Notifier<CreatedThemeReceiver>(), CreatedThemeReceiver {
     override suspend fun receiveCreatedTheme(createdTheme: CreatedTheme) {
-        notifyAll(coroutineContext) { it.receiveCreatedTheme(createdTheme) }
+        notifyAll { it.receiveCreatedTheme(createdTheme) }
     }
 }

@@ -15,6 +15,7 @@ import com.soyle.stories.theme.characterConflict.CharacterConflictScope
 import com.soyle.stories.theme.characterValueComparison.CharacterValueComparisonScope
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import tornadofx.Scope
 import tornadofx.onChange
 import tornadofx.tab
 import java.util.*

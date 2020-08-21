@@ -1,12 +1,9 @@
 package com.soyle.stories.theme.addSymbolicItemToOpposition
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemNotifier
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
-import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import kotlin.coroutines.coroutineContext
 
 class AddSymbolicItemToOppositionNotifier(
@@ -23,6 +20,6 @@ class AddSymbolicItemToOppositionNotifier(
                 includeCharacterInComparisonOutputPort.receiveIncludeCharacterInComparisonResponse(it)
             }
         }
-        notifyAll(coroutineContext) { it.addedSymbolicItemToOpposition(response) }
+        notifyAll { it.addedSymbolicItemToOpposition(response) }
     }
 }

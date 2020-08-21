@@ -8,6 +8,6 @@ class ChangedCharacterArcSectionValueNotifier : ChangedCharacterArcSectionValueR
 
     override suspend fun receiveChangedCharacterArcSectionValue(changedCharacterArcSectionValue: ChangedCharacterArcSectionValue) {
         println("${changedCharacterArcSectionValue.type.name} changed to ${changedCharacterArcSectionValue.newValue}")
-        notifyAll(coroutineContext) { it.receiveChangedCharacterArcSectionValue(changedCharacterArcSectionValue) }
+        notifyAll { it.receiveChangedCharacterArcSectionValue(changedCharacterArcSectionValue) }
     }
 }

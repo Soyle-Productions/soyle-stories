@@ -1,5 +1,6 @@
 package com.soyle.stories.layout
 
+import com.soyle.stories.common.components.bindAndCacheChildren
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.project.layout.WindowChildViewModel

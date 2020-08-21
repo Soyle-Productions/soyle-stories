@@ -7,7 +7,7 @@ import kotlin.coroutines.coroutineContext
 class RemovedCharacterNotifier : RemovedCharacterReceiver, Notifier<RemovedCharacterReceiver>() {
 
     override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
-        notifyAll(coroutineContext) { it.receiveCharacterRemoved(characterRemoved) }
+        notifyAll { it.receiveCharacterRemoved(characterRemoved) }
     }
 
 }

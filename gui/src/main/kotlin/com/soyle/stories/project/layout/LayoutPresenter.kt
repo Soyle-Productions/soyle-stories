@@ -2,6 +2,7 @@ package com.soyle.stories.project.layout
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.gui.View
 import com.soyle.stories.layout.LayoutException
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
@@ -12,13 +13,13 @@ import com.soyle.stories.project.layout.config.RegisteredToolsConfig
 import kotlin.reflect.KClass
 
 class LayoutPresenter(
-  private val view: LayoutView,
-  getSavedLayoutNotifier: Notifier<GetSavedLayout.OutputPort>,
-  toggleToolOpenedNotifier: Notifier<ToggleToolOpened.OutputPort>,
-  openToolNotifier: Notifier<OpenTool.OutputPort>,
-  closeToolNotifier: Notifier<CloseTool.OutputPort>,
-  removeToolsWithIdNotifier: Notifier<RemoveToolsWithId.OutputPort>,
-  private val registeredTools: RegisteredToolsConfig
+	private val view: View.Nullable<LayoutViewModel>,
+	getSavedLayoutNotifier: Notifier<GetSavedLayout.OutputPort>,
+	toggleToolOpenedNotifier: Notifier<ToggleToolOpened.OutputPort>,
+	openToolNotifier: Notifier<OpenTool.OutputPort>,
+	closeToolNotifier: Notifier<CloseTool.OutputPort>,
+	removeToolsWithIdNotifier: Notifier<RemoveToolsWithId.OutputPort>,
+	private val registeredTools: RegisteredToolsConfig
 ) : GetSavedLayout.OutputPort,
   ToggleToolOpened.OutputPort,
   CloseTool.OutputPort,
@@ -36,7 +37,7 @@ RemoveToolsWithId.OutputPort {
 	private fun pushLayout(response: GetSavedLayout.ResponseModel) {
 		val openFixedTools = response.fixedTools.map { it.toolType }.toSet()
 		view.update {
-			copy(
+			LayoutViewModel(
 			  staticTools = registeredTools.listFixedToolTypes().map { fixedTool ->
 				  StaticToolViewModel(
 					fixedTool,
@@ -73,7 +74,7 @@ RemoveToolsWithId.OutputPort {
 
 
 	fun displayDialog(dialog: Dialog) {
-		view.update {
+		view.updateOrInvalidated {
 			copy(
 			  openDialogs = openDialogs + (dialog::class to dialog)
 			)
@@ -81,7 +82,7 @@ RemoveToolsWithId.OutputPort {
 	}
 
 	fun removeDialog(dialog: KClass<out Dialog>) {
-		view.update {
+		view.updateOrInvalidated {
 			copy(
 			  openDialogs = openDialogs - dialog
 			)

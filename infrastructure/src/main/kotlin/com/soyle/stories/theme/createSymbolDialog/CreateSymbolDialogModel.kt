@@ -14,7 +14,7 @@ class CreateSymbolDialogModel : Model<ProjectScope, CreateSymbolDialogViewModel>
     val nameFieldLabel = bind(CreateSymbolDialogViewModel::nameFieldLabel)
     val errorMessage = bind(CreateSymbolDialogViewModel::errorMessage)
     val errorCause = bind(CreateSymbolDialogViewModel::errorCause)
-    val themes = bindImmutableList(CreateSymbolDialogViewModel::themes)
+    val themes = bind(CreateSymbolDialogViewModel::themes)
     val createdId = bind(CreateSymbolDialogViewModel::createdId)
 
     override val applicationScope: ApplicationScope

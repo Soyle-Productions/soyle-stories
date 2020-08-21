@@ -5,12 +5,14 @@ import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.SimpleObjectProperty
+import tornadofx.select
+import tornadofx.selectBoolean
 import tornadofx.toProperty
 
 class ThemeListModel : Model<ProjectScope, ThemeListViewModel>(ProjectScope::class) {
 
-    val themes = bindImmutableList(ThemeListViewModel::themes)
-    val hasThemes = bind { (item?.themes?.isNotEmpty() ?: false).toProperty() }
+    val themes = bind(ThemeListViewModel::themes)
+    val hasThemes = themes.select { (! it.isNullOrEmpty()).toProperty() }
     val emptyMessage = bind(ThemeListViewModel::emptyMessage)
     val createFirstThemeButtonLabel = bind(ThemeListViewModel::createFirstThemeButtonLabel)
     val createThemeButtonLabel = bind(ThemeListViewModel::createThemeButtonLabel)

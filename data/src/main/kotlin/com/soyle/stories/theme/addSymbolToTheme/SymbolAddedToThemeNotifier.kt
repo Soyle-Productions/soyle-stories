@@ -6,6 +6,6 @@ import kotlin.coroutines.coroutineContext
 
 class SymbolAddedToThemeNotifier : Notifier<SymbolAddedToThemeReceiver>(), SymbolAddedToThemeReceiver {
     override suspend fun receiveSymbolAddedToTheme(symbolAddedToTheme: SymbolAddedToTheme) {
-        notifyAll(coroutineContext) { it.receiveSymbolAddedToTheme(symbolAddedToTheme) }
+        notifyAll { it.receiveSymbolAddedToTheme(symbolAddedToTheme) }
     }
 }

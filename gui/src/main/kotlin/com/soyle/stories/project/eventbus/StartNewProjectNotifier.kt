@@ -1,6 +1,7 @@
 package com.soyle.stories.project.eventbus
 
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.project.LocalProjectException
 import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProject
 import com.soyle.stories.workspace.ProjectException
@@ -8,6 +9,7 @@ import com.soyle.stories.workspace.usecases.closeProject.CloseProject
 import com.soyle.stories.workspace.usecases.openProject.OpenProject
 
 class StartNewProjectNotifier(
+    private val threadTransformer: ThreadTransformer,
     private val openProjectNotifier: OpenProjectNotifier
 ) : StartNewLocalProject.OutputPort, Notifier<StartNewLocalProject.OutputPort>() {
 
@@ -15,15 +17,17 @@ class StartNewProjectNotifier(
         openProjectNotifier.receiveOpenProjectFailure(failure)
     }
 
-    override fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
+    override suspend fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
         openProjectNotifier.receiveOpenProjectResponse(response)
     }
 
     override fun receiveStartNewLocalProjectFailure(exception: LocalProjectException) {
-        notifyAll { it.receiveStartNewLocalProjectFailure(exception) }
+        threadTransformer.async {
+            notifyAll { it.receiveStartNewLocalProjectFailure(exception) }
+        }
     }
 
-    override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
+    override suspend fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
         openProjectNotifier.receiveCloseProjectResponse(response)
     }
 

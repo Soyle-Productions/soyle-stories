@@ -31,7 +31,7 @@ class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictVi
     val similaritiesSectionLabel = bind(CharacterConflictViewModel::similaritiesSectionLabel)
     val powerStatusOrAbilitiesLabel = bind(CharacterConflictViewModel::powerStatusOrAbilitiesLabel)
     val mainOpponent = bind(CharacterConflictViewModel::mainOpponent)
-    val opponents = bindImmutableList(CharacterConflictViewModel::opponents)
+    val opponents = bind(CharacterConflictViewModel::opponents)
     val availableOpponents = SimpleObjectProperty<List<AvailableOpponentViewModel>?>(null)
 
     val isSmall = SimpleBooleanProperty()
@@ -42,16 +42,15 @@ class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictVi
     }
 
     override fun viewModel(): CharacterConflictViewModel? {
-        item = item?.copy(
+        return item?.copy(
             selectedPerspectiveCharacter = selectedPerspectiveCharacter.value,
             availablePerspectiveCharacters = availablePerspectiveCharacters.value,
             availableOpponents = availableOpponents.value
         )
-        return item
     }
 
     init {
-        itemProperty.onChange {
+        itemProperty().onChange {
             selectedPerspectiveCharacter.value = it?.selectedPerspectiveCharacter
             availablePerspectiveCharacters.value = it?.availablePerspectiveCharacters
             availableOpponents.value = it?.availableOpponents

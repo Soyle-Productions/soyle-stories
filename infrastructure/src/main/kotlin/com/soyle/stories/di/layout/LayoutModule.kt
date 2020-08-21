@@ -39,7 +39,7 @@ object LayoutModule {
     init {
         scoped<ProjectScope> {
 
-            usecases@ run {
+            run {
                 provide<GetSavedLayout> {
                     GetSavedLayoutUseCase(get(), ::defaultLayout)
                 }
@@ -57,21 +57,21 @@ object LayoutModule {
                 }
             }
 
-            events@ run {
+            run {
                 provide(GetSavedLayout.OutputPort::class) {
-                    GetSavedLayoutNotifier()
+                    GetSavedLayoutNotifier(applicationScope.get())
                 }
                 provide(ToggleToolOpened.OutputPort::class) {
-                    ToggleToolOpenedNotifier()
+                    ToggleToolOpenedNotifier(applicationScope.get())
                 }
                 provide(OpenTool.OutputPort::class) {
-                    OpenToolNotifier()
+                    OpenToolNotifier(applicationScope.get())
                 }
                 provide(CloseTool.OutputPort::class) {
-                    CloseToolNotifier()
+                    CloseToolNotifier(applicationScope.get())
                 }
                 provide(RemoveToolsWithId.OutputPort::class) {
-                    RemoveToolsWithIdNotifier()
+                    RemoveToolsWithIdNotifier(applicationScope.get())
                 }
             }
 
@@ -99,7 +99,7 @@ object LayoutModule {
                     get(),
                     get(),
                     LayoutPresenter(
-                        get(),
+                        get<WorkBenchModel>(),
                         get<GetSavedLayoutNotifier>(),
                         get<ToggleToolOpenedNotifier>(),
                         get<OpenToolNotifier>(),
@@ -108,10 +108,6 @@ object LayoutModule {
                         ToolModule
                     )
                 )
-            }
-
-            provide<LayoutView> {
-                find<WorkBenchModel>(scope = this)
             }
 
         }

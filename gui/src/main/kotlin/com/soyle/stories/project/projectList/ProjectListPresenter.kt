@@ -2,10 +2,14 @@ package com.soyle.stories.project.projectList
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.project.closeProject.ClosedProjectReceiver
 import com.soyle.stories.project.eventbus.ProjectEvents
+import com.soyle.stories.project.openProject.ProjectOpenedReceiver
 import com.soyle.stories.project.projectList.presenters.CloseProjectPresenter
 import com.soyle.stories.project.projectList.presenters.OpenProjectPresenter
 import com.soyle.stories.project.projectList.presenters.StartNewLocalProjectPresenter
+import com.soyle.stories.project.startNewProject.ProjectStartedReceiver
+import com.soyle.stories.project.usecases.startNewProject.StartNewProject
 import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProject
 import com.soyle.stories.workspace.ExpectedProjectDoesNotExistAtLocation
 import com.soyle.stories.workspace.ExpectedProjectException
@@ -15,82 +19,71 @@ import com.soyle.stories.workspace.usecases.openProject.OpenProject
 import com.soyle.stories.workspace.usecases.requestCloseProject.RequestCloseProject
 
 class ProjectListPresenter(
-  private val view: ProjectListView,
-  projectEvents: ProjectEvents
-) : ListOpenProjects.OutputPort {
+    private val view: ProjectListView
+) : ListOpenProjects.OutputPort,
+    ProjectOpenedReceiver by OpenProjectPresenter(view),
+    ClosedProjectReceiver by CloseProjectPresenter(view) {
 
-	// the sub presenters should not be GC'd until the project list presenter is GC'd, but notifiers hold weak references
-	// to their listeners, so we have to hold strong references here to make sure the sub presenters are not GC'd
-	// prematurely.
-	private val subPresenters: List<Any>
 
-	init {
-		val closeProjectOutputPort: RequestCloseProject.OutputPort = CloseProjectPresenter(view)
-		val openProjectOutputPort: OpenProject.OutputPort = OpenProjectPresenter(view, closeProjectOutputPort)
+    override fun receiveListOpenProjectsResponse(response: ListOpenProjects.ResponseModel) {
+        view.update {
+            updateViewModelOrDefault(this, response)
+        }
+    }
 
-		val startNewLocalProjectOutputPort: StartNewLocalProject.OutputPort =
-		  StartNewLocalProjectPresenter(view, openProjectOutputPort, closeProjectOutputPort)
+    private fun updateViewModelOrDefault(
+        viewModel: ProjectListViewModel?,
+        response: ListOpenProjects.ResponseModel
+    ): ProjectListViewModel {
+        return if (viewModel != null) {
+            updateViewModelWithResponse(viewModel, response)
+        } else {
+            defaultProjectListModel(response)
+        }
+    }
 
-		subPresenters = listOf(
-		  startNewLocalProjectOutputPort listensTo projectEvents.openProject,
-		  closeProjectOutputPort listensTo projectEvents.closeProject,
-		  startNewLocalProjectOutputPort listensTo projectEvents.startNewProject
-		)
-	}
+    private fun updateViewModelWithResponse(
+        viewModel: ProjectListViewModel,
+        response: ListOpenProjects.ResponseModel
+    ): ProjectListViewModel {
+        return viewModel.copy(
+            isSplashScreenVisible = false,
+            isWelcomeScreenVisible = response.openProjects.isEmpty() && response.failedProjects.isEmpty(),
+            openProjects = response.openProjects.map(::convertOpenProjectItemToViewModel),
+            failedProjects = response.failedProjects.map(::convertExpectedProjectExceptionToViewModel),
+            startProjectFailure = null
+        )
+    }
 
-	override fun receiveListOpenProjectsResponse(response: ListOpenProjects.ResponseModel) {
-		view.update {
-			updateViewModelOrDefault(this, response)
-		}
-	}
+    private fun defaultProjectListModel(response: ListOpenProjects.ResponseModel) = ProjectListViewModel(
+        openProjectRequest = null,
+        isSplashScreenVisible = false,
+        isWelcomeScreenVisible = response.openProjects.isEmpty() && response.failedProjects.isEmpty(),
+        openProjects = response.openProjects.map(::convertOpenProjectItemToViewModel),
+        failedProjects = response.failedProjects.map(::convertExpectedProjectExceptionToViewModel),
+        closeProjectRequest = null,
+        startProjectFailure = null
+    )
 
-	private fun updateViewModelOrDefault(viewModel: ProjectListViewModel?, response: ListOpenProjects.ResponseModel): ProjectListViewModel {
-		return if (viewModel != null) {
-			updateViewModelWithResponse(viewModel, response)
-		} else {
-			defaultProjectListModel(response)
-		}
-	}
+    private fun convertExpectedProjectExceptionToViewModel(it: ExpectedProjectException): ProjectIssueViewModel {
+        return when (it) {
+            is ExpectedProjectDoesNotExistAtLocation -> ProjectIssueViewModel(
+                it.expectedProjectName,
+                it.location
+            )
+            is UnexpectedProjectExistsAtLocation -> ProjectIssueViewModel(
+                it.expectedProjectName,
+                it.location,
+                "Found unexpected project: ${it.foundProjectName}"
+            )
+        }
+    }
 
-	private fun updateViewModelWithResponse(viewModel: ProjectListViewModel, response: ListOpenProjects.ResponseModel): ProjectListViewModel {
-		return viewModel.copy(
-		  isSplashScreenVisible = false,
-		  isWelcomeScreenVisible = response.openProjects.isEmpty() && response.failedProjects.isEmpty(),
-		  openProjects = response.openProjects.map(::convertOpenProjectItemToViewModel),
-		  failedProjects = response.failedProjects.map(::convertExpectedProjectExceptionToViewModel),
-		  startProjectFailure = null
-		)
-	}
-
-	private fun defaultProjectListModel(response: ListOpenProjects.ResponseModel) = ProjectListViewModel(
-	  openProjectRequest = null,
-	  isSplashScreenVisible = false,
-	  isWelcomeScreenVisible = response.openProjects.isEmpty() && response.failedProjects.isEmpty(),
-	  openProjects = response.openProjects.map(::convertOpenProjectItemToViewModel),
-	  failedProjects = response.failedProjects.map(::convertExpectedProjectExceptionToViewModel),
-	  closeProjectRequest = null,
-	  startProjectFailure = null
-	)
-
-	private fun convertExpectedProjectExceptionToViewModel(it: ExpectedProjectException): ProjectIssueViewModel {
-		return when (it) {
-			is ExpectedProjectDoesNotExistAtLocation -> ProjectIssueViewModel(
-			  it.expectedProjectName,
-			  it.location
-			)
-			is UnexpectedProjectExistsAtLocation -> ProjectIssueViewModel(
-			  it.expectedProjectName,
-			  it.location,
-			  "Found unexpected project: ${it.foundProjectName}"
-			)
-		}
-	}
-
-	private fun convertOpenProjectItemToViewModel(item: ListOpenProjects.OpenProjectItem): ProjectFileViewModel {
-		return ProjectFileViewModel(
-		  item.projectId,
-		  item.projectName,
-		  item.projectLocation
-		)
-	}
+    private fun convertOpenProjectItemToViewModel(item: ListOpenProjects.OpenProjectItem): ProjectFileViewModel {
+        return ProjectFileViewModel(
+            item.projectId,
+            item.projectName,
+            item.projectLocation
+        )
+    }
 }

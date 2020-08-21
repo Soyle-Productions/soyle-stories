@@ -15,10 +15,10 @@ class SceneDetailsModel : Model<SceneDetailsScope, SceneDetailsViewModel>(SceneD
 	val removeCharacterButtonLabel = bind(SceneDetailsViewModel::removeCharacterButtonLabel)
 	val lastChangedTipLabel = bind(SceneDetailsViewModel::lastChangedTipLabel)
 	val resentButtonLabel = bind(SceneDetailsViewModel::resentButtonLabel)
-	val availableCharacters = bindImmutableList(SceneDetailsViewModel::availableCharacters)
-	val availableLocations = bindImmutableList(SceneDetailsViewModel::availableLocations)
+	val availableCharacters = bind(SceneDetailsViewModel::availableCharacters)
+	val availableLocations = bind(SceneDetailsViewModel::availableLocations)
 
-	val includedCharacters = bindImmutableList(SceneDetailsViewModel::includedCharacters)
+	val includedCharacters = bind(SceneDetailsViewModel::includedCharacters)
 	val selectedLocation = bind(SceneDetailsViewModel::selectedLocation)
 
 	override val applicationScope: ApplicationScope

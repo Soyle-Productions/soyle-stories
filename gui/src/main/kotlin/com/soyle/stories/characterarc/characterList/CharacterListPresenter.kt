@@ -141,6 +141,5 @@ class CharacterListPresenter(
 	}
 
 	override fun receiveDemoteMajorCharacterFailure(failure: Exception) {}
-	override fun receiveRenameCharacterArcFailure(failure: Exception) {}
 
 }

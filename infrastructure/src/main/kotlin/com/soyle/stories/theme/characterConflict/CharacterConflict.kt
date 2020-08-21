@@ -2,34 +2,25 @@ package com.soyle.stories.theme.characterConflict
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
-import com.soyle.stories.common.components.*
+import com.soyle.stories.common.components.associateChildrenTo
+import com.soyle.stories.common.components.responsiveBox
 import com.soyle.stories.common.existsWhen
-import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.characterConflict.components.*
-import com.soyle.stories.theme.characterConflict.components.onPerspectiveCharacterSelected
-import com.soyle.stories.theme.characterConflict.components.populatePerspectiveCharacterList
-import de.jensd.fx.glyphs.materialicons.MaterialIcon
-import de.jensd.fx.glyphs.materialicons.MaterialIconView
-import javafx.beans.binding.BooleanExpression
-import javafx.beans.property.*
+import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableObjectValue
 import javafx.beans.value.ObservableValue
-import javafx.collections.ListChangeListener
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
-import javafx.scene.Cursor
 import javafx.scene.Node
 import javafx.scene.Parent
-import javafx.scene.SnapshotParameters
-import javafx.scene.control.*
-import javafx.scene.input.ClipboardContent
-import javafx.scene.input.DataFormat
-import javafx.scene.input.TransferMode
+import javafx.scene.control.MenuButton
+import javafx.scene.control.ScrollPane
+import javafx.scene.control.TextInputControl
+import javafx.scene.control.ToggleButton
 import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import tornadofx.*
 
@@ -391,9 +382,10 @@ class CharacterConflict : View() {
     private fun Parent.minorOpponentList()
     {
         vbox(spacing = 8.0) {
-            associateChildrenTo(model.opponents.select {
+            val opponentsById = model.opponents.select {
                 it.associateBy { it.characterId }.toProperty()
-            }) {
+            }
+            associateChildrenTo(opponentsById) {
                 opponentCard(it as SimpleObjectProperty)
             }
         }

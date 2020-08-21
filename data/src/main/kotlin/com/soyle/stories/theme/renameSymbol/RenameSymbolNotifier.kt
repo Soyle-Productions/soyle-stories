@@ -7,6 +7,6 @@ import kotlin.coroutines.coroutineContext
 
 class RenameSymbolNotifier : Notifier<RenameSymbol.OutputPort>(), RenameSymbol.OutputPort {
     override suspend fun symbolRenamed(response: RenamedSymbol) {
-        notifyAll(coroutineContext) { it.symbolRenamed(response) }
+        notifyAll { it.symbolRenamed(response) }
     }
 }

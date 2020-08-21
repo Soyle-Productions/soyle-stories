@@ -34,7 +34,7 @@ class CreateSymbolDialog : Fragment() {
             field {
                 textProperty.bind(model.nameFieldLabel)
                 textfield {
-                    model.itemProperty.onChange {
+                    model.itemProperty().onChange {
                         decorators.toList().forEach { removeDecorator(it) }
                         if (it?.errorCause == "SymbolName" && it.errorMessage != null) addDecorator(
                             SimpleMessageDecorator(it.errorMessage, ValidationSeverity.Error)
@@ -60,7 +60,7 @@ class CreateSymbolDialog : Fragment() {
                         textProperty().bind(themeId.select {
                             (model.themes.find { it.themeId == themeId.get() }?.themeName ?: "").toProperty()
                         })
-                        model.itemProperty.onChange {
+                        model.itemProperty().onChange {
                             decorators.toList().forEach { removeDecorator(it) }
                             if (it?.errorCause == "ThemeSelection" && it.errorMessage != null) addDecorator(
                                 SimpleMessageDecorator(it.errorMessage, ValidationSeverity.Error)
@@ -84,7 +84,7 @@ class CreateSymbolDialog : Fragment() {
                         fitToParentWidth()
                         visibleProperty().bind(this@field.visibleProperty())
                         themeName.bind(textProperty())
-                        model.itemProperty.onChange {
+                        model.itemProperty().onChange {
                             decorators.toList().forEach { removeDecorator(it) }
                             if (it?.errorCause == "ThemeName" && it.errorMessage != null) addDecorator(
                                 SimpleMessageDecorator(it.errorMessage, ValidationSeverity.Error)
@@ -143,7 +143,7 @@ class CreateSymbolDialog : Fragment() {
                 }
             }
         }
-        model.itemProperty.onChangeUntil({ currentStage?.isShowing != true }) {
+        model.itemProperty().onChangeUntil({ currentStage?.isShowing != true }) {
             if (it?.themes.isNullOrEmpty()) selectingExistingTheme.set(false)
         }
         viewListener.getValidState()
@@ -155,8 +155,8 @@ class CreateSymbolDialog : Fragment() {
             if (themeId != null) {
                 viewListener.createSymbol(themeId, symbolName.get())
             } else {
-                model.rebind {
-                    item = item?.copy(
+                model.updateOrInvalidated {
+                    copy(
                         errorMessage = "No theme selected.",
                         errorCause = "ThemeSelection"
                     )

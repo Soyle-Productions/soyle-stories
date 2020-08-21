@@ -11,17 +11,16 @@ class CharacterValueComparisonModel : Model<CharacterValueComparisonScope, Chara
 
     val addCharacterButtonLabel = bind(CharacterValueComparisonViewModel::addCharacterButtonLabel)
     val openValueWebToolButtonLabel = bind(CharacterValueComparisonViewModel::openValueWebToolButtonLabel)
-    val characters = bindImmutableList(CharacterValueComparisonViewModel::characters)
+    val characters = bind(CharacterValueComparisonViewModel::characters)
     val availableCharacters = SimpleObjectProperty<List<CharacterItemViewModel>?>(null)
     val availableOppositionValues = SimpleObjectProperty<List<AvailableValueWebViewModel>?>(null)
 
     override fun viewModel(): CharacterValueComparisonViewModel? {
-        item = item?.copy(availableCharacters = availableCharacters.value, availableOppositionValues = availableOppositionValues.value)
-        return item
+        return item?.copy(availableCharacters = availableCharacters.value, availableOppositionValues = availableOppositionValues.value)
     }
 
     init {
-        itemProperty.onChange {
+        itemProperty().onChange {
             availableCharacters.value = it?.availableCharacters
             availableOppositionValues.value = it?.availableOppositionValues
         }

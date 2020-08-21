@@ -32,8 +32,8 @@ class SceneDetails : View("Scene") {
 							(!it.isNullOrEmpty() || model.selectedLocation.value != null).toProperty()
 						}
 					}
-					textProperty().bind(model.select {
-						(it.selectedLocation?.name ?: it.locationDropDownEmptyLabel).toProperty()
+					textProperty().bind(model.itemProperty().select {
+						(it?.selectedLocation?.name ?: it?.locationDropDownEmptyLabel).toProperty()
 					})
 					contextMenu = ContextMenu().apply {
 						items.bind(model.availableLocations) {

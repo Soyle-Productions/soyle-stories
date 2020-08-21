@@ -8,6 +8,6 @@ import kotlin.coroutines.coroutineContext
 class RemoveSymbolicItemNotifier : Notifier<RemoveSymbolicItem.OutputPort>(), RemoveSymbolicItem.OutputPort {
 
     override suspend fun symbolicItemsRemoved(response: List<RemovedSymbolicItem>) {
-        notifyAll(coroutineContext) { it.symbolicItemsRemoved(response) }
+        notifyAll { it.symbolicItemsRemoved(response) }
     }
 }

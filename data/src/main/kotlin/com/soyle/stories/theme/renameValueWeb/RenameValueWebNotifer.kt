@@ -7,6 +7,6 @@ import kotlin.coroutines.coroutineContext
 
 class RenameValueWebNotifier : Notifier<RenameValueWeb.OutputPort>(), RenameValueWeb.OutputPort {
     override suspend fun valueWebRenamed(response: RenamedValueWeb) {
-        notifyAll(coroutineContext) { it.valueWebRenamed(response) }
+        notifyAll { it.valueWebRenamed(response) }
     }
 }

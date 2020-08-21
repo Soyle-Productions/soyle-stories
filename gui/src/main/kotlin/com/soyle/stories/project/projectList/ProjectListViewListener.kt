@@ -18,8 +18,8 @@ interface ProjectListViewListener {
 
     suspend fun startNewProject(directory: String, name: String)
 
-    suspend fun openProject(location: String)
-    suspend fun replaceCurrentProject(location: String)
-    suspend fun forceOpenProject(location: String)
+    fun openProject(location: String)
+    fun replaceCurrentProject(location: String)
+    fun forceOpenProject(location: String)
 
 }

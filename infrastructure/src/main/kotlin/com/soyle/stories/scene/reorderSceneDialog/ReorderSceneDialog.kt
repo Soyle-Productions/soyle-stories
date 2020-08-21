@@ -35,7 +35,7 @@ class ReorderSceneDialog : Fragment() {
                 }
             }
         }
-        model.itemProperty.onChange { viewModel ->
+        model.itemProperty().onChange { viewModel ->
             if (viewModel == null) {
                 buttonTypes.clear()
                 return@onChange
@@ -59,7 +59,7 @@ class ReorderSceneDialog : Fragment() {
             }
             close()
         }
-        model.itemProperty.onChangeUntil({ it?.showAgain != null }) {
+        model.itemProperty().onChangeUntil({ it?.showAgain != null }) {
             if (it?.showAgain == true) {
                 openModal(StageStyle.DECORATED, Modality.APPLICATION_MODAL)
             } else if (it?.showAgain == false) {

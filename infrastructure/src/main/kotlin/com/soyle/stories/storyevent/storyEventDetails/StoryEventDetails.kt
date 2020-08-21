@@ -55,8 +55,8 @@ class StoryEventDetails : View() {
 			field {
 				button {
 
-					textProperty().bind(model.itemProperty.select {
-						(it.selectedLocation?.name ?: it.locationSelectionButtonLabel).toProperty()
+					textProperty().bind(model.itemProperty().select {
+						(it?.selectedLocation?.name ?: it?.locationSelectionButtonLabel).toProperty()
 					})
 
 					id = "location-select"

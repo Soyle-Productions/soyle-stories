@@ -8,6 +8,6 @@ import kotlin.coroutines.coroutineContext
 class RenameSymbolicItemNotifier : Notifier<RenameSymbolicItem.OutputPort>(), RenameSymbolicItem.OutputPort {
 
     override suspend fun symbolicItemRenamed(response: List<RenamedSymbolicItem>) {
-        notifyAll(coroutineContext) { it.symbolicItemRenamed(response) }
+        notifyAll { it.symbolicItemRenamed(response) }
     }
 }

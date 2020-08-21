@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty
 class ReorderSceneRamificationsModel : Model<ReorderSceneRamificationsScope, ReorderSceneRamificationsViewModel>(ReorderSceneRamificationsScope::class) {
 
     val invalid = bind(ReorderSceneRamificationsViewModel::invalid)
-    val scenes = bindImmutableList(ReorderSceneRamificationsViewModel::scenes)
+    val scenes = bind(ReorderSceneRamificationsViewModel::scenes)
 
     override val applicationScope: ApplicationScope
         get() = scope.applicationScope

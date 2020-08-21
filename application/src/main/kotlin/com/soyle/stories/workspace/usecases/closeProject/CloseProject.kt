@@ -15,7 +15,7 @@ interface CloseProject {
 
     interface OutputPort {
         fun receiveCloseProjectFailure(failure: Exception)
-        fun receiveCloseProjectResponse(response: ResponseModel)
+        suspend fun receiveCloseProjectResponse(response: ResponseModel)
     }
 
 }

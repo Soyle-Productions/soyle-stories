@@ -7,7 +7,7 @@ import kotlin.coroutines.coroutineContext
 class CharacterUsedAsOpponentNotifier : CharacterUsedAsOpponentReceiver, Notifier<CharacterUsedAsOpponentReceiver>() {
 
     override suspend fun receiveCharacterUsedAsOpponent(characterUsedAsOpponent: CharacterUsedAsOpponent) {
-        notifyAll(coroutineContext) { it.receiveCharacterUsedAsOpponent(characterUsedAsOpponent) }
+        notifyAll { it.receiveCharacterUsedAsOpponent(characterUsedAsOpponent) }
     }
 
 }

@@ -14,12 +14,6 @@ class SyncThreadTransformer : ThreadTransformer, ApplicationTest() {
 	}
 
 	override fun gui(update: suspend CoroutineScope.() -> Unit) {
-		if (Platform.isFxApplicationThread()) {
-			runBlocking {
-				update()
-			}
-			return
-		}
 		interact {
 			runBlocking {
 				update()

@@ -57,20 +57,20 @@ object LocationModule {
 
 	private fun InScope<ProjectScope>.events() {
 		provide(CreateNewLocation.OutputPort::class) {
-			CreateNewLocationNotifier()
+			CreateNewLocationNotifier(applicationScope.get())
 		}
 		provide(DeleteLocation.OutputPort::class) {
-			DeleteLocationNotifier().also {
+			DeleteLocationNotifier(applicationScope.get()).also {
 				get<RemoveSymbolicItemControllerImpl>() listensTo it
 			}
 		}
 		provide(RenameLocation.OutputPort::class) {
-			RenameLocationNotifier().also {
+			RenameLocationNotifier(applicationScope.get()).also {
 				get<RenameSymbolicItemController>() listensTo it
 			}
 		}
 		provide(ReDescribeLocation.OutputPort::class) {
-			ReDescribeLocationNotifier()
+			ReDescribeLocationNotifier(applicationScope.get())
 		}
 
 		provide<LocationEvents> {

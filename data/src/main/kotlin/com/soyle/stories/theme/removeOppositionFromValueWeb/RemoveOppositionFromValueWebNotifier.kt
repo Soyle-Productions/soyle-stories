@@ -8,6 +8,6 @@ import kotlin.coroutines.coroutineContext
 class RemoveOppositionFromValueWebNotifier : Notifier<RemoveOppositionFromValueWeb.OutputPort>(), RemoveOppositionFromValueWeb.OutputPort {
 
     override suspend fun removedOppositionFromValueWeb(response: OppositionRemovedFromValueWeb) {
-        notifyAll(coroutineContext) { it.removedOppositionFromValueWeb(response) }
+        notifyAll { it.removedOppositionFromValueWeb(response) }
     }
 }

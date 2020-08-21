@@ -1,15 +1,22 @@
 package com.soyle.stories.scene.deleteScene
 
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
 
-class DeleteSceneNotifier : DeleteScene.OutputPort, Notifier<DeleteScene.OutputPort>() {
+class DeleteSceneNotifier(
+	private val threadTransformer: ThreadTransformer
+) : DeleteScene.OutputPort, Notifier<DeleteScene.OutputPort>() {
 	override fun receiveDeleteSceneResponse(responseModel: DeleteScene.ResponseModel) {
-		notifyAll { it.receiveDeleteSceneResponse(responseModel) }
+		threadTransformer.async {
+			notifyAll { it.receiveDeleteSceneResponse(responseModel) }
+		}
 	}
 
 	override fun receiveDeleteSceneFailure(failure: SceneException) {
-		notifyAll { it.receiveDeleteSceneFailure(failure) }
+		threadTransformer.async {
+			notifyAll { it.receiveDeleteSceneFailure(failure) }
+		}
 	}
 }

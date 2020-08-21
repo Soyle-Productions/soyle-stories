@@ -6,14 +6,21 @@
 package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
 
-class ChangeThematicSectionValueNotifier : ChangeThematicSectionValue.OutputPort, Notifier<ChangeThematicSectionValue.OutputPort>() {
+class ChangeThematicSectionValueNotifier(
+    private val threadTransformer: ThreadTransformer
+) : ChangeThematicSectionValue.OutputPort, Notifier<ChangeThematicSectionValue.OutputPort>() {
     override fun receiveChangeThematicSectionValueFailure(failure: Exception) {
-        notifyAll { it.receiveChangeThematicSectionValueFailure(failure) }
+        threadTransformer.async {
+            notifyAll { it.receiveChangeThematicSectionValueFailure(failure) }
+        }
     }
 
     override fun receiveChangeThematicSectionValueResponse(response: ChangeThematicSectionValue.ResponseModel) {
-        notifyAll { it.receiveChangeThematicSectionValueResponse(response) }
+        threadTransformer.async {
+            notifyAll { it.receiveChangeThematicSectionValueResponse(response) }
+        }
     }
 }

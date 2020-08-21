@@ -6,6 +6,6 @@ import kotlin.coroutines.coroutineContext
 
 class CreatedCharacterArcNotifier : Notifier<CreatedCharacterArcReceiver>(), CreatedCharacterArcReceiver {
     override suspend fun receiveCreatedCharacterArc(createdCharacterArc: CreatedCharacterArc) {
-        notifyAll(coroutineContext) { it.receiveCreatedCharacterArc(createdCharacterArc) }
+        notifyAll { it.receiveCreatedCharacterArc(createdCharacterArc) }
     }
 }

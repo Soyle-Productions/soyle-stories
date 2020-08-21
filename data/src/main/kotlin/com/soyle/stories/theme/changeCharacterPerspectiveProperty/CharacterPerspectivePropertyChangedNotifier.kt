@@ -8,6 +8,6 @@ class CharacterPerspectivePropertyChangedNotifier : CharacterPerspectiveProperty
 
     override suspend fun receiveCharacterPerspectivePropertyChanged(propertyChanged: ChangeCharacterPerspectivePropertyValue.ResponseModel) {
         println(propertyChanged.property.name + " changed to ${propertyChanged.newValue}")
-        notifyAll(coroutineContext) { it.receiveCharacterPerspectivePropertyChanged(propertyChanged) }
+        notifyAll { it.receiveCharacterPerspectivePropertyChanged(propertyChanged) }
     }
 }

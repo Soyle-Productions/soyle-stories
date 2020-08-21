@@ -1,23 +1,24 @@
 package com.soyle.stories.repositories
 
 import com.soyle.stories.entities.Project
+import com.soyle.stories.stores.FileStore
 import com.soyle.stories.workspace.repositories.FileRepository
 import com.soyle.stories.workspace.repositories.ProjectRepository
 import com.soyle.stories.workspace.valueobjects.ProjectFile
 import java.io.File
 
-class ProjectFileRepository : ProjectRepository, com.soyle.stories.project.repositories.ProjectRepository, FileRepository {
+class ProjectFileRepository(
+    private val fileStore: FileStore<ProjectFile>
+) : ProjectRepository, com.soyle.stories.project.repositories.ProjectRepository, FileRepository {
 
     private val fileSystem: Map<String, MutableSet<String>> = mapOf(
         "directories" to mutableSetOf(),
         "files" to mutableSetOf()
     )
 
-    private val projects = mutableMapOf<String, Project>()
-
     override suspend fun createFile(projectFile: ProjectFile) {
         fileSystem.getValue("files").add(projectFile.location)
-        projects[projectFile.location] = projectFile.run { Project(projectId, projectName) }
+        fileStore.createFile(projectFile.location, projectFile)
     }
 
     override suspend fun doesDirectoryExist(directory: String): Boolean {
@@ -34,5 +35,7 @@ class ProjectFileRepository : ProjectRepository, com.soyle.stories.project.repos
 
     override suspend fun addNewProject(project: Project) {}
 
-    override suspend fun getProjectAtLocation(location: String): Project? = projects[location]
+    override suspend fun getProjectAtLocation(location: String): Project? = fileStore.getFileAt(location)?.let {
+        Project(it.projectId, it.projectName)
+    }
 }

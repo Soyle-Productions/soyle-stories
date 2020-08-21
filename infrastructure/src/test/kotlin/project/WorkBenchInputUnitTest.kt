@@ -67,15 +67,15 @@ class WorkBenchInputUnitTest : ApplicationTest() {
 					TODO("Not yet implemented")
 				}
 
-				override suspend fun openProject(location: String) {
+				override fun openProject(location: String) {
 					TODO("Not yet implemented")
 				}
 
-				override suspend fun replaceCurrentProject(location: String) {
+				override fun replaceCurrentProject(location: String) {
 					TODO("Not yet implemented")
 				}
 
-				override suspend fun forceOpenProject(location: String) {
+				override fun forceOpenProject(location: String) {
 					TODO("Not yet implemented")
 				}
 

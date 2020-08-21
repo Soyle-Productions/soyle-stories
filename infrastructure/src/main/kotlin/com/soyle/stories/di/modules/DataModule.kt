@@ -1,6 +1,5 @@
 package com.soyle.stories.di.modules
 
-import com.soyle.stories.characterarc.repositories.CharacterArcRepository
 import com.soyle.stories.characterarc.repositories.CharacterRepository
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
@@ -15,11 +14,13 @@ import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.storyevent.repositories.StoryEventRepository
 import com.soyle.stories.theme.Context
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.workspace.repositories.FileRepository
 import com.soyle.stories.workspace.repositories.WorkspaceRepository
 import com.soyle.stories.writer.repositories.WriterRepository
+import com.soyle.stories.stores.ProjectFileStore
 
 object DataModule {
 
@@ -32,12 +33,16 @@ object DataModule {
 				WorkspaceRepositoryImpl()
 			}
 
+			provide {
+				ProjectFileStore()
+			}
+
 			provide(
 			  ProjectRepository::class,
 			  com.soyle.stories.workspace.repositories.ProjectRepository::class,
 			  FileRepository::class
 			) {
-				ProjectFileRepository()
+				ProjectFileRepository(get<ProjectFileStore>())
 			}
 		}
 
@@ -46,8 +51,7 @@ object DataModule {
 			provide<LayoutRepository> { LayoutRepositoryImpl() }
 
 			provide(
-			  CharacterArcRepository::class,
-			  com.soyle.stories.theme.repositories.CharacterArcRepository::class
+			  CharacterArcRepository::class
 			) {
 				CharacterArcRepositoryImpl()
 			}

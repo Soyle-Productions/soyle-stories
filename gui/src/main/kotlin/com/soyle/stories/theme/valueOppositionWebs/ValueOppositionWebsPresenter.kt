@@ -1,11 +1,11 @@
 package com.soyle.stories.theme.valueOppositionWebs
 
+import com.soyle.stories.entities.theme.oppositionValue.RenamedOppositionValue
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.OppositionValueNameCannotBeBlank
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.OppositionAddedToValueWeb
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolicRepresentationAddedToOpposition
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.ValueWebAddedToTheme
 import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWeb
@@ -19,7 +19,6 @@ import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromTheme
 import com.soyle.stories.theme.usecases.removeValueWebFromTheme.ValueWebRemovedFromTheme
 import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValue
-import com.soyle.stories.theme.usecases.renameOppositionValue.RenamedOppositionValue
 import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItem
 import com.soyle.stories.theme.usecases.renameSymbolicItems.RenamedSymbolicItem
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
@@ -105,16 +104,16 @@ class ValueOppositionWebsPresenter(
     }
 
     override suspend fun addedOppositionToValueWeb(response: AddOppositionToValueWeb.ResponseModel) {
-        if (themeId != response.themeId) return
+        if (themeId != response.oppositionAddedToValueWeb.themeId) return
         view.updateOrInvalidated {
-            if (selectedValueWeb == null || selectedValueWeb.valueWebId != response.valueWebId.toString()) {
+            if (selectedValueWeb == null || selectedValueWeb.valueWebId != response.oppositionAddedToValueWeb.valueWebId.toString()) {
                 return@updateOrInvalidated this
             }
             copy(
                 oppositionValues = oppositionValues + OppositionValueViewModel(
-                    response.oppositionValueId.toString(),
-                    response.oppositionValueName,
-                    response.needsName,
+                    response.oppositionAddedToValueWeb.oppositionValueId.toString(),
+                    response.oppositionAddedToValueWeb.oppositionValueName,
+                    response.oppositionAddedToValueWeb.needsName,
                     listOf()
                 )
             )

@@ -134,7 +134,7 @@ object CharacterArcModule {
             RenameCharacterUseCase(get(), get())
         }
         provide<RenameCharacterArc> {
-            RenameCharacterArcUseCase(get(), get(), get())
+            RenameCharacterArcUseCase(get(), get())
         }
         provide<LinkLocationToCharacterArcSection> {
             LinkLocationToCharacterArcSectionUseCase(get(), get())
@@ -167,14 +167,14 @@ object CharacterArcModule {
         provide(PlanNewCharacterArc.OutputPort::class) { PlanNewCharacterArcOutput(get(), get()) }
         provide(IncludeCharacterInComparison.OutputPort::class) { IncludeCharacterInComparisonOutput(get()) }
         provide(PromoteMinorCharacter.OutputPort::class) { PromoteMinorCharacterOutput(get()) }
-        provide(DemoteMajorCharacter.OutputPort::class) { DeleteCharacterArcNotifier() }
+        provide(DemoteMajorCharacter.OutputPort::class) { DeleteCharacterArcNotifier(applicationScope.get()) }
         provide(RemoveCharacterFromStory.OutputPort::class) {
             RemoveCharacterFromStoryOutput(get(), get())
         }
-        provide(ChangeStoryFunction.OutputPort::class) { ChangeStoryFunctionNotifier() }
-        provide(ChangeThematicSectionValue.OutputPort::class) { ChangeThematicSectionValueNotifier() }
-        provide(ChangeCentralMoralQuestion.OutputPort::class) { ChangeCentralMoralQuestionNotifier() }
-        provide(ChangeCharacterPropertyValue.OutputPort::class) { ChangeCharacterPropertyValueNotifier() }
+        provide(ChangeStoryFunction.OutputPort::class) { ChangeStoryFunctionNotifier(applicationScope.get()) }
+        provide(ChangeThematicSectionValue.OutputPort::class) { ChangeThematicSectionValueNotifier(applicationScope.get()) }
+        provide(ChangeCentralMoralQuestion.OutputPort::class) { ChangeCentralMoralQuestionNotifier(applicationScope.get()) }
+        provide(ChangeCharacterPropertyValue.OutputPort::class) { ChangeCharacterPropertyValueNotifier(applicationScope.get()) }
         provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) {
             ChangeCharacterPerspectivePropertyValueOutput(
                 get()
@@ -183,9 +183,9 @@ object CharacterArcModule {
         provide(RemoveCharacterFromComparison.OutputPort::class) { RemoveCharacterFromComparisonOutput(get(), get()) }
 
         provide(RenameCharacter.OutputPort::class) { RenameCharacterOutput(get()) }
-        provide(RenameCharacterArc.OutputPort::class) { RenameCharacterArcNotifier() }
-        provide(LinkLocationToCharacterArcSection.OutputPort::class) { LinkLocationToCharacterArcSectionNotifier() }
-        provide(UnlinkLocationFromCharacterArcSection.OutputPort::class) { UnlinkLocationFromCharacterArcSectionNotifier() }
+        provide(RenameCharacterArc.OutputPort::class) { RenameCharacterArcNotifier(applicationScope.get()) }
+        provide(LinkLocationToCharacterArcSection.OutputPort::class) { LinkLocationToCharacterArcSectionNotifier(applicationScope.get()) }
+        provide(UnlinkLocationFromCharacterArcSection.OutputPort::class) { UnlinkLocationFromCharacterArcSectionNotifier(applicationScope.get()) }
     }
 
     private fun InScope<ProjectScope>.controllers() {

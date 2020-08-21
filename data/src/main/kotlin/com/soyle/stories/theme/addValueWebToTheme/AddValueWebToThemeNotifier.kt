@@ -10,7 +10,7 @@ class AddValueWebToThemeNotifier(
 ) : Notifier<AddValueWebToTheme.OutputPort>(), AddValueWebToTheme.OutputPort {
 
     override suspend fun addedValueWebToTheme(response: AddValueWebToTheme.ResponseModel) {
-        notifyAll(coroutineContext) { it.addedValueWebToTheme(response) }
+        notifyAll { it.addedValueWebToTheme(response) }
         response.symbolicItemAdded?.let {
             symbolicItemAddedToOppositionOutputPort.addedSymbolicItemToOpposition(
                 AddSymbolicItemToOpposition.ResponseModel(

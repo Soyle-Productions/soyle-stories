@@ -19,7 +19,7 @@ interface OpenProject {
 
     interface OutputPort : CloseProject.OutputPort {
         fun receiveOpenProjectFailure(failure: ProjectException)
-        fun receiveOpenProjectResponse(response: ResponseModel)
+        suspend fun receiveOpenProjectResponse(response: ResponseModel)
     }
 
 }

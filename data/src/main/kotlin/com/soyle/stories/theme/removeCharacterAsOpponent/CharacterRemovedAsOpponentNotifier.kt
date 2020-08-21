@@ -7,6 +7,6 @@ import kotlin.coroutines.coroutineContext
 class CharacterRemovedAsOpponentNotifier : CharacterRemovedAsOpponentReceiver, Notifier<CharacterRemovedAsOpponentReceiver>() {
 
     override suspend fun receiveCharacterRemovedAsOpponent(characterRemovedAsOpponent: CharacterRemovedAsOpponent) {
-        notifyAll(coroutineContext) { it.receiveCharacterRemovedAsOpponent(characterRemovedAsOpponent) }
+        notifyAll { it.receiveCharacterRemovedAsOpponent(characterRemovedAsOpponent) }
     }
 }

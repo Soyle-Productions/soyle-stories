@@ -5,7 +5,7 @@ import com.soyle.stories.project.usecases.startNewProject.StartNewProject
 import kotlin.coroutines.Continuation
 
 internal class StartNewProjectOutputContinuation(private val continuation: Continuation<StartNewProject.ResponseModel>) : StartNewProject.OutputPort {
-    override fun receiveStartNewProjectResponse(response: StartNewProject.ResponseModel) {
+    override suspend fun receiveStartNewProjectResponse(response: StartNewProject.ResponseModel) {
         continuation.resumeWith(Result.success(response))
     }
 

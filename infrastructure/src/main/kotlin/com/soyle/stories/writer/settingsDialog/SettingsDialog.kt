@@ -12,6 +12,7 @@ class SettingsDialog : View() {
 	private val viewListener by resolveLater<SettingsDialogViewListener>()
 	private val model by resolveLater<SettingsDialogModel>()
 
+
 	override val root: Parent = form {
 		fieldset {
 			textProperty.bind(model.dialogSectionLabel)
@@ -27,12 +28,7 @@ class SettingsDialog : View() {
 									}
 									else dialog
 								}
-								model.dialogs.set(dialogUpdate.toObservable())
-								if (dialogUpdate != model.item.dialogs) {
-									model.markDirty(model.dialogs)
-								} else {
-									model.rollback(model.dialogs)
-								}
+								model.dialogUpdates.set(dialogUpdate.toObservable())
 							}
 						}
 					}
@@ -41,7 +37,11 @@ class SettingsDialog : View() {
 		}
 		buttonbar {
 			button(text = "Save", type = ButtonBar.ButtonData.APPLY) {
-				enableWhen { model.dirtyStateFor(SettingsDialogModel::dialogs) }
+				enableWhen {
+					model.dialogUpdates.selectBoolean {
+						(model.dialogs.value != it).toProperty()
+					}
+				}
 				action {
 					viewListener.saveDialogs(model.dialogs.map {
 						it.dialogId to it.enabled
@@ -58,7 +58,7 @@ class SettingsDialog : View() {
 
 	fun show() {
 		if (currentStage?.isShowing == true) return
-		model.itemProperty.onChangeOnce {
+		model.itemProperty().onChangeOnce {
 			openModal(StageStyle.DECORATED, Modality.APPLICATION_MODAL)
 		}
 		viewListener.getValidState()

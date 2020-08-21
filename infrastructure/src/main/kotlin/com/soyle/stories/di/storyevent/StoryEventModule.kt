@@ -69,23 +69,23 @@ object StoryEventModule {
 
 	private fun InScope<ProjectScope>.notifiers() {
 		provide(CreateStoryEvent.OutputPort::class) {
-			CreateStoryEventNotifier()
+			CreateStoryEventNotifier(applicationScope.get())
 		}
 		provide(LinkLocationToStoryEvent.OutputPort::class) {
-			LinkLocationToStoryEventNotifier()
+			LinkLocationToStoryEventNotifier(applicationScope.get())
 		}
 		provide(AddCharacterToStoryEvent.OutputPort::class) {
-			AddCharacterToStoryEventNotifier().also {
+			AddCharacterToStoryEventNotifier(applicationScope.get()).also {
 				get<IncludeCharacterInSceneController>() listensTo it
 			}
 		}
 		provide(RemoveCharacterFromStoryEvent.OutputPort::class) {
-			RemoveCharacterFromStoryEventNotifier().also {
+			RemoveCharacterFromStoryEventNotifier(applicationScope.get()).also {
 				get<RemoveCharacterFromSceneController>() listensTo it
 			}
 		}
 		provide(RenameStoryEvent.OutputPort::class) {
-			RenameStoryEventNotifier()
+			RenameStoryEventNotifier(applicationScope.get())
 		}
 	}
 

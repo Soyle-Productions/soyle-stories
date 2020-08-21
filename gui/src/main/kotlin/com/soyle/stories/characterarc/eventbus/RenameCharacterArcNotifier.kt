@@ -2,14 +2,15 @@ package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.ThreadTransformer
 
-class RenameCharacterArcNotifier : RenameCharacterArc.OutputPort, Notifier<RenameCharacterArc.OutputPort>() {
+class RenameCharacterArcNotifier(
+	private val threadTransformer: ThreadTransformer
+) : RenameCharacterArc.OutputPort, Notifier<RenameCharacterArc.OutputPort>() {
 
 	override fun receiveRenameCharacterArcResponse(response: RenameCharacterArc.ResponseModel) {
-		notifyAll { it.receiveRenameCharacterArcResponse(response) }
-	}
-
-	override fun receiveRenameCharacterArcFailure(failure: Exception) {
-		notifyAll { it.receiveRenameCharacterArcFailure(failure) }
+		threadTransformer.async {
+			notifyAll { it.receiveRenameCharacterArcResponse(response) }
+		}
 	}
 }

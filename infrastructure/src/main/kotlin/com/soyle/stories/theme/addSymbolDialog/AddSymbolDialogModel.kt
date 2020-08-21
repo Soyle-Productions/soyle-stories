@@ -8,9 +8,9 @@ import com.soyle.stories.theme.addSymbolDialog.AddSymbolDialogViewModel
 
 class AddSymbolDialogModel : Model<AddSymbolDialogScope, AddSymbolDialogViewModel>(AddSymbolDialogScope::class) {
 
-    val characters = bindImmutableList(AddSymbolDialogViewModel::characters)
-    val locations = bindImmutableList(AddSymbolDialogViewModel::locations)
-    val symbols = bindImmutableList(AddSymbolDialogViewModel::symbols)
+    val characters = bind(AddSymbolDialogViewModel::characters)
+    val locations = bind(AddSymbolDialogViewModel::locations)
+    val symbols = bind(AddSymbolDialogViewModel::symbols)
     val completed = bind(AddSymbolDialogViewModel::completed)
 
     override val applicationScope: ApplicationScope

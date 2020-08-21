@@ -6,6 +6,6 @@ import kotlin.coroutines.coroutineContext
 
 class CharacterIncludedInThemeNotifier : CharacterIncludedInThemeReceiver, Notifier<CharacterIncludedInThemeReceiver>() {
     override suspend fun receiveCharacterIncludedInTheme(characterIncludedInTheme: CharacterIncludedInTheme) {
-        notifyAll(coroutineContext) { it.receiveCharacterIncludedInTheme(characterIncludedInTheme) }
+        notifyAll { it.receiveCharacterIncludedInTheme(characterIncludedInTheme) }
     }
 }

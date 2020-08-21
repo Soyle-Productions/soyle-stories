@@ -7,6 +7,6 @@ import kotlin.coroutines.coroutineContext
 class ThemeWithCentralConflictChangedNotifier : ThemeWithCentralConflictChangedReceiver,
     Notifier<ThemeWithCentralConflictChangedReceiver>() {
     override suspend fun receiveThemeWithCentralConflictChanged(themeWithCentralConflictChanged: ThemeWithCentralConflictChanged) {
-        notifyAll(coroutineContext) { it.receiveThemeWithCentralConflictChanged(themeWithCentralConflictChanged) }
+        notifyAll { it.receiveThemeWithCentralConflictChanged(themeWithCentralConflictChanged) }
     }
 }

@@ -10,7 +10,7 @@ class AddOppositionToValueWebNotifier(
 ) : Notifier<AddOppositionToValueWeb.OutputPort>(), AddOppositionToValueWeb.OutputPort {
 
     override suspend fun addedOppositionToValueWeb(response: AddOppositionToValueWeb.ResponseModel) {
-        notifyAll(coroutineContext) { it.addedOppositionToValueWeb(response) }
+        notifyAll { it.addedOppositionToValueWeb(response) }
         response.symbolicRepresentationAddedToOpposition?.let {
             symbolicItemToOppositionOutputPort.addedSymbolicItemToOpposition(
                 AddSymbolicItemToOpposition.ResponseModel(

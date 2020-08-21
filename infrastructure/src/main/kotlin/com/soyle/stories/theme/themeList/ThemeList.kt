@@ -143,7 +143,7 @@ class ThemeList : View() {
     }
 
     init {
-        model.itemProperty.onChangeOnce {
+        model.itemProperty().onChangeOnce {
             owningTab?.tabPane?.requestLayout()
         }
         viewListener.getValidState()

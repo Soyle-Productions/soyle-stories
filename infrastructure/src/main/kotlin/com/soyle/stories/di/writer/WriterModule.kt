@@ -43,7 +43,7 @@ object WriterModule {
 			}
 
 			provide(SetDialogPreferences.OutputPort::class) {
-				SetDialogPreferencesNotifier()
+				SetDialogPreferencesNotifier(applicationScope.get())
 			}
 
 			provide<SetDialogPreferencesController> {

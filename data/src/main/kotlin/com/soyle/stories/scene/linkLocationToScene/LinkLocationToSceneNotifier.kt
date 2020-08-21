@@ -1,15 +1,22 @@
 package com.soyle.stories.scene.linkLocationToScene
 
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
 
-class LinkLocationToSceneNotifier : Notifier<LinkLocationToScene.OutputPort>(), LinkLocationToScene.OutputPort {
+class LinkLocationToSceneNotifier(
+	private val threadTransformer: ThreadTransformer
+) : Notifier<LinkLocationToScene.OutputPort>(), LinkLocationToScene.OutputPort {
 
 	override fun failedToLinkLocationToScene(failure: Exception) {
-		notifyAll { it.failedToLinkLocationToScene(failure) }
+		threadTransformer.async {
+			notifyAll { it.failedToLinkLocationToScene(failure) }
+		}
 	}
 
 	override fun locationLinkedToScene(response: LinkLocationToScene.ResponseModel) {
-		notifyAll { it.locationLinkedToScene(response) }
+		threadTransformer.async {
+			notifyAll { it.locationLinkedToScene(response) }
+		}
 	}
 }

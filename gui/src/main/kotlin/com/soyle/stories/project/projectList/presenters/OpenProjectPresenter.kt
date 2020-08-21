@@ -1,5 +1,6 @@
 package com.soyle.stories.project.projectList.presenters
 
+import com.soyle.stories.project.openProject.ProjectOpenedReceiver
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.project.projectList.ProjectIssueViewModel
 import com.soyle.stories.project.projectList.ProjectListView
@@ -12,39 +13,14 @@ import com.soyle.stories.workspace.usecases.openProject.OpenProject
 import java.io.File
 
 internal class OpenProjectPresenter(
-  private val view: ProjectListView,
-  private val closeProjectOutputPort: CloseProject.OutputPort
-) : OpenProject.OutputPort {
+  private val view: ProjectListView
+) : ProjectOpenedReceiver {
 
-    override fun receiveOpenProjectFailure(failure: ProjectException) {
-        view.updateOrInvalidated {
-            copy(
-                failedProjects = failedProjects + when (failure) {
-                    is ProjectDoesNotExistAtLocation -> ProjectIssueViewModel(
-					  File(failure.location).nameWithoutExtension,
-					  failure.location
-					)
-                    is UnexpectedProjectAlreadyOpenAtLocation -> ProjectIssueViewModel(
-					  failure.foundProjectName,
-					  failure.location,
-					  "Different project already open at this location: ${failure.openProjectName}"
-					)
-                    is ProjectAlreadyOpen -> ProjectIssueViewModel(failure.projectName, failure.location)
-                    else -> ProjectIssueViewModel(
-					  File(failure.location).nameWithoutExtension,
-					  failure.location,
-					  failure.localizedMessage
-					)
-                }
-            )
-        }
-    }
-
-    override fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
-        if (response.requiresConfirmation) {
+    override suspend fun receiveOpenedProject(openedProject: OpenProject.ResponseModel) {
+        if (openedProject.requiresConfirmation) {
             return view.updateOrInvalidated {
                 copy(
-                    openProjectRequest = ProjectFileViewModel(response.projectId, response.projectName, response.projectLocation)
+                    openProjectRequest = ProjectFileViewModel(openedProject.projectId, openedProject.projectName, openedProject.projectLocation)
                 )
             }
         }
@@ -52,16 +28,8 @@ internal class OpenProjectPresenter(
             copy(
                 isWelcomeScreenVisible = false,
                 openProjectRequest = null,
-                openProjects = openProjects + ProjectFileViewModel(response.projectId, response.projectName, response.projectLocation)
+                openProjects = openProjects + ProjectFileViewModel(openedProject.projectId, openedProject.projectName, openedProject.projectLocation)
             )
         }
-    }
-
-    override fun receiveCloseProjectFailure(failure: Exception) {
-        closeProjectOutputPort.receiveCloseProjectFailure(failure)
-    }
-
-    override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
-        closeProjectOutputPort.receiveCloseProjectResponse(response)
     }
 }

@@ -28,7 +28,7 @@ class DeleteValueWebDialog : Fragment() {
                 selectedProperty().bindBidirectional(model.doDefaultAction)
             }
         }
-        model.itemProperty.onChange { viewModel ->
+        model.itemProperty().onChange { viewModel ->
             if (viewModel == null) {
                 buttonTypes.clear()
                 return@onChange
@@ -42,7 +42,7 @@ class DeleteValueWebDialog : Fragment() {
 
     init {
         titleProperty.bind(model.title)
-        model.itemProperty.onChangeUntil({ it?.doDefaultAction != null }) {
+        model.itemProperty().onChangeUntil({ it?.doDefaultAction != null }) {
             if (it?.doDefaultAction == false) {
                 openModal(StageStyle.DECORATED, Modality.APPLICATION_MODAL)
             } else if (it?.doDefaultAction == true) {

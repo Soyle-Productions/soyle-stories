@@ -7,6 +7,6 @@ import kotlin.coroutines.coroutineContext
 class ChangedCharacterChangeNotifier : ChangedCharacterChangeReceiver, Notifier<ChangedCharacterChangeReceiver>() {
 
     override suspend fun receiveChangedCharacterChange(changedCharacterChange: ChangedCharacterChange) {
-        notifyAll(coroutineContext) { it.receiveChangedCharacterChange(changedCharacterChange) }
+        notifyAll { it.receiveChangedCharacterChange(changedCharacterChange) }
     }
 }

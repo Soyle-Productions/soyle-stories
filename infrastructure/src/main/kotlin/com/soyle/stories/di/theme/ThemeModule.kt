@@ -159,6 +159,8 @@ import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListen
 
 object ThemeModule {
 
+    fun provideCreateTheme(scope: ProjectScope): CreateTheme = CreateThemeUseCase(scope.get())
+
     init {
 
         scoped<ProjectScope> {
@@ -171,7 +173,7 @@ object ThemeModule {
     }
 
     private fun InScope<ProjectScope>.usecases() {
-        provide<CreateTheme> { CreateThemeUseCase(get()) }
+        provide { provideCreateTheme(this) }
         provide<ListSymbolsByTheme> { ListSymbolsByThemeUseCase(get()) }
         provide<DeleteTheme> { DeleteThemeUseCase(get(), get()) }
         provide<RenameTheme> { RenameThemeUseCase(get()) }
@@ -241,7 +243,7 @@ object ThemeModule {
             CreateThemeOutput(get(), get())
         }
         provide(DeleteTheme.OutputPort::class) {
-            DeleteThemeNotifier(get())
+            DeleteThemeNotifier(applicationScope.get(), get())
         }
         provide(RenameTheme.OutputPort::class, ChangeCentralConflict.OutputPort::class) {
             UpdateThemeMetaDataOutput(get(), get())

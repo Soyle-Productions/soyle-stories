@@ -4,9 +4,10 @@ import javafx.application.Platform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.testfx.framework.junit5.ApplicationTest
+import kotlin.coroutines.coroutineContext
 
 
-class SyncThreadTransformer : ThreadTransformer, ApplicationTest() {
+class SyncThreadTransformer : ThreadTransformer {
     override fun async(task: suspend CoroutineScope.() -> Unit) {
         runBlocking {
             task()
@@ -14,16 +15,8 @@ class SyncThreadTransformer : ThreadTransformer, ApplicationTest() {
     }
 
     override fun gui(update: suspend CoroutineScope.() -> Unit) {
-        if (Platform.isFxApplicationThread()) {
-            runBlocking {
-                update()
-            }
-            return
-        }
-        interact {
-            runBlocking {
-                update()
-            }
+        runBlocking {
+            update()
         }
     }
 }

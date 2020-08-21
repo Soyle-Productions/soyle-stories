@@ -4,9 +4,9 @@ import com.soyle.stories.characterarc.repositories.ThemeRepository
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import java.util.*
 
 class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositories.ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository {
@@ -22,6 +22,8 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 	}
 
 	override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]
+	override suspend fun listAllThemesInProject(projectId: Project.Id): List<Theme> = listThemesInProject(projectId)
+
 	override suspend fun updateTheme(theme: Theme) {
 		themes[theme.id] = theme
 	}

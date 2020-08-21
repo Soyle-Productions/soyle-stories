@@ -1,5 +1,6 @@
 package com.soyle.stories.soylestories
 
+import com.soyle.stories.common.Model
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.DI
 import com.soyle.stories.common.ThreadTransformer
@@ -17,9 +18,11 @@ import tornadofx.ItemViewModel
  * Date: 2/14/2020
  * Time: 3:24 PM
  */
-class ApplicationModel :
-  ItemViewModel<ProjectListViewModel>(),
+class ApplicationModel : Model<ApplicationScope, ProjectListViewModel>(ApplicationScope::class),
   ProjectListView {
+
+	override val applicationScope: ApplicationScope
+		get() = scope
 
 	val isInvalidated = SimpleBooleanProperty(true)
 	val initializationMessage = SimpleStringProperty("")
@@ -28,24 +31,12 @@ class ApplicationModel :
 	val openProjectRequest = SimpleObjectProperty<ProjectFileViewModel>()
 	val isOpenProjectOptionsDialogOpen = bind(ProjectListViewModel::isOpenProjectOptionsDialogOpen)
 	val isWelcomeScreenVisible = bind(ProjectListViewModel::isWelcomeScreenVisible)
-	val openProjects = bindImmutableList(ProjectListViewModel::openProjects)
+	val openProjects = bind(ProjectListViewModel::openProjects)
 	val isFailedProjectDialogVisible = bind(ProjectListViewModel::isFailedProjectDialogVisible)
-	val failedProjects = bindImmutableList(ProjectListViewModel::failedProjects)
+	val failedProjects = bind(ProjectListViewModel::failedProjects)
 	val startProjectFailure = bind(ProjectListViewModel::startProjectFailure)
 
 	val closingProject = bind(ProjectListViewModel::closeProjectRequest)
-
-	private val threadTransformer by DI.resolveLater<ThreadTransformer>(scope)
-
-	private fun viewModel() = ProjectListViewModel(
-	  isSplashScreenVisible.value,
-	  isWelcomeScreenVisible.value,
-	  openProjectRequest.value,
-	  openProjects.value,
-	  failedProjects.value,
-	  closingProject.value,
-	  startProjectFailure.value
-	)
 
 	override fun update(update: ProjectListViewModel?.() -> ProjectListViewModel) {
 		threadTransformer.gui {

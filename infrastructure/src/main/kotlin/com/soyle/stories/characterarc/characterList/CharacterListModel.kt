@@ -10,8 +10,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.scene.control.TreeItem
-import tornadofx.ItemViewModel
-import tornadofx.toProperty
+import tornadofx.*
 
 /**
  * Created by Brendan
@@ -24,9 +23,9 @@ class CharacterListModel : Model<ProjectScope, CharacterListViewModel>(ProjectSc
         get() = scope.applicationScope
 
     val selectedItem = SimpleObjectProperty<Any?>(null)
-    val characters = bindImmutableList(CharacterListViewModel::characters)
+    val characters = bind(CharacterListViewModel::characters)
     val characterTreeItems = SimpleListProperty(FXCollections.observableArrayList<TreeItem<Any?>>())
-    val hasCharacters: ReadOnlyBooleanProperty = bind { (!item?.characters.isNullOrEmpty()).toProperty() }
+    val hasCharacters = characters.select { (! it.isNullOrEmpty()).toProperty() }
     val invalid = SimpleBooleanProperty(true)
 
     override fun viewModel() = CharacterListViewModel(
@@ -38,5 +37,14 @@ class CharacterListModel : Model<ProjectScope, CharacterListViewModel>(ProjectSc
             }
         }
     )
+
+    init {
+        characters.addListener { observable, oldValue, newValue ->
+            println("Character List Model characters updated to size ${newValue?.size}")
+        }
+        hasCharacters.onChange {
+            println("Character List Model has characters: $it")
+        }
+    }
 
 }

@@ -6,6 +6,6 @@ import kotlin.coroutines.coroutineContext
 
 class CreatedCharacterNotifier : CreatedCharacterReceiver, Notifier<CreatedCharacterReceiver>() {
     override suspend fun receiveCreatedCharacter(createdCharacter: CreatedCharacter) {
-        notifyAll(coroutineContext) { it.receiveCreatedCharacter(createdCharacter) }
+        notifyAll { it.receiveCreatedCharacter(createdCharacter) }
     }
 }

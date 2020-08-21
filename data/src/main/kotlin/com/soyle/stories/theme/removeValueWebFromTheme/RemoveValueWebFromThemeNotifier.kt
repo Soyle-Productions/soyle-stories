@@ -8,7 +8,7 @@ import kotlin.coroutines.coroutineContext
 class RemoveValueWebFromThemeNotifier : Notifier<RemoveValueWebFromTheme.OutputPort>(), RemoveValueWebFromTheme.OutputPort {
 
     override suspend fun removedValueWebFromTheme(response: ValueWebRemovedFromTheme) {
-        notifyAll(coroutineContext) { it.removedValueWebFromTheme(response) }
+        notifyAll { it.removedValueWebFromTheme(response) }
     }
 
 }

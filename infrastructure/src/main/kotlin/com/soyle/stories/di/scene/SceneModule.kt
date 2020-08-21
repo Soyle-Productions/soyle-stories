@@ -129,28 +129,28 @@ object SceneModule {
             }
 
             provide(CreateNewScene.OutputPort::class) {
-                CreateNewSceneNotifier(get<CreateStoryEventNotifier>())
+                CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventNotifier>())
             }
             provide(RenameScene.OutputPort::class) {
-                RenameSceneNotifier()
+                RenameSceneNotifier(applicationScope.get())
             }
             provide(DeleteScene.OutputPort::class) {
-                DeleteSceneNotifier()
+                DeleteSceneNotifier(applicationScope.get())
             }
             provide(SetMotivationForCharacterInScene.OutputPort::class) {
-                SetMotivationForCharacterInSceneNotifier()
+                SetMotivationForCharacterInSceneNotifier(applicationScope.get())
             }
             provide(IncludeCharacterInScene.OutputPort::class) {
-                IncludeCharacterInSceneNotifier()
+                IncludeCharacterInSceneNotifier(applicationScope.get())
             }
             provide(LinkLocationToScene.OutputPort::class) {
-                LinkLocationToSceneNotifier()
+                LinkLocationToSceneNotifier(applicationScope.get())
             }
             provide(RemoveCharacterFromScene.OutputPort::class) {
-                RemoveCharacterFromSceneNotifier()
+                RemoveCharacterFromSceneNotifier(applicationScope.get())
             }
             provide(ReorderScene.OutputPort::class) {
-                ReorderSceneNotifier()
+                ReorderSceneNotifier(applicationScope.get())
             }
 
             provide<CreateNewSceneController> {

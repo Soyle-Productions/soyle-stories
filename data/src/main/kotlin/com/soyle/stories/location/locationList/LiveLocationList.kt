@@ -10,7 +10,7 @@ import com.soyle.stories.location.usecases.listAllLocations.LocationItem
 import com.soyle.stories.location.usecases.renameLocation.RenameLocation
 
 class LiveLocationList(
-  threadTransformer: ThreadTransformer,
+  private val threadTransformer: ThreadTransformer,
   listAllLocations: ListAllLocations,
   createNewLocationNotifier: Notifier<CreateNewLocation.OutputPort>,
   deleteLocationNotifier: Notifier<DeleteLocation.OutputPort>,
@@ -35,25 +35,33 @@ class LiveLocationList(
 		override fun receiveListAllLocationsResponse(response: ListAllLocations.ResponseModel) {
 			val locations = response.locations
 			this@LiveLocationList.locations = locations
-			notifyAll { it.receiveLocationListUpdate(locations) }
+			threadTransformer.async {
+				notifyAll { it.receiveLocationListUpdate(locations) }
+			}
 		}
 
 		override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
 			val locations = locations!! + LocationItem(response.locationId, response.locationName)
 			this@LiveLocationList.locations = locations
-			notifyAll { it.receiveLocationListUpdate(locations) }
+			threadTransformer.async {
+				notifyAll { it.receiveLocationListUpdate(locations) }
+			}
 		}
 
 		override fun receiveRenameLocationResponse(response: RenameLocation.ResponseModel) {
 			val locations = locations!!.filterNot { it.id == response.locationId } + LocationItem(response.locationId, response.newName)
 			this@LiveLocationList.locations = locations
-			notifyAll { it.receiveLocationListUpdate(locations) }
+			threadTransformer.async {
+				notifyAll { it.receiveLocationListUpdate(locations) }
+			}
 		}
 
 		override fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
 			val locations = locations!!.filterNot { it.id == response.locationId }
 			this@LiveLocationList.locations = locations
-			notifyAll { it.receiveLocationListUpdate(locations) }
+			threadTransformer.async {
+				notifyAll { it.receiveLocationListUpdate(locations) }
+			}
 		}
 
 		override fun receiveCreateNewLocationFailure(failure: LocationException) {}

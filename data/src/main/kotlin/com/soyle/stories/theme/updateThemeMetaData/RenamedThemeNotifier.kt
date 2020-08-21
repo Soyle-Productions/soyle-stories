@@ -6,6 +6,6 @@ import kotlin.coroutines.coroutineContext
 
 class RenamedThemeNotifier : RenamedThemeReceiver, Notifier<RenamedThemeReceiver>() {
     override suspend fun receiveRenamedTheme(renamedTheme: RenamedTheme) {
-        notifyAll(coroutineContext) { it.receiveRenamedTheme(renamedTheme) }
+        notifyAll { it.receiveRenamedTheme(renamedTheme) }
     }
 }

@@ -7,7 +7,7 @@ import kotlin.coroutines.coroutineContext
 class RemovedCharacterFromThemeNotifier : RemovedCharacterFromThemeReceiver, Notifier<RemovedCharacterFromThemeReceiver>() {
 
     override suspend fun receiveRemovedCharacterFromTheme(removedCharacterFromTheme: RemovedCharacterFromTheme) {
-        notifyAll(coroutineContext) { it.receiveRemovedCharacterFromTheme(removedCharacterFromTheme) }
+        notifyAll { it.receiveRemovedCharacterFromTheme(removedCharacterFromTheme) }
     }
 
 }

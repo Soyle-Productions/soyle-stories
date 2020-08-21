@@ -12,11 +12,11 @@ import tornadofx.onChange
 
 class ValueOppositionWebsModel : Model<ValueOppositionWebsScope, ValueOppositionWebsViewModel>(ValueOppositionWebsScope::class) {
 
-    val valueWebs = bindImmutableList(ValueOppositionWebsViewModel::valueWebs)
-    val selectedValueWeb = bind(ValueOppositionWebsViewModel::selectedValueWeb) as SimpleObjectProperty
-    val oppositionValues = bindImmutableList(ValueOppositionWebsViewModel::oppositionValues)
-    val errorMessage = bind(ValueOppositionWebsViewModel::errorMessage) as SimpleStringProperty
-    val errorSource = bind(ValueOppositionWebsViewModel::errorSource) as SimpleStringProperty
+    val valueWebs = bind(ValueOppositionWebsViewModel::valueWebs)
+    val selectedValueWeb = bind(ValueOppositionWebsViewModel::selectedValueWeb)
+    val oppositionValues = bind(ValueOppositionWebsViewModel::oppositionValues)
+    val errorMessage = bind(ValueOppositionWebsViewModel::errorMessage)
+    val errorSource = bind(ValueOppositionWebsViewModel::errorSource)
 
     val editingProperty = SimpleStringProperty(null)
 

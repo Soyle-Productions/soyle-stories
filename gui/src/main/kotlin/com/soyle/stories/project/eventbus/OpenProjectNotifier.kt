@@ -1,6 +1,7 @@
 package com.soyle.stories.project.eventbus
 
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.workspace.ProjectException
 import com.soyle.stories.workspace.usecases.closeProject.CloseProject
 import com.soyle.stories.workspace.usecases.openProject.OpenProject
@@ -11,16 +12,19 @@ import com.soyle.stories.workspace.usecases.openProject.OpenProject
  * Time: 6:23 PM
  */
 class OpenProjectNotifier(
+    private val threadTransformer: ThreadTransformer,
     private val closeProjectNotifier: RequestCloseProjectNotifier
 ) : OpenProject.OutputPort, Notifier<OpenProject.OutputPort>() {
 
     override fun receiveOpenProjectFailure(failure: ProjectException) {
-        notifyAll {
-            it.receiveOpenProjectFailure(failure)
+        threadTransformer.async {
+            notifyAll {
+                it.receiveOpenProjectFailure(failure)
+            }
         }
     }
 
-    override fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
+    override suspend fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
         notifyAll { it.receiveOpenProjectResponse(response) }
     }
 
@@ -28,7 +32,7 @@ class OpenProjectNotifier(
         closeProjectNotifier.receiveCloseProjectFailure(failure)
     }
 
-    override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
+    override suspend fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
         closeProjectNotifier.receiveCloseProjectResponse(response)
     }
 }
