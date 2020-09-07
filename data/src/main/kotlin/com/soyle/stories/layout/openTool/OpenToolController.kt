@@ -11,5 +11,6 @@ interface OpenToolController {
 	fun openSceneDetailsTool(sceneId: String)
 	fun openValueOppositionWeb(themeId: String)
 	fun openCentralConflict(themeId: String, characterId: String?)
+	fun openMoralArgument(themeId: String)
 
 }

@@ -28,6 +28,11 @@ internal fun ThemeList.themeItemContextMenu(model: ThemeListModel, viewListener:
             viewListener.openCentralConflict(it.themeId)
         }
     }
+    item("Outline the Moral Argument") {
+        actionForSelectedThemeItem {
+            viewListener.openMoralArgument(it.themeId)
+        }
+    }
     item("Create Symbol") {
         actionForSelectedThemeItem {
             scope.get<CreateSymbolDialog>().show(it.themeId, null, currentWindow)

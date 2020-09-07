@@ -37,6 +37,10 @@ class ThemeListController(
         openToolController.openCentralConflict(themeId, null)
     }
 
+    override fun openMoralArgument(themeId: String) {
+        openToolController.openMoralArgument(themeId)
+    }
+
     override fun renameTheme(themeId: String, newName: String) {
         renameThemeController.renameTheme(themeId, newName)
     }

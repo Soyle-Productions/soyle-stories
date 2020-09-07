@@ -55,6 +55,15 @@ class OpenToolControllerImpl(
 		}
 	}
 
+	override fun openMoralArgument(themeId: String) {
+		val request = MoralArgument(
+			UUID.fromString(themeId),
+		)
+		threadTransformer.async {
+			openTool.invoke(request, openToolOutputPort)
+		}
+	}
+
 	override fun openStoryEventDetailsTool(storyEventId: String) {
 		threadTransformer.async {
 			openTool.invoke(
