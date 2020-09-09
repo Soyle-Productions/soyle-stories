@@ -1,6 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.0'
-    id 'org.unbroken-dome.test-sets' version '2.2.1'
+    id 'org.unbroken-dome.test-sets' version '3.0.1'
 }
 
 group 'com.soyle.stories'
