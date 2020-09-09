@@ -1,9 +1,6 @@
 package com.soyle.stories.scene.usecases
 
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.StoryEvent
+import com.soyle.stories.entities.*
 import com.soyle.stories.scene.characterNotInScene
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
@@ -70,7 +67,7 @@ class RemoveCharacterFromSceneUnitTest {
 	private fun givenSceneExists(includesCharacter: Boolean = false)
 	{
 		sceneRepository.scenes[sceneId] = Scene(sceneId, Project.Id(), "", storyEventId, null, listOfNotNull(
-		  characterId.takeIf { includesCharacter }?.let { Scene.CharacterMotivation(it, "", null) }
+		  characterId.takeIf { includesCharacter }?.let { CharacterInScene(it, sceneId, "", null, listOf()) }
 		))
 	}
 

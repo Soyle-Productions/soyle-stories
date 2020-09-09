@@ -3,7 +3,7 @@ package com.soyle.stories.scene.usecases
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.*
-import com.soyle.stories.scene.characterMotivations
+import com.soyle.stories.scene.charactersInScene
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.sceneDoesNotExist
@@ -25,10 +25,12 @@ class GetSceneDetailsUnitTest {
 	private val linkedLocationId = Location.Id()
 
 	private val includedCharacters = List(5) {
-		Scene.CharacterMotivation(
+		CharacterInScene(
 		  Character.Id(),
+			sceneId,
 		  "Character Name: " + UUID.randomUUID().toString(),
-		  if (it % 2 == 0) UUID.randomUUID().toString() else null
+		  if (it % 2 == 0) UUID.randomUUID().toString() else null,
+			listOf()
 		)
 	}
 	private val inheritedMotivations = includedCharacters.map {
@@ -129,12 +131,12 @@ class GetSceneDetailsUnitTest {
 				assertEquals(expectedCharacter.motivation, it.motivation)
 			}
 			if (expectInheritedMotivations) {
-				val motivationSources = inheritedMotivations.associateBy { it.characterMotivations().single().characterId.uuid }
+				val motivationSources = inheritedMotivations.associateBy { it.charactersInScene().single().characterId.uuid }
 				actual.characters.forEach {
 					val motivationSource = motivationSources.getValue(it.characterId)
 					assertEquals(motivationSource.id.uuid, it.inheritedMotivation?.sceneId)
 					assertEquals(motivationSource.name, it.inheritedMotivation?.sceneName)
-					assertEquals(motivationSource.characterMotivations().single().motivation!!, it.inheritedMotivation?.motivation)
+					assertEquals(motivationSource.charactersInScene().single().motivation!!, it.inheritedMotivation?.motivation)
 				}
 			}
 		}

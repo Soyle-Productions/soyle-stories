@@ -1,5 +1,6 @@
 package com.soyle.stories.scene
 
+import com.soyle.stories.common.DuplicateOperationException
 import java.util.*
 
 abstract class SceneException : Exception()
@@ -12,3 +13,5 @@ class SceneDoesNotExist(private val locale: Locale?, val sceneId: UUID): SceneEx
 }
 class NoSceneExistsWithStoryEventId(val storyEventId: UUID) : SceneException()
 class CharacterNotInScene(val sceneId: UUID, val characterId: UUID) : SceneException()
+
+class SceneAlreadyCoversCharacterArcSection(val sceneId: UUID, val characterId: UUID, val characterArcSectionId: UUID) : DuplicateOperationException()

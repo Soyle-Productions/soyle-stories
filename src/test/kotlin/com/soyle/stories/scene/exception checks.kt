@@ -10,5 +10,6 @@ fun sceneDoesNotExist(sceneId: UUID): (Any?) -> Unit = { actual ->
 
 fun characterNotInScene(sceneId: UUID, characterId: UUID): (Any?) -> Unit = { actual ->
 	actual as CharacterNotInScene
-	assertEquals(sceneId, actual.sceneId)
+	assertEquals(sceneId, actual.sceneId) { "Unexpected sceneId for CharacterNotInScene" }
+	assertEquals(characterId, actual.characterId) { "Unexpected characterId for CharacterNotInScene" }
 }
