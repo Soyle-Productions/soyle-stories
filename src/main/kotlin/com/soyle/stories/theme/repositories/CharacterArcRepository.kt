@@ -14,4 +14,5 @@ interface CharacterArcRepository {
     suspend fun listCharacterArcsForTheme(themeId: Theme.Id): List<CharacterArc>
     suspend fun addNewCharacterArc(characterArc: CharacterArc)
     suspend fun removeCharacterArc(themeId: Theme.Id, characterId: Character.Id)
+    suspend fun listCharacterArcsForCharacter(characterId: Character.Id): List<CharacterArc>
 }

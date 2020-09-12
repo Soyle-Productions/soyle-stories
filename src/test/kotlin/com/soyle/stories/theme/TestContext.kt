@@ -64,6 +64,10 @@ class TestContext(
             removeCharacterArc.invoke(themeId, characterId)
             arcs.remove(themeId to characterId)
         }
+
+        override suspend fun listCharacterArcsForCharacter(characterId: Character.Id): List<CharacterArc> {
+            return arcs.values.filter { it.characterId == characterId }
+        }
     }
     override val characterArcSectionRepository: CharacterArcSectionRepository = object : CharacterArcSectionRepository {
         val arcSections = mutableMapOf<CharacterArcSection.Id, CharacterArcSection>()

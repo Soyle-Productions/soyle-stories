@@ -5,7 +5,7 @@ import java.util.*
 
 fun sceneDoesNotExist(sceneId: UUID): (Any?) -> Unit = { actual ->
 	actual as SceneDoesNotExist
-	assertEquals(sceneId, actual.sceneId)
+	assertEquals(sceneId, actual.sceneId) { "Unexpected sceneId for SceneDoesNotExist" }
 }
 
 fun characterNotInScene(sceneId: UUID, characterId: UUID): (Any?) -> Unit = { actual ->
