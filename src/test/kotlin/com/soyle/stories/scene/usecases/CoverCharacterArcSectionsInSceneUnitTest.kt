@@ -123,10 +123,10 @@ class CoverCharacterArcSectionsInSceneUnitTest {
             listAvailableCharacterArcsForCharacterInScene()
             result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
                 assertEquals(characterArcCount, it.size)
-                val uniqueThemeIds = it.asSequence().map { it.themeId }.toSet()
-                assertEquals(characterArcCount, uniqueThemeIds.size)
+                val uniqueCharacterArcIds = it.asSequence().map { it.characterArcId }.toSet()
+                assertEquals(characterArcCount, uniqueCharacterArcIds.size)
                 it.forEach { availableArc ->
-                    val baseArc = characterArcRepository.characterArcs[Theme.Id(availableArc.themeId) to character.id]!!
+                    val baseArc = characterArcRepository.getCharacterArc(CharacterArc.Id(availableArc.characterArcId))!!
                     assertEquals(baseArc.name, availableArc.characterArcName)
                     assertTrue(availableArc.isEmpty())
                 }
@@ -278,9 +278,8 @@ class CoverCharacterArcSectionsInSceneUnitTest {
 
     private fun givenCharacterHasCharacterArcs(count: Int): List<CharacterArc> {
         return List(count) {
-            val arc = CharacterArc(
+            val arc = CharacterArc.planNewCharacterArc(
                 character.id,
-                CharacterArcTemplate.default(),
                 Theme.Id(),
                 "Character Arc ${str()}"
             )

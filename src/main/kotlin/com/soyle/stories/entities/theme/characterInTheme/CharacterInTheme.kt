@@ -140,7 +140,7 @@ class MajorCharacter(
             }
         },
         CharacterPerspective(otherCharacters),
-        CharacterArc(id, characterArcTemplate, themeId, themeName),
+        CharacterArc.planNewCharacterArc(id, themeId, themeName, characterArcTemplate),
         ""
     )
 

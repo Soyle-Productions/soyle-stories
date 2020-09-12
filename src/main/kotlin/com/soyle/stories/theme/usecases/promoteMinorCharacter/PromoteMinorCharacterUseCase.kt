@@ -58,27 +58,22 @@ class PromoteMinorCharacterUseCase(
                     ""
                 )
             }
-        val promotionResult = theme.withCharacterPromoted(characterInTheme.id)
-            .let { promotedTheme ->
-                CharacterArc.planNewCharacterArc(
-                    characterInTheme.id,
-                    theme.id,
-                    theme.name
-                ).map { promotedTheme to it }
-            }
-        if (promotionResult is Either.Right) {
-            themeRepository.updateTheme(promotionResult.b.first)
-            characterArcRepository.addNewCharacterArc(promotionResult.b.second)
-            characterArcSectionRepository.addNewCharacterArcSections(newSections)
-            output.receivePromoteMinorCharacterResponse(
-                PromoteMinorCharacter.ResponseModel(
-                    CreatedCharacterArc(
-                        request.themeId,
-                        request.characterId,
-                        promotionResult.b.second.name
-                    )
+        val promotionResult = theme.withCharacterPromoted(characterInTheme.id) to CharacterArc.planNewCharacterArc(
+            characterInTheme.id,
+            theme.id,
+            theme.name
+        )
+        themeRepository.updateTheme(promotionResult.first)
+        characterArcRepository.addNewCharacterArc(promotionResult.second)
+        characterArcSectionRepository.addNewCharacterArcSections(newSections)
+        output.receivePromoteMinorCharacterResponse(
+            PromoteMinorCharacter.ResponseModel(
+                CreatedCharacterArc(
+                    request.themeId,
+                    request.characterId,
+                    promotionResult.second.name
                 )
             )
-        }
+        )
     }
 }

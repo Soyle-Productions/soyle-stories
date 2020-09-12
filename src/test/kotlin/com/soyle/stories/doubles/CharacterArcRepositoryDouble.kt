@@ -11,35 +11,41 @@ class CharacterArcRepositoryDouble(
     private val onRemoveCharacterArc: (Theme.Id, Character.Id) -> Unit = { _, _ -> }
 ) : CharacterArcRepository {
 
-    val characterArcs = mutableMapOf<Pair<Theme.Id, Character.Id>, CharacterArc>()
-
+    private val characterArcsByThemeAndCharacter = mutableMapOf<Pair<Theme.Id, Character.Id>, CharacterArc>()
+    private val characterArcsById = mutableMapOf<CharacterArc.Id, CharacterArc>()
     /**
      * Available for tests
      */
     fun givenCharacterArc(characterArc: CharacterArc)
     {
-        characterArcs[characterArc.themeId to characterArc.characterId] = characterArc
+        characterArcsByThemeAndCharacter[characterArc.themeId to characterArc.characterId] = characterArc
+        characterArcsById[characterArc.id] = characterArc
     }
+
+    fun getCharacterArc(id: CharacterArc.Id): CharacterArc? = characterArcsById[id]
 
     override suspend fun getCharacterArcByCharacterAndThemeId(
         characterId: Character.Id,
         themeId: Theme.Id
-    ): CharacterArc? = characterArcs[themeId to characterId]
+    ): CharacterArc? = characterArcsByThemeAndCharacter[themeId to characterId]
 
     override suspend fun listCharacterArcsForTheme(themeId: Theme.Id): List<CharacterArc> =
-        characterArcs.filterKeys { it.first == themeId }.map { it.value }
+        characterArcsByThemeAndCharacter.filterKeys { it.first == themeId }.map { it.value }
 
     override suspend fun addNewCharacterArc(characterArc: CharacterArc) {
         onAddNewCharacterArc.invoke(characterArc)
-        characterArcs[characterArc.themeId to characterArc.characterId] = characterArc
+        characterArcsByThemeAndCharacter[characterArc.themeId to characterArc.characterId] = characterArc
+        characterArcsById[characterArc.id] = characterArc
     }
 
     override suspend fun removeCharacterArc(themeId: Theme.Id, characterId: Character.Id) {
         onRemoveCharacterArc.invoke(themeId, characterId)
-        characterArcs.remove(themeId to characterId)
+        characterArcsByThemeAndCharacter.remove(themeId to characterId)?.let {
+            characterArcsById.remove(it.id)
+        }
     }
 
     override suspend fun listCharacterArcsForCharacter(characterId: Character.Id): List<CharacterArc> {
-        return characterArcs.values.filter { it.characterId == characterId }
+        return characterArcsByThemeAndCharacter.values.filter { it.characterId == characterId }
     }
 }

@@ -113,8 +113,10 @@ class PromoteCharacterTest {
     }
 
     private fun givenCharacterArcExists() {
-        characterArcRepository.characterArcs[themeId to characterId] =
-            CharacterArc(characterId, CharacterArcTemplate.default(), themeId, "")
+        characterArcRepository.givenCharacterArc(
+            CharacterArc.planNewCharacterArc(characterId, themeId, "")
+        )
+
     }
 
 

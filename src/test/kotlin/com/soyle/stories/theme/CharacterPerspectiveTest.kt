@@ -80,7 +80,7 @@ class CharacterPerspectiveTest {
                         mapOf(),
                         mapOf()
                     ),
-                    CharacterArc(id, CharacterArcTemplate.default(), theme.id, theme.name),
+                    CharacterArc.planNewCharacterArc(id, theme.id, theme.name),
                     ""
                 )
             } to otherCharacters.first()
@@ -184,7 +184,7 @@ class CharacterPerspectiveTest {
                         mapOf(),
                         mapOf()
                     ),
-                    CharacterArc(id, CharacterArcTemplate.default(), theme.id, theme.name),
+                    CharacterArc.planNewCharacterArc(id, theme.id, theme.name),
                     ""
                 )
             } to otherCharacters.first()

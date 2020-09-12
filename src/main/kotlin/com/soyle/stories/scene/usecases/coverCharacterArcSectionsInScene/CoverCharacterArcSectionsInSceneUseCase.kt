@@ -32,7 +32,7 @@ class CoverCharacterArcSectionsInSceneUseCase(
             AvailableCharacterArcSectionsForCharacterInScene(sceneId, characterId, arcs.map { (arc, sections) ->
                 CharacterArcUsedInScene(
                     characterId,
-                    arc.themeId.uuid,
+                    arc.id.uuid,
                     arc.name,
                     sections.map {
                         ArcSectionUsedInScene(

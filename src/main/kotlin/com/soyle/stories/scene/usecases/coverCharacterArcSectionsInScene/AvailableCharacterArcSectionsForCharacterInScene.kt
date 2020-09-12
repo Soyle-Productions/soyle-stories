@@ -10,7 +10,7 @@ class AvailableCharacterArcSectionsForCharacterInScene(
 
 class CharacterArcUsedInScene(
     val characterId: UUID,
-    val themeId: UUID,
+    val characterArcId: UUID,
     val characterArcName: String,
     sections: List<ArcSectionUsedInScene>
 ) : List<ArcSectionUsedInScene> by sections

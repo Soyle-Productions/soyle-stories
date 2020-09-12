@@ -178,7 +178,7 @@ class CompareCharacterValuesUnitTest {
                         mapOf(),
                         mapOf()
                     ),
-                    CharacterArc(character.id, CharacterArcTemplate.default(), themeId, "Theme"),
+                    CharacterArc.planNewCharacterArc(character.id, themeId, "Theme"),
                     ""
                 )
             }
