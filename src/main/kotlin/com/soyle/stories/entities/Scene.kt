@@ -34,6 +34,14 @@ class Scene(
 		return charactersById[characterId]?.coveredArcSections
 	}
 
+	private val allCharacterArcSections by lazy {
+		charactersById.values.flatMap { it.coveredArcSections }.toSet()
+	}
+	fun isCharacterArcSectionCovered(characterArcSectionId: CharacterArcSection.Id): Boolean
+	{
+		return allCharacterArcSections.contains(characterArcSectionId)
+	}
+
 	val includedCharacters: List<IncludedCharacter> by lazy {
 		charactersInScene.map { IncludedCharacter(it.characterId, it.characterName) }
 	}
@@ -60,13 +68,13 @@ class Scene(
 	fun withoutLocation() = copy(locationId = null)
 	fun withoutCharacter(characterId: Character.Id) = copy(charactersInScene = charactersInScene.filterNot { it.characterId == characterId })
 
-	fun withCharacterArcSectionCovered(characterId: Character.Id, characterArcSectionId: CharacterArcSection.Id): Scene
+	fun withCharacterArcSectionCovered(characterId: Character.Id, characterArcSection: CharacterArcSection): Scene
 	{
 		charactersById[characterId] ?: throw CharacterNotInScene(id.uuid, characterId.uuid)
 		return copy(
 			charactersInScene = charactersInScene.map {
 				if (it.characterId != characterId) it
-				else it.withCoveredArcSection(characterArcSectionId)
+				else it.withCoveredArcSection(characterArcSection)
 			}
 		)
 	}

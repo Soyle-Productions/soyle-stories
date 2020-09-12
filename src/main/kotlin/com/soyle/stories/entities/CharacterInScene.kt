@@ -1,5 +1,6 @@
 package com.soyle.stories.entities
 
+import com.soyle.stories.scene.CharacterArcSectionIsNotPartOfCharactersArc
 import com.soyle.stories.scene.SceneAlreadyCoversCharacterArcSection
 import java.util.*
 
@@ -17,14 +18,19 @@ class CharacterInScene(
         coveredArcSections: List<CharacterArcSection.Id> = this.coveredArcSections
     ) = CharacterInScene(characterId, sceneId, characterName, motivation, coveredArcSections)
 
-    fun withCoveredArcSection(characterArcSectionId: CharacterArcSection.Id): CharacterInScene
+    fun withCoveredArcSection(characterArcSection: CharacterArcSection): CharacterInScene
     {
-        if (characterArcSectionId in coveredArcSections) throw SceneAlreadyCoversCharacterArcSection(
+        if (characterArcSection.characterId != characterId) throw CharacterArcSectionIsNotPartOfCharactersArc(
+            characterId.uuid,
+            characterArcSection.id.uuid,
+            characterArcSection.characterId.uuid
+        )
+        if (characterArcSection.id in coveredArcSections) throw SceneAlreadyCoversCharacterArcSection(
             sceneId.uuid,
             characterId.uuid,
-            characterArcSectionId.uuid
+            characterArcSection.id.uuid
         )
-        return copy(coveredArcSections = coveredArcSections + characterArcSectionId)
+        return copy(coveredArcSections = coveredArcSections + characterArcSection.id)
     }
 
 }
