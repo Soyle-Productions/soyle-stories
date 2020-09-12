@@ -65,7 +65,7 @@ class LinkLocationToCharacterArcSectionUnitTest {
 			Location(Location.Id(it), Project.Id(UUID.randomUUID()), "")
 		}
 		val context = setupContext(initialCharacterArcSections = characterArcSectionIds.map {
-			CharacterArcSection(CharacterArcSection.Id(it), Character.Id(UUID.randomUUID()), Theme.Id(UUID.randomUUID()), CharacterArcTemplateSection(CharacterArcTemplateSection.Id(UUID.randomUUID()), ""), locations.firstOrNull()?.takeIf { isLinked }?.id, "")
+			CharacterArcSection(CharacterArcSection.Id(it), Character.Id(UUID.randomUUID()), Theme.Id(UUID.randomUUID()), CharacterArcTemplateSection(CharacterArcTemplateSection.Id(UUID.randomUUID()), "", false), locations.firstOrNull()?.takeIf { isLinked }?.id, "")
 		}, updateCharacterArcSection = {
 			updatedCharacterArcSection = it
 		})

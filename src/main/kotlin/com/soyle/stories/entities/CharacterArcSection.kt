@@ -28,15 +28,6 @@ class CharacterArcSection(
 	data class Id(val uuid: UUID)
 
 	companion object {
-		/*
-				fun planSectionsToFillTemplate(existingSections: List<CharacterArcSection>, characterArcTemplate: CharacterArcTemplate): List<CharacterArcSection>
-				{
-					val existingIds = existingSections.map { it.template.id }.toSet()
-					return characterArcTemplate.sections.filterNot { it.id in existingIds }.map {
-						planNewCharacterArcSection(it)
-					}
-				}
-		*/
 		fun planNewCharacterArcSection(
 		  characterId: Character.Id,
 		  themeId: Theme.Id,

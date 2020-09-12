@@ -1,5 +1,6 @@
 package com.soyle.stories.entities
 
+import com.soyle.stories.common.Entity
 import java.util.*
 
 /**
@@ -8,13 +9,10 @@ import java.util.*
  * Time: 2:41 PM
  */
 class CharacterArcTemplateSection(
-    val id: Id,
-    val name: String
-) {
-
-    val isRequired: Boolean by lazy {
-        CharacterArcTemplate.default().sections.find { it.id == id } != null
-    }
+    override val id: Id,
+    val name: String,
+    val isRequired: Boolean
+) : Entity<CharacterArcTemplateSection.Id> {
 
     data class Id(val uuid: UUID)
 }

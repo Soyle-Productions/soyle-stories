@@ -9,7 +9,7 @@ import com.soyle.stories.entities.theme.ThematicTemplateSection
  * Time: 12:03 PM
  */
 fun CharacterArcTemplateSection.asThematicTemplateSection() =
-    ThematicTemplateSection(id, name)
+    ThematicTemplateSection(id, name, isRequired)
 
 fun ThematicTemplateSection.asCharacterArcTemplateSection() =
-    CharacterArcTemplateSection(characterArcTemplateSectionId, name)
+    CharacterArcTemplateSection(characterArcTemplateSectionId, name, isRequired)

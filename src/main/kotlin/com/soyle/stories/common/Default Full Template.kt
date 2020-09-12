@@ -3,21 +3,16 @@ package com.soyle.stories.common
 import com.soyle.stories.entities.CharacterArcTemplateSection
 import java.util.*
 
-/**
- * Created by Brendan
- * Date: 2/5/2020
- * Time: 3:59 PM
- */
-fun template(name: String) = CharacterArcTemplateSection(
-    CharacterArcTemplateSection.Id(UUID.randomUUID()), name
+fun template(name: String, required: Boolean = true) = CharacterArcTemplateSection(
+    CharacterArcTemplateSection.Id(UUID.randomUUID()), name, required
 )
 
-val PsychologicalWeakness = template("Psychological Weakness")
-val MoralWeakness = template("Moral Weakness")
+val PsychologicalWeakness = template("Psychological Weakness", false)
+val MoralWeakness = template("Moral Weakness", false)
 val PsychologicalNeed = template("Psychological Need")
 val MoralNeed = template("Moral Need")
 val Desire = template("Desire")
-val ValuesOrBeliefs = template("Values or Beliefs")
+val ValuesOrBeliefs = template("Values or Beliefs", false)
 val Opponent = template("Opponent")
 val Plan = template("Plan")
 val Battle = template("Battle")

@@ -106,7 +106,7 @@ class ChangeThematicSectionValueTest {
 				CharacterArcTemplateSection(
 					CharacterArcTemplateSection.Id(
 						UUID.randomUUID()
-					), ""
+					), "", false
 				),
 			  null,
 				""

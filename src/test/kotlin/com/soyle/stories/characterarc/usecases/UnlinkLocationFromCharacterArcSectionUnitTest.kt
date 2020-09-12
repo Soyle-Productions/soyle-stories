@@ -53,7 +53,7 @@ class UnlinkLocationFromCharacterArcSectionUnitTest {
 
 	private fun given(characterArcSectionIds: List<UUID>, linkedLocationIds: List<UUID>) {
 		val context = setupContext(initialCharacterArcSections = characterArcSectionIds.map {
-			CharacterArcSection(CharacterArcSection.Id(it), Character.Id(UUID.randomUUID()), Theme.Id(UUID.randomUUID()), CharacterArcTemplateSection(CharacterArcTemplateSection.Id(UUID.randomUUID()), ""), linkedLocationIds.firstOrNull()?.let(Location::Id), "")
+			CharacterArcSection(CharacterArcSection.Id(it), Character.Id(UUID.randomUUID()), Theme.Id(UUID.randomUUID()), CharacterArcTemplateSection(CharacterArcTemplateSection.Id(UUID.randomUUID()), "", false), linkedLocationIds.firstOrNull()?.let(Location::Id), "")
 		}, updateCharacterArcSection = {
 			updatedCharacterArcSection = it
 		})

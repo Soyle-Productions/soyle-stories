@@ -5,17 +5,33 @@ import arrow.core.right
 import com.soyle.stories.common.Entity
 import java.util.*
 
-class CharacterArc(
+class CharacterArc private constructor(
     override val id: Id,
     val characterId: Character.Id,
     val template: CharacterArcTemplate,
     val themeId: Theme.Id,
-    val name: String
+    val name: String,
+    val arcSections: List<CharacterArcSection>,
+
+
+    defaultConstructorMarker: Unit
 ) : Entity<CharacterArc.Id> {
 
+    constructor(
+        id: Id,
+        characterId: Character.Id,
+        template: CharacterArcTemplate,
+        themeId: Theme.Id,
+        name: String,
+        arcSections: List<CharacterArcSection>,
+    ) : this(id, characterId, template, themeId, name, arcSections, defaultConstructorMarker = Unit) {
+
+
+    }
+
     private fun copy(
-      name: String = this.name
-    ) = CharacterArc(id, characterId, template, themeId, name)
+        name: String = this.name
+    ) = CharacterArc(id, characterId, template, themeId, name, arcSections)
 
     fun withNewName(name: String) = copy(name = name)
 
@@ -25,13 +41,20 @@ class CharacterArc(
 
     companion object {
 
-        fun planNewCharacterArc(characterId: Character.Id, themeId: Theme.Id, name: String, template: CharacterArcTemplate = CharacterArcTemplate.default()): CharacterArc {
+        fun planNewCharacterArc(
+            characterId: Character.Id,
+            themeId: Theme.Id,
+            name: String,
+            template: CharacterArcTemplate = CharacterArcTemplate.default()
+        ): CharacterArc {
             return CharacterArc(
                 Id(),
                 characterId,
                 template,
                 themeId,
-                name
+                name,
+                template.sections.asSequence().filter { it.isRequired }
+                    .map { CharacterArcSection.planNewCharacterArcSection(characterId, themeId, it) }.toList()
             )
         }
     }

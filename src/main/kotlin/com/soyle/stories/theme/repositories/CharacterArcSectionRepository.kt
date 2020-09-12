@@ -9,6 +9,7 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
 
+@Deprecated(message = "Character Arcs contain arc sections.")
 interface CharacterArcSectionRepository {
     suspend fun getCharacterArcSectionById(characterArcSectionId: CharacterArcSection.Id): CharacterArcSection?
     suspend fun getCharacterArcSectionsById(characterArcSectionIds: Set<CharacterArcSection.Id>): List<CharacterArcSection>
