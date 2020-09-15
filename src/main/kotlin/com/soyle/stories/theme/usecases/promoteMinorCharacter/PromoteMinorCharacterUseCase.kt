@@ -9,7 +9,6 @@ import com.soyle.stories.theme.CharacterIsAlreadyMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*
 

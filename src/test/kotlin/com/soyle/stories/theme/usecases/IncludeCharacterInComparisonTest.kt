@@ -41,8 +41,7 @@ class IncludeCharacterInComparisonTest {
         )
         val useCase: IncludeCharacterInComparison = IncludeCharacterInComparisonUseCase(
             context.characterRepository,
-            context.themeRepository,
-            context.characterArcRepository
+            context.themeRepository
         )
         val output = object : IncludeCharacterInComparison.OutputPort {
             var result: Either<Exception, CharacterIncludedInTheme>? = null

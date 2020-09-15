@@ -18,7 +18,7 @@ class SceneTest {
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val update = Scene(Project.Id(), "", StoryEvent.Id())
             .withCharacterIncluded(character)
-            .withCharacterArcSectionCovered(character.id, characterArcSection)
+            .withCharacterArcSectionCovered(characterArcSection)
         val sections = update.getCoveredCharacterArcSectionsForCharacter(character.id)!!
         sections.single { it == characterArcSection.id }
     }
@@ -29,7 +29,7 @@ class SceneTest {
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val scene = Scene(Project.Id(), "", StoryEvent.Id())
         val error = assertThrows<CharacterNotInScene> {
-            scene.withCharacterArcSectionCovered(character.id, characterArcSection)
+            scene.withCharacterArcSectionCovered(characterArcSection)
         }
         error shouldBe characterNotInScene(scene.id.uuid, character.id.uuid)
     }
@@ -40,9 +40,9 @@ class SceneTest {
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val scene = Scene(Project.Id(), "", StoryEvent.Id())
             .withCharacterIncluded(character)
-            .withCharacterArcSectionCovered(character.id, characterArcSection)
+            .withCharacterArcSectionCovered(characterArcSection)
         val error = assertThrows<SceneAlreadyCoversCharacterArcSection> {
-            scene.withCharacterArcSectionCovered(character.id, characterArcSection)
+            scene.withCharacterArcSectionCovered(characterArcSection)
         }
         assertEquals(scene.id.uuid, error.sceneId)
         assertEquals(character.id.uuid, error.characterId)
@@ -55,22 +55,5 @@ class SceneTest {
         val character = Character.buildNewCharacter(Project.Id(), "")
         val scene = Scene(Project.Id(), "", StoryEvent.Id())
         assertNull(scene.getCoveredCharacterArcSectionsForCharacter(character.id))
-    }
-
-    @Test
-    fun `covered character arc section must belong to associated character`() {
-        val owner = makeCharacter()
-        val requestedCharacter = makeCharacter()
-        val scene = listOf(owner, requestedCharacter).fold(Scene(Project.Id(), "", StoryEvent.Id())) { scene, character ->
-            scene.withCharacterIncluded(character)
-        }
-        val characterArcSection = makeCharacterArcSection(characterId = owner.id)
-        assertThrows<CharacterArcSectionIsNotPartOfCharactersArc> {
-            scene.withCharacterArcSectionCovered(requestedCharacter.id, characterArcSection)
-        }.run {
-            assertEquals(requestedCharacter.id.uuid, characterId)
-            assertEquals(characterArcSection.id.uuid, characterArcSectionId)
-            assertEquals(owner.id.uuid, expectedCharacterId)
-        }
     }
 }

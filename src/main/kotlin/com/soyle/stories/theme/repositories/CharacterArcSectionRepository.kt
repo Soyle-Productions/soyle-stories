@@ -4,7 +4,7 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
 
-@Deprecated(message = "Character Arcs contain arc sections.", replaceWith = ReplaceWith("CharacterArcRepository"))
+@Deprecated(message = "Character Arcs contain arc sections.", replaceWith = ReplaceWith("CharacterArcRepository"), DeprecationLevel.ERROR)
 interface CharacterArcSectionRepository {
 
     @Deprecated(

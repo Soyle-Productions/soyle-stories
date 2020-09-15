@@ -4,7 +4,6 @@ import com.soyle.stories.characterarc.CharacterArcException
 import com.soyle.stories.characterarc.CharacterArcSectionDoesNotExist
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import java.util.*
 
 class UnlinkLocationFromCharacterArcSectionUseCase(

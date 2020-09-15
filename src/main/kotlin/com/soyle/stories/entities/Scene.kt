@@ -68,13 +68,22 @@ class Scene(
 	fun withoutLocation() = copy(locationId = null)
 	fun withoutCharacter(characterId: Character.Id) = copy(charactersInScene = charactersInScene.filterNot { it.characterId == characterId })
 
-	fun withCharacterArcSectionCovered(characterId: Character.Id, characterArcSection: CharacterArcSection): Scene
+	fun withCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene
 	{
-		charactersById[characterId] ?: throw CharacterNotInScene(id.uuid, characterId.uuid)
+		charactersById[characterArcSection.characterId] ?: throw CharacterNotInScene(id.uuid, characterArcSection.characterId.uuid)
 		return copy(
 			charactersInScene = charactersInScene.map {
-				if (it.characterId != characterId) it
+				if (it.characterId != characterArcSection.characterId) it
 				else it.withCoveredArcSection(characterArcSection)
+			}
+		)
+	}
+	fun withoutCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene
+	{
+		return copy(
+			charactersInScene = charactersInScene.map {
+				if (it.characterId != characterArcSection.characterId) it
+				else it.withoutCoveredArcSection(characterArcSection)
 			}
 		)
 	}

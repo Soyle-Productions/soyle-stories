@@ -2,22 +2,18 @@ package com.soyle.stories.theme.usecases.includeCharacterInComparison
 
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.CharacterException
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
-import com.soyle.stories.translators.asCharacterArcSection
 import java.util.*
 
 class IncludeCharacterInComparisonUseCase(
     private val characterRepository: CharacterRepository,
-    private val themeRepository: ThemeRepository,
-    private val characterArcRepository: CharacterArcRepository
+    private val themeRepository: ThemeRepository
 ) : IncludeCharacterInComparison {
 
     override suspend fun invoke(characterId: UUID, themeId: UUID, output: IncludeCharacterInComparison.OutputPort) {
@@ -41,12 +37,8 @@ class IncludeCharacterInComparisonUseCase(
         val theme = getThemeById(themeId)
 
         val themeWithCharacter = theme.withCharacterIncluded(character.id, character.name, character.media)
-        val includedCharacter = themeWithCharacter.getMinorCharacterById(character.id)!!
-/*
-        characterArcRepository.addNewCharacterArcSections(includedCharacter.thematicSections.map {
-            it.asCharacterArcSection()
-        })*/
         themeRepository.updateTheme(themeWithCharacter)
+
         return CharacterIncludedInTheme(
             themeId,
             "",

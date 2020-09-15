@@ -6,18 +6,15 @@ import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.CharacterNotInScene
-import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.repositories.getSceneOrError
 import java.util.*
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene.*
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 
 class CoverCharacterArcSectionsInSceneUseCase(
     private val sceneRepository: SceneRepository,
-    private val characterArcRepository: CharacterArcRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : CoverCharacterArcSectionsInScene {
 
     override suspend fun listAvailableCharacterArcsForCharacterInScene(
@@ -26,15 +23,15 @@ class CoverCharacterArcSectionsInSceneUseCase(
         output: OutputPort
     ) {
         val scene = getScene(sceneId, characterId)
-        val arcs = getCharacterArcsForCharacter(Character.Id(characterId))
+        val arcs = characterArcRepository.listCharacterArcsForCharacter(Character.Id(characterId))
 
         output.availableCharacterArcSectionsForCharacterInSceneListed(
-            AvailableCharacterArcSectionsForCharacterInScene(sceneId, characterId, arcs.map { (arc, sections) ->
+            AvailableCharacterArcSectionsForCharacterInScene(sceneId, characterId, arcs.map { arc ->
                 CharacterArcUsedInScene(
                     characterId,
                     arc.id.uuid,
                     arc.name,
-                    sections.map {
+                    arc.arcSections.map {
                         ArcSectionUsedInScene(
                             it.id.uuid,
                             it.template.name,
@@ -51,25 +48,36 @@ class CoverCharacterArcSectionsInSceneUseCase(
         val scene = getScene(request.sceneId, request.characterId)
         val sections = getCharacterArcSections(request)
 
-        val updatedScene = scene.withCharacterArcSectionsCovered(Character.Id(request.characterId), sections)
+        val removeSectionIdSet = request.removeSections.toSet()
+        val updatedScene = scene.withCharacterArcSectionsCovered(sections.filter { it.id.uuid !in removeSectionIdSet })
+            .withCharacterArcSectionsUncovered(sections.filter { it.id.uuid in removeSectionIdSet })
         sceneRepository.updateScene(updatedScene)
 
         val coveredSections = sections.map {
             CharacterArcSectionCoveredByScene(scene.id.uuid, request.characterId, it.themeId.uuid, it.id.uuid)
         }
-        val responseModel = ResponseModel(coveredSections)
+        val responseModel = ResponseModel(coveredSections, request.removeSections.map {
+            CharacterArcSectionUncoveredInScene(scene.id.uuid, request.characterId, it)
+        })
         output.characterArcSectionsCoveredInScene(responseModel)
     }
 
-    private fun Scene.withCharacterArcSectionsCovered(characterId: Character.Id, sections: List<CharacterArcSection>): Scene {
+    private fun Scene.withCharacterArcSectionsCovered(sections: List<CharacterArcSection>): Scene {
         return sections.fold(this) { scene, arcSection ->
-            scene.withCharacterArcSectionCovered(characterId, arcSection)
+            scene.withCharacterArcSectionCovered(arcSection)
+        }
+    }
+
+    private fun Scene.withCharacterArcSectionsUncovered(sections: List<CharacterArcSection>): Scene {
+        return sections.fold(this) { scene, arcSection ->
+            scene.withoutCharacterArcSectionCovered(arcSection)
         }
     }
 
     private suspend fun getCharacterArcSections(request: RequestModel.CoverSections): List<CharacterArcSection> {
-        val requestedIdSet = request.sections.map(CharacterArcSection::Id).toSet()
-        val sections = characterArcSectionRepository.getCharacterArcSectionsById(requestedIdSet)
+        val requestedIdSet = (request.sections + request.removeSections).map(CharacterArcSection::Id).toSet()
+        val sections = characterArcRepository.getCharacterArcsContainingArcSections(requestedIdSet)
+            .asSequence().flatMap { it.arcSections.asSequence() }.filter { it.id in requestedIdSet }.toList()
         verifyAllRequestedCharacterArcSectionsExist(requestedIdSet, sections)
         return sections
     }
@@ -81,15 +89,6 @@ class CoverCharacterArcSectionsInSceneUseCase(
         val existingIdSet = existingSections.map { it.id }.toSet()
         requestedIds.minus(existingIdSet).firstOrNull()?.let {
             throw CharacterArcSectionDoesNotExist(it.uuid)
-        }
-    }
-
-    private suspend fun getCharacterArcsForCharacter(characterId: Character.Id): List<Pair<CharacterArc, List<CharacterArcSection>>> {
-        val allSections = characterArcSectionRepository.getCharacterArcSectionsForCharacter(characterId).groupBy {
-            it.themeId
-        }
-        return characterArcRepository.listCharacterArcsForCharacter(characterId).map {
-            it to allSections.getOrDefault(it.themeId, listOf())
         }
     }
 

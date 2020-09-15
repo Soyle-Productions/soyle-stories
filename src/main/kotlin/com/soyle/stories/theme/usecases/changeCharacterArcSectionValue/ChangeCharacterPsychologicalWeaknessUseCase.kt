@@ -1,16 +1,13 @@
 package com.soyle.stories.theme.usecases.changeCharacterArcSectionValue
 
-import com.soyle.stories.common.MoralWeakness
 import com.soyle.stories.common.PsychologicalWeakness
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.repositories.getThemeOrError
 
@@ -34,7 +31,7 @@ class ChangeCharacterPsychologicalWeaknessUseCase(
 
         characterArcRepository.replaceCharacterArcs(
             characterArc.withArcSectionsMapped {
-                if (it.template isSameEntityAs PsychologicalWeakness) it.changeValue(request.psychologicalWeakness)
+                if (it.template isSameEntityAs PsychologicalWeakness) it.withValue(request.psychologicalWeakness)
                 else it
             }
         )

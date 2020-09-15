@@ -2,15 +2,12 @@ package com.soyle.stories.theme.usecases.changeCharacterArcSectionValue
 
 import com.soyle.stories.common.Desire
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.repositories.getThemeOrError
 import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire.*
@@ -31,7 +28,7 @@ class ChangeCharacterDesireUseCase(
 
         characterArcRepository.replaceCharacterArcs(
             characterArc.withArcSectionsMapped {
-                if (it.template isSameEntityAs Desire) it.changeValue(request.desire)
+                if (it.template isSameEntityAs Desire) it.withValue(request.desire)
                 else it
             }
         )

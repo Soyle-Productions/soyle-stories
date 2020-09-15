@@ -33,4 +33,14 @@ class CharacterInScene(
         return copy(coveredArcSections = coveredArcSections + characterArcSection.id)
     }
 
+    fun withoutCoveredArcSection(characterArcSection: CharacterArcSection): CharacterInScene
+    {
+        if (characterArcSection.characterId != characterId) throw CharacterArcSectionIsNotPartOfCharactersArc(
+            characterId.uuid,
+            characterArcSection.id.uuid,
+            characterArcSection.characterId.uuid
+        )
+        return copy(coveredArcSections = coveredArcSections.filter { it != characterArcSection.id })
+    }
+
 }

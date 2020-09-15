@@ -23,7 +23,7 @@ class ChangeThematicSectionValueUseCase(
     ): ChangeThematicSectionValue.ResponseModel {
         val characterArc = getCharacterArc(thematicSectionId)
         val updatedArc = characterArc.withArcSectionsMapped {
-            if (it.id.uuid == thematicSectionId) it.changeValue(value)
+            if (it.id.uuid == thematicSectionId) it.withValue(value)
             else it
         }
         saveUpdate(updatedArc)

@@ -2,7 +2,9 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
 import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.character.makeCharacterArcSection
 import com.soyle.stories.common.*
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.*
@@ -102,7 +104,8 @@ class ExamineCentralConflictOfThemeUnitTest {
             val psychologicalWeakness = "Psychological Weakness ${str()}"
             val moralWeakness = "Moral Weakness ${str()}"
             val changeAtEnd = "Change at End ${str()}"
-            givenCharacterHasValues(desire,
+            givenCharacterHasValues(
+                desire,
                 psychologicalWeakness,
                 moralWeakness,
                 changeAtEnd
@@ -170,7 +173,10 @@ class ExamineCentralConflictOfThemeUnitTest {
                         val character = opponents.getValue(it.characterId)
                         assertEquals(character.name, it.characterName)
                         assertEquals(majorCharacter.getAttacksByCharacter(character.id)!!, it.attack)
-                        assertEquals((theme.getSimilarities(characterId, character.id) as Either.Right).b, it.similarities)
+                        assertEquals(
+                            (theme.getSimilarities(characterId, character.id) as Either.Right).b,
+                            it.similarities
+                        )
                         assertEquals(character.position, it.powerStatusOrAbility)
                         assertEquals(character.id == mainOpponent.id, it.isMainOpponent)
                     }
@@ -178,12 +184,14 @@ class ExamineCentralConflictOfThemeUnitTest {
             }
         }
 
-        private fun givenThemeHasCharacter(isMajorCharacter: Boolean = false)
-        {
+        private fun givenThemeHasCharacter(isMajorCharacter: Boolean = false) {
             themeRepository.themes[themeId] = themeRepository.themes.getValue(themeId)
                 .withCharacterIncluded(characterId, characterName, null)
                 .let {
-                    if (isMajorCharacter) it.withCharacterPromoted(characterId)
+                    if (isMajorCharacter) {
+                        characterArcRepository.givenCharacterArc(CharacterArc.planNewCharacterArc(characterId, themeId, it.name))
+                        it.withCharacterPromoted(characterId)
+                    }
                     else it
                 }
         }
@@ -195,23 +203,42 @@ class ExamineCentralConflictOfThemeUnitTest {
             changeAtEnd: String
         ) {
             themeRepository.themes[themeId] = themeRepository.themes.getValue(themeId).let { theme ->
-                runBlocking {
-                    characterArcSectionRepository.addNewCharacterArcSections(listOf(
-                        CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, themeId, Desire, null, desire),
-                        CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, themeId, PsychologicalWeakness, null, psychologicalWeakness),
-                        CharacterArcSection(CharacterArcSection.Id(UUID.randomUUID()), characterId, themeId, MoralWeakness, null, moralWeakness)
-                    ))
+                val arc = CharacterArc.planNewCharacterArc(
+                    characterId,
+                    themeId,
+                    theme.name,
+                    template = CharacterArcTemplate(listOf(Desire, PsychologicalWeakness, MoralWeakness))
+                )
+                    .withArcSection(makeCharacterArcSection(characterId = characterId, template = PsychologicalWeakness))
+                    .withArcSection(makeCharacterArcSection(characterId = characterId, template = MoralWeakness))
+                    .withArcSectionsMapped {
+                    when {
+                        it.template isSameEntityAs Desire -> it.withValue(desire)
+                        it.template isSameEntityAs PsychologicalWeakness -> it.withValue(psychologicalWeakness)
+                        it.template isSameEntityAs MoralWeakness -> it.withValue(moralWeakness)
+                        else -> it
+                    }
                 }
+                characterArcRepository.givenCharacterArc(arc)
                 theme.withCharacterChangeAs(characterId, changeAtEnd)
             }
         }
 
-        private fun givenCharacterHasOpponents(count: Int, generateAttack: (Int) -> String = { "" }, generateSimilarities: (Int) -> String = { "" }, generatePosition: (Int) -> String = { "" }) {
+        private fun givenCharacterHasOpponents(
+            count: Int,
+            generateAttack: (Int) -> String = { "" },
+            generateSimilarities: (Int) -> String = { "" },
+            generatePosition: (Int) -> String = { "" }
+        ) {
             themeRepository.themes[themeId] = themeRepository.themes.getValue(themeId).let {
                 (1..count).fold(it) { theme, i ->
                     val opponent = makeCharacter()
                     theme.withCharacterIncluded(opponent.id, opponent.name, opponent.media)
-                        .withCharacterAsStoryFunctionForMajorCharacter(opponent.id, StoryFunction.Antagonist, characterId)
+                        .withCharacterAsStoryFunctionForMajorCharacter(
+                            opponent.id,
+                            StoryFunction.Antagonist,
+                            characterId
+                        )
                         .withCharacterAttackingMajorCharacter(opponent.id, generateAttack(i), characterId)
                         .withCharactersSimilarToEachOther(coupleOf(opponent.id, characterId), generateSimilarities(i))
                         .withCharacterHoldingPosition(opponent.id, generatePosition(i))
@@ -219,8 +246,7 @@ class ExamineCentralConflictOfThemeUnitTest {
             }
         }
 
-        private fun givenCharacterHasMainOpponent(): CharacterInTheme
-        {
+        private fun givenCharacterHasMainOpponent(): CharacterInTheme {
             val theme = themeRepository.themes.getValue(themeId)
             val opponentCharacter = theme.characters.find { it.id != characterId }!!
             themeRepository.themes[themeId] = theme.withCharacterAsStoryFunctionForMajorCharacter(
@@ -234,13 +260,14 @@ class ExamineCentralConflictOfThemeUnitTest {
     }
 
     private val themeRepository = ThemeRepositoryDouble()
-    private val characterArcSectionRepository = CharacterArcSectionRepositoryDouble()
+    private val characterArcRepository = CharacterArcRepositoryDouble()
 
     private fun givenThemeExists(centralConflict: String = "") {
         themeRepository.themes[themeId] = makeTheme(themeId, centralConflict = centralConflict)
     }
 
-    private val useCase: ExamineCentralConflictOfTheme = ExamineCentralConflictOfThemeUseCase(themeRepository, characterArcSectionRepository)
+    private val useCase: ExamineCentralConflictOfTheme =
+        ExamineCentralConflictOfThemeUseCase(themeRepository, characterArcRepository)
     private val output = object : ExamineCentralConflictOfTheme.OutputPort {
         override suspend fun centralConflictExamined(response: ExaminedCentralConflict) {
             examinedConflictOfTheme = response

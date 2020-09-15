@@ -73,9 +73,8 @@ class CoverCharacterArcSectionsInSceneUnitTest {
 
     private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::savedScene::set)
     private val characterArcRepository = CharacterArcRepositoryDouble()
-    private val characterArcSectionRepository = CharacterArcSectionRepositoryDouble()
     private val useCase: CoverCharacterArcSectionsInScene =
-        CoverCharacterArcSectionsInSceneUseCase(sceneRepository, characterArcRepository, characterArcSectionRepository)
+        CoverCharacterArcSectionsInSceneUseCase(sceneRepository, characterArcRepository)
     private var result: Any? = null
 
     val output = object : CoverCharacterArcSectionsInScene.OutputPort {
@@ -116,28 +115,10 @@ class CoverCharacterArcSectionsInSceneUnitTest {
         }
 
         @Test
-        fun `character has character arcs`() {
-            givenSceneExists(withCharacterIncluded = true)
-            val characterArcCount = 5
-            givenCharacterHasCharacterArcs(count = characterArcCount)
-            listAvailableCharacterArcsForCharacterInScene()
-            result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
-                assertEquals(characterArcCount, it.size)
-                val uniqueCharacterArcIds = it.asSequence().map { it.characterArcId }.toSet()
-                assertEquals(characterArcCount, uniqueCharacterArcIds.size)
-                it.forEach { availableArc ->
-                    val baseArc = characterArcRepository.getCharacterArc(CharacterArc.Id(availableArc.characterArcId))!!
-                    assertEquals(baseArc.name, availableArc.characterArcName)
-                    assertTrue(availableArc.isEmpty())
-                }
-            }
-        }
-
-        @Test
         fun `character arcs have sections`() {
             givenSceneExists(withCharacterIncluded = true)
-            val baseArc = givenCharacterHasCharacterArcs(count = 1).single()
-            val baseSections = givenCharacterArcHasSections(baseArc, Desire, MoralNeed, Plan)
+            val (baseArc) = givenCharacterHasCharacterArcs(count = 1)
+            val baseSections = baseArc.arcSections
             listAvailableCharacterArcsForCharacterInScene()
             result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
                 val availableArc = it.single()
@@ -156,7 +137,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
         fun `some arc sections covered by scene already`() {
             givenSceneExists(withCharacterIncluded = true)
             val baseArc = givenCharacterHasCharacterArcs(count = 1).single()
-            val baseSections = givenCharacterArcHasSections(baseArc, Desire, MoralNeed, Plan)
+            val baseSections = baseArc.arcSections
             givenSceneCoversSections(baseSections.first())
             listAvailableCharacterArcsForCharacterInScene()
             result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
@@ -181,8 +162,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
     }
 
     @Nested
-    inner class `Cover sections in Scene`
-    {
+    inner class `Cover sections in Scene` {
 
         @Test
         fun `Scene does not exist`() {
@@ -213,19 +193,21 @@ class CoverCharacterArcSectionsInSceneUnitTest {
         @Test
         fun `Some Character arc sections exist`() {
             givenSceneExists(withCharacterIncluded = true)
-            val characterArcSectionIds = givenCharacterArcSectionsExist(3).map { it.id.uuid } +
+            val (characterArc) = givenCharacterHasCharacterArcs(1)
+            val characterArcSectionIds = characterArc.arcSections.map { it.id.uuid } +
                     List(2) { UUID.randomUUID() }
             assertThrows<CharacterArcSectionDoesNotExist> {
                 coverSectionsInScene(*characterArcSectionIds.toTypedArray())
-            } shouldBe {
-                assertEquals(characterArcSectionIds[3], it.characterArcSectionId)
+            } shouldBe { error ->
+                assertTrue(characterArcSectionIds.any { it == error.characterArcSectionId })
             }
         }
 
         @Test
         fun `happy path`() {
             givenSceneExists(withCharacterIncluded = true)
-            val characterArcSections = givenCharacterArcSectionsExist(5)
+            val (characterArc) = givenCharacterHasCharacterArcs(1)
+            val characterArcSections = characterArc.arcSections
 
             coverSectionsInScene(*characterArcSections.map { it.id.uuid }.toTypedArray())
 
@@ -240,20 +222,74 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                     sectionsCoveredByScene.map { it.characterArcSectionId }.toSet()
                 )
                 sectionsCoveredByScene.forEach {
-                    assertEquals(scene.id.uuid, it.sceneId) { "Unexpected sceneId for CharacterArcSectionCoveredByScene" }
-                    assertEquals(character.id.uuid, it.characterId) { "Unexpected characterId for CharacterArcSectionCoveredByScene" }
+                    it.sceneId.mustEqual(scene.id.uuid) { "Unexpected sceneId for CharacterArcSectionCoveredByScene" }
+                    assertEquals(
+                        character.id.uuid,
+                        it.characterId
+                    ) { "Unexpected characterId for CharacterArcSectionCoveredByScene" }
                     val baseSection = baseSections.getValue(it.characterArcSectionId)
-                    assertEquals(baseSection.themeId.uuid, it.themeId) { "Unexpected themeId for CharacterArcSectionCoveredByScene" }
+                    assertEquals(
+                        baseSection.themeId.uuid,
+                        it.themeId
+                    ) { "Unexpected themeId for CharacterArcSectionCoveredByScene" }
+                }
+                assert(sectionsUncovered.isEmpty()) { "No sections should have been uncovered" }
+            }
+        }
+
+        @Test
+        fun `Uncover sections at the same time`() {
+            givenSceneExists(withCharacterIncluded = true)
+            val (characterArc) = givenCharacterHasCharacterArcs(1)
+            val characterArcSections = characterArc.arcSections
+            givenSceneCoversSections(characterArcSections.first())
+
+            coverSectionsInScene(
+                *characterArcSections.drop(1).map { it.id.uuid }.toTypedArray(),
+                removeArcSectionsIds = listOf(characterArcSections.first().id.uuid)
+            )
+
+            with(savedScene!!) {
+                assertTrue(isSameEntityAs(scene))
+                assertTrue(characterArcSections.drop(1).all { isCharacterArcSectionCovered(it.id) })
+                characterArcSections.first().id
+                    .let(this::isCharacterArcSectionCovered)
+                    .let { assertFalse(it) { "Character Arc Section was not uncovered from scene" } }
+            }
+            with(result as CoverCharacterArcSectionsInScene.ResponseModel) {
+                val baseSections = characterArcSections.associateBy { it.id.uuid }
+                assertEquals(
+                    baseSections.keys,
+                    sectionsCoveredByScene.map { it.characterArcSectionId }.toSet()
+                )
+                sectionsCoveredByScene.forEach {
+                    it.sceneId.mustEqual(scene.id.uuid) { "Unexpected sceneId for CharacterArcSectionCoveredByScene" }
+                    assertEquals(
+                        character.id.uuid,
+                        it.characterId
+                    ) { "Unexpected characterId for CharacterArcSectionCoveredByScene" }
+                    val baseSection = baseSections.getValue(it.characterArcSectionId)
+                    assertEquals(
+                        baseSection.themeId.uuid,
+                        it.themeId
+                    ) { "Unexpected themeId for CharacterArcSectionCoveredByScene" }
+                }
+                sectionsUncovered.single().run {
+                    characterArcSectionId.mustEqual(characterArcSections.first().id.uuid) { "Unexpected characterArcSectionId for CharacterArcSectionUncoveredInScene" }
+                    sceneId.mustEqual(scene.id.uuid) { "Unexpected sceneId for CharacterArcSectionUncoveredInScene" }
+                    characterId.mustEqual(character.id.uuid) { "Unexpected characterId for CharacterArcSectionUncoveredInScene" }
                 }
             }
         }
 
-
-        private fun coverSectionsInScene(vararg characterArcSectionIds: UUID)
-        {
+        private fun coverSectionsInScene(
+            vararg characterArcSectionIds: UUID,
+            removeArcSectionsIds: List<UUID> = listOf()
+        ) {
             val request = CoverCharacterArcSectionsInScene.RequestModel.CoverSections(
                 scene.id.uuid,
                 character.id.uuid,
+                removeArcSectionsIds,
                 *characterArcSectionIds
             )
             runBlocking {
@@ -271,8 +307,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                         next.withCharacterIncluded(char)
                     }
                 }
-            }
-            else this
+            } else this
         }
     }
 
@@ -288,9 +323,11 @@ class CoverCharacterArcSectionsInSceneUnitTest {
         }
     }
 
-    private fun givenCharacterArcHasSections(arc: CharacterArc, vararg sectionTemplates: CharacterArcTemplateSection): List<CharacterArcSection>
-    {
-        return sectionTemplates.map {
+    private fun givenCharacterArcHasSections(
+        arc: CharacterArc,
+        vararg sectionTemplates: CharacterArcTemplateSection
+    ): List<CharacterArcSection> {
+        val sections = sectionTemplates.map {
             CharacterArcSection(
                 CharacterArcSection.Id(UUID.randomUUID()),
                 arc.characterId,
@@ -299,31 +336,18 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                 null,
                 "Section Value ${str()}"
             )
-        }.onEach {
-            characterArcSectionRepository.characterArcSections[it.id] = it
         }
+
+        characterArcRepository.givenCharacterArc(sections.fold(arc) { nextArc, section ->
+            nextArc.withArcSection(section)
+        })
+
+        return sections
     }
 
-    private fun givenCharacterArcSectionsExist(count: Int, forCharacter: Character.Id = character.id): List<CharacterArcSection>
-    {
-        return List(count) {
-            CharacterArcSection(
-                CharacterArcSection.Id(UUID.randomUUID()),
-                forCharacter,
-                Theme.Id(),
-                CharacterArcTemplate.default().sections.random(),
-                null,
-                "Section Value ${str()}"
-            )
-        }.onEach {
-            characterArcSectionRepository.characterArcSections[it.id] = it
-        }
-    }
-
-    private fun givenSceneCoversSections(vararg sections: CharacterArcSection)
-    {
+    private fun givenSceneCoversSections(vararg sections: CharacterArcSection) {
         sceneRepository.scenes[scene.id] = sections.fold(sceneRepository.scenes[scene.id] ?: scene) { scene, section ->
-            scene.withCharacterArcSectionCovered(section.characterId, section)
+            scene.withCharacterArcSectionCovered(section)
         }
     }
 
@@ -336,6 +360,9 @@ fun availableCharacterArcSectionsForCharacterInScene(
 ) = fun(actual: Any?) {
     actual as AvailableCharacterArcSectionsForCharacterInScene
     assertEquals(sceneId, actual.sceneId) { "Unexpected sceneId for AvailableCharacterArcSectionsForCharacterInScene" }
-    assertEquals(characterId, actual.characterId) { "Unexpected characterId for AvailableCharacterArcSectionsForCharacterInScene" }
+    assertEquals(
+        characterId,
+        actual.characterId
+    ) { "Unexpected characterId for AvailableCharacterArcSectionsForCharacterInScene" }
     additionalAssertions(actual)
 }
