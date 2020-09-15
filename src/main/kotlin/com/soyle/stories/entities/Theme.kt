@@ -1,7 +1,6 @@
 package com.soyle.stories.entities
 
 import arrow.core.Either
-import arrow.core.Try
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.common.*
@@ -9,7 +8,6 @@ import com.soyle.stories.entities.theme.*
 import com.soyle.stories.entities.theme.characterInTheme.*
 import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.*
-import com.soyle.stories.translators.asThematicSection
 import java.util.*
 
 class Theme(
@@ -83,8 +81,7 @@ class Theme(
         val newCharacter = MinorCharacter(
             id,
             characterId,
-            characterName,
-            thematicTemplate
+            characterName
         )
         val minorCharacters = includedCharacters.values.filterIsInstance<MinorCharacter>()
         val majorCharacters = includedCharacters.values.filterIsInstance<MajorCharacter>().map {
@@ -197,17 +194,6 @@ class Theme(
             includedCharacters = includedCharacters
                 .minus(characterId)
                 .plus(characterId to getIncludedCharacterById(characterId)!!.changePosition(position))
-        )
-    }
-
-    fun withCharacterArcRenamed(characterId: Character.Id, newName: String): Theme
-    {
-        mustContainCharacter(characterId)
-        val majorCharacter = getMajorCharacter(characterId)
-        return copy(
-            includedCharacters = includedCharacters
-                .minus(majorCharacter.id)
-                .plus(majorCharacter.id to majorCharacter.withCharacterArcRenamed(newName))
         )
     }
 
@@ -363,8 +349,7 @@ class Theme(
             name,
             archetype,
             variationOnMoral,
-            position,
-            thematicSections
+            position
         )
 
     @Deprecated(message = "Outdated api.", replaceWith = ReplaceWith("this.withCharacterAsStoryFunctionForMajorCharacter(characterId, function, majorCharacter.id)"))

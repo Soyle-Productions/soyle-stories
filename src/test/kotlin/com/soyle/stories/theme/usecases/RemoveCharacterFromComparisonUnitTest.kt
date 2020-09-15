@@ -4,12 +4,14 @@ import arrow.core.identity
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparisonUseCase
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
@@ -75,7 +77,7 @@ class RemoveCharacterFromComparisonUnitTest {
 
     @Test
     fun `major character in theme`() {
-        givenThemeWith(andCharacterIds = *arrayOf(characterId.uuid), andMajorCharacterIds = listOf(
+        givenThemeWith(andCharacterIds = arrayOf(characterId.uuid), andMajorCharacterIds = listOf(
             characterId.uuid
         ))
         removeCharacterFromComparison()
@@ -90,6 +92,7 @@ class RemoveCharacterFromComparisonUnitTest {
         updatedTheme = it
     })
     private val characterRepository = CharacterRepositoryDouble()
+    private val characterArcRepository = CharacterArcRepositoryDouble()
 
     private fun givenThemeWith(andMajorCharacterIds: List<UUID> = emptyList(), vararg andCharacterIds: UUID) {
         themeRepository.themes[themeId] = makeTheme(themeId)
@@ -101,12 +104,14 @@ class RemoveCharacterFromComparisonUnitTest {
             }
         themeRepository.themes[themeId] = andMajorCharacterIds
             .fold(themeRepository.themes[themeId]!!) { nextTheme, characterId ->
+                characterArcRepository.givenCharacterArc(CharacterArc.planNewCharacterArc(Character.Id(characterId), nextTheme.id, nextTheme.name))
+
                 nextTheme.withCharacterPromoted(Character.Id(characterId))
             }
     }
 
     private fun removeCharacterFromComparison() {
-        val useCase: RemoveCharacterFromComparison = RemoveCharacterFromComparisonUseCase(themeRepository, characterRepository)
+        val useCase: RemoveCharacterFromComparison = RemoveCharacterFromComparisonUseCase(themeRepository, characterArcRepository)
         val output = object : RemoveCharacterFromComparison.OutputPort {
             override suspend fun receiveRemoveCharacterFromComparisonResponse(response: RemovedCharacterFromTheme) {
                 assertNull(removedCharacter) // should not receive multiple removed characters

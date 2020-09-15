@@ -2,9 +2,11 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
 import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.character.makeCharacterArcSection
 import com.soyle.stories.common.MoralWeakness
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
@@ -23,9 +25,9 @@ class ChangeCharacterMoralWeaknessUnitTest {
     private val theme = makeTheme()
         .withCharacterIncluded(character.id, character.name, character.media)
         .withCharacterPromoted(character.id)
-    private val arcSection =
-        theme.getMajorCharacterById(character.id)!!.thematicSections.find { it.template.characterArcTemplateSectionId == MoralWeakness.id }!!
-            .asCharacterArcSection()
+    private val arcSection = makeCharacterArcSection(characterId = character.id, themeId = theme.id, template = MoralWeakness)
+    private val characterArc = CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name)
+        .withArcSection(arcSection)
 
     // input
     private val themeId = theme.id.uuid
@@ -33,7 +35,7 @@ class ChangeCharacterMoralWeaknessUnitTest {
     private val providedWeakness = "Moral Weakness ${str()}"
 
     // post-conditions
-    private var updatedArcSection: CharacterArcSection? = null
+    private var updatedCharacterArc: CharacterArc? = null
 
     // output
     private var responseModel: ChangeCharacterMoralWeakness.ResponseModel? = null
@@ -67,7 +69,7 @@ class ChangeCharacterMoralWeaknessUnitTest {
         givenTheme()
         givenThemeHasCharacter(asMajorCharacter = true)
         changeCharacterMoralWeakness()
-        updatedArcSection!! shouldBe {
+        updatedCharacterArc!!.arcSections.find { it.id == arcSection.id }!! shouldBe {
             assertEquals(arcSection.id, it.id)
             assertEquals(providedWeakness, it.value)
         }
@@ -81,7 +83,7 @@ class ChangeCharacterMoralWeaknessUnitTest {
         givenThemeHasCharacter(asMajorCharacter = true)
         givenArcSectionHasLinkedLocation(linkedLocationId)
         changeCharacterMoralWeakness()
-        updatedArcSection!! shouldBe {
+        updatedCharacterArc!!.arcSections.find { it.id == arcSection.id }!! shouldBe {
             assertEquals(arcSection.id, it.id)
             assertEquals(providedWeakness, it.value)
             assertEquals(linkedLocationId, it.linkedLocation)
@@ -90,9 +92,7 @@ class ChangeCharacterMoralWeaknessUnitTest {
     }
 
 
-    private val characterArcSectionRepository = CharacterArcSectionRepositoryDouble(onUpdateCharacterArcSections = {
-        updatedArcSection = it
-    })
+    private val characterArcRepository = CharacterArcRepositoryDouble(onUpdateCharacterArc = ::updatedCharacterArc::set)
     private val themeRepository = ThemeRepositoryDouble()
 
     private fun givenTheme() {
@@ -101,10 +101,7 @@ class ChangeCharacterMoralWeaknessUnitTest {
 
     private fun givenThemeHasCharacter(asMajorCharacter: Boolean = false) {
         themeRepository.themes[theme.id] = if (asMajorCharacter) theme.also {
-            it.getMajorCharacterById(character.id)!!.thematicSections.forEach {
-                characterArcSectionRepository.characterArcSections[it.characterArcSectionId] =
-                    it.asCharacterArcSection()
-            }
+            characterArcRepository.givenCharacterArc(characterArc)
         } else {
             (theme.demoteCharacter(theme.getMajorCharacterById(character.id)!!) as Either.Right).b
         }
@@ -112,12 +109,20 @@ class ChangeCharacterMoralWeaknessUnitTest {
 
     private fun givenArcSectionHasLinkedLocation(locationId: Location.Id)
     {
-        characterArcSectionRepository.characterArcSections[arcSection.id] = arcSection.withLinkedLocation(locationId)
+        runBlocking {
+            characterArcRepository.givenCharacterArc(
+                characterArcRepository.getCharacterArcByCharacterAndThemeId(character.id, theme.id)!!
+                    .withArcSectionsMapped {
+                        if (it.id == arcSection.id) it.withLinkedLocation(locationId)
+                        else it
+                    }
+            )
+        }
     }
 
     private fun changeCharacterMoralWeakness() {
         val useCase: ChangeCharacterMoralWeakness =
-            ChangeCharacterMoralWeaknessUseCase(themeRepository, characterArcSectionRepository)
+            ChangeCharacterMoralWeaknessUseCase(themeRepository, characterArcRepository)
         val output = object : ChangeCharacterMoralWeakness.OutputPort {
             override suspend fun characterMoralWeaknessChanged(response: ChangeCharacterMoralWeakness.ResponseModel) {
                 responseModel = response

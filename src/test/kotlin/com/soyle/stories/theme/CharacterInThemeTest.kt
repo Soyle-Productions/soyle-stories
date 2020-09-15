@@ -60,15 +60,6 @@ class CharacterInThemeTest {
 	}
 
 	@Test
-	fun `character in theme has a value for each thematic template section`() {
-		val sections = themeWithCharacter.getIncludedCharacterById(newCharacter.id)!!.thematicSections
-
-		val templateSections = themeWithCharacter.thematicTemplate.sections.toSet()
-
-		assertEquals(templateSections, sections.map { it.template }.toSet())
-	}
-
-	@Test
 	fun `can promote minor characters`() {
 		val (theme) = promoteCharacter() as Either.Right
 		assert(theme.getMajorCharacterById(newCharacter.id) != null)

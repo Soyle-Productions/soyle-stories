@@ -14,5 +14,4 @@ interface Context {
     val themeRepository: ThemeRepository
     val characterRepository: CharacterRepository
     val characterArcRepository: CharacterArcRepository
-    val characterArcSectionRepository: CharacterArcSectionRepository
 }

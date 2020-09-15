@@ -15,8 +15,7 @@ import java.util.*
 
 class PromoteMinorCharacterUseCase(
     private val themeRepository: ThemeRepository,
-    private val characterArcRepository: CharacterArcRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : PromoteMinorCharacter {
     override suspend fun invoke(
         request: PromoteMinorCharacter.RequestModel,
@@ -45,33 +44,15 @@ class PromoteMinorCharacterUseCase(
                 request.themeId
             )
         }
-        val thematicTemplateSectionIds =
-            characterInTheme.thematicSections.map { it.template.characterArcTemplateSectionId }.toSet()
-        val templateSectionsToMake =
-            CharacterArcTemplate.default().sections.filterNot { it.id in thematicTemplateSectionIds }
-        val newSections =
-            templateSectionsToMake.map {
-                CharacterArcSection(
-                    CharacterArcSection.Id(UUID.randomUUID()),
-                    characterInTheme.id, theme.id, it,
-                    null,
-                    ""
-                )
-            }
-        val promotionResult = theme.withCharacterPromoted(characterInTheme.id) to CharacterArc.planNewCharacterArc(
-            characterInTheme.id,
-            theme.id,
-            theme.name
-        )
-        themeRepository.updateTheme(promotionResult.first)
-        characterArcRepository.addNewCharacterArc(promotionResult.second)
-        characterArcSectionRepository.addNewCharacterArcSections(newSections)
+        val promotionResult = theme.withCharacterPromoted(characterInTheme.id)
+        themeRepository.updateTheme(promotionResult)
+        characterArcRepository.addNewCharacterArc(CharacterArc.planNewCharacterArc(characterInTheme.id, theme.id, theme.name))
         output.receivePromoteMinorCharacterResponse(
             PromoteMinorCharacter.ResponseModel(
                 CreatedCharacterArc(
                     request.themeId,
                     request.characterId,
-                    promotionResult.second.name
+                    promotionResult.name
                 )
             )
         )

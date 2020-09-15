@@ -75,12 +75,10 @@ class CharacterPerspectiveTest {
                     "",
                     "",
                     "",
-                    listOf(),
                     CharacterPerspective(
                         mapOf(),
                         mapOf()
                     ),
-                    CharacterArc.planNewCharacterArc(id, theme.id, theme.name),
                     ""
                 )
             } to otherCharacters.first()
@@ -179,12 +177,10 @@ class CharacterPerspectiveTest {
                     "",
                     "",
                     "",
-                    listOf(),
                     CharacterPerspective(
                         mapOf(),
                         mapOf()
                     ),
-                    CharacterArc.planNewCharacterArc(id, theme.id, theme.name),
                     ""
                 )
             } to otherCharacters.first()

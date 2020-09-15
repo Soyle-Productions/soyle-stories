@@ -85,7 +85,7 @@ class PromoteCharacterTest {
         promoteMinorCharacter()
         updatedTheme!! shouldBe themeWithCharacterPromoted(characterId)
         createdCharacterArc!! shouldBe characterArc(themeId, characterId, themeName)
-        createdArcSections!! shouldBe listOfArcSections(themeId, characterId)
+        createdCharacterArc!!.arcSections shouldBe listOfArcSections(themeId, characterId)
         result!! shouldBe responseModel(themeId, characterId, themeName)
     }
 
@@ -122,7 +122,7 @@ class PromoteCharacterTest {
 
     private fun promoteMinorCharacter() {
         val useCase: PromoteMinorCharacter = PromoteMinorCharacterUseCase(
-            themeRepository, characterArcRepository, characterArcSectionRepository
+            themeRepository, characterArcRepository
         )
         val output = object : PromoteMinorCharacter.OutputPort {
             override suspend fun receivePromoteMinorCharacterResponse(response: PromoteMinorCharacter.ResponseModel) {

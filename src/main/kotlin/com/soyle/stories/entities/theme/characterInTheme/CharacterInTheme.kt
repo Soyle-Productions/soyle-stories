@@ -17,7 +17,6 @@ sealed class CharacterInTheme {
     abstract val archetype: String
     abstract val variationOnMoral: String
     abstract val position: String
-    abstract val thematicSections: List<ThematicSection>
 
     abstract fun changeName(name: String): CharacterInTheme
     abstract fun changeArchetype(archetype: String): CharacterInTheme
@@ -31,39 +30,28 @@ class MinorCharacter(
     override val name: String,
     override val archetype: String,
     override val variationOnMoral: String,
-    override val position: String,
-    override val thematicSections: List<ThematicSection>
+    override val position: String
 ) : CharacterInTheme() {
 
-    constructor(themeId: Theme.Id, characterId: Character.Id, name: String, thematicTemplate: ThematicTemplate) : this(
+    constructor(themeId: Theme.Id, characterId: Character.Id, name: String) : this(
         characterId,
         name,
         "",
         "",
-        "",
-        thematicTemplate.sections.map {
-            ThematicSection(
-                CharacterArcSection.Id(UUID.randomUUID()),
-                characterId,
-                themeId,
-                it
-            )
-        }
+        ""
     )
 
     private fun copy(
         name: String = this.name,
         archetype: String = this.archetype,
         variationOnMoral: String = this.variationOnMoral,
-        thematicSections: List<ThematicSection> = this.thematicSections,
         position: String = this.position
     ) = MinorCharacter(
         id,
         name,
         archetype,
         variationOnMoral,
-        position,
-        thematicSections
+        position
     )
 
     override fun changeName(name: String): MinorCharacter {
@@ -93,7 +81,6 @@ class MinorCharacter(
         archetype,
         variationOnMoral,
         position,
-        thematicSections,
         otherCharacters,
         themeId,
         themeName,
@@ -108,9 +95,7 @@ class MajorCharacter(
     override val archetype: String,
     override val variationOnMoral: String,
     override val position: String,
-    override val thematicSections: List<ThematicSection>,
     private val perspective: CharacterPerspective,
-    val characterArc: CharacterArc,
     val characterChange: String
 ) : CharacterInTheme() {
 
@@ -120,7 +105,6 @@ class MajorCharacter(
         archetype: String,
         variationOnMoral: String,
         position: String,
-        thematicSections: List<ThematicSection>,
         otherCharacters: List<Character.Id>,
         themeId: Theme.Id,
         themeName: String,
@@ -131,16 +115,7 @@ class MajorCharacter(
         archetype,
         variationOnMoral,
         position,
-        thematicSections.let {
-            val thematicSectionsIds = it.map { it.template.characterArcTemplateSectionId }.toSet()
-            thematicSections + characterArcTemplate.sections.filterNot {
-                it.id in thematicSectionsIds
-            }.map {
-                ThematicSection(CharacterArcSection.Id(UUID.randomUUID()), id, themeId, it.asThematicTemplateSection())
-            }
-        },
         CharacterPerspective(otherCharacters),
-        CharacterArc.planNewCharacterArc(id, themeId, themeName, characterArcTemplate),
         ""
     )
 
@@ -149,9 +124,7 @@ class MajorCharacter(
         archetype: String = this.archetype,
         variationOnMoral: String = this.variationOnMoral,
         position: String = this.position,
-        thematicSections: List<ThematicSection> = this.thematicSections,
         perspective: CharacterPerspective = this.perspective,
-        characterArc: CharacterArc = this.characterArc,
         characterChange: String = this.characterChange
     ) = MajorCharacter(
         id,
@@ -159,9 +132,7 @@ class MajorCharacter(
         archetype,
         variationOnMoral,
         position,
-        thematicSections,
         perspective,
-        characterArc,
         characterChange
     )
 
@@ -209,8 +180,5 @@ class MajorCharacter(
 
     fun withCharacterChangeAs(change: String): MajorCharacter =
         copy(characterChange = change)
-
-    fun withCharacterArcRenamed(name: String): MajorCharacter =
-        copy(characterArc = characterArc.withNewName(name))
 
 }

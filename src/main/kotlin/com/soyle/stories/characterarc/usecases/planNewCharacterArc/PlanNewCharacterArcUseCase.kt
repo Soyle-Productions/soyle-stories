@@ -2,7 +2,7 @@ package com.soyle.stories.characterarc.usecases.planNewCharacterArc
 
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.entities.*
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 import com.soyle.stories.translators.asCharacterArcSection
 import java.util.*
@@ -10,7 +10,7 @@ import java.util.*
 class PlanNewCharacterArcUseCase(
     private val characterRepository: com.soyle.stories.character.repositories.CharacterRepository,
     private val themeRepository: com.soyle.stories.characterarc.repositories.ThemeRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : PlanNewCharacterArc {
 
     override suspend fun invoke(
@@ -22,11 +22,10 @@ class PlanNewCharacterArcUseCase(
         val theme = Theme(character.projectId, name, emptyList(), "")
 
         val themeWithCharacter = addArcToCharacter(character, theme)
-
-        val initialSections = themeWithCharacter.getMajorCharacterById(character.id)!!.thematicSections
+        val newArc = CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name)
 
         themeRepository.addNewTheme(themeWithCharacter)
-        characterArcSectionRepository.addNewCharacterArcSections(initialSections.map { it.asCharacterArcSection() })
+        characterArcRepository.addNewCharacterArc(newArc)
 
         outputPort.characterArcPlanned(
             PlanNewCharacterArc.ResponseModel(

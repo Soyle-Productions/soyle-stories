@@ -1,12 +1,15 @@
 package com.soyle.stories.characterarc.usecases
 
+import com.soyle.stories.character.makeCharacterArcSection
 import com.soyle.stories.characterarc.CharacterArcException
 import com.soyle.stories.characterarc.CharacterArcSectionDoesNotExist
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionUseCase
+import com.soyle.stories.common.str
+import com.soyle.stories.common.template
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.*
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
-import com.soyle.stories.theme.setupContext
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -18,7 +21,7 @@ class UnlinkLocationFromCharacterArcSectionUnitTest {
 	val characterArcSectionId = UUID.randomUUID()
 	val locationId = UUID.randomUUID()
 
-	private var updatedCharacterArcSection: CharacterArcSection? = null
+	private var updatedCharacterArc: CharacterArc? = null
 	var result: Any? = null
 
 	@Test
@@ -34,7 +37,7 @@ class UnlinkLocationFromCharacterArcSectionUnitTest {
 		given(characterArcSectionWithIdOf(characterArcSectionId), NoLinkedLocations)
 		whenUseCaseExecuted()
 		assertIsValidResponseModel(result)
-		assertNull(updatedCharacterArcSection, "Character arc section should not be saved if no changes have been made")
+		assertNull(updatedCharacterArc, "Character arc should not be saved if no changes have been made")
 	}
 
 	@Test
@@ -42,7 +45,7 @@ class UnlinkLocationFromCharacterArcSectionUnitTest {
 		given(characterArcSectionWithIdOf(characterArcSectionId), linkedToLocationWithIdOf(locationId))
 		whenUseCaseExecuted()
 		assertIsValidResponseModel(result)
-		val updatedCharacterArcSection = updatedCharacterArcSection!!
+		val updatedCharacterArcSection = updatedCharacterArc!!.arcSections.find { it.id.uuid == characterArcSectionId }!!
 		assertNull(updatedCharacterArcSection.linkedLocation)
 	}
 
@@ -52,18 +55,22 @@ class UnlinkLocationFromCharacterArcSectionUnitTest {
 	private fun linkedToLocationWithIdOf(id: UUID) = listOf(id)
 
 	private fun given(characterArcSectionIds: List<UUID>, linkedLocationIds: List<UUID>) {
-		val context = setupContext(initialCharacterArcSections = characterArcSectionIds.map {
-			CharacterArcSection(CharacterArcSection.Id(it), Character.Id(UUID.randomUUID()), Theme.Id(UUID.randomUUID()), CharacterArcTemplateSection(CharacterArcTemplateSection.Id(UUID.randomUUID()), "", false), linkedLocationIds.firstOrNull()?.let(Location::Id), "")
-		}, updateCharacterArcSection = {
-			updatedCharacterArcSection = it
-		})
-		characterArcSectionRepository = context.characterArcSectionRepository
+		val arcSections = characterArcSectionIds.map {
+			makeCharacterArcSection(id = CharacterArcSection.Id(it), template = template("Template ${str()}", false), linkedLocation = linkedLocationIds.firstOrNull()?.let(Location::Id))
+		}
+		characterArcRepository = CharacterArcRepositoryDouble(
+			onUpdateCharacterArc = ::updatedCharacterArc::set
+		).apply {
+			arcSections.forEach {
+				givenCharacterArc(CharacterArc.planNewCharacterArc(it.characterId, it.themeId, "").withArcSection(it))
+			}
+		}
 	}
 
-	private lateinit var characterArcSectionRepository: CharacterArcSectionRepository
+	private lateinit var characterArcRepository: CharacterArcRepository
 
 	private fun whenUseCaseExecuted() {
-		val useCase: UnlinkLocationFromCharacterArcSection = UnlinkLocationFromCharacterArcSectionUseCase(characterArcSectionRepository)
+		val useCase: UnlinkLocationFromCharacterArcSection = UnlinkLocationFromCharacterArcSectionUseCase(characterArcRepository)
 		runBlocking {
 			useCase.invoke(characterArcSectionId, object : UnlinkLocationFromCharacterArcSection.OutputPort {
 				override fun receiveUnlinkLocationFromCharacterArcSectionFailure(failure: CharacterArcException) {

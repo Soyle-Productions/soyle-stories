@@ -5,10 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.makeCharacter
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.theme.CharacterAlreadyIncludedInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.makeTheme
@@ -34,18 +31,18 @@ class IncludeCharacterInComparisonTest {
         characters: List<Character>,
         themes: List<Theme>,
         updateTheme: (Theme) -> Unit = {},
-        addNewArcSections: (List<CharacterArcSection>) -> Unit = {}
+        updateCharacterArc: (CharacterArc) -> Unit = {}
     ): (UUID, UUID) -> Either<*, CharacterIncludedInTheme> {
         val context = setupContext(
             initialCharacters = characters,
             initialThemes = themes,
             updateTheme = updateTheme,
-            addNewCharacterArcSections = addNewArcSections
+            updateCharacterArc = updateCharacterArc
         )
         val useCase: IncludeCharacterInComparison = IncludeCharacterInComparisonUseCase(
             context.characterRepository,
             context.themeRepository,
-            context.characterArcSectionRepository
+            context.characterArcRepository
         )
         val output = object : IncludeCharacterInComparison.OutputPort {
             var result: Either<Exception, CharacterIncludedInTheme>? = null
@@ -109,9 +106,7 @@ class IncludeCharacterInComparisonTest {
             characters = listOf(character),
             themes = listOf(
                 makeTheme(Theme.Id(themeUUID), includedCharacters = mapOf(
-                    Character.Id(characterUUID) to character.asMinorCharacter(
-                        listOf()
-                    )
+                    Character.Id(characterUUID) to character.asMinorCharacter()
                 ))
             )
         )
@@ -159,28 +154,6 @@ class IncludeCharacterInComparisonTest {
             ).invoke(characterUUID, themeUUID)
             updatedTheme!!
 
-        }
-
-        @Test
-        fun `should create arc sections for thematic template sections`() {
-            var updatedTheme: Theme? = null
-            val addedSections = mutableListOf<CharacterArcSection>()
-            given(
-                characters = listOf(character),
-                themes = listOf(
-                    makeTheme(Theme.Id(themeUUID))
-                ),
-                updateTheme = {
-                    updatedTheme = it
-                },
-                addNewArcSections = {
-                    addedSections.addAll(it)
-                }
-            ).invoke(characterUUID, themeUUID)
-            assertEquals(
-                updatedTheme!!.thematicTemplate.sections.size,
-                addedSections.size
-            )
         }
 
     }

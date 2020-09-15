@@ -2,12 +2,14 @@ package com.soyle.stories.theme.usecases.changeCharacterArcSectionValue
 
 import com.soyle.stories.common.Desire
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.repositories.getThemeOrError
@@ -15,7 +17,7 @@ import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCha
 
 class ChangeCharacterDesireUseCase(
     private val themeRepository: ThemeRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : ChangeCharacterDesire {
 
     override suspend fun invoke(request: RequestModel, output: OutputPort) {
@@ -23,10 +25,15 @@ class ChangeCharacterDesireUseCase(
 
         val character = getMajorCharacter(theme, request)
 
-        val arcSection = getDesireArcSection(character)
+        val characterArc = characterArcRepository.getCharacterArcByCharacterAndThemeId(character.id, theme.id)!!
 
-        characterArcSectionRepository.updateCharacterArcSection(
-            arcSection.changeValue(request.desire)
+        val arcSection = characterArc.arcSections.find { it.template isSameEntityAs Desire }!!
+
+        characterArcRepository.replaceCharacterArcs(
+            characterArc.withArcSectionsMapped {
+                if (it.template isSameEntityAs Desire) it.changeValue(request.desire)
+                else it
+            }
         )
 
         output.characterDesireChanged(
@@ -34,12 +41,6 @@ class ChangeCharacterDesireUseCase(
                 ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, ArcSectionType.Desire, request.desire)
             )
         )
-    }
-
-    private suspend fun getDesireArcSection(character: CharacterInTheme): CharacterArcSection {
-        val thematicDesire =
-            character.thematicSections.find { it.template.characterArcTemplateSectionId == Desire.id }!!
-        return characterArcSectionRepository.getCharacterArcSectionById(thematicDesire.characterArcSectionId)!!
     }
 
     private fun getMajorCharacter(

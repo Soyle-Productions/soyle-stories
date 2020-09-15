@@ -30,10 +30,36 @@ class CharacterArc private constructor(
     }
 
     private fun copy(
-        name: String = this.name
-    ) = CharacterArc(id, characterId, template, themeId, name, arcSections)
+        name: String = this.name,
+        arcSections: List<CharacterArcSection> = this.arcSections
+    ) = CharacterArc(id, characterId, template, themeId, name, arcSections, defaultConstructorMarker = Unit)
 
     fun withNewName(name: String) = copy(name = name)
+
+    fun withArcSection(arcSection: CharacterArcSection): CharacterArc
+    {
+        return copy(
+            arcSections = arcSections + arcSection
+        )
+    }
+    fun withoutArcSection(arcSectionId: CharacterArcSection.Id) = withoutArcSections(setOf(arcSectionId))
+    fun withoutArcSections(arcSectionIds: Set<CharacterArcSection.Id>): CharacterArc
+    {
+        return copy(
+            arcSections = arcSections.filterNot { it.id in arcSectionIds }
+        )
+    }
+
+    fun withArcSectionsMapped(mapping: (CharacterArcSection) -> CharacterArcSection): CharacterArc
+    {
+        val arcSectionsMapped = arcSections.map(mapping)
+
+        // any validation on changes
+
+        return copy(
+            arcSections = arcSectionsMapped
+        )
+    }
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "CharacterArc($uuid)"

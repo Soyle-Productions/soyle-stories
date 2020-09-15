@@ -165,7 +165,6 @@ class CompareCharacterValuesUnitTest {
                     archetype,
                     "",
                     "",
-                    listOf()
                 )
             } else {
                 MajorCharacter(
@@ -173,12 +172,10 @@ class CompareCharacterValuesUnitTest {
                     archetype,
                     "",
                     "",
-                    listOf(),
                     CharacterPerspective(
                         mapOf(),
                         mapOf()
                     ),
-                    CharacterArc.planNewCharacterArc(character.id, themeId, "Theme"),
                     ""
                 )
             }

@@ -1,16 +1,12 @@
-/**
- * Created by Brendan
- * Date: 2/27/2020
- * Time: 4:48 PM
- */
 package com.soyle.stories.theme.usecases.changeThematicSectionValue
 
+import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import java.util.*
 
 class ChangeThematicSectionValueUseCase(
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : ChangeThematicSectionValue {
 
     override suspend fun invoke(thematicSectionId: UUID, value: String, output: ChangeThematicSectionValue.OutputPort) {
@@ -25,19 +21,22 @@ class ChangeThematicSectionValueUseCase(
     private suspend fun changeThematicSectionValue(
         thematicSectionId: UUID, value: String
     ): ChangeThematicSectionValue.ResponseModel {
-        val characterArcSection = getCharacterArcSectionById(thematicSectionId)
-        val updatedArcSection = characterArcSection.changeValue(value)
-        saveUpdate(updatedArcSection)
+        val characterArc = getCharacterArc(thematicSectionId)
+        val updatedArc = characterArc.withArcSectionsMapped {
+            if (it.id.uuid == thematicSectionId) it.changeValue(value)
+            else it
+        }
+        saveUpdate(updatedArc)
         return ChangeThematicSectionValue.ResponseModel(thematicSectionId, value)
     }
 
-    private suspend fun getCharacterArcSectionById(thematicSectionId: UUID): CharacterArcSection {
-        return characterArcSectionRepository
-            .getCharacterArcSectionById(CharacterArcSection.Id(thematicSectionId))
+    private suspend fun getCharacterArc(thematicSectionId: UUID): CharacterArc {
+        return characterArcRepository
+            .getCharacterArcContainingArcSection(CharacterArcSection.Id(thematicSectionId))
             ?: throw com.soyle.stories.characterarc.CharacterArcSectionDoesNotExist(thematicSectionId)
     }
 
-    private suspend fun saveUpdate(updatedArcSection: CharacterArcSection) {
-        characterArcSectionRepository.updateCharacterArcSection(updatedArcSection)
+    private suspend fun saveUpdate(updatedArc: CharacterArc) {
+        characterArcRepository.replaceCharacterArcs(updatedArc)
     }
 }

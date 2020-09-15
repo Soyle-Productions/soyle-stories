@@ -5,6 +5,7 @@ import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.Desire
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
@@ -16,6 +17,7 @@ import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCh
 import com.soyle.stories.translators.asCharacterArcSection
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -26,9 +28,8 @@ class ChangeCharacterDesireUnitTest {
     private val theme = makeTheme()
         .withCharacterIncluded(character.id, character.name, character.media)
         .withCharacterPromoted(character.id)
-    private val arcSection =
-        theme.getMajorCharacterById(character.id)!!.thematicSections.find { it.template.characterArcTemplateSectionId == Desire.id }!!
-            .asCharacterArcSection()
+    private val characterArc = CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name)
+    private val arcSection = characterArc.arcSections.find { it.template isSameEntityAs Desire }!!
 
     // input
     private val themeId = theme.id.uuid
@@ -36,7 +37,7 @@ class ChangeCharacterDesireUnitTest {
     private val providedDesire = "Desire ${str()}"
 
     // post-conditions
-    private var updatedArcSection: CharacterArcSection? = null
+    private var updatedCharacterArc: CharacterArc? = null
 
     // output
     private var responseModel: ChangeCharacterDesire.ResponseModel? = null
@@ -70,7 +71,7 @@ class ChangeCharacterDesireUnitTest {
         givenTheme()
         givenThemeHasCharacter(asMajorCharacter = true)
         changeCharacterDesire()
-        updatedArcSection!! shouldBe {
+        updatedCharacterArc!!.arcSections.find { it.template isSameEntityAs Desire }!!.shouldBe {
             assertEquals(arcSection.id, it.id)
             assertEquals(providedDesire, it.value)
         }
@@ -84,7 +85,7 @@ class ChangeCharacterDesireUnitTest {
         givenThemeHasCharacter(asMajorCharacter = true)
         givenArcSectionHasLinkedLocation(linkedLocationId)
         changeCharacterDesire()
-        updatedArcSection!! shouldBe {
+        updatedCharacterArc!!.arcSections.find { it.template isSameEntityAs Desire }!! shouldBe {
             assertEquals(arcSection.id, it.id)
             assertEquals(providedDesire, it.value)
             assertEquals(linkedLocationId, it.linkedLocation)
@@ -93,9 +94,7 @@ class ChangeCharacterDesireUnitTest {
     }
 
 
-    private val characterArcSectionRepository = CharacterArcSectionRepositoryDouble(onUpdateCharacterArcSections = {
-        updatedArcSection = it
-    })
+    private val characterArcRepository = CharacterArcRepositoryDouble(onUpdateCharacterArc = ::updatedCharacterArc::set)
     private val themeRepository = ThemeRepositoryDouble()
 
     private fun givenTheme() {
@@ -104,23 +103,27 @@ class ChangeCharacterDesireUnitTest {
 
     private fun givenThemeHasCharacter(asMajorCharacter: Boolean = false) {
         themeRepository.themes[theme.id] = if (asMajorCharacter) theme.also {
-            it.getMajorCharacterById(character.id)!!.thematicSections.forEach {
-                characterArcSectionRepository.characterArcSections[it.characterArcSectionId] =
-                    it.asCharacterArcSection()
-            }
+            characterArcRepository.givenCharacterArc(characterArc)
         } else {
             (theme.demoteCharacter(theme.getMajorCharacterById(character.id)!!) as Either.Right).b
         }
     }
 
-    private fun givenArcSectionHasLinkedLocation(locationId: Location.Id)
-    {
-        characterArcSectionRepository.characterArcSections[arcSection.id] = arcSection.withLinkedLocation(locationId)
+    private fun givenArcSectionHasLinkedLocation(locationId: Location.Id) {
+        runBlocking {
+            characterArcRepository.givenCharacterArc(
+                characterArcRepository.getCharacterArcByCharacterAndThemeId(character.id, theme.id)!!
+                    .withArcSectionsMapped {
+                        if (it.id == arcSection.id) it.withLinkedLocation(locationId)
+                        else it
+                    }
+            )
+        }
     }
 
     private fun changeCharacterDesire() {
         val useCase: ChangeCharacterDesire =
-            ChangeCharacterDesireUseCase(themeRepository, characterArcSectionRepository)
+            ChangeCharacterDesireUseCase(themeRepository, characterArcRepository)
         val output = object : ChangeCharacterDesire.OutputPort {
             override suspend fun characterDesireChanged(response: ChangeCharacterDesire.ResponseModel) {
                 responseModel = response
