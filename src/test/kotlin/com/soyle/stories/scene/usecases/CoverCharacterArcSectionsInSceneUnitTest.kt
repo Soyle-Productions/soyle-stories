@@ -1,11 +1,9 @@
 package com.soyle.stories.scene.usecases
 
-import arrow.core.k
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.CharacterArcSectionDoesNotExist
 import com.soyle.stories.common.*
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
-import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.scene.CharacterNotInScene
 import com.soyle.stories.scene.SceneDoesNotExist
@@ -22,44 +20,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*
 
-/**
- * Summary:
- *  abs
- *
- * Preconditions:
- * 1. A scene has been created
- * 2. The character has been included in the scene
- *
- * Basic Course of Events:
- * 1. The user indicates that they want to cover character arc sections for a character in this scene
- * 2. The software responds by listing all the available character arcs for this character and marks any previously
- * covered character arc sections
- * 3. The user specifies which character arc sections should be covered by this scene for this character
- * 4. The software covers the specified character arc sections in this scene for this character
- *
- * Alternative Paths:
- * 1. In step 3, the user requests making a new character arc for this character first.
- *     1. The software responds by requesting the name of the new character arc and presenting a list of
- *     soon-to-be-created character arc sections
- *     2. The user inputs the name of the new character arc and selects one or more of the soon-to-be-created character
- *     arc sections
- *     3. The software creates the new character arc and the default character arc sections for the character then
- *     covers the specified, newly-created character arc sections in this scene for this character
- * 2. In step 1b, the user requests making a new character arc section while making the new character arc.
- *     1. The software responds by presenting a list of available character arc section types.
- *     2. The user selects one of the presented character arc section types.
- *     3. The user may repeat steps 2 - 2.2 multiple times.
- *     4. The software creates the new character arc, the default character arc sections, and the selected types of
- *     character arc sections for the character, then covers the specified, newly-created character arc sections in this
- *     scene for this character
- * 3. In step 3, the user specifies which character arc sections to uncover.  The post conditions are the same, but the
- * software also uncovers the specified character arc sections
- * 4. In step 3, the user requests making a new character arc section for one of the listed character arcs.
- *     1. The software responds by presenting a list of available character arc section types for that character arc.
- *     2. The user selects one of the presented character arc section types.
- *     3. The software creates the specified character arc section type for the specified character arc and covers it in
- *     this scene for this character.
- */
 class CoverCharacterArcSectionsInSceneUnitTest {
 
     // Preconditions
@@ -68,8 +28,6 @@ class CoverCharacterArcSectionsInSceneUnitTest {
 
     // Post-conditions
     private var savedScene: Scene? = null
-    private var createdCharacterArc: CharacterArc? = null
-    private var createdCharacterArcSections: List<CharacterArcSection>? = null
 
     private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::savedScene::set)
     private val characterArcRepository = CharacterArcRepositoryDouble()
@@ -91,35 +49,80 @@ class CoverCharacterArcSectionsInSceneUnitTest {
     inner class `List available character arcs for character in scene` {
 
         @Test
+        /*
+        Summary: when the scene does not exist, throw a scene does not exist error with the scene id
+
+        When the user indicates that they want to cover character arc sections for a character in a scene
+        then a SceneDoesNotExist error should be thrown with the requested scene id
+         */
         fun `Scene does not exist`() {
-            assertThrows<SceneDoesNotExist> {
+            // when
+            val error = assertThrows<SceneDoesNotExist> {
                 listAvailableCharacterArcsForCharacterInScene()
-            } shouldBe sceneDoesNotExist(scene.id.uuid)
+            }
+            // then
+            error shouldBe sceneDoesNotExist(scene.id.uuid)
         }
 
         @Test
+        /*
+        Summary: when the character is not in the scene, throw a character not in scene error with the scene id and
+                 character id
+
+        Given the scene ${scene} exists
+        When the user indicates that they want to cover character arc sections for a character in this scene
+        then a CharacterNotInScene error should be thrown with the requested character id and scene id
+         */
         fun `Character not in scene`() {
+            // given
             givenSceneExists()
-            assertThrows<CharacterNotInScene> {
+            // when
+            val error = assertThrows<CharacterNotInScene> {
                 listAvailableCharacterArcsForCharacterInScene()
-            } shouldBe characterNotInScene(scene.id.uuid, character.id.uuid)
+            }
+            // then
+            error shouldBe characterNotInScene(scene.id.uuid, character.id.uuid)
         }
 
         @Test
+        /*
+        Given the scene ${scene} exists
+        and the scene ${scene} includes the character ${character}
+        When the user indicates that they want to cover character arc sections for this character in this scene
+        Then the system should respond with the available character arc sections for this character in this scene
+        and there should be no listed character arc sections
+         */
         fun `No character arcs exist for character`() {
+            // given
             givenSceneExists(withCharacterIncluded = true)
+            // when
             listAvailableCharacterArcsForCharacterInScene()
-            result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
+            // then
+            result shouldBe availableCharacterArcSectionsForCharacterInScene(
+                scene.id.uuid,
+                character.id.uuid
+            ) {
                 assertTrue(it.isEmpty())
             }
         }
 
         @Test
+        /*
+        Given the scene ${scene} exists
+        and the scene ${scene} includes the character ${character}
+        and a character arc with sections exists for this character
+        When the user indicates that they want to cover character arc sections for this character in this scene
+        Then the system should respond with the available character arc sections for this character in this scene
+        and
+         */
         fun `character arcs have sections`() {
+            // given
             givenSceneExists(withCharacterIncluded = true)
             val (baseArc) = givenCharacterHasCharacterArcs(count = 1)
             val baseSections = baseArc.arcSections
+            // when
             listAvailableCharacterArcsForCharacterInScene()
+            // then
             result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
                 val availableArc = it.single()
                 assertEquals(baseArc.name, availableArc.characterArcName)
@@ -286,14 +289,14 @@ class CoverCharacterArcSectionsInSceneUnitTest {
             vararg characterArcSectionIds: UUID,
             removeArcSectionsIds: List<UUID> = listOf()
         ) {
-            val request = CoverCharacterArcSectionsInScene.RequestModel.CoverSections(
+            val request = CoverCharacterArcSectionsInScene.RequestModel(
                 scene.id.uuid,
                 character.id.uuid,
                 removeArcSectionsIds,
                 *characterArcSectionIds
             )
             runBlocking {
-                useCase.coverSectionsInScene(request, output)
+                useCase.invoke(request, output)
             }
         }
 

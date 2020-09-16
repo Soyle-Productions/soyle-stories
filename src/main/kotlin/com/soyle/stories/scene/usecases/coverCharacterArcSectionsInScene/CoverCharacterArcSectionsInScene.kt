@@ -4,21 +4,13 @@ import java.util.*
 
 interface CoverCharacterArcSectionsInScene {
 
-    sealed class RequestModel {
-        abstract val sceneId: UUID
-        abstract val characterId: UUID
-
-        class ListAvailableArcs(override val sceneId: UUID, override val characterId: UUID) : RequestModel()
-        class CoverSections(override val sceneId: UUID, override val characterId: UUID, val removeSections: List<UUID>, vararg sections: UUID) : RequestModel()
-        {
-            val sections = sections.toList()
-        }
+    class RequestModel( val sceneId: UUID, val characterId: UUID, val removeSections: List<UUID>, vararg sections: UUID) {
+        val sections = sections.toList()
     }
 
-
-
     suspend fun listAvailableCharacterArcsForCharacterInScene(sceneId: UUID, characterId: UUID, output: OutputPort)
-    suspend fun coverSectionsInScene(request: RequestModel.CoverSections, output: OutputPort)
+    suspend operator fun invoke(request: RequestModel, output: OutputPort)
+
 
     class ResponseModel(
         val sectionsCoveredByScene: List<CharacterArcSectionCoveredByScene>,

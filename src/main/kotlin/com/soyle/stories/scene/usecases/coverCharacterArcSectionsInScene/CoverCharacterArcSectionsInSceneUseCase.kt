@@ -44,7 +44,7 @@ class CoverCharacterArcSectionsInSceneUseCase(
         )
     }
 
-    override suspend fun coverSectionsInScene(request: RequestModel.CoverSections, output: OutputPort) {
+    override suspend fun invoke(request: RequestModel, output: OutputPort) {
         val scene = getScene(request.sceneId, request.characterId)
         val sections = getCharacterArcSections(request)
 
@@ -74,7 +74,7 @@ class CoverCharacterArcSectionsInSceneUseCase(
         }
     }
 
-    private suspend fun getCharacterArcSections(request: RequestModel.CoverSections): List<CharacterArcSection> {
+    private suspend fun getCharacterArcSections(request: RequestModel): List<CharacterArcSection> {
         val requestedIdSet = (request.sections + request.removeSections).map(CharacterArcSection::Id).toSet()
         val sections = characterArcRepository.getCharacterArcsContainingArcSections(requestedIdSet)
             .asSequence().flatMap { it.arcSections.asSequence() }.filter { it.id in requestedIdSet }.toList()
