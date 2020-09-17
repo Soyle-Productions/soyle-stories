@@ -2,11 +2,12 @@ package com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene
 
 import java.util.*
 
-class RequiredCharacterArcSectionTypes(
-    list: List<RequiredCharacterArcSectionType>
-) : List<RequiredCharacterArcSectionType> by list
+class CharacterArcSectionTypes(
+    val requiredTypes: List<CharacterArcSectionType>,
+    val additionalTypes: List<CharacterArcSectionType>
+)
 
-class RequiredCharacterArcSectionType(
+class CharacterArcSectionType(
     val templateSectionId: UUID,
     val name: String
 )

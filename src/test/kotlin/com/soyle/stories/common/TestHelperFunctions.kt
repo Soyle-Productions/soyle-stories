@@ -4,6 +4,7 @@ import arrow.core.Either
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.*
+import kotlin.random.Random
 
 /**
  * Created by Brendan
@@ -30,4 +31,4 @@ infix fun <T : Any?> T.shouldBe(assertion: (T) -> Unit) = assertion(this)
 operator fun <T> Map<Boolean, T>.component1() = this[true]
 operator fun <T> Map<Boolean, T>.component2() = this[false]
 
-fun str() = UUID.randomUUID().toString().take(3)
+fun str() = (Math.random() * Int.MAX_VALUE).toInt().toString(16).take(3)

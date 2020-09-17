@@ -18,6 +18,10 @@ class CharacterRepositoryDouble(
 	val characters = initialCharacters.associateBy { it.id }.toMutableMap()
 	val characterArcs: MutableMap<Character.Id, MutableMap<Theme.Id, CharacterArc>> = WeakHashMap()
 
+	fun givenCharacter(character: Character) {
+		characters[character.id] = character
+	}
+
 	private val _updatedCharacters = mutableListOf<Character>()
 	val updatedCharacters: List<Character>
 		get() = _updatedCharacters

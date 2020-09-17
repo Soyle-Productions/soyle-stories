@@ -17,6 +17,12 @@ class SceneRepositoryDouble(
 	val scenes = initialScenes.associateBy { it.id }.toMutableMap()
 	val sceneOrder = initialScenes.groupBy { it.projectId }.mapValues { it.value.map(Scene::id) }.toMutableMap()
 
+	fun givenScene(scene: Scene)
+	{
+		scenes[scene.id] = scene
+		sceneOrder[scene.projectId] = sceneOrder[scene.projectId]?.plus(scene.id) ?: listOf(scene.id)
+	}
+
 	private val _persistedItems = mutableListOf<PersistenceLog>()
 	val persistedItems: List<PersistenceLog>
 		get() = _persistedItems

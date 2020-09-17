@@ -36,6 +36,19 @@ class CharacterArc private constructor(
 
     fun withNewName(name: String) = copy(name = name)
 
+    fun withArcSection(templateSection: CharacterArcTemplateSection, linkedLocation: Location.Id? = null, value: String = ""): CharacterArc
+    {
+        return copy(
+            arcSections = arcSections + CharacterArcSection(
+                CharacterArcSection.Id(UUID.randomUUID()),
+                characterId,
+                themeId,
+                templateSection,
+                linkedLocation,
+                value
+            )
+        )
+    }
     fun withArcSection(arcSection: CharacterArcSection): CharacterArc
     {
         return copy(

@@ -2,7 +2,7 @@ package com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene
 
 interface CreateCharacterArcSectionAndCoverInScene {
 
-    suspend fun listCharacterArcSectionTypesForNewArc()
+    suspend fun listAvailableCharacterArcSectionTypesForCharacterArc()
     suspend operator fun invoke()
 
 }
