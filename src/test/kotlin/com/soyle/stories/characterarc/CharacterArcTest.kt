@@ -1,11 +1,13 @@
 package com.soyle.stories.characterarc
 
+import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.str
 import com.soyle.stories.common.template
 import com.soyle.stories.entities.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.*
 
 class CharacterArcTest {
@@ -50,6 +52,32 @@ class CharacterArcTest {
 		assertEquals(requiredSections.size, arc.arcSections.size)
 		requiredSections.forEach { templateSection ->
 			arc.arcSections.find { it.template isSameEntityAs templateSection }!!
+		}
+	}
+
+	@Test
+	fun `Cannot add section with the same template if it does not allow multiple`() {
+		val templateWithMaxOfOne = template("", false, multiple = false)
+		val template = CharacterArcTemplate(listOf(
+			templateWithMaxOfOne
+		))
+		val arc = CharacterArc.planNewCharacterArc(characterId, themeId, name, template)
+			.withArcSection(templateWithMaxOfOne)
+		assertThrows<CharacterArcAlreadyContainsMaximumNumberOfTemplateSection> {
+			arc.withArcSection(templateWithMaxOfOne)
+		}.run {
+			arcId.mustEqual(arc.id.uuid)
+			characterId.mustEqual(arc.characterId.uuid)
+			themeId.mustEqual(arc.themeId.uuid)
+			templateSectionId.mustEqual(templateWithMaxOfOne.id.uuid)
+		}
+		assertThrows<CharacterArcAlreadyContainsMaximumNumberOfTemplateSection> {
+			arc.withArcSection(CharacterArcSection.planNewCharacterArcSection(characterId, themeId, templateWithMaxOfOne))
+		}.run {
+			arcId.mustEqual(arc.id.uuid)
+			characterId.mustEqual(arc.characterId.uuid)
+			themeId.mustEqual(arc.themeId.uuid)
+			templateSectionId.mustEqual(templateWithMaxOfOne.id.uuid)
 		}
 	}
 

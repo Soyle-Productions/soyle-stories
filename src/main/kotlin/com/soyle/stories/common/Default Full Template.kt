@@ -3,8 +3,8 @@ package com.soyle.stories.common
 import com.soyle.stories.entities.CharacterArcTemplateSection
 import java.util.*
 
-fun template(name: String, required: Boolean = true) = CharacterArcTemplateSection(
-    CharacterArcTemplateSection.Id(UUID.randomUUID()), name, required
+fun template(name: String, required: Boolean = true, multiple: Boolean = false) = CharacterArcTemplateSection(
+    CharacterArcTemplateSection.Id(UUID.randomUUID()), name, required, multiple
 )
 
 val PsychologicalWeakness = template("Psychological Weakness", false)

@@ -8,6 +8,7 @@ package com.soyle.stories.theme.usecases
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import com.soyle.stories.common.template
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
@@ -79,11 +80,7 @@ class ChangeThematicSectionValueTest {
 				CharacterArcSection.Id(thematicSectionUUID),
 				Character.Id(UUID.randomUUID()),
 				Theme.Id(UUID.randomUUID()),
-				CharacterArcTemplateSection(
-					CharacterArcTemplateSection.Id(
-						UUID.randomUUID()
-					), "", false
-				),
+				template("", false),
 			  null,
 				""
 			)

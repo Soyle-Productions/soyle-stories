@@ -2,6 +2,7 @@ package com.soyle.stories.entities
 
 import arrow.core.Either
 import arrow.core.right
+import com.soyle.stories.characterarc.CharacterArcAlreadyContainsMaximumNumberOfTemplateSection
 import com.soyle.stories.common.Entity
 import java.util.*
 
@@ -38,6 +39,11 @@ class CharacterArc private constructor(
 
     fun withArcSection(templateSection: CharacterArcTemplateSection, linkedLocation: Location.Id? = null, value: String = ""): CharacterArc
     {
+        if (! templateSection.allowsMultiple && arcSections.any { it.template isSameEntityAs templateSection }) {
+            throw CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
+                id.uuid, characterId.uuid, themeId.uuid, templateSection.id.uuid
+            )
+        }
         return copy(
             arcSections = arcSections + CharacterArcSection(
                 CharacterArcSection.Id(UUID.randomUUID()),
@@ -51,6 +57,11 @@ class CharacterArc private constructor(
     }
     fun withArcSection(arcSection: CharacterArcSection): CharacterArc
     {
+        if (! arcSection.template.allowsMultiple && arcSections.any { it.template isSameEntityAs arcSection.template }) {
+            throw CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
+                id.uuid, characterId.uuid, themeId.uuid, arcSection.template.id.uuid
+            )
+        }
         return copy(
             arcSections = arcSections + arcSection
         )

@@ -1,5 +1,6 @@
 package com.soyle.stories.characterarc
 
+import com.soyle.stories.common.DuplicateOperationException
 import com.soyle.stories.common.EntityNotFoundException
 import java.util.*
 
@@ -14,4 +15,12 @@ class CharacterArcNameCannotBeBlank(val characterId: UUID, val themeId: UUID) : 
 class CharacterArcDoesNotExist(val characterId: UUID, val themeId: UUID) : CharacterArcException()
 class CharacterArcSectionDoesNotExist(val characterArcSectionId: UUID) : CharacterArcException()
 
-class CharacterArcTemplateSectionDoesNotExist(val characterArcTemplateSectionId: UUID) : EntityNotFoundException(characterArcTemplateSectionId)
+class CharacterArcTemplateSectionDoesNotExist(val characterArcTemplateSectionId: UUID) :
+    EntityNotFoundException(characterArcTemplateSectionId)
+
+class CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
+    val arcId: UUID,
+    val characterId: UUID,
+    val themeId: UUID,
+    val templateSectionId: UUID,
+) : DuplicateOperationException()
