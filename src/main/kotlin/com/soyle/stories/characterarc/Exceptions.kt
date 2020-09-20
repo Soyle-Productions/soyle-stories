@@ -2,6 +2,7 @@ package com.soyle.stories.characterarc
 
 import com.soyle.stories.common.DuplicateOperationException
 import com.soyle.stories.common.EntityNotFoundException
+import com.soyle.stories.common.ValidationException
 import java.util.*
 
 /**
@@ -24,3 +25,10 @@ class CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
     val themeId: UUID,
     val templateSectionId: UUID,
 ) : DuplicateOperationException()
+
+class TemplateSectionIsNotPartOfArcSection(
+    val arcId: UUID,
+    val characterId: UUID,
+    val themeId: UUID,
+    val templateSectionId: UUID
+) : ValidationException()

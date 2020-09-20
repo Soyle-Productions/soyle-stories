@@ -1,7 +1,10 @@
 package com.soyle.stories.scene.usecases
 
+import arrow.given
 import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.characterarc.CharacterArcAlreadyContainsMaximumNumberOfTemplateSection
 import com.soyle.stories.characterarc.CharacterArcDoesNotExist
+import com.soyle.stories.characterarc.CharacterArcTemplateSectionDoesNotExist
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
@@ -10,21 +13,32 @@ import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcTemplate
 import com.soyle.stories.entities.CharacterArcTemplateSection
+import com.soyle.stories.entities.Scene
+import com.soyle.stories.scene.SceneDoesNotExist
+import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInSceneUseCase
 import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.util.*
 
 class CreateCharacterArcSectionAndCoverInSceneUnitTest {
 
     // Preconditions
     private val character = makeCharacter()
     private val theme = makeTheme()
+    private val scene = makeScene().withCharacterIncluded(character)
+
+    // post conditions
+    private var updatedArc: CharacterArc? = null
+    private var updatedScene: Scene? = null
 
     // output
     private var result: Any? = null
@@ -163,23 +177,169 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
 
     }
 
+    @Nested
+    inner class `Invokation` {
+
+        private val sectionTemplateId = CharacterArcTemplateSection.Id(UUID.randomUUID())
+
+        @Test
+        fun `Character Arc Must exist`() {
+            // when
+            val error = assertThrows<CharacterArcDoesNotExist> {
+                invoke()
+            }
+            // then
+            with(error) {
+                characterId.mustEqual(character.id.uuid)
+                themeId.mustEqual(theme.id.uuid)
+            }
+        }
+
+        @Test
+        fun `Template Section must be part of character arc template`() {
+            // given
+            characterArcRepository.givenCharacterArc(
+                CharacterArc.planNewCharacterArc(
+                    character.id,
+                    theme.id,
+                    theme.name
+                )
+            )
+            // when
+            val error = assertThrows<CharacterArcTemplateSectionDoesNotExist> {
+                invoke()
+            }
+            // then
+            with(error) {
+                characterArcTemplateSectionId.mustEqual(sectionTemplateId.uuid)
+            }
+        }
+
+        @Test
+        fun `Template section cannot be used twice if it doesn't allow multiple`() {
+            val templateSection =
+                CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", isRequired = false, allowsMultiple = false)
+            val arc = givenCharacterArcBasedOnTemplateSections(listOf(templateSection)) {
+                withArcSection(templateSection)
+            }
+            sceneRepository.givenScene(scene)
+            // when
+            val error = assertThrows<CharacterArcAlreadyContainsMaximumNumberOfTemplateSection> {
+                invoke()
+            }
+            // then
+            with (error) {
+                characterId.mustEqual(character.id.uuid)
+                themeId.mustEqual(theme.id.uuid)
+                arcId.mustEqual(arc.id.uuid)
+                templateSectionId.mustEqual(sectionTemplateId.uuid)
+            }
+        }
+
+        @Test
+        fun `Scene must exist`() {
+            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true)
+            givenCharacterArcBasedOnTemplateSections(listOf(templateSection))
+            // when
+            val error = assertThrows<SceneDoesNotExist> {
+                invoke()
+            }
+            // then
+            with (error) {
+                sceneId.mustEqual(scene.id.uuid)
+            }
+        }
+
+        @Test
+        fun `New arc section must be created with template`() {
+            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true)
+            val arc = givenCharacterArcBasedOnTemplateSections(listOf(templateSection))
+            sceneRepository.givenScene(scene)
+            val inputValue = "New section value ${str()}"
+            // when
+            invoke(value = inputValue)
+            // then
+            with (updatedArc!!) {
+                assertTrue(isSameEntityAs(arc))
+                arcSections.size.mustEqual(arc.arcSections.size + 1)
+                val newSection = arcSections.find { it.template == templateSection && it !in arc.arcSections }!!
+                newSection.value.mustEqual(inputValue)
+            }
+            (result as CreateCharacterArcSectionAndCoverInScene.ResponseModel)
+                .createdCharacterArcSection.run {
+                    val newSection = updatedArc!!.arcSections.find { it.template == templateSection && it !in arc.arcSections }!!
+                    characterArcSectionId.mustEqual(newSection.id.uuid)
+                    arcId.mustEqual(arc.id.uuid)
+                    characterId.mustEqual(arc.characterId.uuid)
+                    themeId.mustEqual(arc.themeId.uuid)
+                    templateSectionId.mustEqual(templateSection.id.uuid)
+                    templateSectionName.mustEqual(templateSection.name)
+                    value.mustEqual(inputValue)
+                }
+        }
+
+        @Test
+        fun `Scene should cover new arc section`() {
+            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true)
+            val arc = givenCharacterArcBasedOnTemplateSections(listOf(templateSection))
+            sceneRepository.givenScene(scene)
+            val inputValue = "New section value ${str()}"
+            // when
+            invoke(value = inputValue)
+            // then
+            val newSection = updatedArc!!.arcSections.find { it.template == templateSection && it !in arc.arcSections }!!
+            with (updatedScene!!) {
+                assertTrue(isSameEntityAs(scene))
+                assertTrue(isCharacterArcSectionCovered(newSection.id)) { "Scene does not contain section." }
+            }
+            (result as CreateCharacterArcSectionAndCoverInScene.ResponseModel)
+                .characterArcSectionCoveredByScene.run {
+                    characterArcSectionId.mustEqual(newSection.id.uuid)
+                    sceneId.mustEqual(scene.id.uuid)
+                    characterId.mustEqual(character.id.uuid)
+                    themeId.mustEqual(arc.themeId.uuid)
+                }
+        }
+
+        fun invoke(value: String = "") {
+            runBlocking {
+                useCase.invoke(
+                    CreateCharacterArcSectionAndCoverInScene.RequestModel(
+                        theme.id.uuid,
+                        character.id.uuid,
+                        scene.id.uuid,
+                        sectionTemplateId.uuid,
+                        value
+                    ),
+                    output
+                )
+            }
+        }
+
+    }
+
     private fun givenCharacterArcBasedOnTemplateSections(
         templateSections: List<CharacterArcTemplateSection>,
         and: CharacterArc.() -> CharacterArc = { this }
-    ) {
-        characterArcRepository.givenCharacterArc(
-            CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name, CharacterArcTemplate(templateSections))
-                .and()
-        )
+    ): CharacterArc {
+        val arc = CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name, CharacterArcTemplate(templateSections))
+            .and()
+        characterArcRepository.givenCharacterArc(arc)
+        return arc
     }
 
-    private val characterArcRepository = CharacterArcRepositoryDouble()
+    private val characterArcRepository = CharacterArcRepositoryDouble(onUpdateCharacterArc = ::updatedArc::set)
+    private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::updatedScene::set)
 
     private val useCase: CreateCharacterArcSectionAndCoverInScene =
-        CreateCharacterArcSectionAndCoverInSceneUseCase(characterArcRepository)
+        CreateCharacterArcSectionAndCoverInSceneUseCase(characterArcRepository, sceneRepository)
 
     private val output = object : CreateCharacterArcSectionAndCoverInScene.OutputPort {
         override suspend fun receiveAvailableCharacterArcSectionTypesForCharacterArc(response: AvailableCharacterArcSectionTypesForCharacterArc) {
+            result = response
+        }
+
+        override suspend fun characterArcCreatedAndCoveredInScene(response: CreateCharacterArcSectionAndCoverInScene.ResponseModel) {
             result = response
         }
     }

@@ -81,4 +81,27 @@ class CharacterArcTest {
 		}
 	}
 
+	@Test
+	fun `cannot add section with template that is not in arc template`() {
+		val templateSection = template("", false, true)
+		val template = CharacterArcTemplate(listOf())
+		val arc = CharacterArc.planNewCharacterArc(characterId, themeId, name, template)
+		assertThrows<TemplateSectionIsNotPartOfArcSection> {
+			arc.withArcSection(templateSection)
+		}.run {
+			arcId.mustEqual(arc.id.uuid)
+			characterId.mustEqual(arc.characterId.uuid)
+			themeId.mustEqual(arc.themeId.uuid)
+			templateSectionId.mustEqual(templateSection.id.uuid)
+		}
+		assertThrows<TemplateSectionIsNotPartOfArcSection> {
+			arc.withArcSection(CharacterArcSection.planNewCharacterArcSection(characterId, themeId, templateSection))
+		}.run {
+			arcId.mustEqual(arc.id.uuid)
+			characterId.mustEqual(arc.characterId.uuid)
+			themeId.mustEqual(arc.themeId.uuid)
+			templateSectionId.mustEqual(templateSection.id.uuid)
+		}
+	}
+
 }

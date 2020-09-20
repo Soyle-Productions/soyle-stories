@@ -16,7 +16,9 @@ class CharacterArcTemplate(
         private val defaultTemplate by lazy {
             CharacterArcTemplate(
                 listOf(
+                    PsychologicalWeakness,
                     PsychologicalNeed,
+                    MoralWeakness,
                     MoralNeed,
                     Desire,
                     Opponent,

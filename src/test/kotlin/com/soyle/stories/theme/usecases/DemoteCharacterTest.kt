@@ -217,6 +217,7 @@ class DemoteCharacterTest {
                 themeId,
                 characterId,
                 output.result,
+                initialCharacterArcs.find { it.themeId.uuid == themeId },
                 emptyList(),
                 updatedThemes,
                 deletedThemes,
@@ -230,6 +231,7 @@ class DemoteCharacterTest {
         val themeId: UUID,
         val characterId: UUID,
         val output: Any?,
+        val initialCharacterArc: CharacterArc?,
         val addedThemes: List<Any?>,
         val updatedThemes: List<Any?>,
         val removedThemes: List<Any?>,
@@ -237,9 +239,10 @@ class DemoteCharacterTest {
         val removedCharacterArc: Any?
     ) {
 
-        val sectionIdsThatShouldBeRemoved = CharacterArcTemplate.default()
-            .sections.map { it.id }
-            .toSet()
+        val sectionIdsThatShouldBeRemoved = initialCharacterArc
+            ?.arcSections
+            ?.map { it.id }
+            ?.toSet()
 
         fun assert(block: DemoteCharacterAssertions.() -> Unit) {
             block()
@@ -257,7 +260,7 @@ class DemoteCharacterTest {
         fun assertOutputContainsAllSections() {
             output as DemoteMajorCharacter.ResponseModel
             assertEquals(
-                sectionIdsThatShouldBeRemoved.size,
+                sectionIdsThatShouldBeRemoved?.size ?: 0,
                 output.removedCharacterArcSections.size
             )
         }

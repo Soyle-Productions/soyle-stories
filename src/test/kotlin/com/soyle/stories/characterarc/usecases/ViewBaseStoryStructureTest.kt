@@ -149,7 +149,7 @@ class ViewBaseStoryStructureTest {
 
     private fun assertOnlyRequiredSectionsInOutput(response: ViewBaseStoryStructure.ResponseModel)
     {
-        val requiredSections = CharacterArcTemplate.default().sections.map { it.name }.toSet()
+        val requiredSections = CharacterArcTemplate.default().sections.filter { it.isRequired }.map { it.name }.toSet()
         assertEquals(requiredSections, response.sections.map { it.templateName }.toSet())
     }
 

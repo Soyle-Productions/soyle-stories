@@ -28,7 +28,7 @@ class ChangeThematicSectionValueTest {
 			characterArcSections.groupBy { it.themeId to it.characterId }
 				.map {
 					it.value.fold(
-						CharacterArc.planNewCharacterArc(it.key.second, it.key.first, "")
+						CharacterArc.planNewCharacterArc(it.key.second, it.key.first, "", CharacterArcTemplate(it.value.map { it.template }))
 					) { arc, section ->
 						arc.withArcSection(section)
 					}

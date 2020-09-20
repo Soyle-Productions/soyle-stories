@@ -58,11 +58,12 @@ class UnlinkLocationFromCharacterArcSectionUnitTest {
 		val arcSections = characterArcSectionIds.map {
 			makeCharacterArcSection(id = CharacterArcSection.Id(it), template = template("Template ${str()}", false), linkedLocation = linkedLocationIds.firstOrNull()?.let(Location::Id))
 		}
+		val templateSections = arcSections.map { it.template }
 		characterArcRepository = CharacterArcRepositoryDouble(
 			onUpdateCharacterArc = ::updatedCharacterArc::set
 		).apply {
 			arcSections.forEach {
-				givenCharacterArc(CharacterArc.planNewCharacterArc(it.characterId, it.themeId, "").withArcSection(it))
+				givenCharacterArc(CharacterArc.planNewCharacterArc(it.characterId, it.themeId, "", CharacterArcTemplate(templateSections)).withArcSection(it))
 			}
 		}
 	}

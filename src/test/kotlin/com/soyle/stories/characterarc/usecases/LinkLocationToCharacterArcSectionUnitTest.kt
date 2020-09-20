@@ -70,11 +70,12 @@ class LinkLocationToCharacterArcSectionUnitTest {
         val arcSections = characterArcSectionIds.map {
             makeCharacterArcSection(id = CharacterArcSection.Id(it), template = template("Template ${str()}", false), linkedLocation = locations.firstOrNull()?.takeIf { isLinked }?.id)
         }
+        val sectionTemplates = arcSections.map { it.template }
         characterArcRepository = CharacterArcRepositoryDouble(
             onUpdateCharacterArc = ::updatedCharacterArc::set
         ).apply {
             arcSections.forEach {
-                givenCharacterArc(CharacterArc.planNewCharacterArc(it.characterId, it.themeId, "").withArcSection(it))
+                givenCharacterArc(CharacterArc.planNewCharacterArc(it.characterId, it.themeId, "", CharacterArcTemplate(sectionTemplates)).withArcSection(it))
             }
         }
         locationRepository = LocationRepositoryDouble(initialLocations = locations)

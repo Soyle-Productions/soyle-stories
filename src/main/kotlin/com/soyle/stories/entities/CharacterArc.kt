@@ -3,6 +3,7 @@ package com.soyle.stories.entities
 import arrow.core.Either
 import arrow.core.right
 import com.soyle.stories.characterarc.CharacterArcAlreadyContainsMaximumNumberOfTemplateSection
+import com.soyle.stories.characterarc.TemplateSectionIsNotPartOfArcSection
 import com.soyle.stories.common.Entity
 import java.util.*
 
@@ -39,6 +40,11 @@ class CharacterArc private constructor(
 
     fun withArcSection(templateSection: CharacterArcTemplateSection, linkedLocation: Location.Id? = null, value: String = ""): CharacterArc
     {
+        if (template.sections.none { it isSameEntityAs templateSection}) {
+            throw TemplateSectionIsNotPartOfArcSection(
+                id.uuid, characterId.uuid, themeId.uuid, templateSection.id.uuid
+            )
+        }
         if (! templateSection.allowsMultiple && arcSections.any { it.template isSameEntityAs templateSection }) {
             throw CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
                 id.uuid, characterId.uuid, themeId.uuid, templateSection.id.uuid
@@ -57,6 +63,11 @@ class CharacterArc private constructor(
     }
     fun withArcSection(arcSection: CharacterArcSection): CharacterArc
     {
+        if (template.sections.none { it isSameEntityAs arcSection.template}) {
+            throw TemplateSectionIsNotPartOfArcSection(
+                id.uuid, characterId.uuid, themeId.uuid, arcSection.template.id.uuid
+            )
+        }
         if (! arcSection.template.allowsMultiple && arcSections.any { it.template isSameEntityAs arcSection.template }) {
             throw CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
                 id.uuid, characterId.uuid, themeId.uuid, arcSection.template.id.uuid
