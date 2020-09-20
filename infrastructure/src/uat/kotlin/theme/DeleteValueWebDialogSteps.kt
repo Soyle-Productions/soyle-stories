@@ -1,19 +1,16 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
-import com.soyle.stories.theme.deleteSymbolDialog.DeleteSymbolDialog
 import com.soyle.stories.theme.deleteValueWebDialog.DeleteValueWebDialog
 import com.soyle.stories.writer.DialogType
 import com.soyle.stories.writer.WriterSteps
 import io.cucumber.java8.En
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.testfx.framework.junit5.ApplicationTest

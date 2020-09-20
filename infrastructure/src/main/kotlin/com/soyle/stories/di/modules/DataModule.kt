@@ -15,7 +15,6 @@ import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.storyevent.repositories.StoryEventRepository
 import com.soyle.stories.theme.Context
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.workspace.repositories.FileRepository
 import com.soyle.stories.workspace.repositories.WorkspaceRepository
@@ -70,13 +69,6 @@ object DataModule {
 			  com.soyle.stories.character.repositories.ThemeRepository::class
 			) { ThemeRepositoryImpl() }
 
-			provide(
-			  CharacterArcSectionRepository::class,
-			  com.soyle.stories.location.repositories.CharacterArcSectionRepository::class
-			) {
-				CharacterArcSectionRepositoryImpl()
-			}
-
 			provide<LocationRepository> {
 				LocationRepositoryImpl()
 			}
@@ -115,7 +107,6 @@ object DataModule {
 
 class ContextDouble(scope: ProjectScope) : Context, com.soyle.stories.layout.Context {
 	override val characterArcRepository: com.soyle.stories.theme.repositories.CharacterArcRepository by DI.resolveLater(scope)
-	override val characterArcSectionRepository: CharacterArcSectionRepository by DI.resolveLater(scope)
 	override val characterRepository: com.soyle.stories.theme.repositories.CharacterRepository by DI.resolveLater(scope)
 	override val themeRepository: ThemeRepository by DI.resolveLater(scope)
 	override val layoutRepository: LayoutRepository by DI.resolveLater(scope)

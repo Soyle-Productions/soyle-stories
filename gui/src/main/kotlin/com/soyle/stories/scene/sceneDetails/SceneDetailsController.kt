@@ -46,6 +46,10 @@ class SceneDetailsController(
 		removeCharacterFromStoryEventController.removeCharacter(storyEventId, characterId)
 	}
 
+	override fun getAvailableCharacterArcSections(characterId: String) {
+
+	}
+
 	override fun setMotivation(characterId: String, motivation: String) {
 		setMotivationForCharacterInSceneController.setMotivationForCharacter(sceneId.toString(), characterId, motivation)
 	}

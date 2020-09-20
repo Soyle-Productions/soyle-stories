@@ -26,7 +26,8 @@ data class SceneDetailsCharacterViewModel(
   val characterName: String,
   val motivation: String,
   val previousMotivationSource: SceneDetailsPreviousSceneViewModel?,
-  val canReset: Boolean
+  val canReset: Boolean,
+  val characterArcSections: List<Unit> = listOf()
 )
 
 class SceneDetailsPreviousSceneViewModel(

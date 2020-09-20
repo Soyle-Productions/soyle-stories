@@ -98,10 +98,10 @@ object CharacterArcModule {
             CompareCharactersUseCase(get())
         }
         provide<IncludeCharacterInComparison> {
-            IncludeCharacterInComparisonUseCase(get(), get(), get())
+            IncludeCharacterInComparisonUseCase(get(), get())
         }
         provide<PromoteMinorCharacter> {
-            PromoteMinorCharacterUseCase(get(), get(), get())
+            PromoteMinorCharacterUseCase(get(), get())
         }
         provide<DemoteMajorCharacter> {
             DemoteMajorCharacterUseCase(get())

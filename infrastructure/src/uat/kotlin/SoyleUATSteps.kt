@@ -436,7 +436,7 @@ class SoyleUATSteps : En, ApplicationTest() {
 		Then("the Confirm Delete Character Dialog should be opened") {
 			assertTrue(CharacterDriver.isConfirmDeleteCharacterDialogOpen(double))
 			targetObject = CharacterDriver.getCharacterSelectedInCharacterListTool(double)!!.let {
-				Character(Character.Id(UUID.fromString(it.id)), Project.Id(), it.name, null, listOf())
+				Character(Character.Id(UUID.fromString(it.id)), Project.Id(), it.name, null)
 			}
 		}
 		Then("the Confirm Delete Character Dialog should show the Character name") {

@@ -15,7 +15,6 @@ class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 	companion object : ApplicationTest()
 
 	init {
-		CharacterComparisonSteps(en, double)
 		CharacterValueComparisonSteps(en, double)
 		with(en) {
 
