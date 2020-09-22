@@ -132,6 +132,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                     assertEquals(baseSection.template.name, section.templateName)
                     assertEquals(baseSection.value, section.sectionValue)
                     assertFalse(section.usedInScene)
+                    assertEquals(baseSection.template.allowsMultiple, section.isMultiTemplate)
                 }
             }
         }
@@ -152,6 +153,28 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                     assertEquals(baseSection.template.name, section.templateName)
                     assertEquals(baseSection.value, section.sectionValue)
                     assertEquals(baseSection == baseSections.first(), section.usedInScene)
+                    assertEquals(baseSection.template.allowsMultiple, section.isMultiTemplate)
+                }
+            }
+        }
+
+        @Test
+        fun `Arc Sections must output if template allows multiple`() {
+            givenSceneExists(withCharacterIncluded = true)
+            val template = CharacterArcTemplate(List(5) {
+                template("Template ${str()}", true, it % 2 == 0)
+            })
+            val baseArc = givenCharacterHasCharacterArcs(count = 1,template).single()
+            val baseSections = baseArc.arcSections
+            givenSceneCoversSections(baseSections.first())
+            listAvailableCharacterArcsForCharacterInScene()
+            result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
+                val availableArc = it.single()
+                assertEquals(baseArc.name, availableArc.characterArcName)
+                assertEquals(baseSections.map { it.id.uuid }.toSet(), availableArc.map { it.arcSectionId }.toSet())
+                availableArc.forEach { section ->
+                    val baseSection = baseSections.single { it.id.uuid == section.arcSectionId }
+                    assertEquals(baseSection.template.allowsMultiple, section.isMultiTemplate)
                 }
             }
         }
@@ -314,12 +337,13 @@ class CoverCharacterArcSectionsInSceneUnitTest {
         }
     }
 
-    private fun givenCharacterHasCharacterArcs(count: Int): List<CharacterArc> {
+    private fun givenCharacterHasCharacterArcs(count: Int, template: CharacterArcTemplate = CharacterArcTemplate.default()): List<CharacterArc> {
         return List(count) {
             val arc = CharacterArc.planNewCharacterArc(
                 character.id,
                 Theme.Id(),
-                "Character Arc ${str()}"
+                "Character Arc ${str()}",
+                template
             )
             characterArcRepository.givenCharacterArc(arc)
             arc

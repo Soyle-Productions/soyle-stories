@@ -36,7 +36,8 @@ class CoverCharacterArcSectionsInSceneUseCase(
                             it.id.uuid,
                             it.template.name,
                             it.value,
-                            scene.isCharacterArcSectionCovered(it.id)
+                            scene.isCharacterArcSectionCovered(it.id),
+                            it.template.allowsMultiple
                         )
                     }
                 )

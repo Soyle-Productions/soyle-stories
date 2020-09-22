@@ -19,5 +19,6 @@ class ArcSectionUsedInScene(
     val arcSectionId: UUID,
     val templateName: String,
     val sectionValue: String,
-    val usedInScene: Boolean
+    val usedInScene: Boolean,
+    val isMultiTemplate: Boolean
 )
