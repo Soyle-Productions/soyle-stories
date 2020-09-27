@@ -13,6 +13,24 @@ import java.util.*
 class SceneTest {
 
     @Test
+    fun `scene includes character`() {
+        val character = makeCharacter()
+        val scene = makeScene()
+        assert(
+            scene.withCharacterIncluded(character).includesCharacter(character.id)
+        )
+    }
+
+    @Test
+    fun `Scene cannot include character twice`() {
+        val character = makeCharacter()
+        val scene = makeScene().withCharacterIncluded(character)
+        assertThrows<SceneAlreadyContainsCharacter> {
+            scene.withCharacterIncluded(character)
+        } shouldBe sceneAlreadyContainsCharacter(scene.id.uuid, character.id.uuid)
+    }
+
+    @Test
     fun `scene covers character arc section`() {
         val character = Character.buildNewCharacter(Project.Id(), "")
         val characterArcSection = makeCharacterArcSection(characterId = character.id)

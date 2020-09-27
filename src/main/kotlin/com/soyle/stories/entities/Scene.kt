@@ -2,6 +2,7 @@ package com.soyle.stories.entities
 
 import com.soyle.stories.common.Entity
 import com.soyle.stories.scene.CharacterNotInScene
+import com.soyle.stories.scene.SceneAlreadyContainsCharacter
 import java.util.*
 
 class Scene(
@@ -55,7 +56,10 @@ class Scene(
 	) = Scene(id, projectId, name, storyEventId, locationId, charactersInScene)
 
 	fun withName(newName: String) = copy(name = newName)
-	fun withCharacterIncluded(character: Character) = copy(charactersInScene = charactersInScene + CharacterInScene(character.id, id, character.name, null, listOf()))
+	fun withCharacterIncluded(character: Character): Scene {
+		if (includesCharacter(character.id)) throw SceneAlreadyContainsCharacter(id.uuid, character.id.uuid)
+		return copy(charactersInScene = charactersInScene + CharacterInScene(character.id, id, character.name, null, listOf()))
+	}
 	fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene
 	{
 		if (! includesCharacter(characterId)) throw CharacterNotInScene(id.uuid, characterId.uuid)

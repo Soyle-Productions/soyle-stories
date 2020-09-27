@@ -3,9 +3,10 @@ package com.soyle.stories.scene.usecases.getSceneDetails
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.repositories.SceneRepository
-import com.soyle.stories.scene.usecases.common.IncludedCharacterDetails
+import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
 import com.soyle.stories.scene.usecases.common.getLastSetMotivation
 import com.soyle.stories.scene.usecases.common.getScenesBefore
+import java.util.*
 
 class GetSceneDetailsUseCase(
   private val sceneRepository: SceneRepository
@@ -32,12 +33,13 @@ class GetSceneDetailsUseCase(
 	  sceneRepository.getSceneById(Scene.Id(request.sceneId))
 		?: throw SceneDoesNotExist(request.locale, request.sceneId)
 
-	private suspend fun getIncludedCharacterDetails(scene: Scene): List<IncludedCharacterDetails>
+	private suspend fun getIncludedCharacterDetails(scene: Scene): List<IncludedCharacterInScene>
 	{
 		val scenesBefore = getScenesBefore(scene, sceneRepository).asReversed()
 		return scene.includedCharacters.map {
 			val motivation = scene.getMotivationForCharacter(it.characterId)!!
-			IncludedCharacterDetails(it.characterId.uuid, it.characterName, motivation.motivation,
+			IncludedCharacterInScene(
+				scene.id.uuid, it.characterId.uuid, it.characterName, motivation.motivation,
 			  getLastSetMotivation(scenesBefore, it.characterId)
 			)
 		}

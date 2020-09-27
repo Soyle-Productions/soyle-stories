@@ -7,7 +7,7 @@ import com.soyle.stories.scene.charactersInScene
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.sceneDoesNotExist
-import com.soyle.stories.scene.usecases.common.IncludedCharacterDetails
+import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetailsUseCase
 import kotlinx.coroutines.runBlocking
@@ -123,10 +123,11 @@ class GetSceneDetailsUnitTest {
 			val expectedCharacters = includedCharacters.associateBy { it.characterId.uuid }
 			assertEquals(
 			  expectedCharacters.keys,
-			  actual.characters.map(IncludedCharacterDetails::characterId).toSet()
+			  actual.characters.map(IncludedCharacterInScene::characterId).toSet()
 			)
 			actual.characters.forEach {
 				val expectedCharacter = expectedCharacters.getValue(it.characterId)
+				assertEquals(sceneId.uuid, it.sceneId)
 				assertEquals(expectedCharacter.characterName, it.characterName)
 				assertEquals(expectedCharacter.motivation, it.motivation)
 			}

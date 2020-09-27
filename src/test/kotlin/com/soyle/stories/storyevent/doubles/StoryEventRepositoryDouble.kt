@@ -12,7 +12,11 @@ class StoryEventRepositoryDouble(
   private val onUpdateStoryEvent: (StoryEvent) -> Unit = {}
 ) : StoryEventRepository {
 
-	val storyEvents = initialStoryEvents.associateBy { it.id }.toMutableMap()
+	private val storyEvents = initialStoryEvents.associateBy { it.id }.toMutableMap()
+
+	fun givenStoryEvent(storyEvent: StoryEvent) {
+		storyEvents[storyEvent.id] = storyEvent
+	}
 
 	override suspend fun addNewStoryEvent(storyEvent: StoryEvent) {
 		storyEvents[storyEvent.id] = storyEvent
