@@ -15,6 +15,7 @@ import com.soyle.stories.entities.CharacterArcTemplate
 import com.soyle.stories.entities.CharacterArcTemplateSection
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.SceneDoesNotExist
+import com.soyle.stories.scene.characterArcSectionCoveredByScene
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
@@ -298,6 +299,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
                     sceneId.mustEqual(scene.id.uuid)
                     characterId.mustEqual(character.id.uuid)
                     themeId.mustEqual(arc.themeId.uuid)
+                    this shouldBe characterArcSectionCoveredByScene(newSection, arc, scene.id.uuid)
                 }
         }
 

@@ -5,15 +5,9 @@ import com.soyle.stories.characterarc.CharacterArcSectionDoesNotExist
 import com.soyle.stories.common.*
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.*
-import com.soyle.stories.scene.CharacterNotInScene
-import com.soyle.stories.scene.SceneDoesNotExist
-import com.soyle.stories.scene.characterNotInScene
+import com.soyle.stories.scene.*
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
-import com.soyle.stories.scene.sceneDoesNotExist
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
@@ -255,10 +249,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                         it.characterId
                     ) { "Unexpected characterId for CharacterArcSectionCoveredByScene" }
                     val baseSection = baseSections.getValue(it.characterArcSectionId)
-                    assertEquals(
-                        baseSection.themeId.uuid,
-                        it.themeId
-                    ) { "Unexpected themeId for CharacterArcSectionCoveredByScene" }
+                    it shouldBe characterArcSectionCoveredByScene(baseSection, characterArc, scene.id.uuid)
                 }
                 assert(sectionsUncovered.isEmpty()) { "No sections should have been uncovered" }
             }
@@ -296,10 +287,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                         it.characterId
                     ) { "Unexpected characterId for CharacterArcSectionCoveredByScene" }
                     val baseSection = baseSections.getValue(it.characterArcSectionId)
-                    assertEquals(
-                        baseSection.themeId.uuid,
-                        it.themeId
-                    ) { "Unexpected themeId for CharacterArcSectionCoveredByScene" }
+                    it shouldBe characterArcSectionCoveredByScene(baseSection, characterArc, scene.id.uuid)
                 }
                 sectionsUncovered.single().run {
                     characterArcSectionId.mustEqual(characterArcSections.first().id.uuid) { "Unexpected characterArcSectionId for CharacterArcSectionUncoveredInScene" }

@@ -6,5 +6,9 @@ class CharacterArcSectionCoveredByScene(
     val sceneId: UUID,
     val characterId: UUID,
     val themeId: UUID,
-    val characterArcSectionId: UUID
+    val characterArcId: UUID,
+    val characterArcSectionId: UUID,
+    val characterArcSectionName: String,
+    val characterArcSectionValue: String,
+    val characterArcName: String
 )

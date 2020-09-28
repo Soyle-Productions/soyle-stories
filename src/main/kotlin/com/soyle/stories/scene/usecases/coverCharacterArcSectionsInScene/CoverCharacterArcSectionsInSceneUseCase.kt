@@ -47,15 +47,27 @@ class CoverCharacterArcSectionsInSceneUseCase(
 
     override suspend fun invoke(request: RequestModel, output: OutputPort) {
         val scene = getScene(request.sceneId, request.characterId)
-        val sections = getCharacterArcSections(request)
+        val sectionsByArcs = getCharacterArcSections(request)
+        val sections = sectionsByArcs.values.flatten()
 
         val removeSectionIdSet = request.removeSections.toSet()
         val updatedScene = scene.withCharacterArcSectionsCovered(sections.filter { it.id.uuid !in removeSectionIdSet })
             .withCharacterArcSectionsUncovered(sections.filter { it.id.uuid in removeSectionIdSet })
         sceneRepository.updateScene(updatedScene)
 
-        val coveredSections = sections.map {
-            CharacterArcSectionCoveredByScene(scene.id.uuid, request.characterId, it.themeId.uuid, it.id.uuid)
+        val coveredSections = sectionsByArcs.flatMap { (arc, sections) ->
+            sections.map { section ->
+                CharacterArcSectionCoveredByScene(
+                    scene.id.uuid,
+                    request.characterId,
+                    section.themeId.uuid,
+                    arc.id.uuid,
+                    section.id.uuid,
+                    section.template.name,
+                    section.value,
+                    arc.name
+                )
+            }
         }
         val responseModel = ResponseModel(coveredSections, request.removeSections.map {
             CharacterArcSectionUncoveredInScene(scene.id.uuid, request.characterId, it)
@@ -75,11 +87,14 @@ class CoverCharacterArcSectionsInSceneUseCase(
         }
     }
 
-    private suspend fun getCharacterArcSections(request: RequestModel): List<CharacterArcSection> {
+    private suspend fun getCharacterArcSections(request: RequestModel): Map<CharacterArc, List<CharacterArcSection>> {
         val requestedIdSet = (request.sections + request.removeSections).map(CharacterArcSection::Id).toSet()
         val sections = characterArcRepository.getCharacterArcsContainingArcSections(requestedIdSet)
-            .asSequence().flatMap { it.arcSections.asSequence() }.filter { it.id in requestedIdSet }.toList()
-        verifyAllRequestedCharacterArcSectionsExist(requestedIdSet, sections)
+            .asSequence()
+            .map { arc ->
+                arc to arc.arcSections.filter { it.id in requestedIdSet }
+            }.toMap()
+        verifyAllRequestedCharacterArcSectionsExist(requestedIdSet, sections.values.flatten())
         return sections
     }
 

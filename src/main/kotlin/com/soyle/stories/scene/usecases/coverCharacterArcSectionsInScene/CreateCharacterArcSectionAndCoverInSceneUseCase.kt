@@ -68,7 +68,14 @@ class CreateCharacterArcSectionAndCoverInSceneUseCase(
             CreateCharacterArcSectionAndCoverInScene.ResponseModel(
                 CreatedCharacterArcSection(arc.id, newSection),
                 CharacterArcSectionCoveredByScene(
-                    scene.id.uuid, arc.characterId.uuid, arc.themeId.uuid, newSection.id.uuid,
+                    scene.id.uuid,
+                    arc.characterId.uuid,
+                    arc.themeId.uuid,
+                    arc.id.uuid,
+                    newSection.id.uuid,
+                    newSection.template.name,
+                    newSection.value,
+                    arc.name
                 )
             )
         )

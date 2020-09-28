@@ -94,11 +94,16 @@ class CreateCharacterArcAndCoverSectionsInSceneUseCase(
         }
         sceneRepository.updateScene(updatedScene)
         return requestedTemplateIds.map {
+            val createdArcSection = createdArcSectionsByTemplateId.getValue(it)
             CharacterArcSectionCoveredByScene(
                 scene.id.uuid,
                 arc.characterId.uuid,
                 arc.themeId.uuid,
-                createdArcSectionsByTemplateId.getValue(it).id.uuid
+                arc.id.uuid,
+                createdArcSection.id.uuid,
+                createdArcSection.template.name,
+                createdArcSection.value,
+                arc.name
             )
         }
     }

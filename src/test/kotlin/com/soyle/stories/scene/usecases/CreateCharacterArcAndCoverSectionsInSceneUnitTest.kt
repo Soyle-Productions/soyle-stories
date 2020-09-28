@@ -14,6 +14,7 @@ import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.scene.SceneDoesNotExist
+import com.soyle.stories.scene.characterArcSectionCoveredByScene
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.sceneDoesNotExist
@@ -268,6 +269,8 @@ class CreateCharacterArcAndCoverSectionsInSceneUnitTest {
                     it.sceneId.mustEqual(scene.id.uuid) { "sceneId of CharacterArcSectionCoveredByScene is incorrect" }
                     it.characterId.mustEqual(character.id.uuid) { "characterId of CharacterArcSectionCoveredByScene is incorrect" }
                     it.themeId.mustEqual(createdTheme!!.id.uuid) { "themeId of CharacterArcSectionCoveredByScene is incorrect" }
+                    val baseSection = expectedCoveredSections.find { section -> section.id.uuid == it.characterArcSectionId }!!
+                    it shouldBe characterArcSectionCoveredByScene(baseSection, arc, scene.id.uuid)
                 }
             }
         }
@@ -306,6 +309,8 @@ class CreateCharacterArcAndCoverSectionsInSceneUnitTest {
                     it.sceneId.mustEqual(scene.id.uuid) { "sceneId of CharacterArcSectionCoveredByScene is incorrect" }
                     it.characterId.mustEqual(character.id.uuid) { "characterId of CharacterArcSectionCoveredByScene is incorrect" }
                     it.themeId.mustEqual(createdTheme!!.id.uuid) { "themeId of CharacterArcSectionCoveredByScene is incorrect" }
+                    val baseSection = expectedCoveredSections.find { section -> section.id.uuid == it.characterArcSectionId }!!
+                    it shouldBe characterArcSectionCoveredByScene(baseSection, arc, scene.id.uuid)
                 }
             }
         }
