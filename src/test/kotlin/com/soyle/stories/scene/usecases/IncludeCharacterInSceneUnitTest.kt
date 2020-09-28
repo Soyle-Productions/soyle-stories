@@ -273,7 +273,7 @@ class IncludeCharacterInSceneUnitTest {
             result = response
         }
 
-        override fun characterIncludedInScene(response: IncludeCharacterInScene.ResponseModel) {
+        override suspend fun characterIncludedInScene(response: IncludeCharacterInScene.ResponseModel) {
             result = response
         }
     }

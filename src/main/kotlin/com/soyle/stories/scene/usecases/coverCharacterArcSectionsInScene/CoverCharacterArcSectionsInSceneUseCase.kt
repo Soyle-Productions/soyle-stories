@@ -15,12 +15,12 @@ import com.soyle.stories.theme.repositories.CharacterArcRepository
 class CoverCharacterArcSectionsInSceneUseCase(
     private val sceneRepository: SceneRepository,
     private val characterArcRepository: CharacterArcRepository
-) : CoverCharacterArcSectionsInScene {
+) : CoverCharacterArcSectionsInScene, GetAvailableCharacterArcsForCharacterInScene {
 
-    override suspend fun listAvailableCharacterArcsForCharacterInScene(
+    override suspend fun invoke(
         sceneId: UUID,
         characterId: UUID,
-        output: OutputPort
+        output: GetAvailableCharacterArcsForCharacterInScene.OutputPort
     ) {
         val scene = getScene(sceneId, characterId)
         val arcs = characterArcRepository.listCharacterArcsForCharacter(Character.Id(characterId))

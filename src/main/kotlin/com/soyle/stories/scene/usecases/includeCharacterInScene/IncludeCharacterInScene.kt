@@ -16,7 +16,7 @@ interface IncludeCharacterInScene {
 	)
 
 	interface OutputPort {
-		fun characterIncludedInScene(response: ResponseModel)
+		suspend fun characterIncludedInScene(response: ResponseModel)
 	}
 
 

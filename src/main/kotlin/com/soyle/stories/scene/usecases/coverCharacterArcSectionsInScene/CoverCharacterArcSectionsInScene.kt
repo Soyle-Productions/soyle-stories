@@ -8,7 +8,6 @@ interface CoverCharacterArcSectionsInScene {
         val sections = sections.toList()
     }
 
-    suspend fun listAvailableCharacterArcsForCharacterInScene(sceneId: UUID, characterId: UUID, output: OutputPort)
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
 
@@ -18,8 +17,6 @@ interface CoverCharacterArcSectionsInScene {
     )
 
     interface OutputPort {
-        suspend fun availableCharacterArcSectionsForCharacterInSceneListed(response: AvailableCharacterArcSectionsForCharacterInScene)
-
         suspend fun characterArcSectionsCoveredInScene(response: ResponseModel)
     }
 

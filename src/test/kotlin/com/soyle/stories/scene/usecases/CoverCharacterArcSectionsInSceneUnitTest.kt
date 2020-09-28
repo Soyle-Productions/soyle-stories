@@ -13,6 +13,7 @@ import com.soyle.stories.scene.sceneDoesNotExist
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
@@ -31,11 +32,11 @@ class CoverCharacterArcSectionsInSceneUnitTest {
 
     private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::savedScene::set)
     private val characterArcRepository = CharacterArcRepositoryDouble()
-    private val useCase: CoverCharacterArcSectionsInScene =
+    private val useCase =
         CoverCharacterArcSectionsInSceneUseCase(sceneRepository, characterArcRepository)
     private var result: Any? = null
 
-    val output = object : CoverCharacterArcSectionsInScene.OutputPort {
+    private val output = object : CoverCharacterArcSectionsInScene.OutputPort, GetAvailableCharacterArcsForCharacterInScene.OutputPort {
         override suspend fun availableCharacterArcSectionsForCharacterInSceneListed(response: AvailableCharacterArcSectionsForCharacterInScene) {
             result = response
         }
@@ -181,7 +182,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
 
         private fun listAvailableCharacterArcsForCharacterInScene() {
             runBlocking {
-                useCase.listAvailableCharacterArcsForCharacterInScene(scene.id.uuid, character.id.uuid, output)
+                useCase.invoke(scene.id.uuid, character.id.uuid, output)
             }
         }
 
