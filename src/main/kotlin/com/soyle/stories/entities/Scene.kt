@@ -47,6 +47,10 @@ class Scene(
 		charactersInScene.map { IncludedCharacter(it.characterId, it.characterName) }
 	}
 
+	val coveredArcSectionIds by lazy {
+		charactersInScene.flatMap { it.coveredArcSections }
+	}
+
 	fun hasCharacters(): Boolean = charactersInScene.isNotEmpty()
 
 	private fun copy(

@@ -6,10 +6,12 @@ import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
 import com.soyle.stories.scene.usecases.common.getLastSetMotivation
 import com.soyle.stories.scene.usecases.common.getScenesBefore
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import java.util.*
 
 class GetSceneDetailsUseCase(
-  private val sceneRepository: SceneRepository
+  private val sceneRepository: SceneRepository,
+  private val characterArcRepository: CharacterArcRepository
 ) : GetSceneDetails {
 
 	override suspend fun invoke(request: GetSceneDetails.RequestModel, output: GetSceneDetails.OutputPort) {
@@ -36,11 +38,28 @@ class GetSceneDetailsUseCase(
 	private suspend fun getIncludedCharacterDetails(scene: Scene): List<IncludedCharacterInScene>
 	{
 		val scenesBefore = getScenesBefore(scene, sceneRepository).asReversed()
+
+		// for each covered arc section in the scene, get the character arc
+		val arcs = characterArcRepository.getCharacterArcsContainingArcSections(scene.coveredArcSectionIds.toSet())
+		// associate each arc section in each arc and the arc itself by the arc section id for easy look-up
+		val arcSectionsWithArc = arcs.flatMap { arc -> arc.arcSections.map { it to arc } }.associateBy { it.first.id }
+
 		return scene.includedCharacters.map {
 			val motivation = scene.getMotivationForCharacter(it.characterId)!!
 			IncludedCharacterInScene(
 				scene.id.uuid, it.characterId.uuid, it.characterName, motivation.motivation,
-			  getLastSetMotivation(scenesBefore, it.characterId)
+			  getLastSetMotivation(scenesBefore, it.characterId),
+				(scene.getCoveredCharacterArcSectionsForCharacter(it.characterId) ?: listOf()).map { arcSectionId ->
+					val (arcSection, arc) = arcSectionsWithArc.getValue(arcSectionId)
+					CoveredArcSectionInScene(
+						arcSection.id.uuid,
+						arcSection.template.name,
+						arcSection.value,
+						arcSection.template.allowsMultiple,
+						arc.id.uuid,
+						arc.name
+					)
+				}
 			)
 		}
 	}

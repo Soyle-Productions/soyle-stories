@@ -27,6 +27,11 @@ class CharacterArcRepositoryDouble(
     }
 
     fun getCharacterArc(id: CharacterArc.Id): CharacterArc? = characterArcsById[id]
+    fun getCharacterArcSection(id: CharacterArcSection.Id): CharacterArcSection? {
+        val arcId = characterArcsByArcSectionId[id] ?: return null
+        val arc = characterArcsById[arcId] ?: return null
+        return arc.arcSections.find { it.id == id }
+    }
 
     override suspend fun getCharacterArcByCharacterAndThemeId(
         characterId: Character.Id,

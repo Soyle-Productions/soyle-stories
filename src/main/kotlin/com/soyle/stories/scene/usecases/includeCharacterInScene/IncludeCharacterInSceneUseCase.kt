@@ -68,7 +68,8 @@ class IncludeCharacterInSceneUseCase(
             character.id.uuid,
             character.name,
             null,
-            getInheritedMotivation(scene, character)
+            getInheritedMotivation(scene, character),
+            listOf()
         )
     }
 

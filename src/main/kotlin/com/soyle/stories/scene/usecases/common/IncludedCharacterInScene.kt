@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases.common
 
+import com.soyle.stories.scene.usecases.getSceneDetails.CoveredArcSectionInScene
 import java.util.*
 
 class IncludedCharacterInScene(
@@ -7,5 +8,6 @@ class IncludedCharacterInScene(
   val characterId: UUID,
   val characterName: String,
   val motivation: String?,
-  val inheritedMotivation: InheritedMotivation?
+  val inheritedMotivation: InheritedMotivation?,
+  val coveredArcSections: List<CoveredArcSectionInScene>
 )
