@@ -4,13 +4,18 @@ import com.soyle.stories.Conditional
 import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.UATLogger
+import com.soyle.stories.common.components.menuChipGroup.MenuChipGroup
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.scene.sceneDetails.SceneDetails
 import com.soyle.stories.scene.sceneDetails.SceneDetailsScope
+import com.soyle.stories.scene.sceneDetails.includedCharacter.AvailableArcSectionViewModel
+import com.soyle.stories.scene.sceneDetails.includedCharacter.AvailableCharacterArcViewModel
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.scene.Node
@@ -215,9 +220,9 @@ object SceneDetailsDriver {
 			override fun whenSceneNameSelected(double: SoyleStoriesTestDouble) = previouslySetToolTip.whenSceneNameSelected(double)
 		}
 
-		private fun characterFields(double: SoyleStoriesTestDouble): Set<Field> {
+		private fun characterFields(double: SoyleStoriesTestDouble): Set<Node> {
 			val tool = openTool.get(double) ?: return setOf()
-			return from(tool.root).lookup(".included-character").queryAll<Field>()
+			return from(tool.root).lookup(".included-character").queryAll<Node>()
 		}
 
 		fun hasListedCharacter(character: Character.Id) = object : Conditional
@@ -231,7 +236,7 @@ object SceneDetailsDriver {
 
 		fun listedCharacter(character: Character): ListedCharacterDriver = object : ListedCharacterDriver
 		{
-			fun field(double: SoyleStoriesTestDouble): Field?
+			fun field(double: SoyleStoriesTestDouble): Node?
 			{
 				return characterFields(double).find {
 					it.id == character.id.uuid.toString()
@@ -265,6 +270,20 @@ object SceneDetailsDriver {
 					return (field(double)?.lookup(".reset-button") as? Hyperlink)?.visibleProperty()?.get() ?: false
 				}
 			}
+			override val isPositionOnArcDisplayingAvailableArcs: Conditional = object : Conditional {
+				override fun check(double: SoyleStoriesTestDouble): Boolean {
+					return field(double)?.let { from(it) }?.lookup(".position-on-arc")?.queryAll<MenuChipGroup>()?.firstOrNull()
+						?.isShowing ?: false
+				}
+			}
+
+			private fun tagSelect(double: SoyleStoriesTestDouble): MenuChipGroup?
+			{
+				val field = field(double) ?: return null.also { UATLogger.log("No field found") }
+				val node = from(field).lookup(".position-on-arc").queryAll<MenuChipGroup>()?.firstOrNull()
+				return node ?: return null.also { UATLogger.log("\"No TagSelectControl found") }
+			}
+
 
 			override fun whenResetButtonSelected(double: SoyleStoriesTestDouble) {
 				(field(double)?.lookup(".reset-button") as? Hyperlink)?.let {
@@ -274,10 +293,76 @@ object SceneDetailsDriver {
 				}
 			}
 
+			override fun whenPositionOnCharacterArcsSelected(double: SoyleStoriesTestDouble) {
+				interact {
+					val field = field(double) ?: error("No field found")
+					val select = from(field).lookup(".position-on-arc").query<MenuChipGroup>()
+					select.show()
+				}
+			}
+
+			override fun givenPositionOnCharacterArcsHasBeenSelected(double: SoyleStoriesTestDouble) {
+				if (isPositionOnArcDisplayingAvailableArcs.check(double)) return
+				whenPositionOnCharacterArcsSelected(double)
+			}
+
+			override fun availableArcSectionsHasAll(arcSections: List<CharacterArcSection>): Conditional = object : Conditional {
+				override fun check(double: SoyleStoriesTestDouble): Boolean {
+					val listedItems = tagSelect(double)?.items ?: return arcSections.isEmpty()
+					val userDataSet = listedItems.flatMap { (it as? Menu)?.items ?: listOf() }.mapNotNull{
+						(it.userData as? AvailableArcSectionViewModel)?.arcSectionId
+					}.toSet()
+					val expectedIdSet = arcSections.map{ it.id.uuid.toString() }.toSet()
+					UATLogger.log("availableArcSectionsHasAll")
+					UATLogger.log("$userDataSet == $expectedIdSet")
+					return userDataSet == expectedIdSet
+				}
+			}
+
+			override fun availableArcSectionsAreAllMarked(arcSections: List<CharacterArcSection.Id>): Conditional = object : Conditional {
+				override fun check(double: SoyleStoriesTestDouble): Boolean {
+					val chips = tagSelect(double)?.chips ?: return arcSections.isEmpty()
+					val userDataSet = chips
+						.mapNotNull { it.node.userData as? String }
+						.toSet()
+					val expectedIdSet = arcSections.map { it.uuid.toString() }.toSet()
+					UATLogger.log("availableArcSectionsAreAllMarked")
+					UATLogger.log("$userDataSet == $expectedIdSet")
+					return userDataSet == expectedIdSet
+				}
+			}
+
+			override fun availableArcsHasAll(characterArcs: List<CharacterArc>): Conditional = object : Conditional {
+				override fun check(double: SoyleStoriesTestDouble): Boolean {
+					val listedItems = tagSelect(double)?.items ?: return characterArcs.isEmpty()
+					val userDataSet = listedItems.mapNotNull { (it.userData as? AvailableCharacterArcViewModel)?.characterArcId }.toSet()
+					val expectedIdSet = characterArcs.map{ it.id.uuid.toString() }.toSet()
+					UATLogger.log("availableArcsHasAll")
+					UATLogger.log("$userDataSet == $expectedIdSet")
+					return userDataSet == expectedIdSet
+				}
+			}
+
+			override fun availableArcsAreAllMarked(characterArcs: List<CharacterArc>): Conditional = object : Conditional {
+				override fun check(double: SoyleStoriesTestDouble): Boolean {
+					val listedItems = tagSelect(double)?.items ?: return characterArcs.isEmpty()
+					val userDataSet = listedItems.filter {
+						val text = (it.graphic as? Label)?.text ?: return@filter false
+						text.isNotBlank()
+					}.mapNotNull { (it.userData as? AvailableCharacterArcViewModel)?.characterArcId }.toSet()
+					val expectedIdSet = characterArcs.map{ it.id.uuid.toString() }.toSet()
+					UATLogger.log("availableArcsAreAllMarked")
+					UATLogger.log("$userDataSet == $expectedIdSet")
+					return userDataSet == expectedIdSet
+				}
+			}
+
 			override val characterName: ReadOnlyDependentProperty<String> = object : ReadOnlyDependentProperty<String>
 			{
 				override fun get(double: SoyleStoriesTestDouble): String? {
-					return field(double)?.text
+					return field(double)?.let {
+						from(it).lookup(".character-name").queryAll<Label>().firstOrNull()?.text
+					}
 				}
 			}
 		}
@@ -288,9 +373,16 @@ object SceneDetailsDriver {
 		val isListed: Conditional
 		val isPreviouslySetTipVisible: Conditional
 		val isResetButtonVisible: Conditional
+		val isPositionOnArcDisplayingAvailableArcs: Conditional
 		val characterName: ReadOnlyDependentProperty<String>
 		fun previouslySetTip(double: SoyleStoriesTestDouble): Hyperlink?
 		fun whenResetButtonSelected(double: SoyleStoriesTestDouble)
+		fun whenPositionOnCharacterArcsSelected(double: SoyleStoriesTestDouble)
+		fun givenPositionOnCharacterArcsHasBeenSelected(double: SoyleStoriesTestDouble)
+		fun availableArcsHasAll(characterArcs: List<CharacterArc>): Conditional
+		fun availableArcSectionsHasAll(arcSections: List<CharacterArcSection>): Conditional
+		fun availableArcSectionsAreAllMarked(arcSections: List<CharacterArcSection.Id>): Conditional
+		fun availableArcsAreAllMarked(characterArcs: List<CharacterArc>): Conditional
 	}
 
 	interface PreviouslySetToolTipDriver {
@@ -300,6 +392,6 @@ object SceneDetailsDriver {
 		fun whenSceneNameSelected(double: SoyleStoriesTestDouble)
 	}
 
-	fun toolFor(scene: Scene) = ScopedDriver(scene)
+	fun toolFor(scene: Scene) = SceneDetailsDriver.ScopedDriver(scene)
 
 }

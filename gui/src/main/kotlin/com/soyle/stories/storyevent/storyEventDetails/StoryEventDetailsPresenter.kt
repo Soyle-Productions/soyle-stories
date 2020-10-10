@@ -13,9 +13,11 @@ import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationListListener
 import com.soyle.stories.location.usecases.listAllLocations.LocationItem
 import com.soyle.stories.storyevent.StoryEventException
+import com.soyle.stories.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEventReceiver
 import com.soyle.stories.storyevent.storyEventDetails.presenters.AddCharacterToStoryEventPresenter
 import com.soyle.stories.storyevent.storyEventDetails.presenters.LinkLocationToStoryEventPresenter
 import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
+import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
 import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
 import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
 import java.util.*
@@ -24,7 +26,7 @@ class StoryEventDetailsPresenter(
   storyEventId: String,
   private val view: View.Nullable<StoryEventDetailsViewModel>,
   linkLocationToStoryEventNotifier: Notifier<LinkLocationToStoryEvent.OutputPort>,
-  addCharacterToStoryEventNotifier: Notifier<AddCharacterToStoryEvent.OutputPort>
+  includedCharacterInStoryEventNotifier: Notifier<IncludedCharacterInStoryEventReceiver>
 ) : GetStoryEventDetails.OutputPort, LocationListListener, CharacterListListener {
 
 	private val subPresenters: List<*>
@@ -34,7 +36,7 @@ class StoryEventDetailsPresenter(
 
 		subPresenters = listOf(
 		  LinkLocationToStoryEventPresenter(formattedStoryEventId, view) listensTo linkLocationToStoryEventNotifier,
-		  AddCharacterToStoryEventPresenter(formattedStoryEventId, view) listensTo addCharacterToStoryEventNotifier
+		  AddCharacterToStoryEventPresenter(formattedStoryEventId, view) listensTo includedCharacterInStoryEventNotifier
 		)
 	}
 

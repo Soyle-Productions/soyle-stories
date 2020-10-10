@@ -84,7 +84,7 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
                 vgap = 8.0
                 padding = Insets(8.0, 4.0, 4.0, 4.0)
                 bindChildren(symbolicItems) {
-                    chip(it.itemName.toProperty(), onDelete={
+                    chip(it.itemName.toProperty(), onDelete={ _ ->
                         val oppositionValueId = oppositionValueId.value ?: return@chip
                         viewListener.removeSymbolicItem(oppositionValueId, it.itemId)
                     }).node

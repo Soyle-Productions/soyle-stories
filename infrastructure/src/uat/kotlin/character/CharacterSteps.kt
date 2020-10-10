@@ -3,16 +3,38 @@ package com.soyle.stories.character
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
 import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.ThemeSteps
+import com.soyle.stories.theme.createTheme.CreateThemeController
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import kotlinx.coroutines.runBlocking
 import org.testfx.framework.junit5.ApplicationTest
 
 class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 
 	companion object : ApplicationTest()
+	{
+		fun givenANumberOfCharacterArcsHaveBeenCreatedForCharacter(
+			projectScope: ProjectScope, character: Character, count: Int
+		): List<CharacterArc>
+		{
+			val repository = projectScope.get<CharacterArcRepository>()
+			val existingArcs = runBlocking { repository.listCharacterArcsForCharacter(character.id) }
+			if (existingArcs.size < count) {
+				repeat(count - existingArcs.size) {
+					projectScope.get<PlanNewCharacterArcController>()
+						.planCharacterArc(character.id.uuid.toString(), "Some Arc ${Math.random()}") { throw it }
+				}
+			}
+			return runBlocking { repository.listCharacterArcsForCharacter(character.id) }.take(count)
+		}
+	}
 
 	init {
 		CharacterValueComparisonSteps(en, double)
@@ -29,6 +51,11 @@ class CharacterSteps(en: En, double: SoyleStoriesTestDouble) {
 			}
 			Given("{int} Characters have been created") { int1: Int ->
 				CharacterDriver.givenANumberOfCharactersHaveBeenCreated(double, int1)
+			}
+			Given("{int} Character Arcs have been created for the Character {string}") { arcCount: Int, characterName: String ->
+				val scope = ProjectSteps.givenProjectHasBeenOpened(double)
+				val character = CharacterDriver.givenACharacterHasBeenCreatedWithTheName(double, characterName)
+				givenANumberOfCharacterArcsHaveBeenCreatedForCharacter(scope, character, arcCount)
 			}
 			Given("The Character List Tool has been opened") {
 				// LocationListDriver.givenHasBeenOpened(double)

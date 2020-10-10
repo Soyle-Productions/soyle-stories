@@ -3,9 +3,8 @@ package com.soyle.stories.soylestories
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.scene.image.Image
 import javafx.scene.paint.Color
-import tornadofx.Stylesheet
-import tornadofx.importStylesheet
-import tornadofx.loadFont
+import tornadofx.*
+import tornadofx.Stylesheet.Companion.box
 
 class Styles : Stylesheet() {
 
@@ -23,12 +22,17 @@ class Styles : Stylesheet() {
             loadFont("/com/soyle/stories/soylestories/corbel/CORBELB.TTF", 14)!!
         }
 
+        val section by cssclass()
+
     }
 
     init {
         root {
             accentColor = Blue
             focusColor = Purple
+        }
+        section {
+            padding = box(0.px, 0.px, 15.px, 0.px)
         }
     }
 

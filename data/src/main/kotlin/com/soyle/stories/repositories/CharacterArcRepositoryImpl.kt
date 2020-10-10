@@ -5,13 +5,14 @@ import com.soyle.stories.entities.*
 class CharacterArcRepositoryImpl : com.soyle.stories.theme.repositories.CharacterArcRepository {
 
 	val characterArcs = mutableMapOf<Pair<Character.Id, Theme.Id>, CharacterArc>()
-	val characterArcsBySections = mutableMapOf<CharacterArcSection.Id, CharacterArc.Id>()
+	val characterArcsBySections = mutableMapOf<CharacterArcSection.Id, Pair<Character.Id, Theme.Id>>()
 
 	@Synchronized
 	override suspend fun addNewCharacterArc(characterArc: CharacterArc) {
-		characterArcs[characterArc.characterId to characterArc.themeId] = characterArc
+		val arcKey = characterArc.characterId to characterArc.themeId
+		characterArcs[arcKey] = characterArc
 		characterArc.arcSections.forEach {
-			characterArcsBySections[it.id] = characterArc.id
+			characterArcsBySections[it.id] = arcKey
 		}
 	}
 
@@ -43,7 +44,7 @@ class CharacterArcRepositoryImpl : com.soyle.stories.theme.repositories.Characte
 	override suspend fun getCharacterArcsContainingArcSections(characterArcSectionIds: Set<CharacterArcSection.Id>): List<CharacterArc> {
 		return characterArcSectionIds.mapNotNull {
 			getCharacterArcContainingArcSection(it)
-		}
+		}.toSet().toList()
 	}
 
 	@Synchronized

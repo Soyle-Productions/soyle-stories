@@ -1,23 +1,154 @@
 package com.soyle.stories.common.components
 
 import com.soyle.stories.common.components.ChipStyles.Companion.chipDeleteIcon
+import com.soyle.stories.common.exists
+import com.soyle.stories.common.existsWhen
 import com.soyle.stories.soylestories.Styles
-import com.soyle.stories.swing.soylestories.SoyleStories
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
-import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import javafx.beans.value.ObservableValue
+import javafx.event.ActionEvent
+import javafx.event.Event
+import javafx.event.EventHandler
 import javafx.event.EventTarget
 import javafx.geometry.Pos
-import javafx.scene.Cursor
 import javafx.scene.Node
+import javafx.scene.control.Button
+import javafx.scene.control.Label
 import javafx.scene.control.Labeled
-import javafx.scene.layout.Region
+import javafx.scene.control.Skin
+import javafx.scene.control.skin.LabeledSkinBase
 import javafx.scene.paint.Color
 import tornadofx.*
+import kotlin.math.max
+
+class ChipNode : Labeled() {
+
+    init {
+        addClass(ChipStyles.chip)
+    }
+
+    val onActionProperty = SimpleObjectProperty<EventHandler<ActionEvent>>(null)
+    var onAction: EventHandler<ActionEvent>? by onActionProperty
+    fun action(handler: EventHandler<ActionEvent>) { onAction = handler }
+
+    override fun createDefaultSkin(): Skin<*> = ChipSkin(this)
+
+    override fun getUserAgentStylesheet(): String = ChipStyles().externalForm
+
+}
+
+class ChipSkin(chip: ChipNode) : LabeledSkinBase<ChipNode>(chip)
+{
+    private val label = Label().apply {
+        registerChangeListener(skinnable.graphicProperty()) {
+            graphic = skinnable?.graphic
+        }
+        registerChangeListener(skinnable.textProperty()) {
+            text = skinnable?.text
+        }
+    }
+    private val deleteButton = Button().apply {
+        registerChangeListener(skinnable.onActionProperty) {
+            onAction = skinnable?.onAction
+            exists = skinnable?.onAction != null
+        }
+
+        graphic = MaterialIconView(MaterialIcon.DELETE_FOREVER, "1em").apply {
+            setStyleClass(chipDeleteIcon.name)
+        }
+    }
+
+    init {
+        children.clear()
+        children.addAll(label, deleteButton)
+        skinnable.requestLayout()
+    }
+
+    override fun computeMaxHeight(
+        width: Double,
+        topInset: Double,
+        rightInset: Double,
+        bottomInset: Double,
+        leftInset: Double
+    ): Double {
+        return skinnable.prefHeight(width)
+    }
+
+    override fun computeMaxWidth(
+        height: Double,
+        topInset: Double,
+        rightInset: Double,
+        bottomInset: Double,
+        leftInset: Double
+    ): Double {
+        return skinnable.prefWidth(height)
+    }
+
+    override fun computeMinHeight(
+        width: Double,
+        topInset: Double,
+        rightInset: Double,
+        bottomInset: Double,
+        leftInset: Double
+    ): Double {
+        return (topInset
+                + max(
+            label.minHeight(width), if (deleteButton.managedProperty().get()) snapSizeY(
+                deleteButton.minHeight(
+                    -1.0
+                )
+            ) else 0.0
+        )
+                + bottomInset)
+    }
+
+    override fun computeMinWidth(
+        height: Double,
+        topInset: Double,
+        rightInset: Double,
+        bottomInset: Double,
+        leftInset: Double
+    ): Double {
+        return (leftInset
+                + label.minWidth(height)
+                + (if (deleteButton.managedProperty().get()) snapSizeX(deleteButton.minWidth(height)) else 0.0)
+                + rightInset)
+    }
+
+    override fun computePrefHeight(
+        width: Double,
+        topInset: Double,
+        rightInset: Double,
+        bottomInset: Double,
+        leftInset: Double
+    ): Double {
+        return (topInset
+                + max(label.prefHeight(width), if (deleteButton.managedProperty().get()) snapSizeY(deleteButton.prefHeight(-1.0)) else 0.0)
+                + bottomInset)
+    }
+
+    override fun computePrefWidth(
+        height: Double,
+        topInset: Double,
+        rightInset: Double,
+        bottomInset: Double,
+        leftInset: Double
+    ): Double {
+        return (leftInset
+                + label.prefWidth(height)
+                + (if (deleteButton.managedProperty().get()) snapSizeX(deleteButton.prefWidth(height)) else 0.0)
+                + rightInset)
+    }
+
+    override fun layoutChildren(x: Double, y: Double, w: Double, h: Double) {
+        val arrowButtonWidth = if (deleteButton.managedProperty().get()) snapSizeX(deleteButton.prefWidth(-1.0)) else 0.0
+        label.resizeRelocate(x, y, w - arrowButtonWidth, h)
+        deleteButton.resizeRelocate(x + (w - arrowButtonWidth), y, arrowButtonWidth, h)
+    }
+}
 
 class Chip(val node: Node) {
 
@@ -27,14 +158,17 @@ class Chip(val node: Node) {
     val graphicProperty = SimpleObjectProperty<Node>(null)
     var graphic by graphicProperty
 
-    val onDeleteProperty = SimpleObjectProperty<() -> Unit>(null)
+    val onDeleteProperty = SimpleObjectProperty<(Event) -> Unit>(null)
     var onDelete by onDeleteProperty
+    fun onDelete(op: (Event) -> Unit) {
+        onDelete = op
+    }
 }
 
 fun EventTarget.chip(
     textProperty: ObservableValue<String>? = null,
     graphicProperty: ObservableValue<Node>? = null,
-    onDelete: (() -> Unit)? = null,
+    onDelete: ((Event) -> Unit)? = null,
     op: Chip.() -> Unit = {}
 ): Chip {
     val hbox = hbox {  }
@@ -59,8 +193,8 @@ fun EventTarget.chip(
             visibleWhen(chip.onDeleteProperty.isNotNull)
             managedProperty().bind(visibleProperty())
             isPickOnBounds = true
-            action {
-                onDelete?.invoke()
+            setOnAction {
+                chip.onDelete?.invoke(it)
             }
         }
     }

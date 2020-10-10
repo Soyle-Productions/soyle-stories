@@ -1,9 +1,14 @@
 package com.soyle.stories.di.scene
 
+import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
+import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.coverArcSectionsInScene.*
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.createNewScene.CreateNewSceneControllerImpl
 import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
@@ -19,8 +24,7 @@ import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogModel
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogPresenter
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogViewListener
 import com.soyle.stories.scene.deleteSceneRamifications.*
-import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
-import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneNotifier
+import com.soyle.stories.scene.includeCharacterInScene.*
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneControllerImpl
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
@@ -38,9 +42,18 @@ import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogPresenter
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogViewListener
 import com.soyle.stories.scene.reorderSceneRamifications.*
 import com.soyle.stories.scene.sceneDetails.*
+import com.soyle.stories.scene.sceneDetails.includedCharacter.*
+import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneController
+import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInScenePresenter
+import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneState
+import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewListener
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
 import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
@@ -51,6 +64,7 @@ import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.Get
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingSceneUseCase
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetailsUseCase
+import com.soyle.stories.scene.usecases.includeCharacterInScene.GetAvailableCharactersToAddToScene
 import com.soyle.stories.scene.usecases.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.scene.usecases.includeCharacterInScene.IncludeCharacterInSceneUseCase
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
@@ -97,8 +111,9 @@ object SceneModule {
                     get()
                 )
             }
-            provide<IncludeCharacterInScene> {
+            provide(IncludeCharacterInScene::class, GetAvailableCharactersToAddToScene::class) {
                 IncludeCharacterInSceneUseCase(
+                    get(),
                     get(),
                     get()
                 )
@@ -116,7 +131,7 @@ object SceneModule {
                 GetPotentialChangesFromReorderingSceneUseCase(get())
             }
             provide<GetSceneDetails> {
-                GetSceneDetailsUseCase(get())
+                GetSceneDetailsUseCase(get(), get())
             }
             provide<LinkLocationToScene> {
                 LinkLocationToSceneUseCase(get(), get())
@@ -126,6 +141,18 @@ object SceneModule {
             }
             provide<ReorderScene> {
                 ReorderSceneUseCase(get())
+            }
+            provide(CoverCharacterArcSectionsInScene::class, GetAvailableCharacterArcsForCharacterInScene::class) {
+                CoverCharacterArcSectionsInSceneUseCase(get(), get())
+            }
+            provide(IncludedCharacterInSceneReceiver::class) {
+                IncludedCharacterInSceneNotifier()
+            }
+            provide(CharacterArcSectionsCoveredBySceneReceiver::class) {
+                CharacterArcSectionsCoveredBySceneNotifier()
+            }
+            provide(CharacterArcSectionUncoveredInSceneReceiver::class) {
+                CharacterArcSectionUncoveredInSceneNotifier()
             }
 
             provide(CreateNewScene.OutputPort::class) {
@@ -141,7 +168,7 @@ object SceneModule {
                 SetMotivationForCharacterInSceneNotifier(applicationScope.get())
             }
             provide(IncludeCharacterInScene.OutputPort::class) {
-                IncludeCharacterInSceneNotifier(applicationScope.get())
+                IncludeCharacterInSceneOutput(get(), get())
             }
             provide(LinkLocationToScene.OutputPort::class) {
                 LinkLocationToSceneNotifier(applicationScope.get())
@@ -151,6 +178,9 @@ object SceneModule {
             }
             provide(ReorderScene.OutputPort::class) {
                 ReorderSceneNotifier(applicationScope.get())
+            }
+            provide(CoverCharacterArcSectionsInScene.OutputPort::class) {
+                CoverCharacterArcSectionsInSceneOutputPort(get(), get())
             }
 
             provide<CreateNewSceneController> {
@@ -186,8 +216,8 @@ object SceneModule {
                     get()
                 )
             }
-            provide {
-                IncludeCharacterInSceneController(
+            provide(IncludeCharacterInSceneController::class) {
+                IncludeCharacterInSceneControllerImpl(
                     applicationScope.get(),
                     get(),
                     get()
@@ -212,6 +242,13 @@ object SceneModule {
             provide<ReorderSceneController> {
                 ReorderSceneControllerImpl(
                     applicationScope.get(),
+                    applicationScope.get(),
+                    get(),
+                    get()
+                )
+            }
+            provide<CoverArcSectionsInSceneController> {
+                CoverArcSectionsInSceneControllerImpl(
                     applicationScope.get(),
                     get(),
                     get()
@@ -309,18 +346,59 @@ object SceneModule {
                         sceneId.toString(),
                         get<SceneDetailsModel>(),
                         projectScope.get(),
-                        projectScope.get(),
-                        projectScope.get<IncludeCharacterInSceneNotifier>(),
                         projectScope.get<LinkLocationToSceneNotifier>(),
-                        projectScope.get<RemoveCharacterFromSceneNotifier>(),
-                        projectScope.get<SetMotivationForCharacterInSceneNotifier>(),
-                        projectScope.get<ReorderSceneNotifier>()
+                        projectScope.get<ReorderSceneNotifier>(),
                     ),
                     projectScope.get(),
+                )
+            }
+
+            provide<IncludedCharactersInSceneViewListener> {
+                val presenter = IncludedCharactersInScenePresenter(
+                    sceneId.toString(),
+                    get<IncludedCharactersInSceneState>()
+                ).also {
+                    it listensTo projectScope.get<CreatedCharacterNotifier>()
+                    it listensTo projectScope.get<RemovedCharacterNotifier>()
+                    it listensTo projectScope.get<IncludedCharacterInSceneNotifier>()
+                    it listensTo projectScope.get<RemoveCharacterFromSceneNotifier>()
+                }
+
+                IncludedCharactersInSceneController(
+                    sceneId.toString(),
+                    projectScope.get(),
+                    projectScope.applicationScope.get(),
+                    projectScope.get(),
+                    presenter
+                )
+            }
+        }
+
+        scoped<IncludedCharacterScope> {
+            provide<IncludedCharacterInSceneViewListener> {
+
+                val presenter = IncludedCharacterInScenePresenter(
+                    sceneDetailsScope.sceneId.toString(),
+                    characterId,
+                    get<IncludedCharacterInSceneState>()
+                ).apply {
+                    listensTo(projectScope.get<RenamedCharacterNotifier>())
+                    listensTo(projectScope.get<SetMotivationForCharacterInSceneNotifier>())
+                    listensTo(projectScope.get<CharacterArcSectionsCoveredBySceneNotifier>())
+                    listensTo(projectScope.get<CharacterArcSectionUncoveredInSceneNotifier>())
+                }
+
+                IncludedCharacterInSceneController(
+                    sceneDetailsScope.sceneId.toString(),
+                    storyEventId,
+                    characterId,
+                    projectScope.applicationScope.get(),
                     projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),
-                    projectScope.get()
+                    projectScope.get(),
+                    projectScope.get(),
+                    presenter
                 )
             }
         }

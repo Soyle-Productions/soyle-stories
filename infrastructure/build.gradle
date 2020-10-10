@@ -76,6 +76,8 @@ dependencies {
     }
     implementation libraries.coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-javafx:$KOTLIN_COROUTINES_VERSION"
+    implementation "org.controlsfx:controlsfx:11.0.2"
+    implementation "no.tornado:tornadofx-controlsfx:0.1"
 
     implementation "de.jensd:fontawesomefx-commons:11.0"
     implementation "de.jensd:fontawesomefx-controls:11.0"
