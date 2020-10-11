@@ -8,13 +8,16 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.FontWeight
 import tornadofx.*
 
+
 fun EventTarget.fieldLabel(text: String = "") = hbox {
+    addClass(Styles.fieldLabelContainer)
     hgrow = Priority.ALWAYS
     label(text) {
         addClass(Styles.fieldLabel)
     }
 }
 fun EventTarget.fieldLabel(textProperty: ObservableValue<String>) = hbox {
+    addClass(Styles.fieldLabelContainer)
     hgrow = Priority.ALWAYS
     label(textProperty) {
         addClass(Styles.fieldLabel)
@@ -22,10 +25,12 @@ fun EventTarget.fieldLabel(textProperty: ObservableValue<String>) = hbox {
 }
 
 fun EventTarget.labeledSection(text: String = "", op: VBox.() -> Unit = {}) = vbox {
+    addClass(Styles.labeledSection)
     fieldLabel(text)
     op()
 }
 fun EventTarget.labeledSection(textProperty: ObservableValue<String>, op: VBox.() -> Unit = {}) = vbox {
+    addClass(Styles.labeledSection)
     fieldLabel(textProperty)
     op()
 }
@@ -33,6 +38,8 @@ fun EventTarget.labeledSection(textProperty: ObservableValue<String>, op: VBox.(
 class Styles : Stylesheet() {
 
     companion object {
+        val labeledSection by cssclass()
+        val fieldLabelContainer by cssclass()
         val fieldLabel by cssclass()
         init {
             importStylesheet<Styles>()

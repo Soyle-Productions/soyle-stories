@@ -1,9 +1,12 @@
 package com.soyle.stories.scene.sceneDetails.includedCharacter
 
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogView
 import com.soyle.stories.common.components.Chip
 import com.soyle.stories.common.components.chip
 import com.soyle.stories.common.components.menuChipGroup.menu
 import com.soyle.stories.common.components.menuChipGroup.menuchipgroup
+import com.soyle.stories.di.get
+import com.soyle.stories.scene.sceneDetails.SceneDetails
 import com.soyle.stories.scene.sceneDetails.SceneDetailsStyles
 import com.soyle.stories.soylestories.Styles
 import javafx.application.Platform
@@ -84,6 +87,11 @@ class PositionOnArcSelection(
         menuChipGroup.menu(arc.characterArcName) {
             userData = arc
             graphic = counterGraphic(arc)
+            item("") {
+                action {
+                    state.scope.projectScope.get<CreateArcSectionDialogView>().show(arc.characterArcId)
+                }
+            }
             arc.sections.forEach {
                 displayArcSectionItem(it)
             }
