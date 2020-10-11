@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.changeCharacterArcSectionValue
+package com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue
 
 enum class ArcSectionType {
     Desire,

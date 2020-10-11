@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases
+package com.soyle.stories.characterarc.usecases
 
 import arrow.core.Either
 import com.soyle.stories.character.makeCharacter
@@ -6,18 +6,15 @@ import com.soyle.stories.common.Desire
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
-import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ArcSectionType
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesireUseCase
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
-import com.soyle.stories.translators.asCharacterArcSection
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ArcSectionType
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterDesireUseCase
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 

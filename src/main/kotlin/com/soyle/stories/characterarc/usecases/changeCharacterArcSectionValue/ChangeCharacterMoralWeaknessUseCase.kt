@@ -1,6 +1,6 @@
-package com.soyle.stories.theme.usecases.changeCharacterArcSectionValue
+package com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue
 
-import com.soyle.stories.common.Desire
+import com.soyle.stories.common.MoralWeakness
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
@@ -10,39 +10,42 @@ import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.repositories.getThemeOrError
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire.*
 
-class ChangeCharacterDesireUseCase(
+class ChangeCharacterMoralWeaknessUseCase(
     private val themeRepository: ThemeRepository,
     private val characterArcRepository: CharacterArcRepository
-) : ChangeCharacterDesire {
+) : ChangeCharacterMoralWeakness {
 
-    override suspend fun invoke(request: RequestModel, output: OutputPort) {
+    override suspend fun invoke(
+        request: ChangeCharacterMoralWeakness.RequestModel,
+        output: ChangeCharacterMoralWeakness.OutputPort
+    ) {
+
         val theme = themeRepository.getThemeOrError(Theme.Id(request.themeId))
 
         val character = getMajorCharacter(theme, request)
 
         val characterArc = characterArcRepository.getCharacterArcByCharacterAndThemeId(character.id, theme.id)!!
 
-        val arcSection = characterArc.arcSections.find { it.template isSameEntityAs Desire }!!
+        val arcSection = characterArc.arcSections.find { it.template isSameEntityAs MoralWeakness }!!
 
         characterArcRepository.replaceCharacterArcs(
             characterArc.withArcSectionsMapped {
-                if (it.template isSameEntityAs Desire) it.withValue(request.desire)
+                if (it.template isSameEntityAs MoralWeakness) it.withValue(request.moralWeakness)
                 else it
             }
         )
 
-        output.characterDesireChanged(
-            ResponseModel(
-                ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, ArcSectionType.Desire, request.desire)
+        output.characterMoralWeaknessChanged(
+            ChangeCharacterMoralWeakness.ResponseModel(
+                ChangedCharacterArcSectionValue(arcSection.id.uuid, character.id.uuid, theme.id.uuid, ArcSectionType.MoralWeakness, request.moralWeakness)
             )
         )
     }
 
     private fun getMajorCharacter(
         theme: Theme,
-        request: RequestModel
+        request: ChangeCharacterMoralWeakness.RequestModel
     ): CharacterInTheme {
         val character = theme.getIncludedCharacterById(Character.Id(request.characterId))
             ?: throw CharacterNotInTheme(request.themeId, request.characterId)
@@ -50,5 +53,4 @@ class ChangeCharacterDesireUseCase(
         character as? MajorCharacter ?: throw CharacterIsNotMajorCharacterInTheme(request.characterId, request.themeId)
         return character
     }
-
 }
