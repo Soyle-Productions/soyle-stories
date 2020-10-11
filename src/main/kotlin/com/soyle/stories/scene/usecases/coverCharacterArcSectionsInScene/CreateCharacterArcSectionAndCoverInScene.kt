@@ -4,8 +4,6 @@ import java.util.*
 
 interface CreateCharacterArcSectionAndCoverInScene {
 
-    suspend fun listAvailableCharacterArcSectionTypesForCharacterArc(themeId: UUID, characterId: UUID, output: OutputPort)
-
     class RequestModel(
         val themeId: UUID,
         val characterId: UUID,
@@ -22,7 +20,6 @@ interface CreateCharacterArcSectionAndCoverInScene {
     )
 
     interface OutputPort {
-        suspend fun receiveAvailableCharacterArcSectionTypesForCharacterArc(response: AvailableCharacterArcSectionTypesForCharacterArc)
         suspend fun characterArcCreatedAndCoveredInScene(response: ResponseModel)
     }
 

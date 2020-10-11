@@ -13,12 +13,12 @@ import java.util.*
 class CreateCharacterArcSectionAndCoverInSceneUseCase(
     private val characterArcRepository: CharacterArcRepository,
     private val sceneRepository: SceneRepository
-) : CreateCharacterArcSectionAndCoverInScene {
+) : CreateCharacterArcSectionAndCoverInScene, GetAvailableCharacterArcSectionTypesForCharacterArc {
 
-    override suspend fun listAvailableCharacterArcSectionTypesForCharacterArc(
+    override suspend fun invoke(
         themeId: UUID,
         characterId: UUID,
-        output: CreateCharacterArcSectionAndCoverInScene.OutputPort
+        output: GetAvailableCharacterArcSectionTypesForCharacterArc.OutputPort
     ) {
         val characterArc = characterArcRepository.getCharacterArcOrError(characterId, themeId)
 

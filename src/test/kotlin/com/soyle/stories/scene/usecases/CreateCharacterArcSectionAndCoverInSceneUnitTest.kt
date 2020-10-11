@@ -21,6 +21,7 @@ import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInSceneUseCase
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -160,7 +161,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
 
         fun invoke() {
             runBlocking {
-                useCase.listAvailableCharacterArcSectionTypesForCharacterArc(
+                useCase.invoke(
                     theme.id.uuid,
                     character.id.uuid,
                     output
@@ -333,10 +334,10 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
     private val characterArcRepository = CharacterArcRepositoryDouble(onUpdateCharacterArc = ::updatedArc::set)
     private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::updatedScene::set)
 
-    private val useCase: CreateCharacterArcSectionAndCoverInScene =
+    private val useCase =
         CreateCharacterArcSectionAndCoverInSceneUseCase(characterArcRepository, sceneRepository)
 
-    private val output = object : CreateCharacterArcSectionAndCoverInScene.OutputPort {
+    private val output = object : CreateCharacterArcSectionAndCoverInScene.OutputPort, GetAvailableCharacterArcSectionTypesForCharacterArc.OutputPort {
         override suspend fun receiveAvailableCharacterArcSectionTypesForCharacterArc(response: AvailableCharacterArcSectionTypesForCharacterArc) {
             result = response
         }
