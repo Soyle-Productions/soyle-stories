@@ -89,7 +89,7 @@ class PositionOnArcSelection(
             graphic = counterGraphic(arc)
             item("") {
                 action {
-                    state.scope.projectScope.get<CreateArcSectionDialogView>().show(arc.characterArcId)
+                    state.scope.projectScope.get<CreateArcSectionDialogView>().show(state.characterId.valueSafe, arc.themeId, state.scope.sceneId)
                 }
             }
             arc.sections.forEach {

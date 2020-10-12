@@ -15,8 +15,11 @@ import tornadofx.controlsfx.popover
 
 class CreateArcSectionDialogView : Fragment() {
 
-    private val characterArcProperty = singleAssign<String>()
-    var characterArcId: String by characterArcProperty
+    lateinit var characterId: String
+        private set
+    lateinit var themeId: String
+        private set
+    lateinit var sceneId: String
         private set
 
     private val state = resolve<CreateArcSectionDialogState>()
@@ -60,25 +63,20 @@ class CreateArcSectionDialogView : Fragment() {
 
     private fun sectionTypeMenuItem(option: SectionTypeOption): MenuItem {
         return when (option) {
-            is SectionTypeOption.AlreadyUsed -> {
-                CustomMenuItem().apply {
-                    addClass(ComponentsStyles.discouragedSelection)
-                    content = Label(option.sectionTypeName).apply {
-                        popover { text(option.message) }
-                        setOnMouseClicked { fire() }
-                    }
-                    action {
-                        attemptToSelectSectionOption(option)
-                    }
-                    text = option.sectionTypeName
-                }
-            }
-            else -> {
-                MenuItem(option.sectionTypeName).apply {
-                    action {
-                        attemptToSelectSectionOption(option)
-                    }
-                }
+            is SectionTypeOption.AlreadyUsed -> alreadyUsedSectionTypeMenuItem(option)
+            else -> MenuItem()
+        }.apply {
+            action { attemptToSelectSectionOption(option) }
+            text = option.sectionTypeName
+        }
+    }
+
+    private fun alreadyUsedSectionTypeMenuItem(option: SectionTypeOption.AlreadyUsed): MenuItem {
+        return CustomMenuItem().apply {
+            addClass(ComponentsStyles.discouragedSelection)
+            content = Label(option.sectionTypeName).apply {
+                popover { text(option.message) }
+                setOnMouseClicked { fire() }
             }
         }
     }
@@ -99,8 +97,7 @@ class CreateArcSectionDialogView : Fragment() {
         }
     }
 
-    private fun changingSelectionWouldRemovedChangesToDescription(nextSelection: SectionTypeOption): Boolean
-    {
+    private fun changingSelectionWouldRemovedChangesToDescription(nextSelection: SectionTypeOption): Boolean {
         val currentSelection = state.selectedType.get()
         val description = state.description.get()
         if (currentSelection is SectionTypeOption.AlreadyUsed && description != currentSelection.description) return true
@@ -125,35 +122,53 @@ class CreateArcSectionDialogView : Fragment() {
         }
     }
 
-    private fun primaryButtonText(): StringBinding
-    {
+    private fun primaryButtonText(): StringBinding {
         return state.selectedType.stringBinding(state.defaultPrimaryButtonLabel, state.modifyingPrimaryButtonLabel) {
             if (it is SectionTypeOption.AlreadyUsed) state.modifyingPrimaryButtonLabel.valueSafe
             else state.defaultPrimaryButtonLabel.valueSafe
         }
     }
 
-    private fun createOrModifySelectedSectionType()
-    {
-        val selectedOption =  state.selectedType.value!!
+    private fun createOrModifySelectedSectionType() {
+        val selectedOption = state.selectedType.value!!
         if (selectedOption is SectionTypeOption.AlreadyUsed) {
-            viewListener.modifyArcSection(characterArcId, selectedOption.sectionTypeId, state.description.valueSafe)
+            modifyArcSection(selectedOption)
         } else {
-            viewListener.createArcSection(
-                characterArcId,
-                selectedOption.sectionTypeId,
-                state.description.valueSafe
-            )
+            createArcSection(selectedOption)
         }
     }
 
-    fun show(characterArcId: String) {
-        if (characterArcProperty.isInitialized()) {
+    private fun modifyArcSection(selectedOption: SectionTypeOption.AlreadyUsed) {
+        viewListener.modifyArcSection(
+            characterId,
+            themeId,
+            selectedOption.existingSectionId,
+            sceneId,
+            state.description.valueSafe,
+        )
+    }
+
+    private fun createArcSection(selectedOption: SectionTypeOption) {
+        viewListener.createArcSection(
+            characterId,
+            themeId,
+            selectedOption.sectionTypeId,
+            sceneId,
+            state.description.valueSafe,
+        )
+    }
+
+    private val idsInitialized = lazy { true }
+    fun show(characterId: String, themeId: String, sceneId: String) {
+        if (idsInitialized.isInitialized()) {
             throw Error("Dialog already shown.")
         }
-        this.characterArcId = characterArcId
+        this.characterId = characterId
+        this.themeId = themeId
+        this.sceneId = sceneId
+        idsInitialized.value
         openModal(StageStyle.DECORATED, Modality.APPLICATION_MODAL)
-        viewListener.getValidState()
+        viewListener.getValidState(themeId, characterId)
     }
 
     init {

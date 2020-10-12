@@ -30,7 +30,9 @@ import java.util.*
 
 class CreateArcSectionDialogViewTest : ApplicationTest() {
 
-    private val characterArcId = randomizedString("character arc id")
+    private val sceneId = randomizedString("scene id")
+    private val themeId = randomizedString("theme id")
+    private val characterId = randomizedString("character id")
 
     private var dialog: CreateArcSectionDialogView by singleAssign()
 
@@ -48,7 +50,9 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
             @Test
             fun `should call for initial state`() {
-                assertTrue(getValidStateWasCalled) { "Did not request valid state" }
+                val request = getValidStateParameters ?: error("Did not request valid state")
+                assertEquals(themeId, request[0])
+                assertEquals(characterId, request[1])
             }
 
         }
@@ -78,6 +82,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
                 SectionTypeOption.AlreadyUsed(
                     randomizedString("id"),
                     randomizedString("section type 3"),
+                    randomizedString("existing section id"),
                     randomizedString("section description"),
                     randomizedString("section message")
                 )
@@ -125,6 +130,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
         private val alreadyUsedOption = SectionTypeOption.AlreadyUsed(
             randomizedString("section type id"),
             randomizedString("section type name"),
+            randomizedString("existing section id"),
             randomizedString("section type description"),
             randomizedString("section type message")
         )
@@ -307,7 +313,8 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
             inner class `When Description has been Modified for Selected, Used Option` {
 
                 private val otherUsedOption = SectionTypeOption.AlreadyUsed(
-                    "", randomizedString("other used option name"), "", ""
+                    "", randomizedString("other used option name"),
+                    randomizedString("existing section id"), "", ""
                 )
 
                 @BeforeEach
@@ -356,6 +363,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
         private val selectedOptionAttempt = SectionTypeOption.AlreadyUsed(
             "",
             randomizedString("selectedOptionAttempt"),
+            randomizedString("existing section id"),
             randomizedString("selectedOptionAttempt description"),
             ""
         )
@@ -430,9 +438,11 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
             fun `should request creation`() {
                 interact { dialog.getPrimaryButton().fire() }
 
-                assertEquals(characterArcId, creationRequest!![0])
-                assertEquals(vm.sectionTypeOptions!!.first().sectionTypeId, creationRequest!![1])
-                assertEquals(newDescription, creationRequest!![2])
+                assertEquals(characterId, creationRequest!![0])
+                assertEquals(themeId, creationRequest!![1])
+                assertEquals(vm.sectionTypeOptions!!.first().sectionTypeId, creationRequest!![2])
+                assertEquals(sceneId, creationRequest!![3])
+                assertEquals(newDescription, creationRequest!![4])
             }
 
         }
@@ -442,7 +452,8 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
             val vm = viewModel.copy(
                 sectionTypeOptions = listOf(
-                    SectionTypeOption.AlreadyUsed(randomizedString("id"), "", "", "")
+                    SectionTypeOption.AlreadyUsed(randomizedString("id"), "",
+                        randomizedString("existing section id"), "", "")
                 )
             )
 
@@ -458,20 +469,27 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
             @Test
             fun `should request modification`() {
                 interact { dialog.getPrimaryButton().fire() }
-
-                assertEquals(characterArcId, modificationRequest!![0])
-                assertEquals(vm.sectionTypeOptions!!.first().sectionTypeId, modificationRequest!![1])
-                assertEquals(newDescription, modificationRequest!![2])
+                
+                assertEquals(characterId, modificationRequest!![0])
+                assertEquals(themeId, modificationRequest!![1])
+                assertEquals((vm.sectionTypeOptions!!.first() as SectionTypeOption.AlreadyUsed).existingSectionId, modificationRequest!![2])
+                assertEquals(sceneId, modificationRequest!![3])
+                assertEquals(newDescription, modificationRequest!![4])
             }
 
         }
 
     }
 
-    private fun CreateArcSectionDialogView.show() = show(this@CreateArcSectionDialogViewTest.characterArcId)
+    private fun CreateArcSectionDialogView.show() = show(
+        this@CreateArcSectionDialogViewTest.characterId,
+        this@CreateArcSectionDialogViewTest.themeId,
+        this@CreateArcSectionDialogViewTest.sceneId
+    )
     private fun randomizedString(source: String): String = "$source randomized[${UUID.randomUUID()}]"
 
     var getValidStateWasCalled = false
+    var getValidStateParameters: List<String>? = null
     var creationRequest: List<String>? = null
     var modificationRequest: List<String>? = null
     private val projectScope = ProjectScope(
@@ -498,16 +516,28 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
         scoped<ProjectScope> {
             provide<CreateArcSectionDialogViewListener> {
                 object : CreateArcSectionDialogViewListener {
-                    override fun getValidState() {
-                        getValidStateWasCalled = true
+                    override fun getValidState(themeUUID: String, characterUUID: String) {
+                        getValidStateParameters = listOf(themeUUID, characterUUID)
                     }
 
-                    override fun createArcSection(characterArcId: String, templateId: String, description: String) {
-                        creationRequest = listOf(characterArcId, templateId, description)
+                    override fun createArcSection(
+                        characterId: String,
+                        themeId: String,
+                        sectionTemplateId: String,
+                        sceneId: String,
+                        description: String
+                    ) {
+                        creationRequest = listOf(characterId, themeId, sectionTemplateId, sceneId, description)
                     }
 
-                    override fun modifyArcSection(characterArcId: String, templateId: String, description: String) {
-                        modificationRequest = listOf(characterArcId, templateId, description)
+                    override fun modifyArcSection(
+                        characterId: String,
+                        themeId: String,
+                        arcSectionId: String,
+                        sceneId: String,
+                        description: String
+                    ) {
+                        modificationRequest = listOf(characterId, themeId, arcSectionId, sceneId, description)
                     }
                 }
             }

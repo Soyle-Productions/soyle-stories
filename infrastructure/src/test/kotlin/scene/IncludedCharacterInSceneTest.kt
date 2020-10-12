@@ -35,7 +35,9 @@ import java.util.*
 
 class IncludedCharacterInSceneTest {
 
-    private val characterArcId = UUID.randomUUID().toString()
+    private val characterId = UUID.randomUUID().toString()
+    private val themeId = UUID.randomUUID().toString()
+    private val sceneId = UUID.randomUUID()
 
     private val robot = FxRobot()
 
@@ -55,7 +57,9 @@ class IncludedCharacterInSceneTest {
             else null
         }.firstOrNull() ?: error("No open windows containing CreateArcSectionDialogView")
 
-        assertEquals(characterArcId, dialog.characterArcId)
+        assertEquals(characterId, dialog.characterId)
+        assertEquals(themeId, dialog.themeId)
+        assertEquals(sceneId.toString(), dialog.sceneId)
 
     }
 
@@ -72,9 +76,22 @@ class IncludedCharacterInSceneTest {
         scoped<ProjectScope> {
             provide<CreateArcSectionDialogViewListener> {
                 object : CreateArcSectionDialogViewListener {
-                    override fun getValidState() {}
-                    override fun createArcSection(characterArcId: String, templateId: String, description: String) { }
-                    override fun modifyArcSection(characterArcId: String, templateId: String, description: String) { }
+                    override fun getValidState(themeUUID: String, characterUUID: String) {}
+                    override fun createArcSection(
+                        characterId: String,
+                        themeId: String,
+                        sectionTemplateId: String,
+                        sceneId: String,
+                        description: String
+                    ) {}
+
+                    override fun modifyArcSection(
+                        characterId: String,
+                        themeId: String,
+                        arcSectionId: String,
+                        sceneId: String,
+                        description: String
+                    ) {}
                 }
             }
         }
@@ -109,7 +126,7 @@ class IncludedCharacterInSceneTest {
         val includedCharactersState = SceneDetailsScope(
             ProjectScope(ApplicationScope(), ProjectFileViewModel(UUID.randomUUID(), "", "")),
             "",
-            SceneDetails(UUID.randomUUID(), object : Locale {
+            SceneDetails(sceneId, object : Locale {
                 override val sceneDoesNotExist: String = ""
                 override val sceneNameCannotBeBlank: String = ""
             })
@@ -120,9 +137,9 @@ class IncludedCharacterInSceneTest {
                 IncludedCharactersInSceneViewModel(
                     "", "", "", "", "", "", "", "", listOf(
                         IncludedCharacterInSceneViewModel(
-                            "", "", "", false, null, listOf(), listOf(
+                            characterId, "", "", false, null, listOf(), listOf(
                                 AvailableCharacterArcViewModel(
-                                    characterArcId, "", 0, false, listOf(
+                                    "", themeId, "", 0, false, listOf(
                                         AvailableArcSectionViewModel(
                                             "", "", false, ""
                                         )
