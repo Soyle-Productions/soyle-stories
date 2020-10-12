@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.changeSectionValue
 
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
 
 class ChangeCharacterDesireOutput(
     private val changedCharacterDesireReceiver: ChangedCharacterArcSectionValueReceiver
