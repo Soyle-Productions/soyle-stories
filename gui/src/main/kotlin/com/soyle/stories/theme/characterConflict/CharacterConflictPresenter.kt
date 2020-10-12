@@ -13,8 +13,8 @@ import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFro
 import com.soyle.stories.theme.updateThemeMetaData.ThemeWithCentralConflictChangedReceiver
 import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ArcSectionType
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ArcSectionType
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
@@ -223,6 +223,7 @@ class CharacterConflictPresenter(
                 ArcSectionType.Desire -> copy(desire = changedCharacterArcSectionValue.newValue)
                 ArcSectionType.PsychologicalWeakness -> copy(psychologicalWeakness = changedCharacterArcSectionValue.newValue)
                 ArcSectionType.MoralWeakness -> copy(moralWeakness = changedCharacterArcSectionValue.newValue)
+                else -> this // due to the type !in setOf call above, will never actually reach this line.
             }
         }
     }
