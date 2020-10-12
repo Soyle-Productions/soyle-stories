@@ -23,6 +23,7 @@ data class CoveredArcSectionViewModel(
 
 class AvailableCharacterArcViewModel(
     val characterArcId: String,
+    val themeId: String,
     val characterArcName: String,
     val numberOfCoveredSections: Int,
     val allSectionsCovered: Boolean,

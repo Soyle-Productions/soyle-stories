@@ -29,6 +29,7 @@ class IncludedCharacterInScenePresenter(
                 availableCharacterArcSections = response.map { arc ->
                     AvailableCharacterArcViewModel(
                         arc.characterArcId.toString(),
+                        arc.themeId.toString(),
                         arc.characterArcName,
                         arc.filter { it.usedInScene }.size,
                         arc.all { it.usedInScene },
