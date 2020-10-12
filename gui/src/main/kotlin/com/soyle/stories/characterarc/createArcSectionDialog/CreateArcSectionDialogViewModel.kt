@@ -29,6 +29,7 @@ sealed class SectionTypeOption {
     class AlreadyUsed(
         override val sectionTypeId: String,
         override val sectionTypeName: String,
+        val existingSectionId: String,
         val description: String,
         val message: String
     ) : SectionTypeOption()
