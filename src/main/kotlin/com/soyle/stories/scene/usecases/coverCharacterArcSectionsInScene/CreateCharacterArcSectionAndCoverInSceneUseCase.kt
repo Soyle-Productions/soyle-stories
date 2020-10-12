@@ -75,7 +75,8 @@ class CreateCharacterArcSectionAndCoverInSceneUseCase(
                     newSection.id.uuid,
                     newSection.template.name,
                     newSection.value,
-                    arc.name
+                    arc.name,
+                    newSection.template.allowsMultiple
                 )
             )
         )

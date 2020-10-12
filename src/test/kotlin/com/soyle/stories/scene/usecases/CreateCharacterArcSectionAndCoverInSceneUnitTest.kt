@@ -295,13 +295,8 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
                 assertTrue(isCharacterArcSectionCovered(newSection.id)) { "Scene does not contain section." }
             }
             (result as CreateCharacterArcSectionAndCoverInScene.ResponseModel)
-                .characterArcSectionCoveredByScene.run {
-                    characterArcSectionId.mustEqual(newSection.id.uuid)
-                    sceneId.mustEqual(scene.id.uuid)
-                    characterId.mustEqual(character.id.uuid)
-                    themeId.mustEqual(arc.themeId.uuid)
-                    this shouldBe characterArcSectionCoveredByScene(newSection, arc, scene.id.uuid)
-                }
+                .characterArcSectionCoveredByScene
+                .shouldBe(characterArcSectionCoveredByScene(newSection, updatedArc!!, scene.id.uuid))
         }
 
         fun invoke(value: String = "") {

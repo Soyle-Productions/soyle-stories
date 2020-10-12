@@ -18,7 +18,7 @@ interface ChangeCharacterArcSectionValueAndCoverInScene {
 
     class ResponseModel(
         val changedCharacterArcSectionValue: ChangedCharacterArcSectionValue,
-        val characterArcSectionCoveredByScene: CoveredArcSectionInScene
+        val characterArcSectionCoveredByScene: CharacterArcSectionCoveredByScene
     )
 
     interface OutputPort {

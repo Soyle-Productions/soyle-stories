@@ -66,7 +66,8 @@ class CoverCharacterArcSectionsInSceneUseCase(
                     section.id.uuid,
                     section.template.name,
                     section.value,
-                    arc.name
+                    arc.name,
+                    section.template.allowsMultiple
                 )
             }
         }

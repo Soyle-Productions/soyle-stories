@@ -10,5 +10,6 @@ class CharacterArcSectionCoveredByScene(
     val characterArcSectionId: UUID,
     val characterArcSectionName: String,
     val characterArcSectionValue: String,
-    val characterArcName: String
+    val characterArcName: String,
+    val isMultiTemplate: Boolean
 )

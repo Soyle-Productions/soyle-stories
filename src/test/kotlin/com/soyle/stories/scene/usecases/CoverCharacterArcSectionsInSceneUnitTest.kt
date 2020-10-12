@@ -143,7 +143,6 @@ class CoverCharacterArcSectionsInSceneUnitTest {
             result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
                 val availableArc = it.single()
                 assertEquals(baseArc.name, availableArc.characterArcName)
-                assertEquals(baseArc.themeId.uuid, availableArc.themeId)
                 assertEquals(baseSections.map { it.id.uuid }.toSet(), availableArc.map { it.arcSectionId }.toSet())
                 availableArc.forEach { section ->
                     val baseSection = baseSections.single { it.id.uuid == section.arcSectionId }
@@ -168,7 +167,6 @@ class CoverCharacterArcSectionsInSceneUnitTest {
             result shouldBe availableCharacterArcSectionsForCharacterInScene(scene.id.uuid, character.id.uuid) {
                 val availableArc = it.single()
                 assertEquals(baseArc.name, availableArc.characterArcName)
-                assertEquals(baseArc.themeId.uuid, availableArc.themeId)
                 assertEquals(baseSections.map { it.id.uuid }.toSet(), availableArc.map { it.arcSectionId }.toSet())
                 availableArc.forEach { section ->
                     val baseSection = baseSections.single { it.id.uuid == section.arcSectionId }

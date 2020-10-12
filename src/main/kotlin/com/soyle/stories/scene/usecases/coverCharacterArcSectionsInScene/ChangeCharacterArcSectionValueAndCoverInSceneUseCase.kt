@@ -53,13 +53,16 @@ class ChangeCharacterArcSectionValueAndCoverInSceneUseCase(
                     null,
                     arcSection.value
                 ),
-                CoveredArcSectionInScene(
+                CharacterArcSectionCoveredByScene(
+                    scene.id.uuid,
+                    characterArc.characterId.uuid,
+                    characterArc.themeId.uuid,
+                    characterArc.id.uuid,
                     arcSection.id.uuid,
                     arcSection.template.name,
                     arcSection.value,
-                    arcSection.template.allowsMultiple,
-                    characterArc.id.uuid,
-                    characterArc.name
+                    characterArc.name,
+                    arcSection.template.allowsMultiple
                 )
             )
         )

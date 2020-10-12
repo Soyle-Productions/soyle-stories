@@ -6,7 +6,7 @@ import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.Charact
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.*
 
-fun characterArcSectionCoveredByScene(baseSection: CharacterArcSection, baseArc: CharacterArc, sceneId: UUID) = fun (actual: Any?) {
+fun characterArcSectionCoveredByScene(baseSection: CharacterArcSection, baseArc: CharacterArc, sceneId: UUID) = fun (actual: CharacterArcSectionCoveredByScene?) {
     actual as CharacterArcSectionCoveredByScene
     assertEquals(baseSection.characterId.uuid, actual.characterId) {
         "Unexpected characterId for CharacterArcSectionCoveredByScene" }
@@ -22,4 +22,6 @@ fun characterArcSectionCoveredByScene(baseSection: CharacterArcSection, baseArc:
         "Unexpected characterArcName for CharacterArcSectionCoveredByScene" }
     assertEquals(sceneId, actual.sceneId) {
         "Unexpected sceneId for CharacterArcSectionCoveredByScene" }
+    assertEquals(baseSection.template.allowsMultiple, actual.isMultiTemplate) {
+        "Unexpected isMultiTemplate for CharacterArcSectionCoveredByScene" }
 }

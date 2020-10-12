@@ -15,12 +15,14 @@ import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.sceneDoesNotExist
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInSceneUseCase
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
 import com.soyle.stories.scene.usecases.getSceneDetails.CoveredArcSectionInScene
 import com.soyle.stories.theme.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.util.*
 
 class ChangeCharacterArcSectionValueAndCoverInSceneTest {
 
@@ -93,7 +95,7 @@ class ChangeCharacterArcSectionValueAndCoverInSceneTest {
             assertTrue(it.isCharacterArcSectionCovered(arcSection.id))
         }
         responseModel!!.changedCharacterArcSectionValue shouldBe ::changedCharacterArcSectionValue
-        responseModel!!.characterArcSectionCoveredByScene shouldBe ::coveredSectionInScene
+        responseModel!!.characterArcSectionCoveredByScene shouldBe ::characterArcSectionCoveredByScene
     }
 
     @Test
@@ -113,7 +115,7 @@ class ChangeCharacterArcSectionValueAndCoverInSceneTest {
             assertTrue(it.isCharacterArcSectionCovered(arcSection.id))
         }
         responseModel!!.changedCharacterArcSectionValue shouldBe ::changedCharacterArcSectionValue
-        responseModel!!.characterArcSectionCoveredByScene shouldBe ::coveredSectionInScene
+        responseModel!!.characterArcSectionCoveredByScene shouldBe ::characterArcSectionCoveredByScene
     }
 
 
@@ -169,13 +171,16 @@ class ChangeCharacterArcSectionValueAndCoverInSceneTest {
         assertEquals(providedValue, it.newValue)
     }
 
-    private fun coveredSectionInScene(actual: CoveredArcSectionInScene)
+    private fun characterArcSectionCoveredByScene(actual: CharacterArcSectionCoveredByScene)
     {
-        assertEquals(arcSection.id.uuid, actual.arcSectionId)
+        assertEquals(sceneId, actual.sceneId)
+        assertEquals(characterId, actual.characterId)
+        assertEquals(themeId, actual.themeId)
         assertEquals(characterArc.id.uuid, actual.characterArcId)
         assertEquals(characterArc.name, actual.characterArcName)
-        assertEquals(arcSection.template.name, actual.arcSectionTemplateName)
-        assertEquals(arcSection.template.allowsMultiple, actual.arcSectionTemplateAllowsMultiple)
-        assertEquals(providedValue, actual.arcSectionValue)
+        assertEquals(arcSection.id.uuid, actual.characterArcSectionId)
+        assertEquals(arcSection.template.name, actual.characterArcSectionName)
+        assertEquals(arcSection.template.allowsMultiple, actual.isMultiTemplate)
+        assertEquals(providedValue, actual.characterArcSectionValue)
     }
 }

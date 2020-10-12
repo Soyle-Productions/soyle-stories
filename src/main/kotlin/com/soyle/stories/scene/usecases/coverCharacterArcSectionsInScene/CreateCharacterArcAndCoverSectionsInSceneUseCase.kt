@@ -103,7 +103,8 @@ class CreateCharacterArcAndCoverSectionsInSceneUseCase(
                 createdArcSection.id.uuid,
                 createdArcSection.template.name,
                 createdArcSection.value,
-                arc.name
+                arc.name,
+                createdArcSection.template.allowsMultiple
             )
         }
     }
