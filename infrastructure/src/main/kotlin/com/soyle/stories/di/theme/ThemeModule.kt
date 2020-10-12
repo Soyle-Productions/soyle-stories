@@ -55,7 +55,6 @@ import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.deleteValueWebDialog.*
 import com.soyle.stories.theme.includeCharacterInTheme.*
 import com.soyle.stories.theme.removeCharacterAsOpponent.*
-import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonOutput
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeNotifier
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
@@ -98,7 +97,7 @@ import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicI
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOppositionUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.*
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.*
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChangeUseCase
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
@@ -371,7 +370,7 @@ object ThemeModule {
             ChangeCentralConflictControllerImpl(applicationScope.get(), get(), get())
         }
         provide<ChangeSectionValueController> {
-            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get())
+            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
         }
         provide<ChangeCharacterChangeController> {
             ChangeCharacterChangeControllerImpl(applicationScope.get(), get(), get())

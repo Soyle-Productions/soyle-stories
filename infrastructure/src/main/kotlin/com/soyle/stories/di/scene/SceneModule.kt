@@ -251,6 +251,8 @@ object SceneModule {
                 CoverArcSectionsInSceneControllerImpl(
                     applicationScope.get(),
                     get(),
+                    get(),
+                    get(),
                     get()
                 )
             }
