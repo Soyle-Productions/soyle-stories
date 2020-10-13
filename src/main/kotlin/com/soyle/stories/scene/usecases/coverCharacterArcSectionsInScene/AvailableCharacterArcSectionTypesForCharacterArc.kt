@@ -11,5 +11,6 @@ class AvailableCharacterArcSectionTypesForCharacterArc(
 class AvailableCharacterArcSectionType(
     val templateSectionId: UUID,
     val name: String,
-    val multiple: Boolean
+    val multiple: Boolean,
+    val existingSection: Pair<UUID, String>?
 )

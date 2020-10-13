@@ -21,14 +21,20 @@ class CreateCharacterArcSectionAndCoverInSceneUseCase(
         output: GetAvailableCharacterArcSectionTypesForCharacterArc.OutputPort
     ) {
         val characterArc = characterArcRepository.getCharacterArcOrError(characterId, themeId)
+        val arcSectionsByTemplateId = characterArc.arcSections.associateBy { it.template.id }
 
         output.receiveAvailableCharacterArcSectionTypesForCharacterArc(
             AvailableCharacterArcSectionTypesForCharacterArc(
                 characterId,
                 themeId,
                 characterArc.template.sections
-                    .takeAvailableSectionTemplates(characterArc)
-                    .map { AvailableCharacterArcSectionType(it.id.uuid, it.name, it.allowsMultiple) }
+                    .map { template ->
+                        AvailableCharacterArcSectionType(template.id.uuid, template.name, template.allowsMultiple,
+                            arcSectionsByTemplateId[template.id]?.let {
+                                it.id.uuid to it.value
+                            }
+                        )
+                    }
             )
         )
     }

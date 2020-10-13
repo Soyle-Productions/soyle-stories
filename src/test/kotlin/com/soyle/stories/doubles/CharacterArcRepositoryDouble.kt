@@ -26,6 +26,7 @@ class CharacterArcRepositoryDouble(
         }
     }
 
+    fun getAllCharacterArcs(): List<CharacterArc> = characterArcsById.values.toList()
     fun getCharacterArc(id: CharacterArc.Id): CharacterArc? = characterArcsById[id]
     fun getCharacterArcSection(id: CharacterArcSection.Id): CharacterArcSection? {
         val arcId = characterArcsByArcSectionId[id] ?: return null

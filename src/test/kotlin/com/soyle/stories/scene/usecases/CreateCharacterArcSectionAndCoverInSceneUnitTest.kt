@@ -24,8 +24,7 @@ import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreateC
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -81,14 +80,16 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
         @Test
         fun `Only required sections in template`() {
             // given
-            givenCharacterArcBasedOnTemplateSections(List(6) { template("Template ${str()}") })
+            val templates = List(6) { template("Template ${str()}") }
+            givenCharacterArcBasedOnTemplateSections(templates)
             // when
             invoke()
             // then
             with(result as AvailableCharacterArcSectionTypesForCharacterArc) {
                 characterId.mustEqual(character.id.uuid) { "Unexpected characterId for result" }
                 themeId.mustEqual(theme.id.uuid) { "Unexpected themeId for result" }
-                assertTrue(isEmpty()) { "When all the template sections are required, the character arc will have used them all, so the output should be empty" }
+                size.mustEqual(6) { "Expected all templates to be output." }
+                templates.forEach(assertOutputTemplateMatchesBase(this))
             }
         }
 
@@ -107,7 +108,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
             with(result as AvailableCharacterArcSectionTypesForCharacterArc) {
                 characterId.mustEqual(character.id.uuid) { "Unexpected characterId for result" }
                 themeId.mustEqual(theme.id.uuid) { "Unexpected themeId for result" }
-                assertTrue(isEmpty()) { "When all the template sections have been used, so the output should be empty" }
+                templateSections.forEach(assertOutputTemplateMatchesBase(this))
             }
         }
 
@@ -129,8 +130,8 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
             with(result as AvailableCharacterArcSectionTypesForCharacterArc) {
                 characterId.mustEqual(character.id.uuid) { "Unexpected characterId for result" }
                 themeId.mustEqual(theme.id.uuid) { "Unexpected themeId for result" }
-                size.mustEqual(unusedUnrequiredSections.size) { "All unused template sections should be output.  Unexpected number received" }
-                unusedUnrequiredSections.forEach(assertOutputTemplateMatchesBase(this))
+                size.mustEqual(templateSections.size) { "All template sections should be output.  Unexpected number received" }
+                templateSections.forEach(assertOutputTemplateMatchesBase(this))
             }
         }
 
@@ -152,10 +153,10 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
             with(result as AvailableCharacterArcSectionTypesForCharacterArc) {
                 characterId.mustEqual(character.id.uuid) { "Unexpected characterId for result" }
                 themeId.mustEqual(theme.id.uuid) { "Unexpected themeId for result" }
-                size.mustEqual(unusedAdditionalSections.size + multiSections.size) {
+                size.mustEqual(templateSections.size) {
                     "All multiple template sections or unused sections should be output.  Unexpected number received"
                 }
-                (unusedAdditionalSections + multiSections).forEach(assertOutputTemplateMatchesBase(this))
+                templateSections.forEach(assertOutputTemplateMatchesBase(this))
             }
         }
 
@@ -169,13 +170,23 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
             }
         }
 
-        private fun assertOutputTemplateMatchesBase(output: AvailableCharacterArcSectionTypesForCharacterArc) =
-            fun(baseTemplate: CharacterArcTemplateSection) {
+        private fun assertOutputTemplateMatchesBase(output: AvailableCharacterArcSectionTypesForCharacterArc) : (CharacterArcTemplateSection) -> Unit {
+
+            val arc = characterArcRepository.getAllCharacterArcs().find { it.characterId.uuid == output.characterId && it.themeId.uuid == output.themeId }!!
+            return fun(baseTemplate: CharacterArcTemplateSection) {
                 val outputSection = output.find { it.templateSectionId == baseTemplate.id.uuid }
                     ?: throw AssertionError("Missing expected template section from output ${baseTemplate}")
                 outputSection.name.mustEqual(baseTemplate.name) { "Output template name does not match." }
                 outputSection.multiple.mustEqual(baseTemplate.allowsMultiple) { "Output template should have matching value for `allowMultiple`." }
+                val existingSection = arc.arcSections.find { it.template.id == baseTemplate.id }
+                if (existingSection != null) {
+                    assertEquals(existingSection.id.uuid, outputSection.existingSection!!.first)
+                    assertEquals(existingSection.value, outputSection.existingSection!!.second)
+                }
+                else assertNull(outputSection.existingSection) { "Should not receive backing section if not in arc." }
             }
+        }
+
 
     }
 
