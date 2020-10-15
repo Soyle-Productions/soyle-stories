@@ -1,12 +1,17 @@
 package com.soyle.stories.scene.coverArcSectionsInScene
 
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
+import com.soyle.stories.character.createArcSection.CreatedCharacterArcSectionReceiver
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.*
 
 class CoverCharacterArcSectionsInSceneOutputPort(
     private val coverCharacterArcSectionsInSceneReceiver: CharacterArcSectionsCoveredBySceneReceiver,
-    private val characterArcSectionUncoveredInSceneReceiver: CharacterArcSectionUncoveredInSceneReceiver
-) : CoverCharacterArcSectionsInScene.OutputPort {
+    private val characterArcSectionUncoveredInSceneReceiver: CharacterArcSectionUncoveredInSceneReceiver,
+    private val createdCharacterArcSectionReceiver: CreatedCharacterArcSectionReceiver
+) :
+    CoverCharacterArcSectionsInScene.OutputPort,
+    ChangeCharacterArcSectionValueAndCoverInScene.OutputPort,
+    CreateCharacterArcSectionAndCoverInScene.OutputPort
+{
 
     override suspend fun characterArcSectionsCoveredInScene(response: CoverCharacterArcSectionsInScene.ResponseModel) {
         if (response.sectionsCoveredByScene.isNotEmpty()) {
@@ -15,7 +20,19 @@ class CoverCharacterArcSectionsInSceneOutputPort(
         if (response.sectionsUncovered.isNotEmpty()) {
             characterArcSectionUncoveredInSceneReceiver.receiveCharacterArcSectionUncoveredInScene(response.sectionsUncovered)
         }
+    }
 
+    override suspend fun characterArcSectionValueChangedAndAddedToScene(response: ChangeCharacterArcSectionValueAndCoverInScene.ResponseModel) {
+        coverCharacterArcSectionsInSceneReceiver.receiveCharacterArcSectionsCoveredByScene(
+            listOf(response.characterArcSectionCoveredByScene))
+    }
+
+    override suspend fun characterArcCreatedAndCoveredInScene(response: CreateCharacterArcSectionAndCoverInScene.ResponseModel) {
+        createdCharacterArcSectionReceiver.receiveCreatedCharacterArcSection(
+            response.createdCharacterArcSection
+        )
+        coverCharacterArcSectionsInSceneReceiver.receiveCharacterArcSectionsCoveredByScene(
+            listOf(response.characterArcSectionCoveredByScene))
     }
 
 }

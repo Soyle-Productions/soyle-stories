@@ -4,6 +4,8 @@ import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
 import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -51,9 +53,7 @@ import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationFor
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
 import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
 import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
@@ -145,6 +145,14 @@ object SceneModule {
             provide(CoverCharacterArcSectionsInScene::class, GetAvailableCharacterArcsForCharacterInScene::class) {
                 CoverCharacterArcSectionsInSceneUseCase(get(), get())
             }
+            provide<ChangeCharacterArcSectionValueAndCoverInScene> {
+                ChangeCharacterArcSectionValueAndCoverInSceneUseCase(get(), get(), get())
+            }
+            provide(CreateCharacterArcSectionAndCoverInScene::class, GetAvailableCharacterArcSectionTypesForCharacterArc::class) {
+                CreateCharacterArcSectionAndCoverInSceneUseCase(get(), get())
+            }
+
+
             provide(IncludedCharacterInSceneReceiver::class) {
                 IncludedCharacterInSceneNotifier()
             }
@@ -170,6 +178,7 @@ object SceneModule {
             provide(IncludeCharacterInScene.OutputPort::class) {
                 IncludeCharacterInSceneOutput(get(), get())
             }
+
             provide(LinkLocationToScene.OutputPort::class) {
                 LinkLocationToSceneNotifier(applicationScope.get())
             }
@@ -179,8 +188,12 @@ object SceneModule {
             provide(ReorderScene.OutputPort::class) {
                 ReorderSceneNotifier(applicationScope.get())
             }
-            provide(CoverCharacterArcSectionsInScene.OutputPort::class) {
-                CoverCharacterArcSectionsInSceneOutputPort(get(), get())
+            provide(
+                CoverCharacterArcSectionsInScene.OutputPort::class,
+                ChangeCharacterArcSectionValueAndCoverInScene.OutputPort::class,
+                CreateCharacterArcSectionAndCoverInScene.OutputPort::class
+            ) {
+                CoverCharacterArcSectionsInSceneOutputPort(get(), get(), get())
             }
 
             provide<CreateNewSceneController> {

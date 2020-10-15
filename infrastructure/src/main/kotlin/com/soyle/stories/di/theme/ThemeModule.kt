@@ -293,14 +293,13 @@ object ThemeModule {
         provide(UseCharacterAsMainOpponent.OutputPort::class) {
             UseCharacterAsMainOpponentOutput(get(), get())
         }
-        provide(ChangeCharacterDesire.OutputPort::class) {
-            ChangeCharacterDesireOutput(get())
-        }
-        provide(ChangeCharacterPsychologicalWeakness.OutputPort::class) {
-            ChangeCharacterPsychologicalWeaknessOutput(get())
-        }
-        provide(ChangeCharacterMoralWeakness.OutputPort::class) {
-            ChangeCharacterMoralWeaknessOutput(get())
+        provide(
+            ChangeCharacterDesire.OutputPort::class,
+            ChangeCharacterPsychologicalWeakness.OutputPort::class,
+            ChangeCharacterMoralWeakness.OutputPort::class,
+            ChangeCharacterArcSectionValue.OutputPort::class
+        ) {
+            ChangeCharacterArcSectionValueOutput(get())
         }
         provide(ChangeCharacterChange.OutputPort::class) {
             ChangeCharacterChangeOutput(get())

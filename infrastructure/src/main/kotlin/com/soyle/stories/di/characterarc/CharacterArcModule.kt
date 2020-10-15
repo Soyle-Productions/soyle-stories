@@ -1,6 +1,10 @@
 package com.soyle.stories.di.characterarc
 
 import com.soyle.stories.character.buildNewCharacter.*
+import com.soyle.stories.character.createArcSection.CreateArcSectionController
+import com.soyle.stories.character.createArcSection.CreateArcSectionControllerImpl
+import com.soyle.stories.character.createArcSection.CreatedCharacterArcSectionNotifier
+import com.soyle.stories.character.createArcSection.CreatedCharacterArcSectionReceiver
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
 import com.soyle.stories.character.removeCharacterFromStory.*
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
@@ -16,6 +20,10 @@ import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveChara
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
 import com.soyle.stories.characterarc.changeCentralMoralQuestion.ChangeCentralMoralQuestionNotifier
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogPresenter
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogController
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.characterarc.eventbus.*
@@ -29,6 +37,8 @@ import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.Unli
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionControllerImpl
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.usecaseControllers.*
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterArcSectionValueUseCase
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArc
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
@@ -48,6 +58,7 @@ import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyValueOutput
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedNotifier
@@ -143,6 +154,7 @@ object CharacterArcModule {
             UnlinkLocationFromCharacterArcSectionUseCase(get())
         }
         provide<CreatePerspectiveCharacter> { CreatePerspectiveCharacterUseCase(get(), get()) }
+        provide<ChangeCharacterArcSectionValue> { ChangeCharacterArcSectionValueUseCase(get(), get()) }
     }
 
     private fun InScope<ProjectScope>.events() {
@@ -160,6 +172,9 @@ object CharacterArcModule {
                 get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
                 get<RemoveSymbolicItemControllerImpl>() listensTo it
             }
+        }
+        provide(CreatedCharacterArcSectionReceiver::class) {
+            CreatedCharacterArcSectionNotifier()
         }
 
         provide(BuildNewCharacter.OutputPort::class) { BuildNewCharacterOutput(get(), get(), get()) }
@@ -231,6 +246,9 @@ object CharacterArcModule {
         provide<RemoveCharacterFromStoryController> {
             RemoveCharacterFromStoryControllerImpl(applicationScope.get(), get(), get())
         }
+        provide<CreateArcSectionController> {
+            CreateArcSectionControllerImpl(applicationScope.get(), get(), get())
+        }
     }
 
 
@@ -240,6 +258,19 @@ object CharacterArcModule {
         }
         provide<PlanCharacterArcDialogViewListener> {
             PlanCharacterArcDialogController(get())
+        }
+        provide<CreateArcSectionDialogViewListener> {
+            val presenter = CreateArcSectionDialogPresenter(
+                get<CreateArcSectionDialogState>()
+            )
+
+            CreateArcSectionDialogController(
+                applicationScope.get(),
+                get(),
+                presenter,
+                get(),
+                get()
+            )
         }
     }
 

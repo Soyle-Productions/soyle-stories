@@ -7,6 +7,7 @@ import com.soyle.stories.di.resolveLater
 import javafx.beans.binding.StringBinding
 import javafx.scene.Parent
 import javafx.scene.control.*
+import javafx.scene.text.Text
 import javafx.stage.Modality
 import javafx.stage.StageStyle
 import tornadofx.*
@@ -26,6 +27,7 @@ class CreateArcSectionDialogView : Fragment() {
     private val viewListener by resolveLater<CreateArcSectionDialogViewListener>()
 
     override val root: Parent = vbox {
+        addClass(ComponentsStyles.cardBody)
         labeledSection(state.sectionTypeSelectionFieldLabel) {
             menubutton {
                 addClass(CreateArcSectionDialogStyles.sectionTypeSelection)
@@ -75,15 +77,17 @@ class CreateArcSectionDialogView : Fragment() {
         return CustomMenuItem().apply {
             addClass(ComponentsStyles.discouragedSelection)
             content = Label(option.sectionTypeName).apply {
-                popover { text(option.message) }
-                setOnMouseClicked { fire() }
+                tooltip {
+                    showDelay = 0.seconds
+                    text = option.message
+                }
             }
         }
     }
 
     private fun attemptToSelectSectionOption(option: SectionTypeOption) {
         if (changingSelectionWouldRemovedChangesToDescription(option)) {
-            val alert = Alert(Alert.AlertType.CONFIRMATION, state.confirmUnsavedDescriptionChanges.valueSafe)
+            val alert = Alert(Alert.AlertType.CONFIRMATION, state.confirmUnsavedDescriptionChanges.valueSafe, ButtonType.YES, ButtonType.CANCEL)
 
             alert.resultProperty().onChangeOnce {
                 if (it?.buttonData == ButtonBar.ButtonData.YES) {
@@ -136,6 +140,7 @@ class CreateArcSectionDialogView : Fragment() {
         } else {
             createArcSection(selectedOption)
         }
+        close()
     }
 
     private fun modifyArcSection(selectedOption: SectionTypeOption.AlreadyUsed) {
@@ -163,6 +168,7 @@ class CreateArcSectionDialogView : Fragment() {
         if (idsInitialized.isInitialized()) {
             throw Error("Dialog already shown.")
         }
+        state.reset()
         this.characterId = characterId
         this.themeId = themeId
         this.sceneId = sceneId

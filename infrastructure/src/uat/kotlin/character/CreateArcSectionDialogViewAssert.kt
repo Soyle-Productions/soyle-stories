@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.controlsfx.popover
 import tornadofx.hasClass
-import tornadofx.tooltip
 
 class CreateArcSectionDialogViewAssert private constructor(private val dialog: CreateArcSectionDialogView) :
     AbstractAssert<CreateArcSectionDialogViewAssert, CreateArcSectionDialogView>(
@@ -68,11 +67,10 @@ class CreateArcSectionDialogViewAssert private constructor(private val dialog: C
         fun alreadyUsedItemsDisplayDifferently(expectedAlreadyUsedOptions: List<SectionTypeOption.AlreadyUsed>) {
             val itemsByText = field.getSelection().items.associateBy { it.text }
             expectedAlreadyUsedOptions.forEach { option ->
-                val item = itemsByText.getValue(option.sectionTypeName) as CustomMenuItem
+                val item = itemsByText.getValue(option.sectionTypeName)
                 assertTrue(item.hasClass(ComponentsStyles.discouragedSelection))
-                assertEquals(
-                    option.message,
-                    (item.content as Label).tooltip!!.text
+                assertTrue(
+                    ((item as CustomMenuItem).content!!.popover!!.contentNode!! as Text).text.isNotBlank()
                 )
             }
         }

@@ -24,7 +24,7 @@ class CreateArcSectionDialogPresenter(
                             it.name,
                             existingSection.first.toString(),
                             existingSection.second,
-                            "This moral argument already includes a ${it.name}.  By selecting it, you will instead modify the value of the existing section and link it to this scene."
+                            "This character arc already includes a ${it.name}.  By selecting it, you will instead modify the value of the existing section and link it to this scene."
                         )
                     } else {
                         SectionTypeOption(

@@ -22,7 +22,11 @@ class CreateArcSectionDialogState : Model<ProjectScope, CreateArcSectionDialogVi
     val selectedType = SimpleObjectProperty<SectionTypeOption?>(null)
     val description = SimpleStringProperty("")
 
-
     val sectionTypeOptions = bind(CreateArcSectionDialogViewModel::sectionTypeOptions)
+
+    fun reset() {
+        selectedType.set(null)
+        description.set("")
+    }
 
 }

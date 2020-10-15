@@ -4,6 +4,9 @@ import com.soyle.stories.UATLogger
 import com.soyle.stories.character.CharacterArcSteps
 import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.character.CharacterSteps
+import com.soyle.stories.character.CreateArcSectionDialogViewAssert.Companion.assertThat
+import com.soyle.stories.character.getCreateArcSectionDialogOrError
+import com.soyle.stories.characterarc.createArcSectionDialog.SectionTypeOption
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcSection
@@ -71,9 +74,13 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
             }
         }
 
-        fun givenSceneCoversArcSections(projectScope: ProjectScope, scene: Scene, arcSections: List<CharacterArcSection>)
-        {
-            val uncoveredSections = arcSections.filter { !scene.isCharacterArcSectionCovered(it.id) }.groupBy { it.characterId }
+        fun givenSceneCoversArcSections(
+            projectScope: ProjectScope,
+            scene: Scene,
+            arcSections: List<CharacterArcSection>
+        ) {
+            val uncoveredSections =
+                arcSections.filter { !scene.isCharacterArcSectionCovered(it.id) }.groupBy { it.characterId }
             if (uncoveredSections.isEmpty()) return
             val controller = projectScope.get<CoverArcSectionsInSceneController>()
             uncoveredSections.forEach { (characterId, sections) ->
@@ -243,18 +250,17 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
 
                 }
             }
-            Given("some Character Arc Sections for the Character {string} have been covered by the {string} Scene") {
-                characterName: String, sceneName: String ->
+            Given("some Character Arc Sections for the Character {string} have been covered by the {string} Scene") { characterName: String, sceneName: String ->
 
                 val projectScope = ProjectSteps.givenProjectHasBeenOpened(double)
                 val character = CharacterDriver.givenACharacterHasBeenCreatedWithTheName(double, characterName)
                 val scene = givenASceneHasBeenCreatedWithTheName(projectScope, sceneName)
-                val arcs = CharacterSteps.givenANumberOfCharacterArcsHaveBeenCreatedForCharacter(projectScope, character, 2)
+                val arcs =
+                    CharacterSteps.givenANumberOfCharacterArcsHaveBeenCreatedForCharacter(projectScope, character, 2)
                 val arcSections = arcs.flatMap { it.arcSections }
                 givenSceneCoversArcSections(projectScope, scene, arcSections.shuffled().take(arcSections.size / 2))
             }
-            Given("the user has indicated they want to cover character arc sections for the Character {string} in the {string} Scene") {
-                characterName: String, sceneName: String ->
+            Given("the user has indicated they want to cover character arc sections for the Character {string} in the {string} Scene") { characterName: String, sceneName: String ->
 
                 val projectScope = ProjectSteps.givenProjectHasBeenOpened(double)
                 val scene = givenASceneHasBeenCreatedWithTheName(projectScope, sceneName)
@@ -450,8 +456,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
                 val listedCharacter = sceneDetails.getListedCharacterOrError(character)
                 listedCharacter.givenPositionOnCharacterArcsHasBeenSelected()
             }
-            When("the user specifies additional character arc sections to cover in the {string} Scene for the Character {string}") {
-                sceneName: String, characterName: String ->
+            When("the user specifies additional character arc sections to cover in the {string} Scene for the Character {string}") { sceneName: String, characterName: String ->
 
                 val projectScope = ProjectSteps.getProjectScope(double)!!
                 val scene = getSceneByName(projectScope, sceneName)!!
@@ -460,15 +465,15 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
                     .filterNot { scene.isCharacterArcSectionCovered(it.id) }
                     .shuffled().take(4)
 
-                val sceneDetails = projectScope.givenSceneDetailsHasBeenOpened(scene) // allow given because we don't talk about ui in features files
+                val sceneDetails =
+                    projectScope.givenSceneDetailsHasBeenOpened(scene) // allow given because we don't talk about ui in features files
                 val listedCharacter = sceneDetails.getListedCharacterOrError(character)
                 listedCharacter.givenPositionOnCharacterArcsHasBeenSelected()
                 characterArcSectionsSpecifiedToBeCoveredInScene[scene.id] = arcSections
                 listedCharacter.whenCharacterArcSectionsAreSelected(arcSections)
                 listedCharacter.whenPositionOnCharacterArcsIsHidden()
             }
-            When("the user specifies which character arc sections to uncover in the {string} Scene for the Character {string}") {
-                sceneName: String, characterName: String ->
+            When("the user specifies which character arc sections to uncover in the {string} Scene for the Character {string}") { sceneName: String, characterName: String ->
 
                 val projectScope = ProjectSteps.getProjectScope(double)!!
                 val scene = getSceneByName(projectScope, sceneName)!!
@@ -485,10 +490,23 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
                 listedCharacter.whenPositionOnCharacterArcsIsHidden()
 
             }
+            When("the user indicates that they want to create a new character arc section for one of {string}s character arcs") { characterName: String ->
+                // potentially many ways to indicate this.  If the scene details tool is currently open, then that would
+                // be the way to do it.
+
+                val projectScope = ProjectSteps.getProjectScope(double)!!
+                val character = CharacterDriver.getCharacterByIdentifier(double, characterName)!!
+                val firstArc = CharacterArcSteps.getCharacterArcsCreated(double).asSequence()
+                    .filter { it.characterId == character.id }.first()
+                val sceneDetails = projectScope
+                    .toolScopes.filterIsInstance<SceneDetailsScope>().first()
+                    .get<SceneDetails>()
+                val listedCharacter = sceneDetails.getListedCharacterOrError(character)
+                listedCharacter.requestNewArcSectionForArc(firstArc)
+            }
 
 
-            Then("all Character Arcs and their sections should be listed for the Character {string} to cover in the {string} Scene") {
-                    characterName: String, sceneName: String ->
+            Then("all Character Arcs and their sections should be listed for the Character {string} to cover in the {string} Scene") { characterName: String, sceneName: String ->
 
                 val projectScope = ProjectSteps.getProjectScope(double)!!
                 val scene = getSceneByName(projectScope, sceneName)!!
@@ -511,8 +529,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
                     ) { "Listed Character Arc Section IDs do not match expected set." }
                 }
             }
-            Then("any Character Arc Sections included in the {string} Scene for the Character {string} should be marked") {
-                    sceneName: String, characterName: String ->
+            Then("any Character Arc Sections included in the {string} Scene for the Character {string} should be marked") { sceneName: String, characterName: String ->
 
                 val projectScope = ProjectSteps.getProjectScope(double)!!
                 val scene = getSceneByName(projectScope, sceneName)!!
@@ -524,7 +541,8 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
                 UATLogger.enableLogging {
                     assertTrue(listedCharacterInScene.isPositionOnArcDisplayingAvailableArcs())
                     assertEquals(
-                        scene.getCoveredCharacterArcSectionsForCharacter(character.id)!!.map { it.uuid.toString() }.toSet(),
+                        scene.getCoveredCharacterArcSectionsForCharacter(character.id)!!.map { it.uuid.toString() }
+                            .toSet(),
                         listedCharacterInScene.getCoveredArcSections()
                     )
                 }
@@ -543,12 +561,18 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
 
                 assertTrue(listedCharacterInScene.isPositionOnArcDisplayingAvailableArcs())
                 assertEquals(
-                    allArcs.map { arc -> arc.id.uuid.toString() to arc.arcSections.count { scene.isCharacterArcSectionCovered(it.id) } }.toSet(),
-                    listedCharacterInScene.getListedArcItems().map { it.second.characterArcId to (it.first.graphic as Label).text.toIntOrNull() }.toSet()
+                    allArcs.map { arc ->
+                        arc.id.uuid.toString() to arc.arcSections.count {
+                            scene.isCharacterArcSectionCovered(
+                                it.id
+                            )
+                        }
+                    }.toSet(),
+                    listedCharacterInScene.getListedArcItems()
+                        .map { it.second.characterArcId to (it.first.graphic as Label).text.toIntOrNull() }.toSet()
                 )
             }
-            Then("the specified character arc sections should be covered in the {string} Scene for the Character {string}") {
-                sceneName: String, characterName: String ->
+            Then("the specified character arc sections should be covered in the {string} Scene for the Character {string}") { sceneName: String, characterName: String ->
 
                 val projectScope = ProjectSteps.getProjectScope(double)!!
                 val scene = getSceneByName(projectScope, sceneName)!!
@@ -573,8 +597,7 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
                 }
 
             }
-            Then("the specified character arc sections should be uncovered in the {string} Scene for the Character {string}") {
-                sceneName: String, characterName: String ->
+            Then("the specified character arc sections should be uncovered in the {string} Scene for the Character {string}") { sceneName: String, characterName: String ->
 
 
                 val projectScope = ProjectSteps.getProjectScope(double)!!
@@ -593,6 +616,49 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
                     assertFalse(markedArcSections.contains(it.id.uuid.toString())) { "Arc section still marked for ${it.id} in scene details for $sceneName" }
                 }
 
+            }
+            Then("all character arc section templates in {string}s character arc should be listed") { characterName: String ->
+                val projectScope = ProjectSteps.getProjectScope(double)!!
+
+                val character = CharacterDriver.getCharacterByIdentifier(double, characterName)!!
+                val allArcs =
+                    CharacterArcSteps.getCharacterArcsCreated(double).filter { it.characterId == character.id }
+
+                val dialog = projectScope.getCreateArcSectionDialogOrError()
+                val arc = allArcs.find { it.characterId == character.id && it.themeId.uuid.toString() == dialog.themeId }!!
+                assertThat(dialog) {
+                    andSectionTypeSelectionField {
+                        onlyHasItemsMatching(arc.template.sections.map { it.name })
+                    }
+                }
+            }
+            Then("templates that do not allow multiple and have a section in {string}s character arc should be marked") { characterName: String ->
+                val projectScope = ProjectSteps.getProjectScope(double)!!
+
+                val character = CharacterDriver.getCharacterByIdentifier(double, characterName)!!
+                val allArcs =
+                    CharacterArcSteps.getCharacterArcsCreated(double).filter { it.characterId == character.id }
+
+                val dialog = projectScope.getCreateArcSectionDialogOrError()
+                val arc = allArcs.find { it.characterId == character.id && it.themeId.uuid.toString() == dialog.themeId }!!
+                assertThat(dialog) {
+                    andSectionTypeSelectionField {
+                        alreadyUsedItemsDisplayDifferently(arc.template.sections
+                            .mapNotNull { template ->
+                                if (template.allowsMultiple) return@mapNotNull null
+                                val sectionWithTemplate = arc.arcSections.find { it.template.id == template.id }
+                                    ?: return@mapNotNull null
+                                SectionTypeOption.AlreadyUsed(
+                                    template.id.uuid.toString(),
+                                    template.name,
+                                    sectionWithTemplate.id.uuid.toString(),
+                                    sectionWithTemplate.value,
+                                    ""
+                                )
+                            }
+                        )
+                    }
+                }
             }
 
             Then("an error message should be displayed in the Create Scene Dialog") {

@@ -87,7 +87,7 @@ class PositionOnArcSelection(
         menuChipGroup.menu(arc.characterArcName) {
             userData = arc
             graphic = counterGraphic(arc)
-            item("") {
+            item("Create Character Arc Section") {
                 action {
                     state.scope.projectScope.get<CreateArcSectionDialogView>().show(state.characterId.valueSafe, arc.themeId, state.scope.sceneId)
                 }

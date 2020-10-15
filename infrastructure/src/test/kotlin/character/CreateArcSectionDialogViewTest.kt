@@ -70,6 +70,36 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
         }
 
+        @Nested
+        inner class `When Called a Second Time after being closed` {
+
+            @BeforeEach
+            fun `select and close first dialog`() {
+                projectScope.get<CreateArcSectionDialogState>().update { viewModel.copy(sectionTypeOptions = listOf(SectionTypeOption("", ""))) }
+                interact {
+                    dialog.getSectionTypeSelectionField().getSelection().items.first().fire()
+                    dialog.getDescriptionField().getTextInput().text = "Not empty"
+                    dialog.close()
+                }
+            }
+
+            @Test
+            fun `selection and description should be clear`() {
+                val newDialog = projectScope.get<CreateArcSectionDialogView>()
+                interact { newDialog.show() }
+
+                assertThat(newDialog) {
+                    andSectionTypeSelectionField {
+                        hasLabel(viewModel.sectionTypeSelectionNoSelectionLabel)
+                    }
+                    andDescriptionField {
+                        hasValue("")
+                    }
+                }
+            }
+
+        }
+
     }
 
     @Nested
@@ -388,11 +418,16 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
         @AfterEach
         fun `should have closed alert`() {
             assertFalse(alert.isShowing) { "Alert was not closed." }
+            assertNull(dialog.getAlert()) { "New alert was opened." }
+
         }
 
         @Test
         fun `cancel should retain original selection and description`() {
-            interact { alert.result = ButtonType.CANCEL }
+            val targetButton = from(alert.dialogPane).lookup(".button").queryAll<Button>().find { it.text == ButtonType.CANCEL.text }!!
+            interact {
+                targetButton.fire()
+            }
 
             assertThat(dialog) {
                 andSectionTypeSelectionField { hasLabel(initialSelectedOption.sectionTypeName) }
@@ -402,7 +437,10 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
         @Test
         fun `confirm should update selection and description`() {
-            interact { alert.result = ButtonType.YES }
+            val targetButton = from(alert.dialogPane).lookup(".button").queryAll<Button>().find { it.text == ButtonType.YES.text }!!
+            interact {
+                targetButton.fire()
+            }
 
             assertThat(dialog) {
                 andSectionTypeSelectionField { hasLabel(selectedOptionAttempt.sectionTypeName) }
@@ -443,6 +481,8 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
                 assertEquals(vm.sectionTypeOptions!!.first().sectionTypeId, creationRequest!![2])
                 assertEquals(sceneId, creationRequest!![3])
                 assertEquals(newDescription, creationRequest!![4])
+
+                assertEquals(false, dialog.currentStage?.isShowing)
             }
 
         }
@@ -475,6 +515,8 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
                 assertEquals((vm.sectionTypeOptions!!.first() as SectionTypeOption.AlreadyUsed).existingSectionId, modificationRequest!![2])
                 assertEquals(sceneId, modificationRequest!![3])
                 assertEquals(newDescription, modificationRequest!![4])
+
+                assertEquals(false, dialog.currentStage?.isShowing)
             }
 
         }

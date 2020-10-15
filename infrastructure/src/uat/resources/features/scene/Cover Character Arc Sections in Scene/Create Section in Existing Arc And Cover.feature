@@ -10,4 +10,5 @@ Feature: Create Section in Existing Arc And Cover
   Scenario: List Available Character Arc Section Templates
     Given the user has indicated they want to cover character arc sections for the Character "Bob" in the "Big Battle" Scene
     When the user indicates that they want to create a new character arc section for one of "Bob"s character arcs
-    Then all character arc section templates not yet used or allow multiple for "Bob"s character arc should be listed
+    Then all character arc section templates in "Bob"s character arc should be listed
+    And templates that do not allow multiple and have a section in "Bob"s character arc should be marked

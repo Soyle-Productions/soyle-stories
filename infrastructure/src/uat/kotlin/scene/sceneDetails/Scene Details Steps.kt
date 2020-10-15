@@ -4,6 +4,7 @@ import com.soyle.stories.common.components.Chip
 import com.soyle.stories.common.components.menuChipGroup.MenuChipGroup
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.layout.openTool.OpenToolController
@@ -92,11 +93,11 @@ class SceneDetailsListedCharacterDriver(val node: Node) {
 
     fun getListedArcs(): List<String> = getListedArcItems().map { it.second.characterArcId }
 
-    fun getListedArcItems(): List<Pair<MenuItem, AvailableCharacterArcViewModel>> =
+    fun getListedArcItems(): List<Pair<Menu, AvailableCharacterArcViewModel>> =
         menuChipGroup().items
             .mapNotNull {
                 val userData = it.userData as? AvailableCharacterArcViewModel ?: return@mapNotNull null
-                it to userData
+                (it as? Menu)?.let { it to userData }
             }.toList()
 
     fun getListedArcSections(): List<String> = getListedArcSectionsItems().map { it.second.arcSectionId }
@@ -107,5 +108,10 @@ class SceneDetailsListedCharacterDriver(val node: Node) {
                 val userData = it.userData as? AvailableArcSectionViewModel ?: return@mapNotNull null
                 it to userData
             }.toList()
+
+    fun requestNewArcSectionForArc(arc: CharacterArc) {
+        val (menu, arcVM) = getListedArcItems().find { it.second.characterArcId == arc.id.uuid.toString() } ?: return
+        robot.interact { menu.items.first().fire() }
+    }
 
 }
