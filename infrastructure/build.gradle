@@ -4,11 +4,12 @@ import org.openjfx.gradle.JavaFXOptions
 import org.apache.tools.ant.filters.*
 
 plugins {
-    id 'application'
+    id 'java'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow'
     id 'org.beryx.runtime' version '1.9.1'
-    id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
+    id "org.jetbrains.gradle.plugin.idea-ext"
+    id 'java-test-fixtures'
 }
 
 apply from: "$rootDir/$SUBPROJECT_CONFIG"
@@ -25,6 +26,9 @@ sourceSets {
         java.srcDirs += 'src/uat/java'
         compileClasspath += sourceSets.main.output + sourceSets.test.output
         runtimeClasspath += output + compileClasspath
+    }
+    testFixtures {
+        kotlin.srcDirs += 'src/testFixtures/kotlin'
     }
 }
 
@@ -54,27 +58,33 @@ compileUatKotlin {
         jvmTarget = "$JAVA_VERSION"
     }
 }
+compileTestFixturesKotlin {
+    kotlinOptions {
+        jvmTarget = "$JAVA_VERSION"
+    }
+}
 
 
 javafx {
     version = "14"
     modules = ['javafx.controls', 'javafx.fxml'/*, 'javafx.web', 'javafx.swing'*/]
-
-    
 }
 
-def javaFXOptions = convention.findByType(JavaFXOptions.class) ?: convention.findPlugin(JavaFXOptions.class) ?: convention.getByType(JavaFXOptions.class)
+def javaFXOptions = convention.findByType(JavaFXOptions.class)
+        ?: convention.findPlugin(JavaFXOptions.class)
+        ?: convention.getByType(JavaFXOptions.class)
 
 dependencies {
-    implementation libraries.soyle_stories_core
 
-    implementation project(":application")
-    implementation project(":data")
-    implementation project(":gui")
-    implementation "no.tornado:tornadofx:1.7.19", {
+    // use of api is temporary until more things are moved to root config project
+    api libraries.soyle_stories_core
+    api project(":application")
+    api project(":data")
+    api project(":gui")
+    api "no.tornado:tornadofx:1.7.19", {
         exclude group: 'org.jetbrains.kotlin'
     }
-    implementation libraries.coroutines
+    api libraries.coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-javafx:$KOTLIN_COROUTINES_VERSION"
     implementation "org.controlsfx:controlsfx:11.0.2"
     implementation "no.tornado:tornadofx-controlsfx:0.1"
@@ -88,21 +98,22 @@ dependencies {
     uatImplementation 'io.cucumber:cucumber-java8:6.1.1'
     uatImplementation 'io.cucumber:cucumber-junit:6.1.1'
 
-    testImplementation libraries.junit
-    testImplementation libraries.junitEngine
-    testImplementation libraries.assertj
-
-    testImplementation "org.testfx:testfx-core:4.0.16-alpha"
-    testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
-    testImplementation 'org.testfx:openjfx-monocle:jdk-12.0.1+2'
-
     testImplementation libraries.reflectionKt
+
+
+    testFixturesApi libraries.junit
+    testFixturesApi libraries.junitEngine
+    testFixturesApi libraries.assertj
+    testFixturesApi "org.testfx:testfx-core:4.0.16-alpha"
+    testFixturesApi "org.testfx:testfx-junit5:4.0.16-alpha"
+    testFixturesApi 'org.testfx:openjfx-monocle:jdk-12.0.1+2'
 
     JavaFXPlatform.values().each { platform ->
         def cfg = configurations.create("javafx_" + platform.classifier)
         JavaFXModule.getJavaFXModules(javaFXOptions.modules).each { m ->
-            project.getDependencies().add(cfg.name,
-                    String.format("org.openjfx:%s:%s:%s", m.getArtifactName(), javaFXOptions.version, platform.classifier))
+            def dependency = String.format("org.openjfx:%s:%s:%s", m.getArtifactName(), javaFXOptions.version, platform.classifier)
+            project.getDependencies().add(cfg.name, dependency)
+            project.getDependencies().add("api", dependency)
         }
     }
 }
@@ -120,10 +131,6 @@ runtime {
     targetPlatform("linux", System.getenv("JAVA_HOME"))
     targetPlatform("mac", System.getenv("JAVA_HOME"))
     targetPlatform("win", System.getenv("JAVA_HOME"))
-}
-
-application {
-    mainClassName = 'com.soyle.stories.soylestories.SoyleStoriesKt'
 }
 
 processResources {
@@ -164,6 +171,7 @@ idea {
             packagePrefix["src/test/kotlin"] = "com.soyle.stories"
             packagePrefix["src/integration/kotlin"] = "com.soyle.stories"
             packagePrefix["src/uat/kotlin"] = "com.soyle.stories"
+            packagePrefix["src/testFixtures/kotlin"] = "com.soyle.stories.desktop.view"
         }
     }
 }

@@ -70,7 +70,7 @@ class CreateArcSectionDialogViewAssert private constructor(private val dialog: C
                 val item = itemsByText.getValue(option.sectionTypeName)
                 assertTrue(item.hasClass(ComponentsStyles.discouragedSelection))
                 assertTrue(
-                    ((item as CustomMenuItem).content!!.popover!!.contentNode!! as Text).text.isNotBlank()
+                    ((item as CustomMenuItem).content as Label).tooltip!!.text.isNotBlank()
                 )
             }
         }

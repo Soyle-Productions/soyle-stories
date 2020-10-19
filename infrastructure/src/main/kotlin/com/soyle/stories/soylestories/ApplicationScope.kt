@@ -57,4 +57,8 @@ class ApplicationScope : Scope(), CoroutineScope {
 		}
 	}
 
+	fun close() {
+
+	}
+
 }

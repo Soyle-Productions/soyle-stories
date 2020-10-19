@@ -96,6 +96,7 @@ inline fun <reified T : Any> Scope.get(): T = DI.resolve(this)
 
 class InScope<S : Scope>(val scopeClass: KClass<S>) {
 
+
 	inline fun <reified T : Any> resolveLater() = DI.resolveLater<T>()
 	inline fun <reified T : Any> provide(vararg types: KClass<in T>, noinline factory: S.() -> T) =
 		provide(T::class, types, factory)

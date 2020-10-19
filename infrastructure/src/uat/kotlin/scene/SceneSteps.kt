@@ -53,6 +53,13 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
             }
         }
 
+        fun getScenes(projectScope: ProjectScope): List<Scene> {
+            val repository = projectScope.get<SceneRepository>()
+            return runBlocking {
+                repository.listAllScenesInProject(Project.Id(projectScope.projectId))
+            }
+        }
+
         fun givenASceneHasBeenCreatedWithTheName(projectScope: ProjectScope, sceneName: String): Scene {
             getSceneByName(projectScope, sceneName)?.let { return it }
             projectScope.get<CreateNewSceneController>().createNewScene(sceneName)
@@ -268,6 +275,18 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
 
                 SceneDetailsDriver.toolFor(scene).openTool.given(double)
                 SceneDetailsDriver.toolFor(scene).listedCharacter(character).whenPositionOnCharacterArcsSelected(double)
+
+            }
+            Given("the user has indicated that they want to create a new character arc section for one of {string}s character arcs") {
+                characterName: String ->
+
+                val projectScope = ProjectSteps.givenProjectHasBeenOpened(double)
+                val character = CharacterDriver.givenACharacterHasBeenCreatedWithTheName(double, characterName)
+                CharacterArcSteps.givenANumberOfCharacterArcsHaveBeenCreated(double, 1)
+                val firstArc = CharacterArcSteps.getCharacterArcsCreated(double).first { it.characterId == character.id }
+                val sceneDetails = projectScope.givenSceneDetailsHasBeenOpened(getScenes(projectScope).first())
+                val listedCharacter = sceneDetails.getListedCharacterOrError(character)
+                listedCharacter.requestNewArcSectionForArc(firstArc)
 
             }
 
@@ -634,6 +653,8 @@ class SceneSteps(en: En, double: SoyleStoriesTestDouble) {
             }
             Then("templates that do not allow multiple and have a section in {string}s character arc should be marked") { characterName: String ->
                 val projectScope = ProjectSteps.getProjectScope(double)!!
+
+
 
                 val character = CharacterDriver.getCharacterByIdentifier(double, characterName)!!
                 val allArcs =

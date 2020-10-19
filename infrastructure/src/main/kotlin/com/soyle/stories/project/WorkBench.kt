@@ -90,6 +90,7 @@ class WorkBench : View() {
                 id = "tools"
                 items.bind(model.staticTools) {
                     checkmenuitem(it.name) {
+                        id = "tools_${it.type.toString().toLowerCase()}"
                         isSelected = it.isOpen
                         action {
                             async(scope) {

@@ -54,6 +54,7 @@ class StartProjectDialog : View("Start New Project") {
                 labelContainer.alignment = Pos.CENTER_RIGHT
                 hbox(5) {
                     textfield {
+                        id = "directory-input"
                         toggleClass(errorState, model.select { (it.failingField == "directory").toProperty() })
                         hgrow = Priority.ALWAYS
                         textProperty().bindBidirectional(selectedDirectoryFile, object : StringConverter<File?>() {

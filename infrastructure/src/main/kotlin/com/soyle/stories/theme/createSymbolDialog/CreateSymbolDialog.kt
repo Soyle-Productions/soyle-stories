@@ -34,6 +34,7 @@ class CreateSymbolDialog : Fragment() {
             field {
                 textProperty.bind(model.nameFieldLabel)
                 textfield {
+                    id = "name-input"
                     model.itemProperty().onChange {
                         decorators.toList().forEach { removeDecorator(it) }
                         if (it?.errorCause == "SymbolName" && it.errorMessage != null) addDecorator(

@@ -4,6 +4,7 @@ import com.soyle.stories.common.async
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
 import com.soyle.stories.di.get
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.soylestories.Styles.Companion.appIcon
@@ -13,6 +14,7 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.image.Image
 import javafx.stage.Stage
+import kotlinx.coroutines.cancel
 import tornadofx.*
 
 fun main(args: Array<String>) {
@@ -34,6 +36,7 @@ class SoyleStories : App(WelcomeScreen::class, Styles::class) {
     private val projectListViewListener: ProjectListViewListener by DI.resolveLater(appScope)
 
     val projectViews: ObservableList<WorkBench> = FXCollections.observableArrayList()
+    private var projectScopeListener: SetConversionListener<ProjectScope, WorkBench>? = null
 
     override fun shouldShowPrimaryStage(): Boolean = false
 
@@ -52,12 +55,18 @@ class SoyleStories : App(WelcomeScreen::class, Styles::class) {
             projectListViewListener.startApplicationWithParameters(parameters.raw)
         }
 
-        projectViews.bind(appScope.projectScopesProperty) {
+        projectScopeListener = projectViews.bind(appScope.projectScopesProperty) {
             it.get()
         }
     }
 
-    companion object {
+    override fun stop() {
+        super.stop()
+        projectScopeListener?.let {
+            appScope.projectScopesProperty.removeListener(it)
+        }
+        projectViews.forEach { it.close() }
+        appScope.close()
+        appScope.coroutineContext.cancel()
     }
-
 }

@@ -6,10 +6,13 @@ buildscript {
     props.each { key, value -> ext.set(key, value) }
 }
 
-
 plugins {
+    id 'java'
+    id 'application'
     id 'org.jetbrains.kotlin.jvm' version "$KOTLIN_VERSION"
     id "com.github.breadmoirai.github-release" version "$GITHUB_RELEASE_VERSION"
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
 }
 
 allprojects {
@@ -50,12 +53,12 @@ task buildAndPackage {
 }
 
 apply from: 'publish-conf.gradle'
+apply from: 'local-repositories.gradle'
 
 configure(subprojects) {
     apply plugin: 'java'
     apply plugin: 'org.jetbrains.kotlin.jvm'
     dependencies {
-        implementation libraries.kotlin
         testImplementation libraries.junit
     }
 
@@ -66,4 +69,56 @@ configure(subprojects) {
         kotlinOptions.jvmTarget = JAVA_VERSION
     }
 
+}
+
+idea {
+    module {
+        settings {
+            packagePrefix["src/main/kotlin"] = "com.soyle.stories.desktop.config"
+            packagePrefix["src/test/kotlin"] = "com.soyle.stories.desktop.config"
+        }
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = JAVA_VERSION
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = JAVA_VERSION
+}
+sourceCompatibility = JAVA_VERSION
+targetCompatibility = JAVA_VERSION
+
+application {
+    mainClassName = "soylestories/Main.kt"
+}
+
+dependencies {
+    /*
+    These should not be needed for now because they're all included as api dependencies on infrastructure project
+
+    implementation(name: "soyle-stories-core-0.1.7-alpha", configuration: "default")
+    implementation(project(path: ':application', configuration: 'default')) {
+        exclude group: 'com.soyle.stories'
+    }
+    implementation(project(path: ':data', configuration: 'default')) {
+        exclude group: 'com.soyle.stories'
+    }
+    implementation(project(path: ':gui', configuration: 'default')) {
+        exclude group: 'com.soyle.stories'
+    }
+     */
+    implementation project(':infrastructure')
+
+
+    testImplementation 'io.cucumber:cucumber-java8:6.1.1'
+    testImplementation 'io.cucumber:cucumber-junit:6.1.1'
+
+    testImplementation "org.testfx:testfx-core:4.0.16-alpha"
+    testImplementation 'org.testfx:openjfx-monocle:jdk-12.0.1+2'
+    testImplementation libraries.junit
+
+    testImplementation(testFixtures(project(path: ':infrastructure'))) {
+        exclude group: 'com.soyle.stories'
+    }
 }

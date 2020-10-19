@@ -14,6 +14,10 @@ import kotlin.reflect.KClass
 
 object ThemeList : ToolConfig<ThemeList>, FixedTool() {
 
+    override fun toString(): String {
+        return "ThemeList"
+    }
+
     override fun getFixedType(): FixedTool? = ThemeList
 
     override fun getRegistration(): Pair<KClass<ThemeList>, ToolConfig<ThemeList>> {
