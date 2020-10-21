@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.updateThemeMetaData
+package com.soyle.stories.theme.usecases.changeThemeDetails
 
 import java.util.*
 
