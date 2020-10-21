@@ -4,11 +4,9 @@ import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.str
 import com.soyle.stories.common.template
 import com.soyle.stories.entities.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class CharacterArcTest {
 
@@ -86,7 +84,7 @@ class CharacterArcTest {
 		val templateSection = template("", false, true)
 		val template = CharacterArcTemplate(listOf())
 		val arc = CharacterArc.planNewCharacterArc(characterId, themeId, name, template)
-		assertThrows<TemplateSectionIsNotPartOfArcSection> {
+		assertThrows<TemplateSectionIsNotPartOfArcTemplate> {
 			arc.withArcSection(templateSection)
 		}.run {
 			arcId.mustEqual(arc.id.uuid)
@@ -94,7 +92,7 @@ class CharacterArcTest {
 			themeId.mustEqual(arc.themeId.uuid)
 			templateSectionId.mustEqual(templateSection.id.uuid)
 		}
-		assertThrows<TemplateSectionIsNotPartOfArcSection> {
+		assertThrows<TemplateSectionIsNotPartOfArcTemplate> {
 			arc.withArcSection(CharacterArcSection.planNewCharacterArcSection(characterId, themeId, templateSection))
 		}.run {
 			arcId.mustEqual(arc.id.uuid)
@@ -102,6 +100,28 @@ class CharacterArcTest {
 			themeId.mustEqual(arc.themeId.uuid)
 			templateSectionId.mustEqual(templateSection.id.uuid)
 		}
+	}
+
+	@Test
+	fun `moral sections have an order`() {
+		val templateSection = template("", false, true, moral = true)
+		val template = CharacterArcTemplate(listOf(templateSection))
+		val arc = CharacterArc.planNewCharacterArc(characterId, themeId, name, template)
+		val arcWithArcSection = arc.withArcSection(templateSection)
+		val arcSection = arcWithArcSection.arcSections.single()
+		arcWithArcSection.moralArgument().first().mustEqual(arcSection)
+	}
+
+	@Test
+	fun `only moral sections have an order`() {
+		val templateSection = template("", false, true, moral = false)
+		val template = CharacterArcTemplate(listOf(templateSection))
+		val arc = CharacterArc.planNewCharacterArc(characterId, themeId, name, template)
+		val arcWithArcSection = arc.withArcSection(templateSection)
+		val arcSection = arcWithArcSection.arcSections.single()
+
+		assertFalse(arcWithArcSection.moralArgument().contains(arcSection)) {
+			"Moral argument section order should only contain moral arc sections" }
 	}
 
 }

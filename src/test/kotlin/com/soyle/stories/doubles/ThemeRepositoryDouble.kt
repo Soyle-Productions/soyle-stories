@@ -17,6 +17,10 @@ class ThemeRepositoryDouble(
 {
     val themes = mutableMapOf<Theme.Id, Theme>()
 
+    fun givenTheme(theme: Theme) {
+        themes[theme.id] = theme
+    }
+
     override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {
         return themes.values.filter { it.projectId == projectId }
     }

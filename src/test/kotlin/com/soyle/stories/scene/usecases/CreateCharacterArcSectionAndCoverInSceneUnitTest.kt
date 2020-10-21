@@ -231,7 +231,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
         @Test
         fun `Template section cannot be used twice if it doesn't allow multiple`() {
             val templateSection =
-                CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", isRequired = false, allowsMultiple = false)
+                CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", isRequired = false, allowsMultiple = false, isMoral = false)
             val arc = givenCharacterArcBasedOnTemplateSections(listOf(templateSection)) {
                 withArcSection(templateSection)
             }
@@ -251,7 +251,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
 
         @Test
         fun `Scene must exist`() {
-            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true)
+            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true, isMoral = false)
             givenCharacterArcBasedOnTemplateSections(listOf(templateSection))
             // when
             val error = assertThrows<SceneDoesNotExist> {
@@ -265,7 +265,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
 
         @Test
         fun `New arc section must be created with template`() {
-            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true)
+            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true, isMoral = false)
             val arc = givenCharacterArcBasedOnTemplateSections(listOf(templateSection))
             sceneRepository.givenScene(scene)
             val inputValue = "New section value ${str()}"
@@ -293,7 +293,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
 
         @Test
         fun `Scene should cover new arc section`() {
-            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true)
+            val templateSection = CharacterArcTemplateSection(sectionTemplateId, "Template ${str()}", false, true, isMoral = false)
             val arc = givenCharacterArcBasedOnTemplateSections(listOf(templateSection))
             sceneRepository.givenScene(scene)
             val inputValue = "New section value ${str()}"

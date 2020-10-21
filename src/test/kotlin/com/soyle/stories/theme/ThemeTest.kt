@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.right
 import com.soyle.stories.character.makeCharacter
-import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -29,7 +28,7 @@ class ThemeTest {
 	@Test
 	fun `themes have a central moral question`() {
 		val theme = takeNoteOfTheme()
-		theme.centralMoralQuestion
+		theme.centralMoralProblem
 	}
 
 	@Test
@@ -37,7 +36,7 @@ class ThemeTest {
 		val centralMoralQuestion = "What does it all mean?"
 		val (theme) = takeNoteOfTheme()
 			.changeCentralMoralQuestion(centralMoralQuestion) as Either.Right
-		assertEquals(centralMoralQuestion, theme.centralMoralQuestion)
+		assertEquals(centralMoralQuestion, theme.centralMoralProblem)
 	}
 
 	@Test

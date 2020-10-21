@@ -1,6 +1,5 @@
 package com.soyle.stories.theme.usecases
 
-import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
@@ -49,7 +48,7 @@ class ChangeCentralMoralQuestionUnitTest {
         givenThemeWithId(themeId)
         whenUseCaseIsExecuted()
         assertEquals(inputQuestion,
-            (updatedTheme as Theme).centralMoralQuestion
+            (updatedTheme as Theme).centralMoralProblem
         )
     }
 

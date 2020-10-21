@@ -26,7 +26,7 @@ class CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
     val templateSectionId: UUID,
 ) : DuplicateOperationException()
 
-class TemplateSectionIsNotPartOfArcSection(
+class TemplateSectionIsNotPartOfArcTemplate(
     val arcId: UUID,
     val characterId: UUID,
     val themeId: UUID,

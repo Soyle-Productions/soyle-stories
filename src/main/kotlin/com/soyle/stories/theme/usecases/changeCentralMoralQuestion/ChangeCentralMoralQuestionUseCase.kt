@@ -24,7 +24,7 @@ class ChangeCentralMoralQuestionUseCase(
 
     private suspend fun changeCentralMoralQuestionOfTheme(themeId: Theme.Id, question: String): ResponseModel? {
         val theme = getTheme(themeId)
-        if (theme.centralMoralQuestion != question) {
+        if (theme.centralMoralProblem != question) {
             val newTheme = theme.withNewQuestion(question)
             context.themeRepository.updateTheme(newTheme)
             return respondWith(newTheme)
@@ -42,7 +42,7 @@ class ChangeCentralMoralQuestionUseCase(
     private fun respondWith(theme: Theme): ResponseModel {
         return ResponseModel(
             theme.id.uuid,
-            theme.centralMoralQuestion
+            theme.centralMoralProblem
         )
     }
 

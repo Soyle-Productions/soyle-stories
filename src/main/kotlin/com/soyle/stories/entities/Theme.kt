@@ -16,7 +16,8 @@ class Theme(
     val name: String,
     val symbols: List<Symbol>,
     val centralConflict: String,
-    val centralMoralQuestion: String,
+    val centralMoralProblem: String,
+    val themeLine: String,
     private val includedCharacters: Map<Character.Id, CharacterInTheme>,
     val similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String>,
     val valueWebs: List<ValueWeb>
@@ -27,8 +28,9 @@ class Theme(
         name: String,
         symbols: List<Symbol> = listOf(),
         centralConflict: String = "",
-        centralMoralQuestion: String = ""
-    ) : this(Id(), projectId, name, symbols, centralConflict, centralMoralQuestion, mapOf(), mapOf(), listOf())
+        centralMoralProblem: String = "",
+        themeLine: String = ""
+    ) : this(Id(), projectId, name, symbols, centralConflict, centralMoralProblem, themeLine, mapOf(), mapOf(), listOf())
 
     val thematicTemplate: ThematicTemplate
         get() = ThematicTemplate.default()
@@ -37,7 +39,8 @@ class Theme(
         name: String = this.name,
         symbols: List<Symbol> = this.symbols,
         centralConflict: String = this.centralConflict,
-        centralMoralQuestion: String = this.centralMoralQuestion,
+        centralMoralProblem: String = this.centralMoralProblem,
+        themeLine: String = this.themeLine,
         includedCharacters: Map<Character.Id, CharacterInTheme> = this.includedCharacters,
         similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String> = this.similaritiesBetweenCharacters,
         valueWebs: List<ValueWeb> = this.valueWebs
@@ -47,7 +50,8 @@ class Theme(
         name,
         symbols,
         centralConflict,
-        centralMoralQuestion,
+        centralMoralProblem,
+        themeLine,
         includedCharacters,
         similaritiesBetweenCharacters,
         valueWebs
@@ -68,11 +72,12 @@ class Theme(
         return copy(valueWebs = valueWebs + valueWeb) to valueWeb
     }
 
-    fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> {
-        return copy(
-            centralMoralQuestion = question
-        ).right()
-    }
+    @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.withMoralProblem(question).right()"))
+    fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> = withMoralProblem(question).right()
+
+    fun withMoralProblem(moralProblem: String): Theme = copy(centralMoralProblem = moralProblem)
+
+    fun withThemeLine(themeLine: String): Theme = copy(themeLine = themeLine)
 
     fun withCharacterIncluded(characterId: Character.Id, characterName: String, characterMediaId: Media.Id?): Theme
     {
@@ -423,7 +428,7 @@ class Theme(
         if (name != other.name) return false
         if (symbols != other.symbols) return false
         if (centralConflict != other.centralConflict) return false
-        if (centralMoralQuestion != other.centralMoralQuestion) return false
+        if (centralMoralProblem != other.centralMoralProblem) return false
         if (includedCharacters != other.includedCharacters) return false
         if (similaritiesBetweenCharacters != other.similaritiesBetweenCharacters) return false
         if (valueWebs != other.valueWebs) return false
@@ -437,7 +442,7 @@ class Theme(
         result = 31 * result + name.hashCode()
         result = 31 * result + symbols.hashCode()
         result = 31 * result + centralConflict.hashCode()
-        result = 31 * result + centralMoralQuestion.hashCode()
+        result = 31 * result + centralMoralProblem.hashCode()
         result = 31 * result + includedCharacters.hashCode()
         result = 31 * result + similaritiesBetweenCharacters.hashCode()
         result = 31 * result + valueWebs.hashCode()
@@ -445,7 +450,7 @@ class Theme(
     }
 
     override fun toString(): String {
-        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralConflict='$centralConflict', centralMoralQuestion='$centralMoralQuestion', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
+        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralConflict='$centralConflict', centralMoralQuestion='$centralMoralProblem', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
     }
 
 
@@ -462,6 +467,7 @@ class Theme(
                 listOf(),
                 "",
                 centralMoralQuestion,
+                "",
                 mapOf(),
                 mapOf(),
                 listOf()
