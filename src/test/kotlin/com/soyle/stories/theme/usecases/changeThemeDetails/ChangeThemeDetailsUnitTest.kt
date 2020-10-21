@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.util.*
 
 class ChangeThemeDetailsUnitTest {
 
@@ -232,7 +233,58 @@ class ChangeThemeDetailsUnitTest {
     }
 
     @Nested
-    inner class `Change Theme Line`
+    inner class `Change Theme Line` {
+
+        private val useCase: ChangeThemeLine = changeThemeDetails
+        private val output = object : ChangeThemeLine.OutputPort {
+            override suspend fun themeLineChanged(response: ChangeThemeLine.ResponseModel) {
+                result = response
+            }
+        }
+
+        @Test
+        fun `Theme does not exist`() {
+            val error = degenerateTest<ThemeDoesNotExist> {
+                changeThemeLine("")
+            }
+
+            error shouldBe themeDoesNotExist(theme.id.uuid)
+        }
+
+        @Nested
+        inner class `Theme exists` {
+
+            val inputThemeLine = "New theme line ${str()}"
+
+            init {
+                themeRepository.givenTheme(theme)
+            }
+
+            @Test
+            fun `should output changed central moral question`() {
+                changeThemeLine(inputThemeLine)
+
+                val result = result as ChangeThemeLine.ResponseModel
+                result.changedThemeLine.themeId.mustEqual(theme.id.uuid)
+                result.changedThemeLine.newThemeLine.mustEqual(inputThemeLine)
+            }
+
+            @Test
+            fun `should update theme`() {
+                changeThemeLine(inputThemeLine)
+
+                updatedTheme.mustEqual(theme.withThemeLine(inputThemeLine))
+            }
+
+        }
+
+        private fun changeThemeLine(themeLine: String) {
+            runBlocking {
+                useCase.invoke(theme.id.uuid, themeLine, output)
+            }
+        }
+
+    }
 
     private inline fun <reified T : Throwable> degenerateTest(noinline method: () -> Unit): T {
         val thrown = assertThrows<T>(method)

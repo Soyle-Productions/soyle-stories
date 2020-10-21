@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.usecases.changeThemeDetails
 
 import com.soyle.stories.entities.Theme
+import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.repositories.getThemeOrError
 import com.soyle.stories.theme.usecases.validateThemeName
@@ -8,7 +9,7 @@ import java.util.*
 
 class ChangeThemeDetailsUseCase(
     private val themeRepository: ThemeRepository
-) : RenameTheme, ChangeCentralConflict, ChangeCentralMoralQuestion {
+) : RenameTheme, ChangeCentralConflict, ChangeCentralMoralQuestion, ChangeThemeLine {
 
     override suspend fun invoke(themeId: UUID, name: String, output: RenameTheme.OutputPort) {
         val theme = themeRepository.getThemeOrError(Theme.Id(themeId))
@@ -28,8 +29,17 @@ class ChangeThemeDetailsUseCase(
         if (theme.centralMoralProblem != question) {
             themeRepository.updateTheme(theme.withMoralProblem(question))
         }
-        output.centralMoralQuestionChanged(ChangeCentralMoralQuestion.ResponseModel(ChangedCentralMoralQuestion(themeId, question)))
+        output.centralMoralQuestionChanged(
+            ChangeCentralMoralQuestion.ResponseModel(
+                ChangedCentralMoralQuestion(themeId, question)
+            )
+        )
+    }
 
+    override suspend fun invoke(themeId: UUID, themeLine: String, output: ChangeThemeLine.OutputPort) {
+        val theme = themeRepository.getThemeOrError(Theme.Id(themeId))
+        themeRepository.updateTheme(theme.withThemeLine(themeLine))
+        output.themeLineChanged(ChangeThemeLine.ResponseModel(ChangedThemeLine(themeId, themeLine)))
     }
 
 }
