@@ -234,8 +234,17 @@ class Theme(
         return includedCharacters[characterId]
     }
 
+    fun getIncludedCharacterByIdOrError(characterId: Character.Id): CharacterInTheme {
+        return includedCharacters[characterId] ?: throw CharacterNotInTheme(id.uuid, characterId.uuid)
+    }
+
     fun getMajorCharacterById(characterId: Character.Id): MajorCharacter? {
         return includedCharacters[characterId] as? MajorCharacter
+    }
+
+    fun getMajorCharacterByIdOrError(characterId: Character.Id): MajorCharacter {
+        return getIncludedCharacterByIdOrError(characterId) as? MajorCharacter
+            ?: throw CharacterIsNotMajorCharacterInTheme(characterId.uuid, id.uuid)
     }
 
     fun getMinorCharacterById(characterId: Character.Id): MinorCharacter? =

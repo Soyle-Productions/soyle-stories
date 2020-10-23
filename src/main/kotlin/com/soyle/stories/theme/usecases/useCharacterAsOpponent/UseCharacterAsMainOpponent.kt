@@ -1,6 +1,5 @@
-package com.soyle.stories.theme.usecases.useCharacterAsMainOpponent
+package com.soyle.stories.theme.usecases.useCharacterAsOpponent
 
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import java.util.*
 
 interface UseCharacterAsMainOpponent {

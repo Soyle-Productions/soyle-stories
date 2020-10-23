@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents
+package com.soyle.stories.theme.usecases.useCharacterAsOpponent
 
 import java.util.*
 

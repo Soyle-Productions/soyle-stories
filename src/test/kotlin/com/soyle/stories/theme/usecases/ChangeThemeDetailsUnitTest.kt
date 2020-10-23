@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.changeThemeDetails
+package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.shouldBe
@@ -9,12 +9,12 @@ import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.ThemeNameCannotBeBlank
 import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.themeDoesNotExist
+import com.soyle.stories.theme.usecases.changeThemeDetails.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class ChangeThemeDetailsUnitTest {
 

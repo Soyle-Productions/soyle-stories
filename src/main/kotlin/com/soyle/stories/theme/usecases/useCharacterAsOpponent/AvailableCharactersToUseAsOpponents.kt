@@ -1,6 +1,5 @@
-package com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents
+package com.soyle.stories.theme.usecases.useCharacterAsOpponent
 
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import java.util.*
 
 class AvailableCharactersToUseAsOpponents(

@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.usecases.outlineMoralArgument
+package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.mustEqual
@@ -8,15 +8,16 @@ import com.soyle.stories.common.template
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.CharacterArcTemplate
 import com.soyle.stories.theme.*
+import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralProblemAndThemeLineInTheme
+import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgument
+import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class OutlineMoralArgumentUnitTest {
 

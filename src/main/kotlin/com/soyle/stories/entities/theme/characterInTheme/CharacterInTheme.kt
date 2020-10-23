@@ -23,6 +23,11 @@ sealed class CharacterInTheme {
     abstract fun changeVariationOnMoral(variationOnMoral: String): CharacterInTheme
     abstract fun changePosition(position: String): CharacterInTheme
 
+    fun isAntagonisticTowards(majorCharacter: MajorCharacter): Boolean {
+        val storyFunction = majorCharacter.getStoryFunctionsForCharacter(id)
+        return storyFunction == StoryFunction.MainAntagonist || storyFunction == StoryFunction.Antagonist
+    }
+
 }
 
 class MinorCharacter(
