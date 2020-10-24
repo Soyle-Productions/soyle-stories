@@ -1,11 +1,7 @@
 package com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument
 
-import com.soyle.stories.characterarc.ArcTemplateSectionIsNotMoral
-import com.soyle.stories.characterarc.CharacterArcAlreadyContainsMaximumNumberOfTemplateSection
-import com.soyle.stories.characterarc.CharacterArcDoesNotExist
 import com.soyle.stories.characterarc.TemplateSectionIsNotPartOfArcTemplate
 import com.soyle.stories.characterarc.repositories.getCharacterArcOrError
-import com.soyle.stories.common.template
 import com.soyle.stories.theme.repositories.CharacterArcRepository
 import java.util.*
 
@@ -14,7 +10,7 @@ class AddCharacterArcSectionToMoralArgumentUseCase(
 ) : ListAvailableArcSectionTypesToAddToMoralArgument, AddCharacterArcSectionToMoralArgument {
 
     /**
-     * ListAvailableArcSectionTypesToAddToMoralArgument
+     * List Available Arc Section Types to Add to Moral Argument
      */
     override suspend fun invoke(
         themeId: UUID,
@@ -22,7 +18,7 @@ class AddCharacterArcSectionToMoralArgumentUseCase(
         output: ListAvailableArcSectionTypesToAddToMoralArgument.OutputPort
     ) {
         val characterArc = characterArcRepository.getCharacterArcOrError(characterId, themeId)
-        val arcSectionsByTemplateId by lazy { characterArc.arcSections.associateBy { it.template.id } }
+        val arcSectionsByTemplateId by lazy { characterArc.arcSections.groupBy { it.template.id } }
 
         output.receiveAvailableArcSectionTypesToAddToMoralArgument(
             ListAvailableArcSectionTypesToAddToMoralArgument.ResponseModel(
@@ -30,7 +26,7 @@ class AddCharacterArcSectionToMoralArgumentUseCase(
                 characterId,
                 characterArc.template.sections.filter { it.isMoral }.map { sectionTemplate ->
                     val existingArcSection = if (!sectionTemplate.allowsMultiple)
-                        arcSectionsByTemplateId[sectionTemplate.id]
+                        arcSectionsByTemplateId[sectionTemplate.id]?.first()
                     else
                         null
                     ListAvailableArcSectionTypesToAddToMoralArgument.AvailableArcSectionType(
@@ -45,7 +41,7 @@ class AddCharacterArcSectionToMoralArgumentUseCase(
     }
 
     /**
-     * AddCharacterArcSectionToMoralArgument
+     * Add Character Arc Section to Moral Argument
      */
     override suspend fun invoke(
         request: AddCharacterArcSectionToMoralArgument.RequestModel,
@@ -59,16 +55,10 @@ class AddCharacterArcSectionToMoralArgumentUseCase(
                 characterArc.themeId.uuid,
                 request.templateSectionId
             )
-        if (!templateSection.isMoral) {
-            throw ArcTemplateSectionIsNotMoral(
-                characterArc.id.uuid,
-                characterArc.characterId.uuid,
-                characterArc.themeId.uuid,
-                request.templateSectionId
-            )
-        }
+
         val newCharacterArc = characterArc.moralArgument().withArcSection(templateSection, index = request.indexInMoralArgument)
         val previousCharacterArcSectionIds = characterArc.arcSections.map { it.id }.toSet()
+
         val newSection = newCharacterArc.arcSections.find { it.id !in previousCharacterArcSectionIds }!!
         characterArcRepository.replaceCharacterArcs(
             newCharacterArc

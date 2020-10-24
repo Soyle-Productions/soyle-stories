@@ -1,5 +1,6 @@
 package com.soyle.stories.entities
 
+import com.soyle.stories.characterarc.ArcTemplateSectionIsNotMoral
 import com.soyle.stories.characterarc.CharacterArcAlreadyContainsMaximumNumberOfTemplateSection
 import com.soyle.stories.characterarc.TemplateSectionIsNotPartOfArcTemplate
 import com.soyle.stories.common.Entity
@@ -124,7 +125,14 @@ class CharacterArc private constructor(
         }
         fun withArcSection(arcSection: CharacterArcSection, index: Int? = null): CharacterArc
         {
-            if (! arcSection.template.isMoral) throw error("Template section being added to Moral Argument is not moral")
+
+            if (! arcSection.template.isMoral) throw ArcTemplateSectionIsNotMoral(
+                id.uuid,
+                characterId.uuid,
+                themeId.uuid,
+                arcSection.template.id.uuid
+            )
+
             if (template.sections.none { it isSameEntityAs arcSection.template}) {
                 throw TemplateSectionIsNotPartOfArcTemplate(
                     id.uuid, characterId.uuid, themeId.uuid, arcSection.template.id.uuid
