@@ -287,6 +287,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
                     themeId.mustEqual(arc.themeId.uuid)
                     templateSectionId.mustEqual(templateSection.id.uuid)
                     templateSectionName.mustEqual(templateSection.name)
+                    indexInMoralArgument.mustEqual(null)
                     value.mustEqual(inputValue)
                 }
         }

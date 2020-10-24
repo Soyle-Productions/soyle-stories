@@ -42,16 +42,6 @@ class CharacterArc private constructor(
 
     fun withArcSection(templateSection: CharacterArcTemplateSection, linkedLocation: Location.Id? = null, value: String = ""): CharacterArc
     {
-        if (template.sections.none { it isSameEntityAs templateSection}) {
-            throw TemplateSectionIsNotPartOfArcTemplate(
-                id.uuid, characterId.uuid, themeId.uuid, templateSection.id.uuid
-            )
-        }
-        if (! templateSection.allowsMultiple && arcSections.any { it.template isSameEntityAs templateSection }) {
-            throw CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
-                id.uuid, characterId.uuid, themeId.uuid, templateSection.id.uuid
-            )
-        }
         val newSection = CharacterArcSection(
             CharacterArcSection.Id(UUID.randomUUID()),
             characterId,
@@ -61,14 +51,7 @@ class CharacterArc private constructor(
             value
         )
 
-        return copy(
-            arcSections = arcSections + newSection,
-            moralArgumentSectionOrder = if (templateSection.isMoral) {
-                moralArgumentSectionOrder + (newSection.id to moralArgumentSectionOrder.size)
-            } else {
-                moralArgumentSectionOrder
-            }
-        )
+        return withArcSection(newSection)
     }
     fun withArcSection(arcSection: CharacterArcSection): CharacterArc
     {
@@ -113,7 +96,62 @@ class CharacterArc private constructor(
         )
     }
 
-    fun moralArgument() = arcSections.filter { it.template.isMoral }.sortedBy { moralArgumentSectionOrder.getValue(it.id) }
+    private val moralArgument by lazy { MoralArgument(arcSections.filter { it.template.isMoral }.sortedBy { moralArgumentSectionOrder.getValue(it.id) }) }
+    fun moralArgument(): MoralArgument = moralArgument
+    fun indexInMoralArgument(sectionId: CharacterArcSection.Id): Int? = moralArgumentSectionOrder[sectionId]
+
+    inner class MoralArgument(
+        val arcSections: List<CharacterArcSection>
+    ) {
+
+        fun withArcSection(
+            templateSection: CharacterArcTemplateSection,
+            linkedLocation: Location.Id? = null,
+            value: String = "",
+            index: Int? = null
+        ): CharacterArc
+        {
+            val newSection = CharacterArcSection(
+                CharacterArcSection.Id(UUID.randomUUID()),
+                characterId,
+                themeId,
+                templateSection,
+                linkedLocation,
+                value
+            )
+
+            return withArcSection(newSection, index)
+        }
+        fun withArcSection(arcSection: CharacterArcSection, index: Int? = null): CharacterArc
+        {
+            if (! arcSection.template.isMoral) throw error("Template section being added to Moral Argument is not moral")
+            if (template.sections.none { it isSameEntityAs arcSection.template}) {
+                throw TemplateSectionIsNotPartOfArcTemplate(
+                    id.uuid, characterId.uuid, themeId.uuid, arcSection.template.id.uuid
+                )
+            }
+            if (! arcSection.template.allowsMultiple && arcSections.any { it.template isSameEntityAs arcSection.template }) {
+                throw CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
+                    id.uuid, characterId.uuid, themeId.uuid, arcSection.template.id.uuid
+                )
+            }
+            return copy(
+                arcSections = arcSections + arcSection,
+                moralArgumentSectionOrder = if (index == null) {
+                    moralArgumentSectionOrder + (arcSection.id to moralArgumentSectionOrder.size)
+                } else {
+                    if (index < 0 || index > moralArgumentSectionOrder.size)
+                        throw IndexOutOfBoundsException("Moral Argument index $index is not in the range of 0 to ${moralArgumentSectionOrder.size}.")
+
+                    moralArgumentSectionOrder.mapValues {
+                        if (it.value >= index) it.value + 1
+                        else it.value
+                    } + (arcSection.id to index)
+                }
+            )
+        }
+
+    }
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "CharacterArc($uuid)"

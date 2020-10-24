@@ -191,7 +191,7 @@ class OutlineMoralArgumentUnitTest {
                 outlineMoralArgumentForCharacterInTheme()
 
                 val result = result as OutlineMoralArgumentForCharacterInTheme.ResponseModel
-                val expectedOrder = characterArc.moralArgument().withIndex().associate { it.value.id.uuid to it.index }
+                val expectedOrder = characterArc.moralArgument().arcSections.withIndex().associate { it.value.id.uuid to it.index }
                 result.characterArcSections.withIndex().forEach {
                     it.index.mustEqual(expectedOrder[it.value.arcSectionId]) { "Output sections in wrong order." }
                 }

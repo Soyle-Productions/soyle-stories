@@ -109,7 +109,7 @@ class CharacterArcTest {
 		val arc = CharacterArc.planNewCharacterArc(characterId, themeId, name, template)
 		val arcWithArcSection = arc.withArcSection(templateSection)
 		val arcSection = arcWithArcSection.arcSections.single()
-		arcWithArcSection.moralArgument().first().mustEqual(arcSection)
+		arcWithArcSection.moralArgument().arcSections.first().mustEqual(arcSection)
 	}
 
 	@Test
@@ -120,7 +120,7 @@ class CharacterArcTest {
 		val arcWithArcSection = arc.withArcSection(templateSection)
 		val arcSection = arcWithArcSection.arcSections.single()
 
-		assertFalse(arcWithArcSection.moralArgument().contains(arcSection)) {
+		assertFalse(arcWithArcSection.moralArgument().arcSections.contains(arcSection)) {
 			"Moral argument section order should only contain moral arc sections" }
 	}
 

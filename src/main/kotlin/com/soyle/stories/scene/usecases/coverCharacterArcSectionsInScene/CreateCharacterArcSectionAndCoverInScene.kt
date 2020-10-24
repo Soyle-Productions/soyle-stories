@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene
 
+import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import java.util.*
 
 interface CreateCharacterArcSectionAndCoverInScene {
@@ -15,7 +16,7 @@ interface CreateCharacterArcSectionAndCoverInScene {
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
     class ResponseModel(
-        val createdCharacterArcSection: CreatedCharacterArcSection,
+        val createdCharacterArcSection: ArcSectionAddedToCharacterArc,
         val characterArcSectionCoveredByScene: CharacterArcSectionCoveredByScene
     )
 

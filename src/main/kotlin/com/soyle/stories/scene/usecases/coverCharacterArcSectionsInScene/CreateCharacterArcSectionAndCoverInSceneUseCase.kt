@@ -1,9 +1,8 @@
 package com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene
 
-import com.soyle.stories.characterarc.CharacterArcAlreadyContainsMaximumNumberOfTemplateSection
-import com.soyle.stories.characterarc.CharacterArcDoesNotExist
 import com.soyle.stories.characterarc.CharacterArcTemplateSectionDoesNotExist
 import com.soyle.stories.characterarc.repositories.getCharacterArcOrError
+import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import com.soyle.stories.entities.*
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.repositories.getSceneOrError
@@ -72,7 +71,7 @@ class CreateCharacterArcSectionAndCoverInSceneUseCase(
 
         output.characterArcCreatedAndCoveredInScene(
             CreateCharacterArcSectionAndCoverInScene.ResponseModel(
-                CreatedCharacterArcSection(arc.id, newSection),
+                ArcSectionAddedToCharacterArc(arc, newSection),
                 CharacterArcSectionCoveredByScene(
                     scene.id.uuid,
                     arc.characterId.uuid,
