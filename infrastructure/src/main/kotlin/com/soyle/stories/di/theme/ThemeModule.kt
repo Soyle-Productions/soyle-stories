@@ -86,7 +86,7 @@ import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
-import com.soyle.stories.theme.updateThemeMetaData.*
+import com.soyle.stories.theme.changeThemeDetails.*
 import com.soyle.stories.theme.useCharacterAsMainOpponent.*
 import com.soyle.stories.theme.useCharacterAsOpponent.*
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
@@ -108,8 +108,7 @@ import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
-import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
-import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponentsUseCase
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
@@ -144,12 +143,11 @@ import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItem
 import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItemUseCase
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
-import com.soyle.stories.theme.usecases.updateThemeMetaData.ChangeCentralConflict
-import com.soyle.stories.theme.usecases.updateThemeMetaData.ChangeCentralConflictUseCase
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameThemeUseCase
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponent
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponentUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralConflict
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralMoralQuestion
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeThemeDetailsUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenameTheme
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsMainOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponentUseCase
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsController
@@ -175,7 +173,13 @@ object ThemeModule {
         provide { provideCreateTheme(this) }
         provide<ListSymbolsByTheme> { ListSymbolsByThemeUseCase(get()) }
         provide<DeleteTheme> { DeleteThemeUseCase(get(), get()) }
-        provide<RenameTheme> { RenameThemeUseCase(get()) }
+        provide(
+            ChangeCentralMoralQuestion::class,
+            RenameTheme::class,
+            ChangeCentralConflict::class
+        ) {
+            ChangeThemeDetailsUseCase(get())
+        }
         provide<AddSymbolToTheme> { AddSymbolToThemeUseCase(get()) }
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
@@ -213,10 +217,18 @@ object ThemeModule {
         }
         provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get(), get()) }
         provide<ListAvailablePerspectiveCharacters> { ListAvailablePerspectiveCharactersUseCase(get()) }
-        provide<UseCharacterAsOpponent> { UseCharacterAsOpponentUseCase(get(), get()) }
-        provide<UseCharacterAsMainOpponent> { UseCharacterAsMainOpponentUseCase(get()) }
-        provide<ListAvailableCharactersToUseAsOpponents> { ListAvailableCharactersToUseAsOpponentsUseCase(get(), get()) }
-        provide<ChangeCentralConflict> { ChangeCentralConflictUseCase(get()) }
+        provide(
+            UseCharacterAsOpponent::class,
+            UseCharacterAsMainOpponent::class,
+            ListAvailableCharactersToUseAsOpponents::class
+        ) { UseCharacterAsOpponentUseCase(get(), get()) }
+        provide(
+            ChangeCentralConflict::class,
+            RenameTheme::class,
+            ChangeCentralMoralQuestion::class
+        ) {
+            ChangeThemeDetailsUseCase(get())
+        }
         provide<ChangeCharacterDesire> { ChangeCharacterDesireUseCase(get(), get()) }
         provide<ChangeCharacterPsychologicalWeakness> { ChangeCharacterPsychologicalWeaknessUseCase(get(), get()) }
         provide<ChangeCharacterMoralWeakness> { ChangeCharacterMoralWeaknessUseCase(get(), get()) }
@@ -236,6 +248,7 @@ object ThemeModule {
         provide(ChangedCharacterChangeReceiver::class) { ChangedCharacterChangeNotifier() }
         provide(CharacterRemovedAsOpponentReceiver::class) { CharacterRemovedAsOpponentNotifier() }
         provide(RemovedCharacterFromThemeReceiver::class) { RemovedCharacterFromThemeNotifier() }
+        provide(ChangedCentralMoralQuestionReceiver::class) { ChangedCentralMoralQuestionNotifier() }
 
 
         provide(CreateTheme.OutputPort::class) {
@@ -245,7 +258,7 @@ object ThemeModule {
             DeleteThemeNotifier(applicationScope.get(), get())
         }
         provide(RenameTheme.OutputPort::class, ChangeCentralConflict.OutputPort::class) {
-            UpdateThemeMetaDataOutput(get(), get())
+            ChangeThemeDetailsOutput(get(), get(), get())
         }
         provide(AddSymbolToTheme.OutputPort::class) {
             AddSymbolToThemeOutput(get())

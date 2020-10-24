@@ -5,7 +5,7 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeNameCannotBeBlank
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
 import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
-import com.soyle.stories.theme.updateThemeMetaData.RenamedThemeReceiver
+import com.soyle.stories.theme.changeThemeDetails.RenamedThemeReceiver
 import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
@@ -13,8 +13,7 @@ import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
 import com.soyle.stories.theme.usecases.listThemes.ListThemes
 import com.soyle.stories.theme.usecases.listThemes.ThemeList
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenamedTheme
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 
 class CreateSymbolDialogPresenter(
     private val view: View.Nullable<CreateSymbolDialogViewModel>

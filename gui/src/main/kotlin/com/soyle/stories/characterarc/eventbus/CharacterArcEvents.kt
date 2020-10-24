@@ -5,23 +5,6 @@
  */
 package com.soyle.stories.characterarc.eventbus
 
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
-import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
-import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
-import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
-import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
-import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
-import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
-import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison
 /*
 interface CharacterArcEvents {
 

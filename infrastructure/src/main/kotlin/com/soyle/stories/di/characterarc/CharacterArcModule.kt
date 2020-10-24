@@ -19,7 +19,7 @@ import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveChara
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
-import com.soyle.stories.characterarc.changeCentralMoralQuestion.ChangeCentralMoralQuestionNotifier
+import com.soyle.stories.theme.changeThemeDetails.ChangedCentralMoralQuestionNotifier
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogPresenter
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
@@ -58,7 +58,6 @@ import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyValueOutput
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedNotifier
@@ -69,8 +68,7 @@ import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFrom
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonOutput
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
-import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestion
-import com.soyle.stories.theme.usecases.changeCentralMoralQuestion.ChangeCentralMoralQuestionUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValueUseCase
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
@@ -79,6 +77,9 @@ import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
 import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunctionUseCase
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValueUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralConflict
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeThemeDetailsUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenameTheme
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharactersUseCase
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
@@ -128,9 +129,6 @@ object CharacterArcModule {
         }
         provide<ChangeStoryFunction> {
             ChangeStoryFunctionUseCase(get())
-        }
-        provide<ChangeCentralMoralQuestion> {
-            ChangeCentralMoralQuestionUseCase(get())
         }
         provide<ChangeCharacterPropertyValue> {
             ChangeCharacterPropertyValueUseCase(get())
@@ -188,7 +186,6 @@ object CharacterArcModule {
         }
         provide(ChangeStoryFunction.OutputPort::class) { ChangeStoryFunctionNotifier(applicationScope.get()) }
         provide(ChangeThematicSectionValue.OutputPort::class) { ChangeThematicSectionValueNotifier(applicationScope.get()) }
-        provide(ChangeCentralMoralQuestion.OutputPort::class) { ChangeCentralMoralQuestionNotifier(applicationScope.get()) }
         provide(ChangeCharacterPropertyValue.OutputPort::class) { ChangeCharacterPropertyValueNotifier(applicationScope.get()) }
         provide(ChangeCharacterPerspectivePropertyValue.OutputPort::class) {
             ChangeCharacterPerspectivePropertyValueOutput(

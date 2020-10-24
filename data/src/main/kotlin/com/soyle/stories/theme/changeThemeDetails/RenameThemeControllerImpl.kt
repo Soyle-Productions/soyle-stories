@@ -1,7 +1,7 @@
-package com.soyle.stories.theme.updateThemeMetaData
+package com.soyle.stories.theme.changeThemeDetails
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenameTheme
 import java.util.*
 
 class RenameThemeControllerImpl(

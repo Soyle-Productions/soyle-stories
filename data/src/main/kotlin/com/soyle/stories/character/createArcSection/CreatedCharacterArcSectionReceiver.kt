@@ -1,9 +1,9 @@
 package com.soyle.stories.character.createArcSection
 
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreatedCharacterArcSection
+import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 
 interface CreatedCharacterArcSectionReceiver {
 
-    suspend fun receiveCreatedCharacterArcSection(event: CreatedCharacterArcSection)
+    suspend fun receiveCreatedCharacterArcSection(event: ArcSectionAddedToCharacterArc)
 
 }

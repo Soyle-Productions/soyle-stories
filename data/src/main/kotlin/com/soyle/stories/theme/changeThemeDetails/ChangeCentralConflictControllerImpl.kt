@@ -1,7 +1,7 @@
-package com.soyle.stories.theme.updateThemeMetaData
+package com.soyle.stories.theme.changeThemeDetails
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.updateThemeMetaData.ChangeCentralConflict
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralConflict
 import java.util.*
 
 class ChangeCentralConflictControllerImpl(

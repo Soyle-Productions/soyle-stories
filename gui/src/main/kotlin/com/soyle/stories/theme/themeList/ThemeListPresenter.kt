@@ -4,11 +4,9 @@ import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharact
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
 import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
-import com.soyle.stories.theme.updateThemeMetaData.RenamedThemeReceiver
+import com.soyle.stories.theme.changeThemeDetails.RenamedThemeReceiver
 import com.soyle.stories.theme.usecases.SymbolItem
-import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
-import com.soyle.stories.theme.usecases.createTheme.CreateTheme
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
@@ -20,8 +18,7 @@ import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTh
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenamedTheme
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 import java.util.*
 
 class ThemeListPresenter(

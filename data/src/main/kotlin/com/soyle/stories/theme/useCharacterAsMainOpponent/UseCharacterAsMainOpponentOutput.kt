@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.useCharacterAsMainOpponent
 
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.CharacterUsedAsMainOpponent
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponent
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsMainOpponent
 
 class UseCharacterAsMainOpponentOutput(
     private val characterUsedAsMainOpponentReceiver: CharacterUsedAsMainOpponentReceiver,

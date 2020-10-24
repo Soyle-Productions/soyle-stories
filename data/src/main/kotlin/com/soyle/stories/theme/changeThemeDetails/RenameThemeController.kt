@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.updateThemeMetaData
+package com.soyle.stories.theme.changeThemeDetails
 
 interface RenameThemeController {
 
