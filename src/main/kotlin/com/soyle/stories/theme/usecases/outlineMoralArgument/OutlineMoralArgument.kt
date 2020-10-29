@@ -36,6 +36,8 @@ class OutlineMoralArgument(
 
         output.receiveMoralArgumentOutlineForCharacterInTheme(
             OutlineMoralArgumentForCharacterInTheme.ResponseModel(
+                majorCharacter.id.uuid,
+                majorCharacter.name,
                 characterArc.moralArgument().arcSections.map {
                     OutlineMoralArgumentForCharacterInTheme.CharacterArcSectionInMoralArgument(it.id.uuid, it.value, it.template.name, it.template.isRequired)
                 }

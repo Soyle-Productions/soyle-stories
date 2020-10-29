@@ -7,6 +7,8 @@ interface OutlineMoralArgumentForCharacterInTheme {
     suspend operator fun invoke(themeId: UUID, characterId: UUID, output: OutputPort)
 
     class ResponseModel(
+        val characterId: UUID,
+        val characterName: String,
         val characterArcSections: List<CharacterArcSectionInMoralArgument>
     )
 

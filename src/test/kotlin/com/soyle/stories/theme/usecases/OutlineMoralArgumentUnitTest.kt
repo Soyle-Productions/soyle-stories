@@ -176,6 +176,15 @@ class OutlineMoralArgumentUnitTest {
             }
 
             @Test
+            fun `should output character id and name`() {
+                outlineMoralArgumentForCharacterInTheme()
+
+                val result = result as OutlineMoralArgumentForCharacterInTheme.ResponseModel
+                result.characterId.mustEqual(character.id.uuid)
+                result.characterName.mustEqual(character.name)
+            }
+
+            @Test
             fun `should output all and only moral character arc sections for character in theme`() {
                 outlineMoralArgumentForCharacterInTheme()
 
