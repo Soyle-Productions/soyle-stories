@@ -1,6 +1,7 @@
-package com.soyle.stories.theme.changeThemeDetails
+package com.soyle.stories.theme.changeThemeDetails.changeThemeLine
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineController
 import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeThemeLine
 import java.util.*
 

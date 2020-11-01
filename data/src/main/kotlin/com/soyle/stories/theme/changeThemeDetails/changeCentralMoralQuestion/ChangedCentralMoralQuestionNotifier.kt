@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.changeThemeDetails
+package com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.theme.usecases.changeThemeDetails.ChangedCentralMoralQuestion

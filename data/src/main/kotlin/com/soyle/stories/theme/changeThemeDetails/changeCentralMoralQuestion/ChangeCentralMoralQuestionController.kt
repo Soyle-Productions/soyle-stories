@@ -1,4 +1,4 @@
-package com.soyle.stories.theme.changeThemeDetails
+package com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion
 
 interface ChangeCentralMoralQuestionController {
 

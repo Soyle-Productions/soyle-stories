@@ -1,7 +1,7 @@
-package com.soyle.stories.theme.changeThemeDetails
+package com.soyle.stories.theme.changeThemeDetails.changeCentralConflict
 
 import com.soyle.stories.theme.usecases.changeThemeDetails.CentralConflictChanged
 
-interface ThemeWithCentralConflictChangedReceiver {
+interface CentralConflictChangedReceiver {
     suspend fun receiveThemeWithCentralConflictChanged(centralConflictChanged: CentralConflictChanged)
 }
