@@ -4,10 +4,8 @@ import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.Styles
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
 import javafx.scene.Node
-import javafx.scene.control.Labeled
-import javafx.scene.control.MenuButton
-import javafx.scene.control.ScrollPane
-import javafx.scene.control.TextInputControl
+import javafx.scene.control.*
+import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import org.testfx.api.FxRobot
 
@@ -36,8 +34,12 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
         return from(view.root).lookup("#perspective-character-field .menu-button").query()
     }
 
+    private fun getArcSectionsContainer(): Node {
+        return from(view.root).lookup("#arc-sections").query<ScrollPane>().content
+    }
+
     fun getArcSectionNodes(): List<Node> {
-        val arcSectionsContainer = from(view.root).lookup("#arc-sections").query<ScrollPane>().content as VBox
+        val arcSectionsContainer = getArcSectionsContainer()
         return from(arcSectionsContainer).lookup(".${Styles.labeledSection.name}").queryAll<Node>().toList()
     }
 
@@ -51,6 +53,10 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
         return getArcSectionNodes().map {
             from(it).lookup(".text-field").query()
         }
+    }
+
+    fun getSectionTypeSelections(): Set<MenuButton> {
+        return from(getArcSectionsContainer()).lookup(".section-type-selection").queryAll()
     }
 
 }

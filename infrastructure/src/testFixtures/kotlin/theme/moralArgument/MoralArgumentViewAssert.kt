@@ -2,10 +2,12 @@ package com.soyle.stories.desktop.view.theme.moralArgument
 
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
+import com.soyle.stories.theme.moralArgument.MoralArgumentSectionTypeViewModel
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
 import javafx.scene.control.CustomMenuItem
 import javafx.scene.control.Tooltip
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import tornadofx.hasClass
 import tornadofx.tooltip
 
@@ -72,10 +74,6 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
             driver.getPerspectiveCharacterSelection().items.filter { it.hasClass(ComponentsStyles.discouragedSelection) }
                 .forEach { menuItem ->
                     menuItem as CustomMenuItem
-                    println(
-                        "tooltip text for ${menuItem.text} with is " +
-                                (menuItem.content?.properties?.get("javafx.scene.control.Tooltip") as? Tooltip)?.text
-                    )
                     assertEquals(
                         expectedMessageGenerator(menuItem.userData as AvailablePerspectiveCharacterViewModel),
                         (menuItem.content?.properties?.get("javafx.scene.control.Tooltip") as? Tooltip)?.text
@@ -102,6 +100,39 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
 
         fun hasValue(expectedValue: String) {
             assertEquals(expectedValue, driver.getArcSectionValues()[index].text)
+        }
+
+    }
+
+    fun andSectionTypeMenu(assertions: SectionTypeMenuAssert.() -> Unit) {
+        SectionTypeMenuAssert().assertions()
+    }
+
+    inner class SectionTypeMenuAssert internal constructor() {
+
+        fun onlyHasItems(expectedItems: List<String>) {
+            val expectedItemSet = expectedItems.toSet()
+            driver.getSectionTypeSelections().forEach { selection ->
+                assertEquals(expectedItemSet, selection.items.map { it.text }.toSet())
+            }
+        }
+
+        fun eachDiscouragedItemHasMessage(expectedMessageGenerator: (MoralArgumentSectionTypeViewModel) -> String) {
+            driver.getSectionTypeSelections().forEach { selection ->
+                selection.items.filterNot {
+                    val vm = it.userData as MoralArgumentSectionTypeViewModel
+                    vm.canBeCreated
+                }.forEach { menuItem ->
+                    menuItem as CustomMenuItem
+                    assertTrue(menuItem.hasClass(ComponentsStyles.discouragedSelection)) {
+                        "Un-creatable section type is not discouraged from being selected"
+                    }
+                    assertEquals(
+                        expectedMessageGenerator(menuItem.userData as MoralArgumentSectionTypeViewModel),
+                        (menuItem.content?.properties?.get("javafx.scene.control.Tooltip") as? Tooltip)?.text
+                    )
+                }
+            }
         }
 
     }

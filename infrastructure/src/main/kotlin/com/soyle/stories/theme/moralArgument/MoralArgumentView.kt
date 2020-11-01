@@ -1,18 +1,34 @@
 package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.common.components.*
+import com.soyle.stories.common.components.asyncMenuButton.AsyncMenuButton.Companion.asyncMenuButton
 import com.soyle.stories.common.mapObservable
 import com.soyle.stories.common.mapObservableTo
+import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.soylestories.SplashScreen
+import com.soyle.stories.soylestories.Styles
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
 import com.soyle.stories.theme.characterConflict.addDragAndDrop
+import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
+import javafx.scene.control.CustomMenuItem
 import javafx.scene.control.Label
 import javafx.scene.control.MenuButton
+import javafx.scene.control.MenuItem
+import javafx.scene.layout.BackgroundSize
+import javafx.scene.layout.Priority
+import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
+import javafx.scene.shape.PathElement
 import tornadofx.*
 
 class MoralArgumentView : View() {
@@ -22,71 +38,78 @@ class MoralArgumentView : View() {
 
     override val root: Parent = responsiveBox {
         themeDetails {
+            hgrow = Priority.ALWAYS
             moralProblemField()
             themeLineField()
         }
         moralArgument {
+            hgrow = Priority.ALWAYS
             perspectiveCharacterField()
-            arcSections { moralSection ->
-                labeledSection(moralSection.arcSectionName) {
-                    id = moralSection.arcSectionId
-                    textfield(moralSection.arcSectionValue)
-                    addDragAndDrop()
-                }
+            arcSections {
+                arcSection(it)
             }
         }
     }
 
     private fun Parent.themeDetails(op: Parent.() -> Unit) = vbox(op = op)
+    
     private fun Parent.moralProblemField() = labeledSection(state.moralProblemLabel) {
         id = "moral-problem-field"
-        textfield(state.moralProblemValue)
-    }
-
-    private fun Parent.themeLineField() = labeledSection(state.themeLineLabel) {
-        id = "theme-line-field"
-        textfield(state.themeLineValue)
-    }
-
-    private fun Parent.moralArgument(op: Parent.() -> Unit) = vbox(op = op)
-    private fun Parent.perspectiveCharacterField() = hbox {
-        id = "perspective-character-field"
-        fieldLabel(state.perspectiveCharacterLabel)
-        menubutton {
-            textProperty().bind(state.perspectiveCharacterDisplay)
-            addLoadingItem()
-            addCharacterItemsWhenLoaded()
-        }
-    }
-
-    private fun MenuButton.addLoadingItem() {
-        item("") { textProperty().bind(state.loadingItemLabel) }
-    }
-
-    private fun MenuButton.addCharacterItemsWhenLoaded() {
-        state.availablePerspectiveCharacters.onChange { observableList: ObservableList<AvailablePerspectiveCharacterViewModel>? ->
-            items.clear()
-            when {
-                observableList == null || !isShowing -> addLoadingItem()
-                else -> addCharacterItems(observableList)
+        textfield {
+            text = state.moralProblemValue.valueSafe
+            state.moralProblemValue.onChange { text = it }
+            onLoseFocus {
+                if (state.moralProblemValue.value != text) {
+                    viewListener.setMoralProblem(text)
+                }
             }
         }
     }
 
-    private fun MenuButton.addCharacterItems(observableList: ObservableList<AvailablePerspectiveCharacterViewModel>) {
-        observableList
-            .groupBy { it.isMajorCharacter }
+    private fun Parent.themeLineField() = labeledSection(state.themeLineLabel) {
+        id = "theme-line-field"
+        textfield {
+            text = state.themeLineValue.valueSafe
+            state.themeLineValue.onChange { text = it }
+            onLoseFocus {
+                if (state.themeLineValue.value != text) {
+                    viewListener.setThemeLine(text)
+                }
+            }
+        }
+    }
+
+    private fun Parent.moralArgument(op: Parent.() -> Unit) = vbox(op = op)
+
+    private fun Parent.perspectiveCharacterField() = hbox {
+        id = "perspective-character-field"
+        fieldLabel(state.perspectiveCharacterLabel)
+        asyncMenuButton<AvailablePerspectiveCharacterViewModel> {
+            textProperty.bind(state.perspectiveCharacterDisplay)
+            loadingLabelProperty.bind(state.loadingCharacterLabel)
+            sourceProperty.bind(state.availablePerspectiveCharacters)
+            onLoad = viewListener::getPerspectiveCharacters
+            itemsWhenLoaded(::createCharacterItems)
+        }
+    }
+
+    private fun createCharacterItems(list: List<AvailablePerspectiveCharacterViewModel>): List<MenuItem> {
+        return list.groupBy { it.isMajorCharacter }
             .withDefault { listOf() }
-            .apply { getValue(true).forEach { addMajorCharacterItem(it) } }
-            .apply { getValue(false).forEach { addMinorCharacterItem(it) } }
+            .run {
+                getValue(true).map { createMajorCharacterItem(it) } +
+                getValue(false).map { createMinorCharacterItem(it) }
+            }
     }
 
-    private fun MenuButton.addMajorCharacterItem(it: AvailablePerspectiveCharacterViewModel) {
-        item(it.characterName)
+    private fun createMajorCharacterItem(it: AvailablePerspectiveCharacterViewModel): MenuItem {
+        return MenuItem(it.characterName).apply {
+            action { viewListener.outlineMoralArgument(it.characterId) }
+        }
     }
 
-    private fun MenuButton.addMinorCharacterItem(minorCharacter: AvailablePerspectiveCharacterViewModel) {
-        customitem {
+    private fun createMinorCharacterItem(minorCharacter: AvailablePerspectiveCharacterViewModel): MenuItem {
+        return CustomMenuItem().apply {
             userData = minorCharacter
             text = minorCharacter.characterName
             addClass(ComponentsStyles.discouragedSelection)
@@ -110,6 +133,68 @@ class MoralArgumentView : View() {
                 state.sections.mapObservableTo(children, {it.arcSectionId}) { op(it) }
             }
         }
+    }
+
+    private fun Parent.arcSection(section: MoralArgumentSectionViewModel): Node {
+        return vbox {
+            addSectionTypeButton()
+            labeledSection(section.arcSectionName) {
+                id = section.arcSectionId
+                textfield(section.arcSectionValue)
+            }
+        }
+    }
+
+    private fun Region.addSectionTypeButton() {
+        asyncMenuButton<MoralArgumentSectionTypeViewModel> {
+            root.addClass("section-type-selection")
+            root.useMaxWidth = true
+            text = "Insert Section Type"
+            loadingLabelProperty.bind(state.loadingSectionTypesLabel)
+            sourceProperty.bind(state.availableSectionTypes)
+            onLoad = ::getAvailableSectionTypesToAdd
+            itemsWhenLoaded(::createSectionTypeItems)
+        }
+    }
+
+    private fun getAvailableSectionTypesToAdd() {
+        state.item?.selectedPerspectiveCharacter?.characterId?.let {
+            viewListener.getAvailableArcSectionTypesToAdd(it)
+        }
+    }
+
+    private fun createSectionTypeItems(sectionTypes: List<MoralArgumentSectionTypeViewModel>): List<MenuItem> {
+        return sectionTypes.groupBy { it.canBeCreated }.withDefault { listOf() }
+            .run {
+                getValue(true).map(::createCreatableSectionValueTypeItem) +
+                getValue(false).map(::createUsedSectionValueTypeItem)
+            }
+    }
+
+    private fun createCreatableSectionValueTypeItem(sectionType: MoralArgumentSectionTypeViewModel): MenuItem
+    {
+        return MenuItem(sectionType.sectionTypeName).apply {
+            userData = sectionType
+        }
+    }
+
+    private fun createUsedSectionValueTypeItem(sectionType: MoralArgumentSectionTypeViewModel): MenuItem
+    {
+        return CustomMenuItem().apply {
+            text = sectionType.sectionTypeName
+            addClass(ComponentsStyles.discouragedSelection)
+            userData = sectionType
+            content = Label(sectionType.sectionTypeName).apply {
+                tooltip {
+                    textProperty().bind(usedSectionMessage(sectionType))
+                }
+            }
+        }
+    }
+
+    private fun usedSectionMessage(sectionType: MoralArgumentSectionTypeViewModel): ObservableValue<String>
+    {
+        return state.unavailableSectionTypeMessage.stringBinding { it?.invoke(sectionType) }
     }
 
     init {

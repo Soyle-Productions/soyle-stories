@@ -11,8 +11,10 @@ import com.soyle.stories.layout.config.dynamic.MoralArgument
 import com.soyle.stories.project.makeProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.testfx.api.FxRobot
@@ -36,11 +38,35 @@ class MoralArgumentViewUnitTest : FxRobot() {
 
     private val viewListenerCallLog = mutableMapOf<KFunction<*>, Map<String, Any?>>()
 
+    @BeforeEach
+    fun setInitialState() {
+        state.update {
+            MoralArgumentViewModel(
+                moralProblemLabel = "",
+                moralProblemValue = "",
+                themeLineLabel = "",
+                themeLineValue = "",
+                perspectiveCharacterLabel = "",
+                noPerspectiveCharacterLabel = "",
+                selectedPerspectiveCharacter = null,
+                availablePerspectiveCharacters = null,
+                loadingPerspectiveCharactersLabel = "",
+                loadingSectionTypesLabel = "",
+                createCharacterLabel = "",
+                unavailableCharacterMessage = { "" },
+                unavailableSectionTypeMessage = { "" },
+                sections = null,
+                availableSectionTypes = null
+            )
+        }
+    }
+
     @Nested
     inner class Initialize {
 
         @Test
         fun `should call for initial state`() {
+
             val request =
                 viewListenerCallLog[MoralArgumentViewListener::getValidState] ?: error("Did not request valid state")
             assertEquals(emptyMap<String, Any?>(), request)
@@ -50,25 +76,6 @@ class MoralArgumentViewUnitTest : FxRobot() {
 
     @Nested
     inner class `Update State` {
-
-        init {
-            state.update {
-                MoralArgumentViewModel(
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    null,
-                    null,
-                    "",
-                    "",
-                    { "" },
-                    null
-                )
-            }
-        }
 
         @Test
         fun `moral problem`() {
@@ -172,31 +179,6 @@ class MoralArgumentViewUnitTest : FxRobot() {
         }
 
         @Test
-        fun `Available Perspective Characters When Not Showing List`() {
-            val loadingLabel = "Loading 09u"
-            val availablePerspectiveCharacters = List(10) {
-                AvailablePerspectiveCharacterViewModel(
-                    "",
-                    "Character $it",
-                    isMajorCharacter = it % 2 == 0
-                )
-            }
-
-            state.updateOrInvalidated {
-                copy(
-                    loadingPerspectiveCharactersLabel = loadingLabel,
-                    availablePerspectiveCharacters = availablePerspectiveCharacters
-                )
-            }
-
-            assertThat(moralArgumentView) {
-                andPerspectiveCharacterField {
-                    onlyHasItems(listOf(loadingLabel))
-                }
-            }
-        }
-
-        @Test
         fun `Available Perspective Characters`() {
             val availablePerspectiveCharacters = List(10) {
                 AvailablePerspectiveCharacterViewModel(
@@ -260,7 +242,285 @@ class MoralArgumentViewUnitTest : FxRobot() {
             }
         }
 
+        @Test
+        fun `Loading Section Types`() {
+            val loadingLabel = "Loading 09u"
+
+            state.updateOrInvalidated {
+                copy(
+                    loadingSectionTypesLabel = loadingLabel,
+                    availableSectionTypes = null
+                )
+            }
+
+            assertThat(moralArgumentView) {
+                andSectionTypeMenu {
+                    onlyHasItems(listOf(loadingLabel))
+                }
+            }
+        }
+
+        @Test
+        fun `Available Section Types`() = runBlocking {
+            val availableSectionTypes = List(10) {
+                MoralArgumentSectionTypeViewModel(
+                    "",
+                    "Type $it",
+                    canBeCreated = it % 2 == 0
+                )
+            }
+            val movableSectionTypeMessageGenerator: (MoralArgumentSectionTypeViewModel) -> String = {
+                "This is a generated message for ${it.sectionTypeName}"
+            }
+
+            state.updateOrInvalidated { copy(sections = List(5) { MoralArgumentSectionViewModel("$it", "", "") }) }
+
+            interact {
+                MoralArgumentViewDriver(moralArgumentView).getSectionTypeSelections().first().show()
+            }
+
+            state.updateOrInvalidated {
+                copy(
+                    availableSectionTypes = availableSectionTypes,
+                    unavailableSectionTypeMessage = movableSectionTypeMessageGenerator
+                )
+            }
+
+            assertThat(moralArgumentView) {
+                andSectionTypeMenu {
+                    onlyHasItems(
+                        availableSectionTypes.map { it.sectionTypeName }
+                    )
+                    eachDiscouragedItemHasMessage(movableSectionTypeMessageGenerator)
+                }
+            }
+        }
+
     }
+
+    @Nested
+    inner class `Update Moral Problem` {
+
+        @Nested
+        inner class `When Text is Different` {
+
+            private val newMoralProblem = "New Moral Problem tg8i"
+
+            @Test
+            fun `should update moral problem`() {
+                val driver = MoralArgumentViewDriver(moralArgumentView)
+                interact {
+                    driver.getMoralProblemFieldInput().apply {
+                        requestFocus()
+                        text = newMoralProblem
+                    }
+                    driver.getThemeLineFieldInput().requestFocus()
+                }
+
+                assertEquals(
+                    mapOf("problem" to newMoralProblem),
+                    viewListenerCallLog[MoralArgumentViewListener::setMoralProblem]
+                )
+            }
+
+        }
+
+        @Nested
+        inner class `When Text is the same` {
+
+            @Test
+            fun `should not update moral problem`() {
+                val driver = MoralArgumentViewDriver(moralArgumentView)
+                interact {
+                    driver.getMoralProblemFieldInput().apply {
+                        requestFocus()
+                    }
+                    driver.getThemeLineFieldInput().requestFocus()
+                }
+
+                assertNull(viewListenerCallLog[MoralArgumentViewListener::setMoralProblem])
+
+            }
+
+        }
+
+    }
+
+    @Nested
+    inner class `Update Theme Line` {
+
+        @Nested
+        inner class `When Text is Different` {
+
+            private val newThemeLine = "New Theme Line t53a"
+
+            @Test
+            fun `should update theme line`() {
+                val driver = MoralArgumentViewDriver(moralArgumentView)
+                interact {
+                    driver.getThemeLineFieldInput().apply {
+                        requestFocus()
+                        text = newThemeLine
+                    }
+                    driver.getMoralProblemFieldInput().requestFocus()
+                }
+
+                assertEquals(
+                    mapOf("themeLine" to newThemeLine),
+                    viewListenerCallLog[MoralArgumentViewListener::setThemeLine]
+                )
+            }
+
+        }
+
+        @Nested
+        inner class `When Text is the same` {
+
+            @Test
+            fun `should not update theme line`() {
+                val driver = MoralArgumentViewDriver(moralArgumentView)
+                interact {
+                    driver.getThemeLineFieldInput().apply {
+                        requestFocus()
+                    }
+                    driver.getMoralProblemFieldInput().requestFocus()
+                }
+
+                assertNull(viewListenerCallLog[MoralArgumentViewListener::setThemeLine])
+
+            }
+
+        }
+
+    }
+
+    @Nested
+    inner class `When Perspective Character Selection is Opened` {
+
+        @Test
+        fun `should load available perspective characters`() {
+            interact {
+                MoralArgumentViewDriver(moralArgumentView).getPerspectiveCharacterSelection().show()
+            }
+
+            assertEquals(
+                emptyMap<String, Any?>(),
+                viewListenerCallLog[MoralArgumentViewListener::getPerspectiveCharacters]
+            )
+        }
+
+    }
+
+    @Nested
+    inner class `Select Perspective Character` {
+
+        private val characterId = UUID.randomUUID()
+        private val characterName = "Some Character t849tu"
+
+        @Nested
+        inner class `When Perspective Character is Major Character` {
+
+            @Test
+            fun `should load moral argument sections`() {
+                val driver = MoralArgumentViewDriver(moralArgumentView)
+                interact {
+                    driver.getPerspectiveCharacterSelection().show()
+                }
+                state.updateOrInvalidated {
+                    copy(
+                        availablePerspectiveCharacters = listOf(
+                            AvailablePerspectiveCharacterViewModel(
+                                characterId.toString(),
+                                characterName,
+                                true
+                            )
+                        )
+                    )
+                }
+                interact {
+                    driver.getPerspectiveCharacterSelection().items.find { it.text == characterName }!!.fire()
+                }
+
+                // remember that UUID, when represented as a string, will look identical.  So, make sure types are
+                // correct if this test is failing
+                assertEquals(
+                    mapOf("characterId" to characterId.toString()),
+                    viewListenerCallLog[MoralArgumentViewListener::outlineMoralArgument]
+                )
+            }
+
+        }
+
+    }
+
+
+    @Nested
+    inner class `When Add Section Type Selection is Opened` {
+
+        private val characterId = UUID.randomUUID()
+
+        @Test
+        fun `should load available perspective characters`() {
+            state.updateOrInvalidated {
+                copy(
+                    selectedPerspectiveCharacter = CharacterItemViewModel(characterId.toString(), "", ""),
+                    sections = listOf(MoralArgumentSectionViewModel("", "", ""))
+                )
+            }
+
+            interact {
+                MoralArgumentViewDriver(moralArgumentView).getSectionTypeSelections().first().show()
+            }
+
+            assertEquals(
+                mapOf<String, Any?>("characterId" to characterId.toString()),
+                viewListenerCallLog[MoralArgumentViewListener::getAvailableArcSectionTypesToAdd]
+            )
+        }
+
+    }/*
+
+    @Nested
+    inner class `Select Perspective Character` {
+
+        private val characterId = UUID.randomUUID()
+        private val characterName = "Some Character t849tu"
+
+        @Nested
+        inner class `When Perspective Character is Major Character` {
+
+            @Test
+            fun `should load moral argument sections`() {
+                val driver = MoralArgumentViewDriver(moralArgumentView)
+                interact {
+                    driver.getPerspectiveCharacterSelection().show()
+                }
+                state.updateOrInvalidated {
+                    copy(
+                        availablePerspectiveCharacters = listOf(
+                            AvailablePerspectiveCharacterViewModel(
+                                characterId.toString(),
+                                characterName,
+                                true
+                            )
+                        )
+                    )
+                }
+                interact {
+                    driver.getPerspectiveCharacterSelection().items.find { it.text == characterName }!!.fire()
+                }
+
+                // remember that UUID, when represented as a string, will look identical.  So, make sure types are
+                // correct if this test is failing
+                assertEquals(
+                    mapOf("characterId" to characterId.toString()),
+                    viewListenerCallLog[MoralArgumentViewListener::outlineMoralArgument]
+                )
+            }
+
+        }
+
+    }*/
 
     init {
         scoped<ApplicationScope> {
@@ -271,6 +531,10 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 object : MoralArgumentViewListener {
                     override fun getValidState() {
                         viewListenerCallLog[MoralArgumentViewListener::getValidState] = mapOf()
+                    }
+
+                    override fun getPerspectiveCharacters() {
+                        viewListenerCallLog[MoralArgumentViewListener::getPerspectiveCharacters] = mapOf()
                     }
 
                     override fun outlineMoralArgument(characterId: String) {
@@ -328,7 +592,9 @@ class MoralArgumentViewUnitTest : FxRobot() {
             }
         }
         FX.setPrimaryStage(FX.defaultScope, FxToolkit.registerPrimaryStage())
-        moralArgumentView
+        interact {
+            moralArgumentView.openWindow()
+        }
     }
 
 }

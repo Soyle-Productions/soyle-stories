@@ -13,10 +13,13 @@ class MoralArgumentState : Model<MoralArgumentScope, MoralArgumentViewModel>(Mor
     val perspectiveCharacterDisplay = bind {
         it?.selectedPerspectiveCharacter?.characterName ?: it?.noPerspectiveCharacterLabel ?: ""
     }
-    val loadingItemLabel = bind(MoralArgumentViewModel::loadingPerspectiveCharactersLabel)
+    val loadingCharacterLabel = bind(MoralArgumentViewModel::loadingPerspectiveCharactersLabel)
     val availablePerspectiveCharacters = bind(MoralArgumentViewModel::availablePerspectiveCharacters)
     val unavailableCharacterMessage = bind(MoralArgumentViewModel::unavailableCharacterMessage)
     val sections = bind(MoralArgumentViewModel::sections)
+    val availableSectionTypes = bind(MoralArgumentViewModel::availableSectionTypes)
+    val loadingSectionTypesLabel = bind(MoralArgumentViewModel::loadingSectionTypesLabel)
+    val unavailableSectionTypeMessage = bind(MoralArgumentViewModel::unavailableSectionTypeMessage)
 
     override val applicationScope: ApplicationScope
         get() = scope.projectScope.applicationScope

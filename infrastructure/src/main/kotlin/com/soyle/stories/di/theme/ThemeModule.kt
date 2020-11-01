@@ -257,9 +257,6 @@ object ThemeModule {
         provide(DeleteTheme.OutputPort::class) {
             DeleteThemeNotifier(applicationScope.get(), get())
         }
-        provide(RenameTheme.OutputPort::class, ChangeCentralConflict.OutputPort::class) {
-            ChangeThemeDetailsOutput(get(), get(), get())
-        }
         provide(AddSymbolToTheme.OutputPort::class) {
             AddSymbolToThemeOutput(get())
         }

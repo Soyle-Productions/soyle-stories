@@ -34,6 +34,9 @@ class Styles : Stylesheet() {
         section {
             padding = box(0.px, 0.px, 15.px, 0.px)
         }
+        scrollPane {
+            backgroundColor = multi(Color.TRANSPARENT) // Why would it have a border?
+        }
     }
 
 }

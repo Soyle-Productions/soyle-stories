@@ -35,6 +35,7 @@ object ToolModule : RegisteredToolsConfig {
         ValueOppositionWebsConfig.getRegistration(),
         CharacterValueComparison.getRegistration(),
         CharacterConflict.getRegistration(),
+        MoralArgument.getRegistration(),
         /**
          * Temporary Tools
          */
@@ -44,7 +45,7 @@ object ToolModule : RegisteredToolsConfig {
 
     override fun getConfigFor(type: ToolType): ToolViewModelConfig {
         return registeredTools
-            .getValue(type::class)
+            .getOrElse(type::class) { error("$type has not been registered as a tool.") }
             .let { getViewModelConfig(it, type) }
     }
 
