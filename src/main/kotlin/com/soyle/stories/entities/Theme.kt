@@ -444,6 +444,8 @@ class Theme(
         if (symbols != other.symbols) return false
         if (centralConflict != other.centralConflict) return false
         if (centralMoralProblem != other.centralMoralProblem) return false
+        if (themeLine != other.themeLine) return false
+        if (thematicRevelation != other.thematicRevelation) return false
         if (includedCharacters != other.includedCharacters) return false
         if (similaritiesBetweenCharacters != other.similaritiesBetweenCharacters) return false
         if (valueWebs != other.valueWebs) return false
@@ -458,6 +460,8 @@ class Theme(
         result = 31 * result + symbols.hashCode()
         result = 31 * result + centralConflict.hashCode()
         result = 31 * result + centralMoralProblem.hashCode()
+        result = 31 * result + themeLine.hashCode()
+        result = 31 * result + thematicRevelation.hashCode()
         result = 31 * result + includedCharacters.hashCode()
         result = 31 * result + similaritiesBetweenCharacters.hashCode()
         result = 31 * result + valueWebs.hashCode()
@@ -465,7 +469,7 @@ class Theme(
     }
 
     override fun toString(): String {
-        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralConflict='$centralConflict', centralMoralQuestion='$centralMoralProblem', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
+        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralConflict='$centralConflict', centralMoralProblem='$centralMoralProblem', themeLine='$themeLine', thematicRevelation='$thematicRevelation', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
     }
 
 
