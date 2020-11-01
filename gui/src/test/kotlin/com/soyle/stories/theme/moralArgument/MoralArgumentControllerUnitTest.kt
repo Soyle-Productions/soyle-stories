@@ -2,13 +2,15 @@ package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
 import com.soyle.stories.characterarc.changeSectionValue.ChangeSectionValueController
+import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
 import com.soyle.stories.doubles.ControlledThreadTransformer
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
-import com.soyle.stories.theme.changeThemeDetails.ChangeCentralMoralQuestionController
-import com.soyle.stories.theme.changeThemeDetails.ChangeThemeLineController
+import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
+import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineController
 import com.soyle.stories.theme.outlineMoralArgument.OutlineMoralArgumentController
-import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralProblemAndThemeLineInTheme
+import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
+import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
+import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralArgumentFrame
+import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -22,11 +24,20 @@ class MoralArgumentControllerUnitTest {
 
     private val threadTransformer = ControlledThreadTransformer()
     private val forwardedCalls =
-        object : GetMoralProblemAndThemeLineInTheme, GetAvailableCharacterArcSectionTypesForCharacterArc,
+        object : GetMoralArgumentFrame, ListAvailableArcSectionTypesToAddToMoralArgument,
+            OutlineMoralArgumentForCharacterInTheme,
+            ListAvailablePerspectiveCharacters,
             OutlineMoralArgumentController, AddArcSectionToMoralArgumentController,
             ChangeCentralMoralQuestionController, ChangeThemeLineController,
             ChangeSectionValueController {
             override fun outlineMoralArgument(themeId: String, characterId: String) {
+            }
+
+            override suspend fun invoke(
+                themeId: UUID,
+                characterId: UUID,
+                output: OutlineMoralArgumentForCharacterInTheme.OutputPort
+            ) {
                 forwardedRequest = mapOf(
                     "call" to "outlineMoralArgument",
                     "themeId" to themeId,
@@ -34,20 +45,27 @@ class MoralArgumentControllerUnitTest {
                 )
             }
 
+            override suspend fun invoke(themeId: UUID, output: ListAvailablePerspectiveCharacters.OutputPort) {
+                forwardedRequest = mapOf(
+                    "call" to "getPerspectiveCharacters",
+                    "themeId" to themeId
+                )
+            }
+
             override suspend fun invoke(
                 themeId: UUID,
                 characterId: UUID,
-                output: GetAvailableCharacterArcSectionTypesForCharacterArc.OutputPort
+                output: ListAvailableArcSectionTypesToAddToMoralArgument.OutputPort
             ) {
                 forwardedRequest = mapOf(
-                    "call" to "getAvailableCharacterArcSectionTypesForCharacterArc",
+                    "call" to "listAvailableArcSectionTypesToAddToMoralArgument",
                     "themeId" to themeId,
                     "characterId" to characterId,
                     "output" to output
                 )
             }
 
-            override suspend fun invoke(themeId: UUID, output: GetMoralProblemAndThemeLineInTheme.OutputPort) {
+            override suspend fun invoke(themeId: UUID, output: GetMoralArgumentFrame.OutputPort) {
                 forwardedRequest = mapOf(
                     "call" to "getMoralProblemAndThemeLineInTheme",
                     "themeId" to themeId,
@@ -110,10 +128,15 @@ class MoralArgumentControllerUnitTest {
             }
 
         }
-    private val output = object : GetMoralProblemAndThemeLineInTheme.OutputPort,
-        GetAvailableCharacterArcSectionTypesForCharacterArc.OutputPort {
-        override suspend fun receiveMoralProblemAndThemeLineInTheme(response: GetMoralProblemAndThemeLineInTheme.ResponseModel) {}
-        override suspend fun receiveAvailableCharacterArcSectionTypesForCharacterArc(response: AvailableCharacterArcSectionTypesForCharacterArc) {}
+    private val output = object : GetMoralArgumentFrame.OutputPort,
+        ListAvailableArcSectionTypesToAddToMoralArgument.OutputPort,
+        OutlineMoralArgumentForCharacterInTheme.OutputPort,
+            ListAvailablePerspectiveCharacters.OutputPort
+    {
+        override suspend fun receiveMoralArgumentFrame(response: GetMoralArgumentFrame.ResponseModel) {}
+        override suspend fun receiveAvailableArcSectionTypesToAddToMoralArgument(response: ListAvailableArcSectionTypesToAddToMoralArgument.ResponseModel) {}
+        override suspend fun receiveMoralArgumentOutlineForCharacterInTheme(response: OutlineMoralArgumentForCharacterInTheme.ResponseModel) {}
+        override suspend fun receiveAvailablePerspectiveCharacters(response: AvailablePerspectiveCharacters) {}
     }
     private val controller: MoralArgumentViewListener = MoralArgumentController(
         themeId.toString(),
@@ -121,6 +144,9 @@ class MoralArgumentControllerUnitTest {
         forwardedCalls,
         output,
         forwardedCalls,
+        output,
+        forwardedCalls,
+        output,
         forwardedCalls,
         output,
         forwardedCalls,
@@ -152,18 +178,41 @@ class MoralArgumentControllerUnitTest {
     }
 
     @Nested
+    inner class `Get Perspective Characters` {
+
+        @Test
+        fun `should call use case`() {
+            threadTransformer.ensureRunAsync(::forwardedRequest) {
+                controller.getPerspectiveCharacters()
+            }
+
+            assertEquals(
+                mapOf(
+                    "call" to "getPerspectiveCharacters",
+                    "themeId" to themeId
+                ),
+                forwardedRequest
+            )
+        }
+
+    }
+
+    @Nested
     inner class `Outline Moral Argument` {
 
         @Test
-        fun `should call controller`() {
-            controller.outlineMoralArgument(characterId.toString())
+        fun `should call use case`() {
+            threadTransformer.ensureRunAsync(::forwardedRequest) {
+                controller.outlineMoralArgument(characterId.toString())
+            }
 
             assertEquals(
-                forwardedRequest, mapOf(
+                mapOf(
                     "call" to "outlineMoralArgument",
-                    "themeId" to themeId.toString(),
-                    "characterId" to characterId.toString()
-                )
+                    "themeId" to themeId,
+                    "characterId" to characterId
+                ),
+                forwardedRequest
             )
         }
 
@@ -180,7 +229,7 @@ class MoralArgumentControllerUnitTest {
 
             assertEquals(
                 forwardedRequest, mapOf(
-                    "call" to "getAvailableCharacterArcSectionTypesForCharacterArc",
+                    "call" to "listAvailableArcSectionTypesToAddToMoralArgument",
                     "themeId" to themeId,
                     "characterId" to characterId,
                     "output" to output

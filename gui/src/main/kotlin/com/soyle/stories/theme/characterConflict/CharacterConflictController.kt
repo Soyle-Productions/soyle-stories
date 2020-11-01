@@ -9,7 +9,7 @@ import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacte
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.removeCharacterAsOpponent.RemoveCharacterAsOpponentController
-import com.soyle.stories.theme.changeThemeDetails.ChangeCentralConflictController
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictController
 import com.soyle.stories.theme.useCharacterAsMainOpponent.UseCharacterAsMainOpponentController
 import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentController
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme

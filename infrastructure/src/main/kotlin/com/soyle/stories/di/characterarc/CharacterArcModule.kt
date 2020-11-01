@@ -19,7 +19,6 @@ import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveChara
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
-import com.soyle.stories.theme.changeThemeDetails.ChangedCentralMoralQuestionNotifier
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogPresenter
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
@@ -68,7 +67,6 @@ import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFrom
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonOutput
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralMoralQuestion
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValueUseCase
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
@@ -77,9 +75,6 @@ import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
 import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunctionUseCase
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValueUseCase
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralConflict
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeThemeDetailsUseCase
-import com.soyle.stories.theme.usecases.changeThemeDetails.RenameTheme
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
 import com.soyle.stories.theme.usecases.compareCharacters.CompareCharactersUseCase
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter

@@ -9,6 +9,8 @@ class MoralArgumentState : Model<MoralArgumentScope, MoralArgumentViewModel>(Mor
     val moralProblemValue = bind(MoralArgumentViewModel::moralProblemValue)
     val themeLineLabel = bind(MoralArgumentViewModel::themeLineLabel)
     val themeLineValue = bind(MoralArgumentViewModel::themeLineValue)
+    val thematicRevelationLabel = bind(MoralArgumentViewModel::thematicRevelationLabel)
+    val thematicRevelationValue = bind(MoralArgumentViewModel::thematicRevelationValue)
     val perspectiveCharacterLabel = bind(MoralArgumentViewModel::perspectiveCharacterLabel)
     val perspectiveCharacterDisplay = bind {
         it?.selectedPerspectiveCharacter?.characterName ?: it?.noPerspectiveCharacterLabel ?: ""

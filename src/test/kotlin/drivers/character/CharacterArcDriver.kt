@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.config.drivers.character
 
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.project.ProjectScope
@@ -15,6 +16,14 @@ class CharacterArcDriver private constructor(private val projectScope: ProjectSc
     {
         val characterArcRepository = projectScope.get<CharacterArcRepository>()
         return runBlocking { characterArcRepository.listCharacterArcsForTheme(themeId) }
+    }
+
+    fun getCharacterArcForCharacterAndThemeOrError(characterId: Character.Id, themeId: Theme.Id): CharacterArc =
+        getCharacterArcForCharacterAndTheme(characterId, themeId) ?: error("No character arc for $characterId and $themeId found")
+
+    fun getCharacterArcForCharacterAndTheme(characterId: Character.Id, themeId: Theme.Id): CharacterArc? {
+        val characterArcRepository = projectScope.get<CharacterArcRepository>()
+        return runBlocking { characterArcRepository.getCharacterArcByCharacterAndThemeId(characterId, themeId) }
     }
 
     companion object {

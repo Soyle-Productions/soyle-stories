@@ -46,6 +46,8 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 moralProblemValue = "",
                 themeLineLabel = "",
                 themeLineValue = "",
+                thematicRevelationLabel = "",
+                thematicRevelationValue = "",
                 perspectiveCharacterLabel = "",
                 noPerspectiveCharacterLabel = "",
                 selectedPerspectiveCharacter = null,
@@ -296,6 +298,26 @@ class MoralArgumentViewUnitTest : FxRobot() {
             }
         }
 
+        @Test
+        fun `thematic revelation`() {
+            val thematicRevelationLabel = "Thematic Revelation 756"
+            val thematicRevelationValue = "Thematic Revelation Value nbQ"
+
+            state.updateOrInvalidated {
+                copy(
+                    thematicRevelationLabel = thematicRevelationLabel,
+                    thematicRevelationValue = thematicRevelationValue
+                )
+            }
+
+            assertThat(moralArgumentView) {
+                andThematicRevelationField {
+                    hasLabel(thematicRevelationLabel)
+                    hasValue(thematicRevelationValue)
+                }
+            }
+        }
+
     }
 
     @Nested
@@ -395,6 +417,30 @@ class MoralArgumentViewUnitTest : FxRobot() {
     }
 
     @Nested
+    inner class `Change Thematic Revelation` {
+
+        private val newRevelation = "New Thematic Revelation c1b"
+
+        @Test
+        fun `should update theme line`() {
+            val driver = MoralArgumentViewDriver(moralArgumentView)
+            interact {
+                driver.getThematicRevelationFieldInput().apply {
+                    requestFocus()
+                    text = newRevelation
+                }
+                driver.getMoralProblemFieldInput().requestFocus()
+            }
+
+            assertEquals(
+                mapOf("revelation" to newRevelation),
+                viewListenerCallLog[MoralArgumentViewListener::setThematicRevelation]
+            )
+        }
+
+    }
+
+    @Nested
     inner class `When Perspective Character Selection is Opened` {
 
         @Test
@@ -478,49 +524,55 @@ class MoralArgumentViewUnitTest : FxRobot() {
             )
         }
 
-    }/*
+    }
 
     @Nested
-    inner class `Select Perspective Character` {
+    inner class `Select Section Type to Add` {
 
         private val characterId = UUID.randomUUID()
         private val characterName = "Some Character t849tu"
 
+        private val sectionTypeId = UUID.randomUUID()
+        private val typeName = "Some Section Type"
+
         @Nested
-        inner class `When Perspective Character is Major Character` {
+        inner class `When Section Type is Unused` {
 
             @Test
-            fun `should load moral argument sections`() {
-                val driver = MoralArgumentViewDriver(moralArgumentView)
-                interact {
-                    driver.getPerspectiveCharacterSelection().show()
-                }
+            fun `should call view listener to add section`() {
                 state.updateOrInvalidated {
                     copy(
-                        availablePerspectiveCharacters = listOf(
-                            AvailablePerspectiveCharacterViewModel(
-                                characterId.toString(),
-                                characterName,
-                                true
-                            )
-                        )
+                        selectedPerspectiveCharacter = CharacterItemViewModel(characterId.toString(), "", ""),
+                        sections = List(5) { MoralArgumentSectionViewModel("$it", "", "") }
                     )
                 }
+
                 interact {
-                    driver.getPerspectiveCharacterSelection().items.find { it.text == characterName }!!.fire()
+                    MoralArgumentViewDriver(moralArgumentView).getSectionTypeSelections().toList()[3].show()
                 }
 
-                // remember that UUID, when represented as a string, will look identical.  So, make sure types are
-                // correct if this test is failing
+                state.updateOrInvalidated {
+                    copy(
+                        availableSectionTypes = listOf(MoralArgumentSectionTypeViewModel(sectionTypeId.toString(), typeName, true))
+                    )
+                }
+
+                val item = MoralArgumentViewDriver(moralArgumentView).getSectionTypeSelections().toList()[3].items.find { it.text == typeName }!!
+
+                interact {
+                    item.fire()
+                }
+
                 assertEquals(
-                    mapOf("characterId" to characterId.toString()),
-                    viewListenerCallLog[MoralArgumentViewListener::outlineMoralArgument]
+                    mapOf<String, Any?>("characterId" to characterId.toString(), "sectionTemplateId" to sectionTypeId.toString(), "index" to 3),
+                    viewListenerCallLog[MoralArgumentViewListener::addCharacterArcSectionTypeAtIndex]
                 )
+
             }
 
         }
 
-    }*/
+    }
 
     init {
         scoped<ApplicationScope> {
@@ -585,6 +637,12 @@ class MoralArgumentViewUnitTest : FxRobot() {
                             "characterId" to characterId,
                             "arcSectionId" to arcSectionId,
                             "value" to value
+                        )
+                    }
+
+                    override fun setThematicRevelation(revelation: String) {
+                        viewListenerCallLog[MoralArgumentViewListener::setThematicRevelation] = mapOf(
+                            "revelation" to revelation
                         )
                     }
 

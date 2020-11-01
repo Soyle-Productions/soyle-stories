@@ -3,7 +3,7 @@ package com.soyle.stories.theme.themeList
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.theme.renameSymbol.RenameSymbolController
-import com.soyle.stories.theme.changeThemeDetails.RenameThemeController
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
 import java.util.*
 

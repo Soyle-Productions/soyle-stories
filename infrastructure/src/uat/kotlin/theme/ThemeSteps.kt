@@ -26,7 +26,7 @@ import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFrom
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeValueWebFromTheme.RemoveValueWebFromThemeController
 import com.soyle.stories.theme.renameSymbol.RenameSymbolController
-import com.soyle.stories.theme.changeThemeDetails.RenameThemeController
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En

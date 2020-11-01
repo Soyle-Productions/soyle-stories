@@ -5,6 +5,7 @@ import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterVi
 import com.soyle.stories.theme.moralArgument.MoralArgumentSectionTypeViewModel
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
 import javafx.scene.control.CustomMenuItem
+import javafx.scene.control.MenuButton
 import javafx.scene.control.Tooltip
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -50,6 +51,22 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
         fun hasValue(expectedValue: String) {
             assertEquals(expectedValue, driver.getThemeLineFieldInput().text)
         }
+    }
+
+    fun andThematicRevelationField(assertions: ThematicRevelationAssert.() -> Unit) {
+        ThematicRevelationAssert().assertions()
+    }
+
+    inner class ThematicRevelationAssert internal constructor() {
+
+        fun hasLabel(expectedLabel: String) {
+            assertEquals(expectedLabel, driver.getThematicRevelationFieldLabel().text)
+        }
+
+        fun hasValue(expectedValue: String) {
+            assertEquals(expectedValue, driver.getThematicRevelationFieldInput().text)
+        }
+
     }
 
     fun andPerspectiveCharacterField(assertions: PerspectiveCharacterAssert.() -> Unit) {
@@ -104,34 +121,43 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
 
     }
 
+    fun andAtLeastOneSectionTypeMenu(assertions: SectionTypeMenuAssert.() -> Unit) {
+        val results = driver.getSectionTypeSelections().map {
+            try {
+                SectionTypeMenuAssert(it).assertions()
+                null
+            } catch(t: Throwable) {
+                t
+            }
+        }
+        assertTrue(results.any { it == null}) { "No section type menu passed the test: \n${results.filterNotNull().joinToString("\n")}" }
+    }
     fun andSectionTypeMenu(assertions: SectionTypeMenuAssert.() -> Unit) {
-        SectionTypeMenuAssert().assertions()
+        driver.getSectionTypeSelections().forEach {
+            SectionTypeMenuAssert(it).assertions()
+        }
     }
 
-    inner class SectionTypeMenuAssert internal constructor() {
+    inner class SectionTypeMenuAssert internal constructor(private val selection: MenuButton) {
 
         fun onlyHasItems(expectedItems: List<String>) {
             val expectedItemSet = expectedItems.toSet()
-            driver.getSectionTypeSelections().forEach { selection ->
-                assertEquals(expectedItemSet, selection.items.map { it.text }.toSet())
-            }
+            assertEquals(expectedItemSet, selection.items.map { it.text }.toSet())
         }
 
         fun eachDiscouragedItemHasMessage(expectedMessageGenerator: (MoralArgumentSectionTypeViewModel) -> String) {
-            driver.getSectionTypeSelections().forEach { selection ->
-                selection.items.filterNot {
-                    val vm = it.userData as MoralArgumentSectionTypeViewModel
-                    vm.canBeCreated
-                }.forEach { menuItem ->
-                    menuItem as CustomMenuItem
-                    assertTrue(menuItem.hasClass(ComponentsStyles.discouragedSelection)) {
-                        "Un-creatable section type is not discouraged from being selected"
-                    }
-                    assertEquals(
-                        expectedMessageGenerator(menuItem.userData as MoralArgumentSectionTypeViewModel),
-                        (menuItem.content?.properties?.get("javafx.scene.control.Tooltip") as? Tooltip)?.text
-                    )
+            selection.items.filterNot {
+                val vm = it.userData as MoralArgumentSectionTypeViewModel
+                vm.canBeCreated
+            }.forEach { menuItem ->
+                menuItem as CustomMenuItem
+                assertTrue(menuItem.hasClass(ComponentsStyles.discouragedSelection)) {
+                    "Un-creatable section type is not discouraged from being selected"
                 }
+                assertEquals(
+                    expectedMessageGenerator(menuItem.userData as MoralArgumentSectionTypeViewModel),
+                    (menuItem.content?.properties?.get("javafx.scene.control.Tooltip") as? Tooltip)?.text
+                )
             }
         }
 

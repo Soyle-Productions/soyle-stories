@@ -86,7 +86,6 @@ import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
-import com.soyle.stories.theme.changeThemeDetails.*
 import com.soyle.stories.theme.useCharacterAsMainOpponent.*
 import com.soyle.stories.theme.useCharacterAsOpponent.*
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
@@ -98,6 +97,16 @@ import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicI
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
 import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.*
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedNotifier
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictController
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictControllerImpl
+import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangedCentralMoralQuestionNotifier
+import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangedCentralMoralQuestionReceiver
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeControllerImpl
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChangeUseCase
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
@@ -243,7 +252,7 @@ object ThemeModule {
         provide(CharacterUsedAsOpponentReceiver::class) { CharacterUsedAsOpponentNotifier() }
         provide(CharacterUsedAsMainOpponentReceiver::class) { CharacterUsedAsMainOpponentNotifier() }
         provide(RenamedThemeReceiver::class) { RenamedThemeNotifier() }
-        provide(ThemeWithCentralConflictChangedReceiver::class) { ThemeWithCentralConflictChangedNotifier() }
+        provide(CentralConflictChangedReceiver::class) { CentralConflictChangedNotifier() }
         provide(ChangedCharacterArcSectionValueReceiver::class) { ChangedCharacterArcSectionValueNotifier() }
         provide(ChangedCharacterChangeReceiver::class) { ChangedCharacterChangeNotifier() }
         provide(CharacterRemovedAsOpponentReceiver::class) { CharacterRemovedAsOpponentNotifier() }

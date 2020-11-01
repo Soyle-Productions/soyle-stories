@@ -28,6 +28,11 @@ class CharacterSteps : En {
                 characterDriver.givenCharacterNamed(characterName)
             }
         }
+        Given("a character named {string} has been created") { characterName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val characterDriver = CharacterDriver(workbench)
+            characterDriver.givenCharacterNamed(characterName)
+        }
     }
 
     private fun whens() {

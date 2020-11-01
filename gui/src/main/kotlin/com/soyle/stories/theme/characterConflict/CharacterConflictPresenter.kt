@@ -10,7 +10,7 @@ import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeRecei
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
 import com.soyle.stories.theme.removeCharacterAsOpponent.CharacterRemovedAsOpponentReceiver
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
-import com.soyle.stories.theme.changeThemeDetails.ThemeWithCentralConflictChangedReceiver
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
 import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
 import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ArcSectionType
@@ -37,7 +37,7 @@ class CharacterConflictPresenter(
 ) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
     ListAvailableCharactersToUseAsOpponents.OutputPort, CharacterUsedAsOpponentReceiver,
     CharacterUsedAsMainOpponentReceiver,
-    ThemeWithCentralConflictChangedReceiver, ChangedCharacterArcSectionValueReceiver, ChangedCharacterChangeReceiver,
+    CentralConflictChangedReceiver, ChangedCharacterArcSectionValueReceiver, ChangedCharacterChangeReceiver,
     ChangeCharacterPropertyValue.OutputPort, CharacterPerspectivePropertyChangedReceiver, RenamedCharacterReceiver,
     CharacterRemovedAsOpponentReceiver, RemovedCharacterFromThemeReceiver {
 

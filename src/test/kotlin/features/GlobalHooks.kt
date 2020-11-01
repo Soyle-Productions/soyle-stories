@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.config.features
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransformer
+import com.soyle.stories.desktop.config.soylestories.configureModules
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
 import com.soyle.stories.soylestories.ApplicationScope
@@ -44,7 +45,7 @@ class GlobalHooks : En {
             if (! FxToolkit.isFXApplicationThreadRunning()) {
                 //runHeadless()
                 Runtime.getRuntime().addShutdownHook(closeThread)
-                configureDI()
+                configureModules()
                 synchronizeBackgroundTasks()
                 FxToolkit.registerPrimaryStage()
             }

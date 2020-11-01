@@ -11,6 +11,7 @@ import com.soyle.stories.soylestories.SplashScreen
 import com.soyle.stories.soylestories.Styles
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
 import com.soyle.stories.theme.characterConflict.addDragAndDrop
+import com.soyle.stories.theme.moralArgument.MoralArgumentSection.Companion.moralArgumentSection
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
@@ -41,39 +42,48 @@ class MoralArgumentView : View() {
             hgrow = Priority.ALWAYS
             moralProblemField()
             themeLineField()
+            thematicRevelationField()
         }
         moralArgument {
             hgrow = Priority.ALWAYS
             perspectiveCharacterField()
             arcSections {
-                arcSection(it)
+                moralArgumentSection(scope, it)
             }
         }
     }
 
     private fun Parent.themeDetails(op: Parent.() -> Unit) = vbox(op = op)
     
-    private fun Parent.moralProblemField() = labeledSection(state.moralProblemLabel) {
-        id = "moral-problem-field"
-        textfield {
-            text = state.moralProblemValue.valueSafe
-            state.moralProblemValue.onChange { text = it }
-            onLoseFocus {
-                if (state.moralProblemValue.value != text) {
-                    viewListener.setMoralProblem(text)
-                }
-            }
-        }
-    }
+    private fun Parent.moralProblemField() = moralArgumentFrameField(
+        labelProperty = state.moralProblemLabel,
+        valueProperty = state.moralProblemValue,
+        onChange = viewListener::setMoralProblem
+    ).apply { id = "moral-problem-field" }
 
-    private fun Parent.themeLineField() = labeledSection(state.themeLineLabel) {
-        id = "theme-line-field"
+    private fun Parent.themeLineField() = moralArgumentFrameField(
+        labelProperty = state.themeLineLabel,
+        valueProperty = state.themeLineValue,
+        onChange = viewListener::setThemeLine
+    ).apply { id = "theme-line-field" }
+
+    private fun Parent.thematicRevelationField() = moralArgumentFrameField(
+        labelProperty = state.thematicRevelationLabel,
+        valueProperty = state.thematicRevelationValue,
+        onChange = viewListener::setThematicRevelation
+    ).apply { id = "thematic-revelation-field" }
+
+    private fun Parent.moralArgumentFrameField(
+        labelProperty: ObservableValue<String>,
+        valueProperty: ObservableValue<String>,
+        onChange: (String) -> Unit
+    ) = labeledSection(labelProperty) {
         textfield {
-            text = state.themeLineValue.valueSafe
-            state.themeLineValue.onChange { text = it }
+            text = valueProperty.value ?: ""
+            valueProperty.onChange { text = it }
             onLoseFocus {
-                if (state.themeLineValue.value != text) {
-                    viewListener.setThemeLine(text)
+                if (valueProperty.value != text) {
+                    onChange(text)
                 }
             }
         }
@@ -130,71 +140,11 @@ class MoralArgumentView : View() {
         scrollpane(fitToWidth = true) {
             id = "arc-sections"
             content = vbox {
-                state.sections.mapObservableTo(children, {it.arcSectionId}) { op(it) }
-            }
-        }
-    }
-
-    private fun Parent.arcSection(section: MoralArgumentSectionViewModel): Node {
-        return vbox {
-            addSectionTypeButton()
-            labeledSection(section.arcSectionName) {
-                id = section.arcSectionId
-                textfield(section.arcSectionValue)
-            }
-        }
-    }
-
-    private fun Region.addSectionTypeButton() {
-        asyncMenuButton<MoralArgumentSectionTypeViewModel> {
-            root.addClass("section-type-selection")
-            root.useMaxWidth = true
-            text = "Insert Section Type"
-            loadingLabelProperty.bind(state.loadingSectionTypesLabel)
-            sourceProperty.bind(state.availableSectionTypes)
-            onLoad = ::getAvailableSectionTypesToAdd
-            itemsWhenLoaded(::createSectionTypeItems)
-        }
-    }
-
-    private fun getAvailableSectionTypesToAdd() {
-        state.item?.selectedPerspectiveCharacter?.characterId?.let {
-            viewListener.getAvailableArcSectionTypesToAdd(it)
-        }
-    }
-
-    private fun createSectionTypeItems(sectionTypes: List<MoralArgumentSectionTypeViewModel>): List<MenuItem> {
-        return sectionTypes.groupBy { it.canBeCreated }.withDefault { listOf() }
-            .run {
-                getValue(true).map(::createCreatableSectionValueTypeItem) +
-                getValue(false).map(::createUsedSectionValueTypeItem)
-            }
-    }
-
-    private fun createCreatableSectionValueTypeItem(sectionType: MoralArgumentSectionTypeViewModel): MenuItem
-    {
-        return MenuItem(sectionType.sectionTypeName).apply {
-            userData = sectionType
-        }
-    }
-
-    private fun createUsedSectionValueTypeItem(sectionType: MoralArgumentSectionTypeViewModel): MenuItem
-    {
-        return CustomMenuItem().apply {
-            text = sectionType.sectionTypeName
-            addClass(ComponentsStyles.discouragedSelection)
-            userData = sectionType
-            content = Label(sectionType.sectionTypeName).apply {
-                tooltip {
-                    textProperty().bind(usedSectionMessage(sectionType))
+                state.sections.mapObservableTo(children, { it.arcSectionId }) {
+                    op(it)
                 }
             }
         }
-    }
-
-    private fun usedSectionMessage(sectionType: MoralArgumentSectionTypeViewModel): ObservableValue<String>
-    {
-        return state.unavailableSectionTypeMessage.stringBinding { it?.invoke(sectionType) }
     }
 
     init {

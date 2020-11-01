@@ -8,18 +8,29 @@ data class MoralArgumentViewModel(
     val moralProblemValue: String,
     val themeLineLabel: String,
     val themeLineValue: String,
+    val thematicRevelationLabel: String,
+    val thematicRevelationValue: String,
     val perspectiveCharacterLabel: String,
     val noPerspectiveCharacterLabel: String,
     val selectedPerspectiveCharacter: CharacterItemViewModel?,
     val availablePerspectiveCharacters: List<AvailablePerspectiveCharacterViewModel>?,
     val loadingPerspectiveCharactersLabel: String,
+    val loadingSectionTypesLabel: String,
     val createCharacterLabel: String,
     val unavailableCharacterMessage: (AvailablePerspectiveCharacterViewModel) -> String,
-    val sections: List<MoralArgumentSectionViewModel>?
+    val unavailableSectionTypeMessage: (MoralArgumentSectionTypeViewModel) -> String,
+    val sections: List<MoralArgumentSectionViewModel>?,
+    val availableSectionTypes: List<MoralArgumentSectionTypeViewModel>?
 )
 
 data class MoralArgumentSectionViewModel(
     val arcSectionId: String,
     val arcSectionName: String,
     val arcSectionValue: String
+)
+
+data class MoralArgumentSectionTypeViewModel(
+    val sectionTypeId: String,
+    val sectionTypeName: String,
+    val canBeCreated: Boolean
 )

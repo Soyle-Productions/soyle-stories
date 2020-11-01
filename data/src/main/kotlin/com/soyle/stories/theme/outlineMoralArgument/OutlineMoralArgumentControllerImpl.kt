@@ -1,7 +1,6 @@
 package com.soyle.stories.theme.outlineMoralArgument
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralProblemAndThemeLineInTheme
 import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
 import java.util.*
 

@@ -10,7 +10,7 @@ import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPersp
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeNotifier
 import com.soyle.stories.theme.removeCharacterAsOpponent.CharacterRemovedAsOpponentNotifier
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeNotifier
-import com.soyle.stories.theme.changeThemeDetails.ThemeWithCentralConflictChangedNotifier
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedNotifier
 import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentNotifier
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentNotifier
 
@@ -28,7 +28,7 @@ object CharacterConflictModule {
 
                 presenter listensTo projectScope.get<CharacterUsedAsOpponentNotifier>()
                 presenter listensTo projectScope.get<CharacterUsedAsMainOpponentNotifier>()
-                presenter listensTo projectScope.get<ThemeWithCentralConflictChangedNotifier>()
+                presenter listensTo projectScope.get<CentralConflictChangedNotifier>()
                 presenter listensTo projectScope.get<ChangedCharacterArcSectionValueNotifier>()
                 presenter listensTo projectScope.get<ChangedCharacterChangeNotifier>()
                 presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()

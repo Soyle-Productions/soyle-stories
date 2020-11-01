@@ -2,26 +2,32 @@ package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
 import com.soyle.stories.characterarc.changeSectionValue.ChangeSectionValueController
+import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
-import com.soyle.stories.theme.changeThemeDetails.ChangeCentralMoralQuestionController
-import com.soyle.stories.theme.changeThemeDetails.ChangeThemeLineController
-import com.soyle.stories.theme.outlineMoralArgument.OutlineMoralArgumentController
-import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralProblemAndThemeLineInTheme
+import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
+import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.ChangeThematicRevelationController
+import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineController
+import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
+import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralArgumentFrame
+import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
 import java.util.*
 
 class MoralArgumentController(
     themeId: String,
     private val threadTransformer: ThreadTransformer,
-    private val getMoralProblemAndThemeLine: GetMoralProblemAndThemeLineInTheme,
-    private val getMoralProblemAndThemeLineOutput: GetMoralProblemAndThemeLineInTheme.OutputPort,
-    private val outlineMoralArgumentController: OutlineMoralArgumentController,
-    private val getAvailableArcSectionTypesForCharacterArc: GetAvailableCharacterArcSectionTypesForCharacterArc,
-    private val getAvailableArcSectionTypesForCharacterArcOutput: GetAvailableCharacterArcSectionTypesForCharacterArc.OutputPort,
+    private val getAvailablePerspectiveCharacters: ListAvailablePerspectiveCharacters,
+    private val getAvailablePerspectiveCharactersOutput: ListAvailablePerspectiveCharacters.OutputPort,
+    private val getMoralProblemAndThemeLine: GetMoralArgumentFrame,
+    private val getMoralProblemAndThemeLineOutput: GetMoralArgumentFrame.OutputPort,
+    private val outlineMoralArgument: OutlineMoralArgumentForCharacterInTheme,
+    private val outlineMoralArgumentOutput: OutlineMoralArgumentForCharacterInTheme.OutputPort,
+    private val listAvailableArcSectionTypesToAddToMoralArgument: ListAvailableArcSectionTypesToAddToMoralArgument,
+    private val listAvailableArcSectionTypesToAddToMoralArgumentOutput: ListAvailableArcSectionTypesToAddToMoralArgument.OutputPort,
     private val addArcSectionToMoralArgumentController: AddArcSectionToMoralArgumentController,
     private val changeCentralMoralQuestionController: ChangeCentralMoralQuestionController,
     private val changeThemeLineController: ChangeThemeLineController,
-    private val changeSectionValueController: ChangeSectionValueController
+    private val changeSectionValueController: ChangeSectionValueController,
+    private val changeThematicRevelationController: ChangeThematicRevelationController
 ) : MoralArgumentViewListener {
 
     private val themeId: UUID = UUID.fromString(themeId)
@@ -32,17 +38,26 @@ class MoralArgumentController(
         }
     }
 
+    override fun getPerspectiveCharacters() {
+        threadTransformer.async {
+            getAvailablePerspectiveCharacters.invoke(themeId, getAvailablePerspectiveCharactersOutput)
+        }
+    }
+
     override fun outlineMoralArgument(characterId: String) {
-        outlineMoralArgumentController.outlineMoralArgument(themeId.toString(), characterId)
+        val preparedCharacterId = UUID.fromString(characterId)
+        threadTransformer.async {
+            outlineMoralArgument.invoke(themeId, preparedCharacterId, outlineMoralArgumentOutput)
+        }
     }
 
     override fun getAvailableArcSectionTypesToAdd(characterId: String) {
         val preparedCharacterId = UUID.fromString(characterId)
         threadTransformer.async {
-            getAvailableArcSectionTypesForCharacterArc.invoke(
+            listAvailableArcSectionTypesToAddToMoralArgument.invoke(
                 themeId,
                 preparedCharacterId,
-                getAvailableArcSectionTypesForCharacterArcOutput
+                listAvailableArcSectionTypesToAddToMoralArgumentOutput
             )
         }
     }
@@ -74,5 +89,9 @@ class MoralArgumentController(
             arcSectionId,
             value
         )
+    }
+
+    override fun setThematicRevelation(revelation: String) {
+        changeThematicRevelationController.changeThematicRevelation(themeId.toString(), revelation)
     }
 }

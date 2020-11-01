@@ -26,6 +26,14 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
         return from(view.root).lookup("#theme-line-field .text-field").query()
     }
 
+    fun getThematicRevelationFieldLabel(): Labeled {
+        return from(view.root).lookup("#thematic-revelation-field .${Styles.fieldLabel.name}").query()
+    }
+
+    fun getThematicRevelationFieldInput(): TextInputControl {
+        return from(view.root).lookup("#thematic-revelation-field .text-field").query()
+    }
+
     fun getPerspectiveCharacterLabel(): Labeled {
         return from(view.root).lookup("#perspective-character-field .${Styles.fieldLabel.name}").query()
     }
