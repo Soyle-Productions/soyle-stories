@@ -2,18 +2,19 @@ package com.soyle.stories.theme.usecases.outlineMoralArgument
 
 import java.util.*
 
-interface GetMoralProblemAndThemeLineInTheme {
+interface GetMoralArgumentFrame {
 
     suspend operator fun invoke(themeId: UUID, output: OutputPort)
 
     class ResponseModel(
         val themeId: UUID,
         val themeLine: String,
-        val moralProblem: String
+        val moralProblem: String,
+        val thematicRevelation: String
     )
 
     interface OutputPort {
-        suspend fun receiveMoralProblemAndThemeLineInTheme(response: ResponseModel)
+        suspend fun receiveMoralArgumentFrame(response: ResponseModel)
     }
 
 }

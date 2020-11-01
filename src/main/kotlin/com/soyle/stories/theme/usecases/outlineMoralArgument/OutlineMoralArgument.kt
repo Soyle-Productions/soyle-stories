@@ -13,17 +13,25 @@ import java.util.*
 class OutlineMoralArgument(
     private val themeRepository: ThemeRepository,
     private val characterArcRepository: CharacterArcRepository
-) : GetMoralProblemAndThemeLineInTheme, OutlineMoralArgumentForCharacterInTheme {
+) : GetMoralArgumentFrame, OutlineMoralArgumentForCharacterInTheme {
 
-    override suspend fun invoke(themeId: UUID, output: GetMoralProblemAndThemeLineInTheme.OutputPort) {
+    override suspend fun invoke(themeId: UUID, output: GetMoralArgumentFrame.OutputPort) {
         val theme = themeRepository.getThemeOrError(Theme.Id(themeId))
-        output.receiveMoralProblemAndThemeLineInTheme(GetMoralProblemAndThemeLineInTheme.ResponseModel(
-            themeId,
-            theme.themeLine,
-            theme.centralMoralProblem))
+        output.receiveMoralArgumentFrame(
+            GetMoralArgumentFrame.ResponseModel(
+                themeId,
+                theme.themeLine,
+                theme.centralMoralProblem,
+                theme.thematicRevelation
+            )
+        )
     }
 
-    override suspend fun invoke(themeId: UUID, characterId: UUID, output: OutlineMoralArgumentForCharacterInTheme.OutputPort) {
+    override suspend fun invoke(
+        themeId: UUID,
+        characterId: UUID,
+        output: OutlineMoralArgumentForCharacterInTheme.OutputPort
+    ) {
         val theme = themeRepository.getThemeOrError(Theme.Id(themeId))
         val includedCharacter = theme.getIncludedCharacterById(Character.Id(characterId))
             ?: throw CharacterNotInTheme(themeId, characterId)
@@ -39,7 +47,12 @@ class OutlineMoralArgument(
                 majorCharacter.id.uuid,
                 majorCharacter.name,
                 characterArc.moralArgument().arcSections.map {
-                    OutlineMoralArgumentForCharacterInTheme.CharacterArcSectionInMoralArgument(it.id.uuid, it.value, it.template.name, it.template.isRequired)
+                    OutlineMoralArgumentForCharacterInTheme.CharacterArcSectionInMoralArgument(
+                        it.id.uuid,
+                        it.value,
+                        it.template.name,
+                        it.template.isRequired
+                    )
                 }
             )
         )

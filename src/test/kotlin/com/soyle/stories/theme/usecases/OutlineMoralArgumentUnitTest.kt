@@ -10,7 +10,7 @@ import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcTemplate
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralProblemAndThemeLineInTheme
+import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralArgumentFrame
 import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgument
 import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
 import kotlinx.coroutines.runBlocking
@@ -36,9 +36,9 @@ class OutlineMoralArgumentUnitTest {
     @Nested
     inner class `Get Moral Problem and Theme Line in Theme` {
 
-        private val useCase: GetMoralProblemAndThemeLineInTheme = outlineMoralArgument
-        private val output = object : GetMoralProblemAndThemeLineInTheme.OutputPort {
-            override suspend fun receiveMoralProblemAndThemeLineInTheme(response: GetMoralProblemAndThemeLineInTheme.ResponseModel) {
+        private val useCase: GetMoralArgumentFrame = outlineMoralArgument
+        private val output = object : GetMoralArgumentFrame.OutputPort {
+            override suspend fun receiveMoralArgumentFrame(response: GetMoralArgumentFrame.ResponseModel) {
                 result = response
             }
         }
@@ -61,29 +61,37 @@ class OutlineMoralArgumentUnitTest {
 
             private val moralProblem = "Moral Problem ${str()}"
             private val themeLine = "Theme Line ${str()}"
+            private val thematicRevelation = "Thematic Revelation ${str()}"
 
             init {
-                themeRepository.givenTheme(theme.withMoralProblem(moralProblem).withThemeLine(themeLine))
+                themeRepository.givenTheme(theme.withMoralProblem(moralProblem).withThemeLine(themeLine).withThematicRevelation(thematicRevelation))
             }
 
             @AfterEach
             fun `should output theme id`() {
-                val result = result as GetMoralProblemAndThemeLineInTheme.ResponseModel
+                val result = result as GetMoralArgumentFrame.ResponseModel
                 result.themeId.mustEqual(theme.id.uuid)
             }
 
             @Test
             fun `should output moral problem`() {
                 getMoralProblemAndThemeLineInTheme()
-                val result = result as GetMoralProblemAndThemeLineInTheme.ResponseModel
+                val result = result as GetMoralArgumentFrame.ResponseModel
                 result.moralProblem.mustEqual(moralProblem)
             }
 
             @Test
             fun `should output theme line`() {
                 getMoralProblemAndThemeLineInTheme()
-                val result = result as GetMoralProblemAndThemeLineInTheme.ResponseModel
+                val result = result as GetMoralArgumentFrame.ResponseModel
                 result.themeLine.mustEqual(themeLine)
+            }
+
+            @Test
+            fun `should output thematic revelation`() {
+                getMoralProblemAndThemeLineInTheme()
+                val result = result as GetMoralArgumentFrame.ResponseModel
+                result.thematicRevelation.mustEqual(thematicRevelation)
             }
 
         }

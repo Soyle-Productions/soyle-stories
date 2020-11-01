@@ -24,11 +24,12 @@ fun makeTheme(
 	centralConflict: String = "",
 	centralMoralQuestion: String = "",
 	themeLine: String = "",
+	thematicRevelation: String = "",
 	includedCharacters: Map<Character.Id, CharacterInTheme> = mapOf(),
 	similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String> = mapOf(),
 	valueWebs: List<ValueWeb> = listOf()
 ): Theme = Theme(
-	id, projectId, name, symbols, centralConflict, centralMoralQuestion, themeLine, includedCharacters, similaritiesBetweenCharacters, valueWebs
+	id, projectId, name, symbols, centralConflict, centralMoralQuestion, themeLine, thematicRevelation, includedCharacters, similaritiesBetweenCharacters, valueWebs
 )
 
 fun makeValueWeb(

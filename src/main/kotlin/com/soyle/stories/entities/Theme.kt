@@ -18,6 +18,7 @@ class Theme(
     val centralConflict: String,
     val centralMoralProblem: String,
     val themeLine: String,
+    val thematicRevelation: String,
     private val includedCharacters: Map<Character.Id, CharacterInTheme>,
     val similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String>,
     val valueWebs: List<ValueWeb>
@@ -29,8 +30,9 @@ class Theme(
         symbols: List<Symbol> = listOf(),
         centralConflict: String = "",
         centralMoralProblem: String = "",
-        themeLine: String = ""
-    ) : this(Id(), projectId, name, symbols, centralConflict, centralMoralProblem, themeLine, mapOf(), mapOf(), listOf())
+        themeLine: String = "",
+        thematicRevelation: String = ""
+    ) : this(Id(), projectId, name, symbols, centralConflict, centralMoralProblem, themeLine, thematicRevelation, mapOf(), mapOf(), listOf())
 
     val thematicTemplate: ThematicTemplate
         get() = ThematicTemplate.default()
@@ -41,6 +43,7 @@ class Theme(
         centralConflict: String = this.centralConflict,
         centralMoralProblem: String = this.centralMoralProblem,
         themeLine: String = this.themeLine,
+        thematicRevelation: String = this.thematicRevelation,
         includedCharacters: Map<Character.Id, CharacterInTheme> = this.includedCharacters,
         similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String> = this.similaritiesBetweenCharacters,
         valueWebs: List<ValueWeb> = this.valueWebs
@@ -52,6 +55,7 @@ class Theme(
         centralConflict,
         centralMoralProblem,
         themeLine,
+        thematicRevelation,
         includedCharacters,
         similaritiesBetweenCharacters,
         valueWebs
@@ -78,6 +82,8 @@ class Theme(
     fun withMoralProblem(moralProblem: String): Theme = copy(centralMoralProblem = moralProblem)
 
     fun withThemeLine(themeLine: String): Theme = copy(themeLine = themeLine)
+
+    fun withThematicRevelation(revelation: String): Theme = copy(thematicRevelation = revelation)
 
     fun withCharacterIncluded(characterId: Character.Id, characterName: String, characterMediaId: Media.Id?): Theme
     {
@@ -476,6 +482,7 @@ class Theme(
                 listOf(),
                 "",
                 centralMoralQuestion,
+                "",
                 "",
                 mapOf(),
                 mapOf(),

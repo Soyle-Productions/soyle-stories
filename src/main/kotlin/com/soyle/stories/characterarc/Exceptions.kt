@@ -33,7 +33,7 @@ class TemplateSectionIsNotPartOfArcTemplate(
     val templateSectionId: UUID
 ) : EntityNotFoundException(templateSectionId)
 
-class ArcTemplateSectionIsNotMoral(
+data class ArcTemplateSectionIsNotMoral(
     val arcId: UUID,
     val characterId: UUID,
     val themeId: UUID,
