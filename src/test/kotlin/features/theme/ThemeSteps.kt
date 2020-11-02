@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.features.theme
 
+import com.soyle.stories.common.PairOf
 import com.soyle.stories.desktop.config.drivers.character.CharacterArcDriver
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
@@ -7,6 +8,8 @@ import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert.Companion.assertThat
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert.Companion.assertThat
+import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.theme.moralArgument.MoralArgumentSectionTypeViewModel
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
@@ -122,6 +125,23 @@ class ThemeSteps : En {
             moralArgument.changeThematicRevelationTo(thematicRevelation)
 
         }
+        When(
+            "a moral argument section type is selected for {string} in the {string} theme between two existing sections"
+        ) { characterName: String, themeName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val theme = ThemeDriver(workbench).getThemeByNameOrError(themeName)
+            val character = CharacterDriver(workbench).getCharacterByNameOrError(characterName)
+            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(characterName)
+
+            val insertIndex = arc.moralArgument().arcSections.size / 2
+            moralArgument.givenMoralArgumentHasBeenPreparedToAddNewSection(arc.moralArgument().arcSections.size / 2)
+
+            sectionsSurroundingTemplateSection = arc.moralArgument().arcSections.let { it[insertIndex-1] to it[insertIndex] }
+            templateSectionToAdd = moralArgument.selectUnusedSectionType()
+
+        }
     }
 
     private fun thens() {
@@ -235,6 +255,8 @@ class ThemeSteps : En {
                     arc.moralArgument().arcSections.map { it.template.name }
                 )
             }
+
+            updatedCharacterArc = arc
         }
         Then(
             "the new section should be at the end of {string}s moral argument in the {string} theme"
@@ -248,9 +270,40 @@ class ThemeSteps : En {
                 arc.arcSections.find { it.template.id.uuid.toString() == templateSectionToAdd!!.sectionTypeId }!!
             assertEquals(arc.moralArgument().arcSections.last(), newSection)
         }
+        Then("the new section should be between the two pre-existing moral argument sections") {
+            val surroundingSections = sectionsSurroundingTemplateSection!!
+            val arc = updatedCharacterArc!!
 
+            val firstIndex = arc.indexInMoralArgument(surroundingSections.first.id)!!
+            val secondIndex = arc.indexInMoralArgument(surroundingSections.second.id)!!
+
+            val newSection = arc.moralArgument().arcSections[firstIndex + 1]
+            val midIndex = arc.indexInMoralArgument(newSection.id)
+
+            fun explanation(): String {
+                return "Expected to be placed between ${surroundingSections.first.id} and ${surroundingSections.second.id}.\n"+
+                    "Should have had template of ${templateSectionToAdd!!.sectionTypeId}.\n"+
+                    "\n"+
+                    "Moral Argument Sections and Template ids received:\n"+
+                    arc.moralArgument().arcSections.joinToString("\n") {
+                        val prefix = if (it.id == surroundingSections.first.id) " 1 "
+                        else if (it.id == surroundingSections.second.id) " 2 "
+                        else if (it.template.id.uuid.toString() == templateSectionToAdd!!.sectionTypeId) " + "
+                        else " - "
+
+                        prefix + "Section Id: ${it.id.uuid}, template: ${it.template.id.uuid}"
+                    }
+
+            }
+
+            assertEquals(templateSectionToAdd!!.sectionTypeId, newSection.template.id.uuid.toString()) { explanation() }
+            assertEquals(firstIndex + 1, midIndex) { explanation() }
+            assertEquals(secondIndex - 1, midIndex) { explanation() }
+        }
     }
 
+    private var sectionsSurroundingTemplateSection: PairOf<CharacterArcSection>? = null
     private var templateSectionToAdd: MoralArgumentSectionTypeViewModel? = null
+    private var updatedCharacterArc: CharacterArc? = null
 
 }

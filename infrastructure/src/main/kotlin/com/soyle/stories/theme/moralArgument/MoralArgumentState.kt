@@ -2,6 +2,7 @@ package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.common.Model
 import com.soyle.stories.soylestories.ApplicationScope
+import javafx.application.Platform
 
 class MoralArgumentState : Model<MoralArgumentScope, MoralArgumentViewModel>(MoralArgumentScope::class) {
 
@@ -22,6 +23,18 @@ class MoralArgumentState : Model<MoralArgumentScope, MoralArgumentViewModel>(Mor
     val availableSectionTypes = bind(MoralArgumentViewModel::availableSectionTypes)
     val loadingSectionTypesLabel = bind(MoralArgumentViewModel::loadingSectionTypesLabel)
     val unavailableSectionTypeMessage = bind(MoralArgumentViewModel::unavailableSectionTypeMessage)
+
+    override fun viewModel(): MoralArgumentViewModel? {
+        return item?.copy(
+            availablePerspectiveCharacters = availablePerspectiveCharacters.value,
+            availableSectionTypes = availableSectionTypes.value
+        )
+    }
+
+    override fun updateOrInvalidated(update: MoralArgumentViewModel.() -> MoralArgumentViewModel) {
+        item = viewModel()
+        super.updateOrInvalidated(update)
+    }
 
     override val applicationScope: ApplicationScope
         get() = scope.projectScope.applicationScope

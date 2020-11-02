@@ -94,20 +94,29 @@ fun MoralArgumentView.changeThematicRevelationTo(thematicRevelation: String)
     }
 }
 
-fun MoralArgumentView.givenMoralArgumentHasBeenPreparedToAddNewSection() =
-    if (! preparedToAddNewSection()) prepareToAddNewSection() else Unit
+fun MoralArgumentView.givenMoralArgumentHasBeenPreparedToAddNewSection(index: Int? = null) =
+    if (! preparedToAddNewSection(index)) prepareToAddNewSection(index) else Unit
 
-fun MoralArgumentView.preparedToAddNewSection(): Boolean
+fun MoralArgumentView.preparedToAddNewSection(index: Int? = null): Boolean
 {
     val driver = MoralArgumentViewDriver(this)
     val sectionTypeSelections = driver.getSectionTypeSelections()
-    return sectionTypeSelections.any { it.isShowing }
+    if (index == null) return sectionTypeSelections.any { it.isShowing }
+    val showingIndex = sectionTypeSelections.indexOfFirst { it.isShowing }
+    return showingIndex == index
 }
 
-fun MoralArgumentView.prepareToAddNewSection()
+fun MoralArgumentView.prepareToAddNewSection(index: Int? = null)
 {
     val driver = MoralArgumentViewDriver(this)
-    val sectionTypeSelection = driver.getSectionTypeSelections().last()
+    val sectionTypeSelections =  driver.getSectionTypeSelections()
+    val sectionTypeSelection = sectionTypeSelections.let {
+        if (index == null) it.last()
+        else it.toList()[index]
+    }
+    driver.interact {
+        sectionTypeSelections.forEachIndexed { i, it -> if (it.isShowing && i != index) it.hide() }
+    }
     driver.interact {
         sectionTypeSelection.show()
     }
@@ -119,7 +128,7 @@ fun MoralArgumentView.selectUnusedSectionType(): MoralArgumentSectionTypeViewMod
     val sectionTypeSelection = driver.getSectionTypeSelections().find { it.isShowing }!!
     val (viewModel, item) = sectionTypeSelection.items.asSequence()
         .map { (it.userData as MoralArgumentSectionTypeViewModel) to it }
-        .find {it.first.canBeCreated }!!
+        .find { it.first.canBeCreated }!!
     driver.interact {
         item.fire()
     }

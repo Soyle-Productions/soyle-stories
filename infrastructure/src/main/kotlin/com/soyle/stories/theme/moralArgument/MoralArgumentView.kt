@@ -11,6 +11,7 @@ import com.soyle.stories.soylestories.SplashScreen
 import com.soyle.stories.soylestories.Styles
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
 import com.soyle.stories.theme.characterConflict.addDragAndDrop
+import com.soyle.stories.theme.moralArgument.AddSectionButton.Companion.addSectionButton
 import com.soyle.stories.theme.moralArgument.MoralArgumentSection.Companion.moralArgumentSection
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
@@ -140,9 +141,12 @@ class MoralArgumentView : View() {
         scrollpane(fitToWidth = true) {
             id = "arc-sections"
             content = vbox {
-                state.sections.mapObservableTo(children, { it.arcSectionId }) {
-                    op(it)
+                vbox {
+                    state.sections.mapObservableTo(children, { it.arcSectionId }) {
+                        op(it)
+                    }
                 }
+                addSectionButton(scope, null)
             }
         }
     }

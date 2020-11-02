@@ -33,7 +33,7 @@ class AsyncMenuButton<T> : Fragment() {
     val onLoadProperty = SimpleObjectProperty<() -> Unit> {}
     var onLoad by onLoadProperty
 
-    val sourceProperty = SimpleListProperty<T>()
+    val sourceProperty = SimpleObjectProperty<List<T>>()
     var source by sourceProperty
 
     private var mapToItems: (List<T>) -> List<MenuItem> = { listOf() }
@@ -61,7 +61,7 @@ class AsyncMenuButton<T> : Fragment() {
     }
 
     private fun MenuButton.addItemsWhenLoaded() {
-        sourceProperty.onChange { list: ObservableList<T>? ->
+        sourceProperty.onChange { list: List<T>? ->
             items.clear()
             when (list) {
                 null -> addLoadingItem()

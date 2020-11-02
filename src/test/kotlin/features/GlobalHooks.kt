@@ -43,7 +43,7 @@ class GlobalHooks : En {
     init {
         Before { scenario: Scenario ->
             if (! FxToolkit.isFXApplicationThreadRunning()) {
-                //runHeadless()
+                runHeadless()
                 Runtime.getRuntime().addShutdownHook(closeThread)
                 configureModules()
                 synchronizeBackgroundTasks()
@@ -53,6 +53,7 @@ class GlobalHooks : En {
         }
 
         After { scenario: Scenario ->
+            FxToolkit.cleanupStages()
             FxToolkit.cleanupApplication(soyleStories)
         }
 
