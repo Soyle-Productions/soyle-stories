@@ -2,6 +2,7 @@ package com.soyle.stories.entities
 
 import com.soyle.stories.characterarc.ArcTemplateSectionIsNotMoral
 import com.soyle.stories.characterarc.CharacterArcAlreadyContainsMaximumNumberOfTemplateSection
+import com.soyle.stories.characterarc.CharacterArcSectionNotInMoralArgument
 import com.soyle.stories.characterarc.TemplateSectionIsNotPartOfArcTemplate
 import com.soyle.stories.common.Entity
 import java.util.*
@@ -97,6 +98,9 @@ class CharacterArc private constructor(
         )
     }
 
+    private val arcSectionsById: Map<CharacterArcSection.Id, CharacterArcSection> by lazy { arcSections.associateBy { it.id } }
+    fun getArcSection(arcSectionId: CharacterArcSection.Id): CharacterArcSection? = arcSectionsById[arcSectionId]
+
     private val moralArgument by lazy { MoralArgument(arcSections.filter { it.template.isMoral }.sortedBy { moralArgumentSectionOrder.getValue(it.id) }) }
     fun moralArgument(): MoralArgument = moralArgument
     fun indexInMoralArgument(sectionId: CharacterArcSection.Id): Int? = moralArgumentSectionOrder[sectionId]
@@ -156,6 +160,18 @@ class CharacterArc private constructor(
                         else it.value
                     } + (arcSection.id to index)
                 }
+            )
+        }
+
+        fun withSectionMovedTo(arcSectionId: CharacterArcSection.Id, index: Int): CharacterArc
+        {
+            val currentIndex = indexInMoralArgument(arcSectionId)
+                ?: throw CharacterArcSectionNotInMoralArgument(arcSectionId.uuid,characterId.uuid,themeId.uuid,id.uuid)
+
+            return copy(
+                moralArgumentSectionOrder = arcSections.toMutableList().apply {
+                    add(index, removeAt(currentIndex))
+                }.withIndex().associate { it.value.id to it.index }
             )
         }
 
