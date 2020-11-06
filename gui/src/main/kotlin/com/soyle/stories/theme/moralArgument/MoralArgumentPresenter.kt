@@ -1,8 +1,10 @@
 package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
+import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgumentReceiver
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
+import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgument
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArcReceiver
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
@@ -21,7 +23,8 @@ class MoralArgumentPresenter(
     ListAvailableArcSectionTypesToAddToMoralArgument.OutputPort,
     ListAvailablePerspectiveCharacters.OutputPort,
 
-    ArcSectionAddedToCharacterArcReceiver
+    ArcSectionAddedToCharacterArcReceiver,
+    CharacterArcSectionMovedInMoralArgumentReceiver
 {
 
     private val themeId = UUID.fromString(themeId)
@@ -123,6 +126,20 @@ class MoralArgumentPresenter(
                         )
                     )
                 }
+            )
+        }
+    }
+
+    override suspend fun receiveCharacterArcSectionsMovedInMoralArgument(events: List<CharacterArcSectionMovedInMoralArgument>) {
+        view.updateOrInvalidated {
+            val listedSections = this.sections?.map { it.arcSectionId } ?: return@updateOrInvalidated this
+            val modifiedSections = events.filter { it.toString() in listedSections }.associateBy { it.arcSectionId.toString() }
+            if (modifiedSections.isEmpty()) return@updateOrInvalidated this
+            copy(
+                sections = sections.withIndex().sortedBy { (i, it) ->
+                    if (it.arcSectionId !in modifiedSections) i
+                    else modifiedSections.getValue(it.arcSectionId).newIndex
+                }.map { it.value }
             )
         }
     }
