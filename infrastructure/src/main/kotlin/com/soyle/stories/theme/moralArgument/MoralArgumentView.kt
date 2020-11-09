@@ -2,41 +2,27 @@ package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.components.asyncMenuButton.AsyncMenuButton.Companion.asyncMenuButton
-import com.soyle.stories.common.mapObservable
 import com.soyle.stories.common.mapObservableTo
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
-import com.soyle.stories.di.resolveLater
-import com.soyle.stories.soylestories.SplashScreen
-import com.soyle.stories.soylestories.Styles
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
-import com.soyle.stories.theme.characterConflict.addDragAndDrop
-import com.soyle.stories.theme.moralArgument.AddSectionButton.Companion.addSectionButton
+import com.soyle.stories.theme.moralArgument.MoralArgumentInsertionPoint.Companion.insertionPoint
 import com.soyle.stories.theme.moralArgument.MoralArgumentSection.Companion.moralArgumentSection
-import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.value.ObservableValue
-import javafx.collections.ObservableList
-import javafx.geometry.Insets
-import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.CustomMenuItem
 import javafx.scene.control.Label
-import javafx.scene.control.MenuButton
 import javafx.scene.control.MenuItem
-import javafx.scene.layout.BackgroundSize
 import javafx.scene.layout.Priority
-import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
-import javafx.scene.shape.PathElement
 import tornadofx.*
 
 class MoralArgumentView : View() {
 
     private val viewListener: MoralArgumentViewListener = resolve()
     private val state: MoralArgumentState = resolve()
+    private val moralArgumentInsertionIndex = SimpleIntegerProperty(-1)
 
     override val root: Parent = responsiveBox {
         themeDetails {
@@ -49,7 +35,7 @@ class MoralArgumentView : View() {
             hgrow = Priority.ALWAYS
             perspectiveCharacterField()
             arcSections {
-                moralArgumentSection(scope, it)
+                moralArgumentSection(scope, it, moralArgumentInsertionIndex)
             }
         }
     }
@@ -137,21 +123,71 @@ class MoralArgumentView : View() {
             it?.invoke(minorCharacter)
         }
 
-    private fun Parent.arcSections(op: VBox.(MoralArgumentSectionViewModel) -> Node) {
+    private fun Parent.arcSections(op: VBox.(MoralArgumentSectionViewModel) -> MoralArgumentSection) {
         scrollpane(fitToWidth = true) {
-            id = "arc-sections"
-            content = vbox {
+            id = Styles.arcSections.name
+            content = vbox content@{
                 vbox {
                     state.sections.mapObservableTo(children, { it.arcSectionId }) {
-                        op(it)
+                        val section = op(it).apply {
+                            onSectionPlacedAbove = {
+                                viewListener.moveSectionTo(it, state.item!!.selectedPerspectiveCharacter!!.characterId, root.indexInParent)
+                            }
+                            onSectionPlacedBelow = {
+                                viewListener.moveSectionTo(it, state.item!!.selectedPerspectiveCharacter!!.characterId, root.indexInParent + 1)
+                            }
+                            onSectionDraggedAbove = {
+                                moralArgumentInsertionIndex.set(root.indexInParent)
+                            }
+                            onSectionDraggedBelow = {
+                                moralArgumentInsertionIndex.set(root.indexInParent + 1)
+                            }
+                            onSectionDraggedAway = {
+                                moralArgumentInsertionIndex.set(-1)
+                            }
+                            onMoved = {
+                                viewListener.moveSectionTo(it.arcSectionId, state.item!!.selectedPerspectiveCharacter!!.characterId, root.indexInParent)
+                            }
+                            onDragging = {
+                                this@content.addClass(Styles.dragging)
+                            }
+                            onDragStop = {
+                                moralArgumentInsertionIndex.set(-1)
+                                this@content.removeClass(Styles.dragging)
+                            }
+                        }
+                        section.root
                     }
                 }
-                addSectionButton(scope, null)
+                insertionPoint(scope, null, moralArgumentInsertionIndex.booleanBinding { it == state.sections.size })
             }
         }
     }
 
     init {
         viewListener.getValidState()
+    }
+
+    class Styles: Stylesheet() {
+        companion object {
+            val arcSections by cssid("arc-sections")
+            val dragging by cssclass()
+            init {
+                importStylesheet<Styles>()
+            }
+        }
+
+        init {
+            arcSections {
+                content {
+                    and(dragging) {
+                        MoralArgumentInsertionPoint.Styles.sectionTypeSelection {
+                            //visibility = FXVisibility.HIDDEN
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

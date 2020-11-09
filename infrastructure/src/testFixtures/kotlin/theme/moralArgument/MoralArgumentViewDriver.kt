@@ -1,12 +1,9 @@
 package com.soyle.stories.desktop.view.theme.moralArgument
 
-import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.Styles
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
 import javafx.scene.Node
 import javafx.scene.control.*
-import javafx.scene.layout.StackPane
-import javafx.scene.layout.VBox
 import org.testfx.api.FxRobot
 
 class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
@@ -46,22 +43,21 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
         return from(view.root).lookup("#arc-sections").query<ScrollPane>().content
     }
 
-    fun getArcSectionNodes(): List<Node> {
+    internal fun getArcSectionNodes(): List<Node> {
         val arcSectionsContainer = getArcSectionsContainer()
         return from(arcSectionsContainer).lookup(".${Styles.labeledSection.name}").queryAll<Node>().toList()
     }
 
-    fun getArcSectionLabels(): List<Labeled> {
-        return getArcSectionNodes().map {
-            from(it).lookup(".${Styles.fieldLabel.name}").query()
-        }
-    }
+    private fun getArcSectionLabel(sectionNode: Node): Labeled = from(sectionNode).lookup(".${Styles.fieldLabel.name}").query()
+    fun getArcSectionLabels(): List<Labeled> = getArcSectionNodes().map(::getArcSectionLabel)
+    fun getArcSectionLabel(index: Int): Labeled = getArcSectionLabel(getArcSectionNodes()[index])
 
-    fun getArcSectionValues(): List<TextInputControl> {
-        return getArcSectionNodes().map {
-            from(it).lookup(".text-field").query()
-        }
-    }
+    private fun getArcSectionValueInput(sectionNode: Node): TextInputControl = from(sectionNode).lookup(".text-field").query()
+    fun getArcSectionValueInputs(): List<TextInputControl> = getArcSectionNodes().map(::getArcSectionValueInput)
+    fun getArcSectionValueInput(index: Int): TextInputControl = getArcSectionValueInput(getArcSectionNodes()[index])
+
+    private fun getArcSectionDragHandle(sectionNode: Node): Node = from(sectionNode).lookup(".drag-handle").query()
+    fun getArcSectionDragHandle(index: Int): Node = getArcSectionDragHandle(getArcSectionNodes()[index])
 
     fun getSectionTypeSelections(): Set<MenuButton> {
         return from(getArcSectionsContainer()).lookup(".section-type-selection").queryAll()

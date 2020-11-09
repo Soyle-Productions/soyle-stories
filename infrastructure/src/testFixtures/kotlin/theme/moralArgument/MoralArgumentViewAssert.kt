@@ -10,7 +10,6 @@ import javafx.scene.control.Tooltip
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import tornadofx.hasClass
-import tornadofx.tooltip
 
 class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
 
@@ -116,7 +115,7 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
     inner class ArcSectionAssert internal constructor(private val index: Int) {
 
         fun hasValue(expectedValue: String) {
-            assertEquals(expectedValue, driver.getArcSectionValues()[index].text)
+            assertEquals(expectedValue, driver.getArcSectionValueInputs()[index].text)
         }
 
     }
@@ -143,6 +142,13 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
         fun onlyHasItems(expectedItems: List<String>) {
             val expectedItemSet = expectedItems.toSet()
             assertEquals(expectedItemSet, selection.items.map { it.text }.toSet())
+        }
+
+        fun hasItems(expectedItems: List<String>) {
+            val itemSet = selection.items.groupBy { it.text }
+            expectedItems.forEach {
+                assertTrue(it in itemSet) { "Section Type Menu does not contain $it.  Contained items: ${itemSet.keys}" }
+            }
         }
 
         fun eachDiscouragedItemHasMessage(expectedMessageGenerator: (MoralArgumentSectionTypeViewModel) -> String) {

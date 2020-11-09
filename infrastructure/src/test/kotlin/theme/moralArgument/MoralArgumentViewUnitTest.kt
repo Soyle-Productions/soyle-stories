@@ -13,6 +13,7 @@ import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -36,7 +37,10 @@ class MoralArgumentViewUnitTest : FxRobot() {
     private val moralArgumentView by lazy { scope.get<MoralArgumentView>() }
     private val state by lazy { scope.get<MoralArgumentState>() }
 
-    private val viewListenerCallLog = mutableMapOf<KFunction<*>, Map<String, Any?>>()
+    private val viewListener = MoralArgumentViewListenerMock()
+
+    private val viewListenerCallLog: Map<KFunction<*>, Map<String, Any?>>
+        get() = viewListener.callLog
 
     @BeforeEach
     fun setInitialState() {
@@ -580,78 +584,20 @@ class MoralArgumentViewUnitTest : FxRobot() {
         }
         scoped<MoralArgumentScope> {
             provide<MoralArgumentViewListener> {
-                object : MoralArgumentViewListener {
-                    override fun getValidState() {
-                        viewListenerCallLog[MoralArgumentViewListener::getValidState] = mapOf()
-                    }
+                viewListener
 
-                    override fun getPerspectiveCharacters() {
-                        viewListenerCallLog[MoralArgumentViewListener::getPerspectiveCharacters] = mapOf()
-                    }
-
-                    override fun outlineMoralArgument(characterId: String) {
-                        viewListenerCallLog[MoralArgumentViewListener::outlineMoralArgument] = mapOf(
-                            "characterId" to characterId
-                        )
-                    }
-
-                    override fun getAvailableArcSectionTypesToAdd(characterId: String) {
-                        viewListenerCallLog[MoralArgumentViewListener::getAvailableArcSectionTypesToAdd] = mapOf(
-                            "characterId" to characterId
-                        )
-                    }
-
-                    override fun addCharacterArcSectionType(characterId: String, sectionTemplateId: String) {
-                        viewListenerCallLog[MoralArgumentViewListener::addCharacterArcSectionType] = mapOf(
-                            "characterId" to characterId,
-                            "sectionTemplateId" to sectionTemplateId
-                        )
-                    }
-
-                    override fun addCharacterArcSectionTypeAtIndex(
-                        characterId: String,
-                        sectionTemplateId: String,
-                        index: Int
-                    ) {
-                        viewListenerCallLog[MoralArgumentViewListener::addCharacterArcSectionTypeAtIndex] = mapOf(
-                            "characterId" to characterId,
-                            "sectionTemplateId" to sectionTemplateId,
-                            "index" to index,
-                        )
-                    }
-
-                    override fun setMoralProblem(problem: String) {
-                        viewListenerCallLog[MoralArgumentViewListener::setMoralProblem] = mapOf(
-                            "problem" to problem
-                        )
-                    }
-
-                    override fun setThemeLine(themeLine: String) {
-                        viewListenerCallLog[MoralArgumentViewListener::setThemeLine] = mapOf(
-                            "themeLine" to themeLine
-                        )
-                    }
-
-                    override fun setValueOfArcSection(characterId: String, arcSectionId: String, value: String) {
-                        viewListenerCallLog[MoralArgumentViewListener::setValueOfArcSection] = mapOf(
-                            "characterId" to characterId,
-                            "arcSectionId" to arcSectionId,
-                            "value" to value
-                        )
-                    }
-
-                    override fun setThematicRevelation(revelation: String) {
-                        viewListenerCallLog[MoralArgumentViewListener::setThematicRevelation] = mapOf(
-                            "revelation" to revelation
-                        )
-                    }
-
-                }
             }
         }
         FX.setPrimaryStage(FX.defaultScope, FxToolkit.registerPrimaryStage())
         interact {
             moralArgumentView.openWindow()
+        }
+    }
+
+    @AfterEach
+    fun `close window`() {
+        interact {
+            moralArgumentView.close()
         }
     }
 
