@@ -3,10 +3,13 @@ package com.soyle.stories.desktop.config.features.character
 import com.soyle.stories.desktop.config.drivers.character.CharacterArcDriver
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.project.ProjectDriver
+import com.soyle.stories.desktop.config.drivers.soylestories.ScenarioContext
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.soylestories.getWorkbenchForProjectOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
+import com.soyle.stories.desktop.config.drivers.theme.givenMoralArgumentToolHasBeenOpenedForTheme
 import com.soyle.stories.desktop.config.features.soyleStories
+import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.*
@@ -68,6 +71,28 @@ class CharacterSteps : En {
             val arcs = CharacterArcDriver(workbench).getCharacterArcsForTheme(themeId)
 
             assertFalse(arcs.isEmpty()) { "All character arcs for $themeName theme have been deleted." }
+        }
+        Then(
+            "a new section should have been added to {string}s character arc in the {string} theme with that type"
+        ) { characterName: String, themeName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val theme = ThemeDriver(workbench).getThemeByNameOrError(themeName)
+            val character = CharacterDriver(workbench).getCharacterByNameOrError(characterName)
+            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+            val templateSectionToAdd = ScenarioContext(soyleStories).templateSectionToAdd!!
+
+            arc.arcSections.find {
+                it.template.id.uuid.toString() == templateSectionToAdd
+            }!!
+
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            MoralArgumentViewAssert.assertThat(moralArgument) {
+                onlyHasArcSections(
+                    arc.moralArgument().arcSections.map { it.template.name }
+                )
+            }
+
+            ScenarioContext(soyleStories).updatedCharacterArc = arc
         }
     }
 }

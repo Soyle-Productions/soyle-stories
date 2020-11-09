@@ -2,9 +2,14 @@ package com.soyle.stories.desktop.config.character
 
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentControllerImpl
+import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentController
+import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentControllerImpl
+import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentOutput
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentUseCase
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
+import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgument
+import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentUseCase
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
@@ -31,6 +36,23 @@ object UseCases {
 
             provide<AddCharacterArcSectionToMoralArgument.OutputPort> {
                 AddCharacterArcSectionToMoralArgumentOutput(get())
+            }
+
+
+
+
+            provide<MoveCharacterArcSectionInMoralArgument> {
+                MoveCharacterArcSectionInMoralArgumentUseCase(get())
+            }
+
+            provide<MoveCharacterArcSectionInMoralArgumentController> {
+                MoveCharacterArcSectionInMoralArgumentControllerImpl(
+                    applicationScope.get(), get(), get()
+                )
+            }
+
+            provide<MoveCharacterArcSectionInMoralArgument.OutputPort> {
+                MoveCharacterArcSectionInMoralArgumentOutput(get())
             }
 
         }

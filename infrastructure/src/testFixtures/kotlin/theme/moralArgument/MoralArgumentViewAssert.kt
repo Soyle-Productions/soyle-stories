@@ -112,10 +112,22 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
         }
     }
 
+    fun andSectionAt(index: Int, assertions: ArcSectionAssert.() -> Unit) {
+        ArcSectionAssert(index).assertions()
+    }
+
     inner class ArcSectionAssert internal constructor(private val index: Int) {
 
         fun hasValue(expectedValue: String) {
             assertEquals(expectedValue, driver.getArcSectionValueInputs()[index].text)
+        }
+
+        fun hasLabel(expectedLabel: String) {
+            assertEquals(expectedLabel, driver.getArcSectionLabel(index).text)
+        }
+
+        fun hasId(expectedId: String) {
+            assertEquals(expectedId, driver.getArcSectionNodes()[index].id)
         }
 
     }

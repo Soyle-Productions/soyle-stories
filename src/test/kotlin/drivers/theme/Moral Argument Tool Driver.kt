@@ -4,12 +4,14 @@ import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewDriver
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.theme.moralArgument.MoralArgumentScope
 import com.soyle.stories.theme.moralArgument.MoralArgumentSectionTypeViewModel
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
 import com.soyle.stories.theme.themeList.ThemeList
+import javafx.scene.input.MouseButton
 import kotlinx.coroutines.withTimeout
 import tornadofx.item
 
@@ -46,6 +48,8 @@ fun ThemeList.openMoralArgumentToolFor(themeName: String)
     }
 }
 
+fun MoralArgumentView.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character: Character) =
+    givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
 fun MoralArgumentView.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(characterName: String)
 {
     val driver = MoralArgumentViewDriver(this)
@@ -122,6 +126,27 @@ fun MoralArgumentView.prepareToAddNewSection(index: Int? = null)
     }
 }
 
+fun MoralArgumentView.givenMoralArgumentHasBeenPreparedToMoveSection() {
+    if (! isPreparedToMoveSection()) prepareToMoveSection()
+}
+
+fun MoralArgumentView.isPreparedToMoveSection(): Boolean
+{
+    val driver = MoralArgumentViewDriver(this)
+    val sectionTypeSelections = driver.getSectionTypeSelections()
+    return sectionTypeSelections.any { it.isShowing }
+}
+
+fun MoralArgumentView.prepareToMoveSection()
+{
+    val driver = MoralArgumentViewDriver(this)
+    val sectionTypeSelections =  driver.getSectionTypeSelections()
+    val sectionTypeSelection = sectionTypeSelections.first()
+    driver.interact {
+        sectionTypeSelection.show()
+    }
+}
+
 fun MoralArgumentView.selectUnusedSectionType(): MoralArgumentSectionTypeViewModel
 {
     val driver = MoralArgumentViewDriver(this)
@@ -133,4 +158,26 @@ fun MoralArgumentView.selectUnusedSectionType(): MoralArgumentSectionTypeViewMod
         item.fire()
     }
     return viewModel
+}
+
+fun MoralArgumentView.selectUsedSectionType(): MoralArgumentSectionTypeViewModel
+{
+    val driver = MoralArgumentViewDriver(this)
+    val sectionTypeSelection = driver.getSectionTypeSelections().find { it.isShowing }!!
+    val (viewModel, item) = sectionTypeSelection.items.asSequence()
+        .map { (it.userData as MoralArgumentSectionTypeViewModel) to it }
+        .find { ! it.first.canBeCreated }!!
+    driver.interact {
+        item.fire()
+    }
+    return viewModel
+}
+
+fun MoralArgumentView.moveSectionToNewPosition(initialPosition: Int, newPosition: Int) {
+    val driver = MoralArgumentViewDriver(this)
+    val dragHandle = driver.getArcSectionDragHandle(initialPosition)
+    driver.interact {
+        driver.drag(dragHandle, MouseButton.PRIMARY)
+            .dropTo(driver.getArcSectionLabel(newPosition))
+    }
 }

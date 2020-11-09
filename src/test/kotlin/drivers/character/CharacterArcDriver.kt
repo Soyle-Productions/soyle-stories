@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.drivers.character
 
+import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.entities.Character
@@ -12,10 +13,23 @@ import kotlinx.coroutines.runBlocking
 
 class CharacterArcDriver private constructor(private val projectScope: ProjectScope) {
 
+    private val timeMachine: MutableMap<CharacterArc.Id, MutableList<CharacterArc>> = mutableMapOf()
+    private fun logNextVersion(arc: CharacterArc)
+    {
+        val previousVersions = timeMachine.getOrElse(arc.id) { mutableListOf() }
+        if (previousVersions.lastOrNull() != arc) {
+            timeMachine[arc.id] = previousVersions.apply { add(arc) }
+        }
+    }
+
+    fun getPreviousVersions(arc: CharacterArc): List<CharacterArc> = timeMachine[arc.id]?.toList() ?: listOf()
+
     fun getCharacterArcsForTheme(themeId: Theme.Id): List<CharacterArc>
     {
         val characterArcRepository = projectScope.get<CharacterArcRepository>()
-        return runBlocking { characterArcRepository.listCharacterArcsForTheme(themeId) }
+        val arcs = runBlocking { characterArcRepository.listCharacterArcsForTheme(themeId) }
+        arcs.forEach(::logNextVersion)
+        return arcs
     }
 
     fun getCharacterArcForCharacterAndThemeOrError(characterId: Character.Id, themeId: Theme.Id): CharacterArc =
@@ -23,19 +37,26 @@ class CharacterArcDriver private constructor(private val projectScope: ProjectSc
 
     fun getCharacterArcForCharacterAndTheme(characterId: Character.Id, themeId: Theme.Id): CharacterArc? {
         val characterArcRepository = projectScope.get<CharacterArcRepository>()
-        return runBlocking { characterArcRepository.getCharacterArcByCharacterAndThemeId(characterId, themeId) }
+        val arc = runBlocking { characterArcRepository.getCharacterArcByCharacterAndThemeId(characterId, themeId) }
+        arc?.let(::logNextVersion)
+        return arc
+    }
+
+    fun getCharacterArcForCharacterAndThemeNamedOrError(characterName: String, themeName: String): CharacterArc {
+        return getCharacterArcForCharacterAndThemeNamed(characterName, themeName) ?: error("No character arc for $characterName and $themeName found")
+    }
+    fun getCharacterArcForCharacterAndThemeNamed(characterName: String, themeName: String): CharacterArc? {
+        return getCharacterArcForCharacterAndTheme(
+            CharacterDriver(projectScope.get()).getCharacterByNameOrError(characterName).id,
+            ThemeDriver(projectScope.get()).getThemeByNameOrError(themeName).id
+        )
     }
 
     companion object {
-        private var isFirstCall = true
-        operator fun invoke(workbench: WorkBench): CharacterArcDriver
-        {
-            if (isFirstCall) {
-                scoped<ProjectScope> { provide { CharacterArcDriver(this) } }
-                isFirstCall = false
-            }
-            return workbench.scope.get()
+        init {
+            scoped<ProjectScope> { provide { CharacterArcDriver(this) } }
         }
+        operator fun invoke(workbench: WorkBench): CharacterArcDriver = workbench.scope.get()
     }
 
 }

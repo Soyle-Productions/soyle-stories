@@ -1,14 +1,20 @@
 package com.soyle.stories.desktop.config.features
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransformer
+import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
+import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.soylestories.configureModules
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
+import io.cucumber.java8.ParameterDefinitionBody
 import io.cucumber.java8.Scenario
 import javafx.application.Application
 import javafx.stage.Stage
@@ -57,6 +63,17 @@ class GlobalHooks : En {
             FxToolkit.cleanupApplication(soyleStories)
         }
 
+        ParameterType<Character?>("character", "[A-Z]\\w+") { name: String ->
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByName(name)
+        }
+        ParameterType<Theme>("theme", "\"(.*?)\"") { name: String ->
+            ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
+        }
+
+        ParameterType("ordinal", "(\\d+)(?:st|nd|rd|th)") { ordinal: String ->
+            Regex("(\\d+)").find(ordinal)?.value?.toIntOrNull()?.minus(1)
+                ?: error("detected ordinal, but did not find parsable string")
+        }
 
     }
 
