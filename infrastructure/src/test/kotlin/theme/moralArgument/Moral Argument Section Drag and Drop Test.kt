@@ -3,6 +3,7 @@ package com.soyle.stories.theme.moralArgument
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.SyncThreadTransformer
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert.Companion.assertThat
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.testfx.api.FxRobot
 import org.testfx.api.FxToolkit
 import tornadofx.FX
+import tornadofx.swap
 import java.util.*
 
 class `Moral Argument Section Drag and Drop Test` : FxRobot() {
@@ -152,6 +154,26 @@ class `Moral Argument Section Drag and Drop Test` : FxRobot() {
                 mapOf("arcSectionId" to "4", "characterId" to perspectiveCharacterId, "index" to 2),
                 viewListener.callLog[MoralArgumentViewListener::moveSectionTo]
             )
+        }
+
+        @Test
+        fun `reordered section should be reflected in view`() {
+            val idAt4 = state.item!!.sections!![4].arcSectionId
+
+            state.updateOrInvalidated {
+                copy(
+                    sections = sections!!.toMutableList().apply {
+                        add(2, removeAt(4))
+                    }
+                )
+            }
+
+            assertThat(moralArgumentView) {
+                andSectionAt(2) {
+                    hasId(idAt4)
+                }
+            }
+
         }
     }
 

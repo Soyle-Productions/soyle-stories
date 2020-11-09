@@ -133,8 +133,9 @@ class MoralArgumentPresenter(
     override suspend fun receiveCharacterArcSectionsMovedInMoralArgument(events: List<CharacterArcSectionMovedInMoralArgument>) {
         view.updateOrInvalidated {
             val listedSections = this.sections?.map { it.arcSectionId } ?: return@updateOrInvalidated this
-            val modifiedSections = events.filter { it.toString() in listedSections }.associateBy { it.arcSectionId.toString() }
+            val modifiedSections = events.filter { it.arcSectionId.toString() in listedSections }.associateBy { it.arcSectionId.toString() }
             if (modifiedSections.isEmpty()) return@updateOrInvalidated this
+
             copy(
                 sections = sections.withIndex().sortedBy { (i, it) ->
                     if (it.arcSectionId !in modifiedSections) i
