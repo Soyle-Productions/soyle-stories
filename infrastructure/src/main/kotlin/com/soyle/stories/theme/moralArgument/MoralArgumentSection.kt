@@ -20,11 +20,13 @@ class MoralArgumentSection : Fragment() {
         fun Parent.moralArgumentSection(
             scope: Scope,
             viewModel: MoralArgumentSectionViewModel,
+            removeSectionLabel: ObservableValue<String>,
             insertionIndex: ObservableValue<Number>,
         ): MoralArgumentSection {
             val props = mapOf(
                 MoralArgumentSection::viewModel to viewModel,
-                MoralArgumentSection::insertionIndex to insertionIndex
+                MoralArgumentSection::insertionIndex to insertionIndex,
+                MoralArgumentSection::removeSectionLabel to removeSectionLabel
             )
             val moralArgumentSection = find<MoralArgumentSection>(scope, params = props)
             this += moralArgumentSection
@@ -36,6 +38,7 @@ class MoralArgumentSection : Fragment() {
 
     private val viewModel: MoralArgumentSectionViewModel by param()
     private val insertionIndex: ObservableValue<Number> by param()
+    private val removeSectionLabel: ObservableValue<String> by param()
 
     var onDragging: () -> Unit = {}
     var onDragStop: () -> Unit = {}
@@ -54,12 +57,22 @@ class MoralArgumentSection : Fragment() {
         setOnDragDone(this@MoralArgumentSection::onDragDone)
     }
 
-    private val insertionPoint = root.insertionPoint(scope, viewModel, insertionIndex.booleanBinding { root.indexInParent != -1 && it == root.indexInParent })
+    private val insertionPoint = root.insertionPoint(
+        scope,
+        viewModel,
+        tryingToInsertProperty = insertionIndex.booleanBinding { root.indexInParent != -1 && it == root.indexInParent }
+    )
     private val sectionField = root.vbox {
         id = viewModel.arcSectionId
         addClass(ComponentStyles.labeledSection)
         hbox {
             fieldLabel(viewModel.arcSectionName)
+            if (viewModel.canBeRemoved) {
+                spacer()
+                button(removeSectionLabel) {
+                    addClass("remove-button")
+                }
+            }
         }
         hbox {
             spacing = 8.0

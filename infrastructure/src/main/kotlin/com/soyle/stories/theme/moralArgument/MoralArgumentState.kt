@@ -23,6 +23,7 @@ class MoralArgumentState : Model<MoralArgumentScope, MoralArgumentViewModel>(Mor
     val availableSectionTypes = bind(MoralArgumentViewModel::availableSectionTypes)
     val loadingSectionTypesLabel = bind(MoralArgumentViewModel::loadingSectionTypesLabel)
     val unavailableSectionTypeMessage = bind(MoralArgumentViewModel::unavailableSectionTypeMessage)
+    val removeSectionLabel = bind(MoralArgumentViewModel::removeSectionButtonLabel)
 
     override fun viewModel(): MoralArgumentViewModel? {
         return item?.copy(

@@ -35,7 +35,7 @@ class MoralArgumentView : View() {
             hgrow = Priority.ALWAYS
             perspectiveCharacterField()
             arcSections {
-                moralArgumentSection(scope, it, moralArgumentInsertionIndex)
+                moralArgumentSection(it)
             }
         }
     }
@@ -159,9 +159,15 @@ class MoralArgumentView : View() {
                         section.root
                     }
                 }
-                insertionPoint(scope, null, moralArgumentInsertionIndex.booleanBinding { it == state.sections.size })
+                insertionPoint(scope, null, tryingToInsertProperty = whenInsertingAtEnd())
             }
         }
+    }
+
+    private fun whenInsertingAtEnd() = moralArgumentInsertionIndex.booleanBinding { it == state.sections.size }
+
+    private fun Parent.moralArgumentSection(viewModel: MoralArgumentSectionViewModel): MoralArgumentSection {
+        return moralArgumentSection(scope, viewModel, state.removeSectionLabel, moralArgumentInsertionIndex)
     }
 
     init {

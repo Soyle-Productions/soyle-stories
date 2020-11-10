@@ -61,6 +61,7 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 createCharacterLabel = "",
                 unavailableCharacterMessage = { "" },
                 unavailableSectionTypeMessage = { "" },
+                removeSectionButtonLabel = "",
                 sections = null,
                 availableSectionTypes = null
             )
@@ -229,13 +230,15 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 MoralArgumentSectionViewModel(
                     it.toString(),
                     "Section $it",
-                    "Section Value ${"oinaset${it}asru".hashCode()}"
+                    "Section Value ${"oinaset${it}asru".hashCode()}",
+                    it % 2 == 0
                 )
             }
 
             state.updateOrInvalidated {
                 copy(
                     selectedPerspectiveCharacter = selectedCharacter,
+                    removeSectionButtonLabel = "Remove 832",
                     sections = arcSections
                 )
             }
@@ -244,6 +247,14 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 onlyHasArcSections(arcSections.map { it.arcSectionName })
                 andEachArcSection {
                     hasValue(arcSections[it].arcSectionValue)
+                    if (it % 2 == 0) {
+                        hasRemoveButton()
+                        andRemoveButton {
+                            hasText("Remove 832")
+                        }
+                    } else {
+                        doesNotHaveRemoveButton()
+                    }
                 }
             }
         }
@@ -279,7 +290,7 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 "This is a generated message for ${it.sectionTypeName}"
             }
 
-            state.updateOrInvalidated { copy(sections = List(5) { MoralArgumentSectionViewModel("$it", "", "") }) }
+            state.updateOrInvalidated { copy(sections = List(5) { MoralArgumentSectionViewModel("$it", "", "", false) }) }
 
             interact {
                 MoralArgumentViewDriver(moralArgumentView).getSectionTypeSelections().first().show()
@@ -514,7 +525,7 @@ class MoralArgumentViewUnitTest : FxRobot() {
             state.updateOrInvalidated {
                 copy(
                     selectedPerspectiveCharacter = CharacterItemViewModel(characterId.toString(), "", ""),
-                    sections = listOf(MoralArgumentSectionViewModel("", "", ""))
+                    sections = listOf(MoralArgumentSectionViewModel("", "", "", false))
                 )
             }
 
@@ -547,7 +558,7 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 state.updateOrInvalidated {
                     copy(
                         selectedPerspectiveCharacter = CharacterItemViewModel(characterId.toString(), "", ""),
-                        sections = List(5) { MoralArgumentSectionViewModel("$it", "", "") }
+                        sections = List(5) { MoralArgumentSectionViewModel("$it", "", "", false) }
                     )
                 }
 

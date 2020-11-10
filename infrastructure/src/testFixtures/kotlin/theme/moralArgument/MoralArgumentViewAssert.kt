@@ -4,11 +4,13 @@ import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
 import com.soyle.stories.theme.moralArgument.MoralArgumentSectionTypeViewModel
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
+import javafx.scene.control.Button
 import javafx.scene.control.CustomMenuItem
 import javafx.scene.control.MenuButton
 import javafx.scene.control.Tooltip
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
+import org.testfx.assertions.api.Assertions
+import org.testfx.assertions.api.ButtonAssert
 import tornadofx.hasClass
 
 class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
@@ -128,6 +130,19 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
 
         fun hasId(expectedId: String) {
             assertEquals(expectedId, driver.getArcSectionNodes()[index].id)
+        }
+
+        fun hasRemoveButton() {
+            assertNotNull(driver.getArcSectionRemoveButton(index))
+        }
+
+        fun doesNotHaveRemoveButton() {
+            assertNull(driver.getArcSectionRemoveButton(index))
+        }
+
+        fun andRemoveButton(assertions: ButtonAssert.() -> Unit) {
+            (Assertions.assertThat(driver.getArcSectionRemoveButton(index)!! as Button) as ButtonAssert).assertions()
+
         }
 
     }

@@ -58,7 +58,8 @@ class `Moral Argument Section Drag and Drop Test` : FxRobot() {
                 createCharacterLabel = "createCharacterLabel",
                 unavailableCharacterMessage = { "unavailableCharacterMessage" },
                 unavailableSectionTypeMessage = { "unavailableSectionTypeMessage" },
-                sections = List(10) { MoralArgumentSectionViewModel("$it", "Section $it", "value: $it") },
+                removeSectionButtonLabel = "Remove",
+                sections = List(10) { MoralArgumentSectionViewModel("$it", "Section $it", "value: $it", true) },
                 availableSectionTypes = null
             )
         }

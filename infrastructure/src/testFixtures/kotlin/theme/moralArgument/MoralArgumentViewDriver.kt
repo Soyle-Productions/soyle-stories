@@ -59,6 +59,9 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
     private fun getArcSectionDragHandle(sectionNode: Node): Node = from(sectionNode).lookup(".drag-handle").query()
     fun getArcSectionDragHandle(index: Int): Node = getArcSectionDragHandle(getArcSectionNodes()[index])
 
+    private fun getArcSectionRemoveButton(sectionNode: Node): Node? = from(sectionNode).lookup(".remove-button").queryAll<Node>().firstOrNull()
+    fun getArcSectionRemoveButton(index: Int): Node? = getArcSectionRemoveButton(getArcSectionNodes()[index])
+
     fun getSectionTypeSelections(): Set<MenuButton> {
         return from(getArcSectionsContainer()).lookup(".section-type-selection").queryAll()
     }
