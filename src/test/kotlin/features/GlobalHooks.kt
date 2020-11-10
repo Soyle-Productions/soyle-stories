@@ -10,6 +10,8 @@ import com.soyle.stories.desktop.config.soylestories.configureModules
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArcTemplate
+import com.soyle.stories.entities.CharacterArcTemplateSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
@@ -68,6 +70,9 @@ class GlobalHooks : En {
         }
         ParameterType<Theme>("theme", "\"(.*?)\"") { name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
+        }
+        ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { name: String ->
+            CharacterArcTemplate.default().sections.single { it.name == name }
         }
 
         ParameterType("ordinal", "(\\d+)(?:st|nd|rd|th)") { ordinal: String ->
