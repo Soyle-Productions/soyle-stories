@@ -19,6 +19,7 @@ data class MoralArgumentViewModel(
     val createCharacterLabel: String,
     val unavailableCharacterMessage: (AvailablePerspectiveCharacterViewModel) -> String,
     val unavailableSectionTypeMessage: (MoralArgumentSectionTypeViewModel) -> String,
+    val removeSectionButtonLabel: String,
     val sections: List<MoralArgumentSectionViewModel>?,
     val availableSectionTypes: List<MoralArgumentSectionTypeViewModel>?
 )
@@ -26,7 +27,8 @@ data class MoralArgumentViewModel(
 data class MoralArgumentSectionViewModel(
     val arcSectionId: String,
     val arcSectionName: String,
-    val arcSectionValue: String
+    val arcSectionValue: String,
+    val canBeRemoved: Boolean
 )
 
 data class MoralArgumentSectionTypeViewModel(

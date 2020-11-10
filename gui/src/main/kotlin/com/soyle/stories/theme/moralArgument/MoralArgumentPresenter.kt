@@ -53,6 +53,7 @@ class MoralArgumentPresenter(
                     "${it.sectionTypeName} has already been used.  By selecting this, the section " +
                             "of this type will be moved to this position."
                 },
+                removeSectionButtonLabel = "Remove",
                 sections = null,
                 availableSectionTypes = null
             )
@@ -85,7 +86,8 @@ class MoralArgumentPresenter(
                     MoralArgumentSectionViewModel(
                         it.arcSectionId.toString(),
                         it.sectionTemplateName,
-                        it.arcSectionValue
+                        it.arcSectionValue,
+                        ! it.sectionTemplateIsRequired
                     )
                 }
             )
@@ -122,7 +124,8 @@ class MoralArgumentPresenter(
                         MoralArgumentSectionViewModel(
                             event.characterArcSectionId.toString(),
                             event.templateSectionName,
-                            event.value
+                            event.value,
+                            true // if added, then it wasn't required.
                         )
                     )
                 }
