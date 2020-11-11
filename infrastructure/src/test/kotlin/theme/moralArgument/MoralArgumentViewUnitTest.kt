@@ -589,6 +589,32 @@ class MoralArgumentViewUnitTest : FxRobot() {
 
     }
 
+    @Nested
+    inner class `Remove Section` {
+
+        private val arcSectionId = "Section Id 7w34tg3"
+
+        @Test
+        fun `should call view listener`() {
+            state.updateOrInvalidated {
+                copy(
+                    selectedPerspectiveCharacter = CharacterItemViewModel("", "", ""),
+                    sections = listOf(MoralArgumentSectionViewModel(arcSectionId, "", "", true))
+                )
+            }
+
+            interact {
+                MoralArgumentViewDriver(moralArgumentView).getArcSectionRemoveButton(0)!!.fire()
+            }
+
+            assertEquals(
+                mapOf("arcSectionId" to arcSectionId),
+                viewListener.callLog[MoralArgumentViewListener::removeSection]
+            )
+        }
+
+    }
+
     init {
         scoped<ApplicationScope> {
             provide<ThreadTransformer> { SyncThreadTransformer() }

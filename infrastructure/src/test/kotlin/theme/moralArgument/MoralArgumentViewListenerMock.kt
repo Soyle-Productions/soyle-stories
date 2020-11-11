@@ -81,4 +81,10 @@ class MoralArgumentViewListenerMock  : MoralArgumentViewListener {
         )
     }
 
+    override fun removeSection(arcSectionId: String) {
+        _callLog[MoralArgumentViewListener::removeSection] = mapOf(
+            "arcSectionId" to arcSectionId
+        )
+    }
+
 }
