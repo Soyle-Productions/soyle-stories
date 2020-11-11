@@ -10,7 +10,7 @@ import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseSt
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.*
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -87,7 +87,7 @@ class ViewBaseStoryStructureTest {
     private fun andPromotedCharactersWithIdsOf(vararg ids: UUID) = listOf(*(ids.map { it to true }.toTypedArray()))
     private fun andArcSectionsLinkedToLocationWithIdOf(id: UUID) = id
     private lateinit var themeRepository: ThemeRepository
-    private lateinit var characterArcSectionRepository: CharacterArcSectionRepository
+    private lateinit var characterArcRepository: CharacterArcRepository
 
     private fun given(
       themeIds: List<UUID>, includedCharacterIds: List<Pair<UUID, Boolean>> = emptyList(), linkedLocationId: UUID? = null
@@ -108,23 +108,21 @@ class ViewBaseStoryStructureTest {
         }
         val context = TestContext(initialThemes = themes)
         themeRepository = context.themeRepository
-        val themeContext = setupContext(initialCharacterArcSections = themes.flatMap { theme ->
-            theme.characters.flatMap { character ->
-                CharacterArcTemplate.default().sections.map { template ->
-                    CharacterArcSection(
-                      CharacterArcSection.Id(
-                        UUID.randomUUID()
-                      ), character.id, theme.id, template, linkedLocationId?.let(Location::Id), ""
-                    )
-                }
+        val themeContext = setupContext(initialCharacterArcs = themes.flatMap { theme ->
+            theme.characters.map { character ->
+                CharacterArc.planNewCharacterArc(
+                    character.id,
+                    theme.id,
+                    theme.name
+                )
             }
         })
-        characterArcSectionRepository = themeContext.characterArcSectionRepository
+        characterArcRepository = themeContext.characterArcRepository
     }
 
     private fun whenUseCaseExecuted() {
         val useCase: ViewBaseStoryStructure = ViewBaseStoryStructureUseCase(
-          themeRepository, characterArcSectionRepository
+          themeRepository, characterArcRepository
         )
         runBlocking {
             useCase.invoke(characterUUID, themeUUID, object : ViewBaseStoryStructure.OutputPort {
@@ -151,14 +149,15 @@ class ViewBaseStoryStructureTest {
 
     private fun assertOnlyRequiredSectionsInOutput(response: ViewBaseStoryStructure.ResponseModel)
     {
-        val requiredSections = CharacterArcTemplate.default().sections.map { it.name }.toSet()
+        val requiredSections = CharacterArcTemplate.default().sections.filter { it.isRequired }.map { it.name }.toSet()
         assertEquals(requiredSections, response.sections.map { it.templateName }.toSet())
     }
 
     private fun assertStoredValuesAreInOutput(response: ViewBaseStoryStructure.ResponseModel)
     {
         val values = runBlocking {
-            characterArcSectionRepository.getCharacterArcSectionsForCharacterInTheme(Character.Id(response.characterId), Theme.Id(response.themeId))
+            characterArcRepository.getCharacterArcByCharacterAndThemeId(Character.Id(response.characterId), Theme.Id(response.themeId))!!
+                .arcSections
         }.associate { it.template.name to it.value }
         val templateToValues = response.sections.associate { it.templateName to it.value }
         templateToValues.forEach { (templateName, value) ->
@@ -169,7 +168,8 @@ class ViewBaseStoryStructureTest {
     private fun assertLinkedLocationsAreInOutput(response: ViewBaseStoryStructure.ResponseModel)
     {
         val locations = runBlocking {
-            characterArcSectionRepository.getCharacterArcSectionsForCharacterInTheme(Character.Id(response.characterId), Theme.Id(response.themeId))
+            characterArcRepository.getCharacterArcByCharacterAndThemeId(Character.Id(response.characterId), Theme.Id(response.themeId))!!
+                .arcSections
         }.associate { it.id.uuid to it.linkedLocation?.uuid }
         response.sections.forEach {
             assertEquals(locations.getValue(it.arcSectionId), it.linkedLocation, "Linked location id does not match")

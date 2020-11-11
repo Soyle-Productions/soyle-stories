@@ -8,6 +8,7 @@ import com.soyle.stories.characterarc.TestContext
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
 import com.soyle.stories.common.mustEqual
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
@@ -29,8 +30,9 @@ class RenameCharacterArcUnitTest {
 
 	private var inputName = "New Name"
 	private lateinit var context: TestContext
+	private var updatedArc: CharacterArc? = null
+	private val characterArcRepository = CharacterArcRepositoryDouble(onUpdateCharacterArc = ::updatedArc::set)
 	private var result: RenameCharacterArc.ResponseModel? = null
-	private var updatedTheme: Theme? = null
 
 	@BeforeEach
 	fun clear() {
@@ -46,25 +48,6 @@ class RenameCharacterArcUnitTest {
 			whenUseCaseIsExecuted()
 		}
 		result.characterId.mustEqual(characterId)
-	}
-
-	@Test
-	fun `theme does not exist`() {
-		givenNoThemes()
-		val result = assertThrows<ThemeDoesNotExist> {
-			whenUseCaseIsExecuted()
-		}
-		result.themeId.mustEqual(themeId)
-	}
-
-	@Test
-	fun `character not in theme`() {
-		given(characterWithId = characterId, andThemeWithId = themeId)
-		val result = assertThrows<CharacterNotInTheme> {
-			whenUseCaseIsExecuted()
-		}
-		result.characterId.mustEqual(characterId)
-		result.themeId.mustEqual(themeId)
 	}
 
 	@Test
@@ -95,7 +78,7 @@ class RenameCharacterArcUnitTest {
 		inputName = characterArcName
 		whenUseCaseIsExecuted()
 		assertResultIsResponseModel()
-		updatedTheme.mustEqual(null) { "Theme should not have been updated" }
+		updatedArc.mustEqual(null) { "Character Arc should not have been updated" }
 	}
 
 	@Test
@@ -120,21 +103,21 @@ class RenameCharacterArcUnitTest {
 				val theme = makeTheme(Theme.Id(andThemeWithId), name = characterArcName)
 				if (andThemeHasCharacter) {
 					theme.withCharacterIncluded(character!!.id, character.name, character.media).let {
-						if (andCharacterIsMajorCharacter) it.withCharacterPromoted(character.id)
+						if (andCharacterIsMajorCharacter) {
+							characterArcRepository.givenCharacterArc(CharacterArc.planNewCharacterArc(character.id, it.id, it.name))
+							it.withCharacterPromoted(character.id)
+						}
 						else it
 					}
 				}
 				else theme
 			}
-		  ),
-			onUpdateTheme = {
-				updatedTheme = it
-			}
+		  )
 		)
 	}
 
 	private fun whenUseCaseIsExecuted() {
-		val useCase: RenameCharacterArc = RenameCharacterArcUseCase(context.characterRepository, context.themeRepository)
+		val useCase: RenameCharacterArc = RenameCharacterArcUseCase(context.characterRepository, characterArcRepository)
 		val output = object : RenameCharacterArc.OutputPort {
 			override fun receiveRenameCharacterArcResponse(response: RenameCharacterArc.ResponseModel) {
 				result = response
@@ -154,8 +137,8 @@ class RenameCharacterArcUnitTest {
 	}
 
 	private fun assertThemeHasCharacterWithRenamedCharacterArc() {
-		val updatedTheme = updatedTheme!!
-		updatedTheme.getMajorCharacterById(Character.Id(characterId))!!.characterArc.name.mustEqual(inputName)
+		val updatedArc = updatedArc!!
+		updatedArc.name.mustEqual(inputName)
 	}
 
 }

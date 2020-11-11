@@ -5,11 +5,9 @@
  */
 package com.soyle.stories.theme.usecases
 
-import arrow.core.Either
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.characterInTheme.MinorCharacter
-import com.soyle.stories.entities.theme.ThematicTemplate
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacterUseCase
@@ -121,13 +119,12 @@ class DemoteCharacterTest {
                 output as DemoteMajorCharacter.ResponseModel
                 assertEquals(themeId, output.themeId)
                 assertEquals(characterId, output.characterId)
-                assertOutputContainsNonThematicSections()
+                assertOutputContainsAllSections()
 
                 assertNoNewThemesCreated()
                 val updatedTheme = updatedThemes.single() as Theme
                 updatedTheme.getMinorCharacterById(Character.Id(characterId)) as MinorCharacter
 
-                assertNonThematicSectionsDeleted()
                 assertCharacterArcDeleted()
             }
         }
@@ -180,6 +177,15 @@ class DemoteCharacterTest {
                     result = response
                 }
             }
+            val initialCharacterArcs = initialThemes.flatMap { theme ->
+                theme.characters.map {
+                    CharacterArc.planNewCharacterArc(
+                        it.id,
+                        theme.id,
+                        theme.name
+                    )
+                }
+            }
             var removedCharacterArc: Any? = null
             val removedSections = mutableListOf<CharacterArcSection>()
             val updatedThemes = mutableListOf<Theme>()
@@ -187,20 +193,14 @@ class DemoteCharacterTest {
 
             val context = setupContext(
                 initialThemes = initialThemes,
-                initialCharacterArcSections = initialThemes.flatMap {
-                    it.characters.flatMap {
-                        it.thematicSections.map {
-                            it.asCharacterArcSection(
-                                null
-                            )
-                        }
-                    }
+                initialCharacterArcs = initialCharacterArcs,
+                removeCharacterArc = { arc ->
+                    removedCharacterArc = arc.themeId.uuid to arc.characterId.uuid
                 },
-                removeCharacterArc = { themeId: Theme.Id, characterId: Character.Id ->
-                    removedCharacterArc = themeId.uuid to characterId.uuid
-                },
-                removeArcSections = {
-                    removedSections.addAll(it)
+                updateCharacterArc = { arc ->
+                    val original = initialCharacterArcs.find { it.id == arc.id }!!
+                    val removedIds = original.arcSections.map { it.id }.toSet() - (arc.arcSections.map { it.id }.toSet())
+                    removedSections.addAll(original.arcSections.filter { it.id in removedIds })
                 },
                 updateTheme = {
                     updatedThemes.add(it)
@@ -217,6 +217,7 @@ class DemoteCharacterTest {
                 themeId,
                 characterId,
                 output.result,
+                initialCharacterArcs.find { it.themeId.uuid == themeId },
                 emptyList(),
                 updatedThemes,
                 deletedThemes,
@@ -230,6 +231,7 @@ class DemoteCharacterTest {
         val themeId: UUID,
         val characterId: UUID,
         val output: Any?,
+        val initialCharacterArc: CharacterArc?,
         val addedThemes: List<Any?>,
         val updatedThemes: List<Any?>,
         val removedThemes: List<Any?>,
@@ -237,9 +239,10 @@ class DemoteCharacterTest {
         val removedCharacterArc: Any?
     ) {
 
-        val templateSectionIdsThatShouldBeRemoved = CharacterArcTemplate.default()
-            .sections.map { it.id }
-            .toSet() - ThematicTemplate.default().sections.map { it.characterArcTemplateSectionId }
+        val sectionIdsThatShouldBeRemoved = initialCharacterArc
+            ?.arcSections
+            ?.map { it.id }
+            ?.toSet()
 
         fun assert(block: DemoteCharacterAssertions.() -> Unit) {
             block()
@@ -254,10 +257,10 @@ class DemoteCharacterTest {
             assert(addedThemes.isEmpty()) { "Theme was added $addedThemes" }
         }
 
-        fun assertOutputContainsNonThematicSections() {
+        fun assertOutputContainsAllSections() {
             output as DemoteMajorCharacter.ResponseModel
             assertEquals(
-                templateSectionIdsThatShouldBeRemoved.size,
+                sectionIdsThatShouldBeRemoved?.size ?: 0,
                 output.removedCharacterArcSections.size
             )
         }
@@ -267,7 +270,7 @@ class DemoteCharacterTest {
             assert(removedSections.all { it is CharacterArcSection })
             @Suppress("UNCHECKED_CAST")
             removedSections as List<CharacterArcSection>
-            assertEquals(templateSectionIdsThatShouldBeRemoved, removedSections.map { it.template.id }.toSet())
+            assertEquals(sectionIdsThatShouldBeRemoved, removedSections.map { it.template.id }.toSet())
         }
 
         fun assertCharacterArcDeleted() {

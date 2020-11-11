@@ -2,6 +2,7 @@ package com.soyle.stories.entities
 
 import com.soyle.stories.common.Entity
 import com.soyle.stories.scene.CharacterNotInScene
+import com.soyle.stories.scene.SceneAlreadyContainsCharacter
 import java.util.*
 
 class Scene(
@@ -10,48 +11,90 @@ class Scene(
   val name: String,
   val storyEventId: StoryEvent.Id,
   val locationId: Location.Id?,
-  private val characterMotivations: List<CharacterMotivation>
+  private val charactersInScene: List<CharacterInScene>
 ) : Entity<Scene.Id> {
 
 	constructor(projectId: Project.Id, name: String, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, null, listOf())
 
-	private val motivationsById by lazy { characterMotivations.associateBy { it.characterId } }
+	private val charactersById by lazy { charactersInScene.associateBy { it.characterId } }
 
 	fun includesCharacter(characterId: Character.Id): Boolean
 	{
-		return motivationsById.containsKey(characterId)
+		return charactersById.containsKey(characterId)
 	}
 
 	fun getMotivationForCharacter(characterId: Character.Id): CharacterMotivation?
 	{
-		return motivationsById[characterId]
+		return charactersById[characterId]?.let {
+			CharacterMotivation(it.characterId, it.characterName, it.motivation)
+		}
+	}
+
+	fun getCoveredCharacterArcSectionsForCharacter(characterId: Character.Id): List<CharacterArcSection.Id>?
+	{
+		return charactersById[characterId]?.coveredArcSections
+	}
+
+	private val allCharacterArcSections by lazy {
+		charactersById.values.flatMap { it.coveredArcSections }.toSet()
+	}
+	fun isCharacterArcSectionCovered(characterArcSectionId: CharacterArcSection.Id): Boolean
+	{
+		return allCharacterArcSections.contains(characterArcSectionId)
 	}
 
 	val includedCharacters: List<IncludedCharacter> by lazy {
-		characterMotivations.map { IncludedCharacter(it.characterId, it.characterName) }
+		charactersInScene.map { IncludedCharacter(it.characterId, it.characterName) }
 	}
 
-	fun hasCharacters(): Boolean = characterMotivations.isNotEmpty()
+	val coveredArcSectionIds by lazy {
+		charactersInScene.flatMap { it.coveredArcSections }
+	}
+
+	fun hasCharacters(): Boolean = charactersInScene.isNotEmpty()
 
 	private fun copy(
 	  name: String = this.name,
 	  locationId: Location.Id? = this.locationId,
-	  characterMotivations: List<CharacterMotivation> = this.characterMotivations
-	) = Scene(id, projectId, name, storyEventId, locationId, characterMotivations)
+	  charactersInScene: List<CharacterInScene> = this.charactersInScene
+	) = Scene(id, projectId, name, storyEventId, locationId, charactersInScene)
 
 	fun withName(newName: String) = copy(name = newName)
-	fun withCharacterIncluded(character: Character) = copy(characterMotivations = characterMotivations + CharacterMotivation(character.id, character.name, null))
+	fun withCharacterIncluded(character: Character): Scene {
+		if (includesCharacter(character.id)) throw SceneAlreadyContainsCharacter(id.uuid, character.id.uuid)
+		return copy(charactersInScene = charactersInScene + CharacterInScene(character.id, id, character.name, null, listOf()))
+	}
 	fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene
 	{
 		if (! includesCharacter(characterId)) throw CharacterNotInScene(id.uuid, characterId.uuid)
-		return copy(characterMotivations = characterMotivations.map {
-			if (it.characterId == characterId) CharacterMotivation(it.characterId, it.characterName, motivation)
+		return copy(charactersInScene = charactersInScene.map {
+			if (it.characterId == characterId) CharacterInScene(it.characterId, id, it.characterName, motivation, listOf())
 			else it
 		})
 	}
 	fun withLocationLinked(locationId: Location.Id) = copy(locationId = locationId)
 	fun withoutLocation() = copy(locationId = null)
-	fun withoutCharacter(characterId: Character.Id) = copy(characterMotivations = characterMotivations.filterNot { it.characterId == characterId })
+	fun withoutCharacter(characterId: Character.Id) = copy(charactersInScene = charactersInScene.filterNot { it.characterId == characterId })
+
+	fun withCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene
+	{
+		charactersById[characterArcSection.characterId] ?: throw CharacterNotInScene(id.uuid, characterArcSection.characterId.uuid)
+		return copy(
+			charactersInScene = charactersInScene.map {
+				if (it.characterId != characterArcSection.characterId) it
+				else it.withCoveredArcSection(characterArcSection)
+			}
+		)
+	}
+	fun withoutCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene
+	{
+		return copy(
+			charactersInScene = charactersInScene.map {
+				if (it.characterId != characterArcSection.characterId) it
+				else it.withoutCoveredArcSection(characterArcSection)
+			}
+		)
+	}
 
 	data class Id(val uuid: UUID = UUID.randomUUID()) {
 		override fun toString(): String = "Scene($uuid)"

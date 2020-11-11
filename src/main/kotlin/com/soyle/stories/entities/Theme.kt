@@ -1,7 +1,6 @@
 package com.soyle.stories.entities
 
 import arrow.core.Either
-import arrow.core.Try
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.common.*
@@ -9,7 +8,6 @@ import com.soyle.stories.entities.theme.*
 import com.soyle.stories.entities.theme.characterInTheme.*
 import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.*
-import com.soyle.stories.translators.asThematicSection
 import java.util.*
 
 class Theme(
@@ -18,7 +16,9 @@ class Theme(
     val name: String,
     val symbols: List<Symbol>,
     val centralConflict: String,
-    val centralMoralQuestion: String,
+    val centralMoralProblem: String,
+    val themeLine: String,
+    val thematicRevelation: String,
     private val includedCharacters: Map<Character.Id, CharacterInTheme>,
     val similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String>,
     val valueWebs: List<ValueWeb>
@@ -29,8 +29,10 @@ class Theme(
         name: String,
         symbols: List<Symbol> = listOf(),
         centralConflict: String = "",
-        centralMoralQuestion: String = ""
-    ) : this(Id(), projectId, name, symbols, centralConflict, centralMoralQuestion, mapOf(), mapOf(), listOf())
+        centralMoralProblem: String = "",
+        themeLine: String = "",
+        thematicRevelation: String = ""
+    ) : this(Id(), projectId, name, symbols, centralConflict, centralMoralProblem, themeLine, thematicRevelation, mapOf(), mapOf(), listOf())
 
     val thematicTemplate: ThematicTemplate
         get() = ThematicTemplate.default()
@@ -39,7 +41,9 @@ class Theme(
         name: String = this.name,
         symbols: List<Symbol> = this.symbols,
         centralConflict: String = this.centralConflict,
-        centralMoralQuestion: String = this.centralMoralQuestion,
+        centralMoralProblem: String = this.centralMoralProblem,
+        themeLine: String = this.themeLine,
+        thematicRevelation: String = this.thematicRevelation,
         includedCharacters: Map<Character.Id, CharacterInTheme> = this.includedCharacters,
         similaritiesBetweenCharacters: Map<CoupleOf<Character.Id>, String> = this.similaritiesBetweenCharacters,
         valueWebs: List<ValueWeb> = this.valueWebs
@@ -49,7 +53,9 @@ class Theme(
         name,
         symbols,
         centralConflict,
-        centralMoralQuestion,
+        centralMoralProblem,
+        themeLine,
+        thematicRevelation,
         includedCharacters,
         similaritiesBetweenCharacters,
         valueWebs
@@ -70,11 +76,14 @@ class Theme(
         return copy(valueWebs = valueWebs + valueWeb) to valueWeb
     }
 
-    fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> {
-        return copy(
-            centralMoralQuestion = question
-        ).right()
-    }
+    @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.withMoralProblem(question).right()"))
+    fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> = withMoralProblem(question).right()
+
+    fun withMoralProblem(moralProblem: String): Theme = copy(centralMoralProblem = moralProblem)
+
+    fun withThemeLine(themeLine: String): Theme = copy(themeLine = themeLine)
+
+    fun withThematicRevelation(revelation: String): Theme = copy(thematicRevelation = revelation)
 
     fun withCharacterIncluded(characterId: Character.Id, characterName: String, characterMediaId: Media.Id?): Theme
     {
@@ -83,8 +92,7 @@ class Theme(
         val newCharacter = MinorCharacter(
             id,
             characterId,
-            characterName,
-            thematicTemplate
+            characterName
         )
         val minorCharacters = includedCharacters.values.filterIsInstance<MinorCharacter>()
         val majorCharacters = includedCharacters.values.filterIsInstance<MajorCharacter>().map {
@@ -200,17 +208,6 @@ class Theme(
         )
     }
 
-    fun withCharacterArcRenamed(characterId: Character.Id, newName: String): Theme
-    {
-        mustContainCharacter(characterId)
-        val majorCharacter = getMajorCharacter(characterId)
-        return copy(
-            includedCharacters = includedCharacters
-                .minus(majorCharacter.id)
-                .plus(majorCharacter.id to majorCharacter.withCharacterArcRenamed(newName))
-        )
-    }
-
     private fun mustNotContainCharacter(characterId: Character.Id) {
         if (containsCharacter(characterId)) {
             throw CharacterAlreadyIncludedInTheme(characterId.uuid, id.uuid)
@@ -243,8 +240,17 @@ class Theme(
         return includedCharacters[characterId]
     }
 
+    fun getIncludedCharacterByIdOrError(characterId: Character.Id): CharacterInTheme {
+        return includedCharacters[characterId] ?: throw CharacterNotInTheme(id.uuid, characterId.uuid)
+    }
+
     fun getMajorCharacterById(characterId: Character.Id): MajorCharacter? {
         return includedCharacters[characterId] as? MajorCharacter
+    }
+
+    fun getMajorCharacterByIdOrError(characterId: Character.Id): MajorCharacter {
+        return getIncludedCharacterByIdOrError(characterId) as? MajorCharacter
+            ?: throw CharacterIsNotMajorCharacterInTheme(characterId.uuid, id.uuid)
     }
 
     fun getMinorCharacterById(characterId: Character.Id): MinorCharacter? =
@@ -363,8 +369,7 @@ class Theme(
             name,
             archetype,
             variationOnMoral,
-            position,
-            thematicSections
+            position
         )
 
     @Deprecated(message = "Outdated api.", replaceWith = ReplaceWith("this.withCharacterAsStoryFunctionForMajorCharacter(characterId, function, majorCharacter.id)"))
@@ -438,7 +443,9 @@ class Theme(
         if (name != other.name) return false
         if (symbols != other.symbols) return false
         if (centralConflict != other.centralConflict) return false
-        if (centralMoralQuestion != other.centralMoralQuestion) return false
+        if (centralMoralProblem != other.centralMoralProblem) return false
+        if (themeLine != other.themeLine) return false
+        if (thematicRevelation != other.thematicRevelation) return false
         if (includedCharacters != other.includedCharacters) return false
         if (similaritiesBetweenCharacters != other.similaritiesBetweenCharacters) return false
         if (valueWebs != other.valueWebs) return false
@@ -452,7 +459,9 @@ class Theme(
         result = 31 * result + name.hashCode()
         result = 31 * result + symbols.hashCode()
         result = 31 * result + centralConflict.hashCode()
-        result = 31 * result + centralMoralQuestion.hashCode()
+        result = 31 * result + centralMoralProblem.hashCode()
+        result = 31 * result + themeLine.hashCode()
+        result = 31 * result + thematicRevelation.hashCode()
         result = 31 * result + includedCharacters.hashCode()
         result = 31 * result + similaritiesBetweenCharacters.hashCode()
         result = 31 * result + valueWebs.hashCode()
@@ -460,7 +469,7 @@ class Theme(
     }
 
     override fun toString(): String {
-        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralConflict='$centralConflict', centralMoralQuestion='$centralMoralQuestion', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
+        return "Theme(id=$id, projectId=$projectId, name='$name', symbols=$symbols, centralConflict='$centralConflict', centralMoralProblem='$centralMoralProblem', themeLine='$themeLine', thematicRevelation='$thematicRevelation', includedCharacters=$includedCharacters, similaritiesBetweenCharacters=$similaritiesBetweenCharacters, valueWebs=$valueWebs)"
     }
 
 
@@ -477,6 +486,8 @@ class Theme(
                 listOf(),
                 "",
                 centralMoralQuestion,
+                "",
+                "",
                 mapOf(),
                 mapOf(),
                 listOf()

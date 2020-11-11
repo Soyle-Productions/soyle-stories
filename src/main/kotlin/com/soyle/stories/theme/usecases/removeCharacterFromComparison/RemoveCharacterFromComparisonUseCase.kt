@@ -7,6 +7,7 @@ import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison.OutputPort
@@ -14,7 +15,7 @@ import java.util.*
 
 class RemoveCharacterFromComparisonUseCase(
     private val themeRepository: ThemeRepository,
-    private val characterRepository: CharacterRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : RemoveCharacterFromComparison {
 
     override suspend fun invoke(themeId: UUID, characterId: UUID, outputPort: OutputPort) {
@@ -40,12 +41,12 @@ class RemoveCharacterFromComparisonUseCase(
         theme.getIncludedCharacterById(Character.Id(characterId))
             ?: throw CharacterNotInTheme(theme.id.uuid, characterId)
 
-    private fun removeCharacterArcFromMajorCharacter(
+    private suspend fun removeCharacterArcFromMajorCharacter(
         characterInTheme: CharacterInTheme,
         themeId: Theme.Id
     ): DeletedCharacterArc? {
         if (characterInTheme is MajorCharacter) {
-            val characterArc = characterInTheme.characterArc
+            val characterArc = characterArcRepository.getCharacterArcByCharacterAndThemeId(characterInTheme.id, themeId)!!
             return DeletedCharacterArc(characterArc.characterId.uuid, themeId.uuid)
         }
         return null

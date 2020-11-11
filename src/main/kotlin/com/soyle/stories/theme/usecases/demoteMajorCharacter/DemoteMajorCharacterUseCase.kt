@@ -7,10 +7,12 @@ package com.soyle.stories.theme.usecases.demoteMajorCharacter
 
 import arrow.core.identity
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.*
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import java.util.*
 
 class DemoteMajorCharacterUseCase(
@@ -46,10 +48,9 @@ class DemoteMajorCharacterUseCase(
 
     private suspend fun Theme.demoteMajorCharacter(character: MajorCharacter): MajorCharacterDemotionResult {
         val updatedTheme = tryToDemoteCharacter(character)
-        val thematicSectionIds = removeThematicSectionsForThemeAndCharacter(updatedTheme, character)
-        removeCharacterArc(updatedTheme.id, character.id)
+        val removedCharacterArc = removeCharacterArc(updatedTheme.id, character.id)
         saveTheme(updatedTheme)
-        return MajorCharacterDemotionResult(updatedTheme, character, thematicSectionIds)
+        return MajorCharacterDemotionResult(updatedTheme, character, removedCharacterArc.arcSections.map { it.id })
     }
 
     private suspend fun saveTheme(
@@ -62,15 +63,6 @@ class DemoteMajorCharacterUseCase(
         //}
     }
 
-    private suspend fun removeThematicSectionsForThemeAndCharacter(
-        receiver: Theme,
-        character: MajorCharacter
-    ): List<CharacterArcSection.Id> {
-        val thematicSectionIds = receiver.collectThematicSectionIdsFrom(character)
-        removeArcSections(thematicSectionIds)
-        return thematicSectionIds
-    }
-
     private fun Theme.tryToDemoteCharacter(character: MajorCharacter): Theme {
         return demoteCharacter(character).fold(
             { throw it },
@@ -78,20 +70,11 @@ class DemoteMajorCharacterUseCase(
         )
     }
 
-    private fun Theme.collectThematicSectionIdsFrom(character: MajorCharacter): List<CharacterArcSection.Id> {
-        val defaultThematicTemplateIds = thematicTemplate.ids
-        return character.thematicSections.asSequence()
-            .filterNot { it.template.characterArcTemplateSectionId in defaultThematicTemplateIds }
-            .map { it.characterArcSectionId }.toList()
+    private suspend fun removeCharacterArc(themeId: Theme.Id, characterId: Character.Id): CharacterArc {
+        val arc = context.characterArcRepository.getCharacterArcByCharacterAndThemeId(characterId, themeId)!!
+        context.characterArcRepository.removeCharacterArcs(arc)
+        return arc
     }
-
-    private suspend fun removeArcSections(arcSectionIds: List<CharacterArcSection.Id>) {
-        val sectionsToRemove = context.characterArcSectionRepository.getCharacterArcSectionsById(arcSectionIds.toSet())
-        context.characterArcSectionRepository.removeArcSections(sectionsToRemove)
-    }
-
-    private suspend fun removeCharacterArc(themeId: Theme.Id, characterId: Character.Id) =
-        context.characterArcRepository.removeCharacterArc(themeId, characterId)
 
     private suspend fun updateTheme(updatedTheme: Theme) {
         context.themeRepository.updateTheme(updatedTheme)

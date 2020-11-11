@@ -4,6 +4,8 @@ import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.*
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.common.str
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.makeTheme
@@ -12,11 +14,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-/**
- * Created by Brendan
- * Date: 2/25/2020
- * Time: 5:34 PM
- */
 class ListAllCharacterArcsTest {
 
 	private val projectId = Project.Id()
@@ -43,26 +40,24 @@ class ListAllCharacterArcsTest {
 		result shouldBe responseModel(expectedCount = 3, expectedTotalArcCount = 12)
 	}
 
-	private val themeRepository = ThemeRepositoryDouble()
-	private val characterArcRepository = CharacterRepositoryDouble()
+	private val characterRepository = CharacterRepositoryDouble()
+	private val characterArcRepository = CharacterArcRepositoryDouble()
 
 	private fun givenCharacters(count: Int, arcsPerCharacter: Int = 0)
 	{
-		repeat(count) { _ ->
+		repeat(count) {
 			val character = makeCharacter(projectId = projectId, media = Media.Id())
-			characterArcRepository.characters[character.id] = character
-			repeat(arcsPerCharacter) { _ ->
-				val themeId = Theme.Id()
-				themeRepository.themes[themeId] = makeTheme(themeId, projectId = projectId)
-					.withCharacterIncluded(character.id, character.name, character.media)
-					.withCharacterPromoted(character.id)
+			characterRepository.characters[character.id] = character
+			repeat(arcsPerCharacter) {
+				val arc = CharacterArc.planNewCharacterArc(character.id, Theme.Id(), "Character Arc ${str()}")
+				characterArcRepository.givenCharacterArc(arc)
 			}
 		}
 	}
 
 	private fun listAllCharacterArcs()
 	{
-		val useCase: ListAllCharacterArcs = ListAllCharacterArcsUseCase(characterArcRepository, themeRepository)
+		val useCase: ListAllCharacterArcs = ListAllCharacterArcsUseCase(characterRepository, characterArcRepository)
 		val output = object : ListAllCharacterArcs.OutputPort {
 			override suspend fun receiveCharacterArcList(response: CharacterArcsByCharacter) {
 				result = response
@@ -90,7 +85,7 @@ class ListAllCharacterArcsTest {
 	private fun assertCharactersHaveCorrectNames(items: List<CharacterItem>) {
 		items.forEach {
 			assertEquals(
-				characterArcRepository.characters[Character.Id(it.characterId)]!!.name,
+				characterRepository.characters[Character.Id(it.characterId)]!!.name,
 				it.characterName
 			)
 		}
@@ -99,18 +94,23 @@ class ListAllCharacterArcsTest {
 	private fun assertCharactersHaveCorrectMediaIds(items: List<CharacterItem>) {
 		items.forEach {
 			assertEquals(
-				characterArcRepository.characters[Character.Id(it.characterId)]!!.media?.uuid,
+				characterRepository.characters[Character.Id(it.characterId)]!!.media?.uuid,
 				it.mediaId
 			)
 		}
 	}
 
 	private fun assertCharacterArcsHaveCorrectNames(items: List<CharacterArcItem>) {
-		items.forEach {
-			assertEquals(
-				themeRepository.themes[Theme.Id(it.themeId)]!!.name,
-				it.characterArcName
-			)
+		runBlocking {
+			items.forEach {
+				val baseArc =
+					characterArcRepository.getCharacterArcByCharacterAndThemeId(Character.Id(it.characterId), Theme.Id(it.themeId))
+						?: throw error(it.characterArcName + " is missing from the repository.  CharacterId =${it.characterId}, ThemeId = ${it.themeId}")
+				assertEquals(
+					baseArc.name,
+					it.characterArcName
+				)
+			}
 		}
 	}
 

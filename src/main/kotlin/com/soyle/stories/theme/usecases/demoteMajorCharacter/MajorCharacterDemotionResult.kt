@@ -9,4 +9,4 @@ internal class MajorCharacterDemotionResult(
     val demotedCharacter: MajorCharacter,
     val removedArcSections: List<CharacterArcSection.Id>
 
-    )
+)

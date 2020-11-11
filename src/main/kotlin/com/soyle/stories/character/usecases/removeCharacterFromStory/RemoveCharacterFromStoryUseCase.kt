@@ -4,14 +4,14 @@ import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.repositories.ThemeRepository
 import com.soyle.stories.entities.Character
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
 import java.util.*
 
 class RemoveCharacterFromStoryUseCase(
     private val characterRepository: CharacterRepository,
     private val themeRepository: ThemeRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : RemoveCharacterFromStory {
 
     override suspend fun invoke(
@@ -29,9 +29,9 @@ class RemoveCharacterFromStoryUseCase(
         }
 
         characterRepository.deleteCharacterWithId(character.id)
-        val arcSections = characterArcSectionRepository.getCharacterArcSectionsForCharacter(character.id)
-        if (arcSections.isNotEmpty()) {
-            characterArcSectionRepository.removeArcSections(arcSections)
+        val characterArcs = characterArcRepository.listCharacterArcsForCharacter(character.id)
+        if (characterArcs.isNotEmpty()) {
+            characterArcRepository.removeCharacterArcs(*characterArcs.toTypedArray())
         }
 
         output.receiveRemoveCharacterFromStoryResponse(

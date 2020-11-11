@@ -9,14 +9,12 @@ import com.soyle.stories.theme.CharacterIsAlreadyMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*
 
 class PromoteMinorCharacterUseCase(
     private val themeRepository: ThemeRepository,
-    private val characterArcRepository: CharacterArcRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : PromoteMinorCharacter {
     override suspend fun invoke(
         request: PromoteMinorCharacter.RequestModel,
@@ -45,40 +43,17 @@ class PromoteMinorCharacterUseCase(
                 request.themeId
             )
         }
-        val thematicTemplateSectionIds =
-            characterInTheme.thematicSections.map { it.template.characterArcTemplateSectionId }.toSet()
-        val templateSectionsToMake =
-            CharacterArcTemplate.default().sections.filterNot { it.id in thematicTemplateSectionIds }
-        val newSections =
-            templateSectionsToMake.map {
-                CharacterArcSection(
-                    CharacterArcSection.Id(UUID.randomUUID()),
-                    characterInTheme.id, theme.id, it,
-                    null,
-                    ""
-                )
-            }
         val promotionResult = theme.withCharacterPromoted(characterInTheme.id)
-            .let { promotedTheme ->
-                CharacterArc.planNewCharacterArc(
-                    characterInTheme.id,
-                    theme.id,
-                    theme.name
-                ).map { promotedTheme to it }
-            }
-        if (promotionResult is Either.Right) {
-            themeRepository.updateTheme(promotionResult.b.first)
-            characterArcRepository.addNewCharacterArc(promotionResult.b.second)
-            characterArcSectionRepository.addNewCharacterArcSections(newSections)
-            output.receivePromoteMinorCharacterResponse(
-                PromoteMinorCharacter.ResponseModel(
-                    CreatedCharacterArc(
-                        request.themeId,
-                        request.characterId,
-                        promotionResult.b.second.name
-                    )
+        themeRepository.updateTheme(promotionResult)
+        characterArcRepository.addNewCharacterArc(CharacterArc.planNewCharacterArc(characterInTheme.id, theme.id, theme.name))
+        output.receivePromoteMinorCharacterResponse(
+            PromoteMinorCharacter.ResponseModel(
+                CreatedCharacterArc(
+                    request.themeId,
+                    request.characterId,
+                    promotionResult.name
                 )
             )
-        }
+        )
     }
 }

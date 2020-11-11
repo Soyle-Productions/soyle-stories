@@ -7,13 +7,11 @@ import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharac
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.storyevent.characterDoesNotExist
 import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -31,7 +29,7 @@ class PlanNewCharacterArcTest {
     // persisted data
     private var createdTheme: Theme? = null
     private var updatedCharacter: Character? = null
-    private var createdArcSections: List<CharacterArcSection>? = null
+    private var createdCharacterArc: CharacterArc? = null
 
     // output data
     private var result: PlanNewCharacterArc.ResponseModel? = null
@@ -43,7 +41,7 @@ class PlanNewCharacterArcTest {
         } shouldBe characterDoesNotExist(characterId.uuid)
         assertNull(createdTheme)
         assertNull(updatedCharacter)
-        assertNull(createdArcSections)
+        assertNull(createdCharacterArc)
         assertNull(result)
     }
 
@@ -77,7 +75,7 @@ class PlanNewCharacterArcTest {
         @Test
         fun `character arc has name provided`() {
             planNewCharacterArc()
-            createdTheme!!.getMajorCharacterById(characterId)!!.characterArc shouldBe {
+            createdCharacterArc!! shouldBe {
                 assertEquals(characterArcName, it.name)
             }
         }
@@ -91,10 +89,8 @@ class PlanNewCharacterArcTest {
         @Test
         fun `character arc should have required story sections and thematic sections`() {
             planNewCharacterArc()
-            val addedArc = createdTheme!!.getMajorCharacterById(characterId)!!.characterArc
-            val fullTemplate =
-                (addedArc.template.sections.map { it.id } + createdTheme!!.thematicTemplate.sections.map { it.characterArcTemplateSectionId }).toSet()
-            assertEquals(fullTemplate.size, createdArcSections!!.size)
+            val addedArc = createdCharacterArc!!
+            assertEquals(addedArc.template.sections.filter { it.isRequired }.size, addedArc.arcSections.size)
         }
 
         @Test
@@ -117,8 +113,8 @@ class PlanNewCharacterArcTest {
         CharacterRepositoryDouble(onUpdateCharacter = {
             updatedCharacter = it
         })
-    private val characterArcSectionRepositoryDouble = CharacterArcSectionRepositoryDouble(onAddNewCharacterArcSections = {
-        createdArcSections = it
+    private val characterArcRepositoryDouble = CharacterArcRepositoryDouble(onAddNewCharacterArc = {
+        createdCharacterArc = it
     })
 
     private fun givenCharacter(character: Character) {
@@ -129,7 +125,7 @@ class PlanNewCharacterArcTest {
         val useCase: PlanNewCharacterArc = PlanNewCharacterArcUseCase(
             characterRepository,
             themeRepository,
-            characterArcSectionRepositoryDouble
+            characterArcRepositoryDouble
         )
         val output = object : PlanNewCharacterArc.OutputPort {
             override suspend fun characterArcPlanned(response: PlanNewCharacterArc.ResponseModel) {

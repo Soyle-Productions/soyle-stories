@@ -4,6 +4,7 @@ import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
+import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeTheme
@@ -89,6 +90,7 @@ class DeleteThemeUnitTest {
                 themeRepository.themes[themeId] = themeRepository.themes[themeId]!!.withCharacterIncluded(
                     character.id, character.name, character.media
                 ).withCharacterPromoted(character.id)
+                characterArcRepository.givenCharacterArc(CharacterArc.planNewCharacterArc(character.id, themeId, themeRepository.themes[themeId]!!.name))
             }
 
             private fun givenThemeHasMinorCharacter() {
@@ -105,6 +107,7 @@ class DeleteThemeUnitTest {
 
     private val themeRepository = ThemeRepositoryDouble(onDeleteTheme = { deletedTheme = it })
     private val characterRepository = CharacterRepositoryDouble()
+    private val characterArcRepository = CharacterArcRepositoryDouble()
 
     private fun givenThemeExists()
     {
@@ -113,7 +116,7 @@ class DeleteThemeUnitTest {
 
     private fun whenThemeIsDeleted()
     {
-        val useCase: DeleteTheme = DeleteThemeUseCase(themeRepository, characterRepository)
+        val useCase: DeleteTheme = DeleteThemeUseCase(themeRepository, characterArcRepository)
         val output = object : DeleteTheme.OutputPort {
             override fun themeDeleted(response: DeletedTheme) {
                 result = response

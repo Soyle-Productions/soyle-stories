@@ -9,5 +9,8 @@ import com.soyle.stories.entities.CharacterArcTemplateSection
  */
 data class ThematicTemplateSection(
     val characterArcTemplateSectionId: CharacterArcTemplateSection.Id,
-    val name: String
+    val name: String,
+    val isRequired: Boolean,
+    val allowsMultiple: Boolean,
+    val isMoral: Boolean
 )

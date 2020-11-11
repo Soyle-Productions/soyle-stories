@@ -3,7 +3,7 @@ package com.soyle.stories.theme
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.CharacterUsedAsMainOpponent
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsMainOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.*

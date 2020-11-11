@@ -12,13 +12,13 @@ import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*
 
 class ExamineCentralConflictOfThemeUseCase(
     private val themeRepository: ThemeRepository,
-    private val characterArcSectionRepository: CharacterArcSectionRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : ExamineCentralConflictOfTheme {
 
     override suspend fun invoke(
@@ -99,8 +99,8 @@ class ExamineCentralConflictOfThemeUseCase(
         majorCharacter: MajorCharacter,
         theme: Theme
     ): Map<CharacterArcTemplateSection.Id, CharacterArcSection> {
-        return characterArcSectionRepository.getCharacterArcSectionsForCharacterInTheme(
+        return characterArcRepository.getCharacterArcByCharacterAndThemeId(
             majorCharacter.id, theme.id
-        ).associateBy { it.template.id }
+        )!!.arcSections.associateBy { it.template.id }
     }
 }

@@ -16,12 +16,19 @@ class CharacterArcTemplate(
         private val defaultTemplate by lazy {
             CharacterArcTemplate(
                 listOf(
+                    PsychologicalWeakness,
                     PsychologicalNeed,
+                    MoralWeakness,
                     MoralNeed,
                     Desire,
+                    ImmoralAction,
                     Opponent,
                     Plan,
+                    Drive,
+                    AttackByAlly,
                     Battle,
+                    FinalActionAgainstOpponent,
+                    MoralDecision,
                     PsychologicalSelfRevelation,
                     MoralSelfRevelation,
                     NewEquilibrium

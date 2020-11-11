@@ -48,7 +48,7 @@ class RenameCharacterUnitTest {
 	fun `name is blank`(inputName: String) {
 		givenCharacterWithId(characterId = characterId)
 		whenUseCaseIsExecuted(inputName = inputName)
-		val result = result as CharacterNameCannotBeBlank
+		result as CharacterNameCannotBeBlank
 	}
 
 	@Test

@@ -9,10 +9,11 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 
 class RenameCharacterArcUseCase(
   private val characterRepository: CharacterRepository,
-  private val themeRepository: ThemeRepository
+  private val characterArcRepository: CharacterArcRepository
 ) : RenameCharacterArc {
 
 	override suspend fun invoke(request: RenameCharacterArc.RequestModel, outputPort: RenameCharacterArc.OutputPort) {
@@ -22,11 +23,10 @@ class RenameCharacterArcUseCase(
 
 	private suspend fun renameCharacterArc(request: RenameCharacterArc.RequestModel): RenameCharacterArc.ResponseModel {
 		validateRequest(request)
-		val theme = getTheme(request)
-		val characterArc = theme.getMajorCharacterById(Character.Id(request.characterId))?.characterArc
+		val characterArc = characterArcRepository.getCharacterArcByCharacterAndThemeId(Character.Id(request.characterId), Theme.Id(request.themeId))
 			?: throw CharacterArcDoesNotExist(request.characterId, request.themeId)
 		if (characterArc.name == request.name) return convertRequestToResponse(request)
-		themeRepository.updateTheme(theme.withCharacterArcRenamed(Character.Id(request.characterId), request.name))
+		characterArcRepository.replaceCharacterArcs(characterArc.withNewName(request.name))
 		return convertRequestToResponse(request)
 	}
 
@@ -46,14 +46,5 @@ class RenameCharacterArcUseCase(
 	private suspend fun validateCharacter(request: RenameCharacterArc.RequestModel) {
 		characterRepository.getCharacterById(Character.Id(request.characterId))
 		  ?: throw CharacterDoesNotExist(request.characterId)
-	}
-
-	private suspend fun getTheme(request: RenameCharacterArc.RequestModel): Theme {
-		val theme = themeRepository.getThemeById(Theme.Id(request.themeId))
-		  ?: throw ThemeDoesNotExist(request.themeId)
-
-		if (! theme.containsCharacter(Character.Id(request.characterId))) throw CharacterNotInTheme(request.themeId, request.characterId)
-
-		return theme
 	}
 }

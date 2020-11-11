@@ -4,27 +4,27 @@ import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharact
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*
 
 class DeleteThemeUseCase(
     private val themeRepository: ThemeRepository,
-    private val characterRepository: CharacterRepository
+    private val characterArcRepository: CharacterArcRepository
 ) : DeleteTheme {
 
     override suspend fun invoke(themeId: UUID, output: DeleteTheme.OutputPort) {
         val theme = themeRepository.getThemeById(Theme.Id(themeId))
             ?: throw ThemeDoesNotExist(themeId)
 
-        val deletedCharacterArcs = theme.characters.filterIsInstance<MajorCharacter>().map {
-            it.characterArc
-        }
+        val characterArcsToDelete = characterArcRepository.listAllCharacterArcsInTheme(theme.id)
 
         themeRepository.deleteTheme(theme)
 
-        if (deletedCharacterArcs.isNotEmpty()) {
-            output.characterArcsDeleted(deletedCharacterArcs.map {
+        if (characterArcsToDelete.isNotEmpty()) {
+            characterArcRepository.removeCharacterArcs(*characterArcsToDelete.toTypedArray())
+            output.characterArcsDeleted(characterArcsToDelete.map {
                 DeletedCharacterArc(it.characterId.uuid, theme.id.uuid)
             })
         }
