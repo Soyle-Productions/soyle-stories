@@ -11,16 +11,12 @@ import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert.Companion.assertThat
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewDriver
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import io.cucumber.java8.En
 import io.cucumber.java8.PendingException
 import javafx.scene.input.MouseButton
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.*
 import java.util.*
 
 class `Moral Argument Steps` : En {
@@ -48,6 +44,13 @@ class `Moral Argument Steps` : En {
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
             moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
         }
+        Given(
+            "the user has indicated they want to remove a section from {character}'s {theme} moral argument"
+        ) { character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
+        }
     }
 
     private fun whens() {
@@ -59,6 +62,13 @@ class `Moral Argument Steps` : En {
             moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
             moralArgument.prepareToAddNewSection()
 
+        }
+        When(
+            "the user wants to remove a section from {character}'s {theme} moral argument"
+        ) { character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
         }
         When(
             "an unused moral argument section type is selected to be added for {string} in the {string} theme"
@@ -118,6 +128,15 @@ class `Moral Argument Steps` : En {
 
             moralArgument.moveSectionToNewPosition(initialPosition = initialIndex, newPosition = moveIndex)
         }
+        When(
+            "the {template} section in {character}'s {theme} moral argument is removed"
+        ) { template: CharacterArcTemplateSection, character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+
+            moralArgument.removeFirstSectionWithName(template.name)
+        }
     }
 
     private fun thens() {
@@ -144,7 +163,7 @@ class `Moral Argument Steps` : En {
 
             val newSection =
                 arc.arcSections.find { it.template.id.uuid.toString() == templateSectionToAdd }!!
-            Assertions.assertEquals(arc.moralArgument().arcSections.last(), newSection)
+            assertEquals(arc.moralArgument().arcSections.last(), newSection)
         }
         Then("the new section should be between the two pre-existing moral argument sections") {
             val surroundingSections = ScenarioContext(soyleStories).sectionsSurroundingTemplateSection!!
@@ -173,12 +192,12 @@ class `Moral Argument Steps` : En {
 
             }
 
-            Assertions.assertEquals(
+            assertEquals(
                 templateSectionToAdd,
                 newSection.template.id.uuid.toString()
             ) { explanation() }
-            Assertions.assertEquals(firstIndex + 1, midIndex) { explanation() }
-            Assertions.assertEquals(secondIndex - 1, midIndex) { explanation() }
+            assertEquals(firstIndex + 1, midIndex) { explanation() }
+            assertEquals(secondIndex - 1, midIndex) { explanation() }
         }
         Then(
             "all of {character}'s {theme} moral argument sections should be listed"
@@ -212,21 +231,57 @@ class `Moral Argument Steps` : En {
             assertThat(moralArgument) {
                 andEachArcSection {
                     if (it == movedIndex) {
-                        try {
-                            hasLabel(sectionAtFirstPosition.template.name)
-                            hasValue(sectionAtFirstPosition.value)
-                            hasId(sectionAtFirstPosition.id.uuid.toString())
-                        } catch (assertionError: AssertionError) {
-                            println("Moral argument does not have expected section data at moved position.")
-                            println("Should have moved ${sectionAtFirstPosition.template.name} to index $movedIndex")
-                            println(MoralArgumentViewDriver(moralArgument).getArcSectionLabels().map { it.text })
-                            println(MoralArgumentViewDriver(moralArgument).getArcSectionValueInputs().map { it.text })
-                            throw assertionError
-                        }
+                        hasLabel(sectionAtFirstPosition.template.name)
+                        hasValue(sectionAtFirstPosition.value)
+                        hasId(sectionAtFirstPosition.id.uuid.toString())
                     }
                 }
             }
 
+        }
+        Then(
+            "the optional sections in {character}'s {theme} moral argument should be shown to be able to be removed"
+        ) { character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            assertThat(moralArgument) {
+                andEachArcSection {
+                    val baseSection = arc.moralArgument().arcSections[it]
+                    if (! baseSection.template.isRequired) {
+                        hasRemoveButton()
+                    }
+                }
+            }
+        }
+        Then(
+            "the required sections in {character}'s {theme} moral argument should not be shown to be able to be removed"
+        ) { character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            assertThat(moralArgument) {
+                andEachArcSection {
+                    val baseSection = arc.moralArgument().arcSections[it]
+                    if (baseSection.template.isRequired) {
+                        doesNotHaveRemoveButton()
+                    }
+                }
+            }
+        }
+        Then(
+            "the {template} section should be removed from {character}'s {theme} moral argument"
+        ) { template: CharacterArcTemplateSection, character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+            assertFalse(arc.arcSections.any { it.template == template }) { "${character.name}'s ${theme.name} moral argument still contains ${template.name}" }
+
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            assertThat(moralArgument) {
+                onlyHasArcSections(arc.moralArgument().arcSections.map { it.template.name })
+            }
         }
     }
 

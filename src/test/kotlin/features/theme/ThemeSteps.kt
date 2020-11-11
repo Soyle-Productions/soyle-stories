@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.features.theme
 
+import com.soyle.stories.desktop.config.drivers.character.CharacterArcDriver
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.*
@@ -7,6 +8,7 @@ import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert.Companion.assertThat
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert.Companion.assertThat
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArcTemplateSection
 import com.soyle.stories.entities.Theme
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
@@ -51,6 +53,14 @@ class ThemeSteps : En {
             val theme = themeDriver.getThemeByNameOrError(themeName)
             val character = characterDriver.getCharacterByNameOrError(characterName)
             themeDriver.givenCharacterIsMajorCharacterInTheme(character.id, theme.id)
+        }
+        Given(
+            "{template} has been added to {character}'s {theme} moral argument"
+        ) { template: CharacterArcTemplateSection, character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val arcDriver = CharacterArcDriver(workbench)
+            val arc = arcDriver.getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+            arcDriver.givenArcHasArcSectionInMoralArgument(arc, template)
         }
     }
 

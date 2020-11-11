@@ -3,6 +3,7 @@ package com.soyle.stories.theme.moralArgument
 import com.soyle.stories.common.components.Styles as ComponentStyles
 import com.soyle.stories.common.components.dragHandle.DragHandleImpl.Companion.dragHandle
 import com.soyle.stories.common.components.fieldLabel
+import com.soyle.stories.di.resolveLater
 import com.soyle.stories.theme.moralArgument.MoralArgumentInsertionPoint.Companion.insertionPoint
 import javafx.beans.value.ObservableValue
 import javafx.scene.Node
@@ -40,6 +41,8 @@ class MoralArgumentSection : Fragment() {
     private val insertionIndex: ObservableValue<Number> by param()
     private val removeSectionLabel: ObservableValue<String> by param()
 
+    private val viewListener: MoralArgumentViewListener by resolveLater()
+
     var onDragging: () -> Unit = {}
     var onDragStop: () -> Unit = {}
     var onSectionPlacedAbove: (String) -> Unit = {}
@@ -71,6 +74,9 @@ class MoralArgumentSection : Fragment() {
                 spacer()
                 button(removeSectionLabel) {
                     addClass("remove-button")
+                    action {
+                        viewListener.removeSection(viewModel.arcSectionId)
+                    }
                 }
             }
         }

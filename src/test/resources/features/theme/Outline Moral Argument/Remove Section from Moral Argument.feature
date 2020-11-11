@@ -9,7 +9,7 @@ Feature: Remove Section from Moral Argument
 
   Scenario: List Existing Moral Argument Sections
     When the user wants to remove a section from Bob's "Growing Up" moral argument
-    Then all the sections in Bob's "Growing Up" moral argument should be listed
+    Then all of Bob's "Growing Up" moral argument sections should be listed
     And the optional sections in Bob's "Growing Up" moral argument should be shown to be able to be removed
     But the required sections in Bob's "Growing Up" moral argument should not be shown to be able to be removed
 

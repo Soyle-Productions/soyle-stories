@@ -10,6 +10,10 @@ import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.drivers.theme.givenMoralArgumentToolHasBeenOpenedForTheme
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArcTemplate
+import com.soyle.stories.entities.CharacterArcTemplateSection
+import com.soyle.stories.entities.Theme
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.*

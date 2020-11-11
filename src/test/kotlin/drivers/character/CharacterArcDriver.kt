@@ -1,10 +1,13 @@
 package com.soyle.stories.desktop.config.drivers.character
 
+import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
+import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.CharacterArcTemplateSection
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
@@ -50,6 +53,22 @@ class CharacterArcDriver private constructor(private val projectScope: ProjectSc
             CharacterDriver(projectScope.get()).getCharacterByNameOrError(characterName).id,
             ThemeDriver(projectScope.get()).getThemeByNameOrError(themeName).id
         )
+    }
+
+    fun givenArcHasArcSectionInMoralArgument(arc: CharacterArc, templateSection: CharacterArcTemplateSection): CharacterArc {
+        if (arc.moralArgument().arcSections.none { it.template == templateSection }) {
+            addArcSectionToMoralArgument(arc, templateSection)
+        }
+        return getCharacterArcForCharacterAndThemeOrError(arc.characterId, arc.themeId)
+    }
+    fun addArcSectionToMoralArgument(arc: CharacterArc, templateSection: CharacterArcTemplateSection)
+    {
+        projectScope.get<AddArcSectionToMoralArgumentController>()
+            .addCharacterArcSectionToMoralArgument(
+                arc.themeId.uuid.toString(),
+                arc.characterId.uuid.toString(),
+                templateSection.id.uuid.toString()
+            )
     }
 
     companion object {

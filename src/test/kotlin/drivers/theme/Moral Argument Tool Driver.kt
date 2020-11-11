@@ -181,3 +181,12 @@ fun MoralArgumentView.moveSectionToNewPosition(initialPosition: Int, newPosition
             .dropTo(driver.getArcSectionLabel(newPosition))
     }
 }
+
+fun MoralArgumentView.removeFirstSectionWithName(name: String) {
+    val driver = MoralArgumentViewDriver(this)
+    val index = driver.getArcSectionLabels().indexOfFirst { it.text == name }
+    if (index == -1) error("No arc section found with name $name")
+    driver.interact {
+        driver.getArcSectionRemoveButton(index)!!.fire()
+    }
+}
