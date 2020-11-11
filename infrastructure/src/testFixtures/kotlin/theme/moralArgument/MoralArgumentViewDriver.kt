@@ -39,7 +39,7 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
         return from(view.root).lookup("#perspective-character-field .menu-button").query()
     }
 
-    private fun getArcSectionsContainer(): Node {
+    fun getArcSectionsContainer(): Node {
         return from(view.root).lookup("#arc-sections").query<ScrollPane>().content
     }
 

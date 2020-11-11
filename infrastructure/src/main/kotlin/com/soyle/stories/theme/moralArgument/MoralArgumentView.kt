@@ -127,6 +127,7 @@ class MoralArgumentView : View() {
         scrollpane(fitToWidth = true) {
             id = Styles.arcSections.name
             content = vbox content@{
+                visibleWhen(state.sections.isNotNull)
                 vbox {
                     state.sections.mapObservableTo(children, { it.arcSectionId }) {
                         val section = op(it).apply {

@@ -3,6 +3,7 @@ package com.soyle.stories.di.project
 import com.soyle.stories.di.get
 import com.soyle.stories.di.modules.DataModule
 import com.soyle.stories.di.scoped
+import com.soyle.stories.project.closeProject.CloseProjectOutput
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.workspace.usecases.closeProject.CloseProject
 import com.soyle.stories.workspace.usecases.closeProject.CloseProjectUseCase
@@ -28,6 +29,13 @@ object ProjectUseCases {
             }
             provide<OpenProject> {
                 OpenProjectUseCase(DataModule.workerId, get(), get(), get())
+            }
+
+            provide(
+                CloseProject.OutputPort::class,
+                RequestCloseProject.OutputPort::class
+            ) {
+                CloseProjectOutput(get(), get(), get())
             }
         }
     }

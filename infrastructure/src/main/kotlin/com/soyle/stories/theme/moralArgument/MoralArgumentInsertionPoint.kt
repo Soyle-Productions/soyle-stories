@@ -55,10 +55,10 @@ class MoralArgumentInsertionPoint : Fragment() {
                     .or(tryingToInsertProperty)
             )
 
-            line(0.0, 8.0, endY = 8.0) {
+            line(4.0, 8.0, endY = 8.0) {
                 stroke = com.soyle.stories.soylestories.Styles.Purple
                 strokeWidth = 4.0
-                endXProperty().bind(this@pane.widthProperty())
+                endXProperty().bind(this@pane.widthProperty().minus(4))
             }
             rectangle(8.0, 0.0, 16.0, 16.0) {
                 visibleWhen(notTryingToInsertProperty)

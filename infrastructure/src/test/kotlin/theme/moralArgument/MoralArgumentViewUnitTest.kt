@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.testfx.api.FxRobot
 import org.testfx.api.FxToolkit
+import org.testfx.assertions.api.Assertions
+import org.testfx.assertions.api.NodeAssert
 import tornadofx.FX
 import java.util.*
 import kotlin.math.min
@@ -611,6 +613,24 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 mapOf("arcSectionId" to arcSectionId),
                 viewListener.callLog[MoralArgumentViewListener::removeSection]
             )
+        }
+
+    }
+
+    @Nested
+    inner class `When no perspective character is selected` {
+
+        @Test
+        fun `should not have any elements in the section list`() {
+            state.updateOrInvalidated {
+                copy(
+                    selectedPerspectiveCharacter = null
+                )
+            }
+
+            Assertions.assertThat(
+                MoralArgumentViewDriver(moralArgumentView).getArcSectionsContainer()
+            ).isInvisible
         }
 
     }

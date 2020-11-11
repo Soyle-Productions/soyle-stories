@@ -2,6 +2,7 @@ package com.soyle.stories.project.projectList
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.project.closeProject.CloseProjectRequestReceiver
 import com.soyle.stories.project.closeProject.ClosedProjectReceiver
 import com.soyle.stories.project.eventbus.ProjectEvents
 import com.soyle.stories.project.openProject.ProjectOpenedReceiver
@@ -22,8 +23,8 @@ class ProjectListPresenter(
     private val view: ProjectListView
 ) : ListOpenProjects.OutputPort,
     ProjectOpenedReceiver by OpenProjectPresenter(view),
-    ClosedProjectReceiver by CloseProjectPresenter(view) {
-
+    ClosedProjectReceiver by CloseProjectPresenter(view),
+    CloseProjectRequestReceiver by CloseProjectPresenter(view) {
 
     override fun receiveListOpenProjectsResponse(response: ListOpenProjects.ResponseModel) {
         view.update {
@@ -86,4 +87,6 @@ class ProjectListPresenter(
             item.projectLocation
         )
     }
+
+
 }
