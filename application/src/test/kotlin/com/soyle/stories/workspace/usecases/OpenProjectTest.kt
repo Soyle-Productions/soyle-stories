@@ -257,14 +257,13 @@ class OpenProjectTest {
                 result = failure
             }
 
-            override fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
-                result = response
-            }
-
-            override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
+            override suspend fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
                 closeProjectResult = response
             }
 
+            override suspend fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
+                result = response
+            }
             override fun receiveCloseProjectFailure(failure: Exception) {
                 closeProjectResult = failure
             }
