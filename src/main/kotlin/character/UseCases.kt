@@ -5,11 +5,16 @@ import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSection
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentController
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentControllerImpl
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentOutput
+import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentController
+import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentControllerImpl
+import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentOutput
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentUseCase
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
 import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgument
 import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentUseCase
+import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgument
+import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentUseCase
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
@@ -53,6 +58,22 @@ object UseCases {
 
             provide<MoveCharacterArcSectionInMoralArgument.OutputPort> {
                 MoveCharacterArcSectionInMoralArgumentOutput(get())
+            }
+
+
+
+            provide<RemoveCharacterArcSectionFromMoralArgument> {
+                RemoveCharacterArcSectionFromMoralArgumentUseCase(get())
+            }
+
+            provide<RemoveCharacterArcSectionFromMoralArgumentController> {
+                RemoveCharacterArcSectionFromMoralArgumentControllerImpl(
+                    applicationScope.get(), get(), get()
+                )
+            }
+
+            provide<RemoveCharacterArcSectionFromMoralArgument.OutputPort> {
+                RemoveCharacterArcSectionFromMoralArgumentOutput(get(), get())
             }
 
         }

@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.config.theme
 
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgumentNotifier
+import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.CharacterArcSectionRemovedNotifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -20,6 +21,7 @@ object Presentation {
 
                 presenter listensTo projectScope.get<ArcSectionAddedToCharacterArcNotifier>()
                 presenter listensTo projectScope.get<CharacterArcSectionMovedInMoralArgumentNotifier>()
+                presenter listensTo projectScope.get<CharacterArcSectionRemovedNotifier>()
 
                 MoralArgumentController(
                     themeId,
@@ -32,6 +34,7 @@ object Presentation {
                     presenter,
                     projectScope.get(),
                     presenter,
+                    projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),
                     projectScope.get(),
