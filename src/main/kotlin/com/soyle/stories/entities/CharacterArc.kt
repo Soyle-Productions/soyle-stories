@@ -177,6 +177,39 @@ class CharacterArc private constructor(
 
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CharacterArc
+
+        if (id != other.id) return false
+        if (characterId != other.characterId) return false
+        if (template != other.template) return false
+        if (themeId != other.themeId) return false
+        if (name != other.name) return false
+        if (arcSections != other.arcSections) return false
+        if (moralArgumentSectionOrder != other.moralArgumentSectionOrder) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + characterId.hashCode()
+        result = 31 * result + template.hashCode()
+        result = 31 * result + themeId.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + arcSections.hashCode()
+        result = 31 * result + moralArgumentSectionOrder.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "CharacterArc(id=$id, characterId=$characterId, template=$template, themeId=$themeId, name='$name', arcSections=$arcSections, moralArgumentSectionOrder=$moralArgumentSectionOrder)"
+    }
+
+
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "CharacterArc($uuid)"
     }
