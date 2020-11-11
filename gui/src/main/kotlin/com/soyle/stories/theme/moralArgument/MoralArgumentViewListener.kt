@@ -13,5 +13,6 @@ interface MoralArgumentViewListener {
     fun setValueOfArcSection(characterId: String, arcSectionId: String, value: String)
     fun setThematicRevelation(revelation: String)
     fun moveSectionTo(arcSectionId: String, characterId: String, index: Int)
+    fun removeSection(arcSectionId: String)
 
 }

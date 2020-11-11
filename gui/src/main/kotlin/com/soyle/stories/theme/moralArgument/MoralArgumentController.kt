@@ -3,6 +3,7 @@ package com.soyle.stories.theme.moralArgument
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
 import com.soyle.stories.characterarc.changeSectionValue.ChangeSectionValueController
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentController
+import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentController
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
@@ -29,7 +30,8 @@ class MoralArgumentController(
     private val changeThemeLineController: ChangeThemeLineController,
     private val changeSectionValueController: ChangeSectionValueController,
     private val changeThematicRevelationController: ChangeThematicRevelationController,
-    private val moveCharacterArcSectionInMoralArgumentController: MoveCharacterArcSectionInMoralArgumentController
+    private val moveCharacterArcSectionInMoralArgumentController: MoveCharacterArcSectionInMoralArgumentController,
+    private val removeCharacterArcSectionFromMoralArgumentController: RemoveCharacterArcSectionFromMoralArgumentController
 ) : MoralArgumentViewListener {
 
     private val themeId: UUID = UUID.fromString(themeId)
@@ -99,5 +101,9 @@ class MoralArgumentController(
 
     override fun moveSectionTo(arcSectionId: String, characterId: String, index: Int) {
         moveCharacterArcSectionInMoralArgumentController.moveSectionInMoralArgument(arcSectionId, themeId.toString(), characterId, index)
+    }
+
+    override fun removeSection(arcSectionId: String) {
+        removeCharacterArcSectionFromMoralArgumentController.removeSectionFromMoralArgument(arcSectionId)
     }
 }

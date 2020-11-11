@@ -2,9 +2,11 @@ package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgumentReceiver
+import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.CharacterArcSectionRemovedReceiver
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
 import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgument
+import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.CharacterArcSectionRemoved
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArcReceiver
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
@@ -24,8 +26,8 @@ class MoralArgumentPresenter(
     ListAvailablePerspectiveCharacters.OutputPort,
 
     ArcSectionAddedToCharacterArcReceiver,
-    CharacterArcSectionMovedInMoralArgumentReceiver
-{
+    CharacterArcSectionMovedInMoralArgumentReceiver,
+    CharacterArcSectionRemovedReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -87,7 +89,7 @@ class MoralArgumentPresenter(
                         it.arcSectionId.toString(),
                         it.sectionTemplateName,
                         it.arcSectionValue,
-                        ! it.sectionTemplateIsRequired
+                        !it.sectionTemplateIsRequired
                     )
                 }
             )
@@ -136,7 +138,8 @@ class MoralArgumentPresenter(
     override suspend fun receiveCharacterArcSectionsMovedInMoralArgument(events: List<CharacterArcSectionMovedInMoralArgument>) {
         view.updateOrInvalidated {
             val listedSections = this.sections?.map { it.arcSectionId } ?: return@updateOrInvalidated this
-            val modifiedSections = events.filter { it.arcSectionId.toString() in listedSections }.associateBy { it.arcSectionId.toString() }
+            val modifiedSections = events.filter { it.arcSectionId.toString() in listedSections }
+                .associateBy { it.arcSectionId.toString() }
             if (modifiedSections.isEmpty()) return@updateOrInvalidated this
 
             copy(
@@ -144,6 +147,20 @@ class MoralArgumentPresenter(
                     if (it.arcSectionId !in modifiedSections) i
                     else modifiedSections.getValue(it.arcSectionId).newIndex
                 }.map { it.value }
+            )
+        }
+    }
+
+    override suspend fun receiveCharacterArcSectionRemoved(event: CharacterArcSectionRemoved) {
+        if (event.themeId != themeId) return
+        val arcSectionId = event.arcSectionId.toString()
+        view.updateOrInvalidated {
+            if (event.characterId.toString() != selectedPerspectiveCharacter?.characterId) {
+                return@updateOrInvalidated this
+            }
+
+            copy(
+                sections = sections?.filterNot { it.arcSectionId == arcSectionId }
             )
         }
     }
