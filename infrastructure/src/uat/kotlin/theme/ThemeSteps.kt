@@ -6,10 +6,10 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.ValueWeb
+import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
@@ -26,7 +26,7 @@ import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFrom
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeValueWebFromTheme.RemoveValueWebFromThemeController
 import com.soyle.stories.theme.renameSymbol.RenameSymbolController
-import com.soyle.stories.theme.updateThemeMetaData.RenameThemeController
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En

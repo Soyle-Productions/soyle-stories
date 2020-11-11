@@ -22,7 +22,7 @@ class ProjectScope(val applicationScope: ApplicationScope, val projectViewModel:
 
     val projectId = projectViewModel.projectId
 
-    private val finalized= lazy {  }
+    private val finalized = lazy {  }
     val isRegistered: ReadOnlyBooleanProperty = SimpleBooleanProperty(true)
 
     private val _toolScopes = mutableMapOf<String, Scope>()

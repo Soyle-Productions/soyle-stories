@@ -56,6 +56,7 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
             }
             spacer()
             button("Remove") {
+                addClass("remove-button")
                 hgrow = Priority.NEVER
                 usePrefWidth = true
                 graphic = MaterialIconView(MaterialIcon.DELETE_FOREVER, "1.5em")
@@ -84,7 +85,7 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
                 vgap = 8.0
                 padding = Insets(8.0, 4.0, 4.0, 4.0)
                 bindChildren(symbolicItems) {
-                    chip(it.itemName.toProperty(), onDelete={
+                    chip(it.itemName.toProperty(), onDelete={ _ ->
                         val oppositionValueId = oppositionValueId.value ?: return@chip
                         viewListener.removeSymbolicItem(oppositionValueId, it.itemId)
                     }).node
@@ -116,6 +117,7 @@ private fun Parent.cardName(
     val isErrorSource = oppositionValue.stringBinding { it?.oppositionValueId }.isEqualTo(model.errorSource)
 
     return editableText(oppositionValueName) {
+        root.addClass("opposition-value-name")
         if (oppositionValue.value?.isNew == true) show()
         oppositionValueName.onChangeUntil(isNull(oppositionValue)) { hide() }
         onShowing {

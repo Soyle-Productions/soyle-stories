@@ -11,7 +11,7 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
 
 class BaseStoryStructurePresenter(

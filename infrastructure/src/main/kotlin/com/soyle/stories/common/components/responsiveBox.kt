@@ -44,7 +44,7 @@ fun EventTarget.responsiveBox(isSmall: ObservableValue<Boolean>, hSpacing: Doubl
     return stackpane
 
 }
-fun EventTarget.responsiveBox(threshold: Int = 600, hSpacing: Double = 0.0, vSpacing: Double = 0.0, op: Pane.() -> Unit) {
+fun EventTarget.responsiveBox(threshold: Int = 600, hSpacing: Double = 0.0, vSpacing: Double = 0.0, op: Pane.() -> Unit): StackPane {
 
     val stackpane = stackpane()
     val vBox = VBox(vSpacing)
@@ -74,4 +74,5 @@ fun EventTarget.responsiveBox(threshold: Int = 600, hSpacing: Double = 0.0, vSpa
 
     largeLayout()
 
+    return stackpane
 }

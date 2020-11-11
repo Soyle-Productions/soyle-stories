@@ -12,7 +12,7 @@ class BaseStoryStructureModel : Model<BaseStoryStructureScope, BaseStoryStructur
 
     val sections = bind(BaseStoryStructureViewModel::sections)
     val availableLocations = bind(BaseStoryStructureViewModel::availableLocations)
-    val locationsAvailable = availableLocations.select { it.observable(List<LocationItemViewModel>::isEmpty) }
+    val locationsAvailable = availableLocations.select { it.isEmpty().toProperty() }
 
     override val applicationScope: ApplicationScope
         get() = scope.projectScope.applicationScope

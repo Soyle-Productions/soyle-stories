@@ -1,10 +1,10 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.character.CharacterDriver
-import com.soyle.stories.characterarc.characterComparison.CharacterItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.OppositionValue
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope

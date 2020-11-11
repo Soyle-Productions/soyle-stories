@@ -189,5 +189,11 @@ fun <T : Node> T.existsWhen(expr: () -> ObservableValue<Boolean>): T {
 	managedProperty().cleanBind(visibleProperty())
 	return this
 }
+var <T : Node> T.exists: Boolean
+	get() = visibleProperty().get() && managedProperty().get()
+	set(value) {
+		visibleProperty().set(value)
+		managedProperty().set(value)
+	}
 
 fun Node.onLoseFocus(op: () -> Unit) = focusedProperty().onChange { if (! it) op() }

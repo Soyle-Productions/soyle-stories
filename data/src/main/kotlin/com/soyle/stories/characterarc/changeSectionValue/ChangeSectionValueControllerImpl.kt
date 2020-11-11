@@ -1,9 +1,12 @@
 package com.soyle.stories.characterarc.changeSectionValue
 
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
+import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
 import java.util.*
 
 class ChangeSectionValueControllerImpl(
@@ -13,7 +16,11 @@ class ChangeSectionValueControllerImpl(
     private val changeCharacterPsychologicalWeakness: ChangeCharacterPsychologicalWeakness,
     private val changeCharacterPsychologicalWeaknessOutputPort: ChangeCharacterPsychologicalWeakness.OutputPort,
     private val changeCharacterMoralWeakness: ChangeCharacterMoralWeakness,
-    private val changeCharacterMoralWeaknessOutputPort: ChangeCharacterMoralWeakness.OutputPort
+    private val changeCharacterMoralWeaknessOutputPort: ChangeCharacterMoralWeakness.OutputPort,
+    private val changeCharacterArcSectionValue: ChangeCharacterArcSectionValue,
+    private val changeCharacterArcSectionValueOutputPort: ChangeCharacterArcSectionValue.OutputPort,
+    private val changeCharacterArcSectionValueAndCoverInScene: ChangeCharacterArcSectionValueAndCoverInScene,
+    private val changeCharacterArcSectionValueAndCoverInSceneOutputPort: ChangeCharacterArcSectionValueAndCoverInScene.OutputPort
 ) : ChangeSectionValueController {
 
     override fun changeDesire(themeId: String, characterId: String, desire: String) {
@@ -54,5 +61,40 @@ class ChangeSectionValueControllerImpl(
             )
         }
 
+    }
+
+    override fun changeValueOfArcSection(themeId: String, characterId: String, arcSectionId: String, value: String) {
+        val request = ChangeCharacterArcSectionValue.RequestModel(
+            UUID.fromString(themeId),
+            UUID.fromString(characterId),
+            UUID.fromString(arcSectionId),
+            value
+        )
+        threadTransformer.async {
+            changeCharacterArcSectionValue.invoke(
+                request, changeCharacterArcSectionValueOutputPort
+            )
+        }
+    }
+
+    override fun changeValueOfArcSectionAndCoverInScene(
+        themeId: String,
+        characterId: String,
+        arcSectionId: String,
+        value: String,
+        sceneId: String
+    ) {
+        val request = ChangeCharacterArcSectionValueAndCoverInScene.RequestModel(
+            UUID.fromString(themeId),
+            UUID.fromString(characterId),
+            UUID.fromString(arcSectionId),
+            UUID.fromString(sceneId),
+            value
+        )
+        threadTransformer.async {
+            changeCharacterArcSectionValueAndCoverInScene.invoke(
+                request, changeCharacterArcSectionValueAndCoverInSceneOutputPort
+            )
+        }
     }
 }

@@ -175,12 +175,15 @@ class StartNewLocalProjectUnitTest {
                 result = failure
             }
 
-            override fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
+            override suspend fun receiveOpenProjectResponse(response: OpenProject.ResponseModel) {
+                result = response
+            }
+
+            override suspend fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
                 result = response
             }
 
             override fun receiveCloseProjectFailure(failure: Exception) {}
-            override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {}
         }
         val useCase: StartNewLocalProject = StartNewLocalProjectUseCase(repo, baseUseCase, openProject)
         runBlocking {

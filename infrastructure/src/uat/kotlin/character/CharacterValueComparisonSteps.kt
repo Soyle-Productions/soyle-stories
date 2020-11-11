@@ -1,6 +1,5 @@
 package com.soyle.stories.character
 
-import com.soyle.stories.characterarc.characterComparison.CharacterComparisonScope
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.di.get
 import com.soyle.stories.layout.openTool.OpenToolController
@@ -10,10 +9,12 @@ import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.ThemeSteps
 import com.soyle.stories.theme.characterValueComparison.CharacterValueComparison
 import com.soyle.stories.theme.characterValueComparison.CharacterValueComparisonScope
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import javafx.scene.control.Labeled
 import javafx.scene.control.MenuButton
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.framework.junit5.ApplicationTest
 
@@ -66,8 +67,11 @@ class CharacterValueComparisonSteps(en: En, double: SoyleStoriesTestDouble) {
                 characterName: String, arcName: String ->
 
                 val character = CharacterDriver.getCharacterByIdentifier(double, characterName)!!
-                val arc = character.characterArcs.find { it.name == arcName }!!
                 val scope = ProjectSteps.getProjectScope(double)!!
+                val repository = scope.get<CharacterArcRepository>()
+                val arc = runBlocking {
+                    repository.listCharacterArcsForCharacter(character.id)!!.find { it.name == arcName }!!
+                }
                 val controller = scope.get<OpenToolController>()
                 interact {
                     controller.openCharacterValueComparison(arc.themeId.uuid.toString())

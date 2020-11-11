@@ -4,49 +4,48 @@ import com.soyle.stories.di.get
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialog
 import javafx.scene.control.ContextMenu
+import javafx.scene.control.MenuItem
 import tornadofx.action
 import tornadofx.bind
 import tornadofx.item
 
 internal fun ThemeList.themeItemContextMenu(model: ThemeListModel, viewListener: ThemeListViewListener) = ContextMenu().apply {
-    item("Compare Values") {
+    fun MenuItem.actionForSelectedThemeItem(action: (ThemeListItemViewModel) -> Unit) {
         action {
             val selectedItem = model.selectedItem.value
             if (selectedItem is ThemeListItemViewModel) {
-                viewListener.openValueWeb(selectedItem.themeId)
+                action(selectedItem)
             }
+        }
+    }
+    item("Compare Values") {
+        actionForSelectedThemeItem {
+            viewListener.openValueWeb(it.themeId)
         }
     }
     item("Examine Central Conflict") {
-        action {
-            val selectedItem = model.selectedItem.value
-            if (selectedItem is ThemeListItemViewModel) {
-                viewListener.openCentralConflict(selectedItem.themeId)
-            }
+        actionForSelectedThemeItem {
+            viewListener.openCentralConflict(it.themeId)
+        }
+    }
+    item("Outline the Moral Argument") {
+        actionForSelectedThemeItem {
+            viewListener.openMoralArgument(it.themeId)
         }
     }
     item("Create Symbol") {
-        action {
-            val selectedItem = model.selectedItem.value
-            if (selectedItem is ThemeListItemViewModel) {
-                scope.get<CreateSymbolDialog>().show(selectedItem.themeId, null, currentWindow)
-            }
+        actionForSelectedThemeItem {
+            scope.get<CreateSymbolDialog>().show(it.themeId, null, currentWindow)
         }
     }
     item("Rename") {
-        action {
-            val selectedItem = model.selectedItem.value
-            if (selectedItem is ThemeListItemViewModel) {
-                editThemeName(selectedItem.themeId)
-            }
+        actionForSelectedThemeItem {
+            editThemeName(it.themeId)
         }
     }
     item("Delete") {
-        action {
-            val item = model.selectedItem.get()
-            if (item is ThemeListItemViewModel) {
-                scope.get<DeleteThemeDialog>().show(item.themeId, item.themeName)
-            }
+        actionForSelectedThemeItem {
+            scope.get<DeleteThemeDialog>().show(it.themeId, it.themeName)
         }
     }
 }

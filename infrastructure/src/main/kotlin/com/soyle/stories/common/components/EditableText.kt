@@ -7,10 +7,10 @@ import javafx.event.*
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.ContentDisplay
-import javafx.scene.control.MenuButton
 import javafx.scene.paint.Color
 import tornadofx.*
 
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 class EditableText : Fragment() {
 
     companion object {
@@ -57,8 +57,8 @@ class EditableText : Fragment() {
     fun editedTextProperty(): ReadOnlyStringProperty = editedTextProperty.readOnlyProperty
     var editedText: String?
         get() = editedTextProperty.get()
-        private set(value) {
-            editedTextProperty.set(value)
+        set(value) {
+            popup.textInput.text = value
         }
 
     val errorMessageProperty: StringProperty = SimpleStringProperty(this, "errorMessage", "")
@@ -107,10 +107,10 @@ class EditableText : Fragment() {
         }
     }
 
-    fun focusedProperty() = root.focusedProperty()
+    fun focusedProperty(): ReadOnlyBooleanProperty = root.focusedProperty()
     val isFocused get() = root.isFocused
 
-    var id by root.idProperty()
+    var id: String by root.idProperty()
 
     private val popup = root.popOutEditBox(textProperty) {
         editedTextProperty.bind(textInput.textProperty())
@@ -121,6 +121,8 @@ class EditableText : Fragment() {
             this@EditableText.show()
         }
     }
+
+    fun commit() = popup.complete()
 
     init {
         showingProperty.onChange {
@@ -161,6 +163,7 @@ class EditableText : Fragment() {
     }
 
     private val onActionProperty: ObjectProperty<EventHandler<ActionEvent>> = popup.onActionProperty()
+    @Suppress("NOTHING_TO_INLINE")
     inline fun setOnAction(noinline value: (ActionEvent) -> Unit) { onAction = EventHandler(value) }
     var onAction: EventHandler<ActionEvent>? by onActionProperty()
     fun onActionProperty(): ObjectProperty<EventHandler<ActionEvent>> = popup.onActionProperty()

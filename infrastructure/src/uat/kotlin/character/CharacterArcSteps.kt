@@ -1,18 +1,17 @@
 package com.soyle.stories.character
 
 import com.soyle.stories.UATLogger
-import com.soyle.stories.character.CharacterArcSteps.interact
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructure
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureScope
 import com.soyle.stories.characterarc.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionController
 import com.soyle.stories.characterarc.planCharacterArcDialog.PlanCharacterArcDialogViewListener
-import com.soyle.stories.characterarc.repositories.CharacterArcRepository
 import com.soyle.stories.di.get
 import com.soyle.stories.entities.*
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import javafx.event.ActionEvent
 import javafx.scene.control.Button
 import javafx.scene.control.CheckMenuItem
@@ -58,7 +57,7 @@ object CharacterArcSteps : ApplicationTest() {
 	{
 		val scope = ProjectSteps.getProjectScope(double) ?: return emptyList()
 		return runBlocking {
-			scope.get<com.soyle.stories.theme.repositories.CharacterArcSectionRepository>().getCharacterArcSectionsForCharacter(characterId)
+			scope.get<CharacterArcRepository>().listCharacterArcsForCharacter(characterId).flatMap { it.arcSections }
 		}
 	}
 
@@ -235,7 +234,9 @@ object CharacterArcSteps : ApplicationTest() {
 		val scope = ProjectSteps.getProjectScope(double) ?: return false
 		var section: CharacterArcSection? = null
 		runBlocking {
-			section = scope.get<com.soyle.stories.theme.repositories.CharacterArcSectionRepository>().getCharacterArcSectionById(sectionId)
+			section = scope.get<CharacterArcRepository>().getCharacterArcContainingArcSection(sectionId)?.arcSections?.find {
+				it.id == sectionId
+			}
 		}
 		return section?.linkedLocation == locationId
 	}

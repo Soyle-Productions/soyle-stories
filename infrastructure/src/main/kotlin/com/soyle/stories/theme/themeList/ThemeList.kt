@@ -95,11 +95,11 @@ class ThemeList : View() {
                     }
                     setOnMouseClicked { it.consume() }
                 }
-                populate { parentItem: TreeItem<Any?> ->
-                    when (val itemValue = parentItem.value) {
-                        null -> model.themes
-                        is ThemeListItemViewModel -> itemValue.symbols
-                        else -> null
+                root.children.bind(model.themes) { themeViewModel ->
+                    TreeItem(themeViewModel as Any).apply {
+                        themeViewModel.symbols.forEach { symbolViewModel ->
+                            treeitem(symbolViewModel)
+                        }
                     }
                 }
                 setOnMouseClicked {

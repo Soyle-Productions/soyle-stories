@@ -2,11 +2,13 @@ package com.soyle.stories.project
 
 import com.soyle.stories.common.ScopedTestDouble
 import com.soyle.stories.di.get
+import com.soyle.stories.layout.config.dynamic.SceneDetails
 import com.soyle.stories.layout.config.dynamic.ValueOppositionWebs
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.WindowChildViewModel
+import com.soyle.stories.scene.sceneDetails.SceneDetailsScope
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
 import javafx.collections.FXCollections
 import tornadofx.*
@@ -24,6 +26,7 @@ class WorkbenchDouble : ScopedTestDouble<ProjectScope>(ProjectScope::class) {
         FXCollections.observableArrayList<Scope>().bind(toolViewModels) {
             when (val type = it.type) {
                 is ValueOppositionWebs -> ValueOppositionWebsScope(scope, it.toolId, type)
+                is SceneDetails -> SceneDetailsScope(scope, it.toolId, type)
                 else -> Scope()
             }
         }

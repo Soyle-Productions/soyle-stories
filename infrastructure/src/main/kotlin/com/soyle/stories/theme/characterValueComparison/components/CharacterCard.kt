@@ -18,6 +18,7 @@ import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValue
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
+import javafx.event.Event
 import javafx.scene.Parent
 import javafx.scene.control.MenuItem
 import javafx.scene.control.Tooltip
@@ -218,7 +219,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
         }
     }
 
-    private fun removeChip(value: CharacterValueViewModel) = fun () {
+    private fun removeChip(value: CharacterValueViewModel) = fun (_: Event) {
         val characterId = item?.characterId ?: return
         viewListener.removeOppositionValueFromCharacter(characterId, value.oppositionId)
     }

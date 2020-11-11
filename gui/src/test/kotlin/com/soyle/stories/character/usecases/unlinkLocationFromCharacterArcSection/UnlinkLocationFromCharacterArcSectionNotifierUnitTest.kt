@@ -3,6 +3,9 @@ package com.soyle.stories.character.usecases.unlinkLocationFromCharacterArcSecti
 import com.soyle.stories.characterarc.CharacterArcException
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.common.ThreadTransformer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -29,7 +32,12 @@ class UnlinkLocationFromCharacterArcSectionNotifierUnitTest {
 
 	private fun getOutputPort(): UnlinkLocationFromCharacterArcSection.OutputPort
 	{
-		return UnlinkLocationFromCharacterArcSectionNotifier().apply {
+		val threadTransformer = object : ThreadTransformer {
+			override fun async(task: suspend CoroutineScope.() -> Unit) = runBlocking { task() }
+			override fun gui(update: suspend CoroutineScope.() -> Unit) = runBlocking { update() }
+		}
+
+		return UnlinkLocationFromCharacterArcSectionNotifier(threadTransformer).apply {
 			addListener(object : UnlinkLocationFromCharacterArcSection.OutputPort {
 				override fun receiveUnlinkLocationFromCharacterArcSectionFailure(failure: CharacterArcException) {
 					forwardedEvent = failure

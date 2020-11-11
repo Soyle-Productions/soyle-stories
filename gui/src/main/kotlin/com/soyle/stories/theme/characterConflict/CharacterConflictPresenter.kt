@@ -10,24 +10,24 @@ import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeRecei
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
 import com.soyle.stories.theme.removeCharacterAsOpponent.CharacterRemovedAsOpponentReceiver
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
-import com.soyle.stories.theme.updateThemeMetaData.ThemeWithCentralConflictChangedReceiver
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
 import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ArcSectionType
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ArcSectionType
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
-import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.AvailableCharactersToUseAsOpponents
-import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.AvailableCharactersToUseAsOpponents
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.CharacterRemovedAsOpponent
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
-import com.soyle.stories.theme.usecases.updateThemeMetaData.ThemeWithCentralConflictChanged
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.CharacterUsedAsMainOpponent
+import com.soyle.stories.theme.usecases.changeThemeDetails.CentralConflictChanged
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsMainOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import java.util.*
 
@@ -37,7 +37,7 @@ class CharacterConflictPresenter(
 ) : ExamineCentralConflictOfTheme.OutputPort, ListAvailablePerspectiveCharacters.OutputPort,
     ListAvailableCharactersToUseAsOpponents.OutputPort, CharacterUsedAsOpponentReceiver,
     CharacterUsedAsMainOpponentReceiver,
-    ThemeWithCentralConflictChangedReceiver, ChangedCharacterArcSectionValueReceiver, ChangedCharacterChangeReceiver,
+    CentralConflictChangedReceiver, ChangedCharacterArcSectionValueReceiver, ChangedCharacterChangeReceiver,
     ChangeCharacterPropertyValue.OutputPort, CharacterPerspectivePropertyChangedReceiver, RenamedCharacterReceiver,
     CharacterRemovedAsOpponentReceiver, RemovedCharacterFromThemeReceiver {
 
@@ -165,11 +165,11 @@ class CharacterConflictPresenter(
         }
     }
 
-    override suspend fun receiveThemeWithCentralConflictChanged(themeWithCentralConflictChanged: ThemeWithCentralConflictChanged) {
-        if (themeWithCentralConflictChanged.themeId != themeId) return
+    override suspend fun receiveThemeWithCentralConflictChanged(centralConflictChanged: CentralConflictChanged) {
+        if (centralConflictChanged.themeId != themeId) return
         view.updateOrInvalidated {
             copy(
-                centralConflict = themeWithCentralConflictChanged.centralConflict
+                centralConflict = centralConflictChanged.centralConflict
             )
         }
     }
@@ -223,6 +223,7 @@ class CharacterConflictPresenter(
                 ArcSectionType.Desire -> copy(desire = changedCharacterArcSectionValue.newValue)
                 ArcSectionType.PsychologicalWeakness -> copy(psychologicalWeakness = changedCharacterArcSectionValue.newValue)
                 ArcSectionType.MoralWeakness -> copy(moralWeakness = changedCharacterArcSectionValue.newValue)
+                else -> this // due to the type !in setOf call above, will never actually reach this line.
             }
         }
     }

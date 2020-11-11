@@ -55,7 +55,6 @@ import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.deleteValueWebDialog.*
 import com.soyle.stories.theme.includeCharacterInTheme.*
 import com.soyle.stories.theme.removeCharacterAsOpponent.*
-import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonOutput
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeNotifier
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
@@ -87,7 +86,6 @@ import com.soyle.stories.theme.themeList.ThemeListPresenter
 import com.soyle.stories.theme.themeList.ThemeListViewListener
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsModel
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
-import com.soyle.stories.theme.updateThemeMetaData.*
 import com.soyle.stories.theme.useCharacterAsMainOpponent.*
 import com.soyle.stories.theme.useCharacterAsOpponent.*
 import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
@@ -98,7 +96,17 @@ import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicI
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOppositionUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
-import com.soyle.stories.theme.usecases.changeCharacterArcSectionValue.*
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.*
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedNotifier
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictController
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictControllerImpl
+import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangedCentralMoralQuestionNotifier
+import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangedCentralMoralQuestionReceiver
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeControllerImpl
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChangeUseCase
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
@@ -109,8 +117,7 @@ import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
-import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponents
-import com.soyle.stories.theme.usecases.listAvailableCharactersToUseAsOpponents.ListAvailableCharactersToUseAsOpponentsUseCase
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
@@ -145,12 +152,11 @@ import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItem
 import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItemUseCase
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
-import com.soyle.stories.theme.usecases.updateThemeMetaData.ChangeCentralConflict
-import com.soyle.stories.theme.usecases.updateThemeMetaData.ChangeCentralConflictUseCase
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameTheme
-import com.soyle.stories.theme.usecases.updateThemeMetaData.RenameThemeUseCase
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponent
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponentUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralConflict
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralMoralQuestion
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeThemeDetailsUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenameTheme
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsMainOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponentUseCase
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsController
@@ -176,7 +182,13 @@ object ThemeModule {
         provide { provideCreateTheme(this) }
         provide<ListSymbolsByTheme> { ListSymbolsByThemeUseCase(get()) }
         provide<DeleteTheme> { DeleteThemeUseCase(get(), get()) }
-        provide<RenameTheme> { RenameThemeUseCase(get()) }
+        provide(
+            ChangeCentralMoralQuestion::class,
+            RenameTheme::class,
+            ChangeCentralConflict::class
+        ) {
+            ChangeThemeDetailsUseCase(get())
+        }
         provide<AddSymbolToTheme> { AddSymbolToThemeUseCase(get()) }
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
@@ -214,10 +226,18 @@ object ThemeModule {
         }
         provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get(), get()) }
         provide<ListAvailablePerspectiveCharacters> { ListAvailablePerspectiveCharactersUseCase(get()) }
-        provide<UseCharacterAsOpponent> { UseCharacterAsOpponentUseCase(get(), get()) }
-        provide<UseCharacterAsMainOpponent> { UseCharacterAsMainOpponentUseCase(get()) }
-        provide<ListAvailableCharactersToUseAsOpponents> { ListAvailableCharactersToUseAsOpponentsUseCase(get(), get()) }
-        provide<ChangeCentralConflict> { ChangeCentralConflictUseCase(get()) }
+        provide(
+            UseCharacterAsOpponent::class,
+            UseCharacterAsMainOpponent::class,
+            ListAvailableCharactersToUseAsOpponents::class
+        ) { UseCharacterAsOpponentUseCase(get(), get()) }
+        provide(
+            ChangeCentralConflict::class,
+            RenameTheme::class,
+            ChangeCentralMoralQuestion::class
+        ) {
+            ChangeThemeDetailsUseCase(get())
+        }
         provide<ChangeCharacterDesire> { ChangeCharacterDesireUseCase(get(), get()) }
         provide<ChangeCharacterPsychologicalWeakness> { ChangeCharacterPsychologicalWeaknessUseCase(get(), get()) }
         provide<ChangeCharacterMoralWeakness> { ChangeCharacterMoralWeaknessUseCase(get(), get()) }
@@ -232,11 +252,12 @@ object ThemeModule {
         provide(CharacterUsedAsOpponentReceiver::class) { CharacterUsedAsOpponentNotifier() }
         provide(CharacterUsedAsMainOpponentReceiver::class) { CharacterUsedAsMainOpponentNotifier() }
         provide(RenamedThemeReceiver::class) { RenamedThemeNotifier() }
-        provide(ThemeWithCentralConflictChangedReceiver::class) { ThemeWithCentralConflictChangedNotifier() }
+        provide(CentralConflictChangedReceiver::class) { CentralConflictChangedNotifier() }
         provide(ChangedCharacterArcSectionValueReceiver::class) { ChangedCharacterArcSectionValueNotifier() }
         provide(ChangedCharacterChangeReceiver::class) { ChangedCharacterChangeNotifier() }
         provide(CharacterRemovedAsOpponentReceiver::class) { CharacterRemovedAsOpponentNotifier() }
         provide(RemovedCharacterFromThemeReceiver::class) { RemovedCharacterFromThemeNotifier() }
+        provide(ChangedCentralMoralQuestionReceiver::class) { ChangedCentralMoralQuestionNotifier() }
 
 
         provide(CreateTheme.OutputPort::class) {
@@ -244,9 +265,6 @@ object ThemeModule {
         }
         provide(DeleteTheme.OutputPort::class) {
             DeleteThemeNotifier(applicationScope.get(), get())
-        }
-        provide(RenameTheme.OutputPort::class, ChangeCentralConflict.OutputPort::class) {
-            UpdateThemeMetaDataOutput(get(), get())
         }
         provide(AddSymbolToTheme.OutputPort::class) {
             AddSymbolToThemeOutput(get())
@@ -294,14 +312,13 @@ object ThemeModule {
         provide(UseCharacterAsMainOpponent.OutputPort::class) {
             UseCharacterAsMainOpponentOutput(get(), get())
         }
-        provide(ChangeCharacterDesire.OutputPort::class) {
-            ChangeCharacterDesireOutput(get())
-        }
-        provide(ChangeCharacterPsychologicalWeakness.OutputPort::class) {
-            ChangeCharacterPsychologicalWeaknessOutput(get())
-        }
-        provide(ChangeCharacterMoralWeakness.OutputPort::class) {
-            ChangeCharacterMoralWeaknessOutput(get())
+        provide(
+            ChangeCharacterDesire.OutputPort::class,
+            ChangeCharacterPsychologicalWeakness.OutputPort::class,
+            ChangeCharacterMoralWeakness.OutputPort::class,
+            ChangeCharacterArcSectionValue.OutputPort::class
+        ) {
+            ChangeCharacterArcSectionValueOutput(get())
         }
         provide(ChangeCharacterChange.OutputPort::class) {
             ChangeCharacterChangeOutput(get())
@@ -371,7 +388,7 @@ object ThemeModule {
             ChangeCentralConflictControllerImpl(applicationScope.get(), get(), get())
         }
         provide<ChangeSectionValueController> {
-            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get())
+            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
         }
         provide<ChangeCharacterChangeController> {
             ChangeCharacterChangeControllerImpl(applicationScope.get(), get(), get())

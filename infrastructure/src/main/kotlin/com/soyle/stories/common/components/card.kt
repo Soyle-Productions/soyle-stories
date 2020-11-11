@@ -22,8 +22,10 @@ fun EventTarget.cardHeader(
     op()
 }
 fun EventTarget.cardBody(
-    op: VBox.() -> Unit
+    isFirstChild: Boolean = true,
+    op: VBox.() -> Unit = {}
 ) = vbox {
     addClass(ComponentsStyles.cardBody)
+    if (! isFirstChild) addClass(ComponentsStyles.notFirstChild)
     op()
 }

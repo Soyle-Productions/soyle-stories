@@ -6,6 +6,8 @@ import com.soyle.stories.di.DI
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.project.closeProject.CloseProjectRequestNotifier
+import com.soyle.stories.project.closeProject.CloseProjectRequestReceiver
 import com.soyle.stories.project.closeProject.ClosedProjectNotifier
 import com.soyle.stories.project.closeProject.ClosedProjectReceiver
 import com.soyle.stories.project.eventbus.OpenProjectNotifier
@@ -41,9 +43,6 @@ object ProjectModule {
 
     private fun InScope<ApplicationScope>.events() {
 
-        provide(RequestCloseProject.OutputPort::class) {
-            RequestCloseProjectNotifier(get())
-        }
         provide(OpenProject.OutputPort::class) {
             OpenProjectOutput(get(), get())
         }
@@ -57,6 +56,10 @@ object ProjectModule {
         provide(ClosedProjectReceiver::class) {
             ClosedProjectNotifier()
         }
+        provide(CloseProjectRequestReceiver::class) {
+            CloseProjectRequestNotifier()
+        }
+
         provide(StartNewProject.OutputPort::class) {
             StartNewProjectOutput(
                 get(),
@@ -97,6 +100,7 @@ object ProjectModule {
 
             presenter listensTo get<ProjectOpenedNotifier>()
             presenter listensTo get<ClosedProjectNotifier>()
+            presenter listensTo get<CloseProjectRequestNotifier>()
 
             ProjectListController(
                 get(),

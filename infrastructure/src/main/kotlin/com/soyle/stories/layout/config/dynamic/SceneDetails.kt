@@ -36,7 +36,7 @@ object SceneDetailsConfig : ToolConfig<SceneDetails> {
 	override fun getTabConfig(tool: ToolViewModel, type: SceneDetails): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-				val scope = SceneDetailsScope(projectScope, type)
+				val scope = SceneDetailsScope(projectScope, tool.toolId, type)
 				val view = find<com.soyle.stories.scene.sceneDetails.SceneDetails>(scope = scope)
 				val tab = tabPane.tab(view)
 				tab.tabPaneProperty().onChange {

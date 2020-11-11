@@ -5,11 +5,9 @@ import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
+import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneControllerImpl
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
-import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
-import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventControllerImpl
-import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventNotifier
+import com.soyle.stories.storyevent.addCharacterToStoryEvent.*
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventController
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventControllerImpl
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
@@ -68,6 +66,9 @@ object StoryEventModule {
 	}
 
 	private fun InScope<ProjectScope>.notifiers() {
+		provide(IncludedCharacterInStoryEventReceiver::class) {
+			IncludedCharacterInStoryEventNotifier()
+		}
 		provide(CreateStoryEvent.OutputPort::class) {
 			CreateStoryEventNotifier(applicationScope.get())
 		}
@@ -75,9 +76,9 @@ object StoryEventModule {
 			LinkLocationToStoryEventNotifier(applicationScope.get())
 		}
 		provide(AddCharacterToStoryEvent.OutputPort::class) {
-			AddCharacterToStoryEventNotifier(applicationScope.get()).also {
-				get<IncludeCharacterInSceneController>() listensTo it
-			}
+			get<IncludeCharacterInSceneControllerImpl>() listensTo get<IncludedCharacterInStoryEventNotifier>()
+
+			AddCharacterToStoryEventOutput(applicationScope.get(), get())
 		}
 		provide(RemoveCharacterFromStoryEvent.OutputPort::class) {
 			RemoveCharacterFromStoryEventNotifier(applicationScope.get()).also {

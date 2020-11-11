@@ -2,35 +2,18 @@ package com.soyle.stories.scene.sceneDetails
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.location.items.LocationItemViewModel
+import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewModel
 
-class SceneDetailsViewModel(
+data class SceneDetailsViewModel(
   val invalid: Boolean,
   val storyEventId: String?,
   val locationSectionLabel: String,
   val locationDropDownEmptyLabel: String,
   val selectedLocation: LocationItemViewModel?,
   val availableLocations: List<LocationItemViewModel>,
-  val charactersSectionLabel: String,
-  val addCharacterButtonLabel: String,
-  val includedCharacters: List<SceneDetailsCharacterViewModel>,
-  val availableCharacters: List<CharacterItemViewModel>,
-  val removeCharacterButtonLabel: String,
-  val lastChangedTipLabel: String,
-  val resentButtonLabel: String,
+
+  val includedCharactersInScene: IncludedCharactersInSceneViewModel?,
+
   internal val characters: List<CharacterItemViewModel>,
   internal val locations: List<LocationItemViewModel>
-)
-
-data class SceneDetailsCharacterViewModel(
-  val characterId: String,
-  val characterName: String,
-  val motivation: String,
-  val previousMotivationSource: SceneDetailsPreviousSceneViewModel?,
-  val canReset: Boolean
-)
-
-class SceneDetailsPreviousSceneViewModel(
-  val sceneId: String,
-  val sceneName: String,
-  val previousValue: String
 )

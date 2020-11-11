@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.useCharacterAsMainOpponent
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.useCharacterAsMainOpponent.UseCharacterAsMainOpponent
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsMainOpponent
 import java.util.*
 
 class UseCharacterAsMainOpponentControllerImpl(
