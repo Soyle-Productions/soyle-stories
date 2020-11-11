@@ -19,8 +19,10 @@ import io.cucumber.java8.En
 import io.cucumber.java8.ParameterDefinitionBody
 import io.cucumber.java8.Scenario
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.stage.Stage
 import org.testfx.api.FxToolkit
+import java.lang.NullPointerException
 import kotlin.concurrent.thread
 
 lateinit var soyleStories: SoyleStories
@@ -56,6 +58,17 @@ class GlobalHooks : En {
                 configureModules()
                 synchronizeBackgroundTasks()
                 FxToolkit.registerPrimaryStage()
+                Thread.getAllStackTraces().keys.find { it.name == "JavaFX Application Thread" }?.let {
+                    val currentHandler = it.uncaughtExceptionHandler
+                    it.uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { t, e ->
+                        if (e is NullPointerException && e.stackTrace.any { it.className == "javafx.scene.control.skin.MenuButtonSkinBase" }) {
+                            println("Ignored MenuButtonSkinBase NPE.")
+                            e.printStackTrace()
+                        } else {
+                            currentHandler?.uncaughtException(t, e)
+                        }
+                    }
+                }
             }
             soyleStories = FxToolkit.setupApplication(SoyleStories::class.java) as SoyleStories
         }
