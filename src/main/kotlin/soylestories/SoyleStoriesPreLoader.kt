@@ -11,32 +11,39 @@ import javafx.scene.layout.Region
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.Stage
+import javafx.stage.StageStyle
 import tornadofx.*
-import tornadofx.FX.Companion.messages
+import java.util.*
 
 class SoyleStoriesPreLoader : Preloader() {
 
     private val initializationMessage = SimpleStringProperty()
     private val initializationProgress = SimpleDoubleProperty()
 
+    private val applicationProperties: Properties = Properties()
+
     private lateinit var stage: Stage
 
     override fun start(primaryStage: Stage?) {
         stage = primaryStage ?: return
+        SoyleStoriesPreLoader::class.java.classLoader.getResourceAsStream("soylestories/SoyleStoriesPreLoader.properties")?.let {
+            applicationProperties.load(it)
+        } ?: println("no properties file found")
+        primaryStage.initStyle(StageStyle.UNDECORATED)
         primaryStage.scene = createPreloaderScene()
         primaryStage.show()
     }
 
     private fun createPreloaderScene(): Scene {
         val root = AnchorPane().apply {
-            imageview(Image("com/soyle/stories/soylestories/splash.png")) {
-                AnchorPane.setTopAnchor(this,0.0)
-                AnchorPane.setLeftAnchor(this,0.0)
-                AnchorPane.setRightAnchor(this,0.0)
-                AnchorPane.setBottomAnchor(this,0.0)
+            imageview(Image("soylestories/splash.png")) {
+                AnchorPane.setTopAnchor(this, 0.0)
+                AnchorPane.setLeftAnchor(this, 0.0)
+                AnchorPane.setRightAnchor(this, 0.0)
+                AnchorPane.setBottomAnchor(this, 0.0)
                 isPreserveRatio = true
             }
-            label(messages["application.version"] ?: "DEVELOPMENT") {
+            label(applicationProperties.getProperty("application.version") ?: "DEVELOPMENT") {
                 alignment = Pos.CENTER_RIGHT
                 anchorpaneConstraints {
                     leftAnchor = 30.0
