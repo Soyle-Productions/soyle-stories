@@ -2,9 +2,12 @@ package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
 import com.soyle.stories.characterarc.changeSectionValue.ChangeSectionValueController
+import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentController
+import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentController
 import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
 import com.soyle.stories.doubles.ControlledThreadTransformer
 import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
+import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.ChangeThematicRevelationController
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineController
 import com.soyle.stories.theme.outlineMoralArgument.OutlineMoralArgumentController
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
@@ -29,7 +32,8 @@ class MoralArgumentControllerUnitTest {
             ListAvailablePerspectiveCharacters,
             OutlineMoralArgumentController, AddArcSectionToMoralArgumentController,
             ChangeCentralMoralQuestionController, ChangeThemeLineController,
-            ChangeSectionValueController {
+            ChangeSectionValueController, ChangeThematicRevelationController,
+            MoveCharacterArcSectionInMoralArgumentController, RemoveCharacterArcSectionFromMoralArgumentController {
             override fun outlineMoralArgument(themeId: String, characterId: String) {
             }
 
@@ -127,6 +131,23 @@ class MoralArgumentControllerUnitTest {
                 TODO("Not yet implemented")
             }
 
+            override fun changeThematicRevelation(themeId: String, revelation: String) {
+
+            }
+
+            override fun moveSectionInMoralArgument(
+                sectionId: String,
+                themeId: String,
+                characterId: String,
+                index: Int
+            ) {
+
+            }
+
+            override fun removeSectionFromMoralArgument(arcSectionId: String) {
+                TODO("Not yet implemented")
+            }
+
         }
     private val output = object : GetMoralArgumentFrame.OutputPort,
         ListAvailableArcSectionTypesToAddToMoralArgument.OutputPort,
@@ -149,6 +170,9 @@ class MoralArgumentControllerUnitTest {
         output,
         forwardedCalls,
         output,
+        forwardedCalls,
+        forwardedCalls,
+        forwardedCalls,
         forwardedCalls,
         forwardedCalls,
         forwardedCalls,

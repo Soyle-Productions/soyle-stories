@@ -40,7 +40,8 @@ class CloseProjectTest {
             override fun receiveCloseProjectFailure(failure: Exception) {
                 result = failure.left()
             }
-            override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
+
+            override suspend fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
                 result = response.right()
             }
         }
