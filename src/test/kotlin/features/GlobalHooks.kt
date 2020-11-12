@@ -55,8 +55,10 @@ class GlobalHooks : En {
             if (! FxToolkit.isFXApplicationThreadRunning()) {
                 runHeadless()
                 Runtime.getRuntime().addShutdownHook(closeThread)
-                configureModules()
-                synchronizeBackgroundTasks()
+                SoyleStories.initialization = {
+                    configureModules()
+                    synchronizeBackgroundTasks()
+                }
                 FxToolkit.registerPrimaryStage()
                 Thread.getAllStackTraces().keys.find { it.name == "JavaFX Application Thread" }?.let {
                     val currentHandler = it.uncaughtExceptionHandler
