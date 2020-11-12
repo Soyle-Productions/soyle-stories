@@ -12,6 +12,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version "$KOTLIN_VERSION"
     id "com.github.breadmoirai.github-release" version "$GITHUB_RELEASE_VERSION"
     id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'org.beryx.runtime' version '1.9.1'
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.7"
 }
 
@@ -90,8 +91,9 @@ sourceCompatibility = JAVA_VERSION
 targetCompatibility = JAVA_VERSION
 
 application {
-    mainClassName = "soylestories/Main.kt"
+    mainClassName = "com.soyle.stories.desktop.config.soylestories.MainKt"
 }
+
 
 dependencies {
     /*
@@ -120,5 +122,26 @@ dependencies {
 
     testImplementation(testFixtures(project(path: ':infrastructure'))) {
         exclude group: 'com.soyle.stories'
+    }
+}
+
+runtime {
+    options.set(["--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"])
+    modules.set(['java.desktop',
+                 'java.logging',
+                 'java.prefs',
+                 'java.xml',
+                 'jdk.unsupported',
+                 'java.scripting',
+                 'jdk.jfr'])
+
+    targetPlatform("linux", System.getenv("JAVA_HOME"))
+    targetPlatform("mac", System.getenv("JAVA_HOME"))
+    targetPlatform("win", System.getenv("JAVA_HOME"))
+}
+
+tasks.withType(CreateStartScripts.class).each {script ->
+    script.doFirst {
+        script.classpath =  files("lib/*")
     }
 }
