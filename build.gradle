@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 buildscript {
     apply from: "$LIBRARIES"
 
@@ -23,7 +25,7 @@ allprojects {
     }
 }
 
-subprojects { project ->
+allprojects { project ->
 
     group = GROUP
     version = VERSION_NAME
@@ -143,5 +145,11 @@ runtime {
 tasks.withType(CreateStartScripts.class).each {script ->
     script.doFirst {
         script.classpath =  files("lib/*")
+    }
+}
+
+processResources {
+    filesMatching("**/*.properties") {
+        filter(ReplaceTokens, tokens: ["APPLICATION_VERSION": project.property("version")], beginToken: '@', endToken: '@')
     }
 }

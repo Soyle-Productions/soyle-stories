@@ -61,8 +61,10 @@ class WelcomeScreen : View() {
 
     init {
         titleProperty.bind(model.title)
-        model.isOpen.onChange {
+        model.isOpen.onChangeWithCurrent {
             if (it == true) {
+                primaryStage.titleProperty().bind(titleProperty)
+                primaryStage.scene.root = root
                 primaryStage.show()
             } else {
                 primaryStage.hide()

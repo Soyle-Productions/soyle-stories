@@ -15,19 +15,19 @@ import javafx.collections.ObservableList
 import javafx.scene.image.Image
 import javafx.stage.Stage
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
 import tornadofx.*
-
-fun main(args: Array<String>) {
-    configureDI()
-    launch<SoyleStories>(args)
-}
 
 /**
  * Created by Brendan
  * Date: 2/14/2020
  * Time: 2:50 PM
  */
-class SoyleStories : App(WelcomeScreen::class, Styles::class) {
+class SoyleStories : App(stylesheet = Styles::class) {
+
+    companion object {
+        lateinit var initialization: () -> Unit
+    }
 
     private val appScope = ApplicationScope()
     override var scope: Scope = appScope
@@ -40,20 +40,22 @@ class SoyleStories : App(WelcomeScreen::class, Styles::class) {
 
     override fun shouldShowPrimaryStage(): Boolean = false
 
-    override fun start(stage: Stage) {
+    override fun init() {
+        initialization()
+        runBlocking {
+            projectListViewListener.startApplicationWithParameters(parameters.raw)
+        }
+    }
 
+    override fun start(stage: Stage) {
         super.start(stage)
 
         stage.icons += appIcon
 
-        //find<SplashScreen>(appScope)
+        find<WelcomeScreen>(appScope)
         find<FailedProjectsDialog>(appScope)
         find<ConfirmExitDialog>(appScope)
         find<OpenProjectOptionDialog>(appScope)
-
-        async(appScope) {
-            projectListViewListener.startApplicationWithParameters(parameters.raw)
-        }
 
         projectScopeListener = projectViews.bind(appScope.projectScopesProperty) {
             it.get()

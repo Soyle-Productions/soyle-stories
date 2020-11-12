@@ -1,8 +1,5 @@
 package com.soyle.stories.swing.soylestories
 
-import java.awt.Dimension
-import java.io.File
-import javax.imageio.ImageIO
 import javax.swing.OverlayLayout
 import javax.swing.ImageIcon
 import javax.swing.JFrame
@@ -17,7 +14,7 @@ class SplashScreen {
 		val layout = OverlayLayout(contentPane)
 		contentPane.layout = layout
 
-		val url = this@SplashScreen.javaClass.getResource("/com/soyle/stories/soylestories/splash.png")
+		val url = this@SplashScreen.javaClass.getResource("/soylestories/splash.png")
 
 		val label = JLabel(ImageIcon(url)).apply {
 

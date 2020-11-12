@@ -21,7 +21,7 @@ class SplashScreen : Fragment() {
     private val model = find<ApplicationModel>()
 
     override val root = anchorpane {
-        imageview(Image("com/soyle/stories/soylestories/splash.png")) {
+        imageview(Image("soylestories/splash.png")) {
             AnchorPane.setTopAnchor(this,0.0)
             AnchorPane.setLeftAnchor(this,0.0)
             AnchorPane.setRightAnchor(this,0.0)
