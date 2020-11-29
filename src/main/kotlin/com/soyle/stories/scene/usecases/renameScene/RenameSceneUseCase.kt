@@ -6,7 +6,6 @@ import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.repositories.SceneRepository
-import com.soyle.stories.scene.usecases.validateSceneName
 import java.util.*
 
 class RenameSceneUseCase(

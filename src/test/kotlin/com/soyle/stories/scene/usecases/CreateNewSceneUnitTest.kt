@@ -5,7 +5,6 @@ import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
-import com.soyle.stories.scene.SceneNameCannotBeBlank
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.repositories.SceneRepository

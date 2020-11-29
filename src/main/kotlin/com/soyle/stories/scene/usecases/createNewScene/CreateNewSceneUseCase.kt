@@ -7,7 +7,6 @@ import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
-import com.soyle.stories.scene.usecases.validateSceneName
 import com.soyle.stories.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.storyevent.StoryEventException
 import com.soyle.stories.storyevent.repositories.StoryEventRepository

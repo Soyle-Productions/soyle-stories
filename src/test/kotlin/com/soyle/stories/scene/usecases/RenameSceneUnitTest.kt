@@ -8,7 +8,6 @@ import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.SceneException
-import com.soyle.stories.scene.SceneNameCannotBeBlank
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
@@ -17,8 +16,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import java.util.*
 
 class RenameSceneUnitTest {
