@@ -1,9 +1,9 @@
 package com.soyle.stories.characterarc.usecases
 
 import arrow.core.Either
-import arrow.core.flatMap
 import arrow.core.right
 import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.character.characterName
 import com.soyle.stories.characterarc.TestContext
 import com.soyle.stories.characterarc.repositories.ThemeRepository
 import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
@@ -22,7 +22,7 @@ class ViewBaseStoryStructureTest {
     val themeUUID = UUID.randomUUID()
     val locationUUID = UUID.randomUUID()
     val character = makeCharacter(
-      Character.Id(characterUUID), Project.Id(), "Character Name"
+      Character.Id(characterUUID), Project.Id(), characterName()
     )
 
     private var result: Any? = null
@@ -96,8 +96,8 @@ class ViewBaseStoryStructureTest {
             val initialTheme = takeNoteOfTheme(uuid)
             if (includedCharacterIds.isNotEmpty()) {
                 includedCharacterIds.fold(initialTheme) { theme, (id, isPromoted) ->
-                    val character1 = makeCharacter(Character.Id(id), Project.Id(), "Bob")
-                    val included = theme.withCharacterIncluded(character1.id, character1.name, character1.media).right()
+                    val character1 = makeCharacter(Character.Id(id), Project.Id(), characterName())
+                    val included = theme.withCharacterIncluded(character1.id, character1.name.value, character1.media).right()
                     ((if (isPromoted) {
                         included.map {
                             it.withCharacterPromoted(Character.Id(id))

@@ -197,7 +197,7 @@ class RemoveCharacterFromStoryTest {
     private fun givenANumberOfThemesIncludeCharacter(count: Int, asMajorCharacter: Boolean = false)
     {
         val themes = themes.take(count).map {
-            it.withCharacterIncluded(character.id, character.name, character.media)
+            it.withCharacterIncluded(character.id, character.name.value, character.media)
                 .let {
                     if (asMajorCharacter) it.withCharacterPromoted(character.id)
                     else it

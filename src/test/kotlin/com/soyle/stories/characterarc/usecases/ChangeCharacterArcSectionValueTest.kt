@@ -21,7 +21,7 @@ class ChangeCharacterArcSectionValueTest {
     // preconditions
     private val character = makeCharacter()
     private val theme = makeTheme()
-        .withCharacterIncluded(character.id, character.name, character.media)
+        .withCharacterIncluded(character.id, character.name.value, character.media)
         .withCharacterPromoted(character.id)
     private val characterArc = CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name)
     private val arcSection = characterArc.arcSections.random()

@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases
 
+import com.soyle.stories.character.characterName
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.NonBlankString
@@ -83,10 +84,10 @@ class SetMotivationForCharacterInSceneUnitTest {
 		val scene = Scene(Scene.Id(sceneId), Project.Id(), NonBlankString.create("Scene Name 42")!!, StoryEvent.Id(), null, listOf()).let {
 			when {
 				includesCharacter && hasSameMotivation -> {
-					it.withCharacterIncluded(makeCharacter(Character.Id(characterId), Project.Id(), ""))
+					it.withCharacterIncluded(makeCharacter(Character.Id(characterId), Project.Id(), characterName()))
 					  .withMotivationForCharacter(Character.Id(characterId), motivationToSet)
 				}
-				includesCharacter -> it.withCharacterIncluded(makeCharacter(Character.Id(characterId), Project.Id(), ""))
+				includesCharacter -> it.withCharacterIncluded(makeCharacter(Character.Id(characterId), Project.Id(), characterName()))
 				else -> it
 			}
 		}
@@ -100,7 +101,7 @@ class SetMotivationForCharacterInSceneUnitTest {
 	{
 		runBlocking {
 			characterRepository.addNewCharacter(
-				makeCharacter(Character.Id(characterId), Project.Id(), "Bob")
+				makeCharacter(Character.Id(characterId), Project.Id(), characterName())
 			)
 		}
 	}

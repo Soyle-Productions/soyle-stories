@@ -161,14 +161,14 @@ class CompareCharacterValuesUnitTest {
             if (it % 2 == 0) {
                 MinorCharacter(
                     character.id,
-                    character.name,
+                    character.name.value,
                     archetype,
                     "",
                     "",
                 )
             } else {
                 MajorCharacter(
-                    character.id, character.name,
+                    character.id, character.name.value,
                     archetype,
                     "",
                     "",

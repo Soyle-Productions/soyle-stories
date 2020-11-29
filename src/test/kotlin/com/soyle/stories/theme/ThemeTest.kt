@@ -3,6 +3,7 @@ package com.soyle.stories.theme
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.right
+import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -47,15 +48,15 @@ class ThemeTest {
 
 	@Test
 	fun `character can be included in a theme`() {
-		val theme = takeNoteOfTheme().withCharacterIncluded(newCharacter.id, newCharacter.name, newCharacter.media)
+		val theme = takeNoteOfTheme().withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
 		assert(theme.containsCharacter(newCharacter.id))
 	}
 
 	@Test
 	fun `a character cannot be included in a theme more than once`() {
-		val themeWithCharacter = makeTheme().withCharacterIncluded(newCharacter.id, newCharacter.name, newCharacter.media)
+		val themeWithCharacter = makeTheme().withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
 		val error = assertThrows<CharacterAlreadyIncludedInTheme> {
-			themeWithCharacter.withCharacterIncluded(newCharacter.id, newCharacter.name, newCharacter.media)
+			themeWithCharacter.withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
 		}
 		assertEquals(themeWithCharacter.id.uuid, error.themeId)
 		assertEquals(newCharacter.id.uuid, error.characterId)
@@ -64,7 +65,7 @@ class ThemeTest {
 	@Test
 	fun `character can be removed from a theme`() {
 		val (theme) = takeNoteOfTheme()
-			.withCharacterIncluded(newCharacter.id, newCharacter.name, newCharacter.media)
+			.withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
 			.removeCharacter(newCharacter.id) as Either.Right
 		assert(! theme.containsCharacter(newCharacter.id))
 	}
@@ -80,21 +81,21 @@ class ThemeTest {
 	inner class ForPairsOfCharacters {
 
 		val characterA = makeCharacter(
-            Character.Id(UUID.randomUUID()), Project.Id(), "Name"
+            Character.Id(UUID.randomUUID()), Project.Id(), characterName()
         )
 		val characterB = makeCharacter(
-            Character.Id(UUID.randomUUID()), Project.Id(), "Name"
+            Character.Id(UUID.randomUUID()), Project.Id(), characterName()
         )
 
 		val themeWithCharacterA = (takeNoteOfTheme()
-			.withCharacterIncluded(characterA.id, characterA.name, characterA.media).right() as Either.Right).b
+			.withCharacterIncluded(characterA.id, characterA.name.value, characterA.media).right() as Either.Right).b
 
 		val newSimilarities = "We're similar"
 
 		@Test
 		fun `pairs of characters have similarities`() {
 			themeWithCharacterA
-				.withCharacterIncluded(characterB.id, characterB.name, characterB.media).right()
+				.withCharacterIncluded(characterB.id, characterB.name.value, characterB.media).right()
 				.flatMap { it.getSimilarities(characterA.id, characterB.id) } as Either.Right
 		}
 
@@ -109,7 +110,7 @@ class ThemeTest {
 		@Test
 		fun `can change similarities`() {
 			val (similarities) = themeWithCharacterA
-				.withCharacterIncluded(characterB.id, characterB.name, characterB.media).right()
+				.withCharacterIncluded(characterB.id, characterB.name.value, characterB.media).right()
 				.flatMap { it.changeSimilarities(characterA.id, characterB.id, newSimilarities) }
 				.flatMap { it.getSimilarities(characterA.id, characterB.id) } as Either.Right
 			assertEquals(newSimilarities, similarities)

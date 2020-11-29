@@ -61,10 +61,12 @@ class Scene(
 	) = Scene(id, projectId, name, storyEventId, locationId, charactersInScene)
 
 	fun withName(newName: NonBlankString) = copy(name = newName)
+
 	fun withCharacterIncluded(character: Character): Scene {
 		if (includesCharacter(character.id)) throw SceneAlreadyContainsCharacter(id.uuid, character.id.uuid)
-		return copy(charactersInScene = charactersInScene + CharacterInScene(character.id, id, character.name, null, listOf()))
+		return copy(charactersInScene = charactersInScene + CharacterInScene(character.id, id, character.name.value, null, listOf()))
 	}
+
 	fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene
 	{
 		if (! includesCharacter(characterId)) throw CharacterNotInScene(id.uuid, characterId.uuid)

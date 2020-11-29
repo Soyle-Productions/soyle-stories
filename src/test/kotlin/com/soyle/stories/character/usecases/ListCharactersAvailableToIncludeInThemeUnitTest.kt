@@ -9,6 +9,7 @@ import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.character.characterName
 import com.soyle.stories.entities.Project
 import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.makeTheme
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class ListCharactersAvailableToIncludeInThemeUnitTest {
 
@@ -65,7 +65,7 @@ class ListCharactersAvailableToIncludeInThemeUnitTest {
         fun `check characters have correct names`() {
             availableCharacters shouldBe charactersAvailableToIncludeInTheme {
                 it.forEach {
-                    assertEquals(expectedCharacters[Character.Id(it.characterId)]!!.name, it.characterName)
+                    assertEquals(expectedCharacters[Character.Id(it.characterId)]!!.name.value, it.characterName)
                 }
             }
         }
@@ -92,13 +92,13 @@ class ListCharactersAvailableToIncludeInThemeUnitTest {
 
     private fun givenTheme(withCharactersIncluded: List<Character> = listOf()) {
         themeRepository.themes[themeId] = withCharactersIncluded.fold(makeTheme(themeId, projectId = projectId)) { theme, character ->
-            theme.withCharacterIncluded(character.id, character.name, character.media)
+            theme.withCharacterIncluded(character.id, character.name.value, character.media)
         }
     }
 
     private fun givenCharacters(ids: List<Character.Id>) {
         ids.forEach {
-            characterRepository.characters[it] = makeCharacter(it, projectId, "Character ${UUID.randomUUID().toString().take(2)}")
+            characterRepository.characters[it] = makeCharacter(it, projectId, characterName())
         }
     }
 

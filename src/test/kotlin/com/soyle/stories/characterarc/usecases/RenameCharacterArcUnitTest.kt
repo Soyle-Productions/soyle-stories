@@ -8,6 +8,7 @@ import com.soyle.stories.characterarc.TestContext
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
 import com.soyle.stories.common.mustEqual
+import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.CharacterNotInTheme
@@ -93,7 +94,7 @@ class RenameCharacterArcUnitTest {
 	private fun givenNoThemes() = given(characterWithId = characterId)
 
 	private fun given(characterWithId: UUID? = null, andThemeWithId: UUID? = null, andThemeHasCharacter: Boolean = false, andCharacterIsMajorCharacter: Boolean = false) {
-		val character = characterWithId?.let { makeCharacter(Character.Id(characterWithId), Project.Id(), "Bob") }
+		val character = characterWithId?.let { makeCharacter(Character.Id(characterWithId), Project.Id(), nonBlankStr()) }
 		context = TestContext(
 		  initialCharacters = listOfNotNull(
 			character
@@ -102,7 +103,7 @@ class RenameCharacterArcUnitTest {
 			andThemeWithId?.let {
 				val theme = makeTheme(Theme.Id(andThemeWithId), name = characterArcName)
 				if (andThemeHasCharacter) {
-					theme.withCharacterIncluded(character!!.id, character.name, character.media).let {
+					theme.withCharacterIncluded(character!!.id, character.name.value, character.media).let {
 						if (andCharacterIsMajorCharacter) {
 							characterArcRepository.givenCharacterArc(CharacterArc.planNewCharacterArc(character.id, it.id, it.name))
 							it.withCharacterPromoted(character.id)

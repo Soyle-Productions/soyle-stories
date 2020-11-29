@@ -5,6 +5,7 @@ import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.repositories.ThemeRepository
 import com.soyle.stories.character.usecases.validateCharacterName
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Media
 import com.soyle.stories.entities.Project
@@ -22,7 +23,7 @@ class BuildNewCharacterUseCase(
     private val themeRepository: ThemeRepository
 ) : BuildNewCharacter {
 
-    override suspend fun invoke(projectId: UUID, name: String, outputPort: BuildNewCharacter.OutputPort) {
+    override suspend fun invoke(projectId: UUID, name: NonBlankString, outputPort: BuildNewCharacter.OutputPort) {
         val response = try {
             createCharacter(Project.Id(projectId), name)
         } catch (e: CharacterException) {
@@ -32,7 +33,7 @@ class BuildNewCharacterUseCase(
     }
 
     override suspend fun createAndIncludeInTheme(
-        name: String,
+        name: NonBlankString,
         themeId: UUID,
         outputPort: BuildNewCharacter.OutputPort
     ) {
@@ -49,7 +50,7 @@ class BuildNewCharacterUseCase(
     }
 
     override suspend fun createAndUseAsOpponent(
-        name: String,
+        name: NonBlankString,
         themeId: UUID,
         opponentOfCharacterId: UUID,
         outputPort: BuildNewCharacter.OutputPort
@@ -99,8 +100,7 @@ class BuildNewCharacterUseCase(
         )
     }
 
-    private suspend fun createCharacter(projectId: Project.Id, name: String): CharacterItem {
-        validateCharacterName(name)
+    private suspend fun createCharacter(projectId: Project.Id, name: NonBlankString): CharacterItem {
 
         val character = Character.buildNewCharacter(projectId, name)
 
@@ -108,7 +108,7 @@ class BuildNewCharacterUseCase(
 
         return CharacterItem(
             character.id.uuid,
-            character.name,
+            character.name.value,
             character.media?.uuid
         )
     }

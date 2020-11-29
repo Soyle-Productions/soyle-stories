@@ -235,7 +235,7 @@ class ChangeStoryFunctionTest {
                 val initialTheme =
                     characters.fold(makeTheme(Theme.Id(themeUUID))) { theme, (characterUUID, storyFunction) ->
                         val character = makeCharacter(Character.Id(characterUUID))
-                        theme.withCharacterIncluded(character.id, character.name, character.media)
+                        theme.withCharacterIncluded(character.id, character.name.value, character.media)
                             .let {
                                 if (storyFunction != null) {
                                     it.withCharacterPromoted(character.id)

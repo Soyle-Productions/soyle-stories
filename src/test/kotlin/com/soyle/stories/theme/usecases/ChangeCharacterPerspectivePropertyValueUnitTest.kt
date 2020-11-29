@@ -2,6 +2,7 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
 import arrow.core.identity
+import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -155,8 +156,8 @@ class ChangeCharacterPerspectivePropertyValueUnitTest {
     private fun givenThemeWith(themeId: UUID, andMajorCharacter: UUID? = null, vararg andCharacters: UUID) {
         val theme = makeTheme(Theme.Id(themeId)).let {
             andCharacters.fold(it) { nextTheme, characterId ->
-                val character = makeCharacter(Character.Id(characterId), Project.Id(), "Bob")
-                nextTheme.withCharacterIncluded(character.id, character.name, character.media)
+                val character = makeCharacter(Character.Id(characterId), Project.Id())
+                nextTheme.withCharacterIncluded(character.id, character.name.value, character.media)
             }
         }.let { theme ->
             if (andMajorCharacter != null) theme.getMinorCharacterById(Character.Id(andMajorCharacter))?.let {

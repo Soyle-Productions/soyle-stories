@@ -3,6 +3,7 @@ package com.soyle.stories.theme
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.right
+import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.CoupleOf
 import com.soyle.stories.entities.*
@@ -49,13 +50,13 @@ fun takeNoteOfTheme(expectedId: UUID): Theme =
 	makeTheme(id = Theme.Id(expectedId))
 
 val newCharacter = makeCharacter(
-    Character.Id(UUID.randomUUID()), Project.Id(), "Name"
+    Character.Id(UUID.randomUUID()), Project.Id(), characterName()
 )
 val newArchetype = "Artist"
 val newVariationOnMoral = "When you look at it this way..."
 
 val themeWithCharacter = (Theme.takeNoteOf(Project.Id(), "")
-	.flatMap { it.withCharacterIncluded(newCharacter.id, newCharacter.name, newCharacter.media).right() } as Either.Right).b
+	.flatMap { it.withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media).right() } as Either.Right).b
 
 val themeWithoutCharacter = (Theme.takeNoteOf(Project.Id(), "") as Either.Right).b
 

@@ -7,7 +7,7 @@ import com.soyle.stories.entities.theme.ThematicSection
 fun Character.asMinorCharacter(): MinorCharacter {
     return MinorCharacter(
         id,
-        name,
+        name.value,
         "",
         "",
         ""

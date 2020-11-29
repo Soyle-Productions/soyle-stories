@@ -4,6 +4,7 @@ import arrow.core.identity
 import com.soyle.stories.character.*
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -20,7 +21,7 @@ class RenameCharacterUnitTest {
 
 	val characterId = UUID.randomUUID()
 	val themeId = UUID.randomUUID()
-	val inputName = "Input Name"
+	val inputName = NonBlankString.create("Input Name")!!
 
 	private lateinit var context: TestContext
 	private var updatedCharacter: Character? = null
@@ -41,14 +42,6 @@ class RenameCharacterUnitTest {
 		whenUseCaseIsExecuted()
 		val result = result as CharacterDoesNotExist
 		result.characterId.mustEqual(characterId)
-	}
-
-	@ParameterizedTest
-	@ValueSource(strings = ["", "  ", "\r", "\n", "\r\n"])
-	fun `name is blank`(inputName: String) {
-		givenCharacterWithId(characterId = characterId)
-		whenUseCaseIsExecuted(inputName = inputName)
-		result as CharacterNameCannotBeBlank
 	}
 
 	@Test
@@ -94,8 +87,8 @@ class RenameCharacterUnitTest {
 		)
 	}
 
-	fun givenCharacterWithId(characterId: UUID? = null, andName: String? = null, andThemeId: UUID? = null, andThemeHasCharacter: Boolean = false) {
-		val character = characterId?.let { makeCharacter(Character.Id(it), Project.Id(), andName ?: "Original Name") }
+	fun givenCharacterWithId(characterId: UUID? = null, andName: NonBlankString? = null, andThemeId: UUID? = null, andThemeHasCharacter: Boolean = false) {
+		val character = characterId?.let { makeCharacter(Character.Id(it), Project.Id(), andName ?: NonBlankString.create("Original Name")!!) }
 		context = TestContext(
 		  initialCharacters = listOfNotNull(
 			character
@@ -104,7 +97,7 @@ class RenameCharacterUnitTest {
 			andThemeId?.let { expectedId ->
 				val theme = makeTheme(id = Theme.Id(expectedId))
 				if (andThemeHasCharacter) {
-					theme.withCharacterIncluded(character!!.id, character.name, character.media)
+					theme.withCharacterIncluded(character!!.id, character.name.value, character.media)
 				}
 				else theme
 			}
@@ -118,7 +111,7 @@ class RenameCharacterUnitTest {
 		)
 	}
 
-	private fun whenUseCaseIsExecuted(inputName: String = this.inputName) {
+	private fun whenUseCaseIsExecuted(inputName: NonBlankString = this.inputName) {
 		val repo = context.characterRepository
 		val useCase: RenameCharacter = RenameCharacterUseCase(repo, context.themeRepository)
 		val output = object : RenameCharacter.OutputPort {
@@ -139,12 +132,12 @@ class RenameCharacterUnitTest {
 	private fun assertResultIsResponseModel() {
 		val result = result as RenameCharacter.ResponseModel
 		result.characterId.mustEqual(characterId)
-		result.newName.mustEqual(inputName)
+		result.newName.mustEqual(inputName.value)
 	}
 
 	private fun assertThemeWasUpdated() {
 		val updatedTheme = updatedTheme!!
-		updatedTheme.getIncludedCharacterById(Character.Id(characterId))!!.name.mustEqual(inputName)
+		updatedTheme.getIncludedCharacterById(Character.Id(characterId))!!.name.mustEqual(inputName.value)
 	}
 
 	private fun assertResultHasAffectedThemes() {

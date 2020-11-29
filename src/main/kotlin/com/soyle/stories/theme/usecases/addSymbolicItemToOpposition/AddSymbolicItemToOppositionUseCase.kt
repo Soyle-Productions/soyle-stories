@@ -48,11 +48,11 @@ class AddSymbolicItemToOppositionUseCase(
         val valueWeb = getValueWeb(theme, oppositionId)
 
         val character = getCharacter(characterId)
-        val representation = SymbolicRepresentation(characterId, character.name)
+        val representation = SymbolicRepresentation(characterId, character.name.value)
 
         val characterIncludedInTheme: CharacterIncludedInTheme?
         val themeWithCharacter = if (!theme.containsCharacter(character.id)) {
-            theme.withCharacterIncluded(character.id, character.name, character.media).also {
+            theme.withCharacterIncluded(character.id, character.name.value, character.media).also {
                 characterIncludedInTheme = CharacterIncludedInTheme(
                     theme.id.uuid,
                     "",

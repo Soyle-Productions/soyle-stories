@@ -95,7 +95,7 @@ class AddOppositionToValueWebUseCase(
             return if (firstLinkedItem is CharacterId) {
                 val character = getCharacter(firstLinkedItem)
                 val executorWithCharacter = includeCharacterInThemeIfNeeded(character)
-                val symbolicItem = SymbolicRepresentation(character.id.uuid, character.name)
+                val symbolicItem = SymbolicRepresentation(character.id.uuid, character.name.value)
 
                 val executorWithoutRepresentation = if (valueWeb.hasRepresentation(symbolicItem.entityUUID)) {
                     executorWithCharacter.removeSymbolicItemFromValueWeb(symbolicItem)
@@ -157,7 +157,7 @@ class AddOppositionToValueWebUseCase(
             return if (theme.containsCharacter(character.id)) this
             else {
                 Executor(
-                    theme.withCharacterIncluded(character.id, character.name, character.media),
+                    theme.withCharacterIncluded(character.id, character.name.value, character.media),
                     valueWebId,
                     oppositionValueId,
                     response!!.let {
@@ -165,7 +165,7 @@ class AddOppositionToValueWebUseCase(
                             it.oppositionAddedToValueWeb,
                             it.symbolicRepresentationRemoved,
                             it.symbolicRepresentationAddedToOpposition,
-                            CharacterIncludedInTheme(theme.id.uuid, theme.name, character.id.uuid, character.name, false)
+                            CharacterIncludedInTheme(theme.id.uuid, theme.name, character.id.uuid, character.name.value, false)
                         )
                     }
                 )

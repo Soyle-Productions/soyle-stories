@@ -11,7 +11,7 @@ import java.util.*
 fun includedCharacterInTheme(baseCharacter: Character, theme: Theme, asMajorCharacter: Boolean = false) = fun (event: CharacterIncludedInTheme)
 {
     assertEquals(baseCharacter.id.uuid, event.characterId)
-    assertEquals(baseCharacter.name, event.characterName)
+    assertEquals(baseCharacter.name.value, event.characterName)
     assertEquals(asMajorCharacter, event.isMajorCharacter)
     assertEquals(theme.id.uuid, event.themeId)
     assertEquals(theme.name, event.themeName)

@@ -77,7 +77,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
         private fun givenANumberOfCharactersExist(number: Int, projectId: Project.Id? = null) {
             repeat(number) {
                 val id = Character.Id()
-                characterRepository.characters[id] = makeCharacter(id, projectId ?: Project.Id(), "Character ${UUID.randomUUID()}")
+                characterRepository.characters[id] = makeCharacter(id, projectId ?: Project.Id())
             }
         }
     }
@@ -156,7 +156,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
                 makeValueWeb(
                     oppositions = listOf(
                         makeOppositionValue(oppositionId, representations = characterSymbols.map {
-                            SymbolicRepresentation(it.id.uuid, it.name)
+                            SymbolicRepresentation(it.id.uuid, it.name.value)
                         } + locationSymbols.map {
                             SymbolicRepresentation(it.id.uuid, it.name)
                         } + symbols.map {
@@ -204,7 +204,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
             actual as EntitiesAvailableToAddToOpposition
             assertEquals(characterIds, actual.characters.map { it.characterId }.toSet())
             assertEquals(
-                characterIds.map { characterRepository.characters[Character.Id(it)]!!.name }.toSet(),
+                characterIds.map { characterRepository.characters[Character.Id(it)]!!.name.value }.toSet(),
                 actual.characters.map { it.characterName }.toSet()
             ) { "Character Names not properly mapped" }
 

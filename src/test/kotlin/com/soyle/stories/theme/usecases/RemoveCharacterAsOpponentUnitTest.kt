@@ -137,7 +137,7 @@ class RemoveCharacterAsOpponentUnitTest {
     private fun givenThemeHasCharacter(character: Character, asMajorCharacter: Boolean = false)
     {
         themeRepository.themes[theme.id] = themeRepository.themes.getValue(theme.id)
-            .withCharacterIncluded(character.id, character.name, character.media)
+            .withCharacterIncluded(character.id, character.name.value, character.media)
             .let {
                 if (asMajorCharacter) it.withCharacterPromoted(character.id)
                 else it

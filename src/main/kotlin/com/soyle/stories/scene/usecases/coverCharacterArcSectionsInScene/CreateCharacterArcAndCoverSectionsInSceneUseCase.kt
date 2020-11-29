@@ -62,7 +62,7 @@ class CreateCharacterArcAndCoverSectionsInSceneUseCase(
         name: String
     ): Theme {
         val theme = Theme(character.projectId, name)
-            .withCharacterIncluded(character.id, character.name, null)
+            .withCharacterIncluded(character.id, character.name.value, null)
             .withCharacterPromoted(character.id)
         themeRepository.addTheme(theme)
         return theme

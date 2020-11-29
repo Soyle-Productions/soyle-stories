@@ -1,14 +1,17 @@
 package com.soyle.stories.character
 
 import com.soyle.stories.common.Desire
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.str
 import com.soyle.stories.entities.*
 import java.util.*
 
+fun characterName() = NonBlankString.create("Character ${str()}")!!
+
 fun makeCharacter(
     id: Character.Id = Character.Id(),
     projectId: Project.Id = Project.Id(),
-    name: String = "Character ${UUID.randomUUID().toString().take(3)}",
+    name: NonBlankString = characterName(),
     media: Media.Id? = null
 ) = Character(id, projectId, name, media)
 

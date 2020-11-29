@@ -69,7 +69,7 @@ class AddValueWebToThemeUseCase(
             is CharacterId -> {
                 val character = characterRepository.getCharacterById(Character.Id(symbolicItemId.characterId))
                     ?: throw CharacterDoesNotExist(symbolicItemId.characterId)
-                return SymbolicRepresentation(character.id.uuid, character.name)
+                return SymbolicRepresentation(character.id.uuid, character.name.value)
             }
             else -> error("unexpected representation type (location and symbol not yet available for auto-linking.")
         }

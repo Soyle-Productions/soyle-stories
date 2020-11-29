@@ -40,7 +40,7 @@ class PlanNewCharacterArcUseCase(
         character: Character,
         theme: Theme
     ): Theme {
-        return theme.withCharacterIncluded(character.id, character.name, character.media)
+        return theme.withCharacterIncluded(character.id, character.name.value, character.media)
             .withCharacterPromoted(character.id)
     }
 

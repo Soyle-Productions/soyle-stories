@@ -1,5 +1,6 @@
 package com.soyle.stories.scene
 
+import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.character.makeCharacterArcSection
 import com.soyle.stories.common.NonBlankString
@@ -34,7 +35,7 @@ class SceneTest {
 
     @Test
     fun `scene covers character arc section`() {
-        val character = Character.buildNewCharacter(Project.Id(), "")
+        val character = Character.buildNewCharacter(Project.Id(), characterName())
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
             .withCharacterIncluded(character)
@@ -45,7 +46,7 @@ class SceneTest {
 
     @Test
     fun `character must already be included in scene`() {
-        val character = Character.buildNewCharacter(Project.Id(), "")
+        val character = Character.buildNewCharacter(Project.Id(), characterName())
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
         val error = assertThrows<CharacterNotInScene> {
@@ -56,7 +57,7 @@ class SceneTest {
 
     @Test
     fun `cannot cover the same character arc section twice`() {
-        val character = Character.buildNewCharacter(Project.Id(), "")
+        val character = Character.buildNewCharacter(Project.Id(), characterName())
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
             .withCharacterIncluded(character)
@@ -72,7 +73,7 @@ class SceneTest {
     @Test
     fun `character not in scene has null character arc sections`()
     {
-        val character = Character.buildNewCharacter(Project.Id(), "")
+        val character = Character.buildNewCharacter(Project.Id(), characterName())
         val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
         assertNull(scene.getCoveredCharacterArcSectionsForCharacter(character.id))
     }

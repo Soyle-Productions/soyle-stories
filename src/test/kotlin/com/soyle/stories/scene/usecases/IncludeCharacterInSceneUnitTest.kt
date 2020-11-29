@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.character.CharacterDoesNotExist
+import com.soyle.stories.character.characterName
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.mustEqual
@@ -33,7 +34,7 @@ class IncludeCharacterInSceneUnitTest {
 
     private val storyEventId = StoryEvent.Id().uuid
     private val characterId = Character.Id().uuid
-    private val characterName = "${UUID.randomUUID()}"
+    private val characterName = characterName()
     private val sceneId = Scene.Id().uuid
     private val projectId = Project.Id()
 
@@ -157,7 +158,7 @@ class IncludeCharacterInSceneUnitTest {
                 allCharacters.forEach { baseCharacter ->
                     val availableCharacter =
                         find { it.characterId == baseCharacter.id.uuid } ?: error("$baseCharacter not in output")
-                    availableCharacter.characterName.mustEqual(baseCharacter.name) { "Output character name does not match expected" }
+                    availableCharacter.characterName.mustEqual(baseCharacter.name.value) { "Output character name does not match expected" }
                     availableCharacter.mediaId.mustEqual(baseCharacter.media?.uuid) { "Output character media id does not match expected" }
                 }
             }
@@ -178,7 +179,7 @@ class IncludeCharacterInSceneUnitTest {
                 (allCharacters - includedCharacters).forEach { baseCharacter ->
                     val availableCharacter =
                         find { it.characterId == baseCharacter.id.uuid } ?: error("$baseCharacter not in output")
-                    availableCharacter.characterName.mustEqual(baseCharacter.name) { "Output character name does not match expected" }
+                    availableCharacter.characterName.mustEqual(baseCharacter.name.value) { "Output character name does not match expected" }
                     availableCharacter.mediaId.mustEqual(baseCharacter.media?.uuid) { "Output character media id does not match expected" }
                 }
             }
@@ -304,7 +305,7 @@ class IncludeCharacterInSceneUnitTest {
         actual as IncludedCharacterInScene
         assertEquals(sceneId, actual.sceneId)
         assertEquals(characterId, actual.characterId)
-        assertEquals(characterName, actual.characterName)
+        assertEquals(characterName.value, actual.characterName)
         assertNull(actual.motivation)
         assertInheritedMotivation(actual)
     }
