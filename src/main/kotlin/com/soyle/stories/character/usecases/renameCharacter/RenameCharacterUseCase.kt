@@ -5,7 +5,6 @@ import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.repositories.ThemeRepository
-import com.soyle.stories.character.usecases.validateCharacterName
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme

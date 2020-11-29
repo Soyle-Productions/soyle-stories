@@ -3,7 +3,6 @@ package com.soyle.stories.character.usecases.buildNewCharacter
 import com.soyle.stories.character.CharacterException
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.repositories.ThemeRepository
-import com.soyle.stories.character.usecases.validateCharacterName
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.entities.Character
