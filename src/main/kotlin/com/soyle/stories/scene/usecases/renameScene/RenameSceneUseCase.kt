@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases.renameScene
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneDoesNotExist
@@ -21,10 +22,9 @@ class RenameSceneUseCase(
 	}
 
 	private suspend fun renameScene(request: RenameScene.RequestModel): RenameScene.ResponseModel {
-		validateSceneName(request.name, request.locale)
 		val scene = getScene(request.sceneId, request.locale)
 		updateSceneIfNeeded(scene, request.name)
-		return RenameScene.ResponseModel(scene.id.uuid, request.name)
+		return RenameScene.ResponseModel(scene.id.uuid, request.name.value)
 	}
 
 	private suspend fun getScene(sceneId: UUID, locale: Locale): Scene {
@@ -32,7 +32,7 @@ class RenameSceneUseCase(
 		  ?: throw SceneDoesNotExist(locale, sceneId)
 	}
 
-	private suspend fun updateSceneIfNeeded(scene: Scene, newName: String)
+	private suspend fun updateSceneIfNeeded(scene: Scene, newName: NonBlankString)
 	{
 		if (scene.name != newName) {
 			sceneRepository.updateScene(scene.withName(newName))

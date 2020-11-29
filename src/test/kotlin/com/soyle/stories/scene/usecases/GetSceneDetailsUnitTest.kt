@@ -190,7 +190,7 @@ class GetSceneDetailsUnitTest {
                 actual.characters.forEach {
                     val motivationSource = motivationSources.getValue(it.characterId)
                     assertEquals(motivationSource.id.uuid, it.inheritedMotivation?.sceneId)
-                    assertEquals(motivationSource.name, it.inheritedMotivation?.sceneName)
+                    assertEquals(motivationSource.name.value, it.inheritedMotivation?.sceneName)
                     assertEquals(
                         motivationSource.charactersInScene().single().motivation!!,
                         it.inheritedMotivation?.motivation

@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
@@ -48,7 +49,7 @@ class ListAllScenesUnitTest {
 	private fun givenNoScenes() = given()
 	private fun given(sceneIds: List<UUID> = emptyList()) {
 		storedScenes = sceneIds.map {
-			Scene(Scene.Id(it), projectId, "Unique Scene Name: $it", StoryEvent.Id(), null, listOf())
+			Scene(Scene.Id(it), projectId, NonBlankString.create("Unique Scene Name: $it")!!, StoryEvent.Id(), null, listOf())
 		}
 		sceneRepository = SceneRepositoryDouble(
 		  initialScenes = storedScenes
@@ -73,6 +74,6 @@ class ListAllScenesUnitTest {
 		val result = result as ListAllScenes.ResponseModel
 		result.scenes.map(SceneItem::id).toSet().mustEqual(sceneIds.toSet()) { "Not all scenes output" }
 		result.scenes.map(SceneItem::sceneName).toSet()
-		  .mustEqual(storedScenes.map(Scene::name).toSet()) { "Scene names do not match" }
+		  .mustEqual(storedScenes.map(Scene::name).map(NonBlankString::value).toSet()) { "Scene names do not match" }
 	}
 }

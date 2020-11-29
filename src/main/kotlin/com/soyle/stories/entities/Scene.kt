@@ -1,20 +1,21 @@
 package com.soyle.stories.entities
 
 import com.soyle.stories.common.Entity
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.scene.CharacterNotInScene
 import com.soyle.stories.scene.SceneAlreadyContainsCharacter
 import java.util.*
 
 class Scene(
-  override val id: Id,
-  val projectId: Project.Id,
-  val name: String,
-  val storyEventId: StoryEvent.Id,
-  val locationId: Location.Id?,
-  private val charactersInScene: List<CharacterInScene>
+	override val id: Id,
+	val projectId: Project.Id,
+	val name: NonBlankString,
+	val storyEventId: StoryEvent.Id,
+	val locationId: Location.Id?,
+	private val charactersInScene: List<CharacterInScene>
 ) : Entity<Scene.Id> {
 
-	constructor(projectId: Project.Id, name: String, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, null, listOf())
+	constructor(projectId: Project.Id, name: NonBlankString, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, null, listOf())
 
 	private val charactersById by lazy { charactersInScene.associateBy { it.characterId } }
 
@@ -54,12 +55,12 @@ class Scene(
 	fun hasCharacters(): Boolean = charactersInScene.isNotEmpty()
 
 	private fun copy(
-	  name: String = this.name,
+	  name: NonBlankString = this.name,
 	  locationId: Location.Id? = this.locationId,
 	  charactersInScene: List<CharacterInScene> = this.charactersInScene
 	) = Scene(id, projectId, name, storyEventId, locationId, charactersInScene)
 
-	fun withName(newName: String) = copy(name = newName)
+	fun withName(newName: NonBlankString) = copy(name = newName)
 	fun withCharacterIncluded(character: Character): Scene {
 		if (includesCharacter(character.id)) throw SceneAlreadyContainsCharacter(id.uuid, character.id.uuid)
 		return copy(charactersInScene = charactersInScene + CharacterInScene(character.id, id, character.name, null, listOf()))

@@ -4,6 +4,7 @@ import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.mustEqual
+import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -238,7 +239,7 @@ class IncludeCharacterInSceneUnitTest {
 
     private fun givenMotivationsForCharacterPreviouslySet() {
         repeat(5) {
-            Scene(projectId, "${UUID.randomUUID()}", StoryEvent.Id())
+            Scene(projectId, nonBlankStr(), StoryEvent.Id())
                 .withCharacterIncluded(characterRepository.characters.values.first())
                 .withMotivationForCharacter(Character.Id(characterId), "${UUID.randomUUID()}")
                 .let {
@@ -312,7 +313,7 @@ class IncludeCharacterInSceneUnitTest {
         val lastMotiveSource = lastMotiveSource ?: return
         assertNotNull(actual.inheritedMotivation)
         assertEquals(lastMotiveSource.id.uuid, actual.inheritedMotivation!!.sceneId)
-        assertEquals(lastMotiveSource.name, actual.inheritedMotivation!!.sceneName)
+        assertEquals(lastMotiveSource.name.value, actual.inheritedMotivation!!.sceneName)
         assertEquals(
             lastMotiveSource.getMotivationForCharacter(Character.Id(characterId))?.motivation,
             actual.inheritedMotivation!!.motivation

@@ -34,7 +34,6 @@ class CreateNewSceneUseCase(
 	}
 
 	private suspend fun execute(request: CreateNewScene.RequestModel): Pair<CreateNewScene.ResponseModel, CreateStoryEvent.ResponseModel?> {
-		validateSceneName(request.name, request.locale)
 		val (storyEvent, createdStoryEventResponse) = getOrCreateStoryEvent(request)
 		val response = createNewScene(storyEvent, request)
 		return response to createdStoryEventResponse
@@ -58,11 +57,11 @@ class CreateNewSceneUseCase(
 			request.relativeToScene != null -> {
 				val relativeStoryEvent = getRelativeStoryEvent(request)
 				when(request.relativeToScene.second) {
-					true -> CreateStoryEvent.RequestModel.insertBefore(request.name, relativeStoryEvent.uuid)
-					false -> CreateStoryEvent.RequestModel.insertBefore(request.name, relativeStoryEvent.uuid)
+					true -> CreateStoryEvent.RequestModel.insertBefore(request.name.value, relativeStoryEvent.uuid)
+					false -> CreateStoryEvent.RequestModel.insertBefore(request.name.value, relativeStoryEvent.uuid)
 				}
 			}
-			else -> CreateStoryEvent.RequestModel(request.name, projectId.uuid)
+			else -> CreateStoryEvent.RequestModel(request.name.value, projectId.uuid)
 		}
 	}
 
@@ -113,7 +112,7 @@ class CreateNewSceneUseCase(
 		val idOrder = sceneRepository.getSceneIdsInOrder(projectId)
 		val index = getInsertionIndex(idOrder, request)
 		val affectedScenes = insertSceneAt(idOrder, scene, index)
-		return CreateNewScene.ResponseModel(scene.id.uuid, request.name, index, affectedScenes)
+		return CreateNewScene.ResponseModel(scene.id.uuid, request.name.value, index, affectedScenes)
 	}
 
 	private fun getInsertionIndex(idOrder: List<Scene.Id>, request: CreateNewScene.RequestModel): Int
@@ -134,7 +133,7 @@ class CreateNewSceneUseCase(
 		return if (index < idOrder.size) {
 			val affectedIds = idOrder.asSequence().withIndex().filter { it.index >= index }.associate { it.value to it.index }
 			sceneRepository.listAllScenesInProject(projectId).filter { it.id in affectedIds }.map {
-				SceneItem(it.id.uuid, it.name, affectedIds.getValue(it.id) + 1)
+				SceneItem(it.id.uuid, it.name.value, affectedIds.getValue(it.id) + 1)
 			}
 		} else listOf()
 	}

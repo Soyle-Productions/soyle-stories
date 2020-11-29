@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases
 
+import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
@@ -79,7 +80,7 @@ class LinkLocationToSceneUnitTest {
 
 	private fun givenSceneExists(hasLinkedLocation: Boolean = false)
 	{
-		sceneRepository.scenes[sceneId] = Scene(sceneId, Project.Id(), "", StoryEvent.Id(), locationId.takeIf { hasLinkedLocation }, listOf())
+		sceneRepository.scenes[sceneId] = Scene(sceneId, Project.Id(), nonBlankStr(), StoryEvent.Id(), locationId.takeIf { hasLinkedLocation }, listOf())
 	}
 
 	private fun givenLocationExists()

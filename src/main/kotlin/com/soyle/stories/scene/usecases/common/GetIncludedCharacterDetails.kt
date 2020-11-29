@@ -27,7 +27,7 @@ internal fun getLastSetMotivation(
 	} ?: return null
 	return InheritedMotivation(
 	  lastSetScene.id.uuid,
-	  lastSetScene.name,
+	  lastSetScene.name.value,
 	  lastSetScene.getMotivationForCharacter(characterId)!!.motivation!!
 	)
 }

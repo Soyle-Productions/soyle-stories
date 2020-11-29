@@ -94,7 +94,7 @@ class GetPotentialChangesFromReorderingSceneUseCase(
         ).map { (affectedScene, affectedCharacters) ->
             AffectedScene(
                 affectedScene.id.uuid,
-                affectedScene.name,
+                affectedScene.name.value,
                 affectedCharacters
             )
         }

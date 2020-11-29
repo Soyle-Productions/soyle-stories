@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.usecases
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
@@ -21,7 +22,7 @@ class ReorderSceneUnitTest {
 
 	private val sceneId = Scene.Id()
 	private val otherSceneIds = List(5) { Scene.Id() }
-	private val sceneName = "Target Scene"
+	private val sceneName = NonBlankString.create("Target Scene")!!
 	private val projectId = Project.Id()
 
 	private var savedSceneIds: List<Scene.Id>? = null
@@ -105,7 +106,7 @@ class ReorderSceneUnitTest {
 	private fun `given scene exists`(existingSceneCount: Int = 1, atIndex: Int = 0) {
 		sceneRepository.sceneOrder[projectId] = List(existingSceneCount) {
 			val sceneId = if (it == atIndex) sceneId else otherSceneIds[it]
-			val sceneName = if (it == atIndex) sceneName else "Scene $it"
+			val sceneName = if (it == atIndex) sceneName else NonBlankString.create("Scene $it")!!
 			Scene(sceneId, projectId, sceneName, StoryEvent.Id(), null, listOf())
 		}.onEach {
 			sceneRepository.scenes[it.id] = it
@@ -131,7 +132,7 @@ class ReorderSceneUnitTest {
 
 	private fun responseModel(initialIndex: Int = 0, newIndex: Int = 0, updates: List<Pair<Scene.Id, Int>> = listOf()): (Any?) -> Unit = { actual ->
 		actual as ReorderScene.ResponseModel
-		assertEquals(SceneItem(sceneId.uuid, sceneName, newIndex), actual.scene)
+		assertEquals(SceneItem(sceneId.uuid, sceneName.value, newIndex), actual.scene)
 		assertEquals(initialIndex, actual.oldIndex) { "Original index not correctly output" }
 		assertUpdatedItemsOutput(actual, updates.toMap())
 	}
@@ -139,7 +140,7 @@ class ReorderSceneUnitTest {
 	private fun assertUpdatedItemsOutput(actual: ReorderScene.ResponseModel, updates: Map<Scene.Id, Int>)
 	{
 		assertEquals(
-		  updates.map { SceneItem(it.key.uuid, sceneRepository.scenes.getValue(it.key).name, it.value) },
+		  updates.map { SceneItem(it.key.uuid, sceneRepository.scenes.getValue(it.key).name.value, it.value) },
 		  actual.updatedScenes
 		) { "Not all expected scenes in output.\nTargeted Scene: ${actual.scene}" }
 	}
