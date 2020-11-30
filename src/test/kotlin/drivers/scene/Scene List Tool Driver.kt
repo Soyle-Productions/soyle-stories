@@ -48,3 +48,17 @@ fun SceneList.renameSceneTo(scene: Scene, newName: String)
         }
     }
 }
+
+fun SceneList.deleteScene(scene: Scene)
+{
+    val driver = SceneListDriver(this)
+    val sceneItem = driver.getSceneItemOrError(scene.name.value)
+    val tree = driver.getTree()
+
+    with(driver) {
+        interact {
+            tree.selectionModel.select(sceneItem)
+            sceneItem.getDeleteItem().fire()
+        }
+    }
+}

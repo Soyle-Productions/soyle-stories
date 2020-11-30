@@ -2,14 +2,9 @@ package com.soyle.stories.desktop.config.features.scene
 
 import com.soyle.stories.desktop.config.drivers.scene.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
-import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
-import com.soyle.stories.desktop.config.drivers.theme.createThemeWithName
-import com.soyle.stories.desktop.config.drivers.theme.givenThemeListToolHasBeenOpened
-import com.soyle.stories.desktop.config.drivers.theme.openCreateThemeDialog
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert.Companion.assertThat
-import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert
+import com.soyle.stories.desktop.view.project.workbench.WorkbenchAssertions.Companion.assertThat
 import com.soyle.stories.entities.Scene
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -41,6 +36,11 @@ class SceneSteps : En {
             workbench.givenSceneListToolHasBeenOpened()
                 .renameSceneTo(scene, newName)
         }
+        When("the user wants to delete {scene}") { scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .deleteScene(scene)
+        }
     }
 
     private fun thens() {
@@ -66,6 +66,16 @@ class SceneSteps : En {
                 doesNotHaveSceneNamed(originalName)
                 hasSceneNamed(newName)
             }
+        }
+        Then("a delete scene confirmation message should be shown") {
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            assertThat(workbench) {
+                hasConfirmDeleteSceneDialogOpen()
+            }
+        }
+        Then("the {string} scene should not have been deleted") { sceneName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            SceneDriver(workbench).getSceneByNameOrError(sceneName)
         }
     }
 

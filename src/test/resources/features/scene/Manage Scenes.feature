@@ -18,19 +18,19 @@ Feature: Manage Scenes
     Given a scene named "Big Battle" has been created
     When the user wants to delete "Big Battle"
     Then a delete scene confirmation message should be shown
-    And "Big Battle" should not have been deleted
+    But the "Big Battle" scene should not have been deleted
 
   Scenario: Immediately Delete Scene
     Given a scene named "Big Battle" has been created
     And the user has requested that a delete scene confirmation message not be shown
     When the user wants to delete "Big Battle"
-    Then "Big Battle" should have been deleted
+    Then the "Big Battle" scene should have been deleted
 
   Scenario: Confirm Delete Scene
     Given a scene named "Big Battle" has been created
     And the user wanted to delete "Big Battle"
     When the user confirms they want to delete "Big Battle"
-    Then "Big Battle" should have been deleted
+    Then the "Big Battle" scene should have been deleted
 
   Scenario: Delete Scene with Dependent Scene
     Given the following scenes with motivations for characters
