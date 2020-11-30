@@ -18,7 +18,7 @@ import java.util.*
 class CoverCharacterArcSectionsInSceneUnitTest {
 
     // Preconditions
-    val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
+    val scene = makeScene()
     val character = makeCharacter()
 
     // Post-conditions

@@ -10,6 +10,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.sceneDoesNotExist
 import com.soyle.stories.scene.usecases.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
 import com.soyle.stories.scene.usecases.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingSceneUseCase
@@ -205,7 +206,7 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
     private fun givenScenes(vararg names: String)
     {
         sceneRepository.sceneOrder[projectId] = names.map {
-            val scene = Scene(projectId, NonBlankString.create(it)!!, StoryEvent.Id())
+            val scene = makeScene(projectId = projectId, name = NonBlankString.create(it)!!)
             sceneRepository.scenes[scene.id] = scene
             sceneNameMap[it] = scene.id
             scene.id

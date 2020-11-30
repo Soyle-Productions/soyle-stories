@@ -12,10 +12,11 @@ class Scene(
 	val name: NonBlankString,
 	val storyEventId: StoryEvent.Id,
 	val locationId: Location.Id?,
+	val proseId: Prose.Id,
 	private val charactersInScene: List<CharacterInScene>
 ) : Entity<Scene.Id> {
 
-	constructor(projectId: Project.Id, name: NonBlankString, storyEventId: StoryEvent.Id) : this(Id(), projectId, name, storyEventId, null, listOf())
+	constructor(projectId: Project.Id, name: NonBlankString, storyEventId: StoryEvent.Id, proseId: Prose.Id) : this(Id(), projectId, name, storyEventId, null, proseId, listOf())
 
 	private val charactersById by lazy { charactersInScene.associateBy { it.characterId } }
 
@@ -58,7 +59,7 @@ class Scene(
 	  name: NonBlankString = this.name,
 	  locationId: Location.Id? = this.locationId,
 	  charactersInScene: List<CharacterInScene> = this.charactersInScene
-	) = Scene(id, projectId, name, storyEventId, locationId, charactersInScene)
+	) = Scene(id, projectId, name, storyEventId, locationId, this.proseId, charactersInScene)
 
 	fun withName(newName: NonBlankString) = copy(name = newName)
 

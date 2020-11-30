@@ -1,10 +1,7 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.common.nonBlankStr
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.StoryEvent
+import com.soyle.stories.entities.*
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.locationDoesNotExist
 import com.soyle.stories.scene.doubles.LocaleDouble
@@ -80,7 +77,7 @@ class LinkLocationToSceneUnitTest {
 
 	private fun givenSceneExists(hasLinkedLocation: Boolean = false)
 	{
-		sceneRepository.scenes[sceneId] = Scene(sceneId, Project.Id(), nonBlankStr(), StoryEvent.Id(), locationId.takeIf { hasLinkedLocation }, listOf())
+		sceneRepository.scenes[sceneId] = Scene(sceneId, Project.Id(), nonBlankStr(), StoryEvent.Id(), locationId.takeIf { hasLinkedLocation }, Prose.Id(), listOf())
 	}
 
 	private fun givenLocationExists()

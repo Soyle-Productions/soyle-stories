@@ -1,8 +1,10 @@
 package com.soyle.stories.scene.usecases.createNewScene
 
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Prose
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
+import com.soyle.stories.prose.repositories.ProseRepository
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.repositories.SceneRepository
@@ -18,6 +20,7 @@ class CreateNewSceneUseCase(
   projectId: UUID,
   private val sceneRepository: SceneRepository,
   private val storyEventRepository: StoryEventRepository,
+  private val proseRepository: ProseRepository,
   private val createStoryEvent: CreateStoryEvent
 ) : CreateNewScene {
 
@@ -102,7 +105,9 @@ class CreateNewSceneUseCase(
 	}
 
 	private suspend fun createNewScene(storyEvent: StoryEvent, request: CreateNewScene.RequestModel): CreateNewScene.ResponseModel {
-		val scene = Scene(projectId, request.name, storyEvent.id)
+		val (prose, proseCreated) = Prose.create()
+		proseRepository.addProse(prose)
+		val scene = Scene(projectId, request.name, storyEvent.id, prose.id)
 		return insertScene(scene, request)
 	}
 

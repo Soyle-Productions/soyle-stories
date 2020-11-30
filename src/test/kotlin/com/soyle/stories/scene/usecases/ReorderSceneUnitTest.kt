@@ -1,12 +1,14 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.sceneDoesNotExist
 import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
 import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
@@ -106,8 +108,8 @@ class ReorderSceneUnitTest {
 	private fun `given scene exists`(existingSceneCount: Int = 1, atIndex: Int = 0) {
 		sceneRepository.sceneOrder[projectId] = List(existingSceneCount) {
 			val sceneId = if (it == atIndex) sceneId else otherSceneIds[it]
-			val sceneName = if (it == atIndex) sceneName else NonBlankString.create("Scene $it")!!
-			Scene(sceneId, projectId, sceneName, StoryEvent.Id(), null, listOf())
+			val sceneName = if (it == atIndex) sceneName else nonBlankStr()
+			makeScene(sceneId, projectId, sceneName)
 		}.onEach {
 			sceneRepository.scenes[it.id] = it
 		}.map { it.id }

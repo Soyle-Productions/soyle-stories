@@ -4,13 +4,11 @@ import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.shouldBe
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.StoryEvent
+import com.soyle.stories.entities.*
 import com.soyle.stories.scene.charactersInScene
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.sceneDoesNotExist
 import com.soyle.stories.scene.usecases.common.AffectedScene
 import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
@@ -302,7 +300,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
 			makeCharacter(Character.Id(), projectId, characterName())
 		}
 		val scenes = sceneNames.map {
-			Scene(projectId, NonBlankString.create(it)!!, StoryEvent.Id())
+			makeScene(projectId = projectId, name = NonBlankString.create(it)!!)
 		}.mapIndexed { col, it ->
 			characters.withIndex().fold(it) { scene, (row, character) ->
 				val motive = characterMotives[row][col]
@@ -328,7 +326,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
 		}
 		val targetScene = orderedScenes.selector()
 		sceneRepository.scenes.remove(targetScene.id)
-		sceneRepository.scenes[sceneId] = Scene(sceneId, targetScene.projectId, targetScene.name, targetScene.storyEventId, null, targetScene.charactersInScene())
+		sceneRepository.scenes[sceneId] = Scene(sceneId, targetScene.projectId, targetScene.name, targetScene.storyEventId, null, Prose.Id(), targetScene.charactersInScene())
 		sceneRepository.sceneOrder[projectId] = sceneRepository.sceneOrder.getValue(projectId).map {
 			if (it == targetScene.id) sceneId
 			else it

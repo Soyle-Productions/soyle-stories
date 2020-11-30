@@ -10,6 +10,7 @@ fun makeScene(
     name: NonBlankString = NonBlankString.create("Scene ${str()}")!!,
     storyEventId: StoryEvent.Id = StoryEvent.Id(),
     locationId: Location.Id? = null,
+    proseId: Prose.Id = Prose.Id(),
     charactersInScene: List<CharacterInScene> = listOf()
 ) = Scene(
     sceneId,
@@ -17,6 +18,7 @@ fun makeScene(
     name,
     storyEventId,
     locationId,
+    proseId,
     charactersInScene
 )
 
