@@ -60,6 +60,7 @@ class IncludedCharacterView : View() {
 
     private fun Parent.characterMotivationField() =
         labeledSection(state.motivationFieldLabel) {
+            addClass("motivation")
             motivationTextField()
             hbox {
                 resetButton()

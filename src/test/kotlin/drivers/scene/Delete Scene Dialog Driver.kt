@@ -14,9 +14,9 @@ import javafx.event.ActionEvent
 import tornadofx.uiComponent
 
 fun SceneList.givenDeleteSceneDialogHasBeenOpened(scene: Scene): DeleteSceneDialog =
-    getDeleteSceneDialog() ?: openDeleteSceneDialog(scene)
+    getDeleteSceneDialog() ?: openDeleteSceneDialog(scene).let { getDeleteSceneDialogOrError() }
 
-fun SceneList.openDeleteSceneDialog(scene: Scene): DeleteSceneDialog {
+fun SceneList.openDeleteSceneDialog(scene: Scene) {
     val driver = SceneListDriver(this)
     val tree = driver.getTree()
     val item = driver.getSceneItemOrError(scene.name.value)
@@ -26,7 +26,6 @@ fun SceneList.openDeleteSceneDialog(scene: Scene): DeleteSceneDialog {
             item.getDeleteItem().fire()
         }
     }
-    return getDeleteSceneDialogOrError()
 }
 
 fun getDeleteSceneDialogOrError(): DeleteSceneDialog =

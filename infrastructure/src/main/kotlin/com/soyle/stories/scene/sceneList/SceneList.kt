@@ -135,6 +135,7 @@ class SceneList : View() {
 			}
 		}
 		item("Open") {
+			id = "open_details"
 			action {
 				when (val selectedItem = model.selectedItem.value) {
 					is SceneItemViewModel -> viewListener.openSceneDetails(selectedItem.id)
