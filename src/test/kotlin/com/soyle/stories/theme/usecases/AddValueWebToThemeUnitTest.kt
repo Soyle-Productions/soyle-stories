@@ -131,13 +131,13 @@ class AddValueWebToThemeUnitTest {
             val createdValueWeb = updatedTheme!!.valueWebs.single()
             updatedTheme!! shouldBe {
                 assertCharacterInTheme(character, it)
-                assertValueWebHasSymbolicItem(createdValueWeb, character.id.uuid, character.name)
+                assertValueWebHasSymbolicItem(createdValueWeb, character.id.uuid, character.name.value)
             }
             includedCharacter!! shouldBe {
                 assertEquals(themeId.uuid, it.themeId)
                 assertEquals(updatedTheme!!.name, it.themeName)
                 assertEquals(characterId.uuid, it.characterId)
-                assertEquals(character.name, it.characterName)
+                assertEquals(character.name.value, it.characterName)
                 assertFalse(it.isMajorCharacter)
             }
             symbolicItemAdded!! shouldBe {
@@ -149,7 +149,7 @@ class AddValueWebToThemeUnitTest {
                 assertEquals(firstOpposition.id.uuid, it.oppositionId)
                 assertEquals(firstOpposition.name, it.oppositionName)
                 assertEquals(character.id.uuid, it.characterId)
-                assertEquals(character.name, it.itemName)
+                assertEquals(character.name.value, it.itemName)
             }
         }
 
@@ -162,7 +162,7 @@ class AddValueWebToThemeUnitTest {
             val createdValueWeb = updatedTheme!!.valueWebs.single()
             updatedTheme!! shouldBe {
                 assertCharacterInTheme(character, it)
-                assertValueWebHasSymbolicItem(createdValueWeb, character.id.uuid, character.name)
+                assertValueWebHasSymbolicItem(createdValueWeb, character.id.uuid, character.name.value)
             }
             assertNull(includedCharacter)
             symbolicItemAdded!! shouldBe {
@@ -174,7 +174,7 @@ class AddValueWebToThemeUnitTest {
                 assertEquals(firstOpposition.id.uuid, it.oppositionId)
                 assertEquals(firstOpposition.name, it.oppositionName)
                 assertEquals(character.id.uuid, it.characterId)
-                assertEquals(character.name, it.itemName)
+                assertEquals(character.name.value, it.itemName)
             }
         }
 
@@ -196,7 +196,7 @@ class AddValueWebToThemeUnitTest {
             val character = characterRepository.characters[withCharacterIncluded]!!
             themeRepository.themes[themeId] = themeRepository.themes[themeId]!!.withCharacterIncluded(
                 character.id,
-                character.name,
+                character.name.value,
                 character.media
             )
         }
@@ -224,7 +224,7 @@ class AddValueWebToThemeUnitTest {
     {
         assertTrue(theme.containsCharacter(character.id)) { "Theme does not contain character" }
         val characterInTheme = theme.getIncludedCharacterById(character.id)!!
-        assertEquals(character.name, characterInTheme.name)
+        assertEquals(character.name.value, characterInTheme.name)
     }
 
     private fun assertValueWebHasSymbolicItem(valueWeb: ValueWeb, itemId: UUID, name: String)

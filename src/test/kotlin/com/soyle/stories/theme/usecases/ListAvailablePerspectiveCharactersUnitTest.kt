@@ -59,12 +59,12 @@ class ListAvailablePerspectiveCharactersUnitTest {
         themeRepository.themes[themeId] = makeTheme(themeId).let {
             (1..includedCharacterCount).fold(it) { a, b ->
                 val character = makeCharacter()
-                a.withCharacterIncluded(character.id, character.name, character.media)
+                a.withCharacterIncluded(character.id, character.name.value, character.media)
             }
         }.let {
             (1..majorCharacterCount).fold(it) { a, b ->
                 val character = makeCharacter()
-                a.withCharacterIncluded(character.id, character.name, character.media)
+                a.withCharacterIncluded(character.id, character.name.value, character.media)
                     .withCharacterPromoted(character.id)
             }
         }

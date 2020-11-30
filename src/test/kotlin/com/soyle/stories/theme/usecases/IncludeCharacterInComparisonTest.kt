@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
+import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.CharacterAlreadyIncludedInTheme
@@ -64,10 +65,10 @@ class IncludeCharacterInComparisonTest {
     val characterUUID = UUID.randomUUID()
     val projectUUID = UUID.randomUUID()
     val themeUUID = UUID.randomUUID()
-    val characterName = "Bob the Builder"
     val character = makeCharacter(
-        Character.Id(characterUUID), Project.Id(), characterName
+        Character.Id(characterUUID), Project.Id()
     )
+    val characterName = character.name
 
     @Nested
     inner class GivenCharacterDoesNotExist {
@@ -136,7 +137,7 @@ class IncludeCharacterInComparisonTest {
         @Test
         fun `should contain character id`() {
             assertEquals(characterUUID, result.characterId)
-            assertEquals(characterName, result.characterName)
+            assertEquals(characterName.value, result.characterName)
         }
 
         @Test

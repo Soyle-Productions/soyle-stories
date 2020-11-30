@@ -1,9 +1,11 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.character.CharacterDoesNotExist
+import com.soyle.stories.character.characterName
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.mustEqual
+import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -32,7 +34,7 @@ class IncludeCharacterInSceneUnitTest {
 
     private val storyEventId = StoryEvent.Id().uuid
     private val characterId = Character.Id().uuid
-    private val characterName = "${UUID.randomUUID()}"
+    private val characterName = characterName()
     private val sceneId = Scene.Id().uuid
     private val projectId = Project.Id()
 
@@ -156,7 +158,7 @@ class IncludeCharacterInSceneUnitTest {
                 allCharacters.forEach { baseCharacter ->
                     val availableCharacter =
                         find { it.characterId == baseCharacter.id.uuid } ?: error("$baseCharacter not in output")
-                    availableCharacter.characterName.mustEqual(baseCharacter.name) { "Output character name does not match expected" }
+                    availableCharacter.characterName.mustEqual(baseCharacter.name.value) { "Output character name does not match expected" }
                     availableCharacter.mediaId.mustEqual(baseCharacter.media?.uuid) { "Output character media id does not match expected" }
                 }
             }
@@ -177,7 +179,7 @@ class IncludeCharacterInSceneUnitTest {
                 (allCharacters - includedCharacters).forEach { baseCharacter ->
                     val availableCharacter =
                         find { it.characterId == baseCharacter.id.uuid } ?: error("$baseCharacter not in output")
-                    availableCharacter.characterName.mustEqual(baseCharacter.name) { "Output character name does not match expected" }
+                    availableCharacter.characterName.mustEqual(baseCharacter.name.value) { "Output character name does not match expected" }
                     availableCharacter.mediaId.mustEqual(baseCharacter.media?.uuid) { "Output character media id does not match expected" }
                 }
             }
@@ -238,7 +240,7 @@ class IncludeCharacterInSceneUnitTest {
 
     private fun givenMotivationsForCharacterPreviouslySet() {
         repeat(5) {
-            Scene(projectId, "${UUID.randomUUID()}", StoryEvent.Id())
+            Scene(projectId, nonBlankStr(), StoryEvent.Id())
                 .withCharacterIncluded(characterRepository.characters.values.first())
                 .withMotivationForCharacter(Character.Id(characterId), "${UUID.randomUUID()}")
                 .let {
@@ -303,7 +305,7 @@ class IncludeCharacterInSceneUnitTest {
         actual as IncludedCharacterInScene
         assertEquals(sceneId, actual.sceneId)
         assertEquals(characterId, actual.characterId)
-        assertEquals(characterName, actual.characterName)
+        assertEquals(characterName.value, actual.characterName)
         assertNull(actual.motivation)
         assertInheritedMotivation(actual)
     }
@@ -312,7 +314,7 @@ class IncludeCharacterInSceneUnitTest {
         val lastMotiveSource = lastMotiveSource ?: return
         assertNotNull(actual.inheritedMotivation)
         assertEquals(lastMotiveSource.id.uuid, actual.inheritedMotivation!!.sceneId)
-        assertEquals(lastMotiveSource.name, actual.inheritedMotivation!!.sceneName)
+        assertEquals(lastMotiveSource.name.value, actual.inheritedMotivation!!.sceneName)
         assertEquals(
             lastMotiveSource.getMotivationForCharacter(Character.Id(characterId))?.motivation,
             actual.inheritedMotivation!!.motivation

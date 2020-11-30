@@ -5,6 +5,7 @@ import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
@@ -48,7 +49,7 @@ class PlanNewCharacterArcTest {
     @Nested
     inner class WhenCharacterExists {
 
-        val characterName = "Bob the Builder"
+        val characterName = NonBlankString.create("Bob the Builder")!!
         val character = makeCharacter(
             characterId, projectId, characterName
         )
@@ -83,7 +84,7 @@ class PlanNewCharacterArcTest {
         @Test
         fun `character in theme has name of character`() {
             planNewCharacterArc()
-            assertEquals(characterName, createdTheme!!.getIncludedCharacterById(characterId)!!.name)
+            assertEquals(characterName.value, createdTheme!!.getIncludedCharacterById(characterId)!!.name)
         }
 
         @Test

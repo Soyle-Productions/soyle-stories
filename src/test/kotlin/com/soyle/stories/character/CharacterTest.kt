@@ -1,5 +1,6 @@
 package com.soyle.stories.character
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,13 +17,13 @@ class CharacterTest {
 
 	@Test
 	fun `characters are built`() {
-		Character.buildNewCharacter(projectId, "Bob")
+		Character.buildNewCharacter(projectId, NonBlankString.create("Bob")!!)
 	}
 
 	@Test
 	fun `characters can be renamed`() {
-		val character = Character.buildNewCharacter(projectId, "Bob")
-		  .withName("Frank")
-		assertEquals("Frank", character.name)
+		val character = Character.buildNewCharacter(projectId, NonBlankString.create("Bob")!!)
+		  .withName(NonBlankString.create("Frank")!!)
+		assertEquals("Frank", character.name.value)
 	}
 }

@@ -1,12 +1,13 @@
 package com.soyle.stories.scene
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.str
 import com.soyle.stories.entities.*
 
 fun makeScene(
     sceneId: Scene.Id = Scene.Id(),
     projectId: Project.Id = Project.Id(),
-    name: String = "Scene ${str()}",
+    name: NonBlankString = NonBlankString.create("Scene ${str()}")!!,
     storyEventId: StoryEvent.Id = StoryEvent.Id(),
     locationId: Location.Id? = null,
     charactersInScene: List<CharacterInScene> = listOf()

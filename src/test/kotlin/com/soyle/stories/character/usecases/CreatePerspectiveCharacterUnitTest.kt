@@ -3,6 +3,7 @@ package com.soyle.stories.character.usecases
 import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacter
 import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacterUseCase
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.doubles.CharacterRepositoryDouble
@@ -29,7 +30,7 @@ class CreatePerspectiveCharacterUnitTest {
 
     // input data
     private val themeUUID = theme.id.uuid
-    private val characterName = "Character ${str()}"
+    private val characterName = NonBlankString.create("Character ${str()}")!!
 
     // persisted data
     private var createdCharacter: Character? = null
@@ -84,7 +85,7 @@ class CreatePerspectiveCharacterUnitTest {
 
     private fun character(
         expectedProjectId: Project.Id,
-        expectedName: String
+        expectedName: NonBlankString
     ) = fun(character: Character) {
         assertEquals(expectedProjectId, character.projectId)
         assertEquals(expectedName, character.name)
@@ -93,14 +94,14 @@ class CreatePerspectiveCharacterUnitTest {
     private fun themeWithCharacter(character: Character, asMajorCharacter: Boolean = false) = fun(theme: Theme) {
         val includedCharacter =
             theme.getIncludedCharacterById(character.id) ?: error("theme does not contain expected character")
-        assertEquals(character.name, includedCharacter.name)
+        assertEquals(character.name.value, includedCharacter.name)
         if (asMajorCharacter && includedCharacter !is MajorCharacter) error("expected character to be a major character")
         else if (!asMajorCharacter && includedCharacter !is MinorCharacter) error("expected character to be a minor character")
     }
 
     private fun createdCharacterBasedOn(character: Character) = fun(createdCharacter: CreatedCharacter) {
         assertEquals(character.id.uuid, createdCharacter.characterId)
-        assertEquals(character.name, createdCharacter.characterName)
+        assertEquals(character.name.value, createdCharacter.characterName)
         assertEquals(character.media?.uuid, createdCharacter.mediaId)
     }
 
@@ -109,7 +110,7 @@ class CreatePerspectiveCharacterUnitTest {
             assertEquals(theme.id.uuid, includedCharacter.themeId)
             assertEquals(theme.name, includedCharacter.themeName)
             assertEquals(character.id.uuid, includedCharacter.characterId)
-            assertEquals(character.name, includedCharacter.characterName)
+            assertEquals(character.name.value, includedCharacter.characterName)
             assertTrue(includedCharacter.isMajorCharacter)
         }
 

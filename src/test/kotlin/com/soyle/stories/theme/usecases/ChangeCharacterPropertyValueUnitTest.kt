@@ -122,8 +122,8 @@ class ChangeCharacterPropertyValueUnitTest {
         val theme = makeTheme(Theme.Id(themeId)).let {
             if (andCharacter == null) it
             else {
-                val character = makeCharacter(Character.Id(andCharacter), Project.Id(), "Bob")
-                it.withCharacterIncluded(character.id, character.name, character.media)
+                val character = makeCharacter(Character.Id(andCharacter), Project.Id())
+                it.withCharacterIncluded(character.id, character.name.value, character.media)
             }
         }
         context = setupContext(

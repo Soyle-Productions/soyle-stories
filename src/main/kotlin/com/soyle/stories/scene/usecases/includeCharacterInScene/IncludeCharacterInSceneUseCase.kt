@@ -66,7 +66,7 @@ class IncludeCharacterInSceneUseCase(
         return IncludedCharacterInScene(
             scene.id.uuid,
             character.id.uuid,
-            character.name,
+            character.name.value,
             null,
             getInheritedMotivation(scene, character),
             listOf()

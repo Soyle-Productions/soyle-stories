@@ -85,6 +85,11 @@ class Theme(
 
     fun withThematicRevelation(revelation: String): Theme = copy(thematicRevelation = revelation)
 
+    fun withCharacterIncluded(character: Character) = withCharacterIncluded(
+        character.id,
+        character.name.value,
+        character.media
+    )
     fun withCharacterIncluded(characterId: Character.Id, characterName: String, characterMediaId: Media.Id?): Theme
     {
         mustNotContainCharacter(characterId)

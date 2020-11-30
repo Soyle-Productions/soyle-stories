@@ -85,7 +85,7 @@ class ListAllCharacterArcsTest {
 	private fun assertCharactersHaveCorrectNames(items: List<CharacterItem>) {
 		items.forEach {
 			assertEquals(
-				characterRepository.characters[Character.Id(it.characterId)]!!.name,
+				characterRepository.characters[Character.Id(it.characterId)]!!.name.value,
 				it.characterName
 			)
 		}

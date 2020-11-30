@@ -9,6 +9,7 @@ import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.entities.Character
@@ -31,18 +32,11 @@ import org.junit.jupiter.api.Assertions.*
 class BuildNewCharacterTest {
 
     private val projectId = Project.Id()
-    val providedName = "Character Name"
-    val blankNames = listOf(
-        "",
-        "    ",
-        "\r",
-        "\n  ",
-        "\r\n  \r"
-    )
+    val providedName = NonBlankString.create("Character Name")!!
 
     private var createdCharacter: Character? = null
 
-    fun given(addNewCharacter: (Character) -> Unit = {}): (String) -> Either<*, CharacterItem> {
+    fun given(addNewCharacter: (Character) -> Unit = {}): (NonBlankString) -> Either<*, CharacterItem> {
         val repo = object : CharacterRepository {
             override suspend fun addNewCharacter(character: Character) {
                 createdCharacter = character
@@ -92,15 +86,7 @@ class BuildNewCharacterTest {
     fun `character should have provided name`() {
         val character: CharacterItem = (useCase(providedName) as Either.Right).b
         assertEquals(projectId, createdCharacter!!.projectId)
-        assertEquals(providedName, character.characterName)
-    }
-
-    @Test
-    fun `character name cannot be blank`() {
-        blankNames.forEach {
-            val error = (useCase(it) as Either.Left).a
-            assert(error is com.soyle.stories.character.CharacterNameCannotBeBlank)
-        }
+        assertEquals(providedName.value, character.characterName)
     }
 
     @Test
@@ -116,7 +102,7 @@ class BuildNewCharacterTest {
         val useCase = given()
         val (result) = useCase(providedName) as Either.Right
         assertEquals(createdCharacter!!.id.uuid, result.characterId)
-        assertEquals(providedName, result.characterName)
+        assertEquals(providedName.value, result.characterName)
         assertEquals(createdCharacter!!.media?.uuid, result.mediaId)
     }
 
@@ -170,7 +156,7 @@ class BuildNewCharacterTest {
                 val updatedTheme = updatedTheme!!
                 assertTrue(updatedTheme.containsCharacter(createdCharacter.id))
                 val minorCharacter = updatedTheme.getMinorCharacterById(createdCharacter.id)!!
-                assertEquals(providedName, minorCharacter.name)
+                assertEquals(providedName.value, minorCharacter.name)
             }
 
             @Test
@@ -178,7 +164,7 @@ class BuildNewCharacterTest {
                 val includedCharacterResult = includedCharacterResult!!
                 assertEquals(themeId.uuid, includedCharacterResult.themeId)
                 assertEquals(createdCharacter!!.id.uuid, includedCharacterResult.characterId)
-                assertEquals(providedName, includedCharacterResult.characterName)
+                assertEquals(providedName.value, includedCharacterResult.characterName)
             }
 
         }
@@ -222,14 +208,14 @@ class BuildNewCharacterTest {
                 includedCharacterResult!!
                 opponentCharacter!! shouldBe opponent(
                     createdCharacter!!.id.uuid,
-                    providedName,
+                    providedName.value,
                     perspectiveCharacterId.uuid,
                     themeId.uuid,
                     false
                 )
             }
 
-            private fun buildCharacterToUseAsOpponent(name: String) {
+            private fun buildCharacterToUseAsOpponent(name: NonBlankString) {
                 val useCase: BuildNewCharacter =
                     BuildNewCharacterUseCase(
                         CharacterRepositoryDouble(
@@ -276,7 +262,7 @@ class BuildNewCharacterTest {
                 }
         }
 
-        private fun buildCharacterToIncludeInTheme(name: String) {
+        private fun buildCharacterToIncludeInTheme(name: NonBlankString) {
             val useCase: BuildNewCharacter = BuildNewCharacterUseCase(
                 CharacterRepositoryDouble(
                     onAddNewCharacter = {

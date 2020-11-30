@@ -14,7 +14,7 @@ class ListAllScenesUseCase(
 	override suspend fun invoke(output: ListAllScenes.OutputPort) {
 		val indexOf = sceneRepository.getSceneIdsInOrder(projectId).withIndex().associate { it.value to it.index }
 		output.receiveListAllScenesResponse(ListAllScenes.ResponseModel(sceneRepository.listAllScenesInProject(projectId).map {
-			SceneItem(it.id.uuid, it.name, indexOf.getValue(it.id))
+			SceneItem(it.id.uuid, it.name.value, indexOf.getValue(it.id))
 		}))
 	}
 

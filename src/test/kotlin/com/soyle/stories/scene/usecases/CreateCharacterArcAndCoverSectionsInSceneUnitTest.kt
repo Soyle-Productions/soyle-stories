@@ -177,7 +177,7 @@ class CreateCharacterArcAndCoverSectionsInSceneUnitTest {
                 projectId.mustEqual(character.projectId)
                 name.mustEqual(inputName)
                 with(getMajorCharacterById(character.id)!!) {
-                    name.mustEqual(character.name)
+                    name.mustEqual(character.name.value)
                 }
             }
             (result as CreateCharacterArcAndCoverSectionsInScene.ResponseModel).createdTheme.run {

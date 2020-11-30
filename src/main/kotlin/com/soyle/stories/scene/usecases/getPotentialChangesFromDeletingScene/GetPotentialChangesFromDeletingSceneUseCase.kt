@@ -64,7 +64,7 @@ class GetPotentialChangesFromDeletingSceneUseCase(
 		}
 		return AffectedScene(
 		  scene.id.uuid,
-		  scene.name,
+		  scene.name.value,
 		  inheritedMotives.map { originalMotive ->
 			  AffectedCharacter(
 				originalMotive.characterId.uuid,

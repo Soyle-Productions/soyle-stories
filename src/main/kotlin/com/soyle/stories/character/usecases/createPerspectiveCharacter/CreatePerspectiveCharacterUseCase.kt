@@ -4,6 +4,7 @@ import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.ThemeDoesNotExist
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.theme.repositories.ThemeRepository
@@ -15,7 +16,7 @@ class CreatePerspectiveCharacterUseCase(
     private val characterRepository: CharacterRepository
 ) : CreatePerspectiveCharacter {
 
-    override suspend fun invoke(themeId: UUID, name: String, output: CreatePerspectiveCharacter.OutputPort) {
+    override suspend fun invoke(themeId: UUID, name: NonBlankString, output: CreatePerspectiveCharacter.OutputPort) {
         val theme = getTheme(themeId)
 
         val character = createCharacter(theme.projectId, name)
@@ -29,7 +30,7 @@ class CreatePerspectiveCharacterUseCase(
 
     private suspend fun createCharacter(
         projectId: Project.Id,
-        name: String
+        name: NonBlankString
     ): Character {
         val character = Character(projectId, name, null)
         characterRepository.addNewCharacter(character)
@@ -41,7 +42,7 @@ class CreatePerspectiveCharacterUseCase(
         theme: Theme
     ) {
         themeRepository.updateTheme(
-            theme.withCharacterIncluded(character.id, character.name, character.media)
+            theme.withCharacterIncluded(character.id, character.name.value, character.media)
                  .withCharacterPromoted(character.id)
         )
     }
@@ -57,7 +58,7 @@ class CreatePerspectiveCharacterUseCase(
     }
 
     private fun createdCharacter(character: Character) =
-        CreatedCharacter(character.id.uuid, character.name, null)
+        CreatedCharacter(character.id.uuid, character.name.value, null)
 
     private fun characterIncludedInTheme(
         theme: Theme,
@@ -67,7 +68,7 @@ class CreatePerspectiveCharacterUseCase(
             theme.id.uuid,
             theme.name,
             character.id.uuid,
-            character.name,
+            character.name.value,
             true
         )
     }

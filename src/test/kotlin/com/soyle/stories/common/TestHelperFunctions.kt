@@ -32,3 +32,4 @@ operator fun <T> Map<Boolean, T>.component1() = this[true]
 operator fun <T> Map<Boolean, T>.component2() = this[false]
 
 fun str() = (Math.random() * Int.MAX_VALUE).toInt().toString(16).take(3)
+fun nonBlankStr() = NonBlankString.create(str())!!

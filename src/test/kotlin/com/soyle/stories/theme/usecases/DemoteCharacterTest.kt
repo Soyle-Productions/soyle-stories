@@ -151,15 +151,14 @@ class DemoteCharacterTest {
             val charactersToInclude = includedCharacters[uuid]?.map {
                 makeCharacter(
                     Character.Id(it.first),
-                    Project.Id(),
-                    "Bob"
+                    Project.Id()
                 ) to it.second
             }
             val theme = makeTheme(Theme.Id(uuid))
             if (charactersToInclude.isNullOrEmpty()) return@map theme
             charactersToInclude.fold(theme) { currentTheme, (character, promote) ->
                 val themeWithCharacter =
-                    currentTheme.withCharacterIncluded(character.id, character.name, character.media)
+                    currentTheme.withCharacterIncluded(character.id, character.name.value, character.media)
                 if (promote) themeWithCharacter.withCharacterPromoted(character.id)
                 else themeWithCharacter
 

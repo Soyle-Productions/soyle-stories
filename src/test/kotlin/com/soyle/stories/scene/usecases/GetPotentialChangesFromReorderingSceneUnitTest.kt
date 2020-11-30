@@ -1,7 +1,9 @@
 package com.soyle.stories.scene.usecases
 
 import arrow.core.toT
+import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
@@ -196,16 +198,16 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
     }
 
     private val sceneRepository = SceneRepositoryDouble()
-    private val sceneIdMap = mutableMapOf<String, Scene.Id>()
+    private val sceneNameMap = mutableMapOf<String, Scene.Id>()
     private val characterIdMap = mutableMapOf<String, Character.Id>()
     private val characterMap = mutableMapOf<Character.Id, Character>()
 
-    private fun givenScenes(vararg ids: String)
+    private fun givenScenes(vararg names: String)
     {
-        sceneRepository.sceneOrder[projectId] = ids.map {
-            val scene = Scene(projectId, it, StoryEvent.Id())
+        sceneRepository.sceneOrder[projectId] = names.map {
+            val scene = Scene(projectId, NonBlankString.create(it)!!, StoryEvent.Id())
             sceneRepository.scenes[scene.id] = scene
-            sceneIdMap[it] = scene.id
+            sceneNameMap[it] = scene.id
             scene.id
         }
     }
@@ -231,9 +233,9 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
         }
     }
 
-    private fun idOf(scene: String): Scene.Id = sceneIdMap.getOrPut(scene) { Scene.Id() }
+    private fun idOf(scene: String): Scene.Id = sceneNameMap.getOrPut(scene) { Scene.Id() }
     private fun characterFor(character: String): Character = characterIdMap.getOrPut(character) { Character.Id() }
-        .let { characterMap.getOrPut(it) { makeCharacter(it, projectId, "") } }
+        .let { characterMap.getOrPut(it) { makeCharacter(it, projectId, characterName()) } }
 
     private fun potentialChangesForMoving(scene: String, to: Int = 0)
     {
@@ -260,7 +262,7 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
         val actual = result as PotentialChangesFromReorderingScene
         val includedSet = mutableSetOf<String>()
         val missingSet = mutableSetOf<String>()
-        val sceneUuidToKey = sceneIdMap.entries.associate { it.value.uuid to it.key }
+        val sceneUuidToKey = sceneNameMap.entries.associate { it.value.uuid to it.key }
         scenes.forEach { (sceneIdentifier, expectedCharacters) ->
             val sceneId = idOf(sceneIdentifier).uuid
             includedSet.add(sceneIdentifier)
@@ -319,7 +321,7 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
 
     private fun PotentialChangesFromReorderingScene.format(): String
     {
-        val sceneUuidToKey = sceneIdMap.entries.associate { it.value.uuid to it.key }
+        val sceneUuidToKey = sceneNameMap.entries.associate { it.value.uuid to it.key }
         val characterUuidToKey = characterIdMap.entries.associate { it.value.uuid to it.key }
         val s = StringBuilder()
         affectedScenes.forEach {

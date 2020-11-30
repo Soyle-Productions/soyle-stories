@@ -36,14 +36,14 @@ class IncludeCharacterInComparisonUseCase(
         val character = getCharacterById(characterId)
         val theme = getThemeById(themeId)
 
-        val themeWithCharacter = theme.withCharacterIncluded(character.id, character.name, character.media)
+        val themeWithCharacter = theme.withCharacterIncluded(character.id, character.name.value, character.media)
         themeRepository.updateTheme(themeWithCharacter)
 
         return CharacterIncludedInTheme(
             themeId,
             "",
             characterId,
-            character.name,
+            character.name.value,
             false
         )
     }

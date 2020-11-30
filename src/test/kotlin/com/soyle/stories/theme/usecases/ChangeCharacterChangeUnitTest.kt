@@ -21,7 +21,7 @@ class ChangeCharacterChangeUnitTest {
     // preconditions
     private val character = makeCharacter()
     private val theme = makeTheme()
-        .withCharacterIncluded(character.id, character.name, character.media)
+        .withCharacterIncluded(character.id, character.name.value, character.media)
         .withCharacterPromoted(character.id)
 
     // input
@@ -91,7 +91,7 @@ class ChangeCharacterChangeUnitTest {
 
     private fun givenCharacterIsNotAMajorCharacter() {
         themeRepository.themes[theme.id] = theme.withoutCharacter(character.id)
-            .withCharacterIncluded(character.id, character.name, character.media)
+            .withCharacterIncluded(character.id, character.name.value, character.media)
     }
 
     private fun changeCharacterChange() {

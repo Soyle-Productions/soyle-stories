@@ -9,4 +9,3 @@ import java.util.*
  */
 abstract class CharacterException : Exception()
 class CharacterDoesNotExist(val characterId: UUID) : CharacterException()
-object CharacterNameCannotBeBlank : CharacterException()

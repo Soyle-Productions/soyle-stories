@@ -5,9 +5,6 @@ import com.soyle.stories.common.ValidationException
 import java.util.*
 
 abstract class SceneException : Exception()
-class SceneNameCannotBeBlank(private val locale: Locale) : SceneException() {
-	override fun getLocalizedMessage(): String = locale.sceneNameCannotBeBlank
-}
 class SceneDoesNotExist(private val locale: Locale?, val sceneId: UUID): SceneException() {
 	constructor(sceneId: UUID) : this (null, sceneId)
 	override fun getLocalizedMessage(): String = locale?.sceneDoesNotExist ?: "Scene does not exist $sceneId"

@@ -98,11 +98,11 @@ class AddOppositionToValueWebUnitTest {
         addOppositionToValueWeb(name = "Horrible Bread", itemId = CharacterId(character.id.uuid))
         createdOpposition()!! shouldBe {
             assertEquals(character.id.uuid, it.representations.single().entityUUID)
-            assertEquals(character.name, it.representations.single().name)
+            assertEquals(character.name.value, it.representations.single().name)
         }
         updatedTheme!! shouldBe {
             assertEquals(character.id, it.characters.single().id)
-            assertEquals(character.name, it.characters.single().name)
+            assertEquals(character.name.value, it.characters.single().name)
         }
         result!!.oppositionAddedToValueWeb shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition()!!.id.uuid,
             createdOpposition()!!.name, false
@@ -110,10 +110,10 @@ class AddOppositionToValueWebUnitTest {
         result!! shouldBe {
             it.symbolicRepresentationAddedToOpposition shouldBe characterAddedToOpposition(
                 theme.id.uuid, valueWebId.uuid, valueWebName, createdOpposition()!!.id.uuid, "Horrible Bread",
-                character.id.uuid, character.name
+                character.id.uuid, character.name.value
             )
             it.characterIncludedInTheme shouldBe characterIncludedInTheme(
-                theme.id.uuid, theme.name, character.id.uuid, character.name, false
+                theme.id.uuid, theme.name, character.id.uuid, character.name.value, false
             )
             assertNull(it.symbolicRepresentationRemoved)
             assertNotNull(it.characterIncludedInTheme)
@@ -127,7 +127,7 @@ class AddOppositionToValueWebUnitTest {
         addOppositionToValueWeb(name = "Horrible Bread", itemId = CharacterId(character.id.uuid))
         createdOpposition()!! shouldBe {
             assertEquals(character.id.uuid, it.representations.single().entityUUID)
-            assertEquals(character.name, it.representations.single().name)
+            assertEquals(character.name.value, it.representations.single().name)
         }
         result!!.oppositionAddedToValueWeb shouldBe oppositionAddedToValueWeb(theme.id.uuid, valueWebId.uuid, createdOpposition()!!.id.uuid,
             createdOpposition()!!.name, false
@@ -135,7 +135,7 @@ class AddOppositionToValueWebUnitTest {
         result!! shouldBe {
             it.symbolicRepresentationAddedToOpposition shouldBe characterAddedToOpposition(
                 theme.id.uuid, valueWebId.uuid, valueWebName, createdOpposition()!!.id.uuid, "Horrible Bread",
-                character.id.uuid, character.name
+                character.id.uuid, character.name.value
             )
             assertNull(it.symbolicRepresentationRemoved)
             assertNull(it.characterIncludedInTheme)
@@ -149,7 +149,7 @@ class AddOppositionToValueWebUnitTest {
         themeRepository.themes[theme.id] = themeRepository.themes[theme.id]!!.let {
             it.withReplacedValueWeb(it.valueWebs.single { it.id == valueWebId }.let {
                 it.withRepresentationOf(
-                    SymbolicRepresentation(character.id.uuid, character.name), it.oppositions.first().id
+                    SymbolicRepresentation(character.id.uuid, character.name.value), it.oppositions.first().id
                 )
             })
         }
@@ -175,7 +175,7 @@ class AddOppositionToValueWebUnitTest {
             valueWebs = listOf(makeValueWeb(valueWebId, themeId = themeId, name = valueWebName, oppositions = List(existingOppositionCount) {
                 makeOppositionValue()
             }))
-        ).let { if (includeCharacter != null) it.withCharacterIncluded(includeCharacter.id, includeCharacter.name, includeCharacter.media) else it }
+        ).let { if (includeCharacter != null) it.withCharacterIncluded(includeCharacter.id, includeCharacter.name.value, includeCharacter.media) else it }
         themeRepository.themes[theme.id] = theme
         return theme
     }

@@ -1,9 +1,10 @@
 package com.soyle.stories.scene.usecases
 
+import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
-import com.soyle.stories.scene.SceneNameCannotBeBlank
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.repositories.SceneRepository
@@ -28,7 +29,7 @@ class CreateNewSceneUnitTest {
 	private val createStoryEventOutputException = Exception("I was thrown from the output of creating a story event.")
 
 	val projectId = Project.Id()
-	val validSceneName = "Valid Scene Name"
+	val validSceneName = NonBlankString.create("Valid Scene Name")!!
 	val storyEventId = StoryEvent.Id().uuid
 	val relativeSceneId = Scene.Id().uuid
 
@@ -40,15 +41,9 @@ class CreateNewSceneUnitTest {
 	@Nested
 	inner class `Create Scene with just a name` {
 
-		fun whenUseCaseIsExecuted(withName: String = "") {
+		fun whenUseCaseIsExecuted(withName: NonBlankString) {
 			val request = CreateNewScene.RequestModel(withName, LocaleDouble())
 			this@CreateNewSceneUnitTest.whenUseCaseIsExecuted(request)
-		}
-
-		@Test
-		fun `name cannot be blank`() {
-			whenUseCaseIsExecuted()
-			val result = result as SceneNameCannotBeBlank
 		}
 
 		@Test
@@ -76,15 +71,9 @@ class CreateNewSceneUnitTest {
 	@Nested
 	inner class `Create Scene with story event` {
 
-		fun whenUseCaseIsExecuted(withName: String = "") {
+		fun whenUseCaseIsExecuted(withName: NonBlankString) {
 			val request = CreateNewScene.RequestModel(withName, storyEventId, LocaleDouble())
 			this@CreateNewSceneUnitTest.whenUseCaseIsExecuted(request)
-		}
-
-		@Test
-		fun `name cannot be blank`() {
-			whenUseCaseIsExecuted()
-			val result = result as SceneNameCannotBeBlank
 		}
 
 		@Test
@@ -106,15 +95,9 @@ class CreateNewSceneUnitTest {
 	@Nested
 	inner class `Create Scene before relative Scene` {
 
-		fun whenUseCaseIsExecuted(withName: String = "") {
+		fun whenUseCaseIsExecuted(withName: NonBlankString) {
 			val request = CreateNewScene.RequestModel(withName, relativeSceneId, true, LocaleDouble())
 			this@CreateNewSceneUnitTest.whenUseCaseIsExecuted(request)
-		}
-
-		@Test
-		fun `name cannot be blank`() {
-			whenUseCaseIsExecuted()
-			val result = result as SceneNameCannotBeBlank
 		}
 
 		@Test
@@ -175,11 +158,11 @@ class CreateNewSceneUnitTest {
 		}
 		if (sceneWithId != null) {
 			runBlocking {
-				sceneRepository.createNewScene(Scene(Scene.Id(sceneWithId), projectId, "", StoryEvent.Id(storyEventId), null, listOf()),
+				sceneRepository.createNewScene(Scene(Scene.Id(sceneWithId), projectId, nonBlankStr(), StoryEvent.Id(storyEventId), null, listOf()),
 				sceneRepository.getSceneIdsInOrder(projectId) + Scene.Id(sceneWithId)
 				)
 				repeat(numberOfScenesAfterRelativeScene) {
-					val scene = Scene(projectId, "", StoryEvent.Id())
+					val scene = Scene(projectId, nonBlankStr(), StoryEvent.Id())
 					sceneRepository.createNewScene(scene,
 					  sceneRepository.getSceneIdsInOrder(projectId) + scene.id
 					)
@@ -243,7 +226,7 @@ class CreateNewSceneUnitTest {
 
 	private fun assertStoryEventCreated() {
 		val createStoryEventRequest = createStoryEventRequest!!
-		assertEquals(validSceneName, createStoryEventRequest.name)
+		assertEquals(validSceneName.value, createStoryEventRequest.name)
 		if (createStoryEventRequest.projectId != null) {
 			assertEquals(projectId.uuid, createStoryEventRequest.projectId)
 		}
@@ -282,7 +265,7 @@ class CreateNewSceneUnitTest {
 		val savedScene = savedScene!!
 		actual as CreateNewScene.ResponseModel
 		assertEquals(savedScene.id.uuid, actual.sceneId)
-		assertEquals(validSceneName, actual.sceneName)
+		assertEquals(validSceneName.value, actual.sceneName)
 		return actual
 	}
 

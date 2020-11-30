@@ -76,11 +76,7 @@ class UseCharacterAsOpponentUnitTest {
         @Test
         fun `perspective character is only minor character`() {
             themeRepository.givenTheme(
-                theme.withCharacterIncluded(
-                    perspectiveCharacter.id,
-                    perspectiveCharacter.name,
-                    perspectiveCharacter.media
-                )
+                theme.withCharacterIncluded(perspectiveCharacter)
             )
 
             val error = degenerateTest<CharacterIsNotMajorCharacterInTheme> {
@@ -95,11 +91,7 @@ class UseCharacterAsOpponentUnitTest {
 
             init {
                 themeRepository.givenTheme(
-                    theme.withCharacterIncluded(
-                        perspectiveCharacter.id,
-                        perspectiveCharacter.name,
-                        perspectiveCharacter.media
-                    ).withCharacterPromoted(perspectiveCharacter.id)
+                    theme.withCharacterIncluded(perspectiveCharacter).withCharacterPromoted(perspectiveCharacter.id)
                 )
             }
 
@@ -122,13 +114,9 @@ class UseCharacterAsOpponentUnitTest {
 
             init {
                 themeRepository.givenTheme(
-                    theme.withCharacterIncluded(
-                        perspectiveCharacter.id,
-                        perspectiveCharacter.name,
-                        perspectiveCharacter.media
-                    ).withCharacterPromoted(perspectiveCharacter.id).let {
+                    theme.withCharacterIncluded(perspectiveCharacter).withCharacterPromoted(perspectiveCharacter.id).let {
                         otherIncludedCharacters.fold(it) { nextTheme, character ->
-                            nextTheme.withCharacterIncluded(character.id, character.name, character.media)
+                            nextTheme.withCharacterIncluded(character.id, character.name.value, character.media)
                         }
                     }
                 )
@@ -152,7 +140,7 @@ class UseCharacterAsOpponentUnitTest {
                 result.forEach { availableCharacter ->
                     val backingCharacter =
                         otherIncludedCharacters.find { it.id.uuid == availableCharacter.characterId }!!
-                    availableCharacter.characterName.mustEqual(backingCharacter.name)
+                    availableCharacter.characterName.mustEqual(backingCharacter.name.value)
                 }
             }
 
@@ -198,11 +186,7 @@ class UseCharacterAsOpponentUnitTest {
 
             init {
                 themeRepository.givenTheme(
-                    theme.withCharacterIncluded(
-                        perspectiveCharacter.id,
-                        perspectiveCharacter.name,
-                        perspectiveCharacter.media
-                    ).withCharacterPromoted(perspectiveCharacter.id)
+                    theme.withCharacterIncluded(perspectiveCharacter).withCharacterPromoted(perspectiveCharacter.id)
                 )
                 otherCharacters.forEach(characterRepository::givenCharacter)
             }
@@ -224,7 +208,7 @@ class UseCharacterAsOpponentUnitTest {
                 val result = result as AvailableCharactersToUseAsOpponents
                 result.forEach { availableCharacter ->
                     val backingCharacter = otherCharacters.find { it.id.uuid == availableCharacter.characterId }!!
-                    availableCharacter.characterName.mustEqual(backingCharacter.name)
+                    availableCharacter.characterName.mustEqual(backingCharacter.name.value)
                 }
             }
 
@@ -280,11 +264,7 @@ class UseCharacterAsOpponentUnitTest {
             @Test
             fun `perspective character has no perspective in theme`() {
                 themeRepository.givenTheme(
-                    theme.withCharacterIncluded(
-                        perspectiveCharacter.id,
-                        perspectiveCharacter.name,
-                        perspectiveCharacter.media
-                    )
+                    theme.withCharacterIncluded(perspectiveCharacter)
                 )
 
                 val error = degenerateTest<CharacterIsNotMajorCharacterInTheme> { useCharacterAsOpponent() }
@@ -295,11 +275,7 @@ class UseCharacterAsOpponentUnitTest {
             @Test
             fun `opponent character not in theme and doesn't exist`() {
                 themeRepository.givenTheme(
-                    theme.withCharacterIncluded(
-                        perspectiveCharacter.id,
-                        perspectiveCharacter.name,
-                        perspectiveCharacter.media
-                    ).withCharacterPromoted(perspectiveCharacter.id)
+                    theme.withCharacterIncluded(perspectiveCharacter).withCharacterPromoted(perspectiveCharacter.id)
                 )
 
                 val error = degenerateTest<CharacterDoesNotExist> { useCharacterAsOpponent() }
@@ -315,11 +291,7 @@ class UseCharacterAsOpponentUnitTest {
             init {
                 themeRepository.givenTheme(
                     theme
-                        .withCharacterIncluded(
-                            perspectiveCharacter.id,
-                            perspectiveCharacter.name,
-                            perspectiveCharacter.media
-                        )
+                        .withCharacterIncluded(perspectiveCharacter)
                         .withCharacterPromoted(perspectiveCharacter.id)
                 )
                 characterRepository.givenCharacter(opponent)
@@ -354,17 +326,9 @@ class UseCharacterAsOpponentUnitTest {
             init {
                 themeRepository.givenTheme(
                     theme
-                        .withCharacterIncluded(
-                            perspectiveCharacter.id,
-                            perspectiveCharacter.name,
-                            perspectiveCharacter.media
-                        )
+                        .withCharacterIncluded(perspectiveCharacter)
                         .withCharacterPromoted(perspectiveCharacter.id)
-                        .withCharacterIncluded(
-                            opponent.id,
-                            opponent.name,
-                            opponent.media
-                        )
+                        .withCharacterIncluded(opponent)
                 )
             }
 
@@ -432,11 +396,7 @@ class UseCharacterAsOpponentUnitTest {
             fun `perspective character not major character`() {
                 themeRepository.givenTheme(
                     theme
-                        .withCharacterIncluded(
-                            perspectiveCharacter.id,
-                            perspectiveCharacter.name,
-                            perspectiveCharacter.media
-                        )
+                        .withCharacterIncluded(perspectiveCharacter)
                 )
 
                 val error = degenerateTest<CharacterIsNotMajorCharacterInTheme> { useCharacterAsMainOpponent() }
@@ -448,11 +408,7 @@ class UseCharacterAsOpponentUnitTest {
             fun `opponent character not in theme`() {
                 themeRepository.givenTheme(
                     theme
-                        .withCharacterIncluded(
-                            perspectiveCharacter.id,
-                            perspectiveCharacter.name,
-                            perspectiveCharacter.media
-                        )
+                        .withCharacterIncluded(perspectiveCharacter)
                         .withCharacterPromoted(perspectiveCharacter.id)
                 )
 
@@ -465,17 +421,9 @@ class UseCharacterAsOpponentUnitTest {
             fun `character already main opponent`() {
                 themeRepository.givenTheme(
                     theme
-                        .withCharacterIncluded(
-                            perspectiveCharacter.id,
-                            perspectiveCharacter.name,
-                            perspectiveCharacter.media
-                        )
+                        .withCharacterIncluded(perspectiveCharacter)
                         .withCharacterPromoted(perspectiveCharacter.id)
-                        .withCharacterIncluded(
-                            opponent.id,
-                            opponent.name,
-                            opponent.media
-                        )
+                        .withCharacterIncluded(opponent)
                         .withCharacterAsStoryFunctionForMajorCharacter(
                             opponent.id, StoryFunction.MainAntagonist, perspectiveCharacter.id
                         )
@@ -496,17 +444,9 @@ class UseCharacterAsOpponentUnitTest {
             init {
                 themeRepository.givenTheme(
                     theme
-                        .withCharacterIncluded(
-                            perspectiveCharacter.id,
-                            perspectiveCharacter.name,
-                            perspectiveCharacter.media
-                        )
+                        .withCharacterIncluded(perspectiveCharacter)
                         .withCharacterPromoted(perspectiveCharacter.id)
-                        .withCharacterIncluded(
-                            opponent.id,
-                            opponent.name,
-                            opponent.media
-                        )
+                        .withCharacterIncluded(opponent)
                 )
             }
 
@@ -523,7 +463,7 @@ class UseCharacterAsOpponentUnitTest {
 
                 (result as UseCharacterAsMainOpponent.ResponseModel).mainOpponent shouldBe opponent(
                     opponent.id.uuid,
-                    opponent.name,
+                    opponent.name.value,
                     perspectiveCharacterId.uuid,
                     themeId.uuid,
                     true
@@ -548,22 +488,10 @@ class UseCharacterAsOpponentUnitTest {
             init {
                 themeRepository.givenTheme(
                     theme
-                        .withCharacterIncluded(
-                            perspectiveCharacter.id,
-                            perspectiveCharacter.name,
-                            perspectiveCharacter.media
-                        )
+                        .withCharacterIncluded(perspectiveCharacter)
                         .withCharacterPromoted(perspectiveCharacter.id)
-                        .withCharacterIncluded(
-                            opponent.id,
-                            opponent.name,
-                            opponent.media
-                        )
-                        .withCharacterIncluded(
-                            otherCharacter.id,
-                            otherCharacter.name,
-                            otherCharacter.media
-                        )
+                        .withCharacterIncluded(opponent)
+                        .withCharacterIncluded(otherCharacter)
                         .withCharacterAsStoryFunctionForMajorCharacter(
                             otherCharacter.id,
                             StoryFunction.MainAntagonist,
@@ -589,7 +517,7 @@ class UseCharacterAsOpponentUnitTest {
 
                 val previousOpponent = (result as UseCharacterAsMainOpponent.ResponseModel).previousMainOpponent!!
                 previousOpponent.characterId.mustEqual(otherCharacter.id.uuid)
-                previousOpponent.characterName.mustEqual(otherCharacter.name)
+                previousOpponent.characterName.mustEqual(otherCharacter.name.value)
                 previousOpponent.opponentOfCharacterId.mustEqual(perspectiveCharacter.id.uuid)
                 previousOpponent.themeId.mustEqual(theme.id.uuid)
             }
@@ -638,7 +566,7 @@ class UseCharacterAsOpponentUnitTest {
 
     private fun givenCharacterInTheme(character: Character, isMajorCharacter: Boolean = false) {
         themeRepository.themes[themeId] = themeRepository.themes[themeId]!!
-            .withCharacterIncluded(character.id, character.name, character.media).let {
+            .withCharacterIncluded(character.id, character.name.value, character.media).let {
                 if (isMajorCharacter) it.withCharacterPromoted(character.id)
                 else it
             }
@@ -655,7 +583,7 @@ class UseCharacterAsOpponentUnitTest {
 
     private fun themeWithCharacter(expectedCharacter: Character) = fun(actual: Theme) {
         val includedCharacter = actual.characters.single { it.id == expectedCharacter.id }
-        assertEquals(expectedCharacter.name, includedCharacter.name)
+        assertEquals(expectedCharacter.name.value, includedCharacter.name)
     }
 
     private fun themeWithCharacterAsOpponent() = fun(actual: Any?) {
@@ -669,7 +597,7 @@ class UseCharacterAsOpponentUnitTest {
 
     private fun opponent() = opponent(
         opponent.id.uuid,
-        opponent.name,
+        opponent.name.value,
         perspectiveCharacter.id.uuid,
         themeId.uuid,
         false

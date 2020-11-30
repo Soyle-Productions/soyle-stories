@@ -88,7 +88,7 @@ class DeleteThemeUnitTest {
             private fun givenThemeHasMajorCharacter(character: Character) {
                 characterRepository.characters[character.id] = character
                 themeRepository.themes[themeId] = themeRepository.themes[themeId]!!.withCharacterIncluded(
-                    character.id, character.name, character.media
+                    character.id, character.name.value, character.media
                 ).withCharacterPromoted(character.id)
                 characterArcRepository.givenCharacterArc(CharacterArc.planNewCharacterArc(character.id, themeId, themeRepository.themes[themeId]!!.name))
             }
@@ -97,7 +97,7 @@ class DeleteThemeUnitTest {
                 val character = makeCharacter()
                 characterRepository.characters[character.id] = character
                 themeRepository.themes[themeId] = themeRepository.themes[themeId]!!.withCharacterIncluded(
-                    character.id, character.name, character.media
+                    character.id, character.name.value, character.media
                 )
             }
 

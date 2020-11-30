@@ -98,9 +98,9 @@ class RemoveCharacterFromComparisonUnitTest {
         themeRepository.themes[themeId] = makeTheme(themeId)
         themeRepository.themes[themeId] = andCharacterIds
             .fold(themeRepository.themes[themeId]!!) { nextTheme, characterId ->
-                val character = makeCharacter(Character.Id(characterId), Project.Id(), "Bob")
+                val character = makeCharacter(Character.Id(characterId), Project.Id())
                 characterRepository.characters[character.id] = character
-                nextTheme.withCharacterIncluded(character.id, character.name, character.media)
+                nextTheme.withCharacterIncluded(character.id, character.name.value, character.media)
             }
         themeRepository.themes[themeId] = andMajorCharacterIds
             .fold(themeRepository.themes[themeId]!!) { nextTheme, characterId ->
