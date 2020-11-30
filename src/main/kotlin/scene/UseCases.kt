@@ -79,7 +79,7 @@ object UseCases {
 
     private fun InProjectScope.createNewScene() {
         provide<CreateNewScene> {
-            CreateNewSceneUseCase(projectId, get(), get(), get())
+            CreateNewSceneUseCase(projectId, get(), get(), get(), get())
         }
 
         provide<CreateNewSceneController> {

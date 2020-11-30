@@ -92,6 +92,7 @@ object SceneModule {
                     projectId,
                     get(),
                     get(),
+                    get(),
                     get()
                 )
             }

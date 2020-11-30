@@ -3,16 +3,14 @@ package com.soyle.stories.desktop.config.features
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.robot
+import com.soyle.stories.desktop.config.drivers.scene.SceneDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransformer
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.soylestories.configureModules
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcTemplate
-import com.soyle.stories.entities.CharacterArcTemplateSection
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
@@ -76,8 +74,13 @@ class GlobalHooks : En {
         }
 
         After { scenario: Scenario ->
-            FxToolkit.cleanupStages()
-            FxToolkit.cleanupApplication(soyleStories)
+            try {
+                FxToolkit.cleanupStages()
+                FxToolkit.cleanupApplication(soyleStories)
+            } catch (t: Throwable) {
+                println("Exception after scenario finished:")
+                println(t)
+            }
         }
 
         ParameterType<Character?>("character", "[A-Z]\\w+") { name: String ->
@@ -85,6 +88,9 @@ class GlobalHooks : En {
         }
         ParameterType<Theme>("theme", "\"(.*?)\"") { name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
+        }
+        ParameterType<Scene>("scene", "\"(.*?)\"") { name: String ->
+            SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).getSceneByNameOrError(name)
         }
         ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { name: String ->
             CharacterArcTemplate.default().sections.single { it.name == name }

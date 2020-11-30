@@ -9,6 +9,7 @@ import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.repositories.ProjectRepository
+import com.soyle.stories.prose.repositories.ProseRepository
 import com.soyle.stories.repositories.*
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.soylestories.ApplicationScope
@@ -90,6 +91,10 @@ object DataModule {
 
 			provide<WriterRepository> {
 				WriterRepositoryImpl(applicationScope.writerId)
+			}
+
+			provide<ProseRepository> {
+				ProseRepositoryImpl()
 			}
 
 			provide<OpenToolContext> {
