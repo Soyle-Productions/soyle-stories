@@ -77,6 +77,7 @@ class WorkBench : View() {
                     }*/
                 }
                 item("Settings") {
+                    id = "file_settings"
                     action { scope.get<SettingsDialog>().show() }
                 }
             }

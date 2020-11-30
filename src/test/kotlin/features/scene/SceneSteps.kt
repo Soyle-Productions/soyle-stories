@@ -1,5 +1,7 @@
 package com.soyle.stories.desktop.config.features.scene
 
+import com.soyle.stories.desktop.config.drivers.project.givenSettingsDialogHasBeenOpened
+import com.soyle.stories.desktop.config.drivers.project.markConfirmDeleteSceneDialogUnNecessary
 import com.soyle.stories.desktop.config.drivers.scene.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.features.soyleStories
@@ -8,6 +10,7 @@ import com.soyle.stories.desktop.view.project.workbench.WorkbenchAssertions.Comp
 import com.soyle.stories.entities.Scene
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 
 class SceneSteps : En {
 
@@ -22,6 +25,11 @@ class SceneSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             SceneDriver(workbench).getSceneByName(sceneName) ?: workbench.openCreateSceneDialog()
                 .createSceneWithName(sceneName)
+        }
+        Given("the user has requested that a delete scene confirmation message not be shown") {
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSettingsDialogHasBeenOpened()
+                .markConfirmDeleteSceneDialogUnNecessary()
         }
     }
 
@@ -76,6 +84,10 @@ class SceneSteps : En {
         Then("the {string} scene should not have been deleted") { sceneName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             SceneDriver(workbench).getSceneByNameOrError(sceneName)
+        }
+        Then("the {string} scene should have been deleted") { sceneName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            assertNull(SceneDriver(workbench).getSceneByName(sceneName))
         }
     }
 

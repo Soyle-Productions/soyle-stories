@@ -20,6 +20,7 @@ class SettingsDialog : View() {
 				bindChildren(model.dialogs) {
 					field {
 						checkbox(it.label) {
+							id = it.dialogId
 							isSelected = it.enabled
 							selectedProperty().onChangeOnce { selected ->
 								val dialogUpdate = model.dialogs.map { dialog ->
@@ -37,19 +38,21 @@ class SettingsDialog : View() {
 		}
 		buttonbar {
 			button(text = "Save", type = ButtonBar.ButtonData.APPLY) {
+				id = "save"
 				enableWhen {
 					model.dialogUpdates.selectBoolean {
 						(model.dialogs.value != it).toProperty()
 					}
 				}
 				action {
-					viewListener.saveDialogs(model.dialogs.map {
+					viewListener.saveDialogs(model.dialogUpdates.map {
 						it.dialogId to it.enabled
 					})
 					close()
 				}
 			}
 			button(text = "Cancel", type = ButtonBar.ButtonData.CANCEL_CLOSE) {
+				id = "cancel"
 				requestFocus()
 				action { close() }
 			}
