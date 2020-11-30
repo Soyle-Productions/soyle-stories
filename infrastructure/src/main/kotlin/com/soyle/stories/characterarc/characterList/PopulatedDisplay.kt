@@ -1,13 +1,11 @@
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.character.usecases.validateCharacterName
 import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.components.characterCard
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.*
-import com.soyle.stories.common.components.ComponentsStyles.Companion.arrowIconButton
-import com.soyle.stories.common.components.ComponentsStyles.Companion.iconButton
 import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
@@ -15,17 +13,11 @@ import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.geometry.Insets
-import javafx.geometry.Pos
-import javafx.geometry.Side
 import javafx.geometry.VPos
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.MenuItem
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
-import javafx.scene.image.Image
 import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
 import tornadofx.*
 
 /**
@@ -166,7 +158,10 @@ internal class PopulatedDisplay : View() {
             }) { newName, oldValue ->
 
                 when (oldValue) {
-                    is CharacterTreeItemViewModel -> characterListViewListener.renameCharacter(oldValue.id, newName)
+                    is CharacterTreeItemViewModel -> {
+                        val newNonBlankName = NonBlankString.create(newName) ?: return@makeEditable oldValue
+                        characterListViewListener.renameCharacter(oldValue.id, newNonBlankName)
+                    }
                     is CharacterArcItemViewModel -> characterListViewListener.renameCharacterArc(oldValue.characterId, oldValue.themeId, newName)
                 }
 

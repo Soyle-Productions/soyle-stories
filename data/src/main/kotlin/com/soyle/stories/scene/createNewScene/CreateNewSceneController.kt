@@ -1,10 +1,12 @@
 package com.soyle.stories.scene.createNewScene
 
+import com.soyle.stories.common.NonBlankString
+
 interface CreateNewSceneController {
 
-	fun createNewScene(name: String)
+	fun createNewScene(name: NonBlankString)
 
-	fun createNewSceneBefore(name: String, sceneId: String)
-	fun createNewSceneAfter(name: String, sceneId: String)
+	fun createNewSceneBefore(name: NonBlankString, sceneId: String)
+	fun createNewSceneAfter(name: NonBlankString, sceneId: String)
 
 }

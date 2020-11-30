@@ -49,7 +49,7 @@ fun ThemeList.openMoralArgumentToolFor(themeName: String)
 }
 
 fun MoralArgumentView.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character: Character) =
-    givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
+    givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
 fun MoralArgumentView.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(characterName: String)
 {
     val driver = MoralArgumentViewDriver(this)

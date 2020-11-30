@@ -1,10 +1,10 @@
 package com.soyle.stories.characterarc.characterList.components
 
-import com.soyle.stories.character.usecases.validateCharacterName
 import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.characterList.PopulatedDisplay
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.components.ComponentsStyles.Companion.liftedCard
 import com.soyle.stories.di.get
@@ -86,11 +86,9 @@ class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
             root.style { fontSize = 1.25.em }
             onShowing { errorMessage = null }
             setOnAction { _ ->
-                val newName = editedText ?: ""
-                try {
-                    validateCharacterName(newName)
-                } catch (e: Exception) {
-                    errorMessage = e.localizedMessage ?: "Invalid Character Name"
+                val newName = NonBlankString.create(editedText ?: "")
+                if (newName == null) {
+                    errorMessage = "Character Name cannot be blank"
                     return@setOnAction
                 }
                 renameCharacter(newName)
@@ -99,7 +97,7 @@ class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
         }
     }
 
-    private fun renameCharacter(newName: String) {
+    private fun renameCharacter(newName: NonBlankString) {
         val characterId = item?.id ?: return
         viewListener.renameCharacter(characterId, newName)
     }

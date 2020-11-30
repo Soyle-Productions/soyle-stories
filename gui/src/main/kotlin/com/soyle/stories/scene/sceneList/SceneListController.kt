@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.sceneList
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.scene.renameScene.RenameSceneController
@@ -24,7 +25,7 @@ class SceneListController(
 		openToolController.openSceneDetailsTool(sceneId)
 	}
 
-	override fun renameScene(sceneId: String, newName: String) {
+	override fun renameScene(sceneId: String, newName: NonBlankString) {
 		renameSceneController.renameScene(sceneId, newName)
 	}
 

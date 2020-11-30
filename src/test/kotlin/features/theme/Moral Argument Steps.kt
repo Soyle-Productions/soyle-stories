@@ -33,7 +33,7 @@ class `Moral Argument Steps` : En {
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
             moralArgument.givenMoralArgumentHasBeenPreparedToAddNewSection()
 
         }
@@ -49,7 +49,7 @@ class `Moral Argument Steps` : En {
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
         }
     }
 
@@ -59,7 +59,7 @@ class `Moral Argument Steps` : En {
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
             moralArgument.prepareToAddNewSection()
 
         }
@@ -68,7 +68,7 @@ class `Moral Argument Steps` : En {
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
         }
         When(
             "an unused moral argument section type is selected to be added for {string} in the {string} theme"
@@ -103,7 +103,7 @@ class `Moral Argument Steps` : En {
         ) { character: Character?, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character!!.name)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character!!.name.value)
         }
         When(
             "a used moral argument section type is selected to be moved for {string} in the {string} theme"

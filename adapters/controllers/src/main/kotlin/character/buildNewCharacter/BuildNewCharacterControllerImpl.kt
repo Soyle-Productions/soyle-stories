@@ -1,8 +1,7 @@
-package com.soyle.stories.character.buildNewCharacter
+package com.soyle.stories.controllers.character.buildNewCharacter
 
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacter
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 import kotlin.concurrent.thread
@@ -18,7 +17,7 @@ class BuildNewCharacterControllerImpl(
 
     private val projectId = UUID.fromString(projectId)
 
-    override fun createCharacter(name: NonBlankString, onError: (Throwable) -> Unit) {
+    override fun createCharacter(name: String, onError: (Throwable) -> Unit) {
         threadTransformer.async {
             try {
                 buildNewCharacter.invoke(projectId, name, buildNewCharacterOutputPort)
@@ -26,7 +25,7 @@ class BuildNewCharacterControllerImpl(
         }
     }
 
-    override fun createCharacterAndIncludeInTheme(name: NonBlankString, includeInTheme: String, onError: (Throwable) -> Unit) {
+    override fun createCharacterAndIncludeInTheme(name: String, includeInTheme: String, onError: (Throwable) -> Unit) {
         val preparedThemeId = UUID.fromString(includeInTheme)
         threadTransformer.async {
             try {
@@ -36,7 +35,7 @@ class BuildNewCharacterControllerImpl(
     }
 
     override fun createCharacterForUseAsOpponent(
-        name: NonBlankString,
+        name: String,
         includeInTheme: String,
         opponentForCharacter: String,
         onError: (Throwable) -> Unit
@@ -50,7 +49,7 @@ class BuildNewCharacterControllerImpl(
         }
     }
 
-    override fun createCharacterAsMajorCharacter(name: NonBlankString, includeInTheme: String, onError: (Throwable) -> Unit) {
+    override fun createCharacterAsMajorCharacter(name: String, includeInTheme: String, onError: (Throwable) -> Unit) {
         val preparedThemeId = UUID.fromString(includeInTheme)
         threadTransformer.async {
             try {

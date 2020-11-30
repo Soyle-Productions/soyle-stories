@@ -1,5 +1,6 @@
 package com.soyle.stories.characterarc.createCharacterDialog
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.async
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
@@ -27,7 +28,8 @@ class CreateCharacterDialog : Fragment("New Character") {
             requestFocus()
             onAction = EventHandler {
                 it.consume()
-                if (text.isEmpty()) {
+                val name = NonBlankString.create(text)
+                if (name == null) {
                     val errorDecorator = SimpleMessageDecorator("Name cannot be blank", ValidationSeverity.Error)
                     decorators.toList().forEach { removeDecorator(it) }
                     addDecorator(errorDecorator)
@@ -39,15 +41,15 @@ class CreateCharacterDialog : Fragment("New Character") {
                 if (themeId != null) {
                     when {
                         useAsOpponentForCharacterId != null -> viewListener.createCharacterForUseAsOpponent(
-                            text,
+                            name,
                             themeId,
                             useAsOpponentForCharacterId
                         )
-                        includeAsMajorCharacter -> viewListener.createCharacterAsMajorCharacter(text, themeId)
-                        else -> viewListener.createCharacterAndIncludeInTheme(text, themeId)
+                        includeAsMajorCharacter -> viewListener.createCharacterAsMajorCharacter(name, themeId)
+                        else -> viewListener.createCharacterAndIncludeInTheme(name, themeId)
                     }
                 } else {
-                    viewListener.createCharacter(text)
+                    viewListener.createCharacter(name)
                 }
                 close()
             }

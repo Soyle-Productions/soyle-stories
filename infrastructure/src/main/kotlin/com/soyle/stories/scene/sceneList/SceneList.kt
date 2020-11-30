@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.sceneList
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.emptyListDisplay
 import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.get
@@ -52,9 +53,10 @@ class SceneList : View() {
 				isShowRoot = false
 				vgrow = Priority.ALWAYS
 				makeEditable { newName, oldValue ->
+					val validName = NonBlankString.create(newName)
 					// rename item
-					if (oldValue != null) {
-						viewListener.renameScene(oldValue.id, newName)
+					if (oldValue != null && validName != null) {
+						viewListener.renameScene(oldValue.id, validName)
 					}
 
 					oldValue

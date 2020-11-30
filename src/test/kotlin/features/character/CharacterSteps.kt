@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.features.character
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.desktop.config.drivers.character.CharacterArcDriver
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.project.ProjectDriver
@@ -32,13 +33,13 @@ class CharacterSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val characterDriver = CharacterDriver(workbench)
             data.asList().forEach { characterName ->
-                characterDriver.givenCharacterNamed(characterName)
+                characterDriver.givenCharacterNamed(NonBlankString.create(characterName)!!)
             }
         }
         Given("a character named {string} has been created") { characterName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val characterDriver = CharacterDriver(workbench)
-            characterDriver.givenCharacterNamed(characterName)
+            characterDriver.givenCharacterNamed(NonBlankString.create(characterName)!!)
         }
     }
 
