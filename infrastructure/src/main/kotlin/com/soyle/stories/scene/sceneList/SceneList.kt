@@ -115,7 +115,7 @@ class SceneList : View() {
 		}
 	}
 
-	private val sceneContextMenu = ContextMenu().apply {
+	val sceneContextMenu = ContextMenu().apply {
 		item("Rename") {
 			id = "rename"
 			action {

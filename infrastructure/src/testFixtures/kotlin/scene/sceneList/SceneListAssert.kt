@@ -15,4 +15,9 @@ class SceneListAssert private constructor(private val driver: SceneListDriver) {
     {
         Assertions.assertNotNull(driver.getSceneItem(sceneName)) { "Scene List does not contain scene named $sceneName" }
     }
+
+    fun doesNotHaveSceneNamed(sceneName: String)
+    {
+        Assertions.assertNull(driver.getSceneItem(sceneName)) { "Scene List still contains scene named $sceneName" }
+    }
 }

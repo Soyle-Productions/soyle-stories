@@ -12,7 +12,7 @@ Feature: Manage Scenes
   Scenario: Rename Scene
     Given a scene named "Small Conflict" has been created
     When "Small Conflict" is renamed with the name "Big Battle"
-    Then the scene originally named "Transformation" should have been renamed to "Big Battle"
+    Then the scene originally named "Small Conflict" should have been renamed to "Big Battle"
 
   Scenario: Delay Delete Scene
     Given a scene named "Big Battle" has been created
