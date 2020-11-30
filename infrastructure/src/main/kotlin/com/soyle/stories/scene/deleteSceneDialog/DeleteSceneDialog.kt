@@ -74,9 +74,9 @@ class DeleteSceneDialog : Fragment() {
 	}
 
 	companion object {
-		private val Delete = ButtonBar.ButtonData.FINISH
-		private val Ramifications = ButtonBar.ButtonData.YES
-		private val Cancel = ButtonBar.ButtonData.CANCEL_CLOSE
+		val Delete = ButtonBar.ButtonData.FINISH
+		val Ramifications = ButtonBar.ButtonData.YES
+		val Cancel = ButtonBar.ButtonData.CANCEL_CLOSE
 	}
 
 }

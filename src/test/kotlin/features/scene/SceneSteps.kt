@@ -31,6 +31,11 @@ class SceneSteps : En {
             workbench.givenSettingsDialogHasBeenOpened()
                 .markConfirmDeleteSceneDialogUnNecessary()
         }
+        Given("the user wanted to delete {scene}") { scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenDeleteSceneDialogHasBeenOpened(scene)
+        }
     }
 
     private fun whens() {
@@ -48,6 +53,12 @@ class SceneSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenSceneListToolHasBeenOpened()
                 .deleteScene(scene)
+        }
+        When("the user confirms they want to delete {scene}") { scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenDeleteSceneDialogHasBeenOpened(scene)
+                .confirmDelete()
         }
     }
 
