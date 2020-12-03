@@ -353,18 +353,22 @@ object SceneModule {
 
         scoped<SceneDetailsScope> {
             provide<SceneDetailsViewListener> {
+                val presenter = SceneDetailsPresenter(
+                    sceneId.toString(),
+                    get<SceneDetailsModel>(),
+                    projectScope.get(),
+                    projectScope.get<LinkLocationToSceneNotifier>(),
+                    projectScope.get<ReorderSceneNotifier>(),
+                )
+
+                presenter listensTo projectScope.get<DeleteSceneNotifier>()
+
                 SceneDetailsController(
                     sceneId.toString(),
                     projectScope.applicationScope.get(),
                     projectScope.applicationScope.get(),
                     projectScope.get(),
-                    SceneDetailsPresenter(
-                        sceneId.toString(),
-                        get<SceneDetailsModel>(),
-                        projectScope.get(),
-                        projectScope.get<LinkLocationToSceneNotifier>(),
-                        projectScope.get<ReorderSceneNotifier>(),
-                    ),
+                    presenter,
                     projectScope.get(),
                 )
             }

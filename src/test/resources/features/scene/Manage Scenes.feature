@@ -31,17 +31,3 @@ Feature: Manage Scenes
     And the user wanted to delete "Big Battle"
     When the user confirms they want to delete "Big Battle"
     Then the "Big Battle" scene should have been deleted
-
-  Scenario: Delete Scene with Dependent Scene
-    Given the following scenes with motivations for characters
-      |           | Big Battle | Small Conflict |
-      | Bob       | motivation | inherit        |
-    When "Big Battle" is deleted
-    Then "Small Conflict" should not have a motivation for Bob anymore
-
-  Scenario: Delete Scene with Dependent Scene and Back-Up Scene
-    Given the following scenes with motivations for characters
-      |           | Giant War   | Big Battle  | Small Conflict |
-      | Bob       | motivation1 | motivation2 | inherit        |
-    When "Big Battle" is deleted
-    Then "Small Conflict" should have "motivation1" as Bob's motivation

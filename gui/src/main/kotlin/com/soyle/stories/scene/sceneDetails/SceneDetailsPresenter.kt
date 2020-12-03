@@ -8,11 +8,13 @@ import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LiveLocationList
 import com.soyle.stories.location.locationList.LocationListListener
 import com.soyle.stories.location.usecases.listAllLocations.LocationItem
+import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.sceneDetails.includedCharacter.CoveredArcSectionViewModel
 import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterInScenePresenter
 import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterInSceneViewModel
 import com.soyle.stories.scene.sceneDetails.includedCharacter.PreviousMotivation
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewModel
+import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
 import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
@@ -27,7 +29,9 @@ class SceneDetailsPresenter(
 ) : GetSceneDetails.OutputPort,
     LocationListListener,
     LinkLocationToScene.OutputPort,
-    ReorderScene.OutputPort {
+    ReorderScene.OutputPort,
+        DeleteScene.OutputPort
+{
 
     private val sceneId = UUID.fromString(sceneId)
 
@@ -56,12 +60,12 @@ class SceneDetailsPresenter(
                         IncludedCharacterInSceneViewModel(
                             it.characterId.toString(),
                             it.characterName,
-                            it.motivation ?: it.inheritedMotivation?.motivation ?: "",
+                            it.motivation ?: "",
                             it.motivation != null,
-                            it.inheritedMotivation?.let {
+                            it.inheritedMotivation?.let { inherited ->
                                 PreviousMotivation(
-                                    it.motivation,
-                                    it.sceneId.toString()
+                                    inherited.motivation,
+                                    inherited.sceneId.toString()
                                 )
                             },
                             it.coveredArcSections.map {
@@ -131,6 +135,12 @@ class SceneDetailsPresenter(
         }
     }
 
+    override fun receiveDeleteSceneResponse(responseModel: DeleteScene.ResponseModel) {
+        view.updateOrInvalidated {
+            copyOrDefault(invalid = true)
+        }
+    }
+
     private fun SceneDetailsViewModel?.copyOrDefault(
         invalid: Boolean = this?.invalid ?: true,
         storyEventId: String? = this?.storyEventId,
@@ -159,5 +169,6 @@ class SceneDetailsPresenter(
     }
 
     override fun failedToReorderScene(failure: Exception) {}
+    override fun receiveDeleteSceneFailure(failure: SceneException) {}
 
 }

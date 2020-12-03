@@ -57,6 +57,6 @@ fun SceneDetails.setCharacterMotivation(character: Character, motivation: String
     driver.interact {
         motivationInput.requestFocus()
         motivationInput.text = motivation
-        driver.press(KeyCode.TAB).release(KeyCode.TAB)
+        driver.clickOn(driver.getIncludeCharacterMenu())
     }
 }

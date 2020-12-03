@@ -79,7 +79,7 @@ dependencies {
     api project(":application")
     api project(":data")
     api project(":gui")
-    api "no.tornado:tornadofx:1.7.19", {
+    api "no.tornado:tornadofx:1.7.20", {
         exclude group: 'org.jetbrains.kotlin'
     }
     api libraries.coroutines

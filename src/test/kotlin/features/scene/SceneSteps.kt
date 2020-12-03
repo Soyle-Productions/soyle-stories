@@ -10,11 +10,15 @@ import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert.Companion.assertThat
 import com.soyle.stories.desktop.view.project.workbench.WorkbenchAssertions.Companion.assertThat
 import com.soyle.stories.desktop.view.scene.sceneDetails.SceneDetailsAssertions
+import com.soyle.stories.di.get
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.WorkBench
+import com.soyle.stories.scene.repositories.SceneRepository
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 
 class SceneSteps : En {
@@ -57,7 +61,6 @@ class SceneSteps : En {
                     }
                 }
             }
-
 
         }
     }
@@ -142,6 +145,21 @@ class SceneSteps : En {
             SceneDetailsAssertions.assertThat(sceneDetailsTool) {
                 andCharacter(character.id.uuid.toString()) {
                     hasMotivationValue("")
+                }
+            }
+        }
+        Then(
+            "{scene} should have {string} as {character}'s inherited motivation"
+        ) { scene: Scene, expectedMotivation: String, character: Character ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            assertTrue(scene.getMotivationForCharacter(character.id)!!.isInherited())
+
+            val sceneDetailsTool = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneDetailsToolHasBeenOpened(scene)
+
+            SceneDetailsAssertions.assertThat(sceneDetailsTool) {
+                andCharacter(character.id.uuid.toString()) {
+                    hasInheritedMotivationValue(expectedMotivation)
                 }
             }
         }

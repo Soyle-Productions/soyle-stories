@@ -12,6 +12,10 @@ class SceneDetailsAssertions private constructor(private val driver: SceneDetail
     }
 
     inner class IncludedCharacterAssertions(private val driver: SceneDetailsDriver.IncludedCharacterDriver) {
+        fun hasInheritedMotivationValue(motivation: String)
+        {
+            assertEquals(motivation, driver.getMotivationFieldInput().promptText)
+        }
         fun hasMotivationValue(motivation: String)
         {
             assertEquals(motivation, driver.getMotivationFieldInput().text)

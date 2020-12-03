@@ -9,6 +9,7 @@ import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterI
 import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterScope
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.collections.ObservableList
+import tornadofx.onChange
 import tornadofx.onChangeOnce
 
 class IncludedCharactersInSceneState : Model<SceneDetailsScope, IncludedCharactersInSceneViewModel>(SceneDetailsScope::class) {

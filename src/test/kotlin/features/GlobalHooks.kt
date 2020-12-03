@@ -18,6 +18,7 @@ import io.cucumber.java8.ParameterDefinitionBody
 import io.cucumber.java8.Scenario
 import javafx.application.Application
 import javafx.application.Platform
+import javafx.scene.Scene
 import javafx.stage.Stage
 import org.testfx.api.FxToolkit
 import java.lang.NullPointerException
@@ -75,8 +76,8 @@ class GlobalHooks : En {
 
         After { scenario: Scenario ->
             try {
-                FxToolkit.cleanupStages()
                 FxToolkit.cleanupApplication(soyleStories)
+                FxToolkit.cleanupStages()
             } catch (t: Throwable) {
                 println("Exception after scenario finished:")
                 println(t)
@@ -89,7 +90,7 @@ class GlobalHooks : En {
         ParameterType<Theme>("theme", "\"(.*?)\"") { name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
         }
-        ParameterType<Scene>("scene", "\"(.*?)\"") { name: String ->
+        ParameterType<com.soyle.stories.entities.Scene>("scene", "\"(.*?)\"") { name: String ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).getSceneByNameOrError(name)
         }
         ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { name: String ->
