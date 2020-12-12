@@ -1,35 +1,41 @@
 package com.soyle.stories.prose
 
-import com.soyle.stories.common.SingleLine
-import com.soyle.stories.common.singleLine
+import com.soyle.stories.common.EntityId
 import com.soyle.stories.entities.Prose
 import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.entities.ProseParagraph
+import com.soyle.stories.entities.ProseMentionRange
+import org.junit.jupiter.api.Assertions.assertEquals
 
 fun makeProse(
     id: Prose.Id = Prose.Id(),
-    paragraphs: List<ProseParagraph> = listOf(makeProseParagraph(proseId = id)),
+    content: String = "",
+    mentions: List<ProseMention<*>> = listOf(),
     revision: Long = LongRange(0L, Long.MAX_VALUE).random()
-): Prose
-{
+): Prose {
     return Prose.build(
         id,
-        paragraphs.mapTo(LinkedHashSet(paragraphs.size)) { it },
+        content,
+        mentions,
         revision
     )
 }
 
-fun makeProseParagraph(
-    id: ProseParagraph.Id = ProseParagraph.Id(),
-    proseId: Prose.Id = Prose.Id(),
-    content: SingleLine = singleLine(""),
-    mentions: List<ProseMention<*>> = listOf()
-): ProseParagraph
-{
-    return ProseParagraph.build(
-        id,
-        proseId,
-        content,
-        mentions
-    )
-}
+fun textInsertedIntoProse(proseId: Prose.Id, revision: Long, insertedText: String, index: Int) =
+    fun(event: ProseEvent) {
+        event as TextInsertedIntoProse
+        assertEquals(proseId, event.proseId)
+        assertEquals(revision, event.revision)
+        assertEquals(insertedText, event.insertedText)
+        assertEquals(index, event.index)
+    }
+
+fun entityMentionedInProse(proseId: Prose.Id, revision: Long, entityId: EntityId<*>, range: ProseMentionRange) =
+    fun(event: ProseEvent) {
+        event as EntityMentionedInProse
+        assertEquals(proseId, event.proseId)
+        assertEquals(revision, event.revision)
+        assertEquals(entityId, event.entityId)
+        assertEquals(range, event.position)
+    }
+
+fun ProseEvent.mustMatch(expectation: (ProseEvent) -> Unit) = expectation(this)

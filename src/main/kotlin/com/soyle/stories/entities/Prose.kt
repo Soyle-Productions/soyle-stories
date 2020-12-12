@@ -1,14 +1,14 @@
 package com.soyle.stories.entities
 
-import com.soyle.stories.common.*
+import com.soyle.stories.common.Entity
+import com.soyle.stories.common.EntityId
 import com.soyle.stories.prose.*
 import java.util.*
-import kotlin.collections.HashMap
 
 class Prose private constructor(
     override val id: Id,
-    val paragraphOrder: List<ProseParagraph.Id>,
-    private val paragraphsById: Map<ProseParagraph.Id, ProseParagraph>,
+    val content: String,
+    val mentions: List<ProseMention<*>>,
     val revision: Long,
 
     @Suppress("UNUSED_PARAMETER") defaultConstructorMarker: Unit
@@ -17,29 +17,34 @@ class Prose private constructor(
     companion object {
         fun create(): ProseUpdate<ProseCreated> {
             val newId = Id()
-            val firstParagraph = ProseParagraph.createParagraph(newId, countLines("") as SingleLine)
             val prose =
                 Prose(
                     newId,
-                    listOf(firstParagraph.paragraph.id),
-                    hashMapOf(firstParagraph.paragraph.id to firstParagraph.paragraph),
+                    "",
+                    listOf(),
                     0L,
                     defaultConstructorMarker = Unit
                 )
-            return prose.updatedBy(ProseCreated(newId, firstParagraph.event))
+            return prose.updatedBy(ProseCreated(prose))
         }
 
         fun build(
             id: Id,
-            orderedParagraphs: LinkedHashSet<ProseParagraph>,
+            content: String,
+            mentions: List<ProseMention<*>>,
             revision: Long
         ): Prose {
-            if (orderedParagraphs.isEmpty()) error("Prose must have at least one paragraph.")
             if (revision < 0L) error("Revision number must be at least 0.  Got $revision")
+            val sortedMentions = mentions.sortedBy { it.position.index }
+            sortedMentions.forEachIndexed { index, proseMention ->
+                sortedMentions.subList(index + 1, sortedMentions.size).forEach {
+                    if (it.position.isIntersecting(proseMention.position)) error("No two mentions can intersect.  $it, $proseMention")
+                }
+            }
             return Prose(
                 id,
-                orderedParagraphs.map { it.id }.toList(),
-                orderedParagraphs.associateByTo(HashMap(orderedParagraphs.size)) { it.id },
+                content,
+                mentions,
                 revision,
 
                 defaultConstructorMarker = Unit
@@ -48,60 +53,44 @@ class Prose private constructor(
     }
 
     // reads
-    val paragraphs: List<ProseParagraph> by lazy {
-        paragraphOrder.map { paragraphsById.getValue(it) }
-    }
 
     // updates
     private fun copy(
-        paragraphOrder: List<ProseParagraph.Id> = this.paragraphOrder,
-        paragraphs: Map<ProseParagraph.Id, ProseParagraph> = this.paragraphsById,
-    ) = Prose(id, paragraphOrder, paragraphs, revision = revision + 1L, defaultConstructorMarker = Unit)
-
-    fun withNewParagraphInserted(
-        text: SingleLine,
-        paragraphIndex: Int
-    ): ProseUpdate<ParagraphOrderChanged> {
-        val (newParagraph, paragraphCreated) = ProseParagraph.createParagraph(id, text)
-        val newOrder = paragraphOrder.plusElementAt(paragraphIndex, newParagraph.id)
-        val orderChangedEvent = ParagraphOrderChanged(id, newOrder, paragraphCreated)
-        return copy(
-            paragraphOrder = newOrder,
-            paragraphs = paragraphsById.plus(newParagraph.id to newParagraph)
-        ).updatedBy(orderChangedEvent)
-    }
+        content: String = this.content,
+        mentions: List<ProseMention<*>> = this.mentions
+    ) = Prose(id, content, mentions, revision = revision + 1L, defaultConstructorMarker = Unit)
 
     fun withEntityMentioned(
-        paragraphId: ProseParagraph.Id,
         entityId: EntityId<*>,
         position: Int,
         length: Int
-    ): ProseUpdate<ProseMentionAdded> {
-        val paragraph = paragraphsById.getValue(paragraphId)
-        return copy(
-            paragraphs = paragraphsById.plus(
-                paragraph.id to paragraph.withMention(
-                    entityId,
-                    ProseMentionRange(position, length)
-                )
-            )
-        ).updatedBy(ProseMentionAdded(id, entityId, ProseMentionPosition(paragraphId, position, length)))
+    ): ProseUpdate<EntityMentionedInProse> {
+        val range = ProseMentionRange(position, length)
+        if (position < 0) throw IndexOutOfBoundsException(position)
+        if (position + length > content.length) throw IndexOutOfBoundsException(position + length)
+        if (mentions.any { it.position.isIntersecting(range) }) {
+            throw MentionOverlapsExistingMention()
+        }
+        val newProse = copy(
+            mentions = mentions + ProseMention(entityId, range)
+        )
+        return newProse.updatedBy(EntityMentionedInProse(newProse, entityId, range))
     }
 
     fun withTextInserted(
-        text: SingleLine,
-        paragraphId: ProseParagraph.Id,
+        text: String,
         index: Int? = null
-    ): ProseUpdate<ProseParagraphTextModified> {
-        val paragraph = paragraphsById.getValue(paragraphId)
-        return copy(
-            paragraphs = paragraphsById.plus(
-                paragraphId to paragraph.withTextInserted(
-                    text,
-                    index ?: paragraph.content.length
-                )
-            )
-        ).updatedBy(ProseParagraphTextModified(id, text.toString(), listOf()))
+    ): ProseUpdate<TextInsertedIntoProse> {
+        val insertIndex = index ?: content.length
+        if (mentions.any { it.position.isBisectedBy(insertIndex) }) {
+            throw ProseMentionCannotBeBisected()
+        }
+        val (mentionsBeforeIndex, mentionsAfterIndex) = mentions.partition { it.position.index < insertIndex }
+        val newProse = copy(
+            content = StringBuilder(content).insert(insertIndex, text).toString(),
+            mentions = mentionsBeforeIndex + mentionsAfterIndex.map { it.shiftedRight(text.length) }
+        )
+        return newProse.updatedBy(TextInsertedIntoProse(newProse, text, insertIndex))
     }
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
@@ -109,102 +98,21 @@ class Prose private constructor(
     }
 }
 
-class ProseParagraph private constructor(
-    val id: Id,
-    val proseId: Prose.Id,
-    val content: SingleLine,
-    private val mentionsByEntityId: MultiMap<EntityId<*>, ProseMentionRange>
-) {
-
-    companion object {
-        internal fun createParagraph(
-            proseId: Prose.Id,
-            initialContent: SingleLine
-        ): ProseParagraphUpdate<ParagraphCreated> {
-            val newId = Id()
-            return ProseParagraph(newId, proseId, initialContent, mapOf()).updatedBy(
-                ParagraphCreated(
-                    proseId,
-                    newId,
-                    initialContent.toString()
-                )
-            )
-        }
-
-        fun build(
-            id: Id,
-            proseId: Prose.Id,
-            content: SingleLine,
-            mentions: List<ProseMention<*>>
-        ): ProseParagraph {
-            if (mentions.any { it.position.paragraphId != id }) error("Cannot use mentions from other paragraphs.")
-            return ProseParagraph(
-                id,
-                proseId,
-                content,
-                mentions.groupBy({ it.entityId }) { it.position.range }
-            )
-        }
-    }
-
-    val allMentions: Sequence<ProseMention<*>>
-        get() = mentionsByEntityId.asSequence()
-            .flatMap { (k, v) -> v.asSequence().map { ProseMention(k, ProseMentionPosition(id, it)) } }
-
-    private fun copy(
-        content: SingleLine = this.content,
-        mentions: Map<EntityId<*>, List<ProseMentionRange>> = this.mentionsByEntityId
-    ) = ProseParagraph(id, proseId, content, mentions)
-
-    internal fun withMention(entityId: EntityId<*>, range: ProseMentionRange): ProseParagraph {
-        if (range.index < 0) throw IndexOutOfBoundsException("Starting position for mention of $entityId is out of bounds.  Got ${range.index}.")
-        if (range.index + range.length > content.length) throw IndexOutOfBoundsException("Length of mention of $entityId is too long.  For the index ${range.index}, the maximum length is ${content.length - range.index}.  Got ${range.length}")
-        if (allMentions.any { it.position.range.isIntersecting(range) }) {
-            throw MentionOverlapsExistingMention()
-        }
-        return copy(mentions = mentionsByEntityId.plus(entityId, range))
-    }
-
-    internal fun withTextInserted(text: SingleLine, index: Int): ProseParagraph {
-        if (allMentions.map { it.position.range }.any { index in it.index + 1 until it.index + it.length }) {
-            throw ProseMentionCannotBeBisected()
-        }
-        val newContent = countLines(StringBuilder(content).insert(index, text).toString()) as SingleLine
-        val (mentionsAfterIndex, mentionsBeforeIndex) = allMentions.partition { it.position.range.index >= index }
-        return if (mentionsAfterIndex.isEmpty()) {
-            copy(content = newContent)
-        } else {
-            copy(
-                content = newContent,
-                mentions = (mentionsBeforeIndex + mentionsAfterIndex.map { it.shiftedRight(text.length) }).groupBy({ it.entityId }) { it.position.range }
-            )
-        }
-    }
-
-    data class Id(val uuid: UUID = UUID.randomUUID()) {
-        override fun toString(): String = "ProseParagraph($uuid)"
-    }
-}
-
-data class ProseMention<Id>(val entityId: EntityId<Id>, val position: ProseMentionPosition) {
+data class ProseMention<Id>(val entityId: EntityId<Id>, val position: ProseMentionRange) {
     fun shiftedRight(amount: Int) =
-        copy(entityId = entityId, position = position.copy(range = position.range.shiftedRight(amount)))
+        copy(entityId = entityId, position = position.shiftedRight(amount))
 
     fun shiftedLeft(amount: Int) =
-        copy(entityId = entityId, position = position.copy(range = position.range.shiftedLeft(amount)))
-}
-
-data class ProseMentionPosition(val paragraphId: ProseParagraph.Id, val range: ProseMentionRange) {
-    constructor(paragraphId: ProseParagraph.Id, index: Int, length: Int) : this(
-        paragraphId,
-        ProseMentionRange(index, length)
-    )
+        copy(entityId = entityId, position = position.shiftedLeft(amount))
 }
 
 data class ProseMentionRange(val index: Int, val length: Int) {
     fun isIntersecting(other: ProseMentionRange): Boolean {
         if (isEmpty() || other.isEmpty()) return false
         return index in other.index until other.index + other.length || other.index in index until index + length
+    }
+    inline fun isBisectedBy(index: Int): Boolean {
+        return index in this.index + 1 until this.index + this.length
     }
 
     fun isEmpty() = length == 0
@@ -219,11 +127,5 @@ class ProseUpdate<E : ProseEvent?>(val prose: Prose, val event: E) {
     operator fun component1() = prose
 }
 
-class ProseParagraphUpdate<E : ProseEvent?>(val paragraph: ProseParagraph, val event: E) {
-    operator fun component2() = event
-    operator fun component1() = paragraph
-}
-
 fun <E : ProseEvent?> Prose.updatedBy(event: E) = ProseUpdate(this, event)
-fun <E : ProseEvent?> ProseParagraph.updatedBy(event: E) = ProseParagraphUpdate(this, event)
 
