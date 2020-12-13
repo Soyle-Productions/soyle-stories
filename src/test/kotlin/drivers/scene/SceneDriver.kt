@@ -1,14 +1,16 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
+import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
+import com.soyle.stories.prose.editProse.EditProseController
+import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.scene.repositories.SceneRepository
 import kotlinx.coroutines.runBlocking
-import kotlin.NoSuchElementException
 
 class SceneDriver private constructor(private val projectScope: ProjectScope) {
 
@@ -37,6 +39,14 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
         return previouslyNamedScenes.getValue(sceneName).mapNotNull {
             allScenes[it]
         }
+    }
+
+    fun givenSceneHasProse(scene: Scene, proseParagraphs: List<String>)
+    {
+        val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
+        ProseEditorScope(projectScope, prose.id)
+            .get<EditProseController>()
+            .insertText(proseParagraphs.joinToString("\n"), 0)
     }
 
     companion object {

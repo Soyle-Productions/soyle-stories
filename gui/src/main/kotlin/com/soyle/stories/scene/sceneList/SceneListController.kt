@@ -2,6 +2,7 @@ package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.entities.Prose
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.reorderScene.ReorderSceneController
@@ -19,6 +20,10 @@ class SceneListController(
 		threadTransformer.async {
 			listAllScenes.invoke(listAllScenesOutputPort)
 		}
+	}
+
+	override fun editScene(sceneId: String, proseId: Prose.Id) {
+		openToolController.openSceneEditor(sceneId, proseId)
 	}
 
 	override fun openSceneDetails(sceneId: String) {

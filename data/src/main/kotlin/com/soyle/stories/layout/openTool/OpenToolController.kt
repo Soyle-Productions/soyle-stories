@@ -1,5 +1,7 @@
 package com.soyle.stories.layout.openTool
 
+import com.soyle.stories.entities.Prose
+
 interface OpenToolController {
 
 	fun openLocationDetailsTool(locationId: String)
@@ -12,5 +14,6 @@ interface OpenToolController {
 	fun openValueOppositionWeb(themeId: String)
 	fun openCentralConflict(themeId: String, characterId: String?)
 	fun openMoralArgument(themeId: String)
+	fun openSceneEditor(sceneId: String, proseId: Prose.Id)
 
 }

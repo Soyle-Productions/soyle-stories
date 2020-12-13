@@ -116,6 +116,14 @@ class SceneList : View() {
 	}
 
 	val sceneContextMenu = ContextMenu().apply {
+		item("Edit") {
+			id = "edit"
+			action {
+				when (val selectedItem = model.selectedItem.value) {
+					is SceneItemViewModel -> viewListener.editScene(selectedItem.id, selectedItem.proseId)
+				}
+			}
+		}
 		item("Rename") {
 			id = "rename"
 			action {

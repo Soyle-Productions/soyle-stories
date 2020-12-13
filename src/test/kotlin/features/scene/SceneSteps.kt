@@ -1,24 +1,24 @@
 package com.soyle.stories.desktop.config.features.scene
 
 import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.common.anyNewLineCharacter
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.project.givenSettingsDialogHasBeenOpened
 import com.soyle.stories.desktop.config.drivers.project.markConfirmDeleteSceneDialogUnNecessary
+import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
 import com.soyle.stories.desktop.config.drivers.scene.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
+import com.soyle.stories.desktop.config.features.getParagraphs
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert.Companion.assertThat
 import com.soyle.stories.desktop.view.project.workbench.WorkbenchAssertions.Companion.assertThat
 import com.soyle.stories.desktop.view.scene.sceneDetails.SceneDetailsAssertions
-import com.soyle.stories.di.get
+import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
+import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert.Companion.assertThat
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.scene.repositories.SceneRepository
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 
 class SceneSteps : En {
@@ -61,7 +61,10 @@ class SceneSteps : En {
                     }
                 }
             }
-
+        }
+        Given("the {scene} scene has had {int} paragraphs entered as prose") { scene: Scene, paragraphCount: Int ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            SceneDriver(workbench).givenSceneHasProse(scene, getParagraphs(paragraphCount))
         }
     }
 
@@ -93,6 +96,11 @@ class SceneSteps : En {
                 .openDeleteSceneDialog(scene)
             getDeleteSceneDialog()
                 ?.confirmDelete()
+        }
+        When("the user wants to read the {scene} scene's prose") { scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .openSceneEditorTool(scene)
         }
     }
 
@@ -160,6 +168,22 @@ class SceneSteps : En {
             SceneDetailsAssertions.assertThat(sceneDetailsTool) {
                 andCharacter(character.id.uuid.toString()) {
                     hasInheritedMotivationValue(expectedMotivation)
+                }
+            }
+        }
+        Then(
+            "all {int} paragraphs of the {scene} scene's prose should be displayed"
+        ) { paragraphCount: Int, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+
+            val proseContent = ProseDriver(workbench).getProseByIdOrError(scene.proseId).content
+            assertEquals(paragraphCount, proseContent.split(anyNewLineCharacter).size)
+
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    hasContent(proseContent)
                 }
             }
         }

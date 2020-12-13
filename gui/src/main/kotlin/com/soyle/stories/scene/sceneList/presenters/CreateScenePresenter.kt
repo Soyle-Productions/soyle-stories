@@ -26,7 +26,7 @@ class CreateScenePresenter(
 				  if (it.id in affectedScenes) {
 					  SceneItemViewModel(affectedScenes.getValue(it.id))
 				  } else it
-			  } + SceneItemViewModel(response.sceneId.toString(), response.sceneName, response.sceneIndex)).sortedBy { it.index }
+			  } + SceneItemViewModel(response.sceneId.toString(), response.sceneProse, response.sceneName, response.sceneIndex)).sortedBy { it.index }
 			)
 		}
 	}

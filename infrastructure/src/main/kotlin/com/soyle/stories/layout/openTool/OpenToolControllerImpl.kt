@@ -2,6 +2,8 @@ package com.soyle.stories.layout.openTool
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.entities.Prose
+import com.soyle.stories.entities.Scene
 import com.soyle.stories.layout.config.dynamic.*
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications
@@ -120,6 +122,16 @@ class OpenToolControllerImpl(
 				),
 				openToolOutputPort
 			)
+		}
+	}
+
+	override fun openSceneEditor(sceneId: String, proseId: Prose.Id) {
+		val request = SceneEditor(
+			Scene.Id(UUID.fromString(sceneId)),
+			proseId
+		)
+		threadTransformer.async {
+			openTool.invoke(request, openToolOutputPort)
 		}
 	}
 }

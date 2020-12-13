@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 
 class ProseDriver private constructor(private val projectScope: ProjectScope) {
 
-    fun getProseByIdOrError(proseId: Prose.Id): Prose = getProseById(proseId) ?: throw ProseDoesNotExist(proseId.uuid)
+    fun getProseByIdOrError(proseId: Prose.Id): Prose = getProseById(proseId) ?: throw ProseDoesNotExist(proseId)
     fun getProseById(proseId: Prose.Id): Prose? {
         val repo = projectScope.get<ProseRepository>()
         return runBlocking {
