@@ -27,7 +27,7 @@ class ProseRepositoryImpl : ProseRepository {
         val events = eventTable.getOrDefault(proseId, listOf())
         val firstEvent = events.firstOrNull() ?: return emptyList()
         val startingIndex = sinceRevision - firstEvent.revision
-        return events.subList(startingIndex.toInt(), events.size).toList()
+        return events.subList(startingIndex.toInt() + 1, events.size).toList()
     }
 
 }

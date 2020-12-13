@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
+import com.soyle.stories.common.EntityId
 import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -47,6 +48,12 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
         ProseEditorScope(projectScope, prose.id)
             .get<EditProseController>()
             .insertText(proseParagraphs.joinToString("\n"), 0)
+    }
+
+    fun givenSceneProseMentionsEntity(scene: Scene, entityId: EntityId<*>, index: Int, length: Int)
+    {
+        val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
+        ProseDriver(projectScope.get()).givenProseMentionsEntity(prose, entityId,  index, length)
     }
 
     companion object {

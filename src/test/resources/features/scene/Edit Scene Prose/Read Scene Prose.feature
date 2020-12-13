@@ -21,4 +21,4 @@ Feature: Read Scene Prose
     And a location named "Home" has been created
     And the "Big Battle" scene has mentioned the location Home
     When the user wants to read the "Big Battle" scene's prose
-    Then the "Big Battle" scene's prose should show Home's name as a reference
+    Then the "Big Battle" scene's prose should show the location Home's name as a reference

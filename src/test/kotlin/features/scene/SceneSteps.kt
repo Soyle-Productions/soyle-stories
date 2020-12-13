@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.features.scene
 
+import com.soyle.stories.common.EntityId
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.anyNewLineCharacter
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
@@ -15,6 +16,7 @@ import com.soyle.stories.desktop.view.scene.sceneDetails.SceneDetailsAssertions
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert.Companion.assertThat
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.WorkBench
 import io.cucumber.datatable.DataTable
@@ -65,6 +67,16 @@ class SceneSteps : En {
         Given("the {scene} scene has had {int} paragraphs entered as prose") { scene: Scene, paragraphCount: Int ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             SceneDriver(workbench).givenSceneHasProse(scene, getParagraphs(paragraphCount))
+        }
+        Given("the {scene} scene has mentioned the character {character}") { scene: Scene, character: Character ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            SceneDriver(workbench).givenSceneHasProse(scene, listOf(character.name.value))
+            SceneDriver(workbench).givenSceneProseMentionsEntity(scene, EntityId.of(character), 0, character.name.length)
+        }
+        Given("the {scene} scene has mentioned the location {location}") { scene: Scene, location: Location ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            SceneDriver(workbench).givenSceneHasProse(scene, listOf("Paragraph", location.name))
+            SceneDriver(workbench).givenSceneProseMentionsEntity(scene, EntityId.of(location), 10, location.name.length)
         }
     }
 
@@ -184,6 +196,40 @@ class SceneSteps : En {
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
                     hasContent(proseContent)
+                }
+            }
+        }
+        Then(
+            "the {scene} scene's prose should show {character}'s name as a reference"
+        ) { scene: Scene, character: Character ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+
+            val characterMention = ProseDriver(workbench).getProseByIdOrError(scene.proseId).mentions
+                .find { it.entityId.id == character.id }
+                ?: throw AssertionError("No mention in prose for ${character.name}")
+
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    hasMention(characterMention.entityId, characterMention.position)
+                }
+            }
+        }
+        Then(
+            "the {scene} scene's prose should show the location {location}'s name as a reference"
+        ) { scene: Scene, location: Location ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+
+            val locationMention = ProseDriver(workbench).getProseByIdOrError(scene.proseId).mentions
+                .find { it.entityId.id == location.id }
+                ?: throw AssertionError("No mention in prose for ${location.name}")
+
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    hasMention(locationMention.entityId, locationMention.position)
                 }
             }
         }

@@ -5,16 +5,21 @@ import com.soyle.stories.di.resolve
 import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.prose.proseEditor.ProseEditorView
 import javafx.scene.Parent
+import javafx.scene.layout.Priority
 import tornadofx.View
-import tornadofx.pane
+import tornadofx.hbox
+import tornadofx.hgrow
 
 class SceneEditorView : View() {
 
     override val scope: SceneEditorScope = super.scope as SceneEditorScope
     val state = resolve<SceneEditorState>()
 
-    override val root: Parent = pane {
-        add(ProseEditorScope(scope.projectScope, scope.type.proseId).get<ProseEditorView>())
+    override val root: Parent = hbox {
+        isFillHeight = true
+        val proseEditor = ProseEditorScope(scope.projectScope, scope.type.proseId).get<ProseEditorView>()
+        add(proseEditor)
+        proseEditor.root.hgrow = Priority.ALWAYS
     }
 
 }

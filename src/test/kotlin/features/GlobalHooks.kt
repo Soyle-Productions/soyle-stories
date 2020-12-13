@@ -2,26 +2,19 @@ package com.soyle.stories.desktop.config.features
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
-import com.soyle.stories.desktop.config.drivers.robot
+import com.soyle.stories.desktop.config.drivers.location.LocationDriver
 import com.soyle.stories.desktop.config.drivers.scene.SceneDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransformer
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.soylestories.configureModules
 import com.soyle.stories.di.DI
-import com.soyle.stories.di.configureDI
 import com.soyle.stories.entities.*
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
-import io.cucumber.java8.ParameterDefinitionBody
 import io.cucumber.java8.Scenario
-import javafx.application.Application
-import javafx.application.Platform
-import javafx.scene.Scene
-import javafx.stage.Stage
 import org.testfx.api.FxToolkit
-import java.lang.NullPointerException
 import kotlin.concurrent.thread
 
 lateinit var soyleStories: SoyleStories
@@ -86,6 +79,9 @@ class GlobalHooks : En {
 
         ParameterType<Character?>("character", "[A-Z]\\w+") { name: String ->
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByName(name)
+        }
+        ParameterType<Location?>("location", "[A-Z]\\w+") { name: String ->
+            LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByName(name)
         }
         ParameterType<Theme>("theme", "\"(.*?)\"") { name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)

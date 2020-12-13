@@ -7,6 +7,7 @@ class ProseEditorState : Model<ProseEditorScope, ProseEditorViewModel>(ProseEdit
 
     val versionNumber = bind(ProseEditorViewModel::versionNumber)
     val content = bind(ProseEditorViewModel::content)
+    val mentions = bind(ProseEditorViewModel::mentions)
 
     override val applicationScope: ApplicationScope
         get() = scope.projectScope.applicationScope

@@ -40,12 +40,11 @@ class EditProseControllerImpl(
         processingOperations = true
         nextUpdate = nextUpdate.first to mutableListOf()
         threadTransformer.async {
-            val result = runCatching {
+            try {
                 updateProse.invoke(proseId, revision, operations, output)
-            }
-            result.exceptionOrNull()?.let {
+            } catch (t: Throwable) {
                 nextUpdate = nextUpdate.first to mutableListOf()
-                throw it
+                throw t
             }
         }
     }
