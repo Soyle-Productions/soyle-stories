@@ -284,6 +284,7 @@ class CreateNewSceneUnitTest {
 		actual as CreateNewScene.ResponseModel
 		assertEquals(savedScene.id.uuid, actual.sceneId)
 		assertEquals(validSceneName.value, actual.sceneName)
+		assertEquals(createdProse!!.id, actual.sceneProse)
 		return actual
 	}
 

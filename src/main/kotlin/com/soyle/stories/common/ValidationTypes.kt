@@ -27,6 +27,7 @@ class NonBlankString private constructor(val value: String) {
 }
 
 const val anyNewlinePattern = "\\r\\n|\\r|\\n"
+val anyNewLineCharacter = Regex(anyNewlinePattern)
 
 sealed class StringLineCount
 /**

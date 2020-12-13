@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.usecases.createNewScene
 
 import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.entities.Prose
 import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
 import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
@@ -23,7 +24,7 @@ interface CreateNewScene {
 
 	suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
-	class ResponseModel(val sceneId: UUID, val sceneName: String, val sceneIndex: Int, val affectedScenes: List<SceneItem>)
+	class ResponseModel(val sceneId: UUID, val sceneProse: Prose.Id, val sceneName: String, val sceneIndex: Int, val affectedScenes: List<SceneItem>)
 
 	interface OutputPort {
 		val createStoryEventOutputPort: CreateStoryEvent.OutputPort
