@@ -1,6 +1,6 @@
 package com.soyle.stories.common
 
-class NonBlankString private constructor(val value: String) {
+class NonBlankString private constructor(val value: String) : Comparable<NonBlankString>, CharSequence by value {
 
     operator fun component1() = value
 
@@ -10,6 +10,8 @@ class NonBlankString private constructor(val value: String) {
             return NonBlankString(value)
         }
     }
+
+    override fun compareTo(other: NonBlankString): Int = value.compareTo(other.value)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

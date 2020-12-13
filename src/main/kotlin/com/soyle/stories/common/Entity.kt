@@ -17,6 +17,7 @@ class EntityId<Id> private constructor(val id: Id)
 {
     companion object {
         fun <E : Entity<Id>, Id> of(kClass: KClass<E>): EntityIdGetter<E, Id> = EntityIdGetter()
+        fun <E : Entity<Id>, Id> of(entity: E): EntityId<Id> = EntityIdGetter<E, Id>().id(entity.id)
     }
 
     class EntityIdGetter<E : Entity<Id>, Id> internal constructor()
