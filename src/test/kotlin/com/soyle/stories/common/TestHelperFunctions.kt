@@ -30,6 +30,6 @@ operator fun <T> Map<Boolean, T>.component1() = this[true]
 operator fun <T> Map<Boolean, T>.component2() = this[false]
 
 fun str() = (Math.random() * Int.MAX_VALUE).toInt().toString(16).take(3)
-fun nonBlankStr() = NonBlankString.create(str())!!
+fun nonBlankStr(value: String = str()) = NonBlankString.create(value)!!
 fun singleLine(text: String) = countLines(text) as SingleLine
 fun multiLine(text: String) = countLines(text) as MultiLine
