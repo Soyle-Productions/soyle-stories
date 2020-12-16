@@ -14,6 +14,10 @@ class LocationRepositoryDouble(
 
 	val locations = initialLocations.associateBy { it.id }.toMutableMap()
 
+	fun givenLocation(location: Location) {
+		locations[location.id] = location
+	}
+
 	private val _persistedItems = mutableListOf<PersistenceLog>()
 	val persistedItems: List<PersistenceLog>
 		get() = _persistedItems
