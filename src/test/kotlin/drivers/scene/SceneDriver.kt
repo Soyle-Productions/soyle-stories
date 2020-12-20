@@ -45,7 +45,7 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
     fun givenSceneHasProse(scene: Scene, proseParagraphs: List<String>)
     {
         val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
-        ProseEditorScope(projectScope, prose.id)
+        ProseEditorScope(projectScope, prose.id) { _, _ -> }
             .get<EditProseController>()
             .insertText(proseParagraphs.joinToString("\n"), 0)
     }

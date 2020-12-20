@@ -24,7 +24,7 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
     }
 
     fun givenProseMentionsEntity(prose: Prose, entityId: EntityId<*>, index: Int, length: Int) {
-        ProseEditorScope(projectScope, prose.id).apply {
+        ProseEditorScope(projectScope, prose.id) { _, _ -> }.apply {
             get<ProseEditorState>().versionNumber.set(prose.revision)
         }.get<EditProseController>()
             .addMention(entityId, index, length)

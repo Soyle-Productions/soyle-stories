@@ -1,9 +1,8 @@
 package com.soyle.stories.common
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 /**
  * Created by Brendan
@@ -49,7 +48,6 @@ abstract class Notifier<Listener : Any> {
                     }
                 }
             }
-            Unit
         }
     }
 

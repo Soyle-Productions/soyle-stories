@@ -16,6 +16,8 @@ class WelcomeScreenModel : WelcomeScreenView, ItemViewModel<WelcomeScreenViewMod
 
 	val isInvalid = SimpleBooleanProperty(true)
 
+	override val viewModel: WelcomeScreenViewModel? = item
+
 	override fun update(update: WelcomeScreenViewModel?.() -> WelcomeScreenViewModel) {
 		if (! Platform.isFxApplicationThread()) return runLater { update(update) }
 		isInvalid.set(false)

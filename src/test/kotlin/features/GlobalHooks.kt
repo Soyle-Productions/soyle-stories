@@ -8,6 +8,7 @@ import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransform
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.soylestories.configureModules
+import com.soyle.stories.desktop.view.runHeadless
 import com.soyle.stories.di.DI
 import com.soyle.stories.entities.*
 import com.soyle.stories.soylestories.ApplicationScope
@@ -26,16 +27,6 @@ class GlobalHooks : En {
         private val closeThread = thread(start = false) {
             Thread.currentThread().interrupt()
         }
-    }
-
-    private fun runHeadless()
-    {
-        System.setProperty("testfx.robot", "glass")
-        System.setProperty("testfx.headless", "true")
-        System.setProperty("prism.order", "sw")
-        System.setProperty("prism.text", "t2k")
-        System.setProperty("java.awt.headless", "true")
-        System.setProperty("headless.geometry", "1600x1200-32")
     }
 
     private fun synchronizeBackgroundTasks() {

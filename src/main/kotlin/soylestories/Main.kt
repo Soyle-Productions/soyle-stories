@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.config.soylestories
 
 import com.soyle.stories.desktop.config.character.Characters
 import com.soyle.stories.desktop.config.prose.Prose
+import com.soyle.stories.desktop.config.scene.Scenes
 import com.soyle.stories.desktop.config.theme.Themes
 import com.soyle.stories.di.configureDI
 import com.soyle.stories.soylestories.SoyleStories
@@ -14,7 +15,7 @@ fun main(args: Array<String>) {
 
 fun configureModules() {
     configureDI()
-    //Scenes()
+    Scenes()
     Prose()
     Themes()
     Characters()

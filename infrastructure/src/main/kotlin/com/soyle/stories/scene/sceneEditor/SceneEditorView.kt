@@ -13,11 +13,12 @@ import tornadofx.hgrow
 class SceneEditorView : View() {
 
     override val scope: SceneEditorScope = super.scope as SceneEditorScope
+    private val viewListener = resolve<SceneEditorViewListener>()
     val state = resolve<SceneEditorState>()
 
     override val root: Parent = hbox {
         isFillHeight = true
-        val proseEditor = ProseEditorScope(scope.projectScope, scope.type.proseId).get<ProseEditorView>()
+        val proseEditor = ProseEditorScope(scope.projectScope, scope.type.proseId, viewListener::loadMentionSuggestionsForScene).get<ProseEditorView>()
         add(proseEditor)
         proseEditor.root.hgrow = Priority.ALWAYS
     }

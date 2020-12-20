@@ -21,6 +21,10 @@ import com.soyle.stories.prose.usecases.bulkUpdateProse.BulkUpdateProse
 import com.soyle.stories.prose.usecases.bulkUpdateProse.BulkUpdateProseUseCase
 import com.soyle.stories.prose.usecases.readProse.ReadProse
 import com.soyle.stories.prose.usecases.readProse.ReadProseUseCase
+import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
+import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionControllerImpl
+import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInSceneUseCase
 
 object UseCases {
 
@@ -28,6 +32,7 @@ object UseCases {
         scoped<ProjectScope> {
             readProse()
             editProse()
+            getSuggestedMentions()
         }
     }
 
@@ -65,6 +70,22 @@ object UseCases {
                     projectScope.get()
                 )
             }
+        }
+    }
+
+    private fun InProjectScope.getSuggestedMentions() {
+        provide<GetStoryElementsToMentionInScene> {
+            GetStoryElementsToMentionInSceneUseCase(
+                get(),
+                get(),
+                get()
+            )
+        }
+        provide<GetStoryElementsToMentionController> {
+            GetStoryElementsToMentionControllerImpl(
+                get(),
+                applicationScope.get()
+            )
         }
     }
 

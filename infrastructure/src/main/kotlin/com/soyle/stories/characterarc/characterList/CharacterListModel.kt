@@ -1,16 +1,15 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.common.Model
-import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
-import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.scene.control.TreeItem
-import tornadofx.*
+import tornadofx.select
+import tornadofx.toProperty
 
 /**
  * Created by Brendan
@@ -37,14 +36,5 @@ class CharacterListModel : Model<ProjectScope, CharacterListViewModel>(ProjectSc
             }
         }
     )
-
-    init {
-        characters.addListener { observable, oldValue, newValue ->
-            println("Character List Model characters updated to size ${newValue?.size}")
-        }
-        hasCharacters.onChange {
-            println("Character List Model has characters: $it")
-        }
-    }
 
 }

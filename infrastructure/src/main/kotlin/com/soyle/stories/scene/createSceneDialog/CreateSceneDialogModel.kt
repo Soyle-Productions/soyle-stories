@@ -22,6 +22,8 @@ class CreateSceneDialogModel : ItemViewModel<CreateNewSceneDialogViewModel>(), V
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)
 
+	override val viewModel: CreateNewSceneDialogViewModel? = item
+
 	override fun update(update: CreateNewSceneDialogViewModel?.() -> CreateNewSceneDialogViewModel) {
 		threadTransformer.gui {
 			rebind { item = item.update() }

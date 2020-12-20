@@ -78,6 +78,11 @@ class SceneSteps : En {
             SceneDriver(workbench).givenSceneHasProse(scene, listOf("Paragraph", location.name))
             SceneDriver(workbench).givenSceneProseMentionsEntity(scene, EntityId.of(location), 10, location.name.length)
         }
+        Given("the user has wanted to edit the {scene} scene") { scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+        }
     }
 
     private fun whens() {
@@ -113,6 +118,14 @@ class SceneSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenSceneListToolHasBeenOpened()
                 .openSceneEditorTool(scene)
+        }
+        When(
+            "the user requests the story elements matching {string} for the {scene} scene"
+        ) { query: String, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+                .requestStoryElementsMatching(query)
         }
     }
 
@@ -230,6 +243,35 @@ class SceneSteps : En {
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
                     hasMention(locationMention.entityId, locationMention.position)
+                }
+            }
+        }
+        Then(
+            "the following story elements should be listed for the {scene} scene and marked as their element type"
+        ) { scene: Scene, dataTable: DataTable ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+
+            dataTable.asLists().drop(1)
+                .forEachIndexed { index, (expectedName, expectedTypeLabel) ->
+                    SceneEditorAssertions.assertThat(sceneEditor) {
+                        andProseEditor {
+                            isListingStoryElement(index, expectedName, expectedTypeLabel)
+                        }
+                    }
+                }
+        }
+        Then(
+            "no story elements should be listed for the {scene} scene"
+        ) { scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    suggestedMentionListIsNotVisible()
                 }
             }
         }

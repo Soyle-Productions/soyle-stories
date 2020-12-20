@@ -10,7 +10,6 @@ import javafx.beans.property.SimpleMapProperty
 import javafx.beans.property.SimpleSetProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
-import javafx.event.EventTarget
 import javafx.geometry.Bounds
 import javafx.scene.Node
 import javafx.scene.control.*
@@ -19,7 +18,7 @@ import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
 import tornadofx.*
 import java.util.*
-import kotlin.reflect.KClass
+import kotlin.collections.LinkedHashSet
 import kotlin.reflect.KProperty1
 
 /**
@@ -197,3 +196,6 @@ var <T : Node> T.exists: Boolean
 	}
 
 fun Node.onLoseFocus(op: () -> Unit) = focusedProperty().onChange { if (! it) op() }
+
+val <T> ListView<T>.cells: LinkedHashSet<ListCell<T>>
+	get() = properties.getOrPut("com.soyle.stories.listview.cells") { LinkedHashSet<ListCell<T>>() } as LinkedHashSet<ListCell<T>>

@@ -35,7 +35,10 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 	fun invalidatedProperty(): ReadOnlyBooleanProperty = invalidatedProperty.readOnlyProperty
 	val invalidated: Boolean by invalidatedProperty()
 
-	open fun viewModel(): VM? = item
+	open fun viewModel(): VM? = viewModel
+
+	override val viewModel: VM?
+		get()= item
 
 	override fun update(update: VM?.() -> VM) {
 		threadTransformer.gui {

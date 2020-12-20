@@ -15,7 +15,8 @@ object Presentation {
                 ProseEditorController(
                     proseId,
                     get<ProseEditorState>(),
-                    projectScope.get()
+                    projectScope.get(),
+                    onLoadMentionQuery
                 )
             }
         }
