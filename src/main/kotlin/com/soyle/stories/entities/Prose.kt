@@ -2,6 +2,7 @@ package com.soyle.stories.entities
 
 import com.soyle.stories.common.Entity
 import com.soyle.stories.common.EntityId
+import com.soyle.stories.common.SingleLine
 import com.soyle.stories.prose.*
 import java.util.*
 
@@ -93,10 +94,30 @@ class Prose private constructor(
         return newProse.updatedBy(TextInsertedIntoProse(newProse, text, insertIndex))
     }
 
+    fun withContentReplaced(content: List<ProseContent>): ProseUpdate<ContentReplaced> {
+        var offset = 0
+        val newMentions = content.mapNotNull { (leadingText, mention) ->
+            if (mention == null) return@mapNotNull null
+            offset += leadingText.length
+            ProseMention(mention.first, ProseMentionRange(offset, mention.second.length)).also {
+                offset += mention.second.length
+            }
+        }
+        val newProse = copy(
+            content = content.joinToString("") { proseContent ->
+                proseContent.text + (proseContent.mention?.second ?: "")
+            },
+            mentions = newMentions
+        )
+        return newProse.updatedBy(ContentReplaced(newProse))
+    }
+
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "Prose($uuid)"
     }
 }
+
+data class ProseContent(val text: String, val mention: Pair<EntityId<*>, SingleLine>?)
 
 data class ProseMention<Id>(val entityId: EntityId<Id>, val position: ProseMentionRange) {
     fun shiftedRight(amount: Int) =
@@ -111,6 +132,7 @@ data class ProseMentionRange(val index: Int, val length: Int) {
         if (isEmpty() || other.isEmpty()) return false
         return index in other.index until other.index + other.length || other.index in index until index + length
     }
+
     inline fun isBisectedBy(index: Int): Boolean {
         return index in this.index + 1 until this.index + this.length
     }

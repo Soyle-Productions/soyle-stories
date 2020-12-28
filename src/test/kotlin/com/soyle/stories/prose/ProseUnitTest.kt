@@ -1,11 +1,10 @@
 package com.soyle.stories.prose
 
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.EntityId
 import com.soyle.stories.common.mustEqual
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.entities.ProseMentionRange
+import com.soyle.stories.common.singleLine
+import com.soyle.stories.entities.*
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -150,6 +149,63 @@ class ProseUnitTest {
                     ProseMention(characterId, ProseMentionRange(2, 3))
                 )
             )
+        }
+
+    }
+
+    @Nested
+    inner class `Replace Content`
+    {
+
+        private val prose = makeProse()
+        private val bob = makeCharacter()
+        private val frank = makeCharacter()
+        private val alexis = makeCharacter()
+
+        @Test
+        fun `content should be joined together`() {
+            val (newProse) = prose.withContentReplaced(
+                listOf(
+                    ProseContent("", EntityId.of(bob) to singleLine("Bob")),
+                    ProseContent(" can be annoying.  But listen to ", EntityId.of(frank) to singleLine("Frank")),
+                    ProseContent(" and he'll tell you that ", EntityId.of(alexis) to singleLine("Alexis")),
+                    ProseContent(" is worse.", null)
+                )
+            )
+            newProse.content.mustEqual("Bob can be annoying.  But listen to Frank and he'll tell you that Alexis is worse.")
+        }
+
+        @Test
+        fun `mentions should be in relative positions`() {
+            val (newProse) = prose.withContentReplaced(
+                listOf(
+                    ProseContent("", EntityId.of(bob) to singleLine("Bob")),
+                    ProseContent(" can be annoying.  But listen to ", EntityId.of(frank) to singleLine("Frank")),
+                    ProseContent(" and he'll tell you that ", EntityId.of(alexis) to singleLine("Alexis")),
+                    ProseContent(" is worse.", null)
+                )
+            )
+            newProse.mentions.mustEqual(listOf(
+                ProseMention(EntityId.of(bob), ProseMentionRange(0, 3)),
+                ProseMention(EntityId.of(frank), ProseMentionRange(36, 5)),
+                ProseMention(EntityId.of(alexis), ProseMentionRange(66, 6))
+            ))
+        }
+
+        @Test
+        fun `should emit event`() {
+            val (newProse, event) = prose.withContentReplaced(
+                listOf(
+                    ProseContent("", EntityId.of(bob) to singleLine("Bob")),
+                    ProseContent(" can be annoying.  But listen to ", EntityId.of(frank) to singleLine("Frank")),
+                    ProseContent(" and he'll tell you that ", EntityId.of(alexis) to singleLine("Alexis")),
+                    ProseContent(" is worse.", null)
+                )
+            )
+            event.revision.mustEqual(prose.revision + 1)
+            event.proseId.mustEqual(prose.id)
+            event.newContent.mustEqual(newProse.content)
+            event.newMentions.mustEqual(newProse.mentions)
         }
 
     }

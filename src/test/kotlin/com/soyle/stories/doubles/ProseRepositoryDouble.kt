@@ -6,7 +6,8 @@ import com.soyle.stories.prose.repositories.ProseRepository
 
 class ProseRepositoryDouble(
     private val onCreateProse: (Prose) -> Unit = {},
-    private val onReplaceProse: (Prose) -> Unit = {}
+    private val onReplaceProse: (Prose) -> Unit = {},
+    private val onAddEvents: (Prose.Id, List<ProseEvent>) -> Unit = { _, _ -> }
 ) : ProseRepository {
 
     private val prose = mutableMapOf<Prose.Id, Prose>()
@@ -35,6 +36,7 @@ class ProseRepositoryDouble(
 
     override suspend fun addEvents(proseId: Prose.Id, events: List<ProseEvent>) {
         proseEvents.getOrPut(proseId, ::mutableListOf).addAll(events)
+        onAddEvents(proseId, events)
     }
 
 }

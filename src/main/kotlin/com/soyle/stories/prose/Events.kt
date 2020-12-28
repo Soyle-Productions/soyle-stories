@@ -21,3 +21,11 @@ class EntityMentionedInProse(
     val entityId: EntityId<*>,
     val position: ProseMentionRange
 ) : ProseEvent(prose)
+
+class ContentReplaced(
+    prose: Prose
+) : ProseEvent(prose)
+{
+    val newContent = prose.content
+    val newMentions = prose.mentions
+}
