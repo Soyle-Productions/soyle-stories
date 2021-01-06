@@ -14,7 +14,7 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
 
     fun hasContent(expectedContent: String)
     {
-        assertEquals(expectedContent, driver.getContent())
+        assertEquals(expectedContent, driver.getContent()) { "Prose editor content does not match expected" }
     }
 
     fun hasMention(entityId: EntityId<*>, position: ProseMentionRange)
@@ -36,7 +36,12 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
     fun isListingStoryElement(index: Int, expectedLabel: String, expectedType: String)
     {
         val storyElement = driver.listedStoryElementAt(index)
-        assertEquals(expectedLabel, storyElement!!.name)
+        assertEquals(expectedLabel, storyElement!!.name.toString())
         assertEquals(expectedType, storyElement.type)
+    }
+
+    fun isDisabled()
+    {
+        assertTrue(driver.textArea.isDisabled)
     }
 }

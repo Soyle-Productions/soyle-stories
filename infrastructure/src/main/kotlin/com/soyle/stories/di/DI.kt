@@ -80,7 +80,7 @@ object DI {
 			factory.create(scope)
 		} catch (t: Throwable) {
 			throw Error("$t\n\tWhen resolving type $kClass.", t)
-		} ?: error("Incorrect scope $scope.  Was expecting ${factory.scopeType} for type $kClass")
+		} ?: error("Incorrect scope ${scope::class.simpleName}.  Was expecting ${factory.scopeType} for type $kClass")
 	}
 
 	@JvmName("registerTypeFactoryDefaultScope")

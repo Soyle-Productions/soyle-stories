@@ -14,6 +14,7 @@ import javafx.geometry.Bounds
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.skin.TextAreaSkin
+import javafx.scene.control.skin.VirtualFlow
 import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
 import tornadofx.*
@@ -183,11 +184,12 @@ val TextArea.rowCountProperty
 val TextArea.rowCount
 	get() = rowCountProperty.get()
 
-fun <T : Node> T.existsWhen(expr: () -> ObservableValue<Boolean>): T {
-	visibleWhen(expr())
+fun <T : Node> T.existsWhen(expr: ObservableValue<Boolean>): T {
+	visibleWhen(expr)
 	managedProperty().cleanBind(visibleProperty())
 	return this
 }
+fun <T : Node> T.existsWhen(expr: () -> ObservableValue<Boolean>): T = existsWhen(expr())
 var <T : Node> T.exists: Boolean
 	get() = visibleProperty().get() && managedProperty().get()
 	set(value) {
@@ -199,3 +201,10 @@ fun Node.onLoseFocus(op: () -> Unit) = focusedProperty().onChange { if (! it) op
 
 val <T> ListView<T>.cells: LinkedHashSet<ListCell<T>>
 	get() = properties.getOrPut("com.soyle.stories.listview.cells") { LinkedHashSet<ListCell<T>>() } as LinkedHashSet<ListCell<T>>
+
+fun <T> ListView<T>.sizeToFitItems(maximumVisibleItems: Double = 11.5)
+{
+	val ROW_HEIGHT = (childrenUnmodifiable.firstOrNull() as? VirtualFlow<ListCell<T>>)?.firstVisibleCell?.height ?: return
+	prefHeight = (items.size * ROW_HEIGHT) + 2.0
+	maxHeight = 2.0 + maximumVisibleItems * ROW_HEIGHT
+}

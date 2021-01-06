@@ -1,6 +1,6 @@
 package com.soyle.stories.common.components
 
-import de.jensd.fx.glyphs.GlyphIcon
+import com.soyle.stories.soylestories.Styles
 import javafx.scene.effect.BlurType
 import javafx.scene.effect.DropShadow
 import javafx.scene.paint.Color
@@ -152,6 +152,11 @@ class ComponentsStyles : Stylesheet() {
             label {
                 textFill = Color.DARKGRAY
             }
+        }
+        popup {
+            backgroundColor += Color.WHITE
+            borderColor += box(Styles.Purple)
+            borderWidth += box(1.px)
         }
     }
 }

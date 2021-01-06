@@ -1,5 +1,6 @@
 package com.soyle.stories.prose.proseEditor
 
+import com.soyle.stories.di.get
 import javafx.scene.Parent
 import tornadofx.*
 
@@ -17,6 +18,16 @@ class MentionSuggestion : ListCellFragment<MatchingStoryElementViewModel>() {
         }
         spacer()
         label(itemProperty.stringBinding { it?.type ?: "" })
+    }
+
+    init {
+        root.setOnMouseClicked { mouseEvent ->
+            if (mouseEvent.clickCount == 2) {
+                cell?.index?.let {
+                    scope.get<ProseEditorViewListener>().selectStoryElement(it)
+                }
+            }
+        }
     }
 
 }

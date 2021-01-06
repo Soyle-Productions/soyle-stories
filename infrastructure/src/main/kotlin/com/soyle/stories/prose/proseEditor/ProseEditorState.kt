@@ -7,8 +7,12 @@ class ProseEditorState : Model<ProseEditorScope, ProseEditorViewModel>(ProseEdit
 
     val versionNumber = bind(ProseEditorViewModel::versionNumber)
     val content = bind(ProseEditorViewModel::content)
-    val mentions = bind(ProseEditorViewModel::mentions)
     val mentionQueryState = bind(ProseEditorViewModel::mentionQueryState)
+    val isLocked = bind(ProseEditorViewModel::isLocked)
+
+    override fun viewModel(): ProseEditorViewModel? {
+        return item?.copy(content = content.value)
+    }
 
     override val applicationScope: ApplicationScope
         get() = scope.projectScope.applicationScope

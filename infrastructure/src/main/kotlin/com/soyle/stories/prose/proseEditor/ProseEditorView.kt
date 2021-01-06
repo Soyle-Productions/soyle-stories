@@ -1,137 +1,251 @@
 package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.common.exists
+import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
-import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.soylestories.Styles
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
 import javafx.scene.Parent
 import javafx.scene.input.KeyCode
-import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
-import javafx.stage.Popup
-import org.fxmisc.richtext.StyleClassedTextArea
+import javafx.scene.input.KeyCombination
+import javafx.scene.layout.Priority
+import org.fxmisc.richtext.NavigationActions
+import org.fxmisc.wellbehaved.event.EventPattern
+import org.fxmisc.wellbehaved.event.InputMap
+import org.fxmisc.wellbehaved.event.Nodes
 import tornadofx.*
+import java.util.*
+import kotlin.math.abs
 
 class ProseEditorView : Fragment() {
 
     private val viewListener = resolve<ProseEditorViewListener>()
     private val state = resolve<ProseEditorState>()
 
-    private val textArea = StyleClassedTextArea()
-    private val mentionMenu = Popup().apply {
-        val vbox = VBox().apply {
-            style {
-                backgroundColor += Color.WHITE
-                borderColor += box(Styles.Purple)
-                borderWidth += box(1.px)
-            }
-            label("Loading...") {
-                state.mentionQueryState.onChange {
-                    exists = it is MentionQueryLoading
-                }
-            }
-            listview<MatchingStoryElementViewModel> {
-                val ROW_HEIGHT = 24
-                prefHeight = 2.0
-                maxHeight = 2.0 + 11.5 * ROW_HEIGHT
-                items.onChange {
-                    prefHeight = (items.size * ROW_HEIGHT) + 2.0
-                }
-                cellFragment(scope, MentionSuggestion::class)
-                state.mentionQueryState.onChange {
-                    if (it is MentionQueryLoaded) {
-                        items.setAll(it.prioritizedMatches)
-                    }
-                }
-            }
-        }
-        content.add(vbox)
-        setOnAutoHide {
-            viewListener.cancelQuery()
-        }
-        state.mentionQueryState.onChange {
-            when (it) {
-                is TriggeredQuery -> if (!isShowing) {
-                    textArea.getCharacterBoundsOnScreen(it.primedIndex, it.primedIndex + 1)
-                        .ifPresent { bounds ->
-                            x =
-                                bounds.minX - 8.0 // TODO calculate the actual distance between the first character in the first item in the listview to the edge of the popup
-                            y = bounds.maxY
-                            show(this@ProseEditorView.currentWindow)
-                        }
-                }
-                else -> if (isShowing) hide()
-            }
-        }
-        isAutoHide = true
-    }
+    private val textArea = ProseEditorTextArea()
+    private val mentionMenu = MatchingStoryElementsPopup(scope, state.mentionQueryState)
+        .apply {
+            isAutoHide = true
+            setOnAutoHide { viewListener.cancelQuery() }
 
-    override val root: Parent = textArea.apply {
-        addClass("prose-editor")
-        isWrapText = true
-        val onOutsideSelectionMousePressed = this.onOutsideSelectionMousePressed
-        setOnOutsideSelectionMousePressed {
-            viewListener.cancelQuery()
-            onOutsideSelectionMousePressed.handle(it)
+            state.mentionQueryState.onChange {
+                when (it) {
+                    is TriggeredQuery -> if (!isShowing) {
+                        textArea.getCharacterBoundsOnScreen(it.primedIndex, it.primedIndex + 1)
+                            .ifPresent { bounds ->
+                                // TODO calculate the actual distance between the first character in the first item in the listview to the edge of the popup
+                                x = bounds.minX - 8.0
+                                y = bounds.maxY
+                                show(this@ProseEditorView.currentWindow)
+                            }
+                    }
+                    else -> if (isShowing) hide()
+                }
+            }
+        }
+
+    override val root: Parent = hbox {
+        isFillHeight = true
+        style {
+            padding = box(32.px)
+        }
+        add(textArea)
+        textArea.apply {
+            hgrow = Priority.ALWAYS
+            style {
+                padding = box(32.px)
+            }
+            addClass("prose-editor")
+            isWrapText = true
+            disableWhen(state.isLocked)
+            onLoseFocus {
+                state.content.setAll(paragraphs.flatMap { it.segments })
+                viewListener.save()
+            }
+            val onOutsideSelectionMousePressed = this.onOutsideSelectionMousePressed
+            setOnOutsideSelectionMousePressed {
+                viewListener.cancelQuery()
+                onOutsideSelectionMousePressed.handle(it)
+            }
         }
     }
 
     init {
         properties["mentionMenu"] = mentionMenu
-        state.content.onChange {
-            textArea.replace(0, textArea.text.length, it, "")
-        }
-        state.mentions.onChange { list: ObservableList<ProseMention<*>>? ->
-            if (list == null) return@onChange
-            textArea.clearStyle(0, textArea.content.length)
-            list.forEach {
-                textArea.setStyle(
-                    it.position.index,
-                    it.position.index + it.position.length,
-                    listOf(it.entityId.id.toString())
-                )
+
+        var updateCausedByInput = false
+        var pushingUpdate = false
+
+        state.content.onChange { elements: ObservableList<ContentElement>? ->
+            if (updateCausedByInput) return@onChange
+            pushingUpdate = true
+            val currentPosition = textArea.caretPosition
+            textArea.clear()
+            elements?.forEach {
+                textArea.append(it, listOf())
             }
+            textArea.moveTo(currentPosition.coerceAtMost(textArea.text.length - 1))
+            pushingUpdate = false
+        }
+        textArea.textProperty().onChange {
+            if (pushingUpdate) return@onChange
+            updateCausedByInput = true
+            state.content.setAll(textArea.paragraphs.flatMap { it.segments })
+            updateCausedByInput = false
         }
         textArea.moveTo(0)
         textArea.requestFollowCaret()
-        textArea.setOnKeyPressed {
-            when (it.code) {
-                KeyCode.ESCAPE -> {
-                    viewListener.cancelQuery()
-                }
-                KeyCode.BACK_SPACE -> {
-                    val queryState = state.mentionQueryState.value
-                    if (queryState is TriggeredQuery) {
-                        val nonEmptyQuery = NonBlankString.create(queryState.query.dropLast(1))
-                        if (nonEmptyQuery != null) {
-                            viewListener.getStoryElementsContaining(nonEmptyQuery)
-                        } else {
-                            viewListener.cancelQuery()
-                        }
-                    }
-                }
-            }
+        preventArrowKeysFromEnteringMentions()
+        queryPossibleMentionsWhenSymbolTyped("@")
+
+        textArea.caretPositionProperty().onChange {
+            if (it == null) return@onChange
+            val adjustedPosition = getAdjustedPositionIfBisectingMention(it)
+            if (adjustedPosition != it) textArea.caretSelectionBind.displaceCaret(adjustedPosition)
         }
-        textArea.setOnKeyTyped {
-            val queryState = state.mentionQueryState.value
-            if (queryState is NoQuery) {
-                if (it.character == "@") {
-                    viewListener.primeMentionQuery(textArea.caretPosition)
-                }
-                return@setOnKeyTyped
-            }
-            val currentQuery = (queryState as? TriggeredQuery)?.query.orEmpty()
-            if (it.character != KeyCode.BACK_SPACE.char) {
-                val nonEmptyQuery = NonBlankString.create(currentQuery + it.character)
-                if (nonEmptyQuery != null) {
-                    viewListener.getStoryElementsContaining(nonEmptyQuery)
-                }
+        textArea.caretSelectionBind.underlyingSelection.rangeProperty().onChange {
+            if (it == null) return@onChange
+
+            val adjustedStart = getAdjustedPositionIfBisectingMention(it.start)
+
+            if (it.length == 0) {
+                if (adjustedStart != it.start) textArea.caretSelectionBind.underlyingSelection.selectRange(
+                    adjustedStart,
+                    adjustedStart
+                )
+                return@onChange
             }
 
+            val adjustedEnd = getAdjustedPositionIfBisectingMention(it.end)
+
+            if (adjustedStart != it.start || adjustedEnd != it.end) textArea.caretSelectionBind.underlyingSelection.selectRange(
+                adjustedStart,
+                adjustedEnd
+            )
         }
+
+        val mentionOnLeftOfCaretProperty = SimpleObjectProperty<Mention?>()
+        val mentionOnRightOfCaretProperty = SimpleObjectProperty<Mention?>()
+        Nodes.addInputMap(textArea, InputMap.consumeWhen(EventPattern.keyPressed(KeyCode.DELETE), {
+            mentionOnRightOfCaretProperty.value = findSegment { mention, offset -> offset == textArea.caretPosition }?.first
+            mentionOnRightOfCaretProperty.value != null
+        }) {
+            val mentionOnRightOfCaret = mentionOnRightOfCaretProperty.value!!
+            textArea.deleteText(textArea.caretPosition, textArea.caretPosition + mentionOnRightOfCaret.text.length)
+        })
+        Nodes.addInputMap(textArea, InputMap.consumeWhen(EventPattern.keyPressed(KeyCode.BACK_SPACE), {
+            mentionOnLeftOfCaretProperty.value = findSegment { mention, offset ->  offset+mention.text.length == textArea.caretPosition }?.first
+            mentionOnLeftOfCaretProperty.value != null
+        }) {
+            val mentionOnLeftOfCaret = mentionOnLeftOfCaretProperty.value!!
+            textArea.deleteText(textArea.caretPosition - mentionOnLeftOfCaret.text.length, textArea.caretPosition)
+        })
+
         viewListener.getValidState()
+    }
+
+    private fun getAdjustedPositionIfBisectingMention(position: Int): Int {
+        val bisectedMention = findSegment { mention, offset ->
+            position > offset && position < (offset + mention.text.length)
+        }
+
+        return if (bisectedMention != null) {
+            val bisectedMentionStart = bisectedMention.second
+            val bisectedMentionEnd = bisectedMention.second + bisectedMention.first.text.length
+
+            val startDistance = abs(bisectedMentionStart - position)
+            val endDistance = abs(bisectedMentionEnd - position)
+            if (startDistance < endDistance) bisectedMentionStart else bisectedMentionEnd
+        } else position
+    }
+
+    private fun queryPossibleMentionsWhenSymbolTyped(symbol: String)
+    {
+        textArea.setOnKeyTyped {
+            val mentionQueryState = state.mentionQueryState.value
+            if (mentionQueryState is PrimedQuery) {
+                val query: NonBlankString? = if (mentionQueryState is TriggeredQuery) {
+                    NonBlankString.create(mentionQueryState.query + it.character)
+                } else {
+                    NonBlankString.create(it.character)
+                }
+                if (query is NonBlankString) {
+                    viewListener.getStoryElementsContaining(query)
+                }
+            } else {
+                if (it.character == symbol) {
+                    viewListener.primeMentionQuery(textArea.caretPosition - 1)
+                }
+            }
+        }
+
+    }
+
+    private fun preventArrowKeysFromEnteringMentions() {
+        // without this function, the arrow keys would only adjust the caret position by a single character length.
+        // For any mention with a length greater than 1, it would never jump over due to the caret adjustment code,
+        // so, we override the caret movement behavior due to an arrow key
+
+        preventRightArrowFromEnteringMentions()
+        preventLeftArrowFromEnteringMentions()
+    }
+
+    private fun preventRightArrowFromEnteringMentions() {
+        consumeArrowKeysPressed(
+            listOf(KeyCode.RIGHT, KeyCode.KP_RIGHT),
+            whenMention = { _, offset -> offset == textArea.caretPosition },
+            insteadMoveTo = { (mention, offset) -> offset+mention.text.length }
+        )
+    }
+
+    private fun preventLeftArrowFromEnteringMentions() {
+        consumeArrowKeysPressed(
+            listOf(KeyCode.LEFT, KeyCode.KP_LEFT),
+            whenMention = { mention, offset -> offset+mention.text.length == textArea.caretPosition },
+            insteadMoveTo = { (_, offset) -> offset }
+        )
+    }
+
+    private fun consumeArrowKeysPressed(
+        keyCodes: List<KeyCode>,
+        whenMention: (Mention, Int) -> Boolean,
+        insteadMoveTo: (Pair<Mention, Int>) -> Int
+    ) {
+        Nodes.addInputMap(textArea, InputMap.consumeWhen(
+            EventPattern.anyOf(
+                *keyCodes.map {
+                    EventPattern.keyPressed(it, KeyCombination.SHIFT_ANY)
+                }.toTypedArray()
+            ), {
+                findSegment(whenMention) != null
+            }) {
+            val mention = findSegment(whenMention)!!
+            if (it.isShiftDown) {
+                textArea.moveTo(insteadMoveTo(mention), NavigationActions.SelectionPolicy.ADJUST)
+            } else {
+                textArea.moveTo(insteadMoveTo(mention))
+            }
+        })
+    }
+
+    private fun findSegment(predicate: (Mention, Int) -> Boolean): Pair<Mention, Int>? {
+        var offset = 0
+        return textArea.paragraphs.asSequence()
+            .flatMap { it.segments.asSequence() }
+            .find {
+                if (it !is Mention) {
+                    offset += it.text.length
+                    return@find false
+                }
+                val predicateResult = predicate(it, offset)
+                if (predicateResult) true
+                else {
+                    offset += it.text.length
+                    false
+                }
+            }?.let {
+                it as Mention to offset
+            }
     }
 
 }
