@@ -1,15 +1,21 @@
 package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.common.EntityId
-import com.soyle.stories.entities.ProseMention
+import com.soyle.stories.common.SingleLine
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
 
 data class ProseEditorViewModel(
     val versionNumber: Long,
-    val content: String,
-    val mentions: List<ProseMention<*>>,
+    val isLocked: Boolean,
+    val content: List<ContentElement>,
     val mentionQueryState: MentionQueryState
 )
+
+sealed class ContentElement {
+    abstract val text: String
+}
+data class BasicText(override val text: String) : ContentElement()
+data class Mention(override val text: String, val entityId: EntityId<*>) : ContentElement()
 
 sealed class MentionQueryState
 interface PrimedQuery {
@@ -30,4 +36,4 @@ class MentionQueryLoaded(
     val prioritizedMatches: List<MatchingStoryElementViewModel>
 ) : MentionQueryState(), TriggeredQuery
 
-class MatchingStoryElementViewModel(val name: String, val matchingRange: IntRange, val type: String, val id: EntityId<*>)
+data class MatchingStoryElementViewModel(val name: SingleLine, val matchingRange: IntRange, val type: String, val id: EntityId<*>)

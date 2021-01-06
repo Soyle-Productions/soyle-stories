@@ -1,10 +1,11 @@
 package com.soyle.stories.prose.editProse
 
-import com.soyle.stories.common.EntityId
+import com.soyle.stories.entities.Prose
+import com.soyle.stories.entities.ProseContent
+import kotlinx.coroutines.Job
 
 interface EditProseController {
 
-    fun insertText(text: String, index: Int)
-    fun addMention(entityId: EntityId<*>, index: Int, length: Int)
+    fun updateProse(proseId: Prose.Id, content: List<ProseContent>): Job
 
 }

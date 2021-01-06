@@ -5,6 +5,7 @@ import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.Unli
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.common.ThreadTransformer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -33,7 +34,7 @@ class UnlinkLocationFromCharacterArcSectionNotifierUnitTest {
 	private fun getOutputPort(): UnlinkLocationFromCharacterArcSection.OutputPort
 	{
 		val threadTransformer = object : ThreadTransformer {
-			override fun async(task: suspend CoroutineScope.() -> Unit) = runBlocking { task() }
+			override fun async(task: suspend CoroutineScope.() -> Unit): Job = runBlocking { task() }.let { Job().also { it.complete() } }
 			override fun gui(update: suspend CoroutineScope.() -> Unit) = runBlocking { update() }
 		}
 
