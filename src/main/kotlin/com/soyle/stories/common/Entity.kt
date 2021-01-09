@@ -2,11 +2,6 @@ package com.soyle.stories.common
 
 import kotlin.reflect.KClass
 
-/**
- * Created by Brendan
- * Date: 2/5/2020
- * Time: 3:30 PM
- */
 interface Entity<Id> {
     val id: Id
     infix fun isSameEntityAs(other: Entity<*>): Boolean =
@@ -18,6 +13,7 @@ class EntityId<Id> private constructor(val id: Id)
     companion object {
         fun <E : Entity<Id>, Id> of(kClass: KClass<E>): EntityIdGetter<E, Id> = EntityIdGetter()
         fun <E : Entity<Id>, Id> of(entity: E): EntityId<Id> = EntityIdGetter<E, Id>().id(entity.id)
+        fun <E : Entity<Id>, Id> Id.asIdOf(kClass: KClass<E>): EntityId<Id> = EntityIdGetter<E, Id>().id(this)
     }
 
     class EntityIdGetter<E : Entity<Id>, Id> internal constructor()

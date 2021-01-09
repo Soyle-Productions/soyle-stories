@@ -18,6 +18,17 @@ class InsertText(val text: String, val index: Int) : Operation() {
             is EntityMentionedInProse -> if (event.position.isBisectedBy(index)) {
                 null
             } else this
+            is TextRemovedFromProse -> if (event.index <= index) {
+                InsertText(text, index - event.deletedText.length)
+            } else this
+            is MentionRemovedFromProse -> this
+            is MentionTextReplaced -> {/*
+                val lengthAdjustment = event.insertedText.length - event.deletedText.length
+                val numberOfUpdatesBeforeThisOperation = event.positionUpdates.filter { it.second < index }.size
+                if (numberOfUpdatesBeforeThisOperation == 0) this
+                else InsertText(text, index + (lengthAdjustment * numberOfUpdatesBeforeThisOperation))*/
+                error("Operational Transformation no longer supported")
+            }
         }
     }
 }
@@ -32,6 +43,17 @@ class MentionEntity(val entityId: EntityId<*>, val index: Int, val length: Int) 
             is EntityMentionedInProse -> if (event.position.isBisectedBy(index) || event.position.isBisectedBy(index + length)) {
                 null
             } else this
+            is TextRemovedFromProse -> if (event.index <= index) {
+                MentionEntity(entityId, index - event.deletedText.length, length)
+            } else this
+            is MentionRemovedFromProse -> this
+            is MentionTextReplaced -> {/*
+                val lengthAdjustment = event.insertedText.length - event.deletedText.length
+                val numberOfUpdatesBeforeThisOperation = event.positionUpdates.filter { it.second < index }.size
+                if (numberOfUpdatesBeforeThisOperation == 0) this
+                else MentionEntity(entityId, index - (lengthAdjustment * numberOfUpdatesBeforeThisOperation), length)*/
+                error("Operational Transformation no longer supported")
+            }
         }
     }
 }

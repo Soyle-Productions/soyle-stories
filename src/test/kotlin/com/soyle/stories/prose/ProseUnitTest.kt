@@ -2,10 +2,11 @@ package com.soyle.stories.prose
 
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.EntityId
+import com.soyle.stories.common.EntityId.Companion.asIdOf
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.singleLine
 import com.soyle.stories.entities.*
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.assertThrows
 class ProseUnitTest {
 
     private val proseId = Prose.Id()
+
+    fun entityId() = Character.Id().asIdOf(Character::class)
 
     @Nested
     inner class `Create new Prose` {
@@ -149,6 +152,250 @@ class ProseUnitTest {
                     ProseMention(characterId, ProseMentionRange(2, 3))
                 )
             )
+        }
+
+    }
+
+    @Nested
+    inner class `With Mention Text Replaced`
+    {
+
+        private val entityId = Character.Id().asIdOf(Character::class)
+
+        @Nested
+        inner class `When No Mentions Match Entity Id`
+        {
+            private val prose = makeProse()
+
+            @Test
+            fun `prose should not be modified`() {
+                val update = prose.withMentionTextReplaced(entityId, "I should not appear")
+                assertEquals(prose, update.prose)
+            }
+
+            @Test
+            fun `event should not be produced`() {
+                val update = prose.withMentionTextReplaced(entityId, "I should not appear")
+                assertNull(update.event)
+            }
+
+        }
+
+        @Test
+        fun `produced event should communicate text changes`() {
+            val prose = makeProse(
+                content = "I mention Bob",
+                mentions = listOf(
+                    ProseMention(entityId, ProseMentionRange(10, 3))
+                )
+            )
+            val update = prose.withMentionTextReplaced(entityId, "Frank")
+            update.event!!.let {
+                it.proseId.mustEqual(prose.id)
+                it.newContent.mustEqual(update.prose.content)
+                it.entityId.mustEqual(entityId)
+                it.deletedText.mustEqual("Bob")
+                it.insertedText.mustEqual("Frank")
+            }
+        }
+
+        @Nested
+        inner class `When Sections in Content Match Mention Text but don't Mention Entity`
+        {
+            val prose = makeProse(
+                content = "I mention Bob, the character and I just talk about Bob, the idea.  I mention a different Bob",
+                mentions = listOf(
+                    ProseMention(entityId, ProseMentionRange(10, 3)),
+                    ProseMention(Character.Id().asIdOf(Character::class), ProseMentionRange(89, 3))
+                )
+            )
+
+            @Test
+            fun `prose content should not modify those areas`() {
+                val update = prose.withMentionTextReplaced(entityId, "Frank")
+                assertEquals(
+                    "I mention Frank, the character and I just talk about Bob, the idea.  I mention a different Bob",
+                    update.prose.content
+                )
+            }
+
+        }
+
+        @Nested
+        inner class `When Multiple Mentions Match`
+        {
+
+            val prose = makeProse(content = "I mention Bob, the character and then I mention Bob again.  Let's say Bob a third time.",
+                mentions = listOf(
+                    ProseMention(entityId, ProseMentionRange(10, 3)),
+                    ProseMention(entityId, ProseMentionRange(48, 3)),
+                    ProseMention(entityId, ProseMentionRange(70, 3))
+                ))
+
+            @Test
+            fun `should update mention positions and lengths`() {
+                val update = prose.withMentionTextReplaced(entityId, "Frank")
+                assertEquals(
+                    listOf(
+                        ProseMention(entityId, ProseMentionRange(10, 5)),
+                        ProseMention(entityId, ProseMentionRange(50, 5)),
+                        ProseMention(entityId, ProseMentionRange(74, 5))
+                    ),
+                    update.prose.mentions
+                )
+            }
+
+            @Test
+            fun `produced event should communicate mention positioning changes`() {
+                val update = prose.withMentionTextReplaced(entityId, "Frank")
+                update.event!!.newMentions.mustEqual(listOf(
+                    ProseMention(entityId, ProseMentionRange(10, 5)),
+                    ProseMention(entityId, ProseMentionRange(50, 5)),
+                    ProseMention(entityId, ProseMentionRange(74, 5))
+                ))
+            }
+
+        }
+
+        @Test
+        fun `other mentions should be shifted, but not modified`() {
+            val aliceId = Character.Id().asIdOf(Character::class)
+            val prose = makeProse(content = "I mention Bob, the character and then I mention Alice.  Let's say Bob and Alice again.",
+                mentions = listOf(
+                    ProseMention(entityId, ProseMentionRange(10, 3)),
+                    ProseMention(aliceId, ProseMentionRange(48, 5)),
+                    ProseMention(entityId, ProseMentionRange(66, 3)),
+                    ProseMention(aliceId, ProseMentionRange(74, 5))
+                ))
+            val update = prose.withMentionTextReplaced(entityId, "Frank")
+            assertEquals(
+                listOf(
+                    ProseMention(entityId, ProseMentionRange(10, 5)),
+                    ProseMention(aliceId, ProseMentionRange(50, 5)),
+                    ProseMention(entityId, ProseMentionRange(68, 5)),
+                    ProseMention(aliceId, ProseMentionRange(78, 5))
+                ),
+                update.prose.mentions
+            )
+        }
+
+    }
+
+    @Nested
+    inner class `With Text Removed`
+    {
+
+        @Test
+        fun `range out of bounds should throw error`() {
+            val prose = makeProse(content = "abcde")
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-4 .. 0) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-1 .. 2) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(2 .. 6) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-1 .. 6) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(6 .. 9) }
+        }
+
+        @Test
+        fun `cannot bisect a mention`() {
+            val prose = makeProse(
+                content = "Talking about Bob can be fun.",
+                mentions = listOf(ProseMention(entityId(), ProseMentionRange(14, 3)))
+            )
+            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(12 .. 14) }
+            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(14 .. 15) }
+            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(15 .. 19) }
+
+            // should be fine
+            prose.withTextRemoved(12 until 14 /* == 12 .. 13 */)
+            prose.withTextRemoved(17 .. 19)
+            prose.withTextRemoved(14 until 17 /* == 14 .. 16 */)
+        }
+
+        @Nested
+        inner class `When Range is Valid`
+        {
+
+            @Test
+            fun `should remove text in range`() {
+                val prose = makeProse(content = "I'm content that will have a portion deleted.")
+                val update = prose.withTextRemoved(1 .. 15 /* == 1 until 16 */)
+                update.prose.content.mustEqual(
+                    "I will have a portion deleted."
+                )
+                update.event.index.mustEqual(1)
+                update.event.deletedText.mustEqual("'m content that")
+            }
+
+            @Test
+            fun `should adjust mentions after removed section`() {
+                val bobId = entityId()
+                val frankId = entityId()
+                val prose = makeProse(
+                    content = "Mention Bob, then remove text, then mention Frank",
+                    mentions = listOf(
+                        ProseMention(bobId, ProseMentionRange(8, 3)),
+                        ProseMention(frankId, ProseMentionRange(44, 5))
+                    )
+                )
+                val update = prose.withTextRemoved(11 .. 28)
+                update.prose.mentions.mustEqual(listOf(
+                    ProseMention(bobId, ProseMentionRange(8, 3)),
+                    ProseMention(frankId, ProseMentionRange(26, 5))
+                ))
+                update.event.newMentions.mustEqual(update.prose.mentions)
+            }
+
+            @Test
+            fun `should remove mentions inside range`() {
+                val bobId = entityId()
+                val frankId = entityId()
+                val prose = makeProse(
+                    content = "Mention Bob, then mention Frank and remove text, then mention Frank",
+                    mentions = listOf(
+                        ProseMention(bobId, ProseMentionRange(8, 3)),
+                        ProseMention(frankId, ProseMentionRange(26, 5)),
+                        ProseMention(frankId, ProseMentionRange(62, 5))
+                    )
+                )
+                val update = prose.withTextRemoved(11 until 62)
+                update.prose.mentions.mustEqual(listOf(
+                    ProseMention(bobId, ProseMentionRange(8, 3)),
+                    ProseMention(frankId, ProseMentionRange(11, 5))
+                ))
+                update.event.newMentions.mustEqual(update.prose.mentions)
+            }
+
+        }
+
+    }
+
+    @Nested
+    inner class `Without Mention`
+    {
+
+        @Test
+        fun `when mention does not exist, should throw error`() {
+            val mention = ProseMention(entityId(), ProseMentionRange(10, 3))
+            val prose = makeProse(content = "I mention Bob, the character", mentions = emptyList())
+            assertThrows<MentionDoesNotExistInProse> { prose.withoutMention(mention) }
+        }
+
+        @Test
+        fun `should remove mention`() {
+            val mention = ProseMention(entityId(), ProseMentionRange(10, 3))
+            val prose = makeProse(content = "I mention Bob, the character", mentions = listOf(mention))
+            val update = prose.withoutMention(mention)
+            update.prose.mentions.contains(mention).mustEqual(false)
+            update.event.entityId.mustEqual(mention.entityId)
+            update.event.position.mustEqual(mention.position)
+        }
+
+        @Test
+        fun `should not remove text`() {
+            val mention = ProseMention(entityId(), ProseMentionRange(10, 3))
+            val prose = makeProse(content = "I mention Bob, the character", mentions = listOf(mention))
+            val update = prose.withoutMention(mention)
+            update.prose.content.mustEqual("I mention Bob, the character")
         }
 
     }

@@ -53,6 +53,8 @@ class Prose private constructor(
         }
     }
 
+    private val sortedMentionSet: Set<ProseMention<*>> by lazy { sortedSetOf(compareBy { it.start() }, *mentions.toTypedArray()) }
+
     // reads
 
     // updates
@@ -94,6 +96,69 @@ class Prose private constructor(
         return newProse.updatedBy(TextInsertedIntoProse(newProse, text, insertIndex))
     }
 
+    fun withMentionTextReplaced(entityId: EntityId<*>, newText: String): ProseUpdate<MentionTextReplaced?> {
+        val (mentionsOfEntity, mentionsOfOtherEntities) = mentions.partition { it.entityId == entityId }
+        if (mentionsOfEntity.isEmpty()) return this.updatedBy(null)
+
+        val contentBuilder = StringBuilder(content)
+        mentionsOfEntity.forEach {
+            contentBuilder.replace(it.start(), it.end(), newText)
+        }
+
+        val lengthDifference = newText.length - mentionsOfEntity.first().position.length
+        var adjustment = 0
+        val newMentions = sortedMentionSet.map { mention ->
+            val shiftedMention = mention.shiftedRight(adjustment)
+            if (shiftedMention.entityId == entityId) {
+                adjustment += lengthDifference
+                shiftedMention.withLength(newText.length)
+            } else {
+                shiftedMention
+            }
+        }
+
+        val newProse = copy(content = contentBuilder.toString(), mentions = newMentions)
+
+        return newProse.updatedBy(
+            MentionTextReplaced(
+                newProse,
+                entityId,
+                content.substring(mentionsOfEntity.first().start(), mentionsOfEntity.first().end()),
+                newText
+            )
+        )
+
+    }
+
+    fun withTextRemoved(
+        range: IntRange
+    ): ProseUpdate<TextRemovedFromProse> {
+        if (range.first < 0 || range.last > content.length)
+            throw IndexOutOfBoundsException("Acceptable range to remove text is 0..${content.length}.  Received $range")
+        if (mentions.any { it.position.isBisectedBy(range.first) || it.position.isBisectedBy(range.last+1) }) {
+            throw ProseMentionCannotBeBisected()
+        }
+        val rangeLength = (range.last + 1) - range.first
+        val (mentionsBeforeRange, mentionsAfterRangeStart) = mentions.partition { it.position.index < range.first }
+        val (mentionsInRange, mentionsAfterRange) = mentionsAfterRangeStart.partition { it.end() < range.last }
+
+        val newProse = copy(
+            content = StringBuilder(content).removeRange(range).toString(),
+            mentions = mentionsBeforeRange + mentionsAfterRange.map { it.shiftedLeft(rangeLength) }
+        )
+        return newProse.updatedBy(TextRemovedFromProse(newProse, content.substring(range), range.first))
+    }
+
+    fun withoutMention(
+        mention: ProseMention<*>
+    ): ProseUpdate<MentionRemovedFromProse> {
+        if (!sortedMentionSet.contains(mention)) throw MentionDoesNotExistInProse(id, mention)
+        val newProse = copy(
+            mentions = mentions.minus(mention)
+        )
+        return newProse.updatedBy(MentionRemovedFromProse(newProse, mention.entityId, mention.position))
+    }
+
     fun withContentReplaced(content: List<ProseContent>): ProseUpdate<ContentReplaced> {
         var offset = 0
         val newMentions = content.mapNotNull { (leadingText, mention) ->
@@ -120,11 +185,17 @@ class Prose private constructor(
 data class ProseContent(val text: String, val mention: Pair<EntityId<*>, SingleLine>?)
 
 data class ProseMention<Id>(val entityId: EntityId<Id>, val position: ProseMentionRange) {
+    fun start(): Int = position.index
+    fun end(): Int = position.index + position.length
+
     fun shiftedRight(amount: Int) =
         copy(entityId = entityId, position = position.shiftedRight(amount))
 
     fun shiftedLeft(amount: Int) =
         copy(entityId = entityId, position = position.shiftedLeft(amount))
+
+    fun withLength(length: Int) =
+        copy(entityId = entityId, position = position.withLength(length))
 }
 
 data class ProseMentionRange(val index: Int, val length: Int) {
@@ -142,6 +213,7 @@ data class ProseMentionRange(val index: Int, val length: Int) {
 
     fun shiftedRight(amount: Int) = copy(index = index + amount)
     fun shiftedLeft(amount: Int) = copy(index = index - amount)
+    fun withLength(length: Int) = copy(length = length)
 }
 
 class ProseUpdate<E : ProseEvent?>(val prose: Prose, val event: E) {
