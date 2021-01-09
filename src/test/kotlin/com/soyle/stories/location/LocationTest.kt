@@ -1,5 +1,7 @@
 package com.soyle.stories.location
 
+import com.soyle.stories.common.SingleNonBlankLine
+import com.soyle.stories.common.singleLine
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,23 +15,25 @@ class LocationTest {
 	@Test
 	fun locationIsEntity() {
 		val id = Location.Id()
-		assert(Location(id, projectId, "", "") isSameEntityAs Location(id, projectId, "Bob", ""))
+		assert(Location(id, projectId, SingleNonBlankLine.create(singleLine("Work"))!!, "").isSameEntityAs(
+			Location(id, projectId, SingleNonBlankLine.create(singleLine("Home"))!!, ""))
+		)
 	}
 
 	@Test
 	fun locationHasName() {
-		val name = "Test Name"
+		val name = SingleNonBlankLine.create(singleLine("Test Name"))!!
 		assertEquals(name, Location(Location.Id(), projectId, name, "").name)
 	}
 
 	@Test
 	fun locationHasDescription() {
 		val description = "Test Description"
-		assertEquals(description, Location(Location.Id(), projectId, "", description).description)
+		assertEquals(description, Location(Location.Id(), projectId, SingleNonBlankLine.create(singleLine("Name"))!!, description).description)
 	}
 
 	@Test
 	fun descriptionIsNotRequired() {
-		Location(Location.Id(), projectId, "")
+		Location(Location.Id(), projectId, SingleNonBlankLine.create(singleLine("Name"))!!)
 	}
 }

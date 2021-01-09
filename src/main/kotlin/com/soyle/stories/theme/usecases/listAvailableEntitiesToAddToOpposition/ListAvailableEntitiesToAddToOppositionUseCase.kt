@@ -5,8 +5,8 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.location.usecases.listAllLocations.LocationItem
 import com.soyle.stories.theme.OppositionValueDoesNotExist
@@ -64,7 +64,7 @@ class ListAvailableEntitiesToAddToOppositionUseCase(
     ): EntitiesAvailableToAddToOpposition {
         return EntitiesAvailableToAddToOpposition(
             characters.map { CharacterItem(it.id.uuid, it.name.value, null) },
-            locations.map { LocationItem(it.id.uuid, it.name) },
+            locations.map { LocationItem(it.id.uuid, it.name.value) },
             symbols.map { SymbolItem(it.id.uuid, it.name) }
         )
     }

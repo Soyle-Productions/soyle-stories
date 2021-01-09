@@ -8,6 +8,7 @@ import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
+import com.soyle.stories.location.locationName
 import com.soyle.stories.location.makeLocation
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
@@ -89,13 +90,13 @@ class `Get Story Elements to Mention in Scene Unit Test` {
         init {
             sceneRepository.givenScene(scene)
             locationsByName = listOf(
-                makeLocation(projectId = scene.projectId, name = "Barcelona"),
-                makeLocation(projectId = scene.projectId, name = "Golden Gate Bridge"),
-                makeLocation(projectId = scene.projectId, name = "Mt. Grumble"),
-                makeLocation(projectId = scene.projectId, name = "Sydney"),
-                makeLocation(name = "Bangladesh")
+                makeLocation(projectId = scene.projectId, name = locationName("Barcelona")),
+                makeLocation(projectId = scene.projectId, name = locationName("Golden Gate Bridge")),
+                makeLocation(projectId = scene.projectId, name = locationName("Mt. Grumble")),
+                makeLocation(projectId = scene.projectId, name = locationName("Sydney")),
+                makeLocation(name = locationName("Bangladesh"))
             ).onEach(locationRepository::givenLocation)
-                .associateBy(Location::name)
+                .associateBy { it.name.value }
         }
 
         @Test

@@ -4,6 +4,7 @@ import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
+import com.soyle.stories.location.makeLocation
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocationsUseCase
@@ -47,7 +48,7 @@ class ListAllLocationsUnitTest {
 	private fun givenNoLocations() = given()
 	private fun given(locationIds: List<UUID> = emptyList()) {
 		storedLocations = locationIds.map {
-			Location(Location.Id(it), projectId, "Unique Location Name: $it")
+			makeLocation(id = Location.Id(it), projectId = projectId)
 		}
 		locationRepository = LocationRepositoryDouble(
 		  initialLocations = storedLocations
@@ -72,6 +73,6 @@ class ListAllLocationsUnitTest {
 		val result = result as ListAllLocations.ResponseModel
 		result.locations.map(LocationItem::id).toSet().mustEqual(locationIds.toSet()) { "Not all locations output" }
 		result.locations.map(LocationItem::locationName).toSet()
-		  .mustEqual(storedLocations.map(Location::name).toSet()) { "Location names do not match" }
+		  .mustEqual(storedLocations.map{ it.name.value }.toSet()) { "Location names do not match" }
 	}
 }

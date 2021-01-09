@@ -7,6 +7,7 @@ import com.soyle.stories.common.str
 import com.soyle.stories.common.template
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.entities.*
+import com.soyle.stories.location.locationName
 import com.soyle.stories.scene.charactersInScene
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
@@ -21,13 +22,12 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import java.util.*
 
 class GetSceneDetailsUnitTest {
 
     private val scene = makeScene()
     private val storyEvent = makeStoryEvent(id = scene.storyEventId)
-    private val location = Location(Location.Id(), scene.projectId, "Location ${str()}", "")
+    private val location = Location(Location.Id(), scene.projectId, locationName(), "")
 
     private var result: Any? = null
 

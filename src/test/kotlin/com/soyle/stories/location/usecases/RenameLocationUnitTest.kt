@@ -1,119 +1,94 @@
 package com.soyle.stories.location.usecases
 
+import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
 import com.soyle.stories.location.LocationDoesNotExist
-import com.soyle.stories.location.LocationException
-import com.soyle.stories.location.LocationNameCannotBeBlank
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
-import com.soyle.stories.location.repositories.LocationRepository
+import com.soyle.stories.location.locationName
+import com.soyle.stories.location.makeLocation
 import com.soyle.stories.location.usecases.renameLocation.RenameLocation
 import com.soyle.stories.location.usecases.renameLocation.RenameLocationUseCase
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
-import java.util.*
+import org.junit.jupiter.api.assertThrows
 
 class RenameLocationUnitTest {
 
-	private val projectId = Project.Id(UUID.randomUUID())
-	private val locationId: UUID = UUID.randomUUID()
-	private val originalName: String = "First Location Name"
-	private val inputName: String = "Location Name"
-
-	private lateinit var locationRepository: LocationRepository
+	private val location = makeLocation()
+	private val inputName = locationName()
 
 	private var updatedLocation: Location? = null
-	private var result: Any? = null
+	private var result: RenameLocation.ResponseModel? = null
 
-	@BeforeEach
-	fun clear() {
-		locationRepository = LocationRepositoryDouble()
-		updatedLocation = null
-		result = null
-	}
-
-	@ParameterizedTest
-	@ValueSource(strings = ["", " ", "\r", "\n", "\r\n"])
-	fun `new name is blank`(inputName: String) {
-		givenNoLocations()
-		whenUseCaseIsExecuted(withName = inputName)
-		val result = result as LocationNameCannotBeBlank
-	}
+	private val locationRepository = LocationRepositoryDouble(onUpdateLocation = ::updatedLocation::set)
 
 	@Test
-	fun `location does not exist`() {
-		givenNoLocations()
-		whenUseCaseIsExecuted()
-		val result = result as LocationDoesNotExist
-		result.locationId.mustEqual(locationId)
+	fun `when location does not exist, should throw error`() {
+		val error = assertThrows<LocationDoesNotExist> {
+			renameLocation()
+		}
+		error.locationId.mustEqual(location.id.uuid)
 	}
 
-	@Test
-	fun `valid name is output`() {
-		given(locationWithId = locationId)
-		whenUseCaseIsExecuted()
-		assertResultIsValidResponseModel()
+	@Nested
+	inner class `When Location Exists`
+	{
+		init {
+		    locationRepository.givenLocation(location)
+		}
+
+		@Nested
+		inner class `When Input Name is the Same as Current Name`
+		{
+
+			@Test
+			fun `should not update location`() {
+				renameLocation(location.name)
+				assertNull(updatedLocation)
+			}
+
+			@Test
+			fun `should not output event`() {
+				renameLocation(location.name)
+				assertNull(result)
+			}
+
+		}
+
+		@Nested
+		inner class `When Input Name is Different`
+		{
+
+			@Test
+			fun `should update location`() {
+				renameLocation()
+				updatedLocation!!.name.mustEqual(inputName)
+			}
+
+			@Test
+			fun `should event`() {
+				renameLocation()
+				result!!.locationRenamed.let {
+					it.locationId.mustEqual(location.id)
+					it.newName.mustEqual(inputName.value)
+				}
+			}
+
+		}
+
 	}
 
-	@Test
-	fun `same name is not persisted`() {
-		given(locationWithId = locationId, andName = inputName)
-		whenUseCaseIsExecuted()
-		assertResultIsValidResponseModel()
-		assertLocationNotUpdated()
-	}
-
-	@Test
-	fun `modified valid name is persisted`() {
-		given(locationWithId = locationId)
-		whenUseCaseIsExecuted()
-		assertResultIsValidResponseModel()
-		assertOnlyLocationNameUpdated()
-	}
-
-	private fun givenNoLocations() = given()
-	private fun given(locationWithId: UUID? = null, andName: String? = null) {
-		locationRepository = LocationRepositoryDouble(
-		  initialLocations = listOfNotNull(
-			locationWithId?.let { Location(Location.Id(it), projectId, andName ?: originalName) }
-		  ),
-		  onUpdateLocation = { updatedLocation = it }
-		)
-	}
-
-	private fun whenUseCaseIsExecuted(withName: String = inputName) {
+	private fun renameLocation(withName: SingleNonBlankLine = inputName) {
 		val useCase: RenameLocation = RenameLocationUseCase(locationRepository)
 		runBlocking {
-			useCase.invoke(locationId, withName, object : RenameLocation.OutputPort {
-				override fun receiveRenameLocationFailure(failure: LocationException) {
-					result = failure
-				}
-
-				override fun receiveRenameLocationResponse(response: RenameLocation.ResponseModel) {
+			useCase.invoke(location.id, withName, object : RenameLocation.OutputPort {
+				override suspend fun receiveRenameLocationResponse(response: RenameLocation.ResponseModel) {
 					result = response
 				}
 			})
 		}
 	}
-
-	private fun assertResultIsValidResponseModel() {
-		val result = result as RenameLocation.ResponseModel
-		result.locationId.mustEqual(locationId)
-		result.newName.mustEqual(inputName)
-	}
-
-	private fun assertLocationNotUpdated() {
-		val updatedLocation = updatedLocation
-		updatedLocation.mustEqual(null) { "Location should not have been updated" }
-	}
-
-	private fun assertOnlyLocationNameUpdated() {
-		val updatedLocation = updatedLocation!!
-		updatedLocation.name.mustEqual(inputName)
-	}
-
 }

@@ -2,24 +2,26 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.characterName
-import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.SymbolicRepresentation
+import com.soyle.stories.entities.theme.oppositionValue.*
 import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.locationDoesNotExist
+import com.soyle.stories.location.locationName
 import com.soyle.stories.storyevent.characterDoesNotExist
 import com.soyle.stories.theme.*
-import com.soyle.stories.doubles.ThemeRepositoryDouble
-import com.soyle.stories.entities.theme.oppositionValue.*
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.*
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
 import kotlinx.coroutines.runBlocking
@@ -131,7 +133,7 @@ class AddSymbolicItemToOppositionUnitTest {
     inner class `Add Location to Opposition` {
 
         private val locationId = Location.Id()
-        private val locationName = "Location Name ${UUID.randomUUID().toString().takeLast(3)}"
+        private val locationName = locationName()
 
         @Test
         fun `opposition value does not exist`() {
@@ -165,12 +167,12 @@ class AddSymbolicItemToOppositionUnitTest {
         }
 
         private fun themeWithLocationAsSymbol(actual: Any?) {
-            actual shouldBe themeWithSymbolicRepresentation(locationId.uuid, locationName)
+            actual shouldBe themeWithSymbolicRepresentation(locationId.uuid, locationName.value)
         }
 
         private fun locationAddedToOpposition(actual: Any?) {
             actual as LocationAddedToOpposition
-            actual shouldBe symbolicRepresentationAddedToOpposition(locationId.uuid, locationName)
+            actual shouldBe symbolicRepresentationAddedToOpposition(locationId.uuid, locationName.value)
         }
 
     }
@@ -266,7 +268,7 @@ class AddSymbolicItemToOppositionUnitTest {
         }
     }
 
-    private fun givenLocation(locationId: Location.Id, name: String) {
+    private fun givenLocation(locationId: Location.Id, name: SingleNonBlankLine) {
         locationRepository.locations[locationId] = Location(locationId, Project.Id(), name)
     }
 

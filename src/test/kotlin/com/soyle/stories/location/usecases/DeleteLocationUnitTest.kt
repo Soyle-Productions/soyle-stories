@@ -5,6 +5,7 @@ import com.soyle.stories.entities.*
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
+import com.soyle.stories.location.makeLocation
 import com.soyle.stories.location.repositories.CharacterArcSectionRepository
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
@@ -67,7 +68,7 @@ class DeleteLocationUnitTest {
 	private fun given(locationWithId: UUID? = null, linkedArcSectionIds: List<UUID> = emptyList()) {
 		repository = LocationRepositoryDouble(
 		  initialLocations = listOfNotNull(
-			locationWithId?.let { Location(Location.Id(it), projectId, "Location Name") }
+			locationWithId?.let { makeLocation(id = Location.Id(it), projectId = projectId) }
 		  ),
 		  onRemoveLocation = {
 			  deletedLocation = it

@@ -1,10 +1,11 @@
 package com.soyle.stories.location.usecases
 
 import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
+import com.soyle.stories.location.locationName
+import com.soyle.stories.location.makeLocation
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
 import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocationUseCase
@@ -17,7 +18,7 @@ import java.util.*
 class ReDescribeLocationUnitTest {
 
 	val locationId = UUID.randomUUID()
-	val locationName = "Location Name"
+	val locationName = locationName()
 	val initialDescription = "Original Description"
 
 	val newDescription = "New Description"
@@ -54,7 +55,7 @@ class ReDescribeLocationUnitTest {
 	{
 		actual as ReDescribeLocation.ResponseModel
 		assertEquals(locationId, actual.locationId, "Location id does not match input location id")
-		assertEquals(locationName, actual.locationName, "Location name does not match stored location name")
+		assertEquals(locationName.value, actual.locationName, "Location name does not match stored location name")
 		assertEquals(newDescription, actual.updatedDescription, "Location description does not match input description")
 	}
 
@@ -72,7 +73,11 @@ class ReDescribeLocationUnitTest {
 	private fun givenNoLocations() = given(emptyList())
 	private fun given(locationsWithIdsOf: List<UUID>, locationDescriptions: String = initialDescription) {
 		locationRepo = LocationRepositoryDouble(initialLocations = locationsWithIdsOf.map {
-			Location(Location.Id(it), Project.Id(UUID.randomUUID()), locationName, locationDescriptions)
+			makeLocation(
+				id = Location.Id(it),
+				name = locationName,
+				description = locationDescriptions
+			)
 		}, onUpdateLocation = { updatedLocation = it })
 	}
 	private fun whenUseCaseIsExecuted() {

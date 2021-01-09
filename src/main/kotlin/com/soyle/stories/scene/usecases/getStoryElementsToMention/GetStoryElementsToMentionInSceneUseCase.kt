@@ -48,7 +48,7 @@ class GetStoryElementsToMentionInSceneUseCase(
 
     private suspend fun getLocationsInProjectWithMatchingName(projectId: Project.Id, query: String) =
         locationRepository.getAllLocationsInProject(projectId).asSequence()
-            .filter { it.name.matchesQuery(query) }
+            .filter { it.name.value.matchesQuery(query) }
 
     private fun String.matchesQuery(query: String) = contains(query, ignoreCase = true)
 
@@ -56,6 +56,6 @@ class GetStoryElementsToMentionInSceneUseCase(
         MatchingStoryElement(EntityId.of(character), character.name.value)
 
     private fun locationAsMatchingStoryElement(location: Location) =
-        MatchingStoryElement(EntityId.of(location), location.name)
+        MatchingStoryElement(EntityId.of(location), location.name.value)
 
 }

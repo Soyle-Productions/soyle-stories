@@ -4,6 +4,7 @@ import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.entities.*
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.locationDoesNotExist
+import com.soyle.stories.location.makeLocation
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.sceneDoesNotExist
@@ -82,7 +83,7 @@ class LinkLocationToSceneUnitTest {
 
 	private fun givenLocationExists()
 	{
-		locationRepository.locations[locationId] = Location(locationId, Project.Id(), "", "")
+		locationRepository.locations[locationId] = makeLocation(id = locationId)
 	}
 
 	private fun whenLocationIsClearedFromScene()
