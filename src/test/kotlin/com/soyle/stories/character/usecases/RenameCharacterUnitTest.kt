@@ -1,148 +1,158 @@
 package com.soyle.stories.character.usecases
 
-import arrow.core.identity
-import com.soyle.stories.character.*
+import com.soyle.stories.character.CharacterDoesNotExist
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
+import com.soyle.stories.common.EntityId.Companion.asIdOf
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.mustEqual
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.ProseRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.*
+import com.soyle.stories.prose.makeProse
+import com.soyle.stories.theme.makeCharacterInTheme
 import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.api.assertThrows
 import java.util.*
 
 class RenameCharacterUnitTest {
 
-	val characterId = UUID.randomUUID()
-	val themeId = UUID.randomUUID()
-	val inputName = NonBlankString.create("Input Name")!!
+    private val character = makeCharacter()
+    val themeId = UUID.randomUUID()
+    val inputName = NonBlankString.create("Input Name")!!
 
-	private lateinit var context: TestContext
-	private var updatedCharacter: Character? = null
-	private var updatedTheme: Theme? = null
-	private var result: Any? = null
+    private var updatedCharacter: Character? = null
+    private var updatedTheme: Theme? = null
+    private var updatedProse: Prose? = null
 
-	@BeforeEach
-	fun clear() {
-		result = null
-		context = TestContext()
-		updatedCharacter = null
-		updatedTheme = null
-	}
+    private val characterRepository = CharacterRepositoryDouble(onUpdateCharacter = ::updatedCharacter::set)
+    private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = ::updatedTheme::set)
+    private val proseRepository = ProseRepositoryDouble(onReplaceProse = ::updatedProse::set)
+    private var result: RenameCharacter.ResponseModel? = null
 
-	@Test
-	fun `character does not exist`() {
-		givenNoCharacters()
-		whenUseCaseIsExecuted()
-		val result = result as CharacterDoesNotExist
-		result.characterId.mustEqual(characterId)
-	}
+    @Test
+    fun `character does not exist`() {
+        val error = assertThrows<CharacterDoesNotExist> {
+            renameCharacter()
+        }
+        error.characterId.mustEqual(character.id.uuid)
+    }
 
-	@Test
-	fun `name is same as first name`() {
-		givenCharacterWithId(characterId = characterId, andName = inputName)
-		whenUseCaseIsExecuted()
-		updatedCharacter.mustEqual(null) { "Character should not have been updated" }
-		assertResultIsResponseModel()
-	}
+    @Test
+    fun `name is same as first name`() {
+        characterRepository.givenCharacter(character.withName(inputName))
+        renameCharacter()
+        updatedCharacter.mustEqual(null) { "Character should not have been updated" }
+        assertNull(result) { "No output should have been received" }
+    }
 
-	@Test
-	fun `name is valid`() {
-		givenCharacterWithId(characterId = characterId)
-		whenUseCaseIsExecuted()
-		assertResultIsResponseModel()
-	}
+    @Nested
+    inner class `When Name is Different from Current Name` {
 
-	@Test
-	fun `character is persisted`() {
-		givenCharacterWithId(characterId = characterId)
-		whenUseCaseIsExecuted()
-		val updatedCharacter = updatedCharacter!!
-		updatedCharacter.name.mustEqual(inputName) { "Updated character name should be equal to input" }
-	}
+        init {
+            characterRepository.givenCharacter(character)
+        }
 
-	@Test
-	fun `theme with character`() {
-		givenCharacterWithId(characterId = characterId, andThemeId = themeId, andThemeHasCharacter = true)
-		whenUseCaseIsExecuted()
-		assertThemeWasUpdated()
-		assertResultHasAffectedThemes()
-	}
+        @Test
+        fun `should update character with new name`() {
+            renameCharacter()
+            val updatedCharacter = updatedCharacter!!
+            updatedCharacter.name.value.mustEqual(inputName.value)
+        }
 
+        @Test
+        fun `should output character renamed event`() {
+            renameCharacter()
+            result!!.characterRenamed.let {
+                it.characterId.mustEqual(character.id)
+                it.newName.mustEqual(inputName.value)
+            }
+        }
 
-	fun givenNoCharacters() {
-		context = TestContext(
-		  updateCharacter = {
-			  updatedCharacter = it
-		  },
-		  updateThemes = {
-			  updatedTheme = it.single()
-		  }
-		)
-	}
+        @Nested
+        inner class `When Theme has Character` {
 
-	fun givenCharacterWithId(characterId: UUID? = null, andName: NonBlankString? = null, andThemeId: UUID? = null, andThemeHasCharacter: Boolean = false) {
-		val character = characterId?.let { makeCharacter(Character.Id(it), Project.Id(), andName ?: NonBlankString.create("Original Name")!!) }
-		context = TestContext(
-		  initialCharacters = listOfNotNull(
-			character
-		  ),
-		  initialThemes = listOfNotNull(
-			andThemeId?.let { expectedId ->
-				val theme = makeTheme(id = Theme.Id(expectedId))
-				if (andThemeHasCharacter) {
-					theme.withCharacterIncluded(character!!.id, character.name.value, character.media)
-				}
-				else theme
-			}
-		  ),
-		  updateCharacter = {
-			  updatedCharacter = it
-		  },
-		  updateThemes = {
-			  updatedTheme = it.single()
-		  }
-		)
-	}
+            private val theme =
+                makeTheme(includedCharacters = mapOf(character.id to makeCharacterInTheme(character.id)))
 
-	private fun whenUseCaseIsExecuted(inputName: NonBlankString = this.inputName) {
-		val repo = context.characterRepository
-		val useCase: RenameCharacter = RenameCharacterUseCase(repo, context.themeRepository)
-		val output = object : RenameCharacter.OutputPort {
-			override fun receiveRenameCharacterFailure(failure: CharacterException) {
-				result = failure
-			}
+            init {
+                themeRepository.givenTheme(theme)
+            }
 
-			override suspend fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {
-				result = response
-			}
-		}
+            @Test
+            fun `should update character in theme name`() {
+                renameCharacter()
+                updatedTheme!!.getIncludedCharacterById(character.id)!!.name.mustEqual(inputName.value)
+            }
 
-		runBlocking {
-			useCase.invoke(characterId, inputName, output)
-		}
-	}
+            @Test
+            fun `should output character in theme renamed event`() {
+                renameCharacter()
+                result!!.affectedThemeIds.mustEqual(listOf(theme.id.uuid))
+            }
 
-	private fun assertResultIsResponseModel() {
-		val result = result as RenameCharacter.ResponseModel
-		result.characterId.mustEqual(characterId)
-		result.newName.mustEqual(inputName.value)
-	}
+        }
 
-	private fun assertThemeWasUpdated() {
-		val updatedTheme = updatedTheme!!
-		updatedTheme.getIncludedCharacterById(Character.Id(characterId))!!.name.mustEqual(inputName.value)
-	}
+    }
 
-	private fun assertResultHasAffectedThemes() {
-		val result = result as RenameCharacter.ResponseModel
-		result.affectedThemeIds.contains(themeId).mustEqual(true) { "Affected theme ids in output must include theme id $themeId.  Only had ${result.affectedThemeIds}" }
-	}
+    @Nested
+    inner class `Rule - All Prose that mention the character should update the mention of that character` {
+
+        private val prose = makeProse(
+            content = character.name.value, mentions = listOf(
+                ProseMention(character.id.asIdOf(Character::class), ProseMentionRange(0, character.name.length))
+            )
+        )
+
+        init {
+            characterRepository.givenCharacter(character)
+        }
+
+        @Test
+        fun `should update prose`() {
+            proseRepository.givenProse(prose)
+            renameCharacter()
+            updatedProse!!.let {
+                it.content.mustEqual(inputName.value) { "prose with only mention should have entire content replaced" }
+                it.mentions.mustEqual(listOf(
+                    ProseMention(character.id.asIdOf(Character::class), ProseMentionRange(0, inputName.length))
+                ))
+            }
+        }
+
+        @Test
+        fun `should output prose mention text replaced events`() {
+            proseRepository.givenProse(prose)
+            renameCharacter()
+            result!!.mentionTextReplaced.single().let {
+                it.deletedText.mustEqual(character.name.value)
+                it.entityId.mustEqual(character.id.asIdOf(Character::class))
+                it.insertedText.mustEqual(inputName.value)
+                it.newContent.mustEqual(updatedProse!!.content)
+                it.newMentions.mustEqual(updatedProse!!.mentions)
+            }
+        }
+
+    }
+
+    private fun renameCharacter(inputName: NonBlankString = this.inputName) {
+        val useCase: RenameCharacter = RenameCharacterUseCase(characterRepository, themeRepository, proseRepository)
+        val output = object : RenameCharacter.OutputPort {
+
+            override suspend fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {
+                result = response
+            }
+        }
+
+        runBlocking {
+            useCase.invoke(character.id.uuid, inputName, output)
+        }
+    }
 
 }

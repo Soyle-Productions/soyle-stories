@@ -1,5 +1,6 @@
 package com.soyle.stories.doubles
 
+import com.soyle.stories.common.EntityId
 import com.soyle.stories.entities.Prose
 import com.soyle.stories.prose.ProseEvent
 import com.soyle.stories.prose.repositories.ProseRepository
@@ -28,6 +29,17 @@ class ProseRepositoryDouble(
     override suspend fun replaceProse(prose: Prose) {
         this.prose[prose.id] = prose
         onReplaceProse(prose)
+    }
+
+    override suspend fun replaceProse(allProse: List<Prose>) {
+        allProse.forEach {
+            prose[it.id] = it
+            onReplaceProse(it)
+        }
+    }
+
+    override suspend fun getProseThatMentionEntity(entityId: EntityId<*>): List<Prose> {
+        return prose.values.filter { mention -> mention.mentions.any { it.entityId == entityId } }
     }
 
     override suspend fun getProseEvents(proseId: Prose.Id, sinceRevision: Long): List<ProseEvent> {

@@ -34,3 +34,5 @@ class Character(
 		fun buildNewCharacter(projectId: Project.Id, name: NonBlankString): Character = Character(projectId, name)
 	}
 }
+
+class CharacterRenamed(val characterId: Character.Id, val newName: String)
