@@ -1,12 +1,8 @@
 package com.soyle.stories.prose.usecases
 
-import com.soyle.stories.common.EntityId
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.doubles.ProseRepositoryDouble
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.entities.ProseMentionRange
+import com.soyle.stories.entities.*
 import com.soyle.stories.prose.ProseDoesNotExist
 import com.soyle.stories.prose.entityMentionedInProse
 import com.soyle.stories.prose.makeProse
@@ -45,9 +41,8 @@ class `Bulk Update Prose Unit Test` {
             proseRepository.givenProse(prose)
         }
 
-        private val characterIdGenerator = EntityId.of(Character::class)
-        private val georgeId = characterIdGenerator.id(Character.Id())
-        private val frankId = characterIdGenerator.id(Character.Id())
+        private val georgeId = Character.Id().mentioned()
+        private val frankId = Character.Id().mentioned()
         private val operations = listOf(
             InsertText("I like George", 0),
             MentionEntity(georgeId, 7, 6),
@@ -117,9 +112,8 @@ class `Bulk Update Prose Unit Test` {
             proseRepository.givenProse(prose)
         }
 
-        private val characterIdGenerator = EntityId.of(Character::class)
-        private val georgeId = characterIdGenerator.id(Character.Id())
-        private val frankId = characterIdGenerator.id(Character.Id())
+        private val georgeId = Character.Id().mentioned()
+        private val frankId = Character.Id().mentioned()
         private val operations = listOf(
             InsertText("I am a fan of George", 0),
             MentionEntity(georgeId, 14, 6),

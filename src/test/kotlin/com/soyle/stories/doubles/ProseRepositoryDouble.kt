@@ -1,6 +1,6 @@
 package com.soyle.stories.doubles
 
-import com.soyle.stories.common.EntityId
+import com.soyle.stories.entities.MentionedEntityId
 import com.soyle.stories.entities.Prose
 import com.soyle.stories.prose.ProseEvent
 import com.soyle.stories.prose.repositories.ProseRepository
@@ -38,7 +38,7 @@ class ProseRepositoryDouble(
         }
     }
 
-    override suspend fun getProseThatMentionEntity(entityId: EntityId<*>): List<Prose> {
+    override suspend fun getProseThatMentionEntity(entityId: MentionedEntityId<*>): List<Prose> {
         return prose.values.filter { mention -> mention.mentions.any { it.entityId == entityId } }
     }
 

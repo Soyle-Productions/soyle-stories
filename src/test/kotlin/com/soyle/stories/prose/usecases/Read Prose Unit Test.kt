@@ -1,12 +1,8 @@
 package com.soyle.stories.prose.usecases
 
-import com.soyle.stories.common.EntityId
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.doubles.ProseRepositoryDouble
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.entities.ProseMentionRange
+import com.soyle.stories.entities.*
 import com.soyle.stories.prose.ProseDoesNotExist
 import com.soyle.stories.prose.makeProse
 import com.soyle.stories.prose.usecases.readProse.ReadProse
@@ -65,8 +61,8 @@ class `Read Prose Unit Test` {
                     id = prose.id,
                     content = "I'm a funky monkey\nfrom funky town.",
                     mentions = listOf(
-                        ProseMention(EntityId.of(Character::class).id(characterId), ProseMentionRange(12, 6)),
-                        ProseMention(EntityId.of(Location::class).id(locationId), ProseMentionRange(24, 10))
+                        ProseMention(characterId.mentioned(), ProseMentionRange(12, 6)),
+                        ProseMention(locationId.mentioned(), ProseMentionRange(24, 10))
                     )
                 )
             )
@@ -74,8 +70,8 @@ class `Read Prose Unit Test` {
             val result = result!!
             result.mentions.mustEqual(
                 listOf(
-                    ProseMention(EntityId.of(Character::class).id(characterId), ProseMentionRange(12, 6)),
-                    ProseMention(EntityId.of(Location::class).id(locationId), ProseMentionRange(24, 10))
+                    ProseMention(characterId.mentioned(), ProseMentionRange(12, 6)),
+                    ProseMention(locationId.mentioned(), ProseMentionRange(24, 10))
                 )
             )
         }

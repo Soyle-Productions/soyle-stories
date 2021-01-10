@@ -1,6 +1,6 @@
 package com.soyle.stories.prose.repositories
 
-import com.soyle.stories.common.EntityId
+import com.soyle.stories.entities.MentionedEntityId
 import com.soyle.stories.entities.Prose
 import com.soyle.stories.prose.ProseEvent
 
@@ -11,5 +11,5 @@ interface ProseRepository {
     suspend fun replaceProse(allProse: List<Prose>)
     suspend fun addEvents(proseId: Prose.Id, events: List<ProseEvent>)
     suspend fun getProseEvents(proseId: Prose.Id, sinceRevision: Long): List<ProseEvent>
-    suspend fun getProseThatMentionEntity(entityId: EntityId<*>): List<Prose>
+    suspend fun getProseThatMentionEntity(entityId: MentionedEntityId<*>): List<Prose>
 }

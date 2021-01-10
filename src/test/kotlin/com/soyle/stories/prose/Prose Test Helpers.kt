@@ -1,6 +1,6 @@
 package com.soyle.stories.prose
 
-import com.soyle.stories.common.EntityId
+import com.soyle.stories.entities.MentionedEntityId
 import com.soyle.stories.entities.Prose
 import com.soyle.stories.entities.ProseMention
 import com.soyle.stories.entities.ProseMentionRange
@@ -29,7 +29,7 @@ fun textInsertedIntoProse(proseId: Prose.Id, revision: Long, insertedText: Strin
         assertEquals(index, event.index)
     }
 
-fun entityMentionedInProse(proseId: Prose.Id, revision: Long, entityId: EntityId<*>, range: ProseMentionRange) =
+fun entityMentionedInProse(proseId: Prose.Id, revision: Long, entityId: MentionedEntityId<*>, range: ProseMentionRange) =
     fun(event: ProseEvent) {
         event as EntityMentionedInProse
         assertEquals(proseId, event.proseId)

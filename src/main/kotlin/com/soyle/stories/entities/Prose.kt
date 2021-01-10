@@ -1,7 +1,6 @@
 package com.soyle.stories.entities
 
 import com.soyle.stories.common.Entity
-import com.soyle.stories.common.EntityId
 import com.soyle.stories.common.SingleLine
 import com.soyle.stories.prose.*
 import java.util.*
@@ -64,7 +63,7 @@ class Prose private constructor(
     ) = Prose(id, content, mentions, revision = revision + 1L, defaultConstructorMarker = Unit)
 
     fun withEntityMentioned(
-        entityId: EntityId<*>,
+        entityId: MentionedEntityId<*>,
         position: Int,
         length: Int
     ): ProseUpdate<EntityMentionedInProse> {
@@ -96,16 +95,17 @@ class Prose private constructor(
         return newProse.updatedBy(TextInsertedIntoProse(newProse, text, insertIndex))
     }
 
-    fun withMentionTextReplaced(entityId: EntityId<*>, newText: String): ProseUpdate<MentionTextReplaced?> {
+    fun withMentionTextReplaced(entityId: MentionedEntityId<*>, newText: String): ProseUpdate<MentionTextReplaced?> {
         val (mentionsOfEntity, mentionsOfOtherEntities) = mentions.partition { it.entityId == entityId }
         if (mentionsOfEntity.isEmpty()) return this.updatedBy(null)
 
+        val lengthDifference = newText.length - mentionsOfEntity.first().position.length
         val contentBuilder = StringBuilder(content)
-        mentionsOfEntity.forEach {
-            contentBuilder.replace(it.start(), it.end(), newText)
+        mentionsOfEntity.fold(0) { adjustment, mention ->
+            contentBuilder.replace(mention.start() + adjustment, mention.end() + adjustment, newText)
+            adjustment + lengthDifference
         }
 
-        val lengthDifference = newText.length - mentionsOfEntity.first().position.length
         var adjustment = 0
         val newMentions = sortedMentionSet.map { mention ->
             val shiftedMention = mention.shiftedRight(adjustment)
@@ -182,9 +182,19 @@ class Prose private constructor(
     }
 }
 
-data class ProseContent(val text: String, val mention: Pair<EntityId<*>, SingleLine>?)
+data class ProseContent(val text: String, val mention: Pair<MentionedEntityId<*>, SingleLine>?)
 
-data class ProseMention<Id>(val entityId: EntityId<Id>, val position: ProseMentionRange) {
+sealed class MentionedEntityId<Id> {
+    abstract val id: Id
+}
+
+data class MentionedCharacterId(override val id: Character.Id) : MentionedEntityId<Character.Id>()
+data class MentionedLocationId(override val id: Location.Id) : MentionedEntityId<Location.Id>()
+
+fun Character.Id.mentioned() = MentionedCharacterId(this)
+fun Location.Id.mentioned() = MentionedLocationId(this)
+
+data class ProseMention<Id>(val entityId: MentionedEntityId<Id>, val position: ProseMentionRange) {
     fun start(): Int = position.index
     fun end(): Int = position.index + position.length
 

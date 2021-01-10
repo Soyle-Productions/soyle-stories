@@ -4,10 +4,10 @@ import arrow.core.identity
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.repositories.ThemeRepository
 import com.soyle.stories.character.repositories.getCharacterOrError
-import com.soyle.stories.common.EntityId.Companion.asIdOf
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterRenamed
+import com.soyle.stories.entities.mentioned
 import com.soyle.stories.prose.MentionTextReplaced
 import com.soyle.stories.prose.repositories.ProseRepository
 import java.util.*
@@ -60,7 +60,7 @@ class RenameCharacterUseCase(
     }
 
     private suspend fun replaceProseMentionText(character: Character, name: NonBlankString): List<MentionTextReplaced> {
-        val entityId = character.id.asIdOf(Character::class)
+        val entityId = character.id.mentioned()
         val updates = proseRepository.getProseThatMentionEntity(entityId)
             .map {
                 it.withMentionTextReplaced(entityId, name.value)

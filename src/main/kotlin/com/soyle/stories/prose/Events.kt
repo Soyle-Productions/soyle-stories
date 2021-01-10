@@ -1,6 +1,6 @@
 package com.soyle.stories.prose
 
-import com.soyle.stories.common.EntityId
+import com.soyle.stories.entities.MentionedEntityId
 import com.soyle.stories.entities.Prose
 import com.soyle.stories.entities.ProseMentionRange
 
@@ -26,19 +26,19 @@ class TextRemovedFromProse(
 
 class EntityMentionedInProse(
     prose: Prose,
-    val entityId: EntityId<*>,
+    val entityId: MentionedEntityId<*>,
     val position: ProseMentionRange
 ) : ProseEvent(prose)
 
 class MentionRemovedFromProse(
     prose: Prose,
-    val entityId: EntityId<*>,
+    val entityId: MentionedEntityId<*>,
     val position: ProseMentionRange
 ) : ProseEvent(prose)
 
 class MentionTextReplaced(
     prose: Prose,
-    val entityId: EntityId<*>,
+    val entityId: MentionedEntityId<*>,
     val deletedText: String,
     val insertedText: String
 ) : ProseEvent(prose) {

@@ -1,9 +1,9 @@
 package com.soyle.stories.location.usecases.renameLocation
 
-import com.soyle.stories.common.EntityId.Companion.asIdOf
 import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.LocationRenamed
+import com.soyle.stories.entities.mentioned
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.location.repositories.getLocationOrError
 import com.soyle.stories.prose.MentionTextReplaced
@@ -37,7 +37,7 @@ class RenameLocationUseCase(
 
 	private suspend fun updateProseThatMentionLocation(location: Location, newName: SingleNonBlankLine): List<MentionTextReplaced>
 	{
-		val locationEntityId = location.id.asIdOf(Location::class)
+		val locationEntityId = location.id.mentioned()
 		val updatedProse = proseRepository.getProseThatMentionEntity(locationEntityId).map {
 			it.withMentionTextReplaced(locationEntityId, newName.value)
 		}

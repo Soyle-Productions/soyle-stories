@@ -1,6 +1,6 @@
 package com.soyle.stories.prose.usecases.bulkUpdateProse
 
-import com.soyle.stories.common.EntityId
+import com.soyle.stories.entities.MentionedEntityId
 import com.soyle.stories.prose.*
 
 sealed class Operation {
@@ -32,7 +32,7 @@ class InsertText(val text: String, val index: Int) : Operation() {
         }
     }
 }
-class MentionEntity(val entityId: EntityId<*>, val index: Int, val length: Int) : Operation() {
+class MentionEntity(val entityId: MentionedEntityId<*>, val index: Int, val length: Int) : Operation() {
     override fun transform(event: ProseEvent): Operation? {
         return when (event) {
             is ContentReplaced -> error("Content was replaced.  Cannot synchronize operations after this point.")

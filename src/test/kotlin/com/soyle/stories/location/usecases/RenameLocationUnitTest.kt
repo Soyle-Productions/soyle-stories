@@ -1,13 +1,9 @@
 package com.soyle.stories.location.usecases
 
-import com.soyle.stories.common.EntityId.Companion.asIdOf
 import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.doubles.ProseRepositoryDouble
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.entities.ProseMentionRange
+import com.soyle.stories.entities.*
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.locationName
@@ -96,7 +92,7 @@ class RenameLocationUnitTest {
                         content = location.name.value,
                         mentions = listOf(
                             ProseMention(
-                                location.id.asIdOf(Location::class),
+                                location.id.mentioned(),
                                 ProseMentionRange(0, location.name.length)
                             )
                         )

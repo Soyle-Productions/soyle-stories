@@ -4,7 +4,6 @@ import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
-import com.soyle.stories.common.EntityId.Companion.asIdOf
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.doubles.CharacterRepositoryDouble
@@ -106,7 +105,7 @@ class RenameCharacterUnitTest {
 
         private val prose = makeProse(
             content = character.name.value, mentions = listOf(
-                ProseMention(character.id.asIdOf(Character::class), ProseMentionRange(0, character.name.length))
+                ProseMention(character.id.mentioned(), ProseMentionRange(0, character.name.length))
             )
         )
 
@@ -121,7 +120,7 @@ class RenameCharacterUnitTest {
             updatedProse!!.let {
                 it.content.mustEqual(inputName.value) { "prose with only mention should have entire content replaced" }
                 it.mentions.mustEqual(listOf(
-                    ProseMention(character.id.asIdOf(Character::class), ProseMentionRange(0, inputName.length))
+                    ProseMention(character.id.mentioned(), ProseMentionRange(0, inputName.length))
                 ))
             }
         }
@@ -132,7 +131,7 @@ class RenameCharacterUnitTest {
             renameCharacter()
             result!!.mentionTextReplaced.single().let {
                 it.deletedText.mustEqual(character.name.value)
-                it.entityId.mustEqual(character.id.asIdOf(Character::class))
+                it.entityId.mustEqual(character.id.mentioned())
                 it.insertedText.mustEqual(inputName.value)
                 it.newContent.mustEqual(updatedProse!!.content)
                 it.newMentions.mustEqual(updatedProse!!.mentions)

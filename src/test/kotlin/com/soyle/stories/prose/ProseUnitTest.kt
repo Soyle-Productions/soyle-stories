@@ -1,8 +1,6 @@
 package com.soyle.stories.prose
 
 import com.soyle.stories.character.makeCharacter
-import com.soyle.stories.common.EntityId
-import com.soyle.stories.common.EntityId.Companion.asIdOf
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.singleLine
 import com.soyle.stories.entities.*
@@ -15,7 +13,7 @@ class ProseUnitTest {
 
     private val proseId = Prose.Id()
 
-    fun entityId() = Character.Id().asIdOf(Character::class)
+    fun entityId() = Character.Id().mentioned()
 
     @Nested
     inner class `Create new Prose` {
@@ -33,7 +31,7 @@ class ProseUnitTest {
     @Nested
     inner class `Insert Text` {
 
-        val characterId = EntityId.of(Character::class).id(Character.Id())
+        val characterId = Character.Id().mentioned()
         val prose = makeProse(proseId, content = "banana")
 
         @Test
@@ -110,7 +108,7 @@ class ProseUnitTest {
     @Nested
     inner class `Mention Entity` {
 
-        val characterId = EntityId.of(Character::class).id(Character.Id())
+        val characterId = Character.Id().mentioned()
         private val prose = makeProse(proseId, content = "banana")
 
         @Test
@@ -160,7 +158,7 @@ class ProseUnitTest {
     inner class `With Mention Text Replaced`
     {
 
-        private val entityId = Character.Id().asIdOf(Character::class)
+        private val entityId = Character.Id().mentioned()
 
         @Nested
         inner class `When No Mentions Match Entity Id`
@@ -206,7 +204,7 @@ class ProseUnitTest {
                 content = "I mention Bob, the character and I just talk about Bob, the idea.  I mention a different Bob",
                 mentions = listOf(
                     ProseMention(entityId, ProseMentionRange(10, 3)),
-                    ProseMention(Character.Id().asIdOf(Character::class), ProseMentionRange(89, 3))
+                    ProseMention(Character.Id().mentioned(), ProseMentionRange(89, 3))
                 )
             )
 
@@ -267,7 +265,7 @@ class ProseUnitTest {
 
         @Test
         fun `other mentions should be shifted, but not modified`() {
-            val aliceId = Character.Id().asIdOf(Character::class)
+            val aliceId = Character.Id().mentioned()
             val prose = makeProse(content = "I mention Bob, the character and then I mention Alice.  Let's say Bob and Alice again.",
                 mentions = listOf(
                     ProseMention(entityId, ProseMentionRange(10, 3)),
@@ -421,9 +419,9 @@ class ProseUnitTest {
         fun `content should be joined together`() {
             val (newProse) = prose.withContentReplaced(
                 listOf(
-                    ProseContent("", EntityId.of(bob) to singleLine("Bob")),
-                    ProseContent(" can be annoying.  But listen to ", EntityId.of(frank) to singleLine("Frank")),
-                    ProseContent(" and he'll tell you that ", EntityId.of(alexis) to singleLine("Alexis")),
+                    ProseContent("", bob.id.mentioned() to singleLine("Bob")),
+                    ProseContent(" can be annoying.  But listen to ", frank.id.mentioned() to singleLine("Frank")),
+                    ProseContent(" and he'll tell you that ", alexis.id.mentioned() to singleLine("Alexis")),
                     ProseContent(" is worse.", null)
                 )
             )
@@ -434,16 +432,16 @@ class ProseUnitTest {
         fun `mentions should be in relative positions`() {
             val (newProse) = prose.withContentReplaced(
                 listOf(
-                    ProseContent("", EntityId.of(bob) to singleLine("Bob")),
-                    ProseContent(" can be annoying.  But listen to ", EntityId.of(frank) to singleLine("Frank")),
-                    ProseContent(" and he'll tell you that ", EntityId.of(alexis) to singleLine("Alexis")),
+                    ProseContent("", bob.id.mentioned() to singleLine("Bob")),
+                    ProseContent(" can be annoying.  But listen to ", frank.id.mentioned() to singleLine("Frank")),
+                    ProseContent(" and he'll tell you that ", alexis.id.mentioned() to singleLine("Alexis")),
                     ProseContent(" is worse.", null)
                 )
             )
             newProse.mentions.mustEqual(listOf(
-                ProseMention(EntityId.of(bob), ProseMentionRange(0, 3)),
-                ProseMention(EntityId.of(frank), ProseMentionRange(36, 5)),
-                ProseMention(EntityId.of(alexis), ProseMentionRange(66, 6))
+                ProseMention(bob.id.mentioned(), ProseMentionRange(0, 3)),
+                ProseMention(frank.id.mentioned(), ProseMentionRange(36, 5)),
+                ProseMention(alexis.id.mentioned(), ProseMentionRange(66, 6))
             ))
         }
 
@@ -451,9 +449,9 @@ class ProseUnitTest {
         fun `should emit event`() {
             val (newProse, event) = prose.withContentReplaced(
                 listOf(
-                    ProseContent("", EntityId.of(bob) to singleLine("Bob")),
-                    ProseContent(" can be annoying.  But listen to ", EntityId.of(frank) to singleLine("Frank")),
-                    ProseContent(" and he'll tell you that ", EntityId.of(alexis) to singleLine("Alexis")),
+                    ProseContent("", bob.id.mentioned() to singleLine("Bob")),
+                    ProseContent(" can be annoying.  But listen to ", frank.id.mentioned() to singleLine("Frank")),
+                    ProseContent(" and he'll tell you that ", alexis.id.mentioned() to singleLine("Alexis")),
                     ProseContent(" is worse.", null)
                 )
             )

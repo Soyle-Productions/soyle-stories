@@ -1,7 +1,10 @@
 package com.soyle.stories.prose.usecases
 
 import com.soyle.stories.character.makeCharacter
-import com.soyle.stories.common.*
+import com.soyle.stories.common.SingleLine
+import com.soyle.stories.common.mustEqual
+import com.soyle.stories.common.nonBlankStr
+import com.soyle.stories.common.singleLine
 import com.soyle.stories.doubles.ProseRepositoryDouble
 import com.soyle.stories.entities.*
 import com.soyle.stories.prose.ContentReplaced
@@ -54,9 +57,9 @@ class `Update Prose Unit Test` {
             content.mustEqual("Bob can be annoying.  But listen to Frank and he'll tell you that Alexis is worse.")
             mentions.mustEqual(
                 listOf(
-                    ProseMention(EntityId.of(bob), ProseMentionRange(0, 3)),
-                    ProseMention(EntityId.of(frank), ProseMentionRange(36, 5)),
-                    ProseMention(EntityId.of(alexis), ProseMentionRange(66, 6))
+                    ProseMention(bob.id.mentioned(), ProseMentionRange(0, 3)),
+                    ProseMention(frank.id.mentioned(), ProseMentionRange(36, 5)),
+                    ProseMention(alexis.id.mentioned(), ProseMentionRange(66, 6))
                 )
             )
         }
@@ -98,11 +101,11 @@ class `Update Prose Unit Test` {
 
     }
 
-    private fun mentionOf(character: Character): Pair<EntityId<*>, SingleLine> {
-        return EntityId.of(character) to singleLine(character.name.toString())
+    private fun mentionOf(character: Character): Pair<MentionedEntityId<*>, SingleLine> {
+        return character.id.mentioned() to singleLine(character.name.toString())
     }
 
-    private infix fun String.followedBy(mention: Pair<EntityId<*>, SingleLine>?): ProseContent {
+    private infix fun String.followedBy(mention: Pair<MentionedEntityId<*>, SingleLine>?): ProseContent {
         return ProseContent(this, mention)
     }
 
