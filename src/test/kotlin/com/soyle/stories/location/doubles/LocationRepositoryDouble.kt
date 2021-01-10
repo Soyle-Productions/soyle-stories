@@ -51,4 +51,8 @@ class LocationRepositoryDouble(
 		onRemoveLocation.invoke(location)
 		locations.remove(location.id)
 	}
+
+	override suspend fun getLocationIdsThatDoNotExist(locationIdsToTest: Set<Location.Id>): Set<Location.Id> {
+		return locationIdsToTest.filterNot { it in locations }.toSet()
+	}
 }

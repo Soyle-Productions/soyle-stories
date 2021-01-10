@@ -184,7 +184,7 @@ class Prose private constructor(
 
 data class ProseContent(val text: String, val mention: Pair<MentionedEntityId<*>, SingleLine>?)
 
-sealed class MentionedEntityId<Id> {
+sealed class MentionedEntityId<Id : Any> {
     abstract val id: Id
 }
 
@@ -194,7 +194,7 @@ data class MentionedLocationId(override val id: Location.Id) : MentionedEntityId
 fun Character.Id.mentioned() = MentionedCharacterId(this)
 fun Location.Id.mentioned() = MentionedLocationId(this)
 
-data class ProseMention<Id>(val entityId: MentionedEntityId<Id>, val position: ProseMentionRange) {
+data class ProseMention<Id : Any>(val entityId: MentionedEntityId<Id>, val position: ProseMentionRange) {
     fun start(): Int = position.index
     fun end(): Int = position.index + position.length
 

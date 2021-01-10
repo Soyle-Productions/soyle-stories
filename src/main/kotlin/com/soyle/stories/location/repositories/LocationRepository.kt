@@ -9,4 +9,6 @@ interface LocationRepository {
 	suspend fun getLocationById(locationId: Location.Id): Location?
 	suspend fun updateLocation(location: Location)
 	suspend fun removeLocation(location: Location)
+
+	suspend fun getLocationIdsThatDoNotExist(locationIdsToTest: Set<Location.Id>): Set<Location.Id>
 }

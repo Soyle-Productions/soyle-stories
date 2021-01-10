@@ -19,7 +19,9 @@ class Location(
 	fun withName(name: SingleNonBlankLine) = copy(name = name)
 	fun withDescription(description: String) = copy(description = description)
 
-	data class Id(val uuid: UUID = UUID.randomUUID())
+	data class Id(val uuid: UUID = UUID.randomUUID()) {
+		override fun toString(): String = "Location($uuid)"
+	}
 
 }
 
