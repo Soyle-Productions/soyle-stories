@@ -1,12 +1,12 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.character.makeCharacter
-import com.soyle.stories.common.EntityId
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
+import com.soyle.stories.entities.mentioned
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.locationName
 import com.soyle.stories.location.makeLocation
@@ -73,9 +73,9 @@ class `Get Story Elements to Mention in Scene Unit Test` {
             getStoryElementsToMentionInScene("b")
             result!!.toList().mustEqual(
                 listOf(
-                    MatchingStoryElement(EntityId.of(charactersByName.getValue("Billy")), "Billy"),
-                    MatchingStoryElement(EntityId.of(charactersByName.getValue("John Boy")), "John Boy"),
-                    MatchingStoryElement(EntityId.of(charactersByName.getValue("Hallboid")), "Hallboid"),
+                    MatchingStoryElement(charactersByName.getValue("Billy").id.mentioned(), "Billy"),
+                    MatchingStoryElement(charactersByName.getValue("John Boy").id.mentioned(), "John Boy"),
+                    MatchingStoryElement(charactersByName.getValue("Hallboid").id.mentioned(), "Hallboid"),
                 )
             )
         }
@@ -104,9 +104,9 @@ class `Get Story Elements to Mention in Scene Unit Test` {
             getStoryElementsToMentionInScene("b")
             result!!.toList().mustEqual(
                 listOf(
-                    MatchingStoryElement(EntityId.of(locationsByName.getValue("Barcelona")), "Barcelona"),
-                    MatchingStoryElement(EntityId.of(locationsByName.getValue("Golden Gate Bridge")), "Golden Gate Bridge"),
-                    MatchingStoryElement(EntityId.of(locationsByName.getValue("Mt. Grumble")), "Mt. Grumble"),
+                    MatchingStoryElement(locationsByName.getValue("Barcelona").id.mentioned(), "Barcelona"),
+                    MatchingStoryElement(locationsByName.getValue("Golden Gate Bridge").id.mentioned(), "Golden Gate Bridge"),
+                    MatchingStoryElement(locationsByName.getValue("Mt. Grumble").id.mentioned(), "Mt. Grumble"),
                 )
             )
         }

@@ -1,12 +1,8 @@
 package com.soyle.stories.scene.usecases.getStoryElementsToMention
 
 import com.soyle.stories.character.repositories.CharacterRepository
-import com.soyle.stories.common.EntityId
 import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.entities.*
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.repositories.getSceneOrError
@@ -53,9 +49,9 @@ class GetStoryElementsToMentionInSceneUseCase(
     private fun String.matchesQuery(query: String) = contains(query, ignoreCase = true)
 
     private fun characterAsMatchingStoryElement(character: Character) =
-        MatchingStoryElement(EntityId.of(character), character.name.value)
+        MatchingStoryElement(character.id.mentioned(), character.name.value)
 
     private fun locationAsMatchingStoryElement(location: Location) =
-        MatchingStoryElement(EntityId.of(location), location.name.value)
+        MatchingStoryElement(location.id.mentioned(), location.name.value)
 
 }
