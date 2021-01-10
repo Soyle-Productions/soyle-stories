@@ -233,6 +233,14 @@ class ProseUnitTest {
                 ))
 
             @Test
+            fun `should modify content areas with matched mentions`() {
+                val update = prose.withMentionTextReplaced(entityId, "Frank")
+                update.prose.content.mustEqual(
+                    "I mention Frank, the character and then I mention Frank again.  Let's say Frank a third time."
+                )
+            }
+
+            @Test
             fun `should update mention positions and lengths`() {
                 val update = prose.withMentionTextReplaced(entityId, "Frank")
                 assertEquals(
