@@ -1,11 +1,11 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.prose.proseEditor.ProseEditorTextAreaStyles.Companion.mention
-import javafx.scene.control.Label
+import com.soyle.stories.prose.proseEditor.ProseEditorTextAreaStyles.Companion.problem
+import com.soyle.stories.soylestories.Styles
 import javafx.scene.paint.Color
-import javafx.scene.text.Text
 import org.fxmisc.richtext.GenericStyledArea
+import org.fxmisc.richtext.TextExt
 import org.fxmisc.richtext.model.TextOps
 import tornadofx.*
 import java.util.*
@@ -16,9 +16,11 @@ class ProseEditorTextArea : GenericStyledArea<Unit, ContentElement, Collection<S
     /*initialTextStyle =  */listOf(""),
     /*segmentOps =  */ContentElementOps(),
     /*nodeFactory =  */{
-        Text(it.segment.text).apply {
-            if (it.segment is Mention) {
-                addClass(mention)
+        val segment = it.segment
+        TextExt(segment.text).apply {
+            if (segment is Mention) {
+                toggleClass(mention, segment.issue == null)
+                toggleClass(problem, segment.issue != null)
             }
         }
     }
@@ -30,6 +32,7 @@ class ProseEditorTextAreaStyles : Stylesheet()
     companion object {
 
         val mention by cssclass()
+        val problem by cssclass()
 
         init {
             importStylesheet<ProseEditorTextAreaStyles>()
@@ -38,7 +41,24 @@ class ProseEditorTextAreaStyles : Stylesheet()
 
     init {
         mention {
-            backgroundColor += Color.BLUE
+            val transparentHighlight = Color.rgb(
+                (Styles.Blue.red * 255).toInt(),
+                (Styles.Blue.green * 255).toInt(),
+                (Styles.Blue.blue * 255).toInt(),
+                0.2,
+            )
+            unsafe("-rtfx-background-color", raw(transparentHighlight.css))
+            fill = Styles.Blue
+        }
+        problem {
+            val transparentHighlight = Color.rgb(
+                (Styles.Orange.red * 255).toInt(),
+                (Styles.Orange.green * 255).toInt(),
+                (Styles.Orange.blue * 255).toInt(),
+                0.2,
+            )
+            unsafe("-rtfx-background-color", raw(transparentHighlight.css))
+            fill = Styles.Orange
         }
     }
 
@@ -55,7 +75,7 @@ class ContentElementOps : TextOps<ContentElement, Collection<String>> {
         return when (seg)
         {
             is BasicText -> BasicText(seg.text.substring(start, end))
-            is Mention -> seg
+            is Mention -> seg.copy(text = seg.text.substring(start, end))
             null -> BasicText("")
         }
     }
@@ -64,7 +84,7 @@ class ContentElementOps : TextOps<ContentElement, Collection<String>> {
         return when (seg)
         {
             is BasicText -> BasicText(seg.text.substring(start))
-            is Mention -> seg
+            is Mention -> seg.copy(text = seg.text.substring(start))
             null -> BasicText("")
         }
     }

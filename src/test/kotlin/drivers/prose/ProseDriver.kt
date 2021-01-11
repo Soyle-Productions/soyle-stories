@@ -1,9 +1,10 @@
 package com.soyle.stories.desktop.config.drivers.prose
 
-import com.soyle.stories.common.EntityId
+import com.soyle.stories.common.SingleLine
+import com.soyle.stories.common.countLines
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.Prose
+import com.soyle.stories.entities.*
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.prose.ProseDoesNotExist
@@ -23,11 +24,21 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
         }
     }
 
-    fun givenProseMentionsEntity(prose: Prose, entityId: EntityId<*>, index: Int, length: Int) {
-        ProseEditorScope(projectScope, prose.id) { _, _ -> }.apply {
+    fun givenProseMentionsEntity(prose: Prose, entityId: MentionedEntityId<*>, index: Int, length: Int) {
+        val scope = ProseEditorScope(projectScope, prose.id, { _, _ -> }) {}.apply {
             get<ProseEditorState>().versionNumber.set(prose.revision)
-        }.get<EditProseController>()
-            .addMention(entityId, index, length)
+        }
+        val controller = scope.get<EditProseController>()
+        var lastMentionEnd = 0
+        val content = (prose.mentions + ProseMention(entityId, ProseMentionRange(index, length))).map { mention ->
+            ProseContent(
+                prose.content.substring(lastMentionEnd, mention.start()),
+                mention.entityId to (countLines(prose.content.substring(mention.start(), mention.end())) as SingleLine)
+            ).also {
+                lastMentionEnd = mention.end()
+            }
+        } + ProseContent(prose.content.substring(lastMentionEnd), null)
+        controller.updateProse(prose.id, content)
     }
 
     companion object {
@@ -38,4 +49,17 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
         operator fun invoke(workbench: WorkBench): ProseDriver = workbench.scope.get()
     }
 
+}
+
+fun <ID : Any> Prose.getMentionByEntityIdOrError(id: ID): ProseMention<ID>
+{
+    val mention =  mentions
+        .find { it.entityId.id == id }
+        ?: throw AssertionError("No mention in prose with id $id")
+    return mention as ProseMention<ID>
+}
+
+fun Prose.getMentionByText(text: String): ProseMention<*>?
+{
+    return mentions.find { content.substring(it.start(), it.end()) == text }
 }

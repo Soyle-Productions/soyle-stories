@@ -18,6 +18,10 @@ class ProjectSteps : En {
             val project = ProjectDriver(soyleStories).givenProjectHasBeenStarted()
             soyleStories.getWorkbenchForProjectOrError(project.id.uuid)
         }
+        Given("I have started a project") {
+            val project = ProjectDriver(soyleStories).givenProjectHasBeenStarted()
+            soyleStories.getWorkbenchForProjectOrError(project.id.uuid)
+        }
     }
 
     private fun whens() {

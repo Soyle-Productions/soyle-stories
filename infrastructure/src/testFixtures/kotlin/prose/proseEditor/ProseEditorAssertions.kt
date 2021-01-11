@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.view.prose.proseEditor
 
-import com.soyle.stories.common.EntityId
+import com.soyle.stories.common.PairOf
+import com.soyle.stories.entities.MentionedEntityId
 import com.soyle.stories.entities.ProseMentionRange
 import com.soyle.stories.prose.proseEditor.ProseEditorView
 import org.junit.jupiter.api.Assertions.*
@@ -14,13 +15,20 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
 
     fun hasContent(expectedContent: String)
     {
-        assertEquals(expectedContent, driver.getContent()) { "Prose editor content does not match expected" }
+        assertEquals(expectedContent, driver.getContent()) { "Prose editor content does not match" }
     }
 
-    fun hasMention(entityId: EntityId<*>, position: ProseMentionRange)
+    fun hasMention(entityId: MentionedEntityId<*>, position: ProseMentionRange)
     {
         val mention = driver.getMentionAt(position.index, position.index + position.length)!!
-        assertEquals(entityId, mention)
+        assertEquals(entityId, mention.entityId)
+    }
+
+    fun hasIssueWithMention(entityId: MentionedEntityId<*>, position: ProseMentionRange)
+    {
+        val mention = driver.getMentionAt(position.index, position.index + position.length)!!
+        assertEquals(entityId, mention.entityId)
+        assertNotNull(mention.issue)
     }
 
     fun suggestedMentionListIsVisible() {
@@ -40,8 +48,24 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
         assertEquals(expectedType, storyElement.type)
     }
 
+    fun isListingAllStoryElementsInOrder(elements: List<PairOf<String>>)
+    {
+        elements.forEachIndexed { index, pair -> isListingStoryElement(index, pair.first, pair.second) }
+    }
+
     fun isDisabled()
     {
         assertTrue(driver.textArea.isDisabled)
+    }
+
+    fun eachSuggestedMention(assertions: MentionSuggestionAssertions.() -> Unit) {
+        driver.mentionMenuItems.forEach {
+            MentionSuggestionAssertions()
+        }
+    }
+
+    class MentionSuggestionAssertions internal constructor() {
+
+
     }
 }

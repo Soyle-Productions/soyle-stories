@@ -1,15 +1,10 @@
 package com.soyle.stories.theme.characterConflict.components
 
-import com.soyle.stories.characterarc.components.CharacterNamePresenter
-import com.soyle.stories.common.NodeScope
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.cardHeader
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onLoseFocus
-import com.soyle.stories.di.DI
-import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
-import com.soyle.stories.gui.View
 import com.soyle.stories.theme.characterConflict.*
 import com.soyle.stories.theme.characterConflict.addDragAndDrop
 import de.jensd.fx.glyphs.materialicons.MaterialIcon

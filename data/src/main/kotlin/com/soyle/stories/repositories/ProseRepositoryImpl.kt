@@ -1,5 +1,6 @@
 package com.soyle.stories.repositories
 
+import com.soyle.stories.entities.MentionedEntityId
 import com.soyle.stories.entities.Prose
 import com.soyle.stories.prose.ProseEvent
 import com.soyle.stories.prose.repositories.ProseRepository
@@ -19,6 +20,10 @@ class ProseRepositoryImpl : ProseRepository {
         proseTable[prose.id] = prose
     }
 
+    override suspend fun replaceProse(allProse: List<Prose>) {
+        allProse.forEach { replaceProse(it) }
+    }
+
     override suspend fun addEvents(proseId: Prose.Id, events: List<ProseEvent>) {
         eventTable.getOrPut(proseId) { mutableListOf() }.addAll(events)
     }
@@ -28,6 +33,10 @@ class ProseRepositoryImpl : ProseRepository {
         val firstEvent = events.firstOrNull() ?: return emptyList()
         val startingIndex = sinceRevision - firstEvent.revision
         return events.subList(startingIndex.toInt() + 1, events.size).toList()
+    }
+
+    override suspend fun getProseThatMentionEntity(entityId: MentionedEntityId<*>): List<Prose> {
+        return proseTable.values.filter { prose -> prose.mentions.any { it.entityId == entityId } }
     }
 
 }

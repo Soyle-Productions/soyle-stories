@@ -35,10 +35,10 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 	fun invalidatedProperty(): ReadOnlyBooleanProperty = invalidatedProperty.readOnlyProperty
 	val invalidated: Boolean by invalidatedProperty()
 
-	open fun viewModel(): VM? = viewModel
+	open fun viewModel(): VM? = item
 
 	override val viewModel: VM?
-		get()= item
+		get() = viewModel()
 
 	override fun update(update: VM?.() -> VM) {
 		threadTransformer.gui {
@@ -52,6 +52,8 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 			item = viewModel.update()
 		}
 	}
+
+	private class BoundPropertyCannotBeUpdated(override val cause: Throwable) : Exception()
 
 	inner class BoundProperty<R>(private val prop: WritableValue<R>, private val getter: (VM) -> R) {
 		fun update(vm: VM) {

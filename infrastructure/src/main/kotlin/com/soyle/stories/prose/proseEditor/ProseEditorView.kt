@@ -1,6 +1,5 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
 import javafx.beans.property.SimpleObjectProperty
@@ -15,7 +14,6 @@ import org.fxmisc.wellbehaved.event.InputMap
 import org.fxmisc.wellbehaved.event.Nodes
 import tornadofx.*
 import java.util.*
-import kotlin.math.abs
 
 class ProseEditorView : Fragment() {
 
@@ -44,28 +42,40 @@ class ProseEditorView : Fragment() {
             }
         }
 
+    private val viewController = ProseEditorViewController(
+        viewListener,
+        state,
+        textArea.caretSelectionBind::displaceCaret,
+        { textArea.caretSelectionBind.underlyingSelection.selectRange(it.first, it.last) }
+    )
+
     override val root: Parent = hbox {
         isFillHeight = true
         style {
             padding = box(32.px)
         }
         add(textArea)
+        addClass("prose-editor")
         textArea.apply {
             hgrow = Priority.ALWAYS
             style {
                 padding = box(32.px)
             }
-            addClass("prose-editor")
             isWrapText = true
             disableWhen(state.isLocked)
-            onLoseFocus {
-                state.content.setAll(paragraphs.flatMap { it.segments })
-                viewListener.save()
-            }
+            onLoseFocus(viewController::onTextAreaFocusLost)
             val onOutsideSelectionMousePressed = this.onOutsideSelectionMousePressed
             setOnOutsideSelectionMousePressed {
-                viewListener.cancelQuery()
+                viewController.onClickInNewArea()
                 onOutsideSelectionMousePressed.handle(it)
+            }
+            textArea.caretPositionProperty().onChange { viewController.onCaretMoved(it) }
+            textArea.caretSelectionBind.underlyingSelection.rangeProperty().onChange {
+                if (it == null) return@onChange
+                viewController.onSelectionChanged(it.start..it.end)
+            }
+            textArea.setOnKeyTyped {
+                viewController.onKeyTyped(it.character, textArea.caretPosition - 1)
             }
         }
     }
@@ -84,7 +94,7 @@ class ProseEditorView : Fragment() {
             elements?.forEach {
                 textArea.append(it, listOf())
             }
-            textArea.moveTo(currentPosition.coerceAtMost(textArea.text.length - 1))
+            textArea.moveTo(currentPosition.coerceAtMost(textArea.text.length).coerceAtLeast(0))
             pushingUpdate = false
         }
         textArea.textProperty().onChange {
@@ -96,89 +106,34 @@ class ProseEditorView : Fragment() {
         textArea.moveTo(0)
         textArea.requestFollowCaret()
         preventArrowKeysFromEnteringMentions()
-        queryPossibleMentionsWhenSymbolTyped("@")
-
-        textArea.caretPositionProperty().onChange {
-            if (it == null) return@onChange
-            val adjustedPosition = getAdjustedPositionIfBisectingMention(it)
-            if (adjustedPosition != it) textArea.caretSelectionBind.displaceCaret(adjustedPosition)
-        }
-        textArea.caretSelectionBind.underlyingSelection.rangeProperty().onChange {
-            if (it == null) return@onChange
-
-            val adjustedStart = getAdjustedPositionIfBisectingMention(it.start)
-
-            if (it.length == 0) {
-                if (adjustedStart != it.start) textArea.caretSelectionBind.underlyingSelection.selectRange(
-                    adjustedStart,
-                    adjustedStart
-                )
-                return@onChange
-            }
-
-            val adjustedEnd = getAdjustedPositionIfBisectingMention(it.end)
-
-            if (adjustedStart != it.start || adjustedEnd != it.end) textArea.caretSelectionBind.underlyingSelection.selectRange(
-                adjustedStart,
-                adjustedEnd
-            )
-        }
 
         val mentionOnLeftOfCaretProperty = SimpleObjectProperty<Mention?>()
         val mentionOnRightOfCaretProperty = SimpleObjectProperty<Mention?>()
         Nodes.addInputMap(textArea, InputMap.consumeWhen(EventPattern.keyPressed(KeyCode.DELETE), {
-            mentionOnRightOfCaretProperty.value = findSegment { mention, offset -> offset == textArea.caretPosition }?.first
-            mentionOnRightOfCaretProperty.value != null
+            if (textArea.selection.length > 0) false
+            else {
+                mentionOnRightOfCaretProperty.value =
+                    findSegment { mention, offset -> offset == textArea.caretPosition }?.first
+                mentionOnRightOfCaretProperty.value != null
+            }
         }) {
             val mentionOnRightOfCaret = mentionOnRightOfCaretProperty.value!!
             textArea.deleteText(textArea.caretPosition, textArea.caretPosition + mentionOnRightOfCaret.text.length)
+
         })
         Nodes.addInputMap(textArea, InputMap.consumeWhen(EventPattern.keyPressed(KeyCode.BACK_SPACE), {
-            mentionOnLeftOfCaretProperty.value = findSegment { mention, offset ->  offset+mention.text.length == textArea.caretPosition }?.first
-            mentionOnLeftOfCaretProperty.value != null
+            if (textArea.selection.length > 0) false
+            else {
+                mentionOnLeftOfCaretProperty.value =
+                    findSegment { mention, offset -> offset + mention.text.length == textArea.caretPosition }?.first
+                mentionOnLeftOfCaretProperty.value != null
+            }
         }) {
             val mentionOnLeftOfCaret = mentionOnLeftOfCaretProperty.value!!
             textArea.deleteText(textArea.caretPosition - mentionOnLeftOfCaret.text.length, textArea.caretPosition)
         })
 
         viewListener.getValidState()
-    }
-
-    private fun getAdjustedPositionIfBisectingMention(position: Int): Int {
-        val bisectedMention = findSegment { mention, offset ->
-            position > offset && position < (offset + mention.text.length)
-        }
-
-        return if (bisectedMention != null) {
-            val bisectedMentionStart = bisectedMention.second
-            val bisectedMentionEnd = bisectedMention.second + bisectedMention.first.text.length
-
-            val startDistance = abs(bisectedMentionStart - position)
-            val endDistance = abs(bisectedMentionEnd - position)
-            if (startDistance < endDistance) bisectedMentionStart else bisectedMentionEnd
-        } else position
-    }
-
-    private fun queryPossibleMentionsWhenSymbolTyped(symbol: String)
-    {
-        textArea.setOnKeyTyped {
-            val mentionQueryState = state.mentionQueryState.value
-            if (mentionQueryState is PrimedQuery) {
-                val query: NonBlankString? = if (mentionQueryState is TriggeredQuery) {
-                    NonBlankString.create(mentionQueryState.query + it.character)
-                } else {
-                    NonBlankString.create(it.character)
-                }
-                if (query is NonBlankString) {
-                    viewListener.getStoryElementsContaining(query)
-                }
-            } else {
-                if (it.character == symbol) {
-                    viewListener.primeMentionQuery(textArea.caretPosition - 1)
-                }
-            }
-        }
-
     }
 
     private fun preventArrowKeysFromEnteringMentions() {
@@ -194,14 +149,14 @@ class ProseEditorView : Fragment() {
         consumeArrowKeysPressed(
             listOf(KeyCode.RIGHT, KeyCode.KP_RIGHT),
             whenMention = { _, offset -> offset == textArea.caretPosition },
-            insteadMoveTo = { (mention, offset) -> offset+mention.text.length }
+            insteadMoveTo = { (mention, offset) -> offset + mention.text.length }
         )
     }
 
     private fun preventLeftArrowFromEnteringMentions() {
         consumeArrowKeysPressed(
             listOf(KeyCode.LEFT, KeyCode.KP_LEFT),
-            whenMention = { mention, offset -> offset+mention.text.length == textArea.caretPosition },
+            whenMention = { mention, offset -> offset + mention.text.length == textArea.caretPosition },
             insteadMoveTo = { (_, offset) -> offset }
         )
     }
@@ -211,21 +166,24 @@ class ProseEditorView : Fragment() {
         whenMention: (Mention, Int) -> Boolean,
         insteadMoveTo: (Pair<Mention, Int>) -> Int
     ) {
-        Nodes.addInputMap(textArea, InputMap.consumeWhen(
-            EventPattern.anyOf(
-                *keyCodes.map {
-                    EventPattern.keyPressed(it, KeyCombination.SHIFT_ANY)
-                }.toTypedArray()
-            ), {
-                findSegment(whenMention) != null
-            }) {
-            val mention = findSegment(whenMention)!!
-            if (it.isShiftDown) {
-                textArea.moveTo(insteadMoveTo(mention), NavigationActions.SelectionPolicy.ADJUST)
-            } else {
-                textArea.moveTo(insteadMoveTo(mention))
+        Nodes.addInputMap(
+            textArea,
+            InputMap.consumeWhen(
+                EventPattern.anyOf(
+                    *keyCodes.map {
+                        EventPattern.keyPressed(it, KeyCombination.SHIFT_ANY)
+                    }.toTypedArray()
+                ),
+                { findSegment(whenMention) != null }
+            ) {
+                val mention = findSegment(whenMention)!!
+                if (it.isShiftDown) {
+                    textArea.moveTo(insteadMoveTo(mention), NavigationActions.SelectionPolicy.ADJUST)
+                } else {
+                    textArea.moveTo(insteadMoveTo(mention))
+                }
             }
-        })
+        )
     }
 
     private fun findSegment(predicate: (Mention, Int) -> Boolean): Pair<Mention, Int>? {

@@ -4,6 +4,7 @@ object Prose {
 
     operator fun invoke() {
         UseCases
+        Notifiers
         Presentation
     }
 

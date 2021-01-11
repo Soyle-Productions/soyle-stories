@@ -2,6 +2,8 @@ package com.soyle.stories.desktop.view.scene.sceneList
 
 import com.soyle.stories.scene.sceneList.SceneList
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 
 class SceneListAssert private constructor(private val driver: SceneListDriver) {
 
@@ -19,5 +21,15 @@ class SceneListAssert private constructor(private val driver: SceneListDriver) {
     fun doesNotHaveSceneNamed(sceneName: String)
     {
         Assertions.assertNull(driver.getSceneItem(sceneName)) { "Scene List still contains scene named $sceneName" }
+    }
+
+    fun doesNotIndicateSceneHasAnIssue(sceneName: String)
+    {
+        assertFalse(driver.getSceneItem(sceneName)?.value?.hasProblem == true)
+    }
+
+    fun indicatesSceneHasAnIssue(sceneName: String)
+    {
+        assertTrue(driver.getSceneItem(sceneName)?.value?.hasProblem == true)
     }
 }

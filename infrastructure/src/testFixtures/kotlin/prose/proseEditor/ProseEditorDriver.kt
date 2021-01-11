@@ -1,6 +1,5 @@
 package com.soyle.stories.desktop.view.prose.proseEditor
 
-import com.soyle.stories.common.EntityId
 import com.soyle.stories.prose.proseEditor.*
 import javafx.scene.control.ListView
 import javafx.stage.Popup
@@ -28,9 +27,9 @@ class ProseEditorDriver(private val proseEditor: ProseEditorView) : FxRobot() {
         return textArea.content.text
     }
 
-    fun getMentionAt(start: Int, end: Int): EntityId<*>? {
+    fun getMentionAt(start: Int, end: Int): Mention? {
         var offset = 0
-        return (textArea.paragraphs.asSequence()
+        return textArea.paragraphs.asSequence()
             .flatMap { it.segments.asSequence() }
             .find {
                 if (it !is Mention) {
@@ -42,7 +41,7 @@ class ProseEditorDriver(private val proseEditor: ProseEditorView) : FxRobot() {
                     offset += it.text.length
                     false
                 }
-            } as? Mention)?.entityId
+            } as? Mention
     }
 
 

@@ -68,16 +68,16 @@ class GlobalHooks : En {
             }
         }
 
-        ParameterType<Character?>("character", "[A-Z]\\w+") { name: String ->
+        ParameterType<Character?>("character", "character \"(.*?)\"|\"(.*?)\" character") { name: String ->
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByName(name)
         }
-        ParameterType<Location?>("location", "[A-Z]\\w+") { name: String ->
+        ParameterType<Location?>("location", "location \"(.*?)\"|\"(.*?)\" location") { name: String ->
             LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByName(name)
         }
         ParameterType<Theme>("theme", "\"(.*?)\"") { name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
         }
-        ParameterType<com.soyle.stories.entities.Scene>("scene", "\"(.*?)\"") { name: String ->
+        ParameterType<com.soyle.stories.entities.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { name: String ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).getSceneByNameOrError(name)
         }
         ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { name: String ->

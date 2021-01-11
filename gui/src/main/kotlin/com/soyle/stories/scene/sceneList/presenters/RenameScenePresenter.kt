@@ -14,7 +14,7 @@ class RenameScenePresenter(
 			copy(
 			  scenes = scenes.map {
 				  if (it.id == response.sceneId.toString()) {
-					  SceneItemViewModel(it.id, it.proseId, response.newName, it.index)
+					  SceneItemViewModel(it.id, it.proseId, response.newName, it.index, false)
 				  } else it
 			  },
 			  renameSceneFailureMessage = null

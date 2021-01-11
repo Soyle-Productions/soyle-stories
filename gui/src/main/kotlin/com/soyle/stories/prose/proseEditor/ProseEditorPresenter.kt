@@ -7,13 +7,16 @@ import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.ProseMention
 import com.soyle.stories.gui.View
 import com.soyle.stories.prose.ContentReplaced
+import com.soyle.stories.prose.MentionTextReplaced
 import com.soyle.stories.prose.editProse.ContentReplacedReceiver
+import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
+import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.prose.usecases.readProse.ReadProse
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
 
 class ProseEditorPresenter internal constructor(
     private val view: View.Nullable<ProseEditorViewModel>
-) : ReadProse.OutputPort, OnLoadMentionQueryOutput, ContentReplacedReceiver {
+) : ReadProse.OutputPort, OnLoadMentionQueryOutput, ContentReplacedReceiver, MentionTextReplacedReceiver, DetectInvalidatedMentions.OutputPort {
 
     @Synchronized
     override suspend fun receiveProse(response: ReadProse.ResponseModel) {
@@ -85,19 +88,43 @@ class ProseEditorPresenter internal constructor(
         }
     }
 
+    override suspend fun receiveMentionTextReplaced(mentionTextReplaced: MentionTextReplaced) {
+        view.updateOrInvalidated {
+            copy(
+                versionNumber = mentionTextReplaced.revision,
+                isLocked = false,
+                content = breakBodyIntoContentElements(mentionTextReplaced.newContent, mentionTextReplaced.newMentions)
+            )
+        }
+    }
+
+    override suspend fun receiveDetectedInvalidatedMentions(response: DetectInvalidatedMentions.ResponseModel) {
+        val removedEntityIds = response.invalidEntityIds.toSet()
+        view.updateOrInvalidated {
+            copy(
+                content = content.map {
+                    if (it is Mention) {
+                        if (it.entityId in removedEntityIds) it.copy(issue = "Removed")
+                        else it.copy(issue = null)
+                    }
+                    else it
+                }
+            )
+        }
+    }
+
     private fun breakBodyIntoContentElements(body: String, mentions: List<ProseMention<*>>): List<ContentElement> {
         var lastMentionEnd = 0
         return mentions.flatMap { mention ->
-            listOf(
-                BasicText(body.substring(lastMentionEnd, mention.start())),
-                Mention(body.substring(mention.start(), mention.end()), mention.entityId)
-            ).also {
-                lastMentionEnd = mention.end()
-            }
-        } + listOfNotNull(
-            if (lastMentionEnd < body.length) BasicText(body.substring(lastMentionEnd, body.length)) else null
-        )
+            val mentionText = body.substring(mention.start(), mention.end())
+            body.splitIntoBasicTextLines(lastMentionEnd, mention.start())
+                .plus(Mention(mentionText, mention.entityId))
+                .also { lastMentionEnd = mention.end() }
+        } + if (lastMentionEnd < body.length) body.splitIntoBasicTextLines(lastMentionEnd, body.length) else listOf()
     }
+
+    private fun String.splitIntoBasicTextLines(start: Int, end: Int) = listOf(substring(start, end))
+        .map(::BasicText)
 
     internal fun replaceContentAndLockInput(content: List<ContentElement>) {
         view.updateOrInvalidated {
@@ -119,8 +146,20 @@ class ProseEditorPresenter internal constructor(
     internal fun replaceRangeWithMention(range: IntRange, mention: ProseMention<*>, mentionedText: SingleLine) {
         val newElement = Mention(mentionedText.toString(), mention.entityId)
         view.updateOrInvalidated {
+            var offset = 0
             copy(
-                content = listOf(newElement)//content.substring(0 until range.first) + mentionedText + content.substring(range.last)
+                content = content.flatMap { element ->
+                    if (range.intersect(offset .. offset+element.text.length).isNotEmpty()) {
+                        listOfNotNull(
+                            BasicText(element.text.substring(0 until range.first - offset)).takeUnless { it.text.isEmpty() },
+                            newElement,
+                            BasicText(element.text.substring(range.last - offset)).takeUnless { it.text.isEmpty() }
+                        )
+                    } else {
+                        offset += element.text.length
+                        listOf(element)
+                    }
+                }
             )
         }
     }

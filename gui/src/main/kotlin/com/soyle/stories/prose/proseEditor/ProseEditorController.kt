@@ -1,5 +1,7 @@
 package com.soyle.stories.prose.proseEditor
 
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.SingleLine
 import com.soyle.stories.common.countLines
@@ -8,10 +10,17 @@ import com.soyle.stories.entities.ProseContent
 import com.soyle.stories.entities.ProseMention
 import com.soyle.stories.entities.ProseMentionRange
 import com.soyle.stories.gui.View
+import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
+import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
 import com.soyle.stories.prose.ContentReplaced
+import com.soyle.stories.prose.MentionTextReplaced
 import com.soyle.stories.prose.editProse.ContentReplacedReceiver
 import com.soyle.stories.prose.editProse.EditProseController
+import com.soyle.stories.prose.invalidateRemovedMentions.InvalidateRemovedMentionsController
+import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
 import com.soyle.stories.prose.readProse.ReadProseController
+import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
+import com.soyle.stories.prose.usecases.readProse.ReadProse
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
 
 fun interface OnLoadMentionQueryOutput : (List<GetStoryElementsToMentionInScene.MatchingStoryElement>) -> Unit
@@ -20,28 +29,40 @@ class ProseEditorController private constructor(
     private val proseId: Prose.Id,
     private val view: View.Nullable<ProseEditorViewModel>,
     private val readProseController: ReadProseController,
+    private val invalidateRemovedMentionsController: InvalidateRemovedMentionsController,
     private val editProseController: EditProseController,
     private val onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit,
+    private val onUseStoryElement: (ProseMention<*>) -> Unit,
     private val presenter: ProseEditorPresenter
-) : ProseEditorViewListener, ContentReplacedReceiver {
+) : ReadProse.OutputPort, ProseEditorViewListener, ContentReplacedReceiver, MentionTextReplacedReceiver,
+    DetectInvalidatedMentions.OutputPort, RemovedCharacterReceiver, DeletedLocationReceiver {
 
     constructor(
         proseId: Prose.Id,
         view: View.Nullable<ProseEditorViewModel>,
         readProseController: ReadProseController,
+        invalidateRemovedMentionsController: InvalidateRemovedMentionsController,
         editProseController: EditProseController,
-        onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit
+        onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit,
+        onUseStoryElement: (ProseMention<*>) -> Unit,
     ) : this(
         proseId,
         view,
         readProseController,
+        invalidateRemovedMentionsController,
         editProseController,
         onLoadMentionQuery,
+        onUseStoryElement,
         ProseEditorPresenter(view)
     )
 
     override fun getValidState() {
-        readProseController.readProse(proseId, presenter)
+        readProseController.readProse(proseId, this)
+    }
+
+    override suspend fun receiveProse(response: ReadProse.ResponseModel) {
+        presenter.receiveProse(response)
+        invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
     override fun primeMentionQuery(primedIndex: Int) {
@@ -54,50 +75,19 @@ class ProseEditorController private constructor(
         if (queryState != NoQuery) view.updateOrInvalidated { copy(mentionQueryState = NoQuery) }
     }
 
-    override fun selectStoryElement(filteredListIndex: Int) {
+    override fun selectStoryElement(filteredListIndex: Int, andUseElement: Boolean) {
         val queryState = view.viewModel?.mentionQueryState ?: return
         if (queryState is MentionQueryLoaded) {
             val match = queryState.prioritizedMatches[filteredListIndex]
             val newMention = ProseMention(match.id, ProseMentionRange(queryState.primedIndex, match.name.length))
             presenter.replaceRangeWithMention(
-                queryState.primedIndex .. queryState.primedIndex + queryState.query.length + 1,
+                queryState.primedIndex..queryState.primedIndex + queryState.query.length + 1,
                 newMention,
                 match.name
             )
+            if (andUseElement) onUseStoryElement(newMention)
         }
     }
-/*
-    override fun delete(start: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun backspace(start: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteRange(start: Int, end: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun replaceRange(start: Int, end: Int, replacementText: String): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun insert(start: Int, text: String): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun moveCursorLeft(currentPosition: Int): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun moveCursorRight(currentPosition: Int): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun moveCursorTo(position: Int): Int {
-        TODO("Not yet implemented")
-    }*/
 
     override fun getStoryElementsContaining(query: NonBlankString) {
         val queryState = view.viewModel?.mentionQueryState ?: return
@@ -135,8 +125,27 @@ class ProseEditorController private constructor(
     override suspend fun receiveContentReplacedEvent(contentReplaced: ContentReplaced) {
         if (contentReplaced.proseId != proseId) return
         presenter.receiveContentReplacedEvent(contentReplaced)
+        invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
+    override suspend fun receiveMentionTextReplaced(mentionTextReplaced: MentionTextReplaced) {
+        if (mentionTextReplaced.proseId != proseId) return
+        presenter.receiveMentionTextReplaced(mentionTextReplaced)
+        invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
+    }
+
+    override suspend fun receiveDetectedInvalidatedMentions(response: DetectInvalidatedMentions.ResponseModel) {
+        if (response.proseId != proseId) return
+        presenter.receiveDetectedInvalidatedMentions(response)
+    }
+
+    override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
+        invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
+    }
+
+    override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
+        invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
+    }
 
     override fun save() {
         val viewModel = view.viewModel ?: return
@@ -144,13 +153,33 @@ class ProseEditorController private constructor(
         val content = viewModel.content
         presenter.replaceContentAndLockInput(content)
 
-        val paddedContent = if (content.firstOrNull() !is BasicText) listOf(BasicText("")) + content else content
-        val proseContent = paddedContent.asSequence().windowed(2, 1, true) {
-            val text = it.firstOrNull() as? BasicText ?: return@windowed null
-            val mention = it.getOrNull(1) as? Mention
-            ProseContent(text.text, mention?.let { it.entityId to countLines(it.text) as SingleLine })
-        }.filterNotNull().toList()
-
+        val proseContent = content.fold(mutableListOf<ProseContent>()) { resultList, element ->
+            val previousElement = resultList.lastOrNull()
+            val previousMention = previousElement?.mention
+            when (element) {
+                is BasicText -> when {
+                    previousMention == null && previousElement != null -> {
+                        resultList.removeLast()
+                        resultList.add(ProseContent(previousElement.text + "\n" + element.text, null))
+                    }
+                    else -> {
+                        resultList.add(ProseContent(element.text, null))
+                    }
+                }
+                is Mention -> if (previousElement != null && previousMention == null) {
+                    resultList.removeLast()
+                    resultList.add(
+                        ProseContent(
+                            previousElement.text,
+                            element.entityId to countLines(element.text) as SingleLine
+                        )
+                    )
+                } else {
+                    resultList.add(ProseContent("", element.entityId to countLines(element.text) as SingleLine))
+                }
+            }
+            resultList
+        }.toList()
 
         editProseController.updateProse(proseId, proseContent).invokeOnCompletion { failure ->
             if (failure != null) presenter.unlockInput()

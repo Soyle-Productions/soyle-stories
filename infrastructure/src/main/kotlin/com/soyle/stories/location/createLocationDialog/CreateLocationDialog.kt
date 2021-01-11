@@ -1,5 +1,8 @@
 package com.soyle.stories.location.createLocationDialog
 
+import com.soyle.stories.common.SingleLine
+import com.soyle.stories.common.SingleNonBlankLine
+import com.soyle.stories.common.countLines
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
@@ -28,7 +31,9 @@ class CreateLocationDialog : Fragment("New Location") {
 					requestFocus()
 					onAction = EventHandler {
 						it.consume()
-						createLocationDialogViewListener.createLocation(name.value, description.value)
+						ifNameIsValid {
+							createLocationDialogViewListener.createLocation(it, description.value)
+						}
 					}
 				}
 			}
@@ -47,7 +52,9 @@ class CreateLocationDialog : Fragment("New Location") {
 			button("Create") {
 				id = "createLocation"
 				action {
-					createLocationDialogViewListener.createLocation(name.value, description.value)
+					ifNameIsValid {
+						createLocationDialogViewListener.createLocation(it, description.value)
+					}
 				}
 			}
 			button("Cancel") {
@@ -64,6 +71,15 @@ class CreateLocationDialog : Fragment("New Location") {
 			if (it != true) close()
 		}
 		createLocationDialogViewListener.getValidState()
+	}
+
+	private fun ifNameIsValid(block: (SingleNonBlankLine) -> Unit)
+	{
+		val nameLineCount = countLines(name.value)
+		if (nameLineCount is SingleLine) {
+			val nonBlankName = SingleNonBlankLine.create(nameLineCount)
+			if (nonBlankName != null) block(nonBlankName)
+		}
 	}
 
 }

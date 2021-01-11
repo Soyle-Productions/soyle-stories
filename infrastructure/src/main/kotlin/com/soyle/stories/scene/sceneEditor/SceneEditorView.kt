@@ -18,7 +18,12 @@ class SceneEditorView : View() {
 
     override val root: Parent = hbox {
         isFillHeight = true
-        val proseEditor = ProseEditorScope(scope.projectScope, scope.type.proseId, viewListener::loadMentionSuggestionsForScene).get<ProseEditorView>()
+        val proseEditor = ProseEditorScope(
+            scope.projectScope,
+            scope.type.proseId,
+            viewListener::loadMentionSuggestionsForScene,
+            viewListener::useProseMentionInScene
+        ).get<ProseEditorView>()
         add(proseEditor)
         proseEditor.root.hgrow = Priority.ALWAYS
     }

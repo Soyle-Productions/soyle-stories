@@ -2,12 +2,13 @@ package com.soyle.stories.desktop.config.scene
 
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
-import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
+import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneNotifier
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneNotifier
 import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
@@ -148,7 +149,7 @@ object Presentation {
                     characterId,
                     get<IncludedCharacterInSceneState>()
                 ).apply {
-                    listensTo(projectScope.get<RenamedCharacterNotifier>())
+                    listensTo(projectScope.get<CharacterRenamedNotifier>())
                     listensTo(projectScope.get<SetMotivationForCharacterInSceneNotifier>())
                     listensTo(projectScope.get<CharacterArcSectionsCoveredBySceneNotifier>())
                     listensTo(projectScope.get<CharacterArcSectionUncoveredInSceneNotifier>())
@@ -181,7 +182,8 @@ object Presentation {
                     get<CreateNewSceneNotifier>(),
                     get<RenameSceneNotifier>(),
                     get<DeleteSceneNotifier>(),
-                    get<ReorderSceneNotifier>()
+                    get<ReorderSceneNotifier>(),
+                    get<DetectInvalidatedMentionsOutput>()
                 ),
                 get(),
                 get(),
@@ -239,6 +241,8 @@ object Presentation {
             provide<SceneEditorViewListener> {
                 SceneEditorController(
                     sceneId,
+                    projectScope.get(),
+                    projectScope.get(),
                     projectScope.get()
                 )
             }

@@ -97,7 +97,7 @@ class `Prose Editor Controller Unit Test` {
         readProseController,
         editProseController,
         potentialMentionsLoader
-    )
+    ) {}
 
     @Nested
     inner class `When State is Invalidated` {
@@ -106,7 +106,7 @@ class `Prose Editor Controller Unit Test` {
 
         init {
             readProseController.givenProseRevisionNumber(42L)
-            readProseController.givenProseBody("I'm the prose body that mentions Bob, the character")
+            readProseController.givenProseBody("I'm the prose body\nthat mentions Bob, the character and\nstarts another line")
             readProseController.givenProseMentions(listOf(ProseMention(bobId, ProseMentionRange(33, 3))))
         }
 
@@ -119,9 +119,9 @@ class `Prose Editor Controller Unit Test` {
                 assertEquals(42L, it.versionNumber)
                 assertEquals(
                     listOf(
-                        BasicText("I'm the prose body that mentions "),
+                        BasicText("I'm the prose body\nthat mentions"),
                         Mention("Bob", bobId),
-                        BasicText(", the character")
+                        BasicText(", the character and\nstarts another line")
                     ), it.content
                 )
             }
@@ -218,6 +218,11 @@ class `Prose Editor Controller Unit Test` {
 
         init {
             controller.getValidState()
+
+        }
+
+        @Test
+        fun `should add new mention to view model and remove @ symbol`() {
             view.updateOrInvalidated { copy(content = listOf(BasicText("@"))) } // simulate view typing the @ symbol
             controller.primeMentionQuery(0)
 
@@ -227,14 +232,32 @@ class `Prose Editor Controller Unit Test` {
 
             view.updateOrInvalidated { copy(content = listOf(BasicText("@B"))) } // simulate view typing
             controller.getStoryElementsContaining(NonBlankString.create("B")!!)
-
+            controller.selectStoryElement(1, false)
+            assertEquals(
+                listOf(Mention("Billy", billyId)),
+                viewModel!!.content
+            )
         }
 
         @Test
-        fun `should add new mention to view model and remove @ symbol`() {
-            controller.selectStoryElement(1)
+        fun `should only replace content in query`() {
+            view.updateOrInvalidated { copy(content = listOf(BasicText("Let's talk about  because he's cool"))) }
+            view.updateOrInvalidated { copy(content = listOf(BasicText("Let's talk about @ because he's cool"))) } // simulate view typing the @ symbol
+            controller.primeMentionQuery(17)
+
+            potentialMentionsLoader.givenMentionOption(EntityId.of(Character::class).id(Character.Id()), "Bob")
+            potentialMentionsLoader.givenMentionOption(billyId, "Billy")
+            potentialMentionsLoader.givenMentionOption(EntityId.of(Character::class).id(Character.Id()), "Boyd")
+
+            view.updateOrInvalidated { copy(content = listOf(BasicText("Let's talk about @B because he's cool"))) } // simulate view typing
+            controller.getStoryElementsContaining(NonBlankString.create("B")!!)
+            controller.selectStoryElement(1, false)
             assertEquals(
-                listOf(Mention("Billy", billyId)),
+                listOf(
+                    BasicText("Let's talk about "),
+                    Mention("Billy", billyId),
+                    BasicText(" because he's cool")
+                ),
                 viewModel!!.content
             )
         }
@@ -298,6 +321,29 @@ class `Prose Editor Controller Unit Test` {
                 assertEquals(
                     listOf(
                         ProseContent("Starting content with", null)
+                    ), updateProseCall.getValue("content")
+                )
+            }
+
+            @Test
+            fun `adjacent basic text blocks should be joined with a newline character`() {
+                val bobId = Character.Id().asIdOf(Character::class)
+                controller.getValidState()
+                view.updateOrInvalidated { copy(content = listOf(
+                    BasicText("Starting content with"),
+                    BasicText("another line of text that mentions "),
+                    Mention("Bob", bobId),
+                    BasicText(" and then has"),
+                    BasicText("another line of text after")
+                )) }
+                controller.save()
+
+                val updateProseCall = editProseController.getCall(EditProseController::updateProse)
+                assertEquals(proseId, updateProseCall.getValue("proseId"))
+                assertEquals(
+                    listOf(
+                        ProseContent("Starting content with\nanother line of text that mentions ", bobId to countLines("Bob") as SingleLine),
+                        ProseContent(" and then has\nanother line of text after", null)
                     ), updateProseCall.getValue("content")
                 )
             }

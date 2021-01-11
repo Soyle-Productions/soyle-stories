@@ -3,7 +3,6 @@ package com.soyle.stories.characterarc.characterList
 import com.soyle.stories.common.Model
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
@@ -25,7 +24,6 @@ class CharacterListModel : Model<ProjectScope, CharacterListViewModel>(ProjectSc
     val characters = bind(CharacterListViewModel::characters)
     val characterTreeItems = SimpleListProperty(FXCollections.observableArrayList<TreeItem<Any?>>())
     val hasCharacters = characters.select { (! it.isNullOrEmpty()).toProperty() }
-    val invalid = SimpleBooleanProperty(true)
 
     override fun viewModel() = CharacterListViewModel(
         characterTreeItems.mapNotNull {

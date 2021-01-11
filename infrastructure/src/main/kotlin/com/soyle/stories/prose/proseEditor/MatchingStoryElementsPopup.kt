@@ -33,7 +33,7 @@ class MatchingStoryElementsPopup(
 
         itemList.setOnKeyPressed {
             if (it.code == KeyCode.ENTER) {
-                viewListener.selectStoryElement(itemList.selectionModel.selectedIndex)
+                viewListener.selectStoryElement(itemList.selectionModel.selectedIndex, it.isShiftDown)
             }
         }
     }
@@ -45,7 +45,7 @@ class MatchingStoryElementsPopup(
             whenMentionQueryStateIsLoaded {
                 items.setAll(it.prioritizedMatches)
                 selectionModel.select(0)
-                sizeToFitItems()
+                runLater { sizeToFitItems() }
             }
         }
     }

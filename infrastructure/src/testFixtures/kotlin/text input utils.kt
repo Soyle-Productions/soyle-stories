@@ -24,6 +24,8 @@ private fun uncommonKeyCode(character: Char): KeyCode?
     return when (character)
     {
         ' ' -> KeyCode.SPACE
+        '\'' -> KeyCode.QUOTE
+        '\n' -> KeyCode.ENTER
         else -> null
     }
 }

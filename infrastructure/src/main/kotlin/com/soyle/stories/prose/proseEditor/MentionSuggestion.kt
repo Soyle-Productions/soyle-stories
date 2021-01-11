@@ -24,7 +24,7 @@ class MentionSuggestion : ListCellFragment<MatchingStoryElementViewModel>() {
         root.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 2) {
                 cell?.index?.let {
-                    scope.get<ProseEditorViewListener>().selectStoryElement(it)
+                    scope.get<ProseEditorViewListener>().selectStoryElement(it, false)
                 }
             }
         }

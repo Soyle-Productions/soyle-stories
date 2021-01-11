@@ -31,6 +31,8 @@ class ComponentsStyles : Stylesheet() {
         val contextMenuSectionedItem by cssclass()
         val discouragedSelection by cssclass()
 
+        val hasProblem by cssclass()
+
         init {
             importStylesheet<ComponentsStyles>()
         }
@@ -157,6 +159,10 @@ class ComponentsStyles : Stylesheet() {
             backgroundColor += Color.WHITE
             borderColor += box(Styles.Purple)
             borderWidth += box(1.px)
+        }
+        hasProblem {
+            borderWidth += box(0.px, 0.px, 2.px, 0.px)
+            borderColor += box(Color.TRANSPARENT, Color.TRANSPARENT, Styles.Orange, Color.TRANSPARENT)
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.sceneDetails.includedCharacter
 
-import com.soyle.stories.character.renameCharacter.RenamedCharacterReceiver
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
+import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
+import com.soyle.stories.entities.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneReceiver
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
@@ -15,7 +15,7 @@ class IncludedCharacterInScenePresenter(
     private val sceneId: String,
     private val characterId: String,
     private val view: View.Nullable<IncludedCharacterInSceneViewModel>
-) : RenamedCharacterReceiver, GetAvailableCharacterArcsForCharacterInScene.OutputPort,
+) : CharacterRenamedReceiver, GetAvailableCharacterArcsForCharacterInScene.OutputPort,
     SetMotivationForCharacterInScene.OutputPort, CharacterArcSectionsCoveredBySceneReceiver,
     CharacterArcSectionUncoveredInSceneReceiver {
 
@@ -47,10 +47,10 @@ class IncludedCharacterInScenePresenter(
         }
     }
 
-    override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
-        if (renamedCharacter.characterId.toString() != characterId) return
+    override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
+        if (characterRenamed.characterId.toString() != characterId) return
         view.updateOrInvalidated {
-            copy(characterName = renamedCharacter.newName)
+            copy(characterName = characterRenamed.newName)
         }
     }
 

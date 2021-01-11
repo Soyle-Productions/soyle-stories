@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.config.soylestories
 
 import com.soyle.stories.desktop.config.character.Characters
+import com.soyle.stories.desktop.config.location.Locations
 import com.soyle.stories.desktop.config.prose.Prose
 import com.soyle.stories.desktop.config.scene.Scenes
 import com.soyle.stories.desktop.config.theme.Themes
@@ -19,4 +20,5 @@ fun configureModules() {
     Prose()
     Themes()
     Characters()
+    Locations()
 }

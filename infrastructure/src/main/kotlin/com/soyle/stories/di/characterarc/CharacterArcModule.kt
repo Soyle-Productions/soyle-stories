@@ -7,20 +7,14 @@ import com.soyle.stories.character.createArcSection.CreatedCharacterArcSectionNo
 import com.soyle.stories.character.createArcSection.CreatedCharacterArcSectionReceiver
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
 import com.soyle.stories.character.removeCharacterFromStory.*
-import com.soyle.stories.character.renameCharacter.RenameCharacterController
-import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
-import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
-import com.soyle.stories.character.renameCharacter.RenamedCharacterReceiver
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
 import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacter
 import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacterUseCase
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
-import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogPresenter
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogPresenter
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogController
@@ -35,7 +29,8 @@ import com.soyle.stories.characterarc.planNewCharacterArc.*
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionController
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionControllerImpl
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
-import com.soyle.stories.characterarc.usecaseControllers.*
+import com.soyle.stories.characterarc.usecaseControllers.ChangeThematicSectionValueController
+import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterController
 import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
 import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterArcSectionValueUseCase
 import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArc
@@ -66,7 +61,6 @@ import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFrom
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonControllerImpl
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonOutput
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
-import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValueUseCase
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
@@ -134,9 +128,6 @@ object CharacterArcModule {
         provide<RemoveCharacterFromComparison> {
             RemoveCharacterFromComparisonUseCase(get(), get())
         }
-        provide<RenameCharacter> {
-            RenameCharacterUseCase(get(), get())
-        }
         provide<RenameCharacterArc> {
             RenameCharacterArcUseCase(get(), get())
         }
@@ -155,11 +146,6 @@ object CharacterArcModule {
         provide(CreatedCharacterReceiver::class) { CreatedCharacterNotifier() }
         provide(CreatedCharacterArcReceiver::class) { CreatedCharacterArcNotifier() }
         provide(CharacterPerspectivePropertyChangedReceiver::class) { CharacterPerspectivePropertyChangedNotifier() }
-        provide(RenamedCharacterReceiver::class) {
-            RenamedCharacterNotifier().also {
-                get<RenameSymbolicItemController>() listensTo it
-            }
-        }
         provide(RemovedCharacterReceiver::class) {
             RemovedCharacterNotifier().also {
                 get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
@@ -189,7 +175,6 @@ object CharacterArcModule {
         }
         provide(RemoveCharacterFromComparison.OutputPort::class) { RemoveCharacterFromComparisonOutput(get(), get()) }
 
-        provide(RenameCharacter.OutputPort::class) { RenameCharacterOutput(get()) }
         provide(RenameCharacterArc.OutputPort::class) { RenameCharacterArcNotifier(applicationScope.get()) }
         provide(LinkLocationToCharacterArcSection.OutputPort::class) { LinkLocationToCharacterArcSectionNotifier(applicationScope.get()) }
         provide(UnlinkLocationFromCharacterArcSection.OutputPort::class) { UnlinkLocationFromCharacterArcSectionNotifier(applicationScope.get()) }
@@ -228,7 +213,6 @@ object CharacterArcModule {
                 get()
             )
         }
-        provide<RenameCharacterController> { RenameCharacterControllerImpl(applicationScope.get(), get(), get()) }
         provide<RemoveCharacterFromComparisonController> {
             RemoveCharacterFromComparisonControllerImpl(applicationScope.get(), get(), get())
         }

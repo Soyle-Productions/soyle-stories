@@ -1,10 +1,11 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
-import com.soyle.stories.common.EntityId
 import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.entities.MentionedEntityId
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.ProseContent
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
@@ -45,12 +46,12 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
     fun givenSceneHasProse(scene: Scene, proseParagraphs: List<String>)
     {
         val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
-        ProseEditorScope(projectScope, prose.id) { _, _ -> }
+        ProseEditorScope(projectScope, prose.id, { _, _ -> }) {}
             .get<EditProseController>()
-            .insertText(proseParagraphs.joinToString("\n"), 0)
+            .updateProse(scene.proseId, listOf(ProseContent(proseParagraphs.joinToString("\n"), null)))
     }
 
-    fun givenSceneProseMentionsEntity(scene: Scene, entityId: EntityId<*>, index: Int, length: Int)
+    fun givenSceneProseMentionsEntity(scene: Scene, entityId: MentionedEntityId<*>, index: Int, length: Int)
     {
         val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
         ProseDriver(projectScope.get()).givenProseMentionsEntity(prose, entityId,  index, length)

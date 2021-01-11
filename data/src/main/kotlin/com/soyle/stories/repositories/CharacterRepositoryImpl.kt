@@ -22,4 +22,8 @@ class CharacterRepositoryImpl : CharacterRepository, com.soyle.stories.character
 	override suspend fun updateCharacter(character: Character) {
 		characters[character.id] = character
 	}
+
+	override suspend fun getCharacterIdsThatDoNotExist(characterIdsToTest: Set<Character.Id>): Set<Character.Id> {
+		return characterIdsToTest.asSequence().filterNot { it in characters }.toSet()
+	}
 }
