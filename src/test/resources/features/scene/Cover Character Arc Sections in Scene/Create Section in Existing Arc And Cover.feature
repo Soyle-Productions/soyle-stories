@@ -1,14 +1,15 @@
 Feature: Create Section in Existing Arc And Cover
 
   Background:
-    Given a Scene called "Big Battle" has been created
-    And a Character called "Bob" has been created
-    And the Character "Bob" has been included in the "Big Battle" Scene
-    And 3 Character Arcs have been created for the Character "Bob"
-    And some Character Arc Sections for the Character "Bob" have been covered by the "Big Battle" Scene
+    Given I have started a project
+    And I have created a scene named "Big Battle"
+    And I have created a character named "Bob"
+    And I have included the character "Bob" in the "Big Battle" scene
+    And I have created 3 character arcs for the character "Bob"
+    And I have covered some character arc sections for the character "Bob" in the "Big Battle" scene
 
   Scenario: List Available Character Arc Section Templates
-    Given the user has indicated they want to cover character arc sections for the Character "Bob" in the "Big Battle" Scene
+    Given I am covering character arc sections for the character "Bob" in the "Big Battle" scene
     When the user indicates that they want to create a new character arc section for one of "Bob"s character arcs
     Then all character arc section templates in "Bob"s character arc should be listed
     And templates that do not allow multiple and have a section in "Bob"s character arc should be marked

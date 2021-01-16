@@ -12,7 +12,7 @@ Feature: Read Scene Prose
 
   Scenario Outline: Read Story with Mentioned Story Element
     Given I have created a <element> named <name>
-    And I have mentioned the <element> <name> in the "Big Battle" scene
+    And I have mentioned the <element> <name> in the "Big Battle" scene's prose
     When I read the "Big Battle" scene's prose
     Then I should see the <element> <name> mentioned in the "Big Battle" scene's prose
 

@@ -1,6 +1,7 @@
 package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.entities.MentionedEntityId
 
 interface ProseEditorViewListener {
     fun getValidState()
@@ -9,4 +10,5 @@ interface ProseEditorViewListener {
     fun cancelQuery()
     fun selectStoryElement(filteredListIndex: Int, andUseElement: Boolean)
     fun save()
+    fun clearAllMentionsOfEntity(entityId: MentionedEntityId<*>)
 }

@@ -2,19 +2,23 @@ Feature: Move Section in Moral Argument
 
   Background:
     Given a project has been started
-    And a theme named "Growing Up" has been created
-    And a character named "Bob" has been created
-    And Bob has been included in "Growing Up" as a major character
+    And I have created a theme named "Growing Up"
+    And I have created a character named "Bob"
+    And I have created a character arc for the character "Bob" in the "Growing Up" theme
+    And I am outlining the "Bob" character's "Growing Up" moral argument
 
-  Scenario: List Available Character Arc Section Types to Move in Moral Argument
-    When the user indicates they want to move one of Bob's "Growing Up" moral argument sections
-    Then all of Bob's "Growing Up" moral argument sections should be listed
+  Scenario: Choose Position First
+    When I choose the 2nd position to move one of the "Bob" character's "Growing Up" moral argument sections
+    Then all of the "Bob" character's "Growing Up" moral argument sections should be listed to be moved
 
-  Scenario: Move Character Arc Section Type in Moral Argument
-    Given the user has indicated they want to move one of Bob's "Growing Up" moral argument sections
-    When the 4th section in Bob's "Growing Up" moral argument is moved above the 2nd section
-    Then the section originally in the 4th position in Bob's "Growing Up" moral argument should be in the 2nd position
+  Scenario: Move to Chosen Position
+    Given I have chosen the 2nd position to move one of the "Bob" character's "Growing Up" moral argument sections
+    When I choose to move the "Moral Self-Revelation" section of the "Bob" character's "Growing Up" moral argument
+    Then the order of the sections in the "Bob" character's "Growing Up" moral argument should be as follows
+      | Moral Need | Moral Self-Revelation | Desire | Battle |
 
+  Scenario: Move Section by First Choosing Listed Section
+    When I move the "Moral Self-Revelation" section to the 2nd position of the "Bob" character's "Growing Up" moral argument
+    Then the order of the sections in the "Bob" character's "Growing Up" moral argument should be as follows
+      | Moral Need | Moral Self-Revelation | Desire | Battle |
 
-  
-  

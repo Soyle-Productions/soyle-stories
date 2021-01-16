@@ -1,19 +1,19 @@
 Feature: Remove Section from Moral Argument
 
   Background:
-    Given a project has been started
-    And a theme named "Growing Up" has been created
-    And a character named "Bob" has been created
-    And Bob has been included in "Growing Up" as a major character
-    And "Moral Decision" has been added to Bob's "Growing Up" moral argument
+    Given I have started a project
+    And I have created a theme named "Growing Up"
+    And I have created a character named "Bob"
+    And I have created a character arc for the character "Bob" in the "Growing Up" theme
+    And the "Moral Decision" section has been added to the "Bob" character's "Growing Up" moral argument
 
   Scenario: List Existing Moral Argument Sections
-    When the user wants to remove a section from Bob's "Growing Up" moral argument
-    Then all of Bob's "Growing Up" moral argument sections should be listed
-    And the optional sections in Bob's "Growing Up" moral argument should be shown to be able to be removed
-    But the required sections in Bob's "Growing Up" moral argument should not be shown to be able to be removed
+    When I want to remove a section from the "Bob" character's "Growing Up" moral argument
+    Then all of the "Bob" character's "Growing Up" moral argument sections should be listed
+    And the optional sections in the "Bob" character's "Growing Up" moral argument should indicate they can be removed
+    But the required sections in the "Bob" character's "Growing Up" moral argument should indicate they can not be removed
 
   Scenario: Remove a non-required section from a moral argument
-    Given the user has indicated they want to remove a section from Bob's "Growing Up" moral argument
-    When the "Moral Decision" section in Bob's "Growing Up" moral argument is removed
-    Then the "Moral Decision" section should be removed from Bob's "Growing Up" moral argument
+    Given I am removing a section from the "Bob" character's "Growing Up" moral argument
+    When I remove the "Moral Decision" section from the "Bob" character's "Growing Up" moral argument
+    Then the "Moral Decision" section should be removed from the "Bob" character's "Growing Up" moral argument

@@ -106,7 +106,8 @@ class MoralArgumentPresenter(
                     MoralArgumentSectionTypeViewModel(
                         it.sectionTemplateId.toString(),
                         it.sectionTemplateName,
-                        it.canBeCreated
+                        it.canBeCreated,
+                        it.existingSectionId?.toString()
                     )
                 }
             )

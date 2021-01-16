@@ -12,7 +12,9 @@ import com.soyle.stories.prose.proseEditor.ContentElement
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
 import com.soyle.stories.scene.sceneEditor.SceneEditorView
 import com.soyle.stories.scene.sceneList.SceneList
+import javafx.scene.input.ContextMenuEvent
 import javafx.scene.input.KeyCode
+import javafx.scene.input.PickResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import tornadofx.FX
@@ -34,7 +36,7 @@ fun SceneList.openSceneEditorTool(scene: Scene) {
     val driver = SceneListDriver(this)
     val item = driver.getSceneItemOrError(scene.name.value)
     driver.interact {
-        driver.getTree().selectionModel.select(item)
+        driver.tree.selectionModel.select(item)
         with(driver) {
             item.getSceneEditorItem().fire()
         }
@@ -71,8 +73,7 @@ fun SceneEditorView.enterText(text: String) {
         }
 }
 
-private fun ProseEditorDriver.getOffsetForMention(mentionName: String): Pair<Int, ContentElement>?
-{
+private fun ProseEditorDriver.getOffsetForMention(mentionName: String): Pair<Int, ContentElement>? {
     var offset = 0
     val mention = textArea.paragraphs.asSequence().flatMap { it.segments.asSequence() }
         .find { segment ->
@@ -82,8 +83,8 @@ private fun ProseEditorDriver.getOffsetForMention(mentionName: String): Pair<Int
         }
     return mention?.let { offset to mention }
 }
-fun SceneEditorView.atRightOfMention(mentionName: String): SceneEditorView
-{
+
+fun SceneEditorView.atRightOfMention(mentionName: String): SceneEditorView {
     driver().getProseEditor()
         .drive {
             val (offset, mention) = getOffsetForMention(mentionName)!!
@@ -92,8 +93,7 @@ fun SceneEditorView.atRightOfMention(mentionName: String): SceneEditorView
     return this
 }
 
-fun SceneEditorView.atLeftOfMention(mentionName: String): SceneEditorView
-{
+fun SceneEditorView.atLeftOfMention(mentionName: String): SceneEditorView {
     driver().getProseEditor()
         .drive {
             val (offset, mention) = getOffsetForMention(mentionName)!!
@@ -101,8 +101,8 @@ fun SceneEditorView.atLeftOfMention(mentionName: String): SceneEditorView
         }
     return this
 }
-fun SceneEditorView.typeKey(keyCode: KeyCode): SceneEditorView
-{
+
+fun SceneEditorView.typeKey(keyCode: KeyCode): SceneEditorView {
     driver().getProseEditor()
         .drive {
             textArea.requestFocus()
@@ -112,8 +112,8 @@ fun SceneEditorView.typeKey(keyCode: KeyCode): SceneEditorView
     driver().getProseEditor().drive { textArea.parent.requestFocus() }
     return this
 }
-fun SceneEditorView.query(query: String)
-{
+
+fun SceneEditorView.query(query: String) {
     driver().getProseEditor()
         .drive {
             textArea.requestFocus()
@@ -126,15 +126,15 @@ fun SceneEditorView.query(query: String)
         }
     runBlocking { delay(100) }
 }
-fun SceneEditorView.givenStoryElementsQueried(query: String)
-{
+
+fun SceneEditorView.givenStoryElementsQueried(query: String) {
     val driver = driver().getProseEditor().driver()
-    if (! driver.isShowingMentionMenu()) {
+    if (!driver.isShowingMentionMenu()) {
         query(query)
     }
 }
-fun SceneEditorView.selectMentionSuggestion(suggestionName: String)
-{
+
+fun SceneEditorView.selectMentionSuggestion(suggestionName: String) {
     driver().getProseEditor()
         .drive {
             val mentionItem = mentionMenuItems.find { it.name.toString() == suggestionName }
@@ -148,8 +148,8 @@ fun SceneEditorView.selectMentionSuggestion(suggestionName: String)
             textArea.parent.requestFocus()
         }
 }
-fun SceneEditorView.selectMentionSuggestionAndUse(suggestionName: String)
-{
+
+fun SceneEditorView.selectMentionSuggestionAndUse(suggestionName: String) {
     driver().getProseEditor()
         .drive {
             val mentionItem = mentionMenuItems.find { it.name.toString() == suggestionName }
@@ -162,4 +162,42 @@ fun SceneEditorView.selectMentionSuggestionAndUse(suggestionName: String)
         .drive {
             textArea.parent.requestFocus()
         }
+}
+
+fun SceneEditorView.givenMentionIsBeingInvestigated(mentionName: String): SceneEditorView {
+    if (!isMentionBeingInvestigated(mentionName)) investigateMention(mentionName)
+
+    return this
+}
+
+fun SceneEditorView.isMentionBeingInvestigated(mentionName: String): Boolean = driver().getProseEditor().driver().run {
+    isShowingMentionIssueMenu() && mentionIssueMenuIsRelatedToMention(mentionName)
+}
+
+fun SceneEditorView.investigateMention(mentionName: String) {
+    driver().getProseEditor()
+        .drive {
+            textArea.requestFocus()
+            textArea.moveTo(textArea.text.indexOf(mentionName))
+            textArea.onContextMenuRequested.handle(
+                ContextMenuEvent(
+                    ContextMenuEvent.CONTEXT_MENU_REQUESTED,
+                    -1.0,
+                    -1.0,
+                    -1.0,
+                    -1.0,
+                    true,
+                    PickResult(textArea, 0.0, 0.0)
+                )
+            )
+        }
+}
+
+fun SceneEditorView.clearAllMentionsOfEntity() {
+    val clearMentionOption = with(driver().getProseEditor().driver()) {
+        mentionIssueMenu!!.clearMentionOption()!!
+    }
+    driver().interact {
+        clearMentionOption.fire()
+    }
 }

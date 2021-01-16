@@ -43,6 +43,7 @@ class IncludedCharacterView : View() {
 
     private fun Parent.positionOnArcSelectionField() {
         labeledSection(state.positionOnCharacterArcLabel) {
+            addClass("position-on-arc")
             PositionOnArcSelection(this, state, viewListener)
         }
     }

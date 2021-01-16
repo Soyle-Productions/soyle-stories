@@ -18,6 +18,11 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
         assertEquals(expectedContent, driver.getContent()) { "Prose editor content does not match" }
     }
 
+    fun containsContent(expectedContent: String)
+    {
+        assertTrue(driver.getContent().contains(expectedContent)) { "Prose editor content does not contain $expectedContent" }
+    }
+
     fun hasMention(entityId: MentionedEntityId<*>, position: ProseMentionRange)
     {
         val mention = driver.getMentionAt(position.index, position.index + position.length)!!
@@ -62,6 +67,17 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
         driver.mentionMenuItems.forEach {
             MentionSuggestionAssertions()
         }
+    }
+
+    fun isShowingMentionIssueMenuForMention(mentionText: String)
+    {
+        assertTrue(driver.isShowingMentionIssueMenu()) { "Mention Issue menu is not showing at all" }
+        assertTrue(driver.mentionIssueMenuIsRelatedToMention(mentionText)) { "Mention Issue menu is not showing for $mentionText" }
+    }
+
+    fun mentionIssueMenuHasOption(expectedOption: String)
+    {
+        assertNotNull(driver.mentionIssueMenu!!.items.find { it.text == expectedOption })
     }
 
     class MentionSuggestionAssertions internal constructor() {

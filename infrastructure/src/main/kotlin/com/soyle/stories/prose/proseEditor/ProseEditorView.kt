@@ -2,9 +2,11 @@ package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
+import com.soyle.stories.prose.proseEditor.ProseEditorTextArea.Styles.Companion.proseEditorTextArea
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
-import javafx.scene.Parent
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.MenuItem
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination
 import javafx.scene.layout.Priority
@@ -22,7 +24,73 @@ class ProseEditorView : Fragment() {
 
     private val textArea = ProseEditorTextArea()
     private val mentionMenu = MatchingStoryElementsPopup(scope, state.mentionQueryState)
-        .apply {
+    private val mentionIssueMenu = ContextMenu()
+    private fun mentionIssueItems(mention: Mention) = listOf(
+        clearMentionOption(mention)
+    )
+
+    override val root = hbox {
+        addClass(Styles.proseEditor)
+        add(textArea)
+        textArea.apply {
+            hgrow = Priority.ALWAYS
+            contextMenu = mentionIssueMenu
+            isWrapText = true // css wraptext property does not work with richtextfx
+        }
+    }
+
+    private val viewController = ProseEditorViewController(
+        viewListener,
+        state,
+        textArea.caretSelectionBind::displaceCaret,
+        { textArea.caretSelectionBind.underlyingSelection.selectRange(it.first, it.last) }
+    )
+
+    init {
+        with(textArea) {
+            disableWhen(state.isLocked)
+            onLoseFocus(viewController::onTextAreaFocusLost)
+            val onOutsideSelectionMousePressed = this.onOutsideSelectionMousePressed
+            setOnOutsideSelectionMousePressed {
+                viewController.onClickInNewArea()
+                onOutsideSelectionMousePressed.handle(it)
+            }
+            caretPositionProperty().onChange { viewController.onCaretMoved(it) }
+            caretSelectionBind.underlyingSelection.rangeProperty().onChange {
+                if (it == null) return@onChange
+                viewController.onSelectionChanged(it.start..it.end)
+            }
+            setOnKeyTyped {
+                viewController.onKeyTyped(it.character, caretPosition - 1)
+            }
+            setOnContextMenuRequested {
+                val characterIndex: Int = if (it.isKeyboardTrigger) caretPosition
+                else {
+                    val optionalIndex = hit(it.x, it.y).characterIndex
+                    if (optionalIndex.isEmpty) return@setOnContextMenuRequested
+                    else optionalIndex.asInt
+                }
+                val segment = findSegment { mention, i -> characterIndex in i..i + mention.text.length }
+                if (segment?.first is Mention && segment.first.issue != null) {
+                    mentionIssueMenu.properties["relative-mention"] = segment.first
+                    mentionIssueMenu.items.setAll(mentionIssueItems(segment.first))
+                    it.consume()
+                    if (it.isKeyboardTrigger) {
+                        val screenPosition = getCharacterBoundsOnScreen(segment.second, segment.second + segment.first.text.length).get()
+                        mentionIssueMenu.show(this, screenPosition.minX, screenPosition.maxY)
+                    } else {
+                        mentionIssueMenu.show(this, it.screenX, it.screenY)
+                    }
+                } else {
+                    mentionIssueMenu.properties["relative-mention"] = null
+                    mentionIssueMenu.items.clear()
+                }
+            }
+        }
+    }
+
+    init {
+        with(mentionMenu) {
             isAutoHide = true
             setOnAutoHide { viewListener.cancelQuery() }
 
@@ -39,43 +107,6 @@ class ProseEditorView : Fragment() {
                     }
                     else -> if (isShowing) hide()
                 }
-            }
-        }
-
-    private val viewController = ProseEditorViewController(
-        viewListener,
-        state,
-        textArea.caretSelectionBind::displaceCaret,
-        { textArea.caretSelectionBind.underlyingSelection.selectRange(it.first, it.last) }
-    )
-
-    override val root: Parent = hbox {
-        isFillHeight = true
-        style {
-            padding = box(32.px)
-        }
-        add(textArea)
-        addClass("prose-editor")
-        textArea.apply {
-            hgrow = Priority.ALWAYS
-            style {
-                padding = box(32.px)
-            }
-            isWrapText = true
-            disableWhen(state.isLocked)
-            onLoseFocus(viewController::onTextAreaFocusLost)
-            val onOutsideSelectionMousePressed = this.onOutsideSelectionMousePressed
-            setOnOutsideSelectionMousePressed {
-                viewController.onClickInNewArea()
-                onOutsideSelectionMousePressed.handle(it)
-            }
-            textArea.caretPositionProperty().onChange { viewController.onCaretMoved(it) }
-            textArea.caretSelectionBind.underlyingSelection.rangeProperty().onChange {
-                if (it == null) return@onChange
-                viewController.onSelectionChanged(it.start..it.end)
-            }
-            textArea.setOnKeyTyped {
-                viewController.onKeyTyped(it.character, textArea.caretPosition - 1)
             }
         }
     }
@@ -134,6 +165,13 @@ class ProseEditorView : Fragment() {
         })
 
         viewListener.getValidState()
+    }
+
+    private fun clearMentionOption(mention: Mention): MenuItem {
+        return MenuItem("Clear all Mentions of ${mention.text} and Use Normal Text").apply {
+            id = "clear-mention"
+            action { viewListener.clearAllMentionsOfEntity(mention.entityId) }
+        }
     }
 
     private fun preventArrowKeysFromEnteringMentions() {
@@ -204,6 +242,28 @@ class ProseEditorView : Fragment() {
             }?.let {
                 it as Mention to offset
             }
+    }
+
+    class Styles : Stylesheet() {
+        companion object {
+
+            val proseEditor by cssclass()
+
+            init {
+                importStylesheet<Styles>()
+            }
+        }
+
+        init {
+            proseEditor {
+                fillHeight = true
+                padding = box(32.px)
+
+                proseEditorTextArea {
+                    padding = box(32.px)
+                }
+            }
+        }
     }
 
 }

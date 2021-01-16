@@ -1,8 +1,10 @@
 package com.soyle.stories.desktop.view.character.characterList
 
+import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
 import com.soyle.stories.characterarc.characterList.CharacterList
 import com.soyle.stories.characterarc.characterList.CharacterTreeItemViewModel
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Theme
 import javafx.scene.control.Button
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
@@ -32,6 +34,13 @@ class CharacterListDriver(private val characterList: CharacterList) : FxRobot() 
             if (value?.id == characterId.uuid.toString()) it as TreeItem<Any?>
             else null
         }.firstOrNull() as? TreeItem<CharacterTreeItemViewModel?>
+    }
+
+    fun getArcItem(characterId: Character.Id, themeId: Theme.Id): TreeItem<CharacterArcItemViewModel>?
+    {
+        return getCharacterItem(characterId)
+            ?.children?.find { (it.value as CharacterArcItemViewModel).themeId == themeId.uuid.toString() }
+                as? TreeItem<CharacterArcItemViewModel>
     }
 
 }

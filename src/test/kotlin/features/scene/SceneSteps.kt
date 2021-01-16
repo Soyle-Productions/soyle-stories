@@ -2,9 +2,8 @@ package com.soyle.stories.desktop.config.features.scene
 
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.anyNewLineCharacter
+import com.soyle.stories.desktop.config.drivers.character.CharacterArcDriver
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
-import com.soyle.stories.desktop.config.drivers.project.givenSettingsDialogHasBeenOpened
-import com.soyle.stories.desktop.config.drivers.project.markConfirmDeleteSceneDialogUnNecessary
 import com.soyle.stories.desktop.config.drivers.prose.ProseAssertions
 import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
 import com.soyle.stories.desktop.config.drivers.prose.getMentionByEntityIdOrError
@@ -13,7 +12,6 @@ import com.soyle.stories.desktop.config.drivers.scene.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.features.getParagraphs
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.desktop.view.project.workbench.WorkbenchAssertions.Companion.assertThat
 import com.soyle.stories.desktop.view.scene.sceneDetails.SceneDetailsAssertions
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert
@@ -37,42 +35,73 @@ class SceneSteps : En {
     }
 
     private fun givens() {
-        Given("a scene named {string} has been created") { sceneName: String ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            workbench.givenSceneCreatedWithName(sceneName)
-        }
+
+        //region scene CRUD
         Given("I have created a scene named {string}") { sceneName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            workbench.givenSceneCreatedWithName(sceneName)
+            SceneDriver(workbench).givenScene(sceneName)
         }
-        Given("the user has requested that a delete scene confirmation message not be shown") {
+        Given("I have created the following scenes") { dataTable: DataTable ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            workbench.givenSettingsDialogHasBeenOpened()
-                .markConfirmDeleteSceneDialogUnNecessary()
+            val driver = SceneDriver(workbench)
+            dataTable.asList().forEach(driver::givenScene)
         }
-        Given("the user wanted to delete {scene}") { scene: Scene ->
+        Given("I am deleting the {scene}") { scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            workbench.givenSceneListToolHasBeenOpened()
-                .givenDeleteSceneDialogHasBeenOpened(scene)
+            workbench.givenDeleteSceneDialogHasBeenOpened(scene)
         }
-        Given("the following scenes with motivations for characters") { dataTable: DataTable ->
+        //endregion
+
+        //region characters in scene
+        Given("I have included the {character} in the {scene}") { character: Character, scene: Scene ->
+            SceneDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .givenCharacterIncludedInScene(scene, character)
+        }
+        Given("I have set the following motivations in the following scenes for the following characters") { dataTable: DataTable ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneDriver = SceneDriver(workbench)
             val dataLists = dataTable.asLists()
-            val scenes = dataLists[0].drop(1).map { workbench.givenSceneCreatedWithName(it) }
+            val scenes = dataLists[0].drop(1).map(sceneDriver::givenScene)
             dataLists.drop(1).forEach {
                 val character = CharacterDriver(workbench).givenCharacterNamed(NonBlankString.create(it.first())!!)
                 it.drop(1).forEachIndexed { index, s ->
                     if (s == "-") return@forEach
                     val scene = scenes[index]
-                    val sceneDetailsTool = workbench.givenSceneListToolHasBeenOpened()
-                        .givenSceneDetailsToolHasBeenOpened(scene)
-                    sceneDetailsTool.includeCharacter(character)
                     if (s != "inherit") {
-                        sceneDetailsTool.setCharacterMotivation(character, s)
+                        sceneDriver.givenCharacterIncludedInScene(scene, character, s)
+                    } else {
+                        sceneDriver.givenCharacterIncludedInScene(scene, character)
                     }
                 }
             }
         }
+        Given(
+            "I have covered the following character arc sections in the {scene} for the {character}"
+        ) { scene: Scene, character: Character, dataTable: DataTable ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneDriver = SceneDriver(workbench)
+            val characterArcDriver = CharacterArcDriver(workbench)
+            dataTable.asLists().drop(1)
+                .forEach { (arcName: String, sectionName: String) ->
+                    //sceneDriver.givenSceneCoversArcSection(scene, characterArcDriver.)
+                }
+        }
+        Given(
+            "I have covered some character arc sections for the {character} in the {scene}"
+        ) { character: Character, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneDriver = SceneDriver(workbench)
+            val sections = CharacterDriver(workbench)
+                .getCharacterArcsForCharacter(character)
+                .flatMap { it.arcSections }
+                .shuffled()
+            sections.take(sections.size / 2).forEach {
+                sceneDriver.givenSceneCoversArcSection(scene, it)
+            }
+        }
+        //endregion
+
+        //region scene prose
         Given("my {scene} has {int} paragraphs of text in its prose") { scene: Scene, paragraphCount: Int ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             SceneDriver(workbench).givenSceneHasProse(scene, getParagraphs(paragraphCount))
@@ -110,35 +139,52 @@ class SceneSteps : En {
                 .givenSceneEditorToolHasBeenOpened(scene)
                 .givenStoryElementsQueried(query)
         }
+        //endregion
+
+        Given(
+            "I am covering character arc sections for the {character} in the {scene}"
+        ) { character: Character, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneDetailsToolHasBeenOpened(scene)
+                .givenPositionOnArcInputForCharacterHasBeenSelected(character)
+        }
+        Given(
+            "I am investigating the {string} mention in the {scene}'s prose"
+        ) { mentionText: String, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+                .givenMentionIsBeingInvestigated(mentionText)
+        }
     }
 
     private fun whens() {
-        When("a scene is created with the name {string}") { sceneName: String ->
+        When("I create a scene named {string}") { sceneName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.openCreateSceneDialog()
                 .createSceneWithName(sceneName)
         }
-        When("{scene} is renamed with the name {string}") { scene: Scene, newName: String ->
+        When("I rename the {scene} to {string}") { scene: Scene, newName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenSceneListToolHasBeenOpened()
                 .renameSceneTo(scene, newName)
         }
-        When("the user wants to delete {scene}") { scene: Scene ->
+        When("I want to delete the {scene}") { scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenSceneListToolHasBeenOpened()
                 .deleteScene(scene)
         }
-        When("the user confirms they want to delete {scene}") { scene: Scene ->
+        When("I confirm I want to delete the {scene}") { scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            workbench.givenSceneListToolHasBeenOpened()
-                .givenDeleteSceneDialogHasBeenOpened(scene)
+            workbench.givenDeleteSceneDialogHasBeenOpened(scene)
                 .confirmDelete()
         }
-        When("{scene} is deleted") { scene: Scene ->
+        When("I delete the {scene}") { scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenSceneListToolHasBeenOpened()
                 .openDeleteSceneDialog(scene)
-            getDeleteSceneDialog()
+            workbench.getOpenDeleteSceneDialog(scene)
                 ?.confirmDelete()
         }
         When("I read the {scene}'s prose") { scene: Scene ->
@@ -152,12 +198,12 @@ class SceneSteps : En {
                 .openSceneEditorTool(scene)
         }
         When(
-            "the user requests the story elements matching {string} for the {scene} scene"
-        ) { query: String, scene: Scene ->
+            "I want to cover character arc sections for the {character} in the {scene}"
+        ) { character: Character, scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenSceneListToolHasBeenOpened()
-                .givenSceneEditorToolHasBeenOpened(scene)
-                .requestStoryElementsMatching(query)
+                .givenSceneDetailsToolHasBeenOpened(scene)
+                .selectPositionOnArcInputForCharacter(character)
         }
         When(
             "I enter the following text into the {scene}'s prose"
@@ -217,6 +263,23 @@ class SceneSteps : En {
                 .givenSceneEditorToolHasBeenOpened(scene)
                 .selectMentionSuggestionAndUse(elementName)
         }
+        When(
+            "I investigate the {string} mention in the {scene}'s prose"
+        ) { mentionText: String, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+                .investigateMention(mentionText)
+        }
+        When(
+            "I clear the {string} mention from the {scene}'s prose"
+        ) { mentionText: String, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+                .givenMentionIsBeingInvestigated(mentionText)
+                .clearAllMentionsOfEntity()
+        }
     }
 
     private fun thens() {
@@ -243,11 +306,9 @@ class SceneSteps : En {
                 hasSceneNamed(newName)
             }
         }
-        Then("a delete scene confirmation message should be shown") {
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            assertThat(workbench) {
-                hasConfirmDeleteSceneDialogOpen()
-            }
+        Then("I should be prompted to confirm deleting the {scene}") { scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .getOpenDeleteSceneDialogOrError(scene)
         }
         Then("the {string} scene should not have been deleted") { sceneName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
@@ -258,7 +319,7 @@ class SceneSteps : En {
             assertNull(SceneDriver(workbench).getSceneByName(sceneName))
         }
         Then(
-            "{scene} should not have a motivation for {character} anymore"
+            "the {scene} should not have a motivation for the {character} anymore"
         ) { scene: Scene, character: Character ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             assertTrue(scene.getMotivationForCharacter(character.id)!!.isInherited())
@@ -272,7 +333,7 @@ class SceneSteps : En {
             }
         }
         Then(
-            "{scene} should have {string} as {character}'s inherited motivation"
+            "the {scene} should have {string} as the {character}'s inherited motivation"
         ) { scene: Scene, expectedMotivation: String, character: Character ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             assertTrue(scene.getMotivationForCharacter(character.id)!!.isInherited())
@@ -496,6 +557,53 @@ class SceneSteps : En {
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
                     hasIssueWithMention(mention.entityId, mention.position)
+                }
+            }
+        }
+        Then(
+            "all of the {character}'s arcs and all their sections should be listed to cover in the {scene}"
+        ) { character: Character, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val allArcs = CharacterDriver(workbench)
+                .getCharacterArcsForCharacter(character)
+
+            val sceneDetails = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneDetailsToolHasBeenOpened(scene)
+            SceneDetailsAssertions.assertThat(sceneDetails) {
+                andCharacter(character.id.uuid.toString()) {
+                    allArcs.forEach { arc ->
+                        isListingAvailableArcToCover(arc.id, arc.name)
+                        arc.arcSections.forEach {
+                            isListingAvailableArcSectionToCover(arc.id, it.id, it.template.name)
+                        }
+                    }
+                }
+            }
+        }
+        Then(
+            "I should be able to clear the {string} mention in the {scene}'s prose"
+        ) { mentionText: String, scene: Scene ->
+
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    isShowingMentionIssueMenuForMention(mentionText)
+                    mentionIssueMenuHasOption("Clear all Mentions of $mentionText and Use Normal Text")
+                }
+            }
+        }
+        Then(
+            "the {scene}'s prose should still contain text for {string}"
+        ) { scene: Scene, expectedText: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            assertTrue(ProseDriver(workbench).getProseByIdOrError(scene.proseId).content.contains(expectedText))
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    containsContent(expectedText)
                 }
             }
         }

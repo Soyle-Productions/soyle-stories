@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.view.project.workbench
 
+import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.WorkBench
 import org.junit.jupiter.api.Assertions.assertNotNull
 
@@ -10,7 +11,7 @@ class WorkbenchAssertions private constructor(private val driver: WorkbenchDrive
         }
     }
 
-    fun hasConfirmDeleteSceneDialogOpen() {
+    fun hasConfirmDeleteSceneDialogOpen(scene: Scene) {
         assertNotNull(driver.getConfirmDeleteSceneDialog()) { "Confirm Delete Scene Dialog is not Open" }
     }
 

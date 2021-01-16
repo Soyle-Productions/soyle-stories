@@ -5,10 +5,7 @@ import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedChar
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.SingleLine
 import com.soyle.stories.common.countLines
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.ProseContent
-import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.entities.ProseMentionRange
+import com.soyle.stories.entities.*
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
@@ -63,6 +60,16 @@ class ProseEditorController private constructor(
     override suspend fun receiveProse(response: ReadProse.ResponseModel) {
         presenter.receiveProse(response)
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
+    }
+
+    override fun clearAllMentionsOfEntity(entityId: MentionedEntityId<*>) {
+        val viewModel = view.viewModel ?: return
+        if (viewModel.isLocked) return
+        val content = viewModel.content.map {
+            if (it is Mention && it.entityId == entityId) BasicText(it.text)
+            else it
+        }.collapseAdjacentBasicTexts()
+        updateProse(content)
     }
 
     override fun primeMentionQuery(primedIndex: Int) {
@@ -151,8 +158,26 @@ class ProseEditorController private constructor(
         val viewModel = view.viewModel ?: return
         if (viewModel.isLocked) return
         val content = viewModel.content
-        presenter.replaceContentAndLockInput(content)
+        updateProse(content)
+    }
 
+    private fun List<ContentElement>.collapseAdjacentBasicTexts(): List<ContentElement>
+    {
+        return fold(ArrayList<ContentElement>(this.size)) { collapsedList, element ->
+            val previousElement = collapsedList.lastOrNull()
+            if (element is BasicText && previousElement is BasicText) {
+                collapsedList.removeLast()
+                collapsedList.add(BasicText(previousElement.text + element.text))
+            } else {
+                collapsedList.add(element)
+            }
+            collapsedList
+        }
+    }
+
+    private fun updateProse(content: List<ContentElement>)
+    {
+        presenter.replaceContentAndLockInput(content)
         val proseContent = content.fold(mutableListOf<ProseContent>()) { resultList, element ->
             val previousElement = resultList.lastOrNull()
             val previousMention = previousElement?.mention

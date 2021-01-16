@@ -217,7 +217,7 @@ object CharacterArcModule {
             RemoveCharacterFromComparisonControllerImpl(applicationScope.get(), get(), get())
         }
         provide {
-            PromoteMinorCharacterController(get(), get())
+            PromoteMinorCharacterController(applicationScope.get(), get(), get())
         }
         provide<RemoveCharacterFromStoryController> {
             RemoveCharacterFromStoryControllerImpl(applicationScope.get(), get(), get())

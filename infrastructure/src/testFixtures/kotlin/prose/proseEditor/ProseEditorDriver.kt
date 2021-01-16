@@ -1,7 +1,10 @@
 package com.soyle.stories.desktop.view.prose.proseEditor
 
 import com.soyle.stories.prose.proseEditor.*
+import javafx.geometry.Point2D
+import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListView
+import javafx.scene.control.MenuItem
 import javafx.stage.Popup
 import org.testfx.api.FxRobot
 
@@ -63,5 +66,22 @@ class ProseEditorDriver(private val proseEditor: ProseEditorView) : FxRobot() {
             .query<ListView<MatchingStoryElementViewModel>>()
             .items.getOrNull(index)
     }
+
+    fun positionOfMentionWithText(mentionText: String): Point2D
+    {
+        val start = textArea.text.indexOf(mentionText)
+        val mentionBounds = textArea.getCharacterBoundsOnScreen(start, start + mentionText.length).get()
+        return Point2D(mentionBounds.minX + 2, mentionBounds.minY + 2)
+    }
+
+    val mentionIssueMenu: ContextMenu?
+        get() = textArea.contextMenu
+
+    fun isShowingMentionIssueMenu(): Boolean = mentionIssueMenu?.isShowing == true
+    fun mentionIssueMenuIsRelatedToMention(mentionText: String): Boolean = mentionIssueMenu?.properties?.get("relative-mention")?.let {
+        it is Mention && it.text == mentionText
+    } == true
+
+    fun ContextMenu.clearMentionOption(): MenuItem? = items.find { it.id == "clear-mention" }
 
 }

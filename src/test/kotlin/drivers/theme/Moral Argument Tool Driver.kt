@@ -12,8 +12,6 @@ import com.soyle.stories.theme.moralArgument.MoralArgumentSectionTypeViewModel
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
 import com.soyle.stories.theme.themeList.ThemeList
 import javafx.scene.input.MouseButton
-import kotlinx.coroutines.withTimeout
-import tornadofx.item
 
 fun WorkBench.givenMoralArgumentToolHasBeenOpenedForTheme(theme: Theme): MoralArgumentView =
     getMoralArgumentToolForTheme(theme) ?: openMoralArgumentToolForTheme(theme)
@@ -48,18 +46,26 @@ fun ThemeList.openMoralArgumentToolFor(themeName: String)
     }
 }
 
-fun MoralArgumentView.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character: Character) =
-    givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
-fun MoralArgumentView.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(characterName: String)
+fun MoralArgumentView.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character: Character): MoralArgumentView
 {
     val driver = MoralArgumentViewDriver(this)
     val perspectiveCharacterSelection = driver.getPerspectiveCharacterSelection()
-    if (perspectiveCharacterSelection.text == characterName) return
-    driver.interact {
-        perspectiveCharacterSelection.show()
+    if (perspectiveCharacterSelection.text == character.name.value) return this
+    loadMoralArgumentForPerspectiveCharacter(character)
+    return this
+}
+
+fun MoralArgumentView.loadMoralArgumentForPerspectiveCharacter(character: Character)
+{
+    val driver = MoralArgumentViewDriver(this)
+    val perspectiveCharacterSelection = driver.getPerspectiveCharacterSelection()
+    if (! perspectiveCharacterSelection.isShowing) {
+        driver.interact {
+            perspectiveCharacterSelection.fire()
+        }
     }
-    val characterItem = perspectiveCharacterSelection.items.find { it.text == characterName }
-        ?: error("Could not find item with text $characterName in ${perspectiveCharacterSelection.items.map { it.text }}")
+    val characterItem = perspectiveCharacterSelection.items.find { it.text == character.name.value }
+        ?: error("Could not find item with text ${character.name.value} in ${perspectiveCharacterSelection.items.map { it.text }}")
     driver.interact {
         characterItem.fire()
     }
@@ -98,31 +104,62 @@ fun MoralArgumentView.changeThematicRevelationTo(thematicRevelation: String)
     }
 }
 
-fun MoralArgumentView.givenMoralArgumentHasBeenPreparedToAddNewSection(index: Int? = null) =
-    if (! preparedToAddNewSection(index)) prepareToAddNewSection(index) else Unit
+fun MoralArgumentView.givenMoralArgumentHasBeenPreparedToAddNewSectionAfter(sectionName: String) =
+    if (! isPreparedToAddNewSectionAfter(sectionName)) prepareToAddNewSectionAfter(sectionName) else Unit
 
-fun MoralArgumentView.preparedToAddNewSection(index: Int? = null): Boolean
+fun MoralArgumentView.givenMoralArgumentHasBeenPreparedToAddNewSection() =
+    if (! preparedToAddNewSection()) prepareToAddNewSection() else Unit
+
+
+fun MoralArgumentView.isPreparedToAddNewSectionAfter(sectionName: String): Boolean
 {
     val driver = MoralArgumentViewDriver(this)
     val sectionTypeSelections = driver.getSectionTypeSelections()
-    if (index == null) return sectionTypeSelections.any { it.isShowing }
-    val showingIndex = sectionTypeSelections.indexOfFirst { it.isShowing }
-    return showingIndex == index
+    val index = driver.getArcSectionLabels().indexOfFirst { it.text == sectionName }
+    return sectionTypeSelections.toList()[index + 1].isShowing
 }
 
-fun MoralArgumentView.prepareToAddNewSection(index: Int? = null)
+fun MoralArgumentView.preparedToAddNewSection(): Boolean
+{
+    val driver = MoralArgumentViewDriver(this)
+    val sectionTypeSelections = driver.getSectionTypeSelections()
+    return sectionTypeSelections.any { it.isShowing }
+}
+
+fun MoralArgumentView.prepareToAddNewSectionAfter(sectionName: String)
 {
     val driver = MoralArgumentViewDriver(this)
     val sectionTypeSelections =  driver.getSectionTypeSelections()
-    val sectionTypeSelection = sectionTypeSelections.let {
-        if (index == null) it.last()
-        else it.toList()[index]
-    }
+    val index = driver.getArcSectionLabels().indexOfFirst { it.text == sectionName } + 1
+    val sectionTypeSelection = sectionTypeSelections.toList()[index]
     driver.interact {
         sectionTypeSelections.forEachIndexed { i, it -> if (it.isShowing && i != index) it.hide() }
     }
     driver.interact {
-        sectionTypeSelection.show()
+        if (! sectionTypeSelection.isShowing) sectionTypeSelection.fire()
+    }
+}
+
+fun MoralArgumentView.prepareToAddNewSection()
+{
+    val driver = MoralArgumentViewDriver(this)
+    val sectionTypeSelections =  driver.getSectionTypeSelections()
+    val sectionTypeSelection = sectionTypeSelections.last()
+    driver.interact {
+        sectionTypeSelections.forEach { if (it.isShowing && it != sectionTypeSelection) it.hide() }
+    }
+    driver.interact {
+        if (! sectionTypeSelection.isShowing) sectionTypeSelection.fire()
+    }
+}
+
+fun MoralArgumentView.selectFromAvailableSections(sectionTypeName: String)
+{
+    val driver = MoralArgumentViewDriver(this)
+    val sectionTypeSelection =  driver.getSectionTypeSelections().find { it.isShowing }!!
+    val sectionTypeItem = sectionTypeSelection.items.find { it.text == sectionTypeName }!!
+    driver.interact {
+        sectionTypeItem.fire()
     }
 }
 
@@ -144,6 +181,36 @@ fun MoralArgumentView.prepareToMoveSection()
     val sectionTypeSelection = sectionTypeSelections.first()
     driver.interact {
         sectionTypeSelection.show()
+    }
+}
+
+fun MoralArgumentView.givenPreparedToMoveSectionTo(index: Int)
+{
+    val driver = MoralArgumentViewDriver(this)
+    val sectionTypeSelections =  driver.getSectionTypeSelections()
+    val sectionTypeSelection = sectionTypeSelections.toList()[index]
+    if (sectionTypeSelection.isShowing) return
+    prepareToMoveSectionTo(index)
+}
+
+fun MoralArgumentView.prepareToMoveSectionTo(index: Int)
+{
+    val driver = MoralArgumentViewDriver(this)
+    val sectionTypeSelections =  driver.getSectionTypeSelections()
+    val sectionTypeSelection = sectionTypeSelections.toList()[index]
+    driver.interact {
+        sectionTypeSelection.show()
+    }
+}
+
+fun MoralArgumentView.dragSectionToPosition(sectionName: String, index: Int)
+{
+    val driver = MoralArgumentViewDriver(this)
+    val arcSections = driver.getArcSectionLabels()
+    val handle = driver.getArcSectionDragHandle(arcSections.indexOfFirst { it.text == sectionName })
+    driver.interact {
+        driver.drag(handle, MouseButton.PRIMARY)
+            .dropTo(driver.getArcSectionLabel(index))
     }
 }
 
@@ -171,15 +238,6 @@ fun MoralArgumentView.selectUsedSectionType(): MoralArgumentSectionTypeViewModel
         item.fire()
     }
     return viewModel
-}
-
-fun MoralArgumentView.moveSectionToNewPosition(initialPosition: Int, newPosition: Int) {
-    val driver = MoralArgumentViewDriver(this)
-    val dragHandle = driver.getArcSectionDragHandle(initialPosition)
-    driver.interact {
-        driver.drag(dragHandle, MouseButton.PRIMARY)
-            .dropTo(driver.getArcSectionLabel(newPosition))
-    }
 }
 
 fun MoralArgumentView.removeFirstSectionWithName(name: String) {

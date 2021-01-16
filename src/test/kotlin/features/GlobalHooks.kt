@@ -74,7 +74,10 @@ class GlobalHooks : En {
         ParameterType<Location?>("location", "location \"(.*?)\"|\"(.*?)\" location") { name: String ->
             LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByName(name)
         }
-        ParameterType<Theme>("theme", "\"(.*?)\"") { name: String ->
+        ParameterType<Theme>("theme", "theme \"(.*?)\"|\"(.*?)\" theme") { name: String ->
+            ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
+        }
+        ParameterType<Theme>("moral argument", "moral argument \"(.*?)\"|\"(.*?)\" moral argument") { name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
         }
         ParameterType<com.soyle.stories.entities.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { name: String ->

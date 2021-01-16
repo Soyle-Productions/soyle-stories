@@ -171,11 +171,12 @@ object CharacterArcSteps : ApplicationTest() {
 		val locationItems = openLocationSelection.contextMenu.items.toList()
 		val hasAllLocations = locationItems.map { it.id }.toSet() == locationMap.keys
 		if (! hasAllLocations) return (false).also { UATLogger.log("not all locations included") }
+		error("Unsupported code")/*
 		val allLocationsMatchNames = locationItems.all {
 			it.text == locationMap.getValue(it.id).name
 		}
 		if (! allLocationsMatchNames) return (false).also { UATLogger.log("not all locations have correct name") }
-		return hasAllLocations && allLocationsMatchNames
+		return hasAllLocations && allLocationsMatchNames*/
 	}
 
 	fun givenCharacterArcSectionLocationDropDownMenuHasBeenOpened(
@@ -192,6 +193,7 @@ object CharacterArcSteps : ApplicationTest() {
 	) {
 		val openLocationSelection = getOpenCharacterArcSectionLocationDropDown(double, themeId, characterId)
 		  ?: error("Character Arc Section Location Dropdown not yet open")
+		error("Unsupported code")/*
 		interact {
 			val locationItem = openLocationSelection.contextMenu.items.find { it.text == location.name }
 			  ?: error("no item with text matching location name")
@@ -199,6 +201,7 @@ object CharacterArcSteps : ApplicationTest() {
 			  ?: error("no registered action for menu item")
 			onAction.handle(ActionEvent())
 		}
+		*/
 	}
 
 	fun whenCharacterArcSectionLocationDropDownLosesFocus(
@@ -217,7 +220,9 @@ object CharacterArcSteps : ApplicationTest() {
 	{
 		val openLocationSelection = getCharacterArcSectionLocationDropDown(double, themeId, characterId)
 		  ?: return (false).also { UATLogger.log("Character Arc Section Location Dropdown not yet open") }
+		error("Unsupported code")/*
 		return openLocationSelection.text == location.name
+		*/
 	}
 
 	fun setCharacterArcSectionLinkedToLocation(double: SoyleStoriesTestDouble, sectionId: CharacterArcSection.Id, locationId: Location.Id)

@@ -14,7 +14,7 @@ Feature: Edit Prose
 
   Scenario Outline: Delete Text Next to a Mentioned Story Element
     Given I have created a <element> named <name>
-    And I have mentioned the <name> <element> in the "Big Battle" scene
+    And I have mentioned the <name> <element> in the "Big Battle" scene's prose
     When I press the <key> key on the <direction> of the <name> mention in the "Big Battle" scene's prose
     Then the <name> mention should not be in the "Big Battle" scene's prose
     And the text previously covered by the <name> mention in the "Big Battle" scene's prose should be removed

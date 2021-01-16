@@ -5,12 +5,10 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.*
 import javafx.beans.value.ObservableValue
-import javafx.beans.value.WritableObjectValue
 import javafx.beans.value.WritableValue
 import tornadofx.*
 import kotlin.error
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 
 abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable<VM>, Component(), ScopedInstance {
@@ -57,7 +55,10 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 
 	inner class BoundProperty<R>(private val prop: WritableValue<R>, private val getter: (VM) -> R) {
 		fun update(vm: VM) {
-			prop.value = getter(vm)
+			val newValue = getter(vm)
+			if (newValue != prop.value) {
+				prop.value = newValue
+			}
 		}
 	}
 	private val props = mutableListOf<BoundProperty<*>>()

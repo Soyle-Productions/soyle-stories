@@ -1,6 +1,5 @@
 package com.soyle.stories.theme.moralArgument
 
-import com.soyle.stories.common.components.Styles as ComponentStyles
 import com.soyle.stories.common.components.dragHandle.DragHandleImpl.Companion.dragHandle
 import com.soyle.stories.common.components.fieldLabel
 import com.soyle.stories.di.resolveLater
@@ -14,6 +13,7 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Region
 import javafx.scene.paint.Color
 import tornadofx.*
+import com.soyle.stories.common.components.Styles as ComponentStyles
 
 class MoralArgumentSection : Fragment() {
 

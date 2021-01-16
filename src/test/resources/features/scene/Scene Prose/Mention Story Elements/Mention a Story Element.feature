@@ -67,7 +67,7 @@ Feature: Mention a Story Element
 
     Scenario Outline: Rename a Mentioned Story Element and then Read the Scene
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene
+      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
       And I have renamed the <element> <name> to <new name>
       When I edit the "Big Battle" scene's prose
       Then the <name> mention in the "Big Battle" scene's prose should read <new name>
@@ -79,7 +79,7 @@ Feature: Mention a Story Element
 
     Scenario Outline: Rename a Mentioned Story Element While Reading Scene Prose
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene
+      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
       And I am editing the "Big Battle" scene's prose
       When I rename the <element> <name> to <new name>
       Then the <name> mention in the "Big Battle" scene's prose should read <new name>

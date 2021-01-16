@@ -1,14 +1,15 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.prose.proseEditor.ProseEditorTextAreaStyles.Companion.mention
-import com.soyle.stories.prose.proseEditor.ProseEditorTextAreaStyles.Companion.problem
-import com.soyle.stories.soylestories.Styles
+import com.soyle.stories.prose.proseEditor.ProseEditorTextArea.Styles.Companion.mention
+import com.soyle.stories.prose.proseEditor.ProseEditorTextArea.Styles.Companion.problem
+import com.soyle.stories.prose.proseEditor.ProseEditorTextArea.Styles.Companion.proseEditorTextArea
 import javafx.scene.paint.Color
 import org.fxmisc.richtext.GenericStyledArea
 import org.fxmisc.richtext.TextExt
 import org.fxmisc.richtext.model.TextOps
 import tornadofx.*
 import java.util.*
+import com.soyle.stories.soylestories.Styles as SoyleStyles
 
 class ProseEditorTextArea : GenericStyledArea<Unit, ContentElement, Collection<String>>(
     /*initialParagraphStyle = */Unit,
@@ -24,45 +25,52 @@ class ProseEditorTextArea : GenericStyledArea<Unit, ContentElement, Collection<S
             }
         }
     }
-)
-
-class ProseEditorTextAreaStyles : Stylesheet()
-{
-
-    companion object {
-
-        val mention by cssclass()
-        val problem by cssclass()
-
-        init {
-            importStylesheet<ProseEditorTextAreaStyles>()
-        }
-    }
+) {
 
     init {
-        mention {
-            val transparentHighlight = Color.rgb(
-                (Styles.Blue.red * 255).toInt(),
-                (Styles.Blue.green * 255).toInt(),
-                (Styles.Blue.blue * 255).toInt(),
-                0.2,
-            )
-            unsafe("-rtfx-background-color", raw(transparentHighlight.css))
-            fill = Styles.Blue
-        }
-        problem {
-            val transparentHighlight = Color.rgb(
-                (Styles.Orange.red * 255).toInt(),
-                (Styles.Orange.green * 255).toInt(),
-                (Styles.Orange.blue * 255).toInt(),
-                0.2,
-            )
-            unsafe("-rtfx-background-color", raw(transparentHighlight.css))
-            fill = Styles.Orange
-        }
+        addClass(proseEditorTextArea)
     }
+    class Styles : Stylesheet()
+    {
 
+        companion object {
+
+            val proseEditorTextArea by cssclass()
+            val mention by cssclass()
+            val problem by cssclass()
+
+            init {
+                importStylesheet<Styles>()
+            }
+        }
+
+        init {
+            mention {
+                val transparentHighlight = Color.rgb(
+                    (SoyleStyles.Blue.red * 255).toInt(),
+                    (SoyleStyles.Blue.green * 255).toInt(),
+                    (SoyleStyles.Blue.blue * 255).toInt(),
+                    0.2,
+                )
+                unsafe("-rtfx-background-color", raw(transparentHighlight.css))
+                fill = SoyleStyles.Blue
+            }
+            problem {
+                val transparentHighlight = Color.rgb(
+                    (SoyleStyles.Orange.red * 255).toInt(),
+                    (SoyleStyles.Orange.green * 255).toInt(),
+                    (SoyleStyles.Orange.blue * 255).toInt(),
+                    0.2,
+                )
+                unsafe("-rtfx-background-color", raw(transparentHighlight.css))
+                fill = SoyleStyles.Orange
+            }
+        }
+
+    }
 }
+
+
 
 class ContentElementOps : TextOps<ContentElement, Collection<String>> {
     override fun length(seg: ContentElement?): Int = seg!!.text.length ?: 0

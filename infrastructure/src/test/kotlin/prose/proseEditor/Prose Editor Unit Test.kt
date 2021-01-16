@@ -1,7 +1,6 @@
 package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.common.*
-import com.soyle.stories.common.EntityId.Companion.asIdOf
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorAssertions
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorAssertions.Companion.assertThat
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver
@@ -10,10 +9,7 @@ import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Compan
 import com.soyle.stories.desktop.view.type
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.entities.ProseMentionRange
+import com.soyle.stories.entities.*
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.soylestories.ApplicationScope
@@ -39,7 +35,9 @@ import kotlin.reflect.KFunction
 class `Prose Editor Unit Test` : ApplicationTest() {
 
     private val scope =
-        ProseEditorScope(ProjectScope(ApplicationScope(), ProjectFileViewModel(UUID.randomUUID(), "", "")), Prose.Id()) { _, _ ->
+        ProseEditorScope(ProjectScope(ApplicationScope(), ProjectFileViewModel(UUID.randomUUID(), "", "")), Prose.Id(), { _, _ ->
+
+        }) {
 
         }
     private val proseEditorView: ProseEditorView
@@ -72,8 +70,12 @@ class `Prose Editor Unit Test` : ApplicationTest() {
             )
         }
 
-        override fun selectStoryElement(filteredListIndex: Int) {
+        override fun selectStoryElement(filteredListIndex: Int, andUseElement: Boolean) {
             _callLog[ProseEditorViewListener::selectStoryElement] = mapOf("filteredListIndex" to filteredListIndex)
+        }
+
+        override fun clearAllMentionsOfEntity(entityId: MentionedEntityId<*>) {
+            _callLog[ProseEditorViewListener::clearAllMentionsOfEntity] = mapOf("entityId" to entityId)
         }
 
         override fun save() {
@@ -85,8 +87,8 @@ class `Prose Editor Unit Test` : ApplicationTest() {
     inner class `When Content is Updated` {
 
         private val mentions = listOf(
-            ProseMention(EntityId.of(Prose.create().prose), ProseMentionRange(4, 7)),
-            ProseMention(EntityId.of(Prose.create().prose), ProseMentionRange(18, 6))
+            ProseMention(Character.Id().mentioned(), ProseMentionRange(4, 7)),
+            ProseMention(Character.Id().mentioned(), ProseMentionRange(18, 6))
         )
 
         @Test
@@ -132,8 +134,8 @@ class `Prose Editor Unit Test` : ApplicationTest() {
     inner class `When Mentions are Updated` {
 
         private val mentions = listOf(
-            ProseMention(EntityId.of(Prose.create().prose), ProseMentionRange(4, 7)),
-            ProseMention(EntityId.of(Prose.create().prose), ProseMentionRange(18, 6))
+            ProseMention(Character.Id().mentioned(), ProseMentionRange(4, 7)),
+            ProseMention(Character.Id().mentioned(), ProseMentionRange(18, 6))
         )
 
         @Test
@@ -266,7 +268,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
                     false,
                     listOf(
                         BasicText("I'm content"),
-                        Mention("content", characterId.asIdOf(Character::class)),
+                        Mention("content", characterId.mentioned()),
                         BasicText(" to be texted")
                     ),
                     NoQuery
@@ -305,7 +307,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
             assertEquals(
                 listOf(
                     BasicText("I'm content that is short "),
-                    Mention("content", characterId.asIdOf(Character::class)),
+                    Mention("content", characterId.mentioned()),
                     BasicText(" to be texted")
                 ),
                 scope.get<ProseEditorState>().content.toList()
@@ -322,7 +324,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
             scope.get<ProseEditorState>().update {
                 ProseEditorViewModel(0L, false, listOf(
                     BasicText("I'm on one side of "),
-                    Mention("Frank", Character.Id().asIdOf(Character::class)),
+                    Mention("Frank", Character.Id().mentioned()),
                     BasicText(" and I'm on the other"),
                 ), NoQuery)
             }
@@ -567,7 +569,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
             scope.get<ProseEditorState>().update {
                 ProseEditorViewModel(0L, false, listOf(
                     BasicText("I'm on one side of "),
-                    Mention("Frank", frankId.asIdOf(Character::class)),
+                    Mention("Frank", frankId.mentioned()),
                     BasicText(" and I'm on the other"),
                 ), NoQuery)
             }
@@ -589,7 +591,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
                 assertEquals(
                     listOf(
                         BasicText("I'm on one side of the character "),
-                        Mention("Frank", frankId.asIdOf(Character::class)),
+                        Mention("Frank", frankId.mentioned()),
                         BasicText(" and I'm on the other"),
                     ),
                     proseEditorView.driver().textArea.paragraphs.flatMap { it.segments }
@@ -608,7 +610,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
                 assertEquals(
                     listOf(
                         BasicText("I'm on one side of "),
-                        Mention("Frank", frankId.asIdOf(Character::class)),
+                        Mention("Frank", frankId.mentioned()),
                         BasicText(" and my dog and I'm on the other"),
                     ),
                     proseEditorView.driver().textArea.paragraphs.flatMap { it.segments }
@@ -784,9 +786,9 @@ class `Prose Editor Unit Test` : ApplicationTest() {
                 scope.get<ProseEditorState>().updateOrInvalidated {
                     copy(
                         mentionQueryState = MentionQueryLoaded("b", "b", 9, listOf(), listOf(
-                            MatchingStoryElementViewModel(countLines("Bob") as SingleLine, 0..1, "character", Character.Id().asIdOf(Character::class)),
-                            MatchingStoryElementViewModel(countLines("Billy") as SingleLine, 0..1, "character", Character.Id().asIdOf(Character::class)),
-                            MatchingStoryElementViewModel(countLines("Boyd") as SingleLine, 0..1, "character", Character.Id().asIdOf(Character::class))
+                            MatchingStoryElementViewModel(countLines("Bob") as SingleLine, 0..1, "character", Character.Id().mentioned()),
+                            MatchingStoryElementViewModel(countLines("Billy") as SingleLine, 0..1, "character", Character.Id().mentioned()),
+                            MatchingStoryElementViewModel(countLines("Boyd") as SingleLine, 0..1, "character", Character.Id().mentioned())
                         ))
                     )
                 }
@@ -827,7 +829,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         scope.get<ProseEditorState>().update {
             ProseEditorViewModel(0L, false, listOf(
                 BasicText("I'm on one side of "),
-                Mention("Frank", Character.Id().asIdOf(Character::class)),
+                Mention("Frank", Character.Id().mentioned()),
                 BasicText(" and I'm on the other"),
             ), NoQuery)
         }
@@ -861,7 +863,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
 
     private fun storyElement(name: String): MatchingStoryElementViewModel
     {
-        return MatchingStoryElementViewModel(countLines(name) as SingleLine, 0..1, "test", EntityId.of(Character::class).id(Character.Id()))
+        return MatchingStoryElementViewModel(countLines(name) as SingleLine, 0..1, "test", Character.Id().mentioned())
     }
 
 }

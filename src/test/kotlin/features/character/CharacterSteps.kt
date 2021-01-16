@@ -10,9 +10,11 @@ import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.character.characterList.CharacterListAssertions
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Theme
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.*
+import java.util.*
 
 class CharacterSteps : En {
 
@@ -57,6 +59,24 @@ class CharacterSteps : En {
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenCharacterRemoved(character)
         }
+        Given("I have created a character arc for the {character} in the {theme}") { character: Character, theme: Theme ->
+            ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .givenCharacterIsIncludedInTheme(character.id, theme.id)
+        }
+        Given(
+            "I have created the following character arcs for the {character}"
+        ) { character: Character, dataTable: DataTable ->
+            val driver = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+            dataTable.asList().forEach {
+                driver.givenCharacterHasAnArcNamed(character, it)
+            }
+        }
+        Given("I have created {int} character arcs for the {character}") { arcCount: Int, character: Character ->
+            val driver = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+            repeat(arcCount) {
+                driver.givenCharacterHasAnArcNamed(character, UUID.randomUUID().toString())
+            }
+        }
     }
 
     private fun whens() {
@@ -74,6 +94,18 @@ class CharacterSteps : En {
     }
 
     private fun thens() {
+        Then(
+            "the {character}'s character arc for the {theme} should have been renamed to {string}"
+        ) { character: Character, theme: Theme, expectedName: String ->
+            val workBench = soyleStories.getAnyOpenWorkbenchOrError()
+            val arc = CharacterDriver(workBench)
+                .getCharacterArcByCharacterAndTheme(character, theme)!!
+            assertEquals(expectedName, arc.name)
+
+            CharacterListAssertions.assertThat(workBench.givenCharacterListToolHasBeenOpened()) {
+                characterArcHasName(character.id, theme.id, arc.id, expectedName)
+            }
+        }
         Then(
             "all the character arcs in the theme originally named {string} should have been renamed to {string}"
         ) { originalThemeName: String, expectedArcName: String ->
