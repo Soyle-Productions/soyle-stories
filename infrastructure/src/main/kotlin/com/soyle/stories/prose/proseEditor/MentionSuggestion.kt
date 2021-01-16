@@ -2,6 +2,7 @@ package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.di.get
 import javafx.scene.Parent
+import javafx.scene.text.FontWeight
 import tornadofx.*
 
 class MentionSuggestion : ListCellFragment<MatchingStoryElementViewModel>() {
@@ -12,9 +13,11 @@ class MentionSuggestion : ListCellFragment<MatchingStoryElementViewModel>() {
 
     override val root: Parent = hbox {
         textflow {
-            text(namePartBeforeMatch)
-            text(namePartMatching)
-            text(namePartAfterMatch)
+            label(namePartBeforeMatch)
+            label(namePartMatching) {
+                style { fontWeight = FontWeight.BLACK }
+            }
+            label(namePartAfterMatch)
         }
         spacer()
         label(itemProperty.stringBinding { it?.type ?: "" })

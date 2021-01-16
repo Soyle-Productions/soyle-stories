@@ -204,7 +204,12 @@ val <T> ListView<T>.cells: LinkedHashSet<ListCell<T>>
 
 fun <T> ListView<T>.sizeToFitItems(maximumVisibleItems: Double = 11.5)
 {
-	val ROW_HEIGHT = (childrenUnmodifiable.firstOrNull() as? VirtualFlow<ListCell<T>>)?.firstVisibleCell?.height ?: return
+	val ROW_HEIGHT = (childrenUnmodifiable.firstOrNull() as? VirtualFlow<ListCell<T>>)?.firstVisibleCell?.height ?: 24.0
+	val currentPrefHeight = prefHeight
 	prefHeight = (items.size * ROW_HEIGHT) + 2.0
+	val currentMaxHeight = maxHeight
 	maxHeight = 2.0 + maximumVisibleItems * ROW_HEIGHT
+	if (prefHeight != currentPrefHeight || maxHeight != currentMaxHeight) {
+		requestLayout()
+	}
 }

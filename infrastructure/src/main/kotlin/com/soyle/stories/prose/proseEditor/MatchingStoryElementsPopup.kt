@@ -28,7 +28,7 @@ class MatchingStoryElementsPopup(
     }
 
     init {
-        content.add(root)
+        content.setAll(root)
         FX.applyStylesheetsTo(root.scene)
 
         itemList.setOnKeyPressed {
@@ -40,7 +40,9 @@ class MatchingStoryElementsPopup(
 
     private fun itemList(): ListView<MatchingStoryElementViewModel>
     {
-        return listview {
+        return ListView<MatchingStoryElementViewModel>().apply {
+            translateX = 1.0
+            translateY = 1.0
             cellFragment(scope, MentionSuggestion::class)
             whenMentionQueryStateIsLoaded {
                 items.setAll(it.prioritizedMatches)
