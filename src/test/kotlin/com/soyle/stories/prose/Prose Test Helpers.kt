@@ -1,19 +1,18 @@
 package com.soyle.stories.prose
 
-import com.soyle.stories.entities.MentionedEntityId
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.ProseMention
-import com.soyle.stories.entities.ProseMentionRange
+import com.soyle.stories.entities.*
 import org.junit.jupiter.api.Assertions.assertEquals
 
 fun makeProse(
     id: Prose.Id = Prose.Id(),
+    projectId: Project.Id = Project.Id(),
     content: String = "",
     mentions: List<ProseMention<*>> = listOf(),
     revision: Long = LongRange(0L, Long.MAX_VALUE).random()
 ): Prose {
     return Prose.build(
         id,
+        projectId,
         content,
         mentions,
         revision

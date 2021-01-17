@@ -7,6 +7,7 @@ import java.util.*
 
 class Prose private constructor(
     override val id: Id,
+    val projectId: Project.Id,
     val content: String,
     val mentions: List<ProseMention<*>>,
     val revision: Long,
@@ -15,11 +16,12 @@ class Prose private constructor(
 ) : Entity<Prose.Id> {
 
     companion object {
-        fun create(): ProseUpdate<ProseCreated> {
+        fun create(projectId: Project.Id): ProseUpdate<ProseCreated> {
             val newId = Id()
             val prose =
                 Prose(
                     newId,
+                    projectId,
                     "",
                     listOf(),
                     0L,
@@ -30,6 +32,7 @@ class Prose private constructor(
 
         fun build(
             id: Id,
+            projectId: Project.Id,
             content: String,
             mentions: List<ProseMention<*>>,
             revision: Long
@@ -43,6 +46,7 @@ class Prose private constructor(
             }
             return Prose(
                 id,
+                projectId,
                 content,
                 mentions,
                 revision,
@@ -60,7 +64,7 @@ class Prose private constructor(
     private fun copy(
         content: String = this.content,
         mentions: List<ProseMention<*>> = this.mentions
-    ) = Prose(id, content, mentions, revision = revision + 1L, defaultConstructorMarker = Unit)
+    ) = Prose(id, projectId, content, mentions, revision = revision + 1L, defaultConstructorMarker = Unit)
 
     fun withEntityMentioned(
         entityId: MentionedEntityId<*>,

@@ -20,7 +20,7 @@ class ProseUnitTest {
 
         @Test
         fun `content and mentions should be empty`() {
-            val (newProse, _) = Prose.create()
+            val (newProse, _) = Prose.create(Project.Id())
             assertTrue(newProse.content.isEmpty())
             assertTrue(newProse.mentions.isEmpty())
             newProse.revision.mustEqual(0L)

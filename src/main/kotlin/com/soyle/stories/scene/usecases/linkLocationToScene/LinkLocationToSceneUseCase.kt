@@ -33,8 +33,8 @@ class LinkLocationToSceneUseCase(
 	private suspend fun updateIfNeeded(scene: Scene, request: RequestModel)
 	{
 		if (
-		  (request.locationId != null && scene.locationId?.uuid != request.locationId) ||
-		  (request.locationId == null && scene.locationId != null)
+		  (request.locationId != null && scene.settings.firstOrNull()?.uuid != request.locationId) ||
+		  (request.locationId == null && scene.settings.firstOrNull() != null)
 		  ) {
 			update(scene, request)
 		}
@@ -46,7 +46,7 @@ class LinkLocationToSceneUseCase(
 			val location = getLocation(request.locationId)
 			scene.withLocationLinked(location.id)
 		} else {
-			scene.withoutLocation()
+			scene.settings.fold(scene) { newScene, locationId -> newScene.withoutLocation(locationId) }
 		}
 		sceneRepository.updateScene(update)
 	}

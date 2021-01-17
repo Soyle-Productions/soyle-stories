@@ -78,7 +78,7 @@ class LinkLocationToSceneUnitTest {
 
 	private fun givenSceneExists(hasLinkedLocation: Boolean = false)
 	{
-		sceneRepository.scenes[sceneId] = Scene(sceneId, Project.Id(), nonBlankStr(), StoryEvent.Id(), locationId.takeIf { hasLinkedLocation }, Prose.Id(), listOf())
+		sceneRepository.scenes[sceneId] = Scene(sceneId, Project.Id(), nonBlankStr(), StoryEvent.Id(), setOfNotNull(locationId.takeIf { hasLinkedLocation }), Prose.Id(), listOf())
 	}
 
 	private fun givenLocationExists()
@@ -116,8 +116,8 @@ class LinkLocationToSceneUnitTest {
 	private fun updatedScene(clearedLocation: Boolean = false): (Any?) -> Unit = { actual ->
 		actual as Scene
 		assertEquals(sceneId, actual.id)
-		if (clearedLocation) assertNull(actual.locationId)
-		else assertEquals(locationId, actual.locationId)
+		if (clearedLocation) assertNull(actual.settings.firstOrNull())
+		else assertEquals(locationId, actual.settings.firstOrNull())
 	}
 
 	private fun responseModel(clearedLocation: Boolean = false): (Any?) -> Unit = { actual ->

@@ -105,7 +105,7 @@ class CreateNewSceneUseCase(
 	}
 
 	private suspend fun createNewScene(storyEvent: StoryEvent, request: CreateNewScene.RequestModel): CreateNewScene.ResponseModel {
-		val (prose, proseCreated) = Prose.create()
+		val (prose, proseCreated) = Prose.create(projectId)
 		proseRepository.addProse(prose)
 		val scene = Scene(projectId, request.name, storyEvent.id, prose.id)
 		return insertScene(scene, request)
