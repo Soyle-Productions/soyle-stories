@@ -280,6 +280,15 @@ class SceneSteps : En {
                 .givenMentionIsBeingInvestigated(mentionText)
                 .clearAllMentionsOfEntity()
         }
+        When(
+            "I remove the {string} mention from the {scene}'s prose"
+        ) { mentionText: String, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+                .givenMentionIsBeingInvestigated(mentionText)
+                .removeMention()
+        }
     }
 
     private fun thens() {
@@ -595,6 +604,20 @@ class SceneSteps : En {
             }
         }
         Then(
+            "I should be able to remove the {string} mention from the {scene}'s prose"
+        ) { mentionText: String, scene: Scene ->
+
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    isShowingMentionIssueMenuForMention(mentionText)
+                    mentionIssueMenuHasOption("Remove this Mention of $mentionText and Remove the Text")
+                }
+            }
+        }
+        Then(
             "the {scene}'s prose should still contain text for {string}"
         ) { scene: Scene, expectedText: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
@@ -604,6 +627,19 @@ class SceneSteps : En {
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
                     containsContent(expectedText)
+                }
+            }
+        }
+        Then(
+            "the {scene}'s prose should not contain text for {string}"
+        ) { scene: Scene, expectedText: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            assertFalse(ProseDriver(workbench).getProseByIdOrError(scene.proseId).content.contains(expectedText))
+            val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    doesNotContainContent(expectedText)
                 }
             }
         }

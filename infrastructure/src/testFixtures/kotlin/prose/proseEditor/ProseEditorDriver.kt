@@ -83,5 +83,6 @@ class ProseEditorDriver(private val proseEditor: ProseEditorView) : FxRobot() {
     } == true
 
     fun ContextMenu.clearMentionOption(): MenuItem? = items.find { it.id == "clear-mention" }
+    fun ContextMenu.removeMentionOption(): MenuItem? = items.find { it.id == "remove-mention" }
 
 }

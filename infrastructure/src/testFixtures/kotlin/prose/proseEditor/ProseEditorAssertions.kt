@@ -23,6 +23,11 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
         assertTrue(driver.getContent().contains(expectedContent)) { "Prose editor content does not contain $expectedContent" }
     }
 
+    fun doesNotContainContent(unexpectedContent: String)
+    {
+        assertFalse(driver.getContent().contains(unexpectedContent)) { "Prose editor content contains \"$unexpectedContent\"" }
+    }
+
     fun hasMention(entityId: MentionedEntityId<*>, position: ProseMentionRange)
     {
         val mention = driver.getMentionAt(position.index, position.index + position.length)!!

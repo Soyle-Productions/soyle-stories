@@ -62,12 +62,40 @@ class ProseEditorController private constructor(
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
+    override fun clearMention(mention: Mention) {
+        val viewModel = view.viewModel ?: return
+        if (viewModel.isLocked) return
+        val content = viewModel.content.map {
+            if (it === mention) BasicText(it.text)
+            else it
+        }.collapseAdjacentBasicTexts()
+        updateProse(content)
+    }
+
     override fun clearAllMentionsOfEntity(entityId: MentionedEntityId<*>) {
         val viewModel = view.viewModel ?: return
         if (viewModel.isLocked) return
         val content = viewModel.content.map {
             if (it is Mention && it.entityId == entityId) BasicText(it.text)
             else it
+        }.collapseAdjacentBasicTexts()
+        updateProse(content)
+    }
+
+    override fun removeMention(mention: Mention) {
+        val viewModel = view.viewModel ?: return
+        if (viewModel.isLocked) return
+        val content = viewModel.content.filterNot {
+            it === mention
+        }.collapseAdjacentBasicTexts()
+        updateProse(content)
+    }
+
+    override fun removeAllMentionsOfEntity(entityId: MentionedEntityId<*>) {
+        val viewModel = view.viewModel ?: return
+        if (viewModel.isLocked) return
+        val content = viewModel.content.filterNot {
+            it is Mention && it.entityId == entityId
         }.collapseAdjacentBasicTexts()
         updateProse(content)
     }

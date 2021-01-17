@@ -201,3 +201,12 @@ fun SceneEditorView.clearAllMentionsOfEntity() {
         clearMentionOption.fire()
     }
 }
+
+fun SceneEditorView.removeMention() {
+    val removeMentionOption = with(driver().getProseEditor().driver()) {
+        mentionIssueMenu!!.removeMentionOption()!!
+    }
+    driver().interact {
+        removeMentionOption.fire()
+    }
+}

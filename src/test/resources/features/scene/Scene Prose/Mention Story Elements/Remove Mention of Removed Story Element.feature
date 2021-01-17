@@ -25,7 +25,7 @@ Feature: Remove Mention of Removed Story Element
     And I have removed the <element> <name> from the story
     And I am editing the "Big Battle" scene's prose
     And I am investigating the <name> mention in the "Big Battle" scene's prose
-    When I remove the <name> mention in the "Big Battle" scene's prose
+    When I remove the <name> mention from the "Big Battle" scene's prose
     Then the <name> mention should not be in the "Big Battle" scene's prose
     And the "Big Battle" scene's prose should not contain text for <name>
 

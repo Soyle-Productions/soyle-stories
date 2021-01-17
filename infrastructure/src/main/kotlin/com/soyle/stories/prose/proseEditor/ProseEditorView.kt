@@ -26,7 +26,10 @@ class ProseEditorView : Fragment() {
     private val mentionMenu = MatchingStoryElementsPopup(scope, state.mentionQueryState)
     private val mentionIssueMenu = ContextMenu()
     private fun mentionIssueItems(mention: Mention) = listOf(
-        clearMentionOption(mention)
+        clearMentionOption(mention),
+        clearAllMentionOption(mention),
+        removeMentionOption(mention),
+        removeAllMentionsOption(mention)
     )
 
     override val root = hbox {
@@ -76,7 +79,8 @@ class ProseEditorView : Fragment() {
                     mentionIssueMenu.items.setAll(mentionIssueItems(segment.first))
                     it.consume()
                     if (it.isKeyboardTrigger) {
-                        val screenPosition = getCharacterBoundsOnScreen(segment.second, segment.second + segment.first.text.length).get()
+                        val screenPosition =
+                            getCharacterBoundsOnScreen(segment.second, segment.second + segment.first.text.length).get()
                         mentionIssueMenu.show(this, screenPosition.minX, screenPosition.maxY)
                     } else {
                         mentionIssueMenu.show(this, it.screenX, it.screenY)
@@ -168,9 +172,34 @@ class ProseEditorView : Fragment() {
     }
 
     private fun clearMentionOption(mention: Mention): MenuItem {
+        return MenuItem("Clear this Mention of ${mention.text} and Use Normal Text").apply {
+            id = "clear-mention"
+            action { viewListener.clearMention(mention) }
+        }
+    }
+
+    private fun clearAllMentionOption(mention: Mention): MenuItem {
         return MenuItem("Clear all Mentions of ${mention.text} and Use Normal Text").apply {
             id = "clear-mention"
             action { viewListener.clearAllMentionsOfEntity(mention.entityId) }
+        }
+    }
+
+    private fun removeMentionOption(mention: Mention): MenuItem {
+        return MenuItem("Remove this Mention of ${mention.text} and Remove the Text").apply {
+            id = "remove-mention"
+            action {
+                viewListener.removeMention(mention)
+            }
+        }
+    }
+
+    private fun removeAllMentionsOption(mention: Mention): MenuItem {
+        return MenuItem("Remove all Mentions of ${mention.text} and Remove the Text").apply {
+            id = "remove-mention"
+            action {
+                viewListener.removeAllMentionsOfEntity(mention.entityId)
+            }
         }
     }
 
