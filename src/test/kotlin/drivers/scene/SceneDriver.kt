@@ -12,6 +12,7 @@ import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
+import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import kotlinx.coroutines.runBlocking
@@ -91,9 +92,19 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
         )
     }
 
+    fun givenLocationUsedInScene(scene: Scene, location: Location)
+    {
+        if (! scene.settings.contains(location.id)) useLocationInScene(scene, location)
+    }
+
+    fun useLocationInScene(scene: Scene, location: Location)
+    {
+        projectScope.get<LinkLocationToSceneController>().linkLocationToScene(scene.id.uuid.toString(), location.id.uuid.toString())
+    }
+
     fun givenSceneHasProse(scene: Scene, proseParagraphs: List<String>) {
         val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
-        ProseEditorScope(projectScope, prose.id, { _, _ -> }) {}
+        ProseEditorScope(projectScope, prose.id, { _, _ -> }, {}) { _, _ -> }
             .get<EditProseController>()
             .updateProse(scene.proseId, listOf(ProseContent(proseParagraphs.joinToString("\n"), null)))
     }

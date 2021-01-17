@@ -5,7 +5,6 @@ import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePer
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
-import kotlin.concurrent.thread
 
 class BuildNewCharacterControllerImpl(
     projectId: String,

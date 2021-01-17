@@ -9,6 +9,7 @@ class ProseEditorState : Model<ProseEditorScope, ProseEditorViewModel>(ProseEdit
     val content = bind(ProseEditorViewModel::content)
     val mentionQueryState = bind(ProseEditorViewModel::mentionQueryState)
     val isLocked = bind(ProseEditorViewModel::isLocked)
+    val replacementOptions = bind(ProseEditorViewModel::replacementOptions)
 
     override fun viewModel(): ProseEditorViewModel? {
         return item?.copy(content = content.value)

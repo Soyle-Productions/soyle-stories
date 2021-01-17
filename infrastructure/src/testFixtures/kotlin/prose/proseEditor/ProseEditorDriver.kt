@@ -4,6 +4,7 @@ import com.soyle.stories.prose.proseEditor.*
 import javafx.geometry.Point2D
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListView
+import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.stage.Popup
 import org.testfx.api.FxRobot
@@ -84,5 +85,6 @@ class ProseEditorDriver(private val proseEditor: ProseEditorView) : FxRobot() {
 
     fun ContextMenu.clearMentionOption(): MenuItem? = items.find { it.id == "clear-mention" }
     fun ContextMenu.removeMentionOption(): MenuItem? = items.find { it.id == "remove-mention" }
+    fun ContextMenu.replacementOption(): Menu? = items.find { it.id == "replace-mention" } as? Menu
 
 }

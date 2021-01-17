@@ -25,7 +25,8 @@ object Presentation {
                     projectScope.get(),
                     get(),
                     onLoadMentionQuery,
-                    onUseStoryElement
+                    onUseStoryElement,
+                    onLoadMentionReplacements
                 ).also {
                     it listensTo projectScope.get<ContentReplacedNotifier>()
                     it listensTo projectScope.get<MentionTextReplacedNotifier>()

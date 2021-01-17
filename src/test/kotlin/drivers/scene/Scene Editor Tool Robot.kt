@@ -1,5 +1,8 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
+import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
+import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialogOrError
+import com.soyle.stories.desktop.config.drivers.location.getCreateLocationDialogOrError
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.drive
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.driver
@@ -7,6 +10,7 @@ import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorDriver.Compan
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListDriver
 import com.soyle.stories.desktop.view.type
 import com.soyle.stories.entities.Scene
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.proseEditor.ContentElement
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
@@ -209,4 +213,36 @@ fun SceneEditorView.removeMention() {
     driver().interact {
         removeMentionOption.fire()
     }
+}
+
+fun SceneEditorView.selectReplacementSuggestion(suggestionText: String)
+{
+    val replacementOption = with(driver().getProseEditor().driver()) {
+        mentionIssueMenu!!.replacementOption()!!
+    }
+    driver().interact {
+        replacementOption.items.find { it.text == suggestionText }!!.fire()
+    }
+}
+
+fun SceneEditorView.givenReplacingInvestigatedMentionWithNewCharacter(): CreateCharacterDialog
+{
+    val replacementOption = with(driver().getProseEditor().driver()) {
+        mentionIssueMenu!!.replacementOption()!!
+    }
+    driver().interact {
+        replacementOption.items.first().fire()
+    }
+    return getCreateCharacterDialogOrError()
+}
+
+fun SceneEditorView.givenReplacingInvestigatedMentionWithNewLocation(): CreateLocationDialog
+{
+    val replacementOption = with(driver().getProseEditor().driver()) {
+        mentionIssueMenu!!.replacementOption()!!
+    }
+    driver().interact {
+        replacementOption.items.first().fire()
+    }
+    return getCreateLocationDialogOrError()
 }

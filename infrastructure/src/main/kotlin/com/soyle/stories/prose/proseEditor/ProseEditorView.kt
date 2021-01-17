@@ -1,11 +1,15 @@
 package com.soyle.stories.prose.proseEditor
 
+import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
+import com.soyle.stories.entities.*
+import com.soyle.stories.location.createLocationDialog.createLocationDialog
 import com.soyle.stories.prose.proseEditor.ProseEditorTextArea.Styles.Companion.proseEditorTextArea
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
+import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCombination
@@ -19,6 +23,8 @@ import java.util.*
 
 class ProseEditorView : Fragment() {
 
+    override val scope: ProseEditorScope = super.scope as ProseEditorScope
+
     private val viewListener = resolve<ProseEditorViewListener>()
     private val state = resolve<ProseEditorState>()
 
@@ -30,7 +36,7 @@ class ProseEditorView : Fragment() {
         clearAllMentionOption(mention),
         removeMentionOption(mention),
         removeAllMentionsOption(mention)
-    )
+    ) + replaceMentionOptions(mention)
 
     override val root = hbox {
         addClass(Styles.proseEditor)
@@ -180,7 +186,7 @@ class ProseEditorView : Fragment() {
 
     private fun clearAllMentionOption(mention: Mention): MenuItem {
         return MenuItem("Clear all Mentions of ${mention.text} and Use Normal Text").apply {
-            id = "clear-mention"
+            id = "clear-mentions"
             action { viewListener.clearAllMentionsOfEntity(mention.entityId) }
         }
     }
@@ -196,9 +202,112 @@ class ProseEditorView : Fragment() {
 
     private fun removeAllMentionsOption(mention: Mention): MenuItem {
         return MenuItem("Remove all Mentions of ${mention.text} and Remove the Text").apply {
-            id = "remove-mention"
+            id = "remove-mentions"
             action {
                 viewListener.removeAllMentionsOfEntity(mention.entityId)
+            }
+        }
+    }
+
+    private fun replaceMentionOptions(mention: Mention): List<MenuItem> {
+        val items = listOf(
+            replaceMentionOption(mention),
+            replaceAllMentionsOption(mention)
+        )
+        viewListener.getMentionReplacementOptions(mention)
+        return items
+    }
+
+    private fun replaceMentionOption(mention: Mention): MenuItem {
+        return Menu("Replace this Mention of ${mention.text} with...").apply {
+            id = "replace-mention"
+            state.replacementOptions.onChangeOnce {
+                if (it == null) return@onChangeOnce
+                val creationOption = when (mention.entityId) {
+                    is MentionedCharacterId -> MenuItem("Create New Character").apply {
+                        action {
+                            createCharacterDialog(scope.projectScope, onCharacterCreated = {
+                                viewListener.replaceMention(
+                                    mention,
+                                    ReplacementElementViewModel(
+                                        it.characterName,
+                                        Character.Id(it.characterId).mentioned()
+                                    )
+                                )
+                            })
+                        }
+                    }
+                    is MentionedLocationId -> MenuItem("Create New Location").apply {
+                        action {
+                            createLocationDialog(scope.projectScope, onCreateLocation = {
+                                viewListener.replaceMention(
+                                    mention,
+                                    ReplacementElementViewModel(
+                                        it.locationName,
+                                        Location.Id(it.locationId).mentioned()
+                                    )
+                                )
+                            })
+                        }
+                    }
+                }
+                items.setAll(
+                    *(listOf(creationOption) + state.replacementOptions.map {
+                        MenuItem(it.name).apply {
+                            action { viewListener.replaceMention(mention, it) }
+                        }
+                    }).toTypedArray()
+                )
+            }
+            item("Loading Replacement Options...") {
+                graphic = progressindicator()
+            }
+        }
+    }
+
+    private fun replaceAllMentionsOption(mention: Mention): MenuItem {
+        return Menu("Replace all Mentions of ${mention.text} with...").apply {
+            id = "replace-mentions"
+            state.replacementOptions.onChangeOnce {
+                if (it == null) return@onChangeOnce
+                val creationOption = when (mention.entityId) {
+                    is MentionedCharacterId -> MenuItem("Create New Character").apply {
+                        action {
+                            createCharacterDialog(scope.projectScope, onCharacterCreated = {
+                                viewListener.replaceAllMentionsOfEntity(
+                                    mention.entityId,
+                                    ReplacementElementViewModel(
+                                        it.characterName,
+                                        Character.Id(it.characterId).mentioned()
+                                    )
+                                )
+                            })
+                        }
+                    }
+                    is MentionedLocationId -> MenuItem("Create New Location").apply {
+                        action {
+                            createLocationDialog(scope.projectScope, onCreateLocation = {
+                                viewListener.replaceAllMentionsOfEntity(
+                                    mention.entityId,
+                                    ReplacementElementViewModel(
+                                        it.locationName,
+                                        Location.Id(it.locationId).mentioned()
+                                    )
+                                )
+                            })
+                        }
+                    }
+                }
+                items.setAll(
+                    *(listOf(creationOption) + state.replacementOptions.map {
+                        MenuItem(it.name).apply {
+                            action { viewListener.replaceAllMentionsOfEntity(mention.entityId, it) }
+                        }
+                    }).toTypedArray()
+                )
+            }
+            item("Loading Replacement Options...") {
+                graphic = progressindicator()
             }
         }
     }

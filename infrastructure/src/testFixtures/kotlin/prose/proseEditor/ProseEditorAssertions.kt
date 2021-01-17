@@ -85,6 +85,27 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
         assertNotNull(driver.mentionIssueMenu!!.items.find { it.text == expectedOption })
     }
 
+    fun mentionIssueReplacementMenuHasOption(expectedOption: String)
+    {
+        assertNotNull(with(driver) {
+            mentionIssueMenu!!.replacementOption()!!.items.find { it.text == expectedOption }
+        })
+    }
+
+    fun doesNotHaveAnyReplacementMentionElementsListed()
+    {
+        assertTrue(with(driver) {
+            mentionIssueMenu?.replacementOption()
+        }?.items?.drop(1)?.isEmpty() != false)
+    }
+
+    fun isListingAllReplacementOptionsInOrder(expectedLabels: List<String>)
+    {
+        assertEquals(expectedLabels, with(driver) {
+            mentionIssueMenu?.replacementOption()
+        }?.items?.drop(1)?.map { it.text })
+    }
+
     class MentionSuggestionAssertions internal constructor() {
 
 

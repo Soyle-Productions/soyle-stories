@@ -95,6 +95,12 @@ class CharacterSteps : En {
 
     private fun thens() {
         Then(
+            "a character named {string} should have been created"
+        ) { name: String ->
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .getCharacterByNameOrError(name)
+        }
+        Then(
             "the {character}'s character arc for the {theme} should have been renamed to {string}"
         ) { character: Character, theme: Theme, expectedName: String ->
             val workBench = soyleStories.getAnyOpenWorkbenchOrError()

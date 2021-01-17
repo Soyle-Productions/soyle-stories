@@ -13,10 +13,12 @@ import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
 import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.prose.usecases.readProse.ReadProse
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 
 class ProseEditorPresenter internal constructor(
     private val view: View.Nullable<ProseEditorViewModel>
-) : ReadProse.OutputPort, OnLoadMentionQueryOutput, ContentReplacedReceiver, MentionTextReplacedReceiver, DetectInvalidatedMentions.OutputPort {
+) : ReadProse.OutputPort, OnLoadMentionQueryOutput, ContentReplacedReceiver, MentionTextReplacedReceiver,
+    DetectInvalidatedMentions.OutputPort, OnLoadMentionReplacementsOutput {
 
     @Synchronized
     override suspend fun receiveProse(response: ReadProse.ResponseModel) {
@@ -25,7 +27,8 @@ class ProseEditorPresenter internal constructor(
                 versionNumber = response.revision,
                 isLocked = false,
                 breakBodyIntoContentElements(response.body, response.mentions),
-                mentionQueryState = NoQuery
+                mentionQueryState = NoQuery,
+                replacementOptions = null
             )
         }
     }
@@ -106,8 +109,17 @@ class ProseEditorPresenter internal constructor(
                     if (it is Mention) {
                         if (it.entityId in removedEntityIds) it.copy(issue = "Removed")
                         else it.copy(issue = null)
-                    }
-                    else it
+                    } else it
+                }
+            )
+        }
+    }
+
+    override fun loadedReplacements(replacements: List<ListOptionsToReplaceMentionInSceneProse.MentionOption<*>>) {
+        view.updateOrInvalidated {
+            copy(
+                replacementOptions = replacements.map {
+                    ReplacementElementViewModel(it.name, it.entityId)
                 }
             )
         }
@@ -149,7 +161,7 @@ class ProseEditorPresenter internal constructor(
             var offset = 0
             copy(
                 content = content.flatMap { element ->
-                    if (range.intersect(offset .. offset+element.text.length).isNotEmpty()) {
+                    if (range.intersect(offset..offset + element.text.length).isNotEmpty()) {
                         listOfNotNull(
                             BasicText(element.text.substring(0 until range.first - offset)).takeUnless { it.text.isEmpty() },
                             newElement,

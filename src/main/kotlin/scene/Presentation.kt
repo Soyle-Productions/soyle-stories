@@ -243,6 +243,7 @@ object Presentation {
                     sceneId,
                     projectScope.get(),
                     projectScope.get(),
+                    projectScope.get(),
                     projectScope.get()
                 )
             }

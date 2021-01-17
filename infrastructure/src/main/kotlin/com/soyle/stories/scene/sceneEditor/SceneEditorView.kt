@@ -22,7 +22,8 @@ class SceneEditorView : View() {
             scope.projectScope,
             scope.type.proseId,
             viewListener::loadMentionSuggestionsForScene,
-            viewListener::useProseMentionInScene
+            viewListener::useProseMentionInScene,
+            viewListener::loadMentionReplacements
         ).get<ProseEditorView>()
         add(proseEditor)
         proseEditor.root.hgrow = Priority.ALWAYS

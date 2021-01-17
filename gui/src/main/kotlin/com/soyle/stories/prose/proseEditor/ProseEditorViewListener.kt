@@ -14,4 +14,7 @@ interface ProseEditorViewListener {
     fun clearAllMentionsOfEntity(entityId: MentionedEntityId<*>)
     fun removeMention(mention: Mention)
     fun removeAllMentionsOfEntity(entityId: MentionedEntityId<*>)
+    fun getMentionReplacementOptions(mention: Mention)
+    fun replaceMention(mention: Mention, element: ReplacementElementViewModel)
+    fun replaceAllMentionsOfEntity(entityId: MentionedEntityId<*>, element: ReplacementElementViewModel)
 }

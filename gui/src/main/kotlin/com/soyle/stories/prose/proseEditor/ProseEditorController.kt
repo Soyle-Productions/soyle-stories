@@ -19,8 +19,12 @@ import com.soyle.stories.prose.readProse.ReadProseController
 import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.prose.usecases.readProse.ReadProse
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 
 fun interface OnLoadMentionQueryOutput : (List<GetStoryElementsToMentionInScene.MatchingStoryElement>) -> Unit
+fun interface OnLoadMentionReplacementsOutput {
+    fun loadedReplacements(replacements: List<ListOptionsToReplaceMentionInSceneProse.MentionOption<*>>)
+}
 
 class ProseEditorController private constructor(
     private val proseId: Prose.Id,
@@ -30,6 +34,7 @@ class ProseEditorController private constructor(
     private val editProseController: EditProseController,
     private val onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit,
     private val onUseStoryElement: (ProseMention<*>) -> Unit,
+    private val onLoadMentionReplacements: (MentionedEntityId<*>, OnLoadMentionReplacementsOutput) -> Unit,
     private val presenter: ProseEditorPresenter
 ) : ReadProse.OutputPort, ProseEditorViewListener, ContentReplacedReceiver, MentionTextReplacedReceiver,
     DetectInvalidatedMentions.OutputPort, RemovedCharacterReceiver, DeletedLocationReceiver {
@@ -42,6 +47,7 @@ class ProseEditorController private constructor(
         editProseController: EditProseController,
         onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit,
         onUseStoryElement: (ProseMention<*>) -> Unit,
+        onLoadMentionReplacements: (MentionedEntityId<*>, OnLoadMentionReplacementsOutput) -> Unit,
     ) : this(
         proseId,
         view,
@@ -50,6 +56,7 @@ class ProseEditorController private constructor(
         editProseController,
         onLoadMentionQuery,
         onUseStoryElement,
+        onLoadMentionReplacements,
         ProseEditorPresenter(view)
     )
 
@@ -96,6 +103,30 @@ class ProseEditorController private constructor(
         if (viewModel.isLocked) return
         val content = viewModel.content.filterNot {
             it is Mention && it.entityId == entityId
+        }.collapseAdjacentBasicTexts()
+        updateProse(content)
+    }
+
+    override fun getMentionReplacementOptions(mention: Mention) {
+        onLoadMentionReplacements.invoke(mention.entityId, presenter)
+    }
+
+    override fun replaceMention(mention: Mention, element: ReplacementElementViewModel) {
+        val viewModel = view.viewModel ?: return
+        if (viewModel.isLocked) return
+        val content = viewModel.content.map {
+            if (it === mention) it.copy(element.name, element.id)
+            else it
+        }.collapseAdjacentBasicTexts()
+        updateProse(content)
+    }
+
+    override fun replaceAllMentionsOfEntity(entityId: MentionedEntityId<*>, element: ReplacementElementViewModel) {
+        val viewModel = view.viewModel ?: return
+        if (viewModel.isLocked) return
+        val content = viewModel.content.map {
+            if (it is Mention && it.entityId == entityId) it.copy(element.name, element.id)
+            else it
         }.collapseAdjacentBasicTexts()
         updateProse(content)
     }

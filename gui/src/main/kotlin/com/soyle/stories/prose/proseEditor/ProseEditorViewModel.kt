@@ -8,7 +8,8 @@ data class ProseEditorViewModel(
     val versionNumber: Long,
     val isLocked: Boolean,
     val content: List<ContentElement>,
-    val mentionQueryState: MentionQueryState
+    val mentionQueryState: MentionQueryState,
+    val replacementOptions: List<ReplacementElementViewModel>?
 )
 
 sealed class ContentElement {
@@ -37,3 +38,5 @@ class MentionQueryLoaded(
 ) : MentionQueryState(), TriggeredQuery
 
 data class MatchingStoryElementViewModel(val name: SingleLine, val matchingRange: IntRange, val type: String, val id: MentionedEntityId<*>)
+
+data class ReplacementElementViewModel(val name: String, val id: MentionedEntityId<*>)

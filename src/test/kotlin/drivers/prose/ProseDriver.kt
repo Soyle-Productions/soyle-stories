@@ -25,7 +25,7 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
     }
 
     fun givenProseMentionsEntity(prose: Prose, entityId: MentionedEntityId<*>, index: Int, length: Int) {
-        val scope = ProseEditorScope(projectScope, prose.id, { _, _ -> }) {}.apply {
+        val scope = ProseEditorScope(projectScope, prose.id, { _, _ -> }, {}) { _, _ -> }.apply {
             get<ProseEditorState>().versionNumber.set(prose.revision)
         }
         val controller = scope.get<EditProseController>()

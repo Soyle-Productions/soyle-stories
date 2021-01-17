@@ -65,7 +65,9 @@ class `Location Steps` : En {
     }
 
     private fun thens() {
-
+        Then("a location named {string} should have been created") { expectedName: String ->
+            LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByNameOrError(expectedName)
+        }
     }
 
 }
