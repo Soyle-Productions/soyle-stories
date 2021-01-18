@@ -1,6 +1,6 @@
 package com.soyle.stories.common
 
-class NonBlankString private constructor(val value: String) {
+class NonBlankString private constructor(val value: String) : Comparable<NonBlankString>, CharSequence by value {
 
     operator fun component1() = value
 
@@ -10,6 +10,8 @@ class NonBlankString private constructor(val value: String) {
             return NonBlankString(value)
         }
     }
+
+    override fun compareTo(other: NonBlankString): Int = value.compareTo(other.value)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -24,4 +26,54 @@ class NonBlankString private constructor(val value: String) {
 
     override fun hashCode(): Int = value.hashCode()
     override fun toString(): String = value
+}
+class SingleNonBlankLine private constructor(val value: String) : Comparable<SingleNonBlankLine>, CharSequence by value {
+    companion object {
+        fun create(value: SingleLine): SingleNonBlankLine?
+        {
+            return NonBlankString.create(value.toString())?.let {
+                SingleNonBlankLine(it.toString())
+            }
+        }
+    }
+    operator fun component1() = value
+    override fun compareTo(other: SingleNonBlankLine): Int = value.compareTo(other.value)
+    override fun equals(other: Any?): Boolean = (other as? SingleNonBlankLine)?.value == value
+    override fun hashCode(): Int = value.hashCode()
+    override fun toString(): String = value
+}
+
+const val anyNewlinePattern = "\\r\\n|\\r|\\n"
+val anyNewLineCharacter = Regex(anyNewlinePattern)
+
+sealed class StringLineCount
+
+/**
+ * @return [MultiLine] if [value] contains a newline character, and [SingleLine] otherwise
+ */
+fun countLines(value: String): StringLineCount {
+    if (value.isEmpty()) return SingleLine(value)
+    if (value.contains(Regex(anyNewlinePattern))) return MultiLine(value)
+    return SingleLine(value)
+}
+
+class SingleLine internal constructor(protected val value: String) : Comparable<SingleLine>, CharSequence by value,
+    StringLineCount() {
+    override fun equals(other: Any?): Boolean = (other as? CharSequence)?.equals(value) ?: false
+    override fun toString(): String = value
+    override fun compareTo(other: SingleLine): Int = value.compareTo(other.value)
+    operator fun compareTo(other: String): Int = value.compareTo(other)
+    override fun hashCode(): Int = value.hashCode()
+}
+
+class MultiLine internal constructor(private val value: String) :
+    Comparable<MultiLine>,
+    CharSequence by value,
+    StringLineCount()
+{
+    override fun compareTo(other: MultiLine): Int = value.compareTo(other.value)
+    operator fun compareTo(other: String): Int = value.compareTo(other)
+    val lines: List<String> by lazy {
+        value.split(Regex(anyNewlinePattern))
+    }
 }

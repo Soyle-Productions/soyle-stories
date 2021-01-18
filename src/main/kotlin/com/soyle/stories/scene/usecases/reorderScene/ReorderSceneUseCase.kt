@@ -81,10 +81,11 @@ class ReorderSceneUseCase(
 
 	private suspend fun createResponse(scene: Scene, oldIndex: Int, updatedIds: List<IndexedValue<Scene.Id>>): ReorderScene.ResponseModel {
 		val items = updatedIds.associate {
-			it.value to SceneItem(it.value.uuid, sceneRepository.getSceneById(it.value)!!.name.value, it.index)
+			val backingScene = sceneRepository.getSceneById(it.value)!!
+			it.value to SceneItem(it.value.uuid, backingScene.proseId, backingScene.name.value, it.index)
 		}
 		return ReorderScene.ResponseModel(
-		  items[scene.id] ?: SceneItem(scene.id.uuid, scene.name.value, oldIndex),
+		  items[scene.id] ?: SceneItem(scene.id.uuid, scene.proseId, scene.name.value, oldIndex),
 		  oldIndex,
 		  items.values.filterNot { it.id == scene.id.uuid })
 	}

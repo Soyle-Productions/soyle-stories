@@ -2,8 +2,6 @@ package com.soyle.stories.entities
 
 import com.soyle.stories.common.Entity
 import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.common.ValidationException
-import com.soyle.stories.entities.theme.ThematicTemplate
 import java.util.*
 
 /**
@@ -28,9 +26,13 @@ class Character(
 
 	fun withName(name: NonBlankString): Character = copy(name = name)
 
-	data class Id(val uuid: UUID = UUID.randomUUID())
+	data class Id(val uuid: UUID = UUID.randomUUID()) {
+		override fun toString(): String = "Character($uuid)"
+	}
 
 	companion object {
 		fun buildNewCharacter(projectId: Project.Id, name: NonBlankString): Character = Character(projectId, name)
 	}
 }
+
+class CharacterRenamed(val characterId: Character.Id, val newName: String)

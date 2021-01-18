@@ -1,15 +1,19 @@
 package com.soyle.stories.location.usecases.renameLocation
 
-import com.soyle.stories.location.LocationException
-import java.util.*
+import com.soyle.stories.common.SingleNonBlankLine
+import com.soyle.stories.entities.Location
+import com.soyle.stories.entities.LocationRenamed
+import com.soyle.stories.prose.MentionTextReplaced
 
 interface RenameLocation {
-	suspend operator fun invoke(id: UUID, name: String, output: OutputPort)
+	suspend operator fun invoke(id: Location.Id, name: SingleNonBlankLine, output: OutputPort)
 
-	class ResponseModel(val locationId: UUID, val newName: String)
+	class ResponseModel(
+		val locationRenamed: LocationRenamed,
+		val mentionTextReplaced: List<MentionTextReplaced>
+	)
 
 	interface OutputPort {
-		fun receiveRenameLocationFailure(failure: LocationException)
-		fun receiveRenameLocationResponse(response: ResponseModel)
+		suspend fun receiveRenameLocationResponse(response: ResponseModel)
 	}
 }

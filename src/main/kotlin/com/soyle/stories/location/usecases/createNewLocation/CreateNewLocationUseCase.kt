@@ -1,10 +1,10 @@
 package com.soyle.stories.location.usecases.createNewLocation
 
+import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.repositories.LocationRepository
-import com.soyle.stories.location.usecases.validateLocationName
 import java.util.*
 
 class CreateNewLocationUseCase(
@@ -14,7 +14,7 @@ class CreateNewLocationUseCase(
 
 	private val projectId: Project.Id = Project.Id(projectId)
 
-	override suspend fun invoke(name: String, description: String?, output: CreateNewLocation.OutputPort) {
+	override suspend fun invoke(name: SingleNonBlankLine, description: String?, output: CreateNewLocation.OutputPort) {
 		val response = try {
 			createNewLocation(name, description)
 		} catch (l: LocationException) {
@@ -23,15 +23,13 @@ class CreateNewLocationUseCase(
 		output.receiveCreateNewLocationResponse(response)
 	}
 
-	private suspend fun createNewLocation(name: String, description: String?): CreateNewLocation.ResponseModel {
-		validateLocationName(name)
+	private suspend fun createNewLocation(name: SingleNonBlankLine, description: String?): CreateNewLocation.ResponseModel {
 		val location = createLocation(name, description)
 		addNewLocation(location)
-
-		return CreateNewLocation.ResponseModel(location.id.uuid, name)
+		return CreateNewLocation.ResponseModel(location.id.uuid, name.value)
 	}
 
-	private fun createLocation(name: String, description: String?): Location {
+	private fun createLocation(name: SingleNonBlankLine, description: String?): Location {
 		val id = Location.Id()
 		return Location(id, projectId, name, description ?: "")
 	}

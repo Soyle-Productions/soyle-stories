@@ -1,7 +1,6 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.doubles.ProseRepositoryDouble
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Prose
@@ -9,6 +8,7 @@ import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.sceneDoesNotExist
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
@@ -170,11 +170,12 @@ class CreateNewSceneUnitTest {
 		}
 		if (sceneWithId != null) {
 			runBlocking {
-				sceneRepository.createNewScene(Scene(Scene.Id(sceneWithId), projectId, nonBlankStr(), StoryEvent.Id(storyEventId), null, Prose.Id(proseId), listOf()),
+				sceneRepository.createNewScene(
+					makeScene(sceneId = Scene.Id(sceneWithId), projectId = projectId, storyEventId = StoryEvent.Id(storyEventId), proseId = Prose.Id(proseId)),
 				sceneRepository.getSceneIdsInOrder(projectId) + Scene.Id(sceneWithId)
 				)
 				repeat(numberOfScenesAfterRelativeScene) {
-					val scene = Scene(projectId, nonBlankStr(), StoryEvent.Id(), Prose.Id())
+					val scene = makeScene(projectId = projectId)
 					sceneRepository.createNewScene(scene,
 					  sceneRepository.getSceneIdsInOrder(projectId) + scene.id
 					)
@@ -284,6 +285,7 @@ class CreateNewSceneUnitTest {
 		actual as CreateNewScene.ResponseModel
 		assertEquals(savedScene.id.uuid, actual.sceneId)
 		assertEquals(validSceneName.value, actual.sceneName)
+		assertEquals(createdProse!!.id, actual.sceneProse)
 		return actual
 	}
 
