@@ -3,12 +3,10 @@ package com.soyle.stories.desktop.config.drivers.scene
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
-import com.soyle.stories.desktop.config.drivers.theme.getThemeListToolOrError
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListDriver
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.sceneList.SceneList
-import com.soyle.stories.theme.themeList.ThemeList
 import javafx.event.ActionEvent
 import javafx.scene.control.TextField
 import tornadofx.FX
@@ -35,7 +33,7 @@ fun SceneList.renameSceneTo(scene: Scene, newName: String)
 {
     val driver = SceneListDriver(this)
     val sceneItem = driver.getSceneItemOrError(scene.name.value)
-    val tree = driver.getTree()
+    val tree = driver.tree
 
     with(driver) {
         interact {
@@ -53,7 +51,7 @@ fun SceneList.deleteScene(scene: Scene)
 {
     val driver = SceneListDriver(this)
     val sceneItem = driver.getSceneItemOrError(scene.name.value)
-    val tree = driver.getTree()
+    val tree = driver.tree
 
     with(driver) {
         interact {

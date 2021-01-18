@@ -2,17 +2,19 @@ package com.soyle.stories.theme.addSymbolDialog
 
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.renameCharacter.RenamedCharacterReceiver
+import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
+import com.soyle.stories.entities.CharacterRenamed
+import com.soyle.stories.entities.LocationRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.LocationException
+import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.items.LocationItemViewModel
+import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
-import com.soyle.stories.location.usecases.renameLocation.RenameLocation
+import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
 import com.soyle.stories.theme.themeList.SymbolListItemViewModel
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
@@ -30,8 +32,8 @@ class AddSymbolDialogPresenter(
     oppositionId: String,
     private val view: View.Nullable<AddSymbolDialogViewModel>
 ) : ListAvailableEntitiesToAddToOpposition.OutputPort,
-    CreatedCharacterReceiver, RenamedCharacterReceiver, RemovedCharacterReceiver,
-    CreateNewLocation.OutputPort, RenameLocation.OutputPort, DeleteLocation.OutputPort, SymbolAddedToThemeReceiver,
+    CreatedCharacterReceiver, CharacterRenamedReceiver, RemovedCharacterReceiver,
+    CreateNewLocation.OutputPort, LocationRenamedReceiver, DeletedLocationReceiver, SymbolAddedToThemeReceiver,
     RenameSymbol.OutputPort, RemoveSymbolFromTheme.OutputPort, AddSymbolicItemToOpposition.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
@@ -66,12 +68,12 @@ class AddSymbolDialogPresenter(
         }
     }
 
-    override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
-        val characterId = renamedCharacter.characterId.toString()
+    override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
+        val characterId = characterRenamed.characterId.toString()
         view.updateOrInvalidated {
             copyOrDefault(
                 characters = characters.map {
-                    if (it.characterId == characterId) it.copy(characterName = renamedCharacter.newName)
+                    if (it.characterId == characterId) it.copy(characterName = characterRenamed.newName)
                     else it
                 }
             )
@@ -98,20 +100,20 @@ class AddSymbolDialogPresenter(
         }
     }
 
-    override fun receiveRenameLocationResponse(response: RenameLocation.ResponseModel) {
-        val locationId = response.locationId.toString()
+    override suspend fun receiveLocationRenamed(locationRenamed: LocationRenamed) {
+        val locationId = locationRenamed.locationId.toString()
         view.updateOrInvalidated {
             copyOrDefault(
                 locations = locations.map {
-                    if (it.id == locationId) LocationItemViewModel(it.id, name = response.newName)
+                    if (it.id == locationId) LocationItemViewModel(it.id, name = locationRenamed.newName)
                     else it
                 }
             )
         }
     }
 
-    override fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
-        val locationId = response.locationId.toString()
+    override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
+        val locationId = deletedLocation.location.uuid.toString()
         view.updateOrInvalidated {
             copyOrDefault(
                 locations = locations.filterNot { it.id == locationId }
@@ -176,6 +178,4 @@ class AddSymbolDialogPresenter(
     )
 
     override fun receiveCreateNewLocationFailure(failure: LocationException) {}
-    override fun receiveRenameLocationFailure(failure: LocationException) {}
-    override fun receiveDeleteLocationFailure(failure: LocationException) {}
 }

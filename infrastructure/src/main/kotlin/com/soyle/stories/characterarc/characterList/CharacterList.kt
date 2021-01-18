@@ -21,7 +21,7 @@ class CharacterList : View("Characters") {
     init {
         val characterListViewListener = resolve<CharacterListViewListener>()
         val model = find<CharacterListModel>()
-        model.invalid.onChange {
+        model.invalidatedProperty().onChange {
             if (it) characterListViewListener.getList()
         }
     }

@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.themeList
 
+import com.soyle.stories.common.SyncThreadTransformer
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.common.makeEditable
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
@@ -10,22 +10,17 @@ import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.geometry.Orientation
 import javafx.scene.Scene
-import javafx.scene.control.*
+import javafx.scene.control.SplitPane
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
 import javafx.scene.control.skin.TreeViewSkin
 import javafx.scene.control.skin.VirtualFlow
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
-import javafx.scene.layout.Priority
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
-import tornadofx.FX
-import tornadofx.cellFormat
-import tornadofx.treeitem
-import tornadofx.vgrow
 import java.util.*
 
 class ThemeListViewTest : ApplicationTest() {
@@ -102,13 +97,7 @@ class ThemeListViewTest : ApplicationTest() {
 
     private fun setupMockDI() {
         DI.registerTypeFactory<ThreadTransformer, ApplicationScope> {
-            object : ThreadTransformer {
-                override fun async(task: suspend CoroutineScope.() -> Unit) = runBlocking { task() }
-
-                override fun gui(update: suspend CoroutineScope.() -> Unit) {
-                    interact { runBlocking { update() } }
-                }
-            }
+            SyncThreadTransformer()
         }
         DI.registerTypeFactory<ThemeListViewListener> {
             object : ThemeListViewListener {

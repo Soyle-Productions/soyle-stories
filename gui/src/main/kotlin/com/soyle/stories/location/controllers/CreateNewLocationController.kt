@@ -1,5 +1,6 @@
 package com.soyle.stories.location.controllers
 
+import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 
 class CreateNewLocationController(
@@ -7,7 +8,7 @@ class CreateNewLocationController(
   private val createNewLocationOutputPort: CreateNewLocation.OutputPort
 ) {
 
-	suspend fun createNewLocation(name: String, description: String) {
+	suspend fun createNewLocation(name: SingleNonBlankLine, description: String) {
 		createNewLocation.invoke(name, description.takeIf { it.isNotBlank() }, createNewLocationOutputPort)
 	}
 

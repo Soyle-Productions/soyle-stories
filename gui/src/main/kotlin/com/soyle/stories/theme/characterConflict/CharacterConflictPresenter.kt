@@ -1,34 +1,34 @@
 package com.soyle.stories.theme.characterConflict
 
-import com.soyle.stories.character.renameCharacter.RenamedCharacterReceiver
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
+import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ArcSectionType
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.entities.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeReceiver
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
 import com.soyle.stories.theme.removeCharacterAsOpponent.CharacterRemovedAsOpponentReceiver
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
-import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
 import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ArcSectionType
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
+import com.soyle.stories.theme.usecases.changeThemeDetails.CentralConflictChanged
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.AvailableCharactersToUseAsOpponents
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
 import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.CharacterRemovedAsOpponent
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
-import com.soyle.stories.theme.usecases.changeThemeDetails.CentralConflictChanged
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.AvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsMainOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
 import java.util.*
 
 class CharacterConflictPresenter(
@@ -38,7 +38,7 @@ class CharacterConflictPresenter(
     ListAvailableCharactersToUseAsOpponents.OutputPort, CharacterUsedAsOpponentReceiver,
     CharacterUsedAsMainOpponentReceiver,
     CentralConflictChangedReceiver, ChangedCharacterArcSectionValueReceiver, ChangedCharacterChangeReceiver,
-    ChangeCharacterPropertyValue.OutputPort, CharacterPerspectivePropertyChangedReceiver, RenamedCharacterReceiver,
+    ChangeCharacterPropertyValue.OutputPort, CharacterPerspectivePropertyChangedReceiver, CharacterRenamedReceiver,
     CharacterRemovedAsOpponentReceiver, RemovedCharacterFromThemeReceiver {
 
     private val themeId = UUID.fromString(themeId)
@@ -257,26 +257,26 @@ class CharacterConflictPresenter(
         }
     }
 
-    override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
-        val renamedCharacterId = renamedCharacter.characterId.toString()
+    override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
+        val renamedCharacterId = characterRenamed.characterId.toString()
         view.updateOrInvalidated {
             copy(
                 selectedPerspectiveCharacter = if (selectedPerspectiveCharacter?.characterId == renamedCharacterId) {
-                    selectedPerspectiveCharacter.copy(characterName = renamedCharacter.newName)
+                    selectedPerspectiveCharacter.copy(characterName = characterRenamed.newName)
                 } else selectedPerspectiveCharacter,
                 availablePerspectiveCharacters = availablePerspectiveCharacters?.map {
-                    if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+                    if (it.characterId == renamedCharacterId) it.copy(characterName = characterRenamed.newName)
                     else it
                 },
                 availableOpponents = availableOpponents?.map {
-                    if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+                    if (it.characterId == renamedCharacterId) it.copy(characterName = characterRenamed.newName)
                     else it
                 },
                 mainOpponent = if (mainOpponent?.characterId == renamedCharacterId) {
-                    mainOpponent.copy(characterName = renamedCharacter.newName)
+                    mainOpponent.copy(characterName = characterRenamed.newName)
                 } else mainOpponent,
                 opponents = opponents.map {
-                    if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+                    if (it.characterId == renamedCharacterId) it.copy(characterName = characterRenamed.newName)
                     else it
                 }
             )

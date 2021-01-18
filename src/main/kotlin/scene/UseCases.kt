@@ -20,6 +20,8 @@ import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneOu
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneControllerImpl
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
+import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
+import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionControllerImpl
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
@@ -49,6 +51,8 @@ import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToSceneUseCase
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenesUseCase
+import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
+import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProseUseCase
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
@@ -74,6 +78,7 @@ object UseCases {
             removeCharacterFromScene()
             reorderScene()
             coverCharacterArcSectionsInScene()
+            listOptionsToReplaceMention()
         }
     }
 
@@ -283,6 +288,19 @@ object UseCases {
             CreateCharacterArcSectionAndCoverInScene.OutputPort::class
         ) {
             CoverCharacterArcSectionsInSceneOutputPort(get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.listOptionsToReplaceMention() {
+        provide<ListOptionsToReplaceMentionController> {
+            ListOptionsToReplaceMentionControllerImpl(
+                applicationScope.get(),
+                get()
+            )
+        }
+
+        provide<ListOptionsToReplaceMentionInSceneProse> {
+            ListOptionsToReplaceMentionInSceneProseUseCase(get(), get(), get())
         }
     }
 

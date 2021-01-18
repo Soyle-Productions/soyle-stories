@@ -17,6 +17,13 @@ private class RegisteredFactory<T : Any, S : Scope>(val factory: (S) -> T, val s
 	}
 }
 
+class NoRegisteredModuleException(val type: KClass<*>) : Throwable() {
+	override val message: String?
+		get() = "${type.simpleName}\nNo registered module for $type"
+}
+
+private inline fun noModule(type: KClass<*>): Nothing = throw NoRegisteredModuleException(type)
+
 object DI {
 
 	var verbose: Boolean = false
@@ -62,7 +69,7 @@ object DI {
 
 	private fun <T : Any> getRegisteredFactory(kClass: KClass<in T>): RegisteredFactory<T, *>
 	{
-		val factory = factories[kClass] ?: error("No registered module for type $kClass.")
+		val factory = factories[kClass] ?: noModule(kClass)
 		@Suppress("UNCHECKED_CAST")
 		return factory as RegisteredFactory<T, *>
 	}
@@ -73,7 +80,7 @@ object DI {
 			factory.create(scope)
 		} catch (t: Throwable) {
 			throw Error("$t\n\tWhen resolving type $kClass.", t)
-		} ?: error("Incorrect scope $scope.  Was expecting ${factory.scopeType} for type $kClass")
+		} ?: error("Incorrect scope ${scope::class.simpleName}.  Was expecting ${factory.scopeType} for type $kClass")
 	}
 
 	@JvmName("registerTypeFactoryDefaultScope")

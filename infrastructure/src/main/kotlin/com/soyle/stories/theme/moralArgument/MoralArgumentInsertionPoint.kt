@@ -4,9 +4,6 @@ import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.asyncMenuButton.AsyncMenuButton.Companion.asyncMenuButton
 import com.soyle.stories.di.resolveLater
 import javafx.beans.binding.BooleanBinding
-import javafx.beans.binding.BooleanExpression
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.value.ObservableBooleanValue
 import javafx.beans.value.ObservableValue
 import javafx.scene.Node
 import javafx.scene.Parent
@@ -85,9 +82,10 @@ class MoralArgumentInsertionPoint : Fragment() {
 
     private fun getAvailableSectionTypesToAdd() {
         state.availableSectionTypes.value = null
-        state.item?.selectedPerspectiveCharacter?.characterId?.let {
-            viewListener.getAvailableArcSectionTypesToAdd(it)
-        }
+        val selectedCharacter = state.item?.selectedPerspectiveCharacter
+            ?: kotlin.error("cannot load available types if perspective character not yet selected")
+
+        viewListener.getAvailableArcSectionTypesToAdd(selectedCharacter.characterId)
     }
 
     private fun createSectionTypeItems(sectionTypes: List<MoralArgumentSectionTypeViewModel>): List<MenuItem> {
@@ -126,6 +124,12 @@ class MoralArgumentInsertionPoint : Fragment() {
                 tooltip {
                     textProperty().bind(usedSectionMessage(sectionType))
                 }
+            }
+            action {
+                val characterId = state.item?.selectedPerspectiveCharacter?.characterId ?: return@action
+                val arcSectionId = addToTopOfSection?.arcSectionId ?: return@action
+                val index = state.sections.indexOfFirst { it.arcSectionId == arcSectionId }.takeIf { it >= 0 } ?: return@action
+                viewListener.moveSectionTo(sectionType.existingArcSectionId!!, characterId, index)
             }
         }
     }

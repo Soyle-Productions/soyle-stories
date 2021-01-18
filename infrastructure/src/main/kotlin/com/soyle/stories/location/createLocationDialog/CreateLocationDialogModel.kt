@@ -15,6 +15,8 @@ class CreateLocationDialogModel : CreateLocationDialogView, ItemViewModel<Create
 
 	val errorMessage = bind(CreateLocationDialogViewModel::errorMessage) as SimpleStringProperty
 
+	override val viewModel: CreateLocationDialogViewModel? = item
+
 	override fun update(update: CreateLocationDialogViewModel?.() -> CreateLocationDialogViewModel) {
 		val threadTransformer = threadTransformer
 		threadTransformer.gui {

@@ -6,9 +6,7 @@ import com.soyle.stories.common.components.chip
 import com.soyle.stories.common.components.menuChipGroup.menu
 import com.soyle.stories.common.components.menuChipGroup.menuchipgroup
 import com.soyle.stories.di.get
-import com.soyle.stories.scene.sceneDetails.SceneDetails
 import com.soyle.stories.scene.sceneDetails.SceneDetailsStyles
-import com.soyle.stories.soylestories.Styles
 import javafx.application.Platform
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
@@ -18,8 +16,10 @@ import javafx.collections.MapChangeListener
 import javafx.collections.ObservableList
 import javafx.scene.Node
 import javafx.scene.Parent
-import javafx.scene.control.*
-import javafx.scene.layout.HBox
+import javafx.scene.control.CheckBox
+import javafx.scene.control.Label
+import javafx.scene.control.Menu
+import javafx.scene.control.MenuItem
 import tornadofx.*
 import kotlin.math.max
 
@@ -32,7 +32,6 @@ class PositionOnArcSelection(
     private val selection = observableMapOf<String, String>()
 
     private val menuChipGroup = parent.menuchipgroup {
-        addClass("position-on-arc")
         noSelectionText = "Nothing Selected"
 
         onShowing { getUpToDateAvailability() }
@@ -85,6 +84,7 @@ class PositionOnArcSelection(
     {
         // add menu to menuChipGroup with a counter graphic and the arc name as the label
         menuChipGroup.menu(arc.characterArcName) {
+            id = arc.characterArcId
             userData = arc
             graphic = counterGraphic(arc)
             item("Create Character Arc Section") {
@@ -138,6 +138,7 @@ class PositionOnArcSelection(
     {
         customitem(hideOnClick = false) {
             addClass(SceneDetailsStyles.arcSectionItem)
+            id = arcSection.arcSectionId
             userData = arcSection
             val checkBox = CheckBox().apply {
                 fillWidth(parentMenuProperty())
@@ -253,6 +254,7 @@ class PositionOnArcSelection(
         val deselectedIds = previouslyCoveredSections - selectedIds
 
         if (newlySelectedIds.isNotEmpty() || deselectedIds.isNotEmpty()) {
+            println("covering sections.. ${newlySelectedIds}")
             viewListener.coverCharacterArcSectionInScene(
                 newlySelectedIds.toList(),
                 deselectedIds.toList()

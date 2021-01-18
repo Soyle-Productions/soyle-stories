@@ -115,6 +115,9 @@ class MoralArgumentView : View() {
                     textProperty().bind(unavailableCharacterMessage(minorCharacter))
                 }
             }
+            action {
+                println("minor character selected $minorCharacter")
+            }
         }
     }
 

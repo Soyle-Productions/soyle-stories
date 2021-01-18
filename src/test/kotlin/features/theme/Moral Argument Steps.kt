@@ -1,23 +1,18 @@
 package com.soyle.stories.desktop.config.features.theme
 
-import com.soyle.stories.common.PairOf
-import com.soyle.stories.common.template
 import com.soyle.stories.desktop.config.drivers.character.CharacterArcDriver
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.ScenarioContext
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert.Companion.assertThat
-import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewDriver
-import com.soyle.stories.entities.*
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArcTemplateSection
+import com.soyle.stories.entities.Theme
+import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import io.cucumber.java8.PendingException
-import javafx.scene.input.MouseButton
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
-import java.util.*
 
 class `Moral Argument Steps` : En {
 
@@ -29,16 +24,17 @@ class `Moral Argument Steps` : En {
 
     private fun givens() {
         Given(
-            "the user has indicated they want to add a new section to {character}'s {theme} moral argument"
-        ) { character: Character, theme: Theme ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
-            moralArgument.givenMoralArgumentHasBeenPreparedToAddNewSection()
-
+            "the {string} section has been added to the {character}'s {moral argument}"
+        ) { sectionName: String, character: Character, theme: Theme ->
+            val driver = CharacterArcDriver(soyleStories.getAnyOpenWorkbenchOrError())
+            val arc = driver.getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+            driver.givenArcHasArcSectionInMoralArgument(
+                arc,
+                arc.template.sections.find { it.name == sectionName }!!
+            )
         }
         Given(
-            "the user has indicated they want to move one of {character}'s {theme} moral argument sections"
+            "I am moving one of the {character}'s {moral argument} sections"
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
@@ -49,103 +45,134 @@ class `Moral Argument Steps` : En {
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+        }
+        Given(
+            "I am removing a section from the {character}'s {moral argument}"
+        ) { character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+        }
+        Given("I am outlining the {character}'s {moral argument}") { character: Character, theme: Theme ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+                .givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+        }
+        Given(
+            "I have requested which sections are available to add to the {character}'s {moral argument}"
+        ) { character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+            moralArgument.givenMoralArgumentHasBeenPreparedToAddNewSection()
+        }
+        Given(
+            "I have requested which sections are available to add to the {character}'s {moral argument} after the {string} section"
+        ) { character: Character, theme: Theme, relativeSectionName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+            moralArgument.givenMoralArgumentHasBeenPreparedToAddNewSectionAfter(relativeSectionName)
+        }
+        Given(
+            "I have chosen the {ordinal} position to move one of the {character}'s {moral argument} sections"
+        ) { ordinal: Int, character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+            moralArgument.givenPreparedToMoveSectionTo(ordinal)
         }
     }
 
     private fun whens() {
         When(
-            "the user wants to add a new section to {character}'s {theme} moral argument"
+            "I request which sections are available to add to the {character}'s {moral argument}"
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
             moralArgument.prepareToAddNewSection()
-
         }
         When(
-            "the user wants to remove a section from {character}'s {theme} moral argument"
+            "I request which sections are available to add to the {character}'s {moral argument} after the {string} section"
+        ) { character: Character, theme: Theme, sectionName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+            moralArgument.prepareToAddNewSectionAfter(sectionName)
+        }
+        When(
+            "I want to remove a section from the {character}'s {moral argument}"
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character.name.value)
+            moralArgument.loadMoralArgumentForPerspectiveCharacter(character)
         }
         When(
-            "an unused moral argument section type is selected to be added for {string} in the {string} theme"
-        ) { characterName: String, themeName: String ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val theme = ThemeDriver(workbench).getThemeByNameOrError(themeName)
-            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(characterName)
-            moralArgument.givenMoralArgumentHasBeenPreparedToAddNewSection()
-            ScenarioContext(soyleStories).templateSectionToAdd = moralArgument.selectUnusedSectionType().sectionTypeId
-
-        }
-        When(
-            "a moral argument section type is selected for {string} in the {string} theme between two existing sections"
-        ) { characterName: String, themeName: String ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val theme = ThemeDriver(workbench).getThemeByNameOrError(themeName)
-            val character = CharacterDriver(workbench).getCharacterByNameOrError(characterName)
-            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
-            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(characterName)
-
-            val insertIndex = arc.moralArgument().arcSections.size / 2
-            moralArgument.givenMoralArgumentHasBeenPreparedToAddNewSection(arc.moralArgument().arcSections.size / 2)
-
-            ScenarioContext(soyleStories).sectionsSurroundingTemplateSection = arc.moralArgument().arcSections.let { it[insertIndex-1] to it[insertIndex] }
-            ScenarioContext(soyleStories).templateSectionToAdd = moralArgument.selectUnusedSectionType().sectionTypeId
-
-        }
-        When(
-            "the user indicates they want to move one of {character}'s {theme} moral argument sections"
-        ) { character: Character?, theme: Theme ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(character!!.name.value)
-        }
-        When(
-            "a used moral argument section type is selected to be moved for {string} in the {string} theme"
-        ) { characterName: String, themeName: String ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val theme = ThemeDriver(workbench).getThemeByNameOrError(themeName)
-            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
-            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacterNamed(characterName)
-            moralArgument.givenMoralArgumentHasBeenPreparedToMoveSection()
-            ScenarioContext(soyleStories).templateSectionToMove = moralArgument.selectUsedSectionType().sectionTypeId
-        }
-        When(
-            "the {ordinal} section in {character}'s {theme} moral argument is moved above the {ordinal} section"
-        ) { initialIndex: Int, character: Character, theme: Theme, moveIndex: Int ->
+            "I choose the {string} section type to add to the {character}'s {moral argument}"
+        ) { sectionTypeName: String, character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
             moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
-
-            // Produces a snapshot of the character arc before the move.  Any [then]s trying to compare after the fact
-            // will now have a snapshot of the arc to look back to
-            CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
-
-            moralArgument.moveSectionToNewPosition(initialPosition = initialIndex, newPosition = moveIndex)
+            moralArgument.selectFromAvailableSections(sectionTypeName)
         }
         When(
-            "the {template} section in {character}'s {theme} moral argument is removed"
-        ) { template: CharacterArcTemplateSection, character: Character, theme: Theme ->
+            "I choose the {ordinal} position to move one of the {character}'s {moral argument} sections"
+        ) { ordinal: Int, character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
             moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
-
-            moralArgument.removeFirstSectionWithName(template.name)
+            moralArgument.prepareToMoveSectionTo(ordinal)
+        }
+        When(
+            "I move the {string} section to the {ordinal} position of the {character}'s {moral argument}"
+        ) { sectionName: String, ordinal: Int, character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+            moralArgument.dragSectionToPosition(sectionName, ordinal)
+        }
+        When(
+            "I choose to move the {string} section of the {character}'s {moral argument}"
+        ) { sectionName: String, character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+            moralArgument.selectFromAvailableSections(sectionName)
+        }
+        When(
+            "I remove the {string} section from the {character}'s {moral argument}"
+        ) { sectionName: String, character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val section = CharacterDriver(workbench).getCharacterArcSectionByNameOrError(character, theme, sectionName)
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+            moralArgument.removeFirstSectionWithName(section.template.name)
         }
     }
 
     private fun thens() {
         Then(
+            "I should see the following options to add to the {character}'s {moral argument}"
+        ) { character: Character, theme: Theme, dataTable: DataTable ->
+            val moralArgumentView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+                .givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
+            assertThat(moralArgumentView) {
+                andSectionTypeMenu {
+                    hasItemsInOrder(dataTable.asLists().drop(1)
+                        .map { (sectionName, usability) -> sectionName to (usability == "unused") })
+                }
+            }
+        }
+        Then(
             "all the moral argument section types should be listed for {string}s moral argument in the {string} theme"
         ) { characterName: String, themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val theme = ThemeDriver(workbench).getThemeByNameOrError(themeName)
-            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeNamedOrError(characterName, themeName)
+            val arc =
+                CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeNamedOrError(characterName, themeName)
 
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
             assertThat(moralArgument) {
@@ -158,7 +185,8 @@ class `Moral Argument Steps` : En {
             "the new section should be at the end of {string}s moral argument in the {string} theme"
         ) { characterName: String, themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeNamedOrError(characterName, themeName)
+            val arc =
+                CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeNamedOrError(characterName, themeName)
             val templateSectionToAdd = ScenarioContext(soyleStories).templateSectionToAdd!!
 
             val newSection =
@@ -177,10 +205,10 @@ class `Moral Argument Steps` : En {
             val midIndex = arc.indexInMoralArgument(newSection.id)
 
             fun explanation(): String {
-                return "Expected to be placed between ${surroundingSections.first.id} and ${surroundingSections.second.id}.\n"+
-                        "Should have had template of ${templateSectionToAdd}.\n"+
-                        "\n"+
-                        "Moral Argument Sections and Template ids received:\n"+
+                return "Expected to be placed between ${surroundingSections.first.id} and ${surroundingSections.second.id}.\n" +
+                        "Should have had template of ${templateSectionToAdd}.\n" +
+                        "\n" +
+                        "Moral Argument Sections and Template ids received:\n" +
                         arc.moralArgument().arcSections.joinToString("\n") {
                             val prefix = if (it.id == surroundingSections.first.id) " 1 "
                             else if (it.id == surroundingSections.second.id) " 2 "
@@ -200,7 +228,7 @@ class `Moral Argument Steps` : En {
             assertEquals(secondIndex - 1, midIndex) { explanation() }
         }
         Then(
-            "all of {character}'s {theme} moral argument sections should be listed"
+            "all of the {character}'s {moral argument} sections should be listed"
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
@@ -210,6 +238,35 @@ class `Moral Argument Steps` : En {
                 onlyHasArcSections(
                     arc.moralArgument().arcSections.map { it.template.name }
                 )
+            }
+        }
+        Then(
+            "all of the {character}'s {moral argument} sections should be listed to be moved"
+        ) { character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            assertThat(moralArgument) {
+                andSectionTypeMenu {
+                    hasItems(arc.moralArgument().arcSections.map { it.template.name })
+                }
+            }
+        }
+        Then(
+            "the order of the sections in the {character}'s {moral argument} should be as follows"
+        ) { character: Character, theme: Theme, dataTable: DataTable ->
+            val expectedNameOrder = dataTable.asList()
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+            assertEquals(
+                expectedNameOrder,
+                arc.moralArgument().arcSections.map { it.template.name }
+            )
+
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            assertThat(moralArgument) {
+                hasArcSectionsInOrder(expectedNameOrder)
             }
         }
         Then(
@@ -240,23 +297,38 @@ class `Moral Argument Steps` : En {
 
         }
         Then(
-            "the optional sections in {character}'s {theme} moral argument should be shown to be able to be removed"
-        ) { character: Character, theme: Theme ->
+            "the {string} section should be removed from the {character}'s {moral argument}"
+        ) { sectionName: String, character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+            assertNull(arc.moralArgument().arcSections.find { it.template.name == sectionName })
 
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            moralArgument.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(character)
             assertThat(moralArgument) {
                 andEachArcSection {
                     val baseSection = arc.moralArgument().arcSections[it]
-                    if (! baseSection.template.isRequired) {
+                    if (!baseSection.template.isRequired) {
                         hasRemoveButton()
                     }
                 }
             }
         }
         Then(
-            "the required sections in {character}'s {theme} moral argument should not be shown to be able to be removed"
+            "the optional sections in the {character}'s {moral argument} should indicate they can be removed"
+        ) { character: Character, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
+
+            val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
+            assertThat(moralArgument) {
+                onlyHasArcSections(
+                    arc.moralArgument().arcSections.map { it.template.name }
+                )
+            }
+        }
+        Then(
+            "the required sections in the {character}'s {moral argument} should indicate they can not be removed"
         ) { character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
@@ -282,6 +354,27 @@ class `Moral Argument Steps` : En {
             assertThat(moralArgument) {
                 onlyHasArcSections(arc.moralArgument().arcSections.map { it.template.name })
             }
+        }
+        Then(
+            "the last section of the {character}'s {moral argument} should be the {string} section"
+        ) { character: Character, theme: Theme, expectedSectionName: String ->
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .getCharacterArcByCharacterAndTheme(character, theme)!!
+                .moralArgument()
+                .arcSections
+                .last()
+                .template.name
+                .let { assertEquals(expectedSectionName, it) }
+        }
+        Then(
+            "the section after the {string} section in the {character}'s {moral argument} should be the {string} section"
+        ) { relativeSectionName: String, character: Character, theme: Theme, expectedSectionName: String ->
+            val arcSections = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .getCharacterArcByCharacterAndTheme(character, theme)!!
+                .moralArgument()
+                .arcSections
+            val relativeIndex = arcSections.indexOfFirst { it.template.name == relativeSectionName }
+            assertEquals(expectedSectionName, arcSections[relativeIndex + 1].template.name)
         }
     }
 

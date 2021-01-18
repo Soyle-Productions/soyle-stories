@@ -25,4 +25,8 @@ class LocationRepositoryImpl : LocationRepository {
 	override suspend fun removeLocation(location: Location) {
 		locations.remove(location.id)
 	}
+
+	override suspend fun getLocationIdsThatDoNotExist(locationIdsToTest: Set<Location.Id>): Set<Location.Id> {
+		return locationIdsToTest.asSequence().filterNot { it in locations }.toSet()
+	}
 }

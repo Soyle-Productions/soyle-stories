@@ -1,11 +1,10 @@
 package com.soyle.stories.theme.removeSymbolicItem
 
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.location.LocationException
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
+import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
+import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
@@ -16,7 +15,7 @@ class RemoveSymbolicItemControllerImpl(
     private val removeSymbolicItem: RemoveSymbolicItem,
     private val removeSymbolicItemOutputPort: RemoveSymbolicItem.OutputPort
 ) : RemoveSymbolicItemController, RemovedCharacterReceiver,
-    DeleteLocation.OutputPort, RemoveSymbolFromTheme.OutputPort {
+    DeletedLocationReceiver, RemoveSymbolFromTheme.OutputPort {
 
     override fun removeItemFromOpposition(oppositionId: String, itemId: String, onError: (Throwable) -> Unit) {
         val preparedOppositionId = UUID.fromString(oppositionId)
@@ -41,10 +40,10 @@ class RemoveSymbolicItemControllerImpl(
         }
     }
 
-    override fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
+    override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
         threadTransformer.async {
             removeSymbolicItem.removeSymbolicItemFromAllThemes(
-                response.locationId,
+                deletedLocation.location.uuid,
                 removeSymbolicItemOutputPort
             )
         }
@@ -56,7 +55,5 @@ class RemoveSymbolicItemControllerImpl(
             removeSymbolicItemOutputPort
         )
     }
-
-    override fun receiveDeleteLocationFailure(failure: LocationException) {}
 
 }

@@ -20,6 +20,8 @@ class CreateStoryEventDialogModel : View.Nullable<CreateStoryEventDialogViewMode
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)
 
+	override val viewModel: CreateStoryEventDialogViewModel? = item
+
 	override fun update(update: CreateStoryEventDialogViewModel?.() -> CreateStoryEventDialogViewModel) {
 		threadTransformer.gui {
 			rebind { item = item.update() }

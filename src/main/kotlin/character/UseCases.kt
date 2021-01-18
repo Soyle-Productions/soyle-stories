@@ -1,7 +1,12 @@
 package com.soyle.stories.desktop.config.character
 
+import com.soyle.stories.character.renameCharacter.RenameCharacterController
+import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
+import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentControllerImpl
+import com.soyle.stories.characterarc.eventbus.RenameCharacterOutput
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentController
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentControllerImpl
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentOutput
@@ -15,6 +20,7 @@ import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArg
 import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentUseCase
 import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgument
 import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentUseCase
+import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
@@ -76,6 +82,20 @@ object UseCases {
                 RemoveCharacterArcSectionFromMoralArgumentOutput(get(), get())
             }
 
+            renameCharacter()
+
+        }
+    }
+
+    private fun InProjectScope.renameCharacter() {
+        provide<RenameCharacter> {
+            RenameCharacterUseCase(get(), get(), get())
+        }
+        provide(RenameCharacter.OutputPort::class) {
+            RenameCharacterOutput(get(), get())
+        }
+        provide<RenameCharacterController> {
+            RenameCharacterControllerImpl(applicationScope.get(), get(), get())
         }
     }
 

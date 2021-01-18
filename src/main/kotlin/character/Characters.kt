@@ -5,6 +5,7 @@ object Characters {
     operator fun invoke() {
         UseCases
         Notifiers
+        Presentation
     }
 
 }

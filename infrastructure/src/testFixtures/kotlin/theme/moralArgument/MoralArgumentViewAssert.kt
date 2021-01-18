@@ -4,10 +4,7 @@ import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
 import com.soyle.stories.theme.moralArgument.MoralArgumentSectionTypeViewModel
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
-import javafx.scene.control.Button
-import javafx.scene.control.CustomMenuItem
-import javafx.scene.control.MenuButton
-import javafx.scene.control.Tooltip
+import javafx.scene.control.*
 import org.junit.jupiter.api.Assertions.*
 import org.testfx.assertions.api.Assertions
 import org.testfx.assertions.api.ButtonAssert
@@ -108,6 +105,13 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
         )
     }
 
+    fun hasArcSectionsInOrder(expectedArcSections: List<String>) {
+        assertEquals(
+            expectedArcSections,
+            driver.getArcSectionLabels().map { it.text }
+        )
+    }
+
     fun andEachArcSection(assertions: ArcSectionAssert.(Int) -> Unit) {
         driver.getArcSectionNodes().indices.forEach {
             ArcSectionAssert(it).assertions(it)
@@ -175,6 +179,27 @@ class MoralArgumentViewAssert private constructor(view: MoralArgumentView) {
             val itemSet = selection.items.groupBy { it.text }
             expectedItems.forEach {
                 assertTrue(it in itemSet) { "Section Type Menu does not contain $it.  Contained items: ${itemSet.keys}" }
+            }
+        }
+
+        /**
+         * first part of each pair is the expected label
+         * second part of each pair is the expected usability: true meaning usable, false meaning already used
+         */
+        fun hasItemsInOrder(expectedItems: List<Pair<String, Boolean>>) {
+            selection.items.forEachIndexed { index, menuItem ->
+                val expectedLabel = expectedItems[index].first
+                val expectedUsability = expectedItems[index].second
+                if (! expectedUsability) {
+                    menuItem as CustomMenuItem
+                    assertTrue(menuItem.hasClass(ComponentsStyles.discouragedSelection)) {
+                        "Un-creatable section type is not discouraged from being selected"
+                    }
+                    assertEquals(expectedLabel, (menuItem.content as Label).text)
+                } else {
+                    assertFalse(menuItem.hasClass(ComponentsStyles.discouragedSelection))
+                    assertEquals(expectedLabel, menuItem.text)
+                }
             }
         }
 

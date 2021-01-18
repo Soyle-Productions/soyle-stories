@@ -34,5 +34,6 @@ data class MoralArgumentSectionViewModel(
 data class MoralArgumentSectionTypeViewModel(
     val sectionTypeId: String,
     val sectionTypeName: String,
-    val canBeCreated: Boolean
+    val canBeCreated: Boolean,
+    val existingArcSectionId: String?
 )

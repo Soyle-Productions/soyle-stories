@@ -2,13 +2,13 @@ package com.soyle.stories.characterarc.characterList.components
 
 import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.*
-import com.soyle.stories.characterarc.characterList.PopulatedDisplay
+import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogView
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.components.ComponentsStyles.Companion.liftedCard
-import com.soyle.stories.di.get
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.entities.Character
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.property.SimpleBooleanProperty
@@ -24,6 +24,7 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 import tornadofx.*
+import java.util.*
 
 class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
 
@@ -143,7 +144,10 @@ class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
 
     private fun deleteCharacter() {
         val characterItem = item ?: return
-        confirmDeleteCharacter(characterItem.id, characterItem.name, viewListener)
+        find<DeleteCharacterDialogView>().show(
+            Character.Id(UUID.fromString(characterItem.id)),
+            characterItem.name
+        )
     }
 
     private fun VBox.displayCharacterArcsButton(): Button {

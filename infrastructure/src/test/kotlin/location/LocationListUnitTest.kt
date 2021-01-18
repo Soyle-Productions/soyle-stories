@@ -1,7 +1,9 @@
 package com.soyle.stories.location
 
+import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
+import com.soyle.stories.entities.Location
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationList
@@ -59,8 +61,8 @@ class LocationListUnitTest : ApplicationTest() {
 					openLocationDetailsLocationId = locationId
 				}
 
-				override fun renameLocation(locationId: String, newName: String) {
-
+				override fun renameLocation(locationId: Location.Id, newName: SingleNonBlankLine) {
+					
 				}
 			}
 		}

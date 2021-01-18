@@ -16,6 +16,8 @@ class DeleteSceneRamificationsModel : ItemViewModel<DeleteSceneRamificationsView
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)
 
+	override val viewModel: DeleteSceneRamificationsViewModel? = item
+
 	override fun update(update: DeleteSceneRamificationsViewModel?.() -> DeleteSceneRamificationsViewModel) {
 		threadTransformer.gui {
 			rebind { item = item.update() }

@@ -3,15 +3,18 @@ package com.soyle.stories.characterarc.characterList
 import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.components.characterCard
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
+import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogView
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.resolve
+import com.soyle.stories.entities.Character
 import com.soyle.stories.project.ProjectScope
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.collections.ObservableList
 import javafx.geometry.Insets
 import javafx.geometry.VPos
 import javafx.scene.control.ContextMenu
@@ -19,6 +22,7 @@ import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.layout.Priority
 import tornadofx.*
+import java.util.*
 
 /**
  * Created by Brendan
@@ -57,7 +61,10 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterTreeItemViewModel) {
-                    confirmDeleteCharacter(selectedItem.id, selectedItem.name, characterListViewListener)
+                    find<DeleteCharacterDialogView>().show(
+                        Character.Id(UUID.fromString(selectedItem.id)),
+                        selectedItem.name
+                    )
                 }
             }
         }
@@ -191,18 +198,14 @@ internal class PopulatedDisplay : View() {
                     else -> throw IllegalArgumentException("Invalid value type")
                 }
             }
-            populate { parentItem: TreeItem<Any?> ->
-                val parentItemValue = parentItem.value
-                if (parentItemValue is CharacterTreeItemViewModel) {
-                    parentItem.isExpanded = parentItemValue.isExpanded
-                }
-                when (parentItemValue) {
-                    null -> model.characters
-                    is CharacterTreeItemViewModel -> {
-                        parentItemValue.arcs
+            model.characters.onChange { characterList: ObservableList<CharacterTreeItemViewModel>? ->
+                root.children.setAll(characterList?.map {
+                    TreeItem<Any?>(it).apply {
+                        children.setAll(it.arcs.map {
+                            TreeItem(it)
+                        })
                     }
-                    else -> emptyList()
-                }
+                })
             }
         }
         flowpane {

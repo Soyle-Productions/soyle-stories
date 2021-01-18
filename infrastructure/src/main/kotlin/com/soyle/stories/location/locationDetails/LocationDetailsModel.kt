@@ -1,7 +1,7 @@
 package com.soyle.stories.location.locationDetails
 
-import com.soyle.stories.di.resolveLater
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.di.resolveLater
 import tornadofx.ItemViewModel
 
 class LocationDetailsModel : ItemViewModel<LocationDetailsViewModel>(), LocationDetailsView {
@@ -13,6 +13,8 @@ class LocationDetailsModel : ItemViewModel<LocationDetailsViewModel>(), Location
 	val description = bind(LocationDetailsViewModel::description)
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.projectScope.applicationScope)
+
+	override val viewModel: LocationDetailsViewModel? = item
 
 	override fun update(update: LocationDetailsViewModel?.() -> LocationDetailsViewModel) {
 		threadTransformer.gui {

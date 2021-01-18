@@ -38,7 +38,7 @@ class SoyleStories(
   // applicationViewListener
 ) : ProjectListView {
 
-	private var viewModel: ProjectListViewModel? = null
+	override var viewModel: ProjectListViewModel? = null
 
 	fun start(args: List<String>) {
 		// applicationViewListener.startApplicationWithArguments(args)

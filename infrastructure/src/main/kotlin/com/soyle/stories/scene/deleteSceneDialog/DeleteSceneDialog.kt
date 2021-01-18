@@ -18,7 +18,8 @@ class DeleteSceneDialog : Fragment() {
 	val viewListener = resolve<DeleteSceneDialogViewListener>()
 	val model = resolve<DeleteSceneDialogModel>()
 
-	private lateinit var sceneId: String
+	lateinit var sceneId: String
+	private set
 
 	private val alert = Alert(Alert.AlertType.CONFIRMATION)
 
