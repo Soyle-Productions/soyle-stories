@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.createSceneDialog
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
@@ -34,12 +35,17 @@ class CreateSceneDialog : Fragment() {
 			onAction = EventHandler {
 				it.consume()
 				model.executing.set(true)
+				val name = NonBlankString.create(text)
+				if (name == null) {
+					model.errorMessage.value = "Name cannot be blank"
+					return@EventHandler
+				}
 				when {
 					sceneId != null -> when (relativeDirection) {
-						true -> viewListener.createSceneBefore(text, sceneId!!)
-						false -> viewListener.createSceneAfter(text, sceneId!!)
+						true -> viewListener.createSceneBefore(name, sceneId!!)
+						false -> viewListener.createSceneAfter(name, sceneId!!)
 					}
-					else -> viewListener.createScene(text)
+					else -> viewListener.createScene(name)
 				}
 			}
 		}

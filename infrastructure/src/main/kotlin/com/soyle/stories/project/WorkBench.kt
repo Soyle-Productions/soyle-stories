@@ -14,7 +14,6 @@ import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
-import com.soyle.stories.soylestories.SoyleStories
 import com.soyle.stories.soylestories.Styles
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
@@ -77,6 +76,7 @@ class WorkBench : View() {
                     }*/
                 }
                 item("Settings") {
+                    id = "file_settings"
                     action { scope.get<SettingsDialog>().show() }
                 }
             }

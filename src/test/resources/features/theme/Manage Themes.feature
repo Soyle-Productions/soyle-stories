@@ -2,38 +2,38 @@ Feature: Manage Themes
   Describes the basic CRUD actions for themes
 
   Background:
-    Given a project has been started
+    Given I have started a project
 
   Scenario: Create New Theme
-    When a theme is created with the name "Growing Up"
+    When I create a theme named "Growing Up"
     Then a theme named "Growing Up" should have been created
 
   Scenario: Rename Theme
-    Given a theme named "Transformation" has been created
-    When the "Transformation" theme is renamed with the name "Growing Up"
+    Given I have created a theme named "Transformation"
+    When I rename the "Transformation" theme to "Growing Up"
     Then the theme originally named "Transformation" should have been renamed to "Growing Up"
 
-  Scenario: Rename Theme with Major Characters
-    Given a theme named "Transformation" has been created
-    And a theme named "Becoming a Ruler" has been created
-    And the following characters have been created
-      | "Bob" | "Frank" | "Alice" |
-    And the following characters have been included as major characters in the "Transformation" theme
-      | "Bob" | "Frank" |
-    And the following characters have been included as major characters in the "Becoming a Ruler" theme
-      | "Alice" |
-    When the "Transformation" theme is renamed with the name "Growing Up"
-    Then all the character arcs in the theme originally named "Transformation" should have been renamed to "Growing Up"
-    But all the character arcs in the theme named "Becoming a Ruler" should still be named "Becoming a Ruler"
+#  Scenario: Rename Theme with Major Characters
+#    Given I have created a theme named "Transformation"
+#    And I have created a theme named "Becoming a Ruler"
+#    And I have created the following characters
+#      | Bob | Frank | Alice |
+#    And I have created a character arc for the "Bob" character in the "Transformation" theme
+#    And I have created a character arc for the "Frank" character in the "Transformation" theme
+#    And I have created a character arc for the "Alice" character in the "Becoming a Ruler" theme
+#    When I rename the "Transformation" theme to "Growing Up"
+#    Then the "Bob" character's character arc for the "Growing Up" theme should have been renamed to "Growing Up"
+#    And the "Frank" character's character arc for the "Growing Up" theme should have been renamed to "Growing Up"
+#    But the "Alice" character's character arc for the "Becoming a Ruler" theme should not have been renamed to "Growing Up"
 
   Scenario: Delete Theme
-    Given a theme named "Growing Up" has been created
+    Given I have created a theme named "Growing Up"
     When the "Growing Up" theme is deleted
     Then the "Growing Up" theme should have been deleted
 
   Scenario: Delete Theme with Major Characters
-    Given a theme named "Growing Up" has been created
-    And a theme named "Becoming a Ruler" has been created
+    Given I have created a theme named "Growing Up"
+    And I have created a theme named "Becoming a Ruler"
     And the following characters have been created
       | "Bob" | "Frank" | "Alice" |
     And the following characters have been included as major characters in the "Growing Up" theme

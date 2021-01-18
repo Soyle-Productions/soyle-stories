@@ -2,10 +2,7 @@ package com.soyle.stories.di.scene
 
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
-import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
-import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
-import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
+import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -52,7 +49,6 @@ import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharacter
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
-import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
@@ -90,6 +86,7 @@ object SceneModule {
             provide<CreateNewScene> {
                 CreateNewSceneUseCase(
                     projectId,
+                    get(),
                     get(),
                     get(),
                     get()
@@ -352,18 +349,22 @@ object SceneModule {
 
         scoped<SceneDetailsScope> {
             provide<SceneDetailsViewListener> {
+                val presenter = SceneDetailsPresenter(
+                    sceneId.toString(),
+                    get<SceneDetailsModel>(),
+                    projectScope.get(),
+                    projectScope.get<LinkLocationToSceneNotifier>(),
+                    projectScope.get<ReorderSceneNotifier>(),
+                )
+
+                presenter listensTo projectScope.get<DeleteSceneNotifier>()
+
                 SceneDetailsController(
                     sceneId.toString(),
                     projectScope.applicationScope.get(),
                     projectScope.applicationScope.get(),
                     projectScope.get(),
-                    SceneDetailsPresenter(
-                        sceneId.toString(),
-                        get<SceneDetailsModel>(),
-                        projectScope.get(),
-                        projectScope.get<LinkLocationToSceneNotifier>(),
-                        projectScope.get<ReorderSceneNotifier>(),
-                    ),
+                    presenter,
                     projectScope.get(),
                 )
             }
@@ -397,7 +398,7 @@ object SceneModule {
                     characterId,
                     get<IncludedCharacterInSceneState>()
                 ).apply {
-                    listensTo(projectScope.get<RenamedCharacterNotifier>())
+                    listensTo(projectScope.get<CharacterRenamedNotifier>())
                     listensTo(projectScope.get<SetMotivationForCharacterInSceneNotifier>())
                     listensTo(projectScope.get<CharacterArcSectionsCoveredBySceneNotifier>())
                     listensTo(projectScope.get<CharacterArcSectionUncoveredInSceneNotifier>())
@@ -417,8 +418,6 @@ object SceneModule {
                 )
             }
         }
-
-        SceneListModule
 
     }
 }

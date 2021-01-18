@@ -1,6 +1,6 @@
 package com.soyle.stories.common.components
 
-import de.jensd.fx.glyphs.GlyphIcon
+import com.soyle.stories.soylestories.Styles
 import javafx.scene.effect.BlurType
 import javafx.scene.effect.DropShadow
 import javafx.scene.paint.Color
@@ -30,6 +30,8 @@ class ComponentsStyles : Stylesheet() {
         val contextMenuSectionHeaderItem by cssclass()
         val contextMenuSectionedItem by cssclass()
         val discouragedSelection by cssclass()
+
+        val hasProblem by cssclass()
 
         init {
             importStylesheet<ComponentsStyles>()
@@ -152,6 +154,15 @@ class ComponentsStyles : Stylesheet() {
             label {
                 textFill = Color.DARKGRAY
             }
+        }
+        popup {
+            backgroundColor += Color.WHITE
+            borderColor += box(Styles.Purple)
+            borderWidth += box(1.px)
+        }
+        hasProblem {
+            borderWidth += box(0.px, 0.px, 2.px, 0.px)
+            borderColor += box(Color.TRANSPARENT, Color.TRANSPARENT, Styles.Orange, Color.TRANSPARENT)
         }
     }
 }

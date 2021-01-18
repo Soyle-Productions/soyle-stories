@@ -1,9 +1,6 @@
 package com.soyle.stories.soylestories
 
 import com.soyle.stories.common.Model
-import com.soyle.stories.common.bindImmutableList
-import com.soyle.stories.di.DI
-import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.project.projectList.ProjectListView
 import com.soyle.stories.project.projectList.ProjectListViewModel
@@ -11,7 +8,6 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.ItemViewModel
 
 /**
  * Created by Brendan

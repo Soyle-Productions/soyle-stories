@@ -3,11 +3,10 @@ package com.soyle.stories.storyevent.storyEventDetails
 import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.entities.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationListListener
@@ -16,8 +15,6 @@ import com.soyle.stories.storyevent.StoryEventException
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEventReceiver
 import com.soyle.stories.storyevent.storyEventDetails.presenters.AddCharacterToStoryEventPresenter
 import com.soyle.stories.storyevent.storyEventDetails.presenters.LinkLocationToStoryEventPresenter
-import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
-import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
 import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
 import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
 import java.util.*
@@ -113,16 +110,16 @@ class StoryEventDetailsPresenter(
 		}
 	}
 
-	override suspend fun receiveRenamedCharacter(renamedCharacter: RenameCharacter.ResponseModel) {
-		val renamedCharacterId= renamedCharacter.characterId.toString()
+	override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
+		val renamedCharacterId= characterRenamed.characterId.toString()
 		view.updateOrInvalidated {
 			copy(
 				availableCharacters = availableCharacters.map {
-					if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+					if (it.characterId == renamedCharacterId) it.copy(characterName = characterRenamed.newName)
 					else it
 				},
 				characters = characters.map {
-					if (it.characterId == renamedCharacterId) it.copy(characterName = renamedCharacter.newName)
+					if (it.characterId == renamedCharacterId) it.copy(characterName = characterRenamed.newName)
 					else it
 				}
 			)

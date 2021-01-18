@@ -1,8 +1,8 @@
 package com.soyle.stories.location.deleteLocationDialog
 
 
-import com.soyle.stories.di.resolveLater
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.di.resolveLater
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBenchModel
 import com.soyle.stories.project.layout.Dialog
@@ -22,6 +22,8 @@ class DeleteLocationDialogModel : DeleteLocationDialogView, ItemViewModel<Delete
 	val locationName = bind(DeleteLocationDialogViewModel::locationName)
 
 	val threadTransformer: ThreadTransformer by resolveLater(scope.applicationScope)
+
+	override val viewModel: DeleteLocationDialogViewModel? = item
 
 	override fun update(update: DeleteLocationDialogViewModel?.() -> DeleteLocationDialogViewModel) {
 		threadTransformer.gui {

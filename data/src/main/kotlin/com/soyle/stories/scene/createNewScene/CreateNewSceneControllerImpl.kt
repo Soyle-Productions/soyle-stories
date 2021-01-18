@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.createNewScene
 
 import com.soyle.stories.common.LocaleManager
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import java.util.*
@@ -15,7 +16,7 @@ class CreateNewSceneControllerImpl(
 
 	private val projectId = UUID.fromString(projectId)
 
-	override fun createNewScene(name: String) {
+	override fun createNewScene(name: NonBlankString) {
 		threadTransformer.async {
 			val request = CreateNewScene.RequestModel(
 			  name,
@@ -25,7 +26,7 @@ class CreateNewSceneControllerImpl(
 		}
 	}
 
-	override fun createNewSceneBefore(name: String, sceneId: String) {
+	override fun createNewSceneBefore(name: NonBlankString, sceneId: String) {
 		threadTransformer.async {
 			createNewScene.invoke(
 			  CreateNewScene.RequestModel(
@@ -39,7 +40,7 @@ class CreateNewSceneControllerImpl(
 		}
 	}
 
-	override fun createNewSceneAfter(name: String, sceneId: String) {
+	override fun createNewSceneAfter(name: NonBlankString, sceneId: String) {
 		threadTransformer.async {
 			createNewScene.invoke(
 			  CreateNewScene.RequestModel(

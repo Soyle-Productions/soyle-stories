@@ -10,9 +10,7 @@ import com.soyle.stories.di.get
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.location.LocationSteps.interact
 import com.soyle.stories.location.controllers.CreateNewLocationController
-import com.soyle.stories.location.controllers.DeleteLocationController
 import com.soyle.stories.location.controllers.RenameLocationController
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog

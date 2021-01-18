@@ -1,8 +1,9 @@
 package com.soyle.stories.repositories
 
 import com.soyle.stories.entities.*
+import com.soyle.stories.location.repositories.CharacterArcSectionRepository
 
-class CharacterArcRepositoryImpl : com.soyle.stories.theme.repositories.CharacterArcRepository {
+class CharacterArcRepositoryImpl : com.soyle.stories.theme.repositories.CharacterArcRepository, CharacterArcSectionRepository {
 
 	val characterArcs = mutableMapOf<Pair<Character.Id, Theme.Id>, CharacterArc>()
 	val characterArcsBySections = mutableMapOf<CharacterArcSection.Id, Pair<Character.Id, Theme.Id>>()
@@ -73,5 +74,12 @@ class CharacterArcRepositoryImpl : com.soyle.stories.theme.repositories.Characte
 		characterArcs.forEach {
 			addNewCharacterArc(it)
 		}
+	}
+
+	@Synchronized
+	override fun getCharacterArcSectionsLinkedToLocation(locationId: Location.Id): List<CharacterArcSection> = emptyList()
+
+	@Synchronized
+	override fun updateCharacterArcSections(characterArcSections: Set<CharacterArcSection>) {
 	}
 }

@@ -1,25 +1,14 @@
 package com.soyle.stories.scene.sceneDetails.includedCharacter
 
 import com.soyle.stories.common.components.*
-import com.soyle.stories.common.components.menuChipGroup.MenuChipGroup
-import com.soyle.stories.common.components.menuChipGroup.menu
-import com.soyle.stories.common.components.menuChipGroup.menuchipgroup
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.get
-import javafx.beans.property.SimpleIntegerProperty
-import javafx.collections.MapChangeListener
-import javafx.collections.ObservableList
-import javafx.collections.ObservableMap
 import javafx.scene.Parent
-import javafx.scene.control.CheckBox
-import javafx.scene.control.Label
-import javafx.scene.control.MenuItem
 import javafx.scene.layout.Priority
 import org.controlsfx.control.PopOver
 import tornadofx.*
 import tornadofx.controlsfx.popover
-import java.lang.ref.WeakReference
 
 class IncludedCharacterView : View() {
 
@@ -54,12 +43,14 @@ class IncludedCharacterView : View() {
 
     private fun Parent.positionOnArcSelectionField() {
         labeledSection(state.positionOnCharacterArcLabel) {
+            addClass("position-on-arc")
             PositionOnArcSelection(this, state, viewListener)
         }
     }
 
     private fun Parent.characterMotivationField() =
         labeledSection(state.motivationFieldLabel) {
+            addClass("motivation")
             motivationTextField()
             hbox {
                 resetButton()
@@ -69,7 +60,10 @@ class IncludedCharacterView : View() {
 
     private fun Parent.motivationTextField() =
         textfield(state.motivation) {
-            onLoseFocus { updateMotivationIfDifferent(text) }
+            promptTextProperty().bind(state.previousMotivationValue)
+            onLoseFocus {
+                viewListener.setMotivation(text)
+            }
         }
 
     private fun Parent.resetButton() = hyperlink(state.resetMotivationLabel) {
@@ -126,14 +120,6 @@ class IncludedCharacterView : View() {
     {
         if (! state.motivationCanBeReset.get()) return
         viewListener.resetMotivation()
-    }
-
-    private fun updateMotivationIfDifferent(text: String)
-    {
-        val motivationValue = state.motivation.value ?: return
-        if (text != motivationValue) {
-            viewListener.setMotivation(text)
-        }
     }
 
 }

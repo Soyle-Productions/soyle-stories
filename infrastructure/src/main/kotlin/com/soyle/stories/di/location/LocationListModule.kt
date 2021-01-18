@@ -2,10 +2,10 @@ package com.soyle.stories.di.location
 
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.location.events.CreateNewLocationNotifier
-import com.soyle.stories.location.events.DeleteLocationNotifier
-import com.soyle.stories.location.events.RenameLocationNotifier
 import com.soyle.stories.location.locationList.*
+import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.project.ProjectScope
 
 internal object LocationListModule {
@@ -18,8 +18,8 @@ internal object LocationListModule {
 				  applicationScope.get(),
 				  get(),
 				  get<CreateNewLocationNotifier>(),
-				  get<DeleteLocationNotifier>(),
-				  get<RenameLocationNotifier>()
+				  get<DeletedLocationNotifier>(),
+				  get<LocationRenamedNotifier>()
 				)
 			}
 

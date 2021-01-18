@@ -5,8 +5,8 @@ import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert.Companion.assertThat
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert.Companion.assertThat
+import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert.Companion.assertThat
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.CharacterArcTemplateSection
 import com.soyle.stories.entities.Theme
@@ -24,7 +24,7 @@ class ThemeSteps : En {
     }
 
     private fun givens() {
-        Given("a theme named {string} has been created") { themeName: String ->
+        Given("I have created a theme named {string}") { themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             ThemeDriver(workbench).givenThemeNamed(themeName)
         }
@@ -65,15 +65,15 @@ class ThemeSteps : En {
     }
 
     private fun whens() {
-        When("a theme is created with the name {string}") { themeName: String ->
+        When("I create a theme named {string}") { themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.openCreateThemeDialog()
                 .createThemeWithName(themeName)
         }
-        When("the {string} theme is renamed with the name {string}") { originalThemeName: String, newName: String ->
+        When("I rename the {theme} to {string}") { theme: Theme, newName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenThemeListToolHasBeenOpened()
-                .renameThemeTo(originalThemeName, newName)
+                .renameThemeTo(theme, newName)
         }
         When("the {string} theme is deleted") { themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()

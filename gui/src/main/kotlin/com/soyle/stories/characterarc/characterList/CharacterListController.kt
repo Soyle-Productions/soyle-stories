@@ -5,6 +5,7 @@ import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveChara
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
@@ -45,7 +46,7 @@ class CharacterListController(
         openToolController.openCentralConflict(themeId, characterId)
     }
 
-    override fun renameCharacter(characterId: String, newName: String) {
+    override fun renameCharacter(characterId: String, newName: NonBlankString) {
         threadTransformer.async {
             renameCharacter.invoke(
               UUID.fromString(characterId),

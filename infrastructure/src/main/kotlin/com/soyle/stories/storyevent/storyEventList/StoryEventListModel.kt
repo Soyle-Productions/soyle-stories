@@ -25,6 +25,8 @@ class StoryEventListModel : ItemViewModel<StoryEventListViewModel>(), View.Nulla
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)
 
+	override val viewModel: StoryEventListViewModel? = item
+
 	override fun update(update: StoryEventListViewModel?.() -> StoryEventListViewModel) {
 		threadTransformer.gui {
 			rebind { item = item.update() }

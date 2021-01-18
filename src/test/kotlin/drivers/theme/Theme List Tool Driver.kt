@@ -4,26 +4,14 @@ import com.soyle.stories.common.editingCell
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
-import com.soyle.stories.di.get
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.theme.themeList.ThemeList
-import com.soyle.stories.theme.themeList.ThemeListItemViewModel
-import com.soyle.stories.theme.themeList.ThemeListModel
 import com.sun.javafx.tk.Toolkit
-import javafx.application.Platform
 import javafx.event.ActionEvent
-import javafx.scene.control.*
-import javafx.scene.control.skin.TreeViewSkin
-import javafx.scene.control.skin.VirtualFlow
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
-import org.junit.jupiter.api.Assertions.*
+import javafx.scene.control.SplitPane
+import javafx.scene.control.TextField
 import tornadofx.FX
-import java.util.*
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import kotlin.NoSuchElementException
 
 fun WorkBench.givenThemeListToolHasBeenOpened(): ThemeList =
     getThemeListTool() ?: openThemeListTool()
@@ -43,11 +31,11 @@ fun WorkBench.openThemeListTool(): ThemeList
     return getThemeListToolOrError()
 }
 
-fun ThemeList.renameThemeTo(originalName: String, newName: String)
+fun ThemeList.renameThemeTo(theme: Theme, newName: String)
 {
     val driver = ThemeListDriver(this)
     val tree = driver.getTree()
-    val treeItem = driver.getThemeItemOrError(originalName)
+    val treeItem = driver.getThemeItemOrError(theme.name)
     val renameOptionItem = themeItemContextMenu.items.find { it.text == "Rename" }!!
     driver.interact {
         tree.selectionModel.select(treeItem)

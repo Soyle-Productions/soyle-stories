@@ -36,6 +36,7 @@ object ToolModule : RegisteredToolsConfig {
         CharacterValueComparison.getRegistration(),
         CharacterConflict.getRegistration(),
         MoralArgument.getRegistration(),
+        SceneEditor.getRegistration(),
         /**
          * Temporary Tools
          */

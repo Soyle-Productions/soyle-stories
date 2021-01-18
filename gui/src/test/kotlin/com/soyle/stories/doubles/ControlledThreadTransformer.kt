@@ -21,16 +21,20 @@ class ControlledThreadTransformer : ThreadTransformer {
     }
 
 
-    override fun async(task: suspend CoroutineScope.() -> Unit) {
+    override fun async(task: suspend CoroutineScope.() -> Unit): Job {
+        val job = Job()
         if (asyncDelay == 0L) runBlocking {
             task()
+            job.complete()
         }
         else {
             CoroutineScope(Dispatchers.Default).launch {
                 delay(asyncDelay)
                 task()
+                job.complete()
             }
         }
+        return job
     }
 
     override fun gui(update: suspend CoroutineScope.() -> Unit) {}

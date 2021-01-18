@@ -10,16 +10,16 @@ import javafx.beans.property.SimpleMapProperty
 import javafx.beans.property.SimpleSetProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
-import javafx.event.EventTarget
 import javafx.geometry.Bounds
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.skin.TextAreaSkin
+import javafx.scene.control.skin.VirtualFlow
 import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
 import tornadofx.*
 import java.util.*
-import kotlin.reflect.KClass
+import kotlin.collections.LinkedHashSet
 import kotlin.reflect.KProperty1
 
 /**
@@ -184,11 +184,12 @@ val TextArea.rowCountProperty
 val TextArea.rowCount
 	get() = rowCountProperty.get()
 
-fun <T : Node> T.existsWhen(expr: () -> ObservableValue<Boolean>): T {
-	visibleWhen(expr())
+fun <T : Node> T.existsWhen(expr: ObservableValue<Boolean>): T {
+	visibleWhen(expr)
 	managedProperty().cleanBind(visibleProperty())
 	return this
 }
+fun <T : Node> T.existsWhen(expr: () -> ObservableValue<Boolean>): T = existsWhen(expr())
 var <T : Node> T.exists: Boolean
 	get() = visibleProperty().get() && managedProperty().get()
 	set(value) {
@@ -197,3 +198,18 @@ var <T : Node> T.exists: Boolean
 	}
 
 fun Node.onLoseFocus(op: () -> Unit) = focusedProperty().onChange { if (! it) op() }
+
+val <T> ListView<T>.cells: LinkedHashSet<ListCell<T>>
+	get() = properties.getOrPut("com.soyle.stories.listview.cells") { LinkedHashSet<ListCell<T>>() } as LinkedHashSet<ListCell<T>>
+
+fun <T> ListView<T>.sizeToFitItems(maximumVisibleItems: Double = 11.5)
+{
+	val ROW_HEIGHT = (childrenUnmodifiable.firstOrNull() as? VirtualFlow<ListCell<T>>)?.firstVisibleCell?.height ?: 24.0
+	val currentPrefHeight = prefHeight
+	prefHeight = (items.size * ROW_HEIGHT) + 2.0
+	val currentMaxHeight = maxHeight
+	maxHeight = 2.0 + maximumVisibleItems * ROW_HEIGHT
+	if (prefHeight != currentPrefHeight || maxHeight != currentMaxHeight) {
+		requestLayout()
+	}
+}

@@ -11,12 +11,10 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import com.soyle.stories.theme.ThemeDoesNotExist
-import com.soyle.stories.theme.characterConflict.CharacterConflictScope
 import com.soyle.stories.theme.moralArgument.MoralArgumentScope
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
-import tornadofx.UIComponent
 import tornadofx.onChange
 import tornadofx.tab
 import java.util.*

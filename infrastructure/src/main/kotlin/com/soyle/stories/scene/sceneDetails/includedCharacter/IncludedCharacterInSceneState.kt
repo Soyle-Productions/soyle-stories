@@ -1,7 +1,9 @@
 package com.soyle.stories.scene.sceneDetails.includedCharacter
 
 import com.soyle.stories.common.Model
+import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.soylestories.ApplicationScope
+import tornadofx.onChange
 import tornadofx.stringBinding
 
 class IncludedCharacterInSceneState : Model<IncludedCharacterScope, IncludedCharacterInSceneViewModel>(IncludedCharacterScope::class) {
@@ -29,7 +31,9 @@ class IncludedCharacterInSceneState : Model<IncludedCharacterScope, IncludedChar
     val motivation = bind(IncludedCharacterInSceneViewModel::motivation)
     val motivationCanBeReset = bind(IncludedCharacterInSceneViewModel::motivationCanBeReset)
     val previousMotivation = bind(IncludedCharacterInSceneViewModel::previousMotivation)
-    val previousMotivationValue = previousMotivation.stringBinding { it?.value }
+    val previousMotivationValue = previousMotivation.stringBinding {
+        it?.value
+    }
     val previousMotivationSource = previousMotivation.stringBinding { it?.sourceSceneId }
 
     val coveredArcSections = bind(IncludedCharacterInSceneViewModel::coveredArcSections)

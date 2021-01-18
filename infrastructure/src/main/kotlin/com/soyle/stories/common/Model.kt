@@ -5,12 +5,10 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.*
 import javafx.beans.value.ObservableValue
-import javafx.beans.value.WritableObjectValue
 import javafx.beans.value.WritableValue
 import tornadofx.*
 import kotlin.error
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 
 abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable<VM>, Component(), ScopedInstance {
@@ -37,6 +35,9 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 
 	open fun viewModel(): VM? = item
 
+	override val viewModel: VM?
+		get() = viewModel()
+
 	override fun update(update: VM?.() -> VM) {
 		threadTransformer.gui {
 			item = viewModel().update()
@@ -50,9 +51,14 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 		}
 	}
 
+	private class BoundPropertyCannotBeUpdated(override val cause: Throwable) : Exception()
+
 	inner class BoundProperty<R>(private val prop: WritableValue<R>, private val getter: (VM) -> R) {
 		fun update(vm: VM) {
-			prop.value = getter(vm)
+			val newValue = getter(vm)
+			if (newValue != prop.value) {
+				prop.value = newValue
+			}
 		}
 	}
 	private val props = mutableListOf<BoundProperty<*>>()

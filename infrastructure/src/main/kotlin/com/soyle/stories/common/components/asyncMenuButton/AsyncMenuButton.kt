@@ -1,12 +1,8 @@
 package com.soyle.stories.common.components.asyncMenuButton
 
-import javafx.application.Platform
-import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.collections.ObservableList
 import javafx.event.EventTarget
-import javafx.scene.Parent
 import javafx.scene.control.MenuButton
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.Region

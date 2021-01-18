@@ -1,7 +1,8 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.common.makeEditable
+import com.soyle.stories.common.*
 import com.soyle.stories.di.resolve
+import com.soyle.stories.entities.Location
 import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
@@ -11,6 +12,7 @@ import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.layout.Priority
 import tornadofx.*
+import java.util.*
 
 /**
  * Created by Brendan
@@ -70,12 +72,19 @@ internal class PopulatedDisplay : View() {
             makeEditable { newName, oldValue ->
                 // rename item
                 when (oldValue) {
-                    is LocationItemViewModel -> locationListViewListener.renameLocation(oldValue.id, newName)
+                    is LocationItemViewModel -> {
+                        (countLines(newName) as? SingleLine)
+                            ?.let { SingleNonBlankLine.create(it) }
+                            ?.let {
+                                locationListViewListener.renameLocation(Location.Id(UUID.fromString(oldValue.id)), it)
+                            }
+
+                    }
                 }
 
                 oldValue
             }
-            selectionModel.selectedItemProperty().onChange { model.selectedItem.value = it?.value }
+            bindSelected(model.selectedItem)
             model.selectedItem.onChange { newSelection -> selectionModel.select(root.children.find { it.value?.id == newSelection?.id }) }
             model.selectedItem.onChange {
                 contextMenu = when (it) {

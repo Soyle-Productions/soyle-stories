@@ -1,8 +1,8 @@
 package com.soyle.stories.scene.sceneList
 
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.gui.View
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.items.SceneItemViewModel
@@ -24,6 +24,8 @@ class SceneListModel : ItemViewModel<SceneListViewModel>(), View.Nullable<SceneL
 	val selectedItem = SimpleObjectProperty<SceneItemViewModel?>(null)
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)
+
+	override val viewModel: SceneListViewModel? = item
 
 	override fun update(update: SceneListViewModel?.() -> SceneListViewModel) {
 		threadTransformer.gui {

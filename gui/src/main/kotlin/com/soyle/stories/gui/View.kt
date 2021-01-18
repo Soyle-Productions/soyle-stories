@@ -9,6 +9,7 @@ interface View<VM> {
     fun update(update: VM.() -> VM)
 
     interface Nullable<VM : Any> {
+        val viewModel: VM?
         fun update(update: VM?.() -> VM)
         fun updateOrInvalidated(update: VM.() -> VM)
     }

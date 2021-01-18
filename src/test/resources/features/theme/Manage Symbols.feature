@@ -2,8 +2,8 @@ Feature: Manage Symbols
   Describes the basic CRUD actions for symbols
 
   Background:
-    Given a project has been started
-    And a theme named "Growing Up" has been created
+    Given I have started a project
+    And I have created a theme named "Growing Up"
 
   Scenario: Create New Symbol
     When a symbol is created with the name "Ring" in the "Growing Up" theme

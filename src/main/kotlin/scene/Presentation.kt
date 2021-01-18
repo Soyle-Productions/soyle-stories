@@ -2,11 +2,13 @@ package com.soyle.stories.desktop.config.scene
 
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
-import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
+import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneNotifier
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneNotifier
 import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
@@ -36,6 +38,9 @@ import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharacter
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInScenePresenter
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneState
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewListener
+import com.soyle.stories.scene.sceneEditor.SceneEditorController
+import com.soyle.stories.scene.sceneEditor.SceneEditorScope
+import com.soyle.stories.scene.sceneEditor.SceneEditorViewListener
 import com.soyle.stories.scene.sceneList.SceneListController
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneList.SceneListPresenter
@@ -46,61 +51,14 @@ object Presentation {
 
     init {
         scoped<ProjectScope> {
+            createNewSceneDialog()
+            deleteSceneDialog()
+            reorderSceneDialog()
 
-            provide<CreateNewSceneDialogViewListener> {
-                CreateNewSceneDialogController(
-                    CreateNewSceneDialogPresenter(
-                        get<CreateSceneDialogModel>(),
-                        get<CreateNewSceneNotifier>()
-                    ),
-                    get()
-                )
-            }
-            provide<DeleteSceneDialogViewListener> {
-                val presenter = DeleteSceneDialogPresenter(
-                    get<DeleteSceneDialogModel>()
-                )
-                DeleteSceneDialogController(
-                    applicationScope.get(),
-                    presenter,
-                    get(),
-                    get(),
-                    get(),
-                    presenter,
-                    get()
-                )
-            }
-            provide<ReorderSceneDialogViewListener> {
-                ReorderSceneDialogController(
-                    applicationScope.get(),
-                    ReorderSceneDialogPresenter(
-                        get<ReorderSceneDialogModel>()
-                    ),
-                    get(),
-                    get(),
-                    get(),
-                    get()
-                )
-            }
-
-            provide<SceneListViewListener> {
-                SceneListController(
-                    applicationScope.get(),
-                    get(),
-                    SceneListPresenter(
-                        get<SceneListModel>(),
-                        get<CreateNewSceneNotifier>(),
-                        get<RenameSceneNotifier>(),
-                        get<DeleteSceneNotifier>(),
-                        get<ReorderSceneNotifier>()
-                    ),
-                    get(),
-                    get(),
-                    get()
-                )
-            }
+            sceneList()
 
         }
+        sceneEditor()
 
         scoped<DeleteSceneRamificationsScope> {
 
@@ -191,7 +149,7 @@ object Presentation {
                     characterId,
                     get<IncludedCharacterInSceneState>()
                 ).apply {
-                    listensTo(projectScope.get<RenamedCharacterNotifier>())
+                    listensTo(projectScope.get<CharacterRenamedNotifier>())
                     listensTo(projectScope.get<SetMotivationForCharacterInSceneNotifier>())
                     listensTo(projectScope.get<CharacterArcSectionsCoveredBySceneNotifier>())
                     listensTo(projectScope.get<CharacterArcSectionUncoveredInSceneNotifier>())
@@ -212,6 +170,84 @@ object Presentation {
             }
         }
 
+    }
+
+    private fun InScope<ProjectScope>.sceneList() {
+        provide<SceneListViewListener> {
+            SceneListController(
+                applicationScope.get(),
+                get(),
+                SceneListPresenter(
+                    get<SceneListModel>(),
+                    get<CreateNewSceneNotifier>(),
+                    get<RenameSceneNotifier>(),
+                    get<DeleteSceneNotifier>(),
+                    get<ReorderSceneNotifier>(),
+                    get<DetectInvalidatedMentionsOutput>()
+                ),
+                get(),
+                get(),
+                get()
+            )
+        }
+    }
+
+    private fun InScope<ProjectScope>.reorderSceneDialog() {
+        provide<ReorderSceneDialogViewListener> {
+            ReorderSceneDialogController(
+                applicationScope.get(),
+                ReorderSceneDialogPresenter(
+                    get<ReorderSceneDialogModel>()
+                ),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
+    }
+
+    private fun InScope<ProjectScope>.deleteSceneDialog() {
+        provide<DeleteSceneDialogViewListener> {
+            val presenter = DeleteSceneDialogPresenter(
+                get<DeleteSceneDialogModel>()
+            )
+            DeleteSceneDialogController(
+                applicationScope.get(),
+                presenter,
+                get(),
+                get(),
+                get(),
+                presenter,
+                get()
+            )
+        }
+    }
+
+    private fun InScope<ProjectScope>.createNewSceneDialog() {
+        provide<CreateNewSceneDialogViewListener> {
+            CreateNewSceneDialogController(
+                CreateNewSceneDialogPresenter(
+                    get<CreateSceneDialogModel>(),
+                    get<CreateNewSceneNotifier>()
+                ),
+                get()
+            )
+        }
+    }
+
+    private fun sceneEditor() {
+        scoped<SceneEditorScope> {
+            provide<SceneEditorViewListener> {
+                SceneEditorController(
+                    sceneId,
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get()
+                )
+            }
+        }
     }
 
 }

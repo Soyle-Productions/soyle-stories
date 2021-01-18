@@ -2,7 +2,6 @@ package com.soyle.stories.location.locationList
 
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
 import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
-import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -34,9 +33,8 @@ internal class ActionBar : View() {
             id = "actionBar_deleteLocation"
             enableWhen { model.selectedItem.isNotNull }
             action {
-                when (val selectedItem = model.selectedItem.value) {
-                    is LocationItemViewModel -> deleteLocationDialog(scope, selectedItem)
-                }
+                val selectedItem = model.selectedItem.value ?: return@action
+                deleteLocationDialog(scope, selectedItem)
             }
             isMnemonicParsing = false
         }

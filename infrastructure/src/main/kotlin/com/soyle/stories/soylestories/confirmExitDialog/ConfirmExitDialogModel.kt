@@ -1,7 +1,6 @@
 package com.soyle.stories.soylestories.confirmExitDialog
 
 import com.soyle.stories.soylestories.ApplicationModel
-import com.soyle.stories.soylestories.welcomeScreen.WelcomeScreenViewModel
 import javafx.application.Platform
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.ItemViewModel
@@ -16,6 +15,8 @@ class ConfirmExitDialogModel : ConfirmExitDialogView, ItemViewModel<ConfirmExitD
 	val closingProject = find<ApplicationModel>().closingProject
 
 	val isInvalid = SimpleBooleanProperty(true)
+
+	override val viewModel: ConfirmExitDialogViewModel? = item
 
 	override fun update(update: ConfirmExitDialogViewModel?.() -> ConfirmExitDialogViewModel) {
 		if (! Platform.isFxApplicationThread()) return runLater { update(update) }

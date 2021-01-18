@@ -2,18 +2,19 @@ package com.soyle.stories.di.theme
 
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
-import com.soyle.stories.character.renameCharacter.RenamedCharacterNotifier
+import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
 import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInThemeUseCase
 import com.soyle.stories.characterarc.changeSectionValue.*
 import com.soyle.stories.characterarc.eventbus.ChangeCharacterPropertyValueNotifier
+import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.*
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.location.events.CreateNewLocationNotifier
-import com.soyle.stories.location.events.DeleteLocationNotifier
-import com.soyle.stories.location.events.RenameLocationNotifier
+import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebControllerImpl
@@ -31,13 +32,26 @@ import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacte
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.ChangeCharacterPerspectivePropertyControllerImpl
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyController
 import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValueControllerImpl
-import com.soyle.stories.theme.characterConflict.*
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedNotifier
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictController
+import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictControllerImpl
+import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangedCentralMoralQuestionNotifier
+import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangedCentralMoralQuestionReceiver
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeControllerImpl
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
+import com.soyle.stories.theme.characterConflict.CharacterConflictModule
 import com.soyle.stories.theme.characterValueComparison.*
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogController
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogModel
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogPresenter
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialogViewListener
-import com.soyle.stories.theme.createSymbolDialog.*
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialogController
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialogModel
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialogPresenter
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialogViewListener
 import com.soyle.stories.theme.createTheme.*
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogController
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogModel
@@ -53,7 +67,10 @@ import com.soyle.stories.theme.deleteTheme.DeleteThemeControllerImpl
 import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
 import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.deleteValueWebDialog.*
-import com.soyle.stories.theme.includeCharacterInTheme.*
+import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeNotifier
+import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
+import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController
+import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonControllerImpl
 import com.soyle.stories.theme.removeCharacterAsOpponent.*
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeNotifier
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
@@ -96,19 +113,12 @@ import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicI
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOppositionUseCase
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToThemeUseCase
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.*
-import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedNotifier
-import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
-import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictController
-import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.ChangeCentralConflictControllerImpl
-import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangedCentralMoralQuestionNotifier
-import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangedCentralMoralQuestionReceiver
-import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
-import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeControllerImpl
-import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
-import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChange
 import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChangeUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralConflict
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralMoralQuestion
+import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeThemeDetailsUseCase
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenameTheme
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
 import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValuesUseCase
 import com.soyle.stories.theme.usecases.createTheme.CreateTheme
@@ -117,7 +127,6 @@ import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeleteThemeUseCase
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
 import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
 import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
@@ -152,10 +161,7 @@ import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItem
 import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItemUseCase
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWeb
 import com.soyle.stories.theme.usecases.renameValueWeb.RenameValueWebUseCase
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralConflict
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralMoralQuestion
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeThemeDetailsUseCase
-import com.soyle.stories.theme.usecases.changeThemeDetails.RenameTheme
+import com.soyle.stories.theme.usecases.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsMainOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponentUseCase
@@ -617,12 +623,12 @@ object ThemeModule {
                 )
 
                 presenter listensTo projectScope.get<CreatedCharacterNotifier>()
-                presenter listensTo projectScope.get<RenamedCharacterNotifier>()
+                presenter listensTo projectScope.get<CharacterRenamedNotifier>()
                 presenter listensTo projectScope.get<RemovedCharacterNotifier>()
 
                 presenter listensTo projectScope.get<CreateNewLocationNotifier>()
-                presenter listensTo projectScope.get<RenameLocationNotifier>()
-                presenter listensTo projectScope.get<DeleteLocationNotifier>()
+                presenter listensTo projectScope.get<LocationRenamedNotifier>()
+                presenter listensTo projectScope.get<DeletedLocationNotifier>()
 
                 presenter listensTo projectScope.get<SymbolAddedToThemeNotifier>()
                 presenter listensTo projectScope.get<RenameSymbolNotifier>()
