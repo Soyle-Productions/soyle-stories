@@ -13,18 +13,18 @@ Feature: Manage Themes
     When I rename the "Transformation" theme to "Growing Up"
     Then the theme originally named "Transformation" should have been renamed to "Growing Up"
 
-  Scenario: Rename Theme with Major Characters
-    Given I have created a theme named "Transformation"
-    And I have created a theme named "Becoming a Ruler"
-    And I have created the following characters
-      | Bob | Frank | Alice |
-    And I have created a character arc for the "Bob" character in the "Transformation" theme
-    And I have created a character arc for the "Frank" character in the "Transformation" theme
-    And I have created a character arc for the "Alice" character in the "Becoming a Ruler" theme
-    When I rename the "Transformation" theme to "Growing Up"
-    Then the "Bob" character's character arc for the "Growing Up" theme should have been renamed to "Growing Up"
-    And the "Frank" character's character arc for the "Growing Up" theme should have been renamed to "Growing Up"
-    But the "Alice" character's character arc for the "Becoming a Ruler" theme should not have been renamed to "Growing Up"
+#  Scenario: Rename Theme with Major Characters
+#    Given I have created a theme named "Transformation"
+#    And I have created a theme named "Becoming a Ruler"
+#    And I have created the following characters
+#      | Bob | Frank | Alice |
+#    And I have created a character arc for the "Bob" character in the "Transformation" theme
+#    And I have created a character arc for the "Frank" character in the "Transformation" theme
+#    And I have created a character arc for the "Alice" character in the "Becoming a Ruler" theme
+#    When I rename the "Transformation" theme to "Growing Up"
+#    Then the "Bob" character's character arc for the "Growing Up" theme should have been renamed to "Growing Up"
+#    And the "Frank" character's character arc for the "Growing Up" theme should have been renamed to "Growing Up"
+#    But the "Alice" character's character arc for the "Becoming a Ruler" theme should not have been renamed to "Growing Up"
 
   Scenario: Delete Theme
     Given I have created a theme named "Growing Up"

@@ -1,5 +1,7 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogView
+import com.soyle.stories.desktop.config.drivers.character.getCreateArcSectionDialogOrError
 import com.soyle.stories.desktop.view.scene.sceneDetails.drive
 import com.soyle.stories.desktop.view.scene.sceneDetails.driver
 import com.soyle.stories.desktop.view.scene.sceneList.drive
@@ -32,10 +34,11 @@ private fun SceneList.openSceneDetails(scene: Scene) {
     }
 }
 
-fun SceneDetails.givenPositionOnArcInputForCharacterHasBeenSelected(character: Character) {
+fun SceneDetails.givenPositionOnArcInputForCharacterHasBeenSelected(character: Character): SceneDetails {
     if (! driver().getIncludedCharacter(character.id.uuid.toString()).getPositionOnArcInput().isShowing) {
         selectPositionOnArcInputForCharacter(character)
     }
+    return this
 }
 
 fun SceneDetails.selectPositionOnArcInputForCharacter(character: Character) {
@@ -44,4 +47,43 @@ fun SceneDetails.selectPositionOnArcInputForCharacter(character: Character) {
             .getPositionOnArcInput()
             .fire()
     }
+}
+
+fun SceneDetails.coverSectionInArc(arcName: String, sectionName: String) {
+    val includedCharacterDriver = driver().findIncludedCharacter { it.getPositionOnArcInput().isShowing }!!
+    with (includedCharacterDriver) {
+        val sectionItem = getPositionOnArcInput().getArcItem(arcName)!!
+            .getArcSectionItemOrError(sectionName)
+        if (sectionItem.isCovered()) return@with
+        drive {
+            sectionItem.fire()
+            getPositionOnArcInput().hide()
+        }
+    }
+}
+
+fun SceneDetails.uncoverSectionInArc(arcName: String, sectionName: String) {
+    val includedCharacterDriver = driver().findIncludedCharacter { it.getPositionOnArcInput().isShowing }!!
+    with (includedCharacterDriver) {
+        val sectionItem = getPositionOnArcInput().getArcItem(arcName)!!
+            .getArcSectionItemOrError(sectionName)
+        if (! sectionItem.isCovered()) return@with
+        drive {
+            sectionItem.fire()
+            getPositionOnArcInput().hide()
+        }
+    }
+}
+
+fun SceneDetails.givenCreateNewSectionInArcSelected(arcName: String): CreateArcSectionDialogView
+{
+    val includedCharacterDriver = driver().findIncludedCharacter { it.getPositionOnArcInput().isShowing }!!
+    with (includedCharacterDriver) {
+        val createNewOption = getPositionOnArcInput().getArcItem(arcName)!!
+            .getCreateNewSectionOption()
+        drive {
+            createNewOption.fire()
+        }
+    }
+    return getCreateArcSectionDialogOrError()
 }

@@ -254,6 +254,7 @@ class PositionOnArcSelection(
         val deselectedIds = previouslyCoveredSections - selectedIds
 
         if (newlySelectedIds.isNotEmpty() || deselectedIds.isNotEmpty()) {
+            println("covering sections.. ${newlySelectedIds}")
             viewListener.coverCharacterArcSectionInScene(
                 newlySelectedIds.toList(),
                 deselectedIds.toList()

@@ -61,7 +61,7 @@ class CharacterSteps : En {
         }
         Given("I have created a character arc for the {character} in the {theme}") { character: Character, theme: Theme ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError())
-                .givenCharacterIsIncludedInTheme(character.id, theme.id)
+                .givenCharacterIsMajorCharacterInTheme(character.id, theme.id)
         }
         Given(
             "I have created the following character arcs for the {character}"

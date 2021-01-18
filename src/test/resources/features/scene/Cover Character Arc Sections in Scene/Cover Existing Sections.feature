@@ -7,7 +7,6 @@ Feature: Cover Existing Sections
     And I have included the character "Bob" in the "Big Battle" scene
     And I have created the following character arcs for the character "Bob"
       | Growing Up | Transformation | Becoming a Leader |
-    And I have created 3 character arcs for the character "Bob"
     And I have covered the following character arc sections in the "Big Battle" scene for the "Bob" character
       | :arc:             | :section:  |
       | Growing Up        | Moral Need |
@@ -15,17 +14,20 @@ Feature: Cover Existing Sections
       | Transformation    | Opponent   |
       | Becoming a Leader | Plan       |
 
-  Scenario: Indicate intent to cover character arc sections in scene
-    When I want to cover character arc sections for the character "Bob" in the "Big Battle" scene
-    Then all of the "Bob" character's arcs and all their sections should be listed to cover in the "Big Battle" scene
-    And all of the "Bob" character's arc sections that are covered in the "Big Battle" scene should indicate they have been covered
-    And all of the "Bob" character's arc sections that are not covered in the "Big Battle" scene should not indicate they have been covered
+  Scenario: Can Cover New Sections from Character Arcs
+    When I request which arc sections for the "Bob" character can be covered in the "Big Battle" scene
+    Then all of the "Bob" character's arc sections that have not yet been covered in the "Big Battle" scene should be listed
+
+  Scenario: Can Uncover Sections Already Covered
+    When I request which arc sections for the "Bob" character can be uncovered in the "Big Battle" scene
+    Then all of the "Bob" character's arc sections that have been covered in the "Big Battle" scene should be listed
 
   Scenario: Specify Character Arc Sections to cover in Scene
-    Given I am covering character arc sections for the character "Bob" in the "Big Battle" scene
+    Given I have requested which arc sections for the "Bob" character can be covered in the "Big Battle" scene
     When I cover the "Desire" section from the "Bob" character's "Transformation" character arc in the "Big Battle" scene
     Then the "Big Battle" scene should cover the "Desire" section from the "Bob" character's "Transformation" character arc
 
   Scenario: Remove Covered Sections
+    Given I have requested which arc sections for the "Bob" character can be uncovered in the "Big Battle" scene
     When I uncover the "Desire" section from the "Bob" character's "Growing Up" character arc in the "Big Battle" scene
     Then the "Big Battle" scene should not cover the "Desire" section from the "Bob" character's "Growing Up" character arc

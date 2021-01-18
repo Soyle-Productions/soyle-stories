@@ -126,8 +126,6 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
     {
         projectScope.get<IncludeCharacterInComparisonController>()
             .includeCharacterInTheme(themeId.uuid.toString(), characterId.uuid.toString())
-        projectScope.get<PromoteMinorCharacterController>()
-            .promoteCharacter(themeId.uuid.toString(), characterId.uuid.toString())
         return getIncludedCharacterInThemeOrError(characterId, themeId)
     }
 
