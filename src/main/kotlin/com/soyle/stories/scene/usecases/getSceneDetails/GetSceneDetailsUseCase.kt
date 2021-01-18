@@ -7,7 +7,6 @@ import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
 import com.soyle.stories.scene.usecases.common.getLastSetMotivation
 import com.soyle.stories.scene.usecases.common.getScenesBefore
 import com.soyle.stories.theme.repositories.CharacterArcRepository
-import java.util.*
 
 class GetSceneDetailsUseCase(
   private val sceneRepository: SceneRepository,
@@ -26,7 +25,7 @@ class GetSceneDetailsUseCase(
 		return GetSceneDetails.ResponseModel(
 		  scene.id.uuid,
 		  scene.storyEventId.uuid,
-		  scene.locationId?.uuid,
+		  scene.settings.firstOrNull()?.uuid,
 		  getIncludedCharacterDetails(scene)
 		)
 	}

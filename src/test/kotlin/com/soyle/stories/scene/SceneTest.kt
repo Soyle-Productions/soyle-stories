@@ -37,7 +37,7 @@ class SceneTest {
     fun `scene covers character arc section`() {
         val character = Character.buildNewCharacter(Project.Id(), characterName())
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
-        val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
+        val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
             .withCharacterIncluded(character)
             .withCharacterArcSectionCovered(characterArcSection)
         val sections = update.getCoveredCharacterArcSectionsForCharacter(character.id)!!
@@ -48,7 +48,7 @@ class SceneTest {
     fun `character must already be included in scene`() {
         val character = Character.buildNewCharacter(Project.Id(), characterName())
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
-        val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
+        val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
         val error = assertThrows<CharacterNotInScene> {
             scene.withCharacterArcSectionCovered(characterArcSection)
         }
@@ -59,7 +59,7 @@ class SceneTest {
     fun `cannot cover the same character arc section twice`() {
         val character = Character.buildNewCharacter(Project.Id(), characterName())
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
-        val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
+        val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
             .withCharacterIncluded(character)
             .withCharacterArcSectionCovered(characterArcSection)
         val error = assertThrows<SceneAlreadyCoversCharacterArcSection> {
@@ -74,7 +74,7 @@ class SceneTest {
     fun `character not in scene has null character arc sections`()
     {
         val character = Character.buildNewCharacter(Project.Id(), characterName())
-        val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id())
+        val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
         assertNull(scene.getCoveredCharacterArcSectionsForCharacter(character.id))
     }
 }

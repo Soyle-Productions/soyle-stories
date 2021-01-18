@@ -14,4 +14,6 @@ interface CharacterRepository {
     suspend fun getCharacterById(characterId: Character.Id): Character?
     suspend fun updateCharacter(character: Character)
     suspend fun deleteCharacterWithId(characterId: Character.Id)
+
+    suspend fun getCharacterIdsThatDoNotExist(characterIdsToTest: Set<Character.Id>): Set<Character.Id>
 }

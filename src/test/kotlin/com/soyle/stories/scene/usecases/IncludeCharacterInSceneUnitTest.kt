@@ -240,7 +240,7 @@ class IncludeCharacterInSceneUnitTest {
 
     private fun givenMotivationsForCharacterPreviouslySet() {
         repeat(5) {
-            Scene(projectId, nonBlankStr(), StoryEvent.Id())
+            makeScene(projectId = projectId)
                 .withCharacterIncluded(characterRepository.characters.values.first())
                 .withMotivationForCharacter(Character.Id(characterId), "${UUID.randomUUID()}")
                 .let {

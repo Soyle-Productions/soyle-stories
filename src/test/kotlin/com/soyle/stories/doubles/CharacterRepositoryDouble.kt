@@ -47,4 +47,8 @@ class CharacterRepositoryDouble(
 	override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
 		return characters.values.filter { it.projectId == projectId }
 	}
+
+	override suspend fun getCharacterIdsThatDoNotExist(characterIdsToTest: Set<Character.Id>): Set<Character.Id> {
+		return characterIdsToTest.filterNot { it in characters }.toSet()
+	}
 }

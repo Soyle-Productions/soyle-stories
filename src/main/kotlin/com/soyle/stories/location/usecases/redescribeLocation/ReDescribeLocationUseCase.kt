@@ -23,7 +23,7 @@ class ReDescribeLocationUseCase(
 	{
 		val location = getLocation(locationId)
 		updateLocationIfNeeded(location, description)
-		return ReDescribeLocation.ResponseModel(location.id.uuid, location.name, description)
+		return ReDescribeLocation.ResponseModel(location.id.uuid, location.name.value, description)
 	}
 
 	private suspend fun getLocation(locationId: UUID): Location

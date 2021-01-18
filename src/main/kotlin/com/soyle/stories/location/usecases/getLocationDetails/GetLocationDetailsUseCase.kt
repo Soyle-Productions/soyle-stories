@@ -13,6 +13,6 @@ class GetLocationDetailsUseCase(
 		val location = locationRepository.getLocationById(Location.Id(locationId))
 		  ?: return output.receiveGetLocationDetailsFailure(LocationDoesNotExist(locationId))
 
-		output.receiveGetLocationDetailsResponse(GetLocationDetails.ResponseModel(locationId, location.name, location.description))
+		output.receiveGetLocationDetailsResponse(GetLocationDetails.ResponseModel(locationId, location.name.value, location.description))
 	}
 }

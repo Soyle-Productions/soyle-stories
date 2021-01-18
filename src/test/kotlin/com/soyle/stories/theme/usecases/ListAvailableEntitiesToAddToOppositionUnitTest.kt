@@ -4,17 +4,18 @@ import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.component1
 import com.soyle.stories.common.component2
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.entities.theme.SymbolicRepresentation
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
+import com.soyle.stories.location.makeLocation
 import com.soyle.stories.theme.*
-import com.soyle.stories.doubles.CharacterRepositoryDouble
-import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.EntitiesAvailableToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
@@ -118,7 +119,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
         private fun givenANumberOfLocationsExist(number: Int, projectId: Project.Id? = null) {
             repeat(number) {
                 val id = Location.Id()
-                locationRepository.locations[id] = Location(id, projectId ?: Project.Id(), "Location ${UUID.randomUUID()}", "")
+                locationRepository.locations[id] = makeLocation(id = id, projectId =  projectId ?: Project.Id())
             }
         }
 
@@ -158,7 +159,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
                         makeOppositionValue(oppositionId, representations = characterSymbols.map {
                             SymbolicRepresentation(it.id.uuid, it.name.value)
                         } + locationSymbols.map {
-                            SymbolicRepresentation(it.id.uuid, it.name)
+                            SymbolicRepresentation(it.id.uuid, it.name.value)
                         } + symbols.map {
                             SymbolicRepresentation(it.id.uuid, it.name)
                         })
@@ -210,7 +211,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
 
             assertEquals(locationIds, actual.locations.map { it.id }.toSet())
             assertEquals(
-                locationIds.map { locationRepository.locations[Location.Id(it)]!!.name }.toSet(),
+                locationIds.map { locationRepository.locations[Location.Id(it)]!!.name.value }.toSet(),
                 actual.locations.map { it.locationName }.toSet()
             ) { "Location Names not properly mapped" }
 

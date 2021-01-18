@@ -7,9 +7,13 @@ import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection
 import com.soyle.stories.common.str
 import com.soyle.stories.common.template
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
-import com.soyle.stories.entities.*
+import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.CharacterArcSection
+import com.soyle.stories.entities.CharacterArcTemplate
+import com.soyle.stories.entities.Location
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
+import com.soyle.stories.location.makeLocation
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.theme.repositories.CharacterArcRepository
 import kotlinx.coroutines.runBlocking
@@ -65,7 +69,7 @@ class LinkLocationToCharacterArcSectionUnitTest {
     private fun givenNoCharacterArcSections() = given(emptyList(), emptyList())
     private fun given(characterArcSectionIds: List<UUID>, locationIds: List<UUID>, isLinked: Boolean = false) {
         val locations = locationIds.map {
-            Location(Location.Id(it), Project.Id(UUID.randomUUID()), "")
+            makeLocation(id = Location.Id(it))
         }
         val arcSections = characterArcSectionIds.map {
             makeCharacterArcSection(id = CharacterArcSection.Id(it), template = template("Template ${str()}", false), linkedLocation = locations.firstOrNull()?.takeIf { isLinked }?.id)

@@ -9,6 +9,7 @@ import com.soyle.stories.scene.Locale
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
 import com.soyle.stories.scene.usecases.renameScene.RenameSceneUseCase
@@ -75,7 +76,7 @@ class RenameSceneUnitTest {
 	private fun given(sceneWithId: UUID? = null, andName: NonBlankString? = null) {
 		sceneRepository = SceneRepositoryDouble(
 		  initialScenes = listOfNotNull(
-			sceneWithId?.let { Scene(Scene.Id(it), projectId, andName ?: originalName, StoryEvent.Id(), null, listOf()) }
+			sceneWithId?.let { makeScene(Scene.Id(it), projectId, andName ?: originalName) }
 		  ),
 		  onUpdateScene = { updatedScene = it }
 		)

@@ -2,8 +2,8 @@ package com.soyle.stories.character
 
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.repositories.ThemeRepository
+import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 
 class TestContext(
@@ -28,32 +28,21 @@ class TestContext(
 	val persistedItems: List<PersistenceLog>
 		get() = _persistedItems
 
-	val characterRepository: CharacterRepository = object : CharacterRepository {
-		private val characters = initialCharacters.associateBy { it.id }.toMutableMap()
-		override suspend fun addNewCharacter(character: Character) {
-			_persistedItems.add(PersistenceLog("addNewCharacter", character))
-			addNewCharacter.invoke(character)
-			characters[character.id] = character
+	val characterRepository: CharacterRepository = CharacterRepositoryDouble(
+		initialCharacters = initialCharacters,
+		onAddNewCharacter = {
+			_persistedItems.add(PersistenceLog("addNewCharacter", it))
+			addNewCharacter.invoke(it)
+		},
+		onUpdateCharacter = {
+			_persistedItems.add(PersistenceLog("updateCharacter", it))
+			updateCharacter.invoke(it)
+		},
+		onDeleteCharacterWithId = {
+			_persistedItems.add(PersistenceLog("deleteCharacterWithId", it))
+			deleteCharacterWithId.invoke(it)
 		}
-
-		override suspend fun deleteCharacterWithId(characterId: Character.Id) {
-			_persistedItems.add(PersistenceLog("deleteCharacterWithId", characterId))
-			deleteCharacterWithId.invoke(characterId)
-			characters.remove(characterId)
-		}
-
-		override suspend fun getCharacterById(characterId: Character.Id): Character? = characters[characterId]
-
-		override suspend fun updateCharacter(character: Character) {
-			_persistedItems.add(PersistenceLog("updateCharacter", character))
-			updateCharacter.invoke(character)
-			characters[character.id] = character
-		}
-
-		override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
-			TODO("Not yet implemented")
-		}
-	}
+	)
 
 	val themeRepository: ThemeRepository = object : ThemeRepository {
 		private val themes = initialThemes.associateBy { it.id }.toMutableMap()

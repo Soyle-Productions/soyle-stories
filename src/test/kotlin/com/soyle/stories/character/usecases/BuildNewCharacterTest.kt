@@ -4,25 +4,27 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterException
-import com.soyle.stories.doubles.CharacterRepositoryDouble
-import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
+import com.soyle.stories.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.characterInTheme.StoryFunction
 import com.soyle.stories.theme.*
-import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 
 /**
  * Created by Brendan
@@ -37,22 +39,12 @@ class BuildNewCharacterTest {
     private var createdCharacter: Character? = null
 
     fun given(addNewCharacter: (Character) -> Unit = {}): (NonBlankString) -> Either<*, CharacterItem> {
-        val repo = object : CharacterRepository {
-            override suspend fun addNewCharacter(character: Character) {
-                createdCharacter = character
-                addNewCharacter.invoke(character)
+        val repo = CharacterRepositoryDouble(
+            onAddNewCharacter = {
+                createdCharacter = it
+                addNewCharacter.invoke(it)
             }
-
-            override suspend fun getCharacterById(characterId: Character.Id): Character? = null
-            override suspend fun deleteCharacterWithId(characterId: Character.Id) = Unit
-            override suspend fun updateCharacter(character: Character) {
-
-            }
-
-            override suspend fun listCharactersInProject(projectId: Project.Id): List<Character> {
-                TODO("Not yet implemented")
-            }
-        }
+        )
         val useCase = BuildNewCharacterUseCase(repo, ThemeRepositoryDouble())
         val output = object : BuildNewCharacter.OutputPort {
             var result: Either<*, CharacterItem>? = null

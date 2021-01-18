@@ -1,8 +1,10 @@
 package com.soyle.stories.scene.usecases.createNewScene
 
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Prose
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
+import com.soyle.stories.prose.repositories.ProseRepository
 import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.repositories.SceneRepository
@@ -18,6 +20,7 @@ class CreateNewSceneUseCase(
   projectId: UUID,
   private val sceneRepository: SceneRepository,
   private val storyEventRepository: StoryEventRepository,
+  private val proseRepository: ProseRepository,
   private val createStoryEvent: CreateStoryEvent
 ) : CreateNewScene {
 
@@ -102,7 +105,9 @@ class CreateNewSceneUseCase(
 	}
 
 	private suspend fun createNewScene(storyEvent: StoryEvent, request: CreateNewScene.RequestModel): CreateNewScene.ResponseModel {
-		val scene = Scene(projectId, request.name, storyEvent.id)
+		val (prose, proseCreated) = Prose.create(projectId)
+		proseRepository.addProse(prose)
+		val scene = Scene(projectId, request.name, storyEvent.id, prose.id)
 		return insertScene(scene, request)
 	}
 
@@ -111,7 +116,7 @@ class CreateNewSceneUseCase(
 		val idOrder = sceneRepository.getSceneIdsInOrder(projectId)
 		val index = getInsertionIndex(idOrder, request)
 		val affectedScenes = insertSceneAt(idOrder, scene, index)
-		return CreateNewScene.ResponseModel(scene.id.uuid, request.name.value, index, affectedScenes)
+		return CreateNewScene.ResponseModel(scene.id.uuid, scene.proseId, request.name.value, index, affectedScenes)
 	}
 
 	private fun getInsertionIndex(idOrder: List<Scene.Id>, request: CreateNewScene.RequestModel): Int
@@ -132,7 +137,7 @@ class CreateNewSceneUseCase(
 		return if (index < idOrder.size) {
 			val affectedIds = idOrder.asSequence().withIndex().filter { it.index >= index }.associate { it.value to it.index }
 			sceneRepository.listAllScenesInProject(projectId).filter { it.id in affectedIds }.map {
-				SceneItem(it.id.uuid, it.name.value, affectedIds.getValue(it.id) + 1)
+				SceneItem(it.id.uuid,it.proseId, it.name.value, affectedIds.getValue(it.id) + 1)
 			}
 		} else listOf()
 	}

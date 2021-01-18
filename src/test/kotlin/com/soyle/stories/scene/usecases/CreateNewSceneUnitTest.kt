@@ -1,12 +1,14 @@
 package com.soyle.stories.scene.usecases
 
 import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.common.nonBlankStr
+import com.soyle.stories.doubles.ProseRepositoryDouble
 import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Prose
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.sceneDoesNotExist
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
@@ -31,12 +33,16 @@ class CreateNewSceneUnitTest {
 	val projectId = Project.Id()
 	val validSceneName = NonBlankString.create("Valid Scene Name")!!
 	val storyEventId = StoryEvent.Id().uuid
+	val proseId = Prose.Id().uuid
 	val relativeSceneId = Scene.Id().uuid
 
 	var createStoryEventRequest: CreateStoryEvent.RequestModel? = null
 	var createStoryEventResult: Any? = null
 	var savedScene: Scene? = null
 	var result: Any? = null
+	private var createdProse: Prose? = null
+
+	private val proseRepository = ProseRepositoryDouble(onCreateProse = ::createdProse::set)
 
 	@Nested
 	inner class `Create Scene with just a name` {
@@ -52,6 +58,12 @@ class CreateNewSceneUnitTest {
 			assertStoryEventCreated()
 			assertStoryEventOutputNotified()
 			assertSceneCreatedWithStoryEventId()
+		}
+
+		@Test
+		fun `create prose`() {
+			whenUseCaseIsExecuted(validSceneName)
+			assertProseCreated()
 		}
 
 		@Test
@@ -158,11 +170,12 @@ class CreateNewSceneUnitTest {
 		}
 		if (sceneWithId != null) {
 			runBlocking {
-				sceneRepository.createNewScene(Scene(Scene.Id(sceneWithId), projectId, nonBlankStr(), StoryEvent.Id(storyEventId), null, listOf()),
+				sceneRepository.createNewScene(
+					makeScene(sceneId = Scene.Id(sceneWithId), projectId = projectId, storyEventId = StoryEvent.Id(storyEventId), proseId = Prose.Id(proseId)),
 				sceneRepository.getSceneIdsInOrder(projectId) + Scene.Id(sceneWithId)
 				)
 				repeat(numberOfScenesAfterRelativeScene) {
-					val scene = Scene(projectId, nonBlankStr(), StoryEvent.Id())
+					val scene = makeScene(projectId = projectId)
 					sceneRepository.createNewScene(scene,
 					  sceneRepository.getSceneIdsInOrder(projectId) + scene.id
 					)
@@ -186,7 +199,7 @@ class CreateNewSceneUnitTest {
 
 	private fun whenUseCaseIsExecuted(requestModel: CreateNewScene.RequestModel)
 	{
-		val useCase: CreateNewScene = CreateNewSceneUseCase(projectId.uuid, sceneRepository, storyEventRepository, object : CreateStoryEvent {
+		val useCase: CreateNewScene = CreateNewSceneUseCase(projectId.uuid, sceneRepository, storyEventRepository, proseRepository, object : CreateStoryEvent {
 			override suspend fun invoke(request: CreateStoryEvent.RequestModel, output: CreateStoryEvent.OutputPort) {
 				createStoryEventRequest = request
 				val newStoryEvent = StoryEvent(request.name, request.projectId?.let(Project::Id) ?: projectId)
@@ -232,6 +245,12 @@ class CreateNewSceneUnitTest {
 		}
 	}
 
+	private fun assertProseCreated() {
+		val proseId = createdProse!!.id
+		val savedScene = savedScene!!
+		assertEquals(proseId, savedScene.proseId)
+	}
+
 	private fun assertCreatedSceneIsBeforeRelativeScene() {
 		val savedScene = savedScene!!
 		runBlocking {
@@ -266,6 +285,7 @@ class CreateNewSceneUnitTest {
 		actual as CreateNewScene.ResponseModel
 		assertEquals(savedScene.id.uuid, actual.sceneId)
 		assertEquals(validSceneName.value, actual.sceneName)
+		assertEquals(createdProse!!.id, actual.sceneProse)
 		return actual
 	}
 

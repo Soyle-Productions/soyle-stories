@@ -6,8 +6,12 @@ import arrow.core.right
 import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.CoupleOf
+import com.soyle.stories.common.str
 import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.*
+import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.entities.theme.SymbolicRepresentation
+import com.soyle.stories.entities.theme.ThematicSection
+import com.soyle.stories.entities.theme.ThematicTemplate
 import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.entities.theme.characterInTheme.MinorCharacter
 import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
@@ -32,6 +36,23 @@ fun makeTheme(
 ): Theme = Theme(
 	id, projectId, name, symbols, centralConflict, centralMoralQuestion, themeLine, thematicRevelation, includedCharacters, similaritiesBetweenCharacters, valueWebs
 )
+
+fun makeCharacterInTheme(
+	characterId: Character.Id = Character.Id(),
+	name: String = "character ${str()}",
+	archetype: String = "",
+	variationOnMoral: String = "",
+	position: String = ""
+): CharacterInTheme
+{
+	return MinorCharacter(
+		characterId,
+		name,
+		archetype,
+		variationOnMoral,
+		position
+	)
+}
 
 fun makeValueWeb(
 	id: ValueWeb.Id = ValueWeb.Id(),

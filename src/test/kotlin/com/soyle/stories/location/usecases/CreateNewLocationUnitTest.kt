@@ -1,26 +1,23 @@
 package com.soyle.stories.location.usecases
 
+import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.location.LocationException
-import com.soyle.stories.location.LocationNameCannotBeBlank
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
-import com.soyle.stories.location.repositories.LocationRepository
+import com.soyle.stories.location.locationName
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocationUseCase
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import java.util.*
 
 class CreateNewLocationUnitTest {
 
 	private val projectId = Project.Id(UUID.randomUUID())
-	private val inputName = "New Location"
+	private val inputName = locationName()
 
 	private var createdLocation: Location? = null
 	private var result: Any? = null
@@ -31,18 +28,11 @@ class CreateNewLocationUnitTest {
 		result = null
 	}
 
-	@ParameterizedTest
-	@ValueSource(strings = ["", " ", "\r", "\n", "\r\n"])
-	fun `blank names are invalid`(inputName: String) {
-		whenExecutedWith(inputName)
-		val result = result as LocationNameCannotBeBlank
-	}
-
 	@Test
 	fun `valid name`() {
 		whenExecuted()
 		val result = result as CreateNewLocation.ResponseModel
-		result.locationName.mustEqual(inputName)
+		result.locationName.mustEqual(inputName.value)
 	}
 
 	@Test
@@ -77,7 +67,7 @@ class CreateNewLocationUnitTest {
 	}
 
 	private fun whenExecuted() = whenExecutedWith()
-	private fun whenExecutedWith(inputName: String = this.inputName, inputDescription: String? = null) {
+	private fun whenExecutedWith(inputName: SingleNonBlankLine = this.inputName, inputDescription: String? = null) {
 		val useCase: CreateNewLocation = CreateNewLocationUseCase(projectId.uuid, LocationRepositoryDouble(
 		  onAddNewLocation = { createdLocation = it }
 		))

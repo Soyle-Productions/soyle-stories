@@ -2,11 +2,13 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
-import com.soyle.stories.entities.*
-import com.soyle.stories.theme.*
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
-import com.soyle.stories.doubles.CharacterArcSectionRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.CharacterArcSection
+import com.soyle.stories.entities.Theme
+import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacterUseCase
 import kotlinx.coroutines.runBlocking
@@ -94,9 +96,6 @@ class PromoteCharacterTest {
     })
     private val characterArcRepository = CharacterArcRepositoryDouble(onAddNewCharacterArc = {
         createdCharacterArc = it
-    })
-    private val characterArcSectionRepository = CharacterArcSectionRepositoryDouble(onAddNewCharacterArcSections = {
-        createdArcSections = it
     })
 
     private fun givenTheme() {

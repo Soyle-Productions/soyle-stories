@@ -14,6 +14,10 @@ class LocationRepositoryDouble(
 
 	val locations = initialLocations.associateBy { it.id }.toMutableMap()
 
+	fun givenLocation(location: Location) {
+		locations[location.id] = location
+	}
+
 	private val _persistedItems = mutableListOf<PersistenceLog>()
 	val persistedItems: List<PersistenceLog>
 		get() = _persistedItems
@@ -46,5 +50,9 @@ class LocationRepositoryDouble(
 		log(location)
 		onRemoveLocation.invoke(location)
 		locations.remove(location.id)
+	}
+
+	override suspend fun getLocationIdsThatDoNotExist(locationIdsToTest: Set<Location.Id>): Set<Location.Id> {
+		return locationIdsToTest.filterNot { it in locations }.toSet()
 	}
 }

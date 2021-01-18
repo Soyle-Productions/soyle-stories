@@ -4,8 +4,8 @@ import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenesUseCase
@@ -49,7 +49,7 @@ class ListAllScenesUnitTest {
 	private fun givenNoScenes() = given()
 	private fun given(sceneIds: List<UUID> = emptyList()) {
 		storedScenes = sceneIds.map {
-			Scene(Scene.Id(it), projectId, NonBlankString.create("Unique Scene Name: $it")!!, StoryEvent.Id(), null, listOf())
+			makeScene(Scene.Id(it), projectId)
 		}
 		sceneRepository = SceneRepositoryDouble(
 		  initialScenes = storedScenes
@@ -75,5 +75,6 @@ class ListAllScenesUnitTest {
 		result.scenes.map(SceneItem::id).toSet().mustEqual(sceneIds.toSet()) { "Not all scenes output" }
 		result.scenes.map(SceneItem::sceneName).toSet()
 		  .mustEqual(storedScenes.map(Scene::name).map(NonBlankString::value).toSet()) { "Scene names do not match" }
+		result.scenes.map(SceneItem::proseId).toSet().mustEqual(storedScenes.map(Scene::proseId).toSet())
 	}
 }
