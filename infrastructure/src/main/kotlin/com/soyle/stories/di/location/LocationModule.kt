@@ -95,7 +95,6 @@ object LocationModule {
 
 		CreateLocationDialogModule
 		LocationListModule
-		LocationDetailsModule
 
 	}
 }

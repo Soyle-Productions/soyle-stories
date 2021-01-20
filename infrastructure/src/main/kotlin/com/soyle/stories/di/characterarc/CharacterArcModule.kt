@@ -259,7 +259,6 @@ object CharacterArcModule {
             views()
         }
 
-        BaseStoryStructureModule
         CharacterListModule
 
     }
