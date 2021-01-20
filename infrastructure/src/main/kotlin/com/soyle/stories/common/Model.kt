@@ -35,19 +35,27 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 
 	open fun viewModel(): VM? = item
 
-	override val viewModel: VM?
+	final override val viewModel: VM?
 		get() = viewModel()
+
+	private fun updateItem(newItem: VM?)
+	{
+		item = newItem
+		props.forEach { prop ->
+			newItem?.let { prop.update(it) }
+		}
+	}
 
 	override fun update(update: VM?.() -> VM) {
 		threadTransformer.gui {
-			item = viewModel().update()
+			updateItem(viewModel().update())
 		}
 	}
 
 	override fun updateOrInvalidated(update: VM.() -> VM) {
 		threadTransformer.gui {
 			val viewModel = viewModel() ?: return@gui invalidatedProperty.set(false)
-			item = viewModel.update()
+			updateItem(viewModel.update())
 		}
 	}
 
@@ -62,14 +70,6 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 		}
 	}
 	private val props = mutableListOf<BoundProperty<*>>()
-
-	init {
-		itemProperty.onChange { vm ->
-			props.forEach { prop ->
-				vm?.let { prop.update(it) }
-			}
-		}
-	}
 
 	@JvmName("bindInt")
 	protected fun bind(prop: KProperty1<VM, Int>): SimpleIntegerProperty {
