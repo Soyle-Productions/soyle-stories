@@ -20,6 +20,9 @@ import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArg
 import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentUseCase
 import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgument
 import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentUseCase
+import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
+import com.soyle.stories.characterarc.viewBaseStoryStructure.ViewBaseStoryStructureController
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -48,7 +51,6 @@ object UseCases {
             provide<AddCharacterArcSectionToMoralArgument.OutputPort> {
                 AddCharacterArcSectionToMoralArgumentOutput(get())
             }
-
 
 
 
@@ -83,6 +85,7 @@ object UseCases {
             }
 
             renameCharacter()
+            viewBaseStoryStructure()
 
         }
     }
@@ -96,6 +99,18 @@ object UseCases {
         }
         provide<RenameCharacterController> {
             RenameCharacterControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.viewBaseStoryStructure() {
+        provide {
+            ViewBaseStoryStructureController(
+                applicationScope.get(),
+                get()
+            )
+        }
+        provide<ViewBaseStoryStructure> {
+            ViewBaseStoryStructureUseCase(get(), get())
         }
     }
 

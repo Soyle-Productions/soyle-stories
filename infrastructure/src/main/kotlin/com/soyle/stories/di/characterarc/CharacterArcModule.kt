@@ -45,8 +45,6 @@ import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacte
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionUseCase
-import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
-import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
@@ -91,9 +89,6 @@ object CharacterArcModule {
         }
         provide<PlanNewCharacterArc> {
             PlanNewCharacterArcUseCase(get(), get(), get())
-        }
-        provide<ViewBaseStoryStructure> {
-            ViewBaseStoryStructureUseCase(get(), get())
         }
         provide<CompareCharacters> {
             CompareCharactersUseCase(get())

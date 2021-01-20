@@ -16,43 +16,7 @@ internal object BaseStoryStructureModule {
 
     init {
 
-        scoped<BaseStoryStructureScope> {
 
-            provide(ViewBaseStoryStructure.OutputPort::class, ListAllLocations.OutputPort::class) {
-                BaseStoryStructurePresenter(
-                    get<BaseStoryStructureModel>(),
-                    projectScope.get<ChangeThematicSectionValueNotifier>(),
-                    projectScope.get<LinkLocationToCharacterArcSectionNotifier>(),
-                    projectScope.get<UnlinkLocationFromCharacterArcSectionNotifier>(),
-                    projectScope.get()
-                ).also {
-                    it listensTo projectScope.get<ChangedCharacterArcSectionValueNotifier>()
-                }
-            }
-
-            provide {
-                ViewBaseStoryStructureController(
-                    projectScope.applicationScope.get(),
-                    projectScope.get(),
-                    get()
-                )
-            }
-
-            provide<BaseStoryStructureViewListener> {
-                BaseStoryStructureController(
-                    projectScope.applicationScope.get(),
-                    type.themeId.toString(),
-                    type.characterId.toString(),
-                    projectScope.get(),
-                    get(),
-                    get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get()
-                )
-            }
-
-        }
 
     }
 

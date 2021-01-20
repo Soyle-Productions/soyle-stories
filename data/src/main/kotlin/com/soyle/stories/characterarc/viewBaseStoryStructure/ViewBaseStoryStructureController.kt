@@ -10,30 +10,23 @@ import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 
 class ViewBaseStoryStructureController(
-  private val threadTransformer: ThreadTransformer,
-  private val viewBaseStoryStructure: ViewBaseStoryStructure,
-  private val viewBaseStoryStructureOutputPort: ViewBaseStoryStructure.OutputPort
+    private val threadTransformer: ThreadTransformer,
+    private val viewBaseStoryStructure: ViewBaseStoryStructure
 ) {
 
-    fun getBaseStoryStructure(characterId: String, themeId: String) {
-        executeUseCaseInBackground(
-            UUID.fromString(characterId),
-            UUID.fromString(themeId)
-        )
-    }
-
-    private fun executeUseCaseInBackground(characterId: UUID, themeId: UUID) {
+    fun getBaseStoryStructure(
+        characterId: String,
+        themeId: String,
+        viewBaseStoryStructureOutputPort: ViewBaseStoryStructure.OutputPort
+    ) {
+        val preparedCharacterId = UUID.fromString(characterId)
+        val preparedThemeId = UUID.fromString(themeId)
         threadTransformer.async {
-            executeUseCase(characterId, themeId)
+            viewBaseStoryStructure.invoke(
+                preparedCharacterId,
+                preparedThemeId,
+                viewBaseStoryStructureOutputPort
+            )
         }
-    }
-
-    private suspend fun executeUseCase(characterId: UUID, themeId: UUID)
-    {
-        viewBaseStoryStructure.invoke(
-            characterId,
-            themeId,
-            viewBaseStoryStructureOutputPort
-        )
     }
 }
