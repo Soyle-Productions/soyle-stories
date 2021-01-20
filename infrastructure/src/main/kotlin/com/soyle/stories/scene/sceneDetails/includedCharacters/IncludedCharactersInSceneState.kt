@@ -47,7 +47,6 @@ class IncludedCharactersInSceneState : Model<SceneDetailsScope, IncludedCharacte
 
     init {
         scope.get<SceneDetailsModel>().includedCharactersInScene.onChangeOnce {
-            println("includedCharactersInScene changed $it")
             item = it
         }
     }
