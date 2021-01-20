@@ -10,6 +10,7 @@ import javafx.geometry.Orientation
 import javafx.scene.Parent
 import javafx.scene.control.CheckMenuItem
 import javafx.scene.control.MenuItem
+import javafx.scene.control.ScrollPane
 import javafx.scene.layout.Priority
 import tornadofx.*
 
@@ -20,16 +21,21 @@ class BaseStoryStructure : ToolView() {
     val model = find<BaseStoryStructureModel>()
     private val baseStoryStructureViewListener = resolve<BaseStoryStructureViewListener>()
 
-    override val root: Parent = form {
-        fieldset(labelPosition = Orientation.VERTICAL) {
-            model.sections.indices.forEach {
-                addStoryStructureItem(it)
-            }
-            model.sections.select { SimpleIntegerProperty(it.size) }.addListener { _, i, i2 ->
-                val originalSize = i?.toInt() ?: 0
-                val newSize = i2?.toInt() ?: 0
-                if (newSize > originalSize) {
-                    (originalSize until newSize).forEach { addStoryStructureItem(it) }
+    override val root: Parent = scrollpane {
+        hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
+        vbarPolicy = ScrollPane.ScrollBarPolicy.AS_NEEDED
+        isFitToWidth = true
+        content = form {
+            fieldset(labelPosition = Orientation.VERTICAL) {
+                model.sections.indices.forEach {
+                    addStoryStructureItem(it)
+                }
+                model.sections.select { SimpleIntegerProperty(it.size) }.addListener { _, i, i2 ->
+                    val originalSize = i?.toInt() ?: 0
+                    val newSize = i2?.toInt() ?: 0
+                    if (newSize > originalSize) {
+                        (originalSize until newSize).forEach { addStoryStructureItem(it) }
+                    }
                 }
             }
         }
@@ -39,8 +45,7 @@ class BaseStoryStructure : ToolView() {
         baseStoryStructureViewListener.getBaseStoryStructure()
     }
 
-    private fun linkedLocationOptions(section: StoryStructureSectionViewModel): List<MenuItem>
-    {
+    private fun linkedLocationOptions(section: StoryStructureSectionViewModel): List<MenuItem> {
         return listOf(
             MenuItem("Create Location").apply {
                 action {
@@ -104,6 +109,6 @@ class BaseStoryStructure : ToolView() {
     }
 
     init {
-    	title = "Base Story Structure"
+        title = "Base Story Structure"
     }
 }
