@@ -12,7 +12,13 @@ class DeleteScenePresenter(
 	override fun receiveDeleteSceneResponse(responseModel: DeleteScene.ResponseModel) {
 		view.updateOrInvalidated {
 			copy(
-			  scenes = scenes.filterNot { it.id == responseModel.sceneId.toString() }
+			  scenes = scenes
+				  .asSequence()
+				  .filterNot { it.id == responseModel.sceneId.toString() }
+				  .mapIndexed { index, sceneItemViewModel ->
+					  sceneItemViewModel.copy(index = index)
+				  }
+				  .toList()
 			)
 		}
 	}
