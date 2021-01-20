@@ -20,8 +20,16 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 
 	private val itemProperty: ReadOnlyObjectWrapper<VM?> = ReadOnlyObjectWrapper(null)
 	fun itemProperty(): ReadOnlyObjectProperty<VM?> = itemProperty.readOnlyProperty
-	var item by itemProperty
-		protected set
+
+	var item: VM?
+		get() = itemProperty.get()
+		set(value) {
+			itemProperty.set(value)
+			props.forEach { prop ->
+				value?.let { prop.update(it) }
+			}
+		}
+
 
 	abstract val applicationScope: ApplicationScope
 
@@ -38,24 +46,16 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 	final override val viewModel: VM?
 		get() = viewModel()
 
-	private fun updateItem(newItem: VM?)
-	{
-		item = newItem
-		props.forEach { prop ->
-			newItem?.let { prop.update(it) }
-		}
-	}
-
 	override fun update(update: VM?.() -> VM) {
 		threadTransformer.gui {
-			updateItem(viewModel().update())
+			item = viewModel().update()
 		}
 	}
 
 	override fun updateOrInvalidated(update: VM.() -> VM) {
 		threadTransformer.gui {
 			val viewModel = viewModel() ?: return@gui invalidatedProperty.set(false)
-			updateItem(viewModel.update())
+			item = viewModel.update()
 		}
 	}
 
