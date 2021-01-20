@@ -14,13 +14,9 @@ import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.property.Property
 import javafx.geometry.Insets
-import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.layout.GridPane
-import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
-import kotlinx.coroutines.flow.flow
 import tornadofx.*
 
 internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebsModel, viewListener: ValueOppositionWebsViewListener) {
@@ -76,7 +72,7 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
             button("Add Symbol") {
                 action {
                     val oppositionValueId = oppositionValueId.value ?: return@action
-                    model.scope.projectScope.get<AddSymbolDialog>().show(model.scope.themeId.toString(), oppositionValueId)
+                    model.scope.projectScope.get<AddSymbolDialog>().show(scene.window, model.scope.themeId.toString(), oppositionValueId)
                 }
             }
             flowpane {
