@@ -95,7 +95,7 @@ internal class PopulatedDisplay : View() {
                 }
             }
         }
-        item("Examine Character Change") {
+        item("Examine Character Conflict") {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterArcItemViewModel) {
