@@ -1,74 +1,43 @@
 package com.soyle.stories.layout.entities
 
 import com.soyle.stories.common.Entity
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.layout.tools.ToolType
 import java.util.*
 
-sealed class Tool<T>(
+class Tool(
     override val id: Id,
-    val identifyingData: T,
-    val isOpen: Boolean,
     val type: ToolType,
-    val associatedData: Any? = null
+    val isOpen: Boolean
 ) : Entity<Tool.Id> {
 
-    data class Id(val uuid: UUID) {
-        override fun toString(): String = "Tool($uuid)"
+    constructor(type: ToolType, isOpen: Boolean = true) : this(Id(), type, isOpen)
+
+    fun isTemporary() = type.isTemporary
+
+    fun closed() = Tool(id, type, false)
+    fun opened() = Tool(id, type, true)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Tool
+
+        if (id != other.id) return false
+        if (type != other.type) return false
+        if (isOpen != other.isOpen) return false
+
+        return true
     }
 
-    abstract fun open(): Tool<T>
-    abstract fun close(): Tool<T>
-}
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + isOpen.hashCode()
+        return result
+    }
 
-class CharacterListTool(id: Tool.Id, projectId: Project.Id, isOpen: Boolean) :
-    Tool<Project.Id>(id, projectId, isOpen, ToolType.CharacterList, null) {
-    override fun open(): Tool<Project.Id> =
-        CharacterListTool(id, identifyingData, true)
-    override fun close(): Tool<Project.Id> =
-        CharacterListTool(id, identifyingData, false)
-
-}
-class LocationListTool(id: Id, projectId: Project.Id, isOpen: Boolean) :
-  Tool<Project.Id>(id, projectId, isOpen, ToolType.LocationList, null) {
-    override fun open(): Tool<Project.Id> =
-      LocationListTool(id, identifyingData, true)
-    override fun close(): Tool<Project.Id> =
-      LocationListTool(id, identifyingData, false)
-}
-class SceneListTool(id: Id, projectId: Project.Id, isOpen: Boolean) :
-  Tool<Project.Id>(id, projectId, isOpen, ToolType.SceneList, null) {
-    override fun open(): Tool<Project.Id> =
-      SceneListTool(id, identifyingData, true)
-    override fun close(): Tool<Project.Id> =
-      SceneListTool(id, identifyingData, false)
-}
-
-class BaseStoryStructureTool(id: Tool.Id, themeId: Theme.Id, characterId: Character.Id, isOpen: Boolean) :
-    Tool<Pair<Theme.Id, Character.Id>>(id, themeId to characterId, isOpen, ToolType.BaseStoryStructure, null) {
-    override fun open(): Tool<Pair<Theme.Id, Character.Id>> =
-        BaseStoryStructureTool(id, identifyingData.first, identifyingData.second, true)
-
-    override fun close(): Tool<Pair<Theme.Id, Character.Id>> =
-        BaseStoryStructureTool(id, identifyingData.first, identifyingData.second, false)
-}
-
-class CharacterComparisonTool(id: Tool.Id, themeId: Theme.Id, characterId: Character.Id?, isOpen: Boolean) :
-    Tool<Theme.Id>(id, themeId, isOpen, ToolType.CharacterComparison, characterId) {
-    override fun open(): Tool<Theme.Id> =
-        CharacterComparisonTool(id, identifyingData, associatedData as Character.Id?, true)
-
-    override fun close(): Tool<Theme.Id> =
-        CharacterComparisonTool(id, identifyingData, associatedData as Character.Id?, false)
-}
-
-class LocationDetailsTool(id: Id, locationId: Location.Id, isOpen: Boolean) :
-  Tool<Location.Id>(id, locationId, isOpen, ToolType.LocationDetails) {
-    override fun open(): Tool<Location.Id> =
-      LocationDetailsTool(id, identifyingData, true)
-
-    override fun close(): Tool<Location.Id> =
-      LocationDetailsTool(id, identifyingData, false)
+    data class Id(val uuid: UUID = UUID.randomUUID()) {
+        override fun toString(): String = "Tool($uuid)"
+    }
 }

@@ -5,6 +5,7 @@ import com.soyle.stories.scene.items.SceneItemViewModel
 interface DeleteSceneDialogViewListener {
 
 	fun getValidState(sceneItemViewModel: SceneItemViewModel)
-	fun deleteScene(sceneId: String)
+	fun viewRamifications(sceneId: String, showNextTime: Boolean)
+	fun deleteScene(sceneId: String, showNextTime: Boolean)
 
 }

@@ -64,7 +64,9 @@ class UnexpectedProjectExistsAtLocation(
 
 class ProjectDoesNotExistAtLocation(
     override val location: String
-) : ProjectException()
+) : ProjectException() {
+    override val message: String? = "Project doesn't Exist at Location $location"
+}
 
 class UnexpectedProjectAlreadyOpenAtLocation(
     override val location: String,

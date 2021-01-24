@@ -1,62 +1,51 @@
-/**
- * Created by Brendan
- * Date: 3/1/2020
- * Time: 4:05 PM
- */
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.character.usecases.removeCharacterFromLocalStory.RemoveCharacterFromLocalStory
+import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.characterarc.usecases.deleteLocalCharacterArc.DeleteLocalCharacterArc
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.gui.ThreadTransformer
-import com.soyle.stories.layout.usecases.openTool.OpenTool
+import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
 import java.util.*
 
 class CharacterListController(
+    projectId: String,
     private val threadTransformer: ThreadTransformer,
     private val listAllCharacterArcs: ListAllCharacterArcs,
     private val listAllCharacterArcsOutputPort: ListAllCharacterArcs.OutputPort,
-    private val openTool: OpenTool,
-    private val openToolOutputPort: OpenTool.OutputPort,
-    private val removeCharacterFromStory: RemoveCharacterFromLocalStory,
-    private val removeCharacterFromStoryOutputPort: RemoveCharacterFromLocalStory.OutputPort,
-    private val deleteCharacterArc: DeleteLocalCharacterArc,
-    private val deleteCharacterArcOutputPort: DeleteLocalCharacterArc.OutputPort,
+    private val openToolController: OpenToolController,
+    private val removeCharacterFromStoryController: RemoveCharacterFromStoryController,
+    private val deleteCharacterArc: DemoteMajorCharacter,
+    private val deleteCharacterArcOutputPort: DemoteMajorCharacter.OutputPort,
     private val renameCharacter: RenameCharacter,
     private val renameCharacterOutputPort: RenameCharacter.OutputPort,
     private val renameCharacterArc: RenameCharacterArc,
     private val renameCharacterArcOutputPort: RenameCharacterArc.OutputPort
 ) : CharacterListViewListener {
 
+    private val projectId = UUID.fromString(projectId)
+
     override fun getList() {
         threadTransformer.async {
-            listAllCharacterArcs.invoke(listAllCharacterArcsOutputPort)
+            listAllCharacterArcs.invoke(projectId, listAllCharacterArcsOutputPort)
         }
     }
 
     override fun openBaseStoryStructureTool(characterId: String, themeId: String) {
-        val request = OpenTool.RequestModel.BaseStoryStructure(
-            UUID.fromString(characterId),
-            UUID.fromString(themeId)
-        )
-        threadTransformer.async {
-            openTool(request, openToolOutputPort)
-        }
+        openToolController.openBaseStoryStructureTool(themeId, characterId)
     }
 
-    override fun openCharacterComparison(characterId: String, themeId: String) {
-        val request = OpenTool.RequestModel.CharacterComparison(
-            UUID.fromString(characterId),
-            UUID.fromString(themeId)
-        )
-        threadTransformer.async {
-            openTool(request, openToolOutputPort)
-        }
+    override fun openCharacterValueComparison(themeId: String) {
+        openToolController.openCharacterValueComparison(themeId)
     }
 
-    override fun renameCharacter(characterId: String, newName: String) {
+    override fun openCentralConflict(themeId: String, characterId: String) {
+        openToolController.openCentralConflict(themeId, characterId)
+    }
+
+    override fun renameCharacter(characterId: String, newName: NonBlankString) {
         threadTransformer.async {
             renameCharacter.invoke(
               UUID.fromString(characterId),
@@ -67,12 +56,7 @@ class CharacterListController(
     }
 
     override fun removeCharacter(characterId: String) {
-        threadTransformer.async {
-            removeCharacterFromStory.invoke(
-                UUID.fromString(characterId),
-                removeCharacterFromStoryOutputPort
-            )
-        }
+        removeCharacterFromStoryController.requestRemoveCharacter(characterId)
     }
 
     override fun removeCharacterArc(characterId: String, themeId: String) {

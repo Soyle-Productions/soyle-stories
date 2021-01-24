@@ -4,8 +4,9 @@ import com.soyle.stories.characterarc.CharacterArcException
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionController
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionControllerImpl
 import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -36,12 +37,15 @@ class UnlinkLocationFromCharacterArcSectionControllerUnitTest {
 	{
 		val controller: UnlinkLocationFromCharacterArcSectionController = UnlinkLocationFromCharacterArcSectionControllerImpl(
 		  object : ThreadTransformer {
-			  override fun async(task: suspend CoroutineScope.() -> Unit) {
+			  override fun async(task: suspend CoroutineScope.() -> Unit): Job {
+				  val job = Job()
 				  threadTransformerAsyncCalled = true
 				  runBlocking {
 					  task()
+					  job.complete()
 				  }
 				  threadTransformerAsyncCalled = false
+				  return job
 			  }
 
 			  override fun gui(update: suspend CoroutineScope.() -> Unit) { }

@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.createSceneDialog
 
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.gui.View
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogViewModel
@@ -21,6 +21,8 @@ class CreateSceneDialogModel : ItemViewModel<CreateNewSceneDialogViewModel>(), V
 	val executing = SimpleBooleanProperty(false)
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)
+
+	override val viewModel: CreateNewSceneDialogViewModel? = item
 
 	override fun update(update: CreateNewSceneDialogViewModel?.() -> CreateNewSceneDialogViewModel) {
 		threadTransformer.gui {

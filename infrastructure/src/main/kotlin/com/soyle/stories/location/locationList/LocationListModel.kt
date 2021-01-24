@@ -1,8 +1,8 @@
 package com.soyle.stories.location.locationList
 
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.binding.BooleanBinding
@@ -22,6 +22,8 @@ class LocationListModel : LocationListView, ItemViewModel<LocationListViewModel>
 	val locations = bindImmutableList(LocationListViewModel::locations)
 
 	val threadTransformer: ThreadTransformer by resolveLater(scope.applicationScope)
+
+	override val viewModel: LocationListViewModel? = item
 
 	override fun update(update: LocationListViewModel?.() -> LocationListViewModel) {
 		threadTransformer.gui {

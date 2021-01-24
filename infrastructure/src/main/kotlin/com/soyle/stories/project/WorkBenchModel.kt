@@ -1,12 +1,14 @@
 package com.soyle.stories.project
 
+import com.soyle.stories.common.Model
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.common.bindImmutableMap
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.gui.ThreadTransformer
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewModel
 import com.soyle.stories.project.projectList.ProjectFileViewModel
+import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -19,7 +21,7 @@ import tornadofx.toProperty
  * Date: 2/14/2020
  * Time: 9:38 PM
  */
-class WorkBenchModel : ItemViewModel<LayoutViewModel>(LayoutViewModel()), LayoutView {
+class WorkBenchModel : Model<ProjectScope, LayoutViewModel>(ProjectScope::class) {
 
     override val scope: ProjectScope = super.scope as ProjectScope
 
@@ -30,18 +32,13 @@ class WorkBenchModel : ItemViewModel<LayoutViewModel>(LayoutViewModel()), Layout
     val projectViewModel = SimpleObjectProperty<ProjectFileViewModel?>(scope.projectViewModel)
     val isValidLayout = bind(LayoutViewModel::isValid)
 
-    val primaryWindow = bind { item.primaryWindow?.toProperty() } as SimpleObjectProperty
-    val staticTools = bindImmutableList(LayoutViewModel::staticTools)
+    val primaryWindow = bind { item?.primaryWindow } as SimpleObjectProperty
+    val staticTools = bind(LayoutViewModel::staticTools)
 
-    val openDialogs = bindImmutableMap(LayoutViewModel::openDialogs)
+    val openDialogs = bind(LayoutViewModel::openDialogs)
 
-    private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)
-
-    override fun update(update: LayoutViewModel.() -> LayoutViewModel) {
-        threadTransformer.gui {
-            this@WorkBenchModel.rebind { item = item.update() }
-        }
-    }
+    override val applicationScope: ApplicationScope
+        get() = scope.applicationScope
 
     companion object {
         const val MAX_LOADING_VALUE = 1.0

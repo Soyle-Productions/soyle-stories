@@ -7,9 +7,10 @@ import javafx.scene.Parent
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonBar
 import javafx.scene.control.ButtonType
+import javafx.stage.Modality
 import tornadofx.View
-import tornadofx.alert
 import tornadofx.onChange
+import tornadofx.onChangeOnce
 import tornadofx.region
 
 
@@ -22,25 +23,25 @@ class OpenProjectOptionDialog : View("Open Project Options") {
 
 	override val root: Parent = region()
 
-	private var alert: Alert? = null
-
+	private fun alert(): Alert = Alert(Alert.AlertType.CONFIRMATION, "",
+		ButtonType("This Window", ButtonBar.ButtonData.YES),
+		ButtonType("New Window", ButtonBar.ButtonData.NO),
+		ButtonType.CANCEL
+	).apply {
+		title = "Open Project Options"
+		headerText = "How would you like to open the project?"
+	}
+	private var previousAlert: Alert? = null
 
 	init {
-		model.isOpenProjectOptionsDialogOpen.onChange {
-			if (it == true) {
-				alert = alert(
-				  type = Alert.AlertType.CONFIRMATION,
-				  title = "Open Project Options",
-				  header = "How would you like to open the project?",
-				  owner = currentWindow,
-				  buttons = *arrayOf(
-					ButtonType("This Window", ButtonBar.ButtonData.YES),
-					ButtonType("New Window", ButtonBar.ButtonData.NO),
-					ButtonType.CANCEL
-				  )
-				) {
-					val projectLocation = model.openProjectRequest.value!!.location
-					when (it.buttonData) {
+		model.isOpenProjectOptionsDialogOpen.onChange { isOpen ->
+			if (isOpen) {
+				val projectLocation = model.openProjectRequest.value!!.location
+				val alert = alert()
+				alert.initModality(Modality.APPLICATION_MODAL)
+				alert.initOwner(currentWindow)
+				alert.resultProperty().onChangeOnce {
+					when (it?.buttonData) {
 						ButtonBar.ButtonData.YES -> {
 							async(scope) {
 								projectListViewListener.replaceCurrentProject(projectLocation)
@@ -57,8 +58,11 @@ class OpenProjectOptionDialog : View("Open Project Options") {
 						else -> {}
 					}
 				}
+				previousAlert = alert
+				alert.show()
 			} else {
-				alert?.close()
+				previousAlert?.close()
+				previousAlert = null
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package com.soyle.stories.soylestories
 
+import com.soyle.stories.soylestories.Styles.Companion.appIcon
 import javafx.geometry.Pos
 import javafx.scene.image.Image
 import javafx.scene.layout.AnchorPane
@@ -20,7 +21,7 @@ class SplashScreen : Fragment() {
     private val model = find<ApplicationModel>()
 
     override val root = anchorpane {
-        imageview(Image("com/soyle/stories/soylestories/splash.png")) {
+        imageview(Image("soylestories/splash.png")) {
             AnchorPane.setTopAnchor(this,0.0)
             AnchorPane.setLeftAnchor(this,0.0)
             AnchorPane.setRightAnchor(this,0.0)
@@ -75,7 +76,7 @@ class SplashScreen : Fragment() {
             StageStyle.UNDECORATED, Modality.APPLICATION_MODAL,
             escapeClosesWindow = false, owner = null, block = false, resizable = false
         )?.apply {
-            icons += SoyleStories.appIcon
+            icons += appIcon
             centerOnScreen()
             isAlwaysOnTop = true
             model.isSplashScreenVisible.onChange {

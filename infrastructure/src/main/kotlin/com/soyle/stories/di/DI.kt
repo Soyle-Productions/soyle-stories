@@ -8,12 +8,21 @@ import java.util.*
 import kotlin.collections.set
 import kotlin.reflect.KClass
 
-private class RegisteredFactory<T : Any, S : Scope>(val factory: (S) -> T, val scopeType: KClass<S>) {
+private class RegisteredFactory<T : Any, S : Scope>(val factory: (S) -> T, val scopeType: KClass<S>, val isSingleton: Boolean) {
+
 	fun create(scope: Scope): T? {
 		if (! scopeType.isInstance(scope)) return null
+		@Suppress("UNCHECKED_CAST")
 		return factory(scope as S)
 	}
 }
+
+class NoRegisteredModuleException(val type: KClass<*>) : Throwable() {
+	override val message: String?
+		get() = "${type.simpleName}\nNo registered module for $type"
+}
+
+private inline fun noModule(type: KClass<*>): Nothing = throw NoRegisteredModuleException(type)
 
 object DI {
 
@@ -40,42 +49,49 @@ object DI {
 			val useScope = relatedScopes[kClass] ?: scope
 			val registeredTypes = getRegisteredTypes(useScope)
 
-			if (! registeredTypes.containsKey(kClass)) {
-				synchronized(FX.lock) {
-					try {
+			val factory = getRegisteredFactory(kClass)
+
+			if (factory.isSingleton) {
+				if (! registeredTypes.containsKey(kClass)) {
+					synchronized(FX.lock) {
 						if (!registeredTypes.containsKey(kClass)) {
-
-							val t = createType(kClass, useScope) ?: run {
-								val errorMessage = StringBuilder("No registered module for type $kClass.")
-								if (verbose) errorMessage.append("\nAll factories: ${factories}")
-								throw Error(errorMessage.toString())
-							}
-
+							val t = createType(factory, kClass, useScope)
 							registeredTypes[kClass] = t
 						}
-					} catch (t: Throwable) {
-						throw Error("Failed to retrieve $kClass in $useScope.\nCaused by: $t", t)
 					}
 				}
+				registeredTypes[kClass] as T
+			} else {
+				createType(factory, kClass, useScope)
 			}
-
-			registeredTypes[kClass] as T
 		}
 	}
 
+	private fun <T : Any> getRegisteredFactory(kClass: KClass<in T>): RegisteredFactory<T, *>
+	{
+		val factory = factories[kClass] ?: noModule(kClass)
+		@Suppress("UNCHECKED_CAST")
+		return factory as RegisteredFactory<T, *>
+	}
+
 	@Suppress("UNCHECKED_CAST")
-	private fun <T : Any> createType(kClass: KClass<in T>, scope: Scope): T? {
-		val registeredFactory = factories[kClass] ?: return null
-		val t = registeredFactory.create(scope) as T? ?: error("Incorrect scope $scope.  Was expecting ${registeredFactory.scopeType} for type $kClass")
-		return t
+	private fun <T : Any> createType(factory: RegisteredFactory<T, *>, kClass: KClass<in T>, scope: Scope): T {
+		return try {
+			factory.create(scope)
+		} catch (t: Throwable) {
+			throw Error("$t\n\tWhen resolving type $kClass.", t)
+		} ?: error("Incorrect scope ${scope::class.simpleName}.  Was expecting ${factory.scopeType} for type $kClass")
 	}
 
 	@JvmName("registerTypeFactoryDefaultScope")
-	inline fun <reified T : Any> registerTypeFactory(noinline factory: (Scope) -> T) = registerTypeFactory(T::class, Scope::class, factory)
+	inline fun <reified T : Any> registerTypeFactory(noinline factory: (Scope) -> T) = registerTypeFactory(T::class, Scope::class, factory = factory)
 
-	inline fun <reified T : Any, reified S : Scope> registerTypeFactory(noinline factory: (S) -> T) = registerTypeFactory(T::class, S::class, factory)
-	fun <T : Any, S: Scope> registerTypeFactory(kClass: KClass<in T>, scopeClass: KClass<S>, factory: (S) -> T) {
-		factories[kClass] = RegisteredFactory(factory, scopeClass)
+	inline fun <reified T : Any, reified S : Scope> registerTypeFactory(noinline factory: (S) -> T) = registerTypeFactory(T::class, S::class, factory = factory)
+	fun <T : Any, S: Scope> registerTypeFactory(kClass: KClass<in T>, scopeClass: KClass<S>, isSingleton: Boolean = true, factory: (S) -> T) {
+		if (factories.containsKey(kClass) && verbose) {
+			println("WARNING: Already registered type factory for $kClass as ${factories[kClass]?.scopeType}.  Replacing with $scopeClass")
+		}
+		factories[kClass] = RegisteredFactory(factory, scopeClass, isSingleton)
 	}
 
 }
@@ -87,13 +103,26 @@ inline fun <reified T : Any> Scope.get(): T = DI.resolve(this)
 
 class InScope<S : Scope>(val scopeClass: KClass<S>) {
 
+
 	inline fun <reified T : Any> resolveLater() = DI.resolveLater<T>()
-	inline fun <reified T : Any> provide(vararg types: KClass<in T>, noinline factory: S.() -> T) {
+	inline fun <reified T : Any> provide(vararg types: KClass<in T>, noinline factory: S.() -> T) =
+		provide(T::class, types, factory)
+	fun <T : Any> provide(type: KClass<T>, types: Array<out KClass<in T>>, factory: S.() -> T) {
 		val uniqueTypes = types.toSet()
-		val type = T::class
-		DI.registerTypeFactory(T::class, scopeClass, factory)
+		DI.registerTypeFactory(type, scopeClass, factory = factory)
 		uniqueTypes.forEach { otherType ->
 			DI.registerTypeFactory<T, S>(otherType, scopeClass) {
+				DI.resolveClass(type, it)
+			}
+		}
+	}
+	inline fun <reified T : Any> factory(vararg types: KClass<in T>, noinline factory: S.() -> T) =
+		factory(T::class, types, factory)
+	fun <T : Any> factory(type: KClass<T>, types: Array<out KClass<in T>>, factory: S.() -> T) {
+		val uniqueTypes = types.toSet()
+		DI.registerTypeFactory(type, scopeClass, false, factory)
+		uniqueTypes.forEach { otherType ->
+			DI.registerTypeFactory<T, S>(otherType, scopeClass, false) {
 				DI.resolveClass(type, it)
 			}
 		}

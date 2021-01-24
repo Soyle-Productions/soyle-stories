@@ -1,24 +1,24 @@
 package com.soyle.stories.di.location
 
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.eventbus.Notifier
 import com.soyle.stories.location.controllers.CreateNewLocationController
-import com.soyle.stories.location.controllers.DeleteLocationController
 import com.soyle.stories.location.controllers.RenameLocationController
+import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
+import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.events.CreateNewLocationNotifier
-import com.soyle.stories.location.events.DeleteLocationNotifier
 import com.soyle.stories.location.events.LocationEvents
-import com.soyle.stories.location.events.RenameLocationNotifier
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationControllerImpl
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationNotifier
+import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
+import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
+import com.soyle.stories.location.renameLocation.RenameLocationOutput
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocationUseCase
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocationUseCase
 import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetails
 import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetailsUseCase
 import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
@@ -38,11 +38,8 @@ object LocationModule {
 		provide<CreateNewLocation> {
 			CreateNewLocationUseCase(projectId, get())
 		}
-		provide<DeleteLocation> {
-			DeleteLocationUseCase(get(), get())
-		}
 		provide<RenameLocation> {
-			RenameLocationUseCase(get())
+			RenameLocationUseCase(get(), get())
 		}
 		provide<GetLocationDetails> {
 			GetLocationDetailsUseCase(get())
@@ -54,23 +51,23 @@ object LocationModule {
 
 	private fun InScope<ProjectScope>.events() {
 		provide(CreateNewLocation.OutputPort::class) {
-			CreateNewLocationNotifier()
+			CreateNewLocationNotifier(applicationScope.get())
 		}
-		provide(DeleteLocation.OutputPort::class) {
-			DeleteLocationNotifier()
+		provide(LocationRenamedReceiver::class) {
+			LocationRenamedNotifier()
 		}
-		provide(RenameLocation.OutputPort::class) {
-			RenameLocationNotifier()
+		provide<RenameLocation.OutputPort> {
+			RenameLocationOutput(get(), get())
 		}
 		provide(ReDescribeLocation.OutputPort::class) {
-			ReDescribeLocationNotifier()
+			ReDescribeLocationNotifier(applicationScope.get())
 		}
 
 		provide<LocationEvents> {
 			object : LocationEvents {
 				override val createNewLocation: Notifier<CreateNewLocation.OutputPort> by DI.resolveLater<CreateNewLocationNotifier>(this@provide)
-				override val deleteLocation: Notifier<DeleteLocation.OutputPort> by DI.resolveLater<DeleteLocationNotifier>(this@provide)
-				override val renameLocation: Notifier<RenameLocation.OutputPort> by DI.resolveLater<RenameLocationNotifier>(this@provide)
+				override val deleteLocation: Notifier<DeletedLocationReceiver> by lazy { this@provide.get<DeletedLocationNotifier>() }
+				override val renameLocation: Notifier<RenameLocation.OutputPort> by lazy { this@provide.get() }
 				override val reDescribeLocation: Notifier<ReDescribeLocation.OutputPort> by DI.resolveLater<ReDescribeLocationNotifier>(this@provide)
 			}
 		}
@@ -79,9 +76,6 @@ object LocationModule {
 	private fun InScope<ProjectScope>.controllers() {
 		provide {
 			CreateNewLocationController(get(), get())
-		}
-		provide {
-			DeleteLocationController(get(), get())
 		}
 		provide {
 			RenameLocationController(get(), get())
@@ -100,9 +94,7 @@ object LocationModule {
 		}
 
 		CreateLocationDialogModule
-		DeleteLocationDialogModule
 		LocationListModule
-		LocationDetailsModule
 
 	}
 }

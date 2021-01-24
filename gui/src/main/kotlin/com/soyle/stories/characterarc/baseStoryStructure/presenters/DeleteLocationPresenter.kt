@@ -1,23 +1,20 @@
 package com.soyle.stories.characterarc.baseStoryStructure.presenters
 
-import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureView
-import com.soyle.stories.location.LocationException
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
+import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureViewModel
+import com.soyle.stories.gui.View
+import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
+import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
 
 class DeleteLocationPresenter(
-  private val view: BaseStoryStructureView
-) : DeleteLocation.OutputPort {
+  private val view: View.Nullable<BaseStoryStructureViewModel>
+) : DeletedLocationReceiver {
 
-	override fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
+	override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
 		view.updateOrInvalidated {
 			withLocations(
-			  availableLocations = availableLocations.filterNot { it.id == response.locationId.toString() }
+			  availableLocations = availableLocations.filterNot { it.id == deletedLocation.location.uuid.toString() }
 			)
 		}
-	}
-
-	override fun receiveDeleteLocationFailure(failure: LocationException) {
-
 	}
 
 }

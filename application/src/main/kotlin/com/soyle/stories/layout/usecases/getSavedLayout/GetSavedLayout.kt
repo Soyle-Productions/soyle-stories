@@ -1,7 +1,7 @@
 package com.soyle.stories.layout.usecases.getSavedLayout
 
-import com.soyle.stories.layout.usecases.ActiveWindow
-import com.soyle.stories.layout.usecases.StaticTool
+import com.soyle.stories.layout.usecases.OpenTool
+import com.soyle.stories.layout.usecases.OpenWindow
 import java.util.*
 
 /**
@@ -14,7 +14,7 @@ interface GetSavedLayout {
     suspend operator fun invoke(projectId: UUID, outputPort: OutputPort)
 
     class ResponseModel(
-        val layoutId: UUID, val windows: List<ActiveWindow>, val staticTools: List<StaticTool>
+	  val layoutId: UUID, val windows: List<OpenWindow>, val fixedTools: List<OpenTool>
     )
 
     interface OutputPort {

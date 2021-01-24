@@ -1,5 +1,6 @@
 package com.soyle.stories.scene.createSceneDialog
 
+import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
@@ -14,6 +15,9 @@ import tornadofx.*
 class CreateSceneDialog : Fragment() {
 
 	override val scope: ProjectScope = super.scope as ProjectScope
+
+	private val sceneId: String? by params
+	private val relativeDirection: Boolean by params
 
 	private val viewListener by resolveLater<CreateNewSceneDialogViewListener>()
 	private val model = resolve<CreateSceneDialogModel>()
@@ -31,7 +35,18 @@ class CreateSceneDialog : Fragment() {
 			onAction = EventHandler {
 				it.consume()
 				model.executing.set(true)
-				viewListener.createScene(text)
+				val name = NonBlankString.create(text)
+				if (name == null) {
+					model.errorMessage.value = "Name cannot be blank"
+					return@EventHandler
+				}
+				when {
+					sceneId != null -> when (relativeDirection) {
+						true -> viewListener.createSceneBefore(name, sceneId!!)
+						false -> viewListener.createSceneAfter(name, sceneId!!)
+					}
+					else -> viewListener.createScene(name)
+				}
 			}
 		}
 	}
@@ -45,7 +60,7 @@ class CreateSceneDialog : Fragment() {
 	}
 
 }
-fun createSceneDialog(scope: ProjectScope): CreateSceneDialog = scope.get<CreateSceneDialog>().apply {
+fun createSceneDialog(scope: ProjectScope, relativeSceneId: String? = null, direction: Boolean = true): CreateSceneDialog = find<CreateSceneDialog>(scope, mapOf("sceneId" to relativeSceneId, "relativeDirection" to direction)).apply {
 	openModal(StageStyle.UTILITY, Modality.NONE, escapeClosesWindow = true, owner = scope.get<WorkBench>().currentWindow)?.apply {
 		centerOnScreen()
 		focusedProperty().onChange {

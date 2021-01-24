@@ -1,84 +1,51 @@
 package com.soyle.stories.layout.usecases.closeTool
 
 import com.soyle.stories.entities.Project
-import com.soyle.stories.layout.Context
+import com.soyle.stories.layout.LayoutDoesNotExist
 import com.soyle.stories.layout.LayoutException
 import com.soyle.stories.layout.ToolDoesNotExist
-import com.soyle.stories.layout.entities.*
+import com.soyle.stories.layout.entities.Layout
+import com.soyle.stories.layout.entities.Tool
+import com.soyle.stories.layout.repositories.LayoutRepository
 import com.soyle.stories.layout.usecases.closeTool.CloseTool.OutputPort
-import com.soyle.stories.layout.usecases.closeTool.CloseTool.ResponseModel
+import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
+import com.soyle.stories.layout.usecases.toResponseModel
 import java.util.*
 
 class CloseToolUseCase(
-    private val context: Context,
-    projectId: UUID
+  projectId: UUID,
+  private val layoutRepository: LayoutRepository
 ) : CloseTool {
 
     private val projectId = Project.Id(projectId)
 
     override suspend fun invoke(toolId: UUID, output: OutputPort) {
-        val response = try {
-            closeTool(toolId)
-        } catch (l: LayoutException) {
-            return output.receiveCloseToolFailure(l)
-        }
+        val response = try { execute(toolId) }
+        catch (l: LayoutException) { return output.receiveCloseToolFailure(l) }
         output.receiveCloseToolResponse(response)
     }
 
-    private suspend fun closeTool(toolId: UUID): ResponseModel {
-        val layout = getLayoutWithTool(toolId)
-            .closeToolAndSaveIfNotOpen(Tool.Id(toolId))
-        return getResponseModel(layout, Tool.Id(toolId))
+    private suspend fun execute(toolId: UUID): GetSavedLayout.ResponseModel {
+        val layout = getLayout()
+        val tool = getTool(layout, toolId)
+        val modifiedLayout = closeTool(layout, tool)
+        return modifiedLayout.toResponseModel()
     }
 
-    private suspend fun getLayoutWithTool(toolId: UUID) =
-        context.layoutRepository
-            .getLayoutForProject(projectId)
-            ?.ensureHasTool(toolId)
-            ?: throw ToolDoesNotExist(toolId)
+    private suspend fun getLayout() =
+        layoutRepository.getLayoutForProject(projectId)
+            ?: throw LayoutDoesNotExist()
 
-    private suspend fun Layout.closeToolAndSaveIfNotOpen(toolId: Tool.Id): Layout {
-        return if (isToolOpen(toolId)) {
-            closeTool(toolId).fold(
-                { throw it },
-                {
-                    context.layoutRepository.saveLayout(it)
-                    it
-                }
-            )
-        } else this
+    private suspend fun closeTool(layout: Layout, tool: Tool): Layout {
+        return if (layout.isToolOpen(tool.id)) {
+            val modifiedLayout = if (tool.isTemporary()) layout.withoutTools(setOf(tool.id))
+            else layout.withToolClosed(tool.id)
+            layoutRepository.saveLayout(modifiedLayout)
+            modifiedLayout
+        } else layout
     }
 
-    private fun getResponseModel(layout: Layout, toolId: Tool.Id): ResponseModel {
-        val ancestorWindow = layout.windows.find { it.hasTool(toolId) }
-        return ResponseModel(
-            toolId.uuid,
-            closedStackId = layout.getParentToolGroupIdIfClosed(toolId)?.uuid,
-            closedSplitterIds = ancestorWindow?.getClosedAncestorSplitterIds(toolId).mapToUUIDsOrEmptyIfNull().toSet(),
-            closedWindowId = ancestorWindow?.takeUnless { it.isOpen }?.id?.uuid
-        )
-    }
-
-    private fun Layout.getParentToolGroupIdIfClosed(toolId: Tool.Id): ToolStack.Id? {
-        return getParentToolGroup(toolId)?.takeUnless { it.isOpen }?.id
-    }
-
-    private fun Window.getClosedAncestorSplitterIds(toolId: Tool.Id): List<StackSplitter.Id>
-    {
-        return child.getAncestorSplittersFor(toolId).filter { ! it.isOpen }.map { it.id }
-    }
-
-    private fun List<StackSplitter.Id>?.mapToUUIDsOrEmptyIfNull() =
-        this?.map { it.uuid } ?: emptyList()
-
-    private fun Window.WindowChild.getAncestorSplittersFor(toolId: Tool.Id): List<StackSplitter> {
-        return if (this is StackSplitter && this.hasTool(toolId)) {
-            listOf(this) + children.flatMap {
-                it.second.getAncestorSplittersFor(toolId)
-            }
-        } else emptyList()
-    }
-
-
-    private fun Layout.ensureHasTool(toolId: UUID): Layout? = takeIf { it.tools.find { it.id.uuid == toolId } != null }
+    private fun getTool(layout: Layout, toolId: UUID) =
+      layout.getToolById(Tool.Id(toolId))
+        ?: throw ToolDoesNotExist(toolId)
 }

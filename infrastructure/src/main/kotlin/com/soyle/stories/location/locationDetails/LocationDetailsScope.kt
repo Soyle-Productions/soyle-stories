@@ -1,17 +1,17 @@
 package com.soyle.stories.location.locationDetails
 
 import com.soyle.stories.di.DI
+import com.soyle.stories.layout.config.dynamic.LocationDetails
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.LocationDetailsToolViewModel
 import javafx.event.EventTarget
 import tornadofx.FX
 import tornadofx.Scope
 import tornadofx.removeFromParent
 
-class LocationDetailsScope(val projectScope: ProjectScope, locationDetailsToolViewModel: LocationDetailsToolViewModel) : Scope()
+class LocationDetailsScope(val projectScope: ProjectScope, tool: LocationDetails) : Scope()
 {
 
-	val locationId = locationDetailsToolViewModel.locationId
+	val locationId = tool.locationId.toString()
 
 	init {
 		projectScope.addScope(locationId, this)

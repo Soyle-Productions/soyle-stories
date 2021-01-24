@@ -1,21 +1,21 @@
 package com.soyle.stories.layout
 
-import com.soyle.stories.characterarc.baseStoryStructure.baseStoryStructureTab
-import com.soyle.stories.characterarc.characterComparison.characterComparisonTab
-import com.soyle.stories.characterarc.characterList.CharacterList
 import com.soyle.stories.common.async
+import com.soyle.stories.di.layout.ToolModule
 import com.soyle.stories.di.resolve
-import com.soyle.stories.location.locationDetails.locationDetailsTab
-import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.*
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.project.layout.LayoutViewListener
+import com.soyle.stories.project.layout.ToolGroupViewModel
+import javafx.animation.Animation
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.geometry.Side
+import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import javafx.scene.layout.Pane
+import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import tornadofx.*
 
@@ -40,6 +40,7 @@ class ToolGroup : WindowChild() {
         }
 
     private val isEmpty = viewModelProperty.booleanBinding { it?.tools.isNullOrEmpty() }
+    private var receivingUpdate = false
 
     override val root: Parent = stackpane {
         tabpane {
@@ -54,42 +55,30 @@ class ToolGroup : WindowChild() {
                 val toolIds = vm.tools.map { it.toolId }.toSet()
                 vm.tools.map { tool ->
                     tabMap.getOrPut(tool.toolId) {
-                        when (tool) {
-                            is CharacterListToolViewModel -> tab<CharacterList>()
-                            is LocationListToolViewModel -> tab<LocationList>()
-                            is SceneListToolViewModel -> tab<SceneList>()
-                            is BaseStoryStructureToolViewModel -> baseStoryStructureTab(scope, tool)
-                            is CharacterComparisonToolViewModel -> characterComparisonTab(scope, tool.themeId, tool.characterId)
-                            is LocationDetailsToolViewModel -> locationDetailsTab(scope, tool)/*
-                            ToolType.Timeline -> Tab("").also { tabs.add(it) }
-                            ToolType.NoteList -> Tab().also { tabs.add(it) }
-                            ToolType.SceneList -> Tab().also { tabs.add(it) }
-                            ToolType.Properties -> Tab().also { tabs.add(it) }
-                            ToolType.PlotPointList -> Tab().also { tabs.add(it) }
-                            ToolType.SceneWeave -> Tab().also { tabs.add(it) }
-                            ToolType.ContinuityErrors -> Tab().also { tabs.add(it) }
-                            ToolType.CharacterDevelopment -> Tab().also { tabs.add(it) }
-                            ToolType.LocationTracking -> Tab().also { tabs.add(it) }*/
-                        }.also {
+                        ToolModule.getTabConfigFor(tool).getTab(this, scope).also {
                             it.setOnCloseRequest {
                                 async(scope) {
                                     layoutViewListener.closeTool(tool.toolId)
                                 }
                                 it.consume()
                             }
+                            receivingUpdate = true
                             selectionModel.select(it)
+                            receivingUpdate = false
                         }
                     }
                 }
                 tabMap.forEach { (t, u) ->
-                    if (t !in toolIds) u.close()
+                    if (t !in toolIds) {
+                        u.close()
+                    }
                 }
-                tabMap.keys.removeIf { it !in toolIds }
+                tabMap.keys.removeIf { it !in toolIds }/*
                 vm.focusedToolId?.let {
                     tabMap[it]?.let {
                         selectionModel.select(it)
                     }
-                }
+                }*/
             }
         }
         label("Random hints") {

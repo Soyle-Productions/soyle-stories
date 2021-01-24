@@ -1,80 +1,118 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.common.*
+import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
-import com.soyle.stories.project.layout.Dialog
-import com.soyle.stories.project.layout.LayoutViewListener
+import com.soyle.stories.location.LocationException
+import com.soyle.stories.location.events.CreateNewLocationNotifier
+import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
+import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.WorkBench
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.stage.Modality
-import javafx.stage.Stage
 import javafx.stage.StageStyle
 import tornadofx.*
 
-class CreateLocationDialog : View("New Location") {
+class CreateLocationDialog : Fragment("New Location") {
 
-	private val model = find<CreateLocationDialogModel>()
-	private val createLocationDialogViewListener: CreateLocationDialogViewListener = resolve()
-	private val layoutViewListener: LayoutViewListener = resolve()
+    override val scope: ProjectScope = super.scope as ProjectScope
+    private val model = find<CreateLocationDialogModel>()
+    private val createLocationDialogViewListener: CreateLocationDialogViewListener = resolve()
 
-	val name = SimpleStringProperty("")
-	val description = SimpleStringProperty("")
+    internal var onCreateLocation: (CreateNewLocation.ResponseModel) -> Unit by singleAssign()
 
-	override val root = form {
-		fieldset {
-			field("Name") {
-				textfield {
-					id = "name"
-					name.bind(textProperty())
-					requestFocus()
-					onAction = EventHandler {
-						it.consume()
-						createLocationDialogViewListener.createLocation(name.value, description.value)
-					}
-				}
-			}
-			field("Description (Optional)") {
-				textfield {
-					description.bind(textProperty())
-				}
-			}
-			field {
-				text(model.errorMessage) {
-					id = "errorMessage"
-				}
-			}
-		}
-		hbox {
-			button("Create") {
-				id = "createLocation"
-				action {
-					createLocationDialogViewListener.createLocation(name.value, description.value)
-				}
-			}
-			button("Cancel") {
-				id = "cancel"
-				action {
-					close()
-				}
-			}
-		}
-	}
+    private val createdLocationNotifier = resolve<CreateNewLocationNotifier>()
 
-	override fun onUndock() {
-		FX.getComponents(scope).remove(CreateLocationDialog::class)
-		layoutViewListener.closeDialog(Dialog.CreateLocation::class)
-	}
+    private val createdLocationReceiver = object : CreateNewLocation.OutputPort {
+        override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
+            scope.applicationScope.get<ThreadTransformer>().gui {
+                onCreateLocation.invoke(response)
+            }
+            createdLocationNotifier.removeListener(this)
+        }
 
-	init {
-		model.isOpen.onChangeUntil({ it != true }) {
-			if (it != true) close()
-		}
-		createLocationDialogViewListener.getValidState()
-	}
+        override fun receiveCreateNewLocationFailure(failure: LocationException) {
+            createdLocationNotifier.removeListener(this)
+        }
+    }
+
+    val name = SimpleStringProperty("")
+    val description = SimpleStringProperty("")
+
+    override val root = form {
+        fieldset {
+            field("Name") {
+                textfield {
+                    id = "name"
+                    name.bind(textProperty())
+                    requestFocus()
+                    onAction = EventHandler {
+                        it.consume()
+                        ifNameIsValid {
+                            createdLocationNotifier.addListener(createdLocationReceiver)
+                            createLocationDialogViewListener.createLocation(it, description.value)
+                        }
+                    }
+                }
+            }
+            field("Description (Optional)") {
+                textfield {
+                    description.bind(textProperty())
+                }
+            }
+            field {
+                text(model.errorMessage) {
+                    id = "errorMessage"
+                }
+            }
+        }
+        hbox {
+            button("Create") {
+                id = "createLocation"
+                action {
+                    ifNameIsValid {
+                        createLocationDialogViewListener.createLocation(it, description.value)
+                    }
+                }
+            }
+            button("Cancel") {
+                id = "cancel"
+                action {
+                    close()
+                }
+            }
+        }
+    }
+
+    init {
+        model.isOpen.onChangeUntil({ it != true }) {
+            if (it != true) close()
+        }
+        createLocationDialogViewListener.getValidState()
+    }
+
+    private fun ifNameIsValid(block: (SingleNonBlankLine) -> Unit) {
+        val nameLineCount = countLines(name.value)
+        if (nameLineCount is SingleLine) {
+            val nonBlankName = SingleNonBlankLine.create(nameLineCount)
+            if (nonBlankName != null) block(nonBlankName)
+        }
+    }
+
 }
 
-fun Component.createLocationDialog(owner: Stage?): CreateLocationDialog = find {
-	openModal(StageStyle.UTILITY, Modality.APPLICATION_MODAL, escapeClosesWindow = true, owner = owner)?.apply {
-		centerOnScreen()
-	}
+fun createLocationDialog(
+    scope: ProjectScope,
+    onCreateLocation: (CreateNewLocation.ResponseModel) -> Unit = {}
+): CreateLocationDialog = scope.get<CreateLocationDialog>().apply {
+    this.onCreateLocation = onCreateLocation
+    openModal(
+        StageStyle.UTILITY,
+        Modality.APPLICATION_MODAL,
+        escapeClosesWindow = true,
+        owner = scope.get<WorkBench>().currentWindow
+    )?.apply {
+        centerOnScreen()
+    }
 }

@@ -1,13 +1,13 @@
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.common.bindImmutableList
-import javafx.beans.property.ReadOnlyBooleanProperty
-import javafx.beans.property.SimpleBooleanProperty
+import com.soyle.stories.common.Model
+import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.scene.control.TreeItem
-import tornadofx.ItemViewModel
+import tornadofx.select
 import tornadofx.toProperty
 
 /**
@@ -15,33 +15,24 @@ import tornadofx.toProperty
  * Date: 2/10/2020
  * Time: 10:41 AM
  */
-class CharacterListModel : ItemViewModel<CharacterListViewModel>(), CharacterListView {
+class CharacterListModel : Model<ProjectScope, CharacterListViewModel>(ProjectScope::class) {
+
+    override val applicationScope: ApplicationScope
+        get() = scope.applicationScope
 
     val selectedItem = SimpleObjectProperty<Any?>(null)
-    val characters = bindImmutableList(CharacterListViewModel::characters)
+    val characters = bind(CharacterListViewModel::characters)
     val characterTreeItems = SimpleListProperty(FXCollections.observableArrayList<TreeItem<Any?>>())
-    val hasCharacters: ReadOnlyBooleanProperty = bind { (!item?.characters.isNullOrEmpty()).toProperty() }
-    val invalid = SimpleBooleanProperty(true)
+    val hasCharacters = characters.select { (! it.isNullOrEmpty()).toProperty() }
 
-    fun viewModel() = CharacterListViewModel(
+    override fun viewModel() = CharacterListViewModel(
         characterTreeItems.mapNotNull {
             val itemValue = it.value
             if (itemValue !is CharacterTreeItemViewModel) null
             else {
-                CharacterTreeItemViewModel(itemValue.id, itemValue.name, it.isExpanded, itemValue.arcs)
+                CharacterTreeItemViewModel(itemValue.id, itemValue.name, itemValue.imageResource, it.isExpanded, itemValue.arcs)
             }
         }
     )
-
-    override suspend fun displayNewViewModel(list: CharacterListViewModel) {
-        item = list
-        invalid.set(false)
-    }
-
-    override suspend fun invalidate() {
-        invalid.set(true)
-    }
-
-    override suspend fun getViewModel(): CharacterListViewModel? = viewModel()
 
 }

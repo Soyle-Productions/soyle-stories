@@ -72,7 +72,7 @@ task fullTestReport {
         dependsOn(useCasesTest, adaptersTest, javafxTest, ":infrastructure:runFeaturesUsingJUnit")
     }
 }
-task run {
+task runInIde {
     group = "Soyle Tasks"
     description = "Start the application in the IDE"
 
@@ -98,13 +98,5 @@ task zipTestReport(type: Zip) {
         println archiveFileName.get()
         println relativePath(destinationDirectory)
         println relativePath(archiveFile)
-    }
-}
-task buildAndPackage {
-    group = "Soyle Tasks"
-    description = "Create runtime images for all three platforms"
-
-    configure {
-        dependsOn(":infrastructure:runtimeZip")
     }
 }

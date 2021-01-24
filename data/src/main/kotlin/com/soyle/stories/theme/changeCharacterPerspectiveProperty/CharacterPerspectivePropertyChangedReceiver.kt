@@ -1,0 +1,9 @@
+package com.soyle.stories.theme.changeCharacterPerspectiveProperty
+
+import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
+
+interface CharacterPerspectivePropertyChangedReceiver {
+
+    suspend fun receiveCharacterPerspectivePropertyChanged(propertyChanged: ChangeCharacterPerspectivePropertyValue.ResponseModel)
+
+}

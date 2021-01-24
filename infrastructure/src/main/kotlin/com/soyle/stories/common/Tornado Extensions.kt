@@ -1,7 +1,6 @@
 package com.soyle.stories.common
 
 import com.soyle.stories.di.DI
-import com.soyle.stories.gui.ThreadTransformer
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.binding.BooleanExpression
@@ -12,11 +11,15 @@ import javafx.beans.property.SimpleSetProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Bounds
+import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.skin.TextAreaSkin
+import javafx.scene.control.skin.VirtualFlow
 import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
 import tornadofx.*
+import java.util.*
+import kotlin.collections.LinkedHashSet
 import kotlin.reflect.KProperty1
 
 /**
@@ -181,60 +184,32 @@ val TextArea.rowCountProperty
 val TextArea.rowCount
 	get() = rowCountProperty.get()
 
-val TreeView<*>.isEditing: Boolean
-	get() = editingItem != null
+fun <T : Node> T.existsWhen(expr: ObservableValue<Boolean>): T {
+	visibleWhen(expr)
+	managedProperty().cleanBind(visibleProperty())
+	return this
+}
+fun <T : Node> T.existsWhen(expr: () -> ObservableValue<Boolean>): T = existsWhen(expr())
+var <T : Node> T.exists: Boolean
+	get() = visibleProperty().get() && managedProperty().get()
+	set(value) {
+		visibleProperty().set(value)
+		managedProperty().set(value)
+	}
 
-val <T> TreeView<T>.editingCell: TreeCell<T>?
-	get() = properties.getOrDefault("com.soyle.stories.treeView.editingCell", null) as? TreeCell<T>
+fun Node.onLoseFocus(op: () -> Unit) = focusedProperty().onChange { if (! it) op() }
 
-fun <T> TreeView<T>.makeEditable(valid: (String, T?) -> String? = { _, _ -> null }, convertFromString: TreeCell<T>.(String, T?) -> T) {
-	val self = this
-	isEditable = true
-	properties["tornadofx.editSupport"] = fun TreeCell<T>.(eventType: EditEventType, value: T?) {
-		val cell = this
-		graphic = when (eventType) {
-			EditEventType.StartEdit -> {
-				self.properties["com.soyle.stories.treeView.editingCell"] = this
-				val rollbackText = text
-				properties["com.soyle.stories.rollbackText"] = rollbackText
-				text = null
-				textfield(rollbackText) {
-					fun commit() {
-						val errorMessage = valid(textProperty().get(), item)
-						if (errorMessage == null) {
-							cell.commitEdit(convertFromString.invoke(cell, textProperty().get(), item))
-						} else {
-							val errorDecorator = SimpleMessageDecorator(errorMessage, ValidationSeverity.Error)
-							decorators.toList().forEach { removeDecorator(it) }
-							addDecorator(errorDecorator)
-						}
-					}
-					action {
-						commit()
-					}
-					focusedProperty().onChange {
-						if (! it) {
-							if (text != rollbackText) {
-								commit()
-							} else {
-								cell.cancelEdit()
-							}
-						}
-					}
-					requestFocus()
-					selectAll()
-				}
-			}
-			EditEventType.CancelEdit -> {
-				self.properties.remove("com.soyle.stories.treeView.editingCell", this)
-				text = properties["com.soyle.stories.rollbackText"] as? String ?: ""
-				null
-			}
-			EditEventType.CommitEdit -> {
-				self.properties.remove("com.soyle.stories.treeView.editingCell", this)
-				text = (graphic as? TextField)?.text ?: (properties["com.soyle.stories.rollbackText"] as? String) ?: ""
-				null
-			}
-		}
+val <T> ListView<T>.cells: LinkedHashSet<ListCell<T>>
+	get() = properties.getOrPut("com.soyle.stories.listview.cells") { LinkedHashSet<ListCell<T>>() } as LinkedHashSet<ListCell<T>>
+
+fun <T> ListView<T>.sizeToFitItems(maximumVisibleItems: Double = 11.5)
+{
+	val ROW_HEIGHT = (childrenUnmodifiable.firstOrNull() as? VirtualFlow<ListCell<T>>)?.firstVisibleCell?.height ?: 24.0
+	val currentPrefHeight = prefHeight
+	prefHeight = (items.size * ROW_HEIGHT) + 2.0
+	val currentMaxHeight = maxHeight
+	maxHeight = 2.0 + maximumVisibleItems * ROW_HEIGHT
+	if (prefHeight != currentPrefHeight || maxHeight != currentMaxHeight) {
+		requestLayout()
 	}
 }

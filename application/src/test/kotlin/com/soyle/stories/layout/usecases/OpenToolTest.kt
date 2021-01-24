@@ -5,306 +5,204 @@
  */
 package com.soyle.stories.layout.usecases
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.layout.LayoutDoesNotExist
-import com.soyle.stories.layout.TestContext
-import com.soyle.stories.layout.entities.*
+import com.soyle.stories.layout.assertLayoutDoesNotExist
+import com.soyle.stories.layout.assertResponseModel
+import com.soyle.stories.layout.doubles.LayoutRepositoryDouble
+import com.soyle.stories.layout.doubles.OpenToolContextDouble
+import com.soyle.stories.layout.entities.Layout
+import com.soyle.stories.layout.entities.Tool
+import com.soyle.stories.layout.entities.ToolStack
+import com.soyle.stories.layout.entities.layout
+import com.soyle.stories.layout.repositories.OpenToolContext
+import com.soyle.stories.layout.tools.DynamicTool
+import com.soyle.stories.layout.tools.TemporaryTool
+import com.soyle.stories.layout.usecases.getSavedLayout.GetSavedLayout
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import com.soyle.stories.layout.usecases.openTool.OpenToolUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.*
-import kotlin.reflect.KClass
 
 class OpenToolTest {
 
-    val projectId = Project.Id(UUID.randomUUID())
+    private var validationFails: Boolean = true
 
-    private fun given(
-        layouts: List<Layout>,
-        saveLayout: (Layout) -> Unit = {}
-    ): (OpenTool.RequestModel) -> Either<*, *> {
-        val repo = TestContext(initialLayouts = layouts, saveLayout = saveLayout).layoutRepository
-        val useCase: OpenTool = OpenToolUseCase(projectId, repo)
-        val output = object : OpenTool.OutputPort {
-            var result: Either<*, *>? = null
-            override fun receiveOpenToolFailure(failure: Exception) {
-                result = failure.left()
-            }
+    private val dynamicTool: DynamicTool = DynamicDouble()
+    private val temporaryTool: TemporaryTool = TemporaryDouble()
 
-            override fun receiveOpenToolResponse(response: OpenTool.ResponseModel) {
-                result = response.right()
-            }
-        }
-        return {
-            runBlocking {
-                useCase.invoke(it, output)
-            }
-            output.result ?: null.right()
+    private inner class DynamicDouble : DynamicTool() {
+        override fun identifiedWithId(id: UUID): Boolean = false
+        override suspend fun validate(context: OpenToolContext) {
+            if (validationFails) throw Exception("validation error")
         }
     }
 
-    val characterUUID = UUID.randomUUID()
-    val themeUUID = UUID.randomUUID()
-    val request = OpenTool.RequestModel.BaseStoryStructure(characterUUID, themeUUID)
-
-    /**
-     *
-     */
-    @Nested
-    inner class `When layout does not exist` {
-
-        val useCase = given(emptyList())
-
-        @Test
-        fun `should output error`() {
-            val (result) = useCase.invoke(request) as Either.Left
-            result as LayoutDoesNotExist
+    private inner class TemporaryDouble : TemporaryTool() {
+        override fun identifiedWithId(id: UUID): Boolean = false
+        override suspend fun validate(context: OpenToolContext) {
+            if (validationFails) throw Exception("validation error")
         }
-
     }
 
-    @Nested
-    inner class `When layout exists` {
+    private var result: Any? = null
 
-        val layout: Layout = layout(projectId, Layout.Id(UUID.randomUUID())) {
-            window {
-                primaryStack {}
-            }
-        }
-
-        @Nested
-        inner class `And does not contain tool` {
-
-            @Test
-            fun `should create new tool`() {
-                var savedLayout: Layout? = null
-                given(layouts = listOf(layout), saveLayout = {
-                    savedLayout = it
-                }).invoke(request)
-                assert((savedLayout!!.windows.first().child as ToolStack).tools.first().isOpen)
-            }
-
-            @Test
-            fun `new tool should be in output`() {
-                var savedLayout: Layout? = null
-                val (result) = given(layouts = listOf(layout), saveLayout = {
-                    savedLayout = it
-                }).invoke(request) as Either.Right
-                result as OpenTool.ResponseModel
-                result.affectedToolGroup.run {
-                    (savedLayout!!.windows.first().child as ToolStack).tools.first().id
-                }
-            }
-
-        }
-
-        @Nested
-        inner class `And contains tool` {
-
-            val parentGroup: ToolStack
-            val toolId: Tool.Id = Tool.Id(UUID.randomUUID())
-            val layout: Layout
-
-            init {
-                val tool = BaseStoryStructureTool(toolId, Theme.Id(themeUUID), Character.Id(characterUUID), true)
-                layout = (this@`When layout exists`.layout.addToolToPrimaryStack(tool) as Either.Right).b
-                parentGroup = layout.getParentToolGroup(toolId)!!
-            }
-
-            @Test
-            fun `tool should be opened`() {
-                var savedLayout: Layout? = null
-                given(layouts = listOf(layout), saveLayout = {
-                    savedLayout = it
-                }).invoke(request)
-                assert((savedLayout!!.windows.first().child as ToolStack).tools.first().isOpen)
-            }
-
-            fun assertReceivedParentToolGroup(result: Any?) {
-                result as OpenTool.ResponseModel
-                result.affectedToolGroup.run {
-                    assertEquals(parentGroup.id.uuid, groupId)
-                }
-            }
-
-            @Test
-            fun `should output parent tool group`() {
-                val (result) = given(layouts = listOf(layout)).invoke(request) as Either.Right
-                assertReceivedParentToolGroup(result)
-            }
-
-            @Nested
-            inner class `And Tool is open` {
-
-                val layout = (this@`And contains tool`.layout.openTool(toolId) as Either.Right).b
-
-                @Test
-                fun `tool should be focused`() {
-                    var savedLayout: Layout? = null
-                    given(layouts = listOf(layout), saveLayout = {
-                        savedLayout = it
-                    }).invoke(request)
-                    assertEquals(
-                        toolId,
-                        (savedLayout!!.windows.first().child as ToolStack).focusedTool
-                    )
-                }
-
-                @Test
-                fun `should output parent tool group`() {
-                    val (result) = given(layouts = listOf(layout)).invoke(request) as Either.Right
-                    assertReceivedParentToolGroup(result)
-                }
-
-                @Nested
-                inner class `And tool group is focused` {
-
-                    val layout: Layout
-
-                    init {
-                        val layoutWithOpenTool = this@`And Tool is open`.layout
-                        layout = Layout(layoutWithOpenTool.id, projectId, layoutWithOpenTool.windows.map {
-                            if (it.isPrimary) {
-                                val toolStack = (it.child as ToolStack)
-                                val stackWithFocus = ToolStack(
-                                    toolStack.id,
-                                    toolStack.layoutId,
-                                    toolStack.tools,
-                                    toolStack.isPrimary,
-                                    toolId
-                                )
-                                Window(it.id, it.layoutId, stackWithFocus)
-                            } else it
-                        })
-                    }
-
-                    @Test
-                    fun `should receive no output`() {
-                        val (result) = given(layouts = listOf(layout)).invoke(request) as Either.Right
-                        assert(result == null)
-                    }
-
-                }
-
-            }
-
-        }
-
+    @Test
+    fun `open a new tool in a layout`() {
+        givenALayoutExistsForProject()
+        givenDataForDynamicToolExists()
+        whenAToolIsOpened(dynamicTool)
+        savedLayoutShouldHaveToolInPrimaryStack(dynamicTool)
+        assertResponseModel(savedLayout!!).invoke(result)
     }
 
-    @Nested
-    inner class SupportedToolTypes {
-
-        val layout: Layout = layout(projectId, Layout.Id(UUID.randomUUID())) {
-            window {
-                primaryStack {}
-            }
-        }
-
-        fun <T : Tool<*>, R : ActiveTool> testType(request: OpenTool.RequestModel, toolClass: KClass<T>, findType: (T) -> Boolean, activeClass: KClass<R>, findActive: (R) -> Boolean) {
-            var savedLayout: Layout? = null
-            val (result) = given(layouts = listOf(layout), saveLayout = {
-                savedLayout = it
-            }).invoke(request) as Either.Right
-            val openedTool = (savedLayout!!.tools
-              .filter { it.isOpen }
-              .filter { toolClass.isInstance(it) } as List<T>)
-              .find(findType)
-            assertNotNull(openedTool)
-            result as OpenTool.ResponseModel
-            val toolsMatchingSaved = result.affectedToolGroup.tools.filter { it.toolId == openedTool!!.id.uuid }
-            assertTrue(toolsMatchingSaved.isNotEmpty(), "No active tools matching tool id")
-            val toolsAsActiveClass = (toolsMatchingSaved.filter { activeClass.isInstance(it) } as List<R>)
-            assertTrue(toolsAsActiveClass.isNotEmpty(), "No active tools of expected type $activeClass")
-            val activeTool = toolsAsActiveClass.find(findActive)
-            assertNotNull(activeTool)
-        }
-
-        @Test
-        fun `base story structure`() {
-            val request = OpenTool.RequestModel.BaseStoryStructure(UUID.randomUUID(), UUID.randomUUID())
-            testType(
-              request,
-              BaseStoryStructureTool::class,
-              {
-                  it.identifyingData == Theme.Id(request.themeId) to Character.Id(request.characterId)
-              },
-              BaseStoryStructureActiveTool::class,
-              {
-                  it.characterId == request.characterId && it.themeId == request.themeId
-              }
-            )
-        }
-
-        @Test
-        fun `character comparison`() {
-            val request = OpenTool.RequestModel.CharacterComparison(UUID.randomUUID(), UUID.randomUUID())
-            testType(
-              request,
-              CharacterComparisonTool::class,
-              {
-                  it.identifyingData == Theme.Id(request.themeId) && it.associatedData == Character.Id(request.characterId)
-              },
-              CharacterComparisonActiveTool::class,
-              {
-                  it.characterId == request.characterId && it.themeId == request.themeId
-              }
-            )
-        }
-
-        @Test
-        fun `location details`() {
-            val request = OpenTool.RequestModel.LocationDetails(UUID.randomUUID())
-            testType(
-              request,
-              LocationDetailsTool::class,
-              { it.identifyingData == Location.Id(request.locationId) },
-              LocationDetailsActiveTool::class,
-              { it.locationId == request.locationId }
-            )
-        }
-
+    @Test
+    fun `layout does not exist`() {
+        whenAToolIsOpened(dynamicTool)
+        layoutShouldNotHaveBeenSaved()
+        assertLayoutDoesNotExist().invoke(result)
     }
 
-    @Nested
-    inner class `When windows and splitters are also affected` {
+    @Test
+    fun `data for dynamic tool doesn't exist`() {
+        givenALayoutExistsForProject()
+        whenADynamicToolIsOpened()
+        layoutShouldNotHaveBeenSaved()
+        result as Exception
+    }
 
-        var ancestorWindowId: Window.Id? = null
-        val ancestorSplitters = mutableListOf<StackSplitter>()
-        val layout: Layout = layout(projectId, Layout.Id(UUID.randomUUID())) {
-            window { primaryStack {  } }
+    @Test
+    fun `reopen existing tool`() {
+        givenALayoutExistsForProject()
+        givenDynamicToolExistsInLayout()
+        givenDataForDynamicToolExists()
+        whenAToolIsOpened(dynamicTool)
+        savedLayoutShouldHaveToolInSameToolStack(dynamicTool)
+        assertResponseModel(savedLayout!!).invoke(result)
+    }
+
+    @Test
+    fun `temporary tool`() {
+        givenALayoutExistsForProject()
+        givenTemporaryToolMarkerExistsInLayout()
+        givenDataForTemporaryToolExists()
+        whenAToolIsOpened(temporaryTool)
+        savedLayoutShouldHaveToolInMarkedToolStack(temporaryTool)
+        assertResponseModel(savedLayout!!).invoke(result)
+    }
+
+    private val projectId = Project.Id().uuid
+    private val layoutId = Layout.Id().uuid
+
+    private var savedLayout: Layout? = null
+
+    private val layoutRepository = LayoutRepositoryDouble(onSaveLayout = {
+        savedLayout = it
+    })
+    private val context = OpenToolContextDouble()
+
+    private fun givenALayoutExistsForProject() {
+        layoutRepository.layout = Layout(Project.Id(projectId)).let {
+            Layout(Layout.Id(layoutId), it.projectId, it.windows)
+        }
+    }
+
+    private var initialParentStackId: ToolStack.Id? = null
+    private var initialToolId: Tool.Id? = null
+
+    private fun givenDynamicToolExistsInLayout() {
+        layoutRepository.layout = layout(Project.Id(projectId), Layout.Id(layoutId)) {
             window {
                 verticalStackSplitter {
-                    stackSplitter(1) {
-                        stackSplitter(1) {
-                            stack(1) {
-                                this += BaseStoryStructureTool(Tool.Id(UUID.randomUUID()), Theme.Id(themeUUID), Character.Id(characterUUID), false)
-                            }
-                        }.also { ancestorSplitters.add(it) }
-                    }.also { ancestorSplitters.add(it) }
-                }.also { ancestorSplitters.add(it) }
-            }.also { ancestorWindowId = it.id }
-        }
-
-        @Test
-        fun `should output all affected ancestors`() {
-            val (result) = given(layouts = listOf(layout)).invoke(request) as Either.Right
-            result as OpenTool.ResponseModel
-            result.affectedGroupSplitterIds.run {
-                assertEquals(ancestorSplitters.size, size)
-                assertEquals(ancestorSplitters.map { it.id.uuid }.toSet(), toSet())
+                    primaryStack(1) {}
+                    stack(1) {
+                        initialParentStackId = id
+                        val tool = Tool(dynamicTool)
+                        initialToolId = tool.id
+                        tool(tool)
+                    }
+                }
             }
-            assertEquals(ancestorWindowId!!.uuid, result.affectedWindowId)
         }
+    }
+
+    private var markedToolStackId: ToolStack.Id? = null
+
+    private fun givenTemporaryToolMarkerExistsInLayout() {
+        layoutRepository.layout = layout(Project.Id(projectId), Layout.Id(layoutId)) {
+            window {
+                verticalStackSplitter {
+                    primaryStack(1) {}
+                    stack(1) {
+                        markedToolStackId = id
+                        marker(TemporaryDouble::class)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun givenDataForDynamicToolExists() {
+        validationFails = false
+    }
+
+    private fun givenDataForTemporaryToolExists() {
+        validationFails = false
+    }
+
+    private fun whenAToolIsOpened(type: DynamicTool) {
+        val useCase: OpenTool = OpenToolUseCase(projectId, layoutRepository, context)
+        val output = object : OpenTool.OutputPort {
+            override fun receiveOpenToolResponse(response: GetSavedLayout.ResponseModel) {
+                result = response
+            }
+
+            override fun receiveOpenToolFailure(failure: Exception) {
+                result = failure
+            }
+        }
+        runBlocking {
+            useCase.invoke(type, output)
+        }
+    }
+
+    private fun whenADynamicToolIsOpened() = whenAToolIsOpened(dynamicTool)
+    private fun whenATemporaryToolIsOpened() = whenAToolIsOpened(temporaryTool)
+
+    private fun layoutShouldNotHaveBeenSaved() {
+        assertNull(savedLayout)
+    }
+
+    private fun savedLayoutShouldContainOpenTool(toolType: DynamicTool): Tool {
+        val savedLayout = savedLayout!!
+        assertEquals(layoutId, savedLayout.id.uuid)
+        val stack = savedLayout.getToolStackForToolType(toolType)!!
+        val tool = stack.tools.find { it.type == toolType }!!
+        assertTrue(tool.isOpen)
+        return tool
+    }
+
+    private fun savedLayoutShouldHaveToolInPrimaryStack(toolType: DynamicTool): Tool {
+        val tool = savedLayoutShouldContainOpenTool(toolType)
+        val primaryStack = savedLayout!!.getToolStackForToolType(toolType)!!
+        assertTrue(primaryStack.isPrimary)
+        return tool
+    }
+
+    private fun savedLayoutShouldHaveToolInSameToolStack(toolType: DynamicTool): Tool {
+        val tool = savedLayoutShouldContainOpenTool(toolType)
+        val stack = savedLayout!!.getToolStackForToolType(toolType)!!
+        assertEquals(initialParentStackId!!, stack.id)
+        assertEquals(initialToolId!!, tool.id)
+        return tool
+    }
+
+    private fun savedLayoutShouldHaveToolInMarkedToolStack(toolType: DynamicTool): Tool {
+        val tool = savedLayoutShouldContainOpenTool(toolType)
+        val stack = savedLayout!!.getToolStackForToolType(toolType)!!
+        assertEquals(markedToolStackId!!, stack.id)
+        return tool
     }
 
 }

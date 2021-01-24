@@ -1,5 +1,6 @@
 package com.soyle.stories.project.layout
 
+import com.soyle.stories.layout.tools.FixedTool
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -11,7 +12,7 @@ import kotlin.reflect.KClass
 interface LayoutViewListener {
 
     fun loadLayoutForProject(projectId: UUID)
-    suspend fun toggleToolOpen(toolId: String)
+    suspend fun toggleToolOpen(tool: FixedTool)
     suspend fun closeTool(toolId: String)
     fun openDialog(dialog: Dialog)
     fun closeDialog(dialog: KClass<out Dialog>)

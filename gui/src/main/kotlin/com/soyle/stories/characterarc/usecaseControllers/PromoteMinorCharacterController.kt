@@ -1,21 +1,24 @@
 package com.soyle.stories.characterarc.usecaseControllers
 
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
 import java.util.*
 
 class PromoteMinorCharacterController(
-  themeId: String,
-  private val promoteMinorCharacter: PromoteMinorCharacter,
-  private val promoteMinorCharacterOutputPort: PromoteMinorCharacter.OutputPort
+    private val threadTransformer: ThreadTransformer,
+    private val promoteMinorCharacter: PromoteMinorCharacter,
+    private val promoteMinorCharacterOutputPort: PromoteMinorCharacter.OutputPort
 ) {
 
-	private val themeId: UUID = UUID.fromString(themeId)
-
-	suspend fun promoteCharacter(characterId: String) {
-		PromoteMinorCharacter.RequestModel(
-		  themeId,
-		  UUID.fromString(characterId)
-		)
-		  .let { promoteMinorCharacter.invoke(it, promoteMinorCharacterOutputPort) }
-	}
+    fun promoteCharacter(themeId: String, characterId: String) {
+        val preparedThemeId = UUID.fromString(themeId)
+        val preparedCharacterId = UUID.fromString(characterId)
+        val request = PromoteMinorCharacter.RequestModel(
+            preparedThemeId,
+            preparedCharacterId
+        )
+        threadTransformer.async {
+            promoteMinorCharacter.invoke(request, promoteMinorCharacterOutputPort)
+        }
+    }
 }

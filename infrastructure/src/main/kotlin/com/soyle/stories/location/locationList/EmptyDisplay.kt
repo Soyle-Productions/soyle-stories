@@ -1,8 +1,7 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.di.resolve
-import com.soyle.stories.project.layout.Dialog
-import com.soyle.stories.project.layout.LayoutViewListener
+import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.project.ProjectScope
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -21,9 +20,9 @@ import tornadofx.*
  */
 internal class EmptyDisplay : View() {
 
+    override val scope: ProjectScope = super.scope as ProjectScope
+
     private val model by inject<LocationListModel>()
-    private val locationListViewListener: LocationListViewListener = resolve()
-    private val layoutViewListener: LayoutViewListener = resolve()
 
     override val root = gridpane {
         hiddenWhen { model.hasLocations  }
@@ -56,7 +55,7 @@ internal class EmptyDisplay : View() {
             GridPane.setRowIndex(this, 1)
             GridPane.setMargin(this, Insets(5.0, 0.0, 0.0, 0.0))
             action {
-                layoutViewListener.openDialog(Dialog.CreateLocation)
+                createLocationDialog(scope)
             }
         }
     }

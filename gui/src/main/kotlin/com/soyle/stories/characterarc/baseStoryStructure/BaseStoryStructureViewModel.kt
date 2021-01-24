@@ -43,7 +43,23 @@ internal data class Full(
   override val availableLocations: List<LocationItemViewModel>
 ) : BaseStoryStructureViewModel() {
 	override fun withSections(sections: List<StoryStructureSectionViewModel>): BaseStoryStructureViewModel = copy(sections = sections)
-	override fun withLocations(availableLocations: List<LocationItemViewModel>): BaseStoryStructureViewModel = copy(availableLocations = availableLocations)
+	override fun withLocations(availableLocations: List<LocationItemViewModel>): BaseStoryStructureViewModel {
+		val locationsById = availableLocations.associateBy { it.id }
+		return copy(
+			sections.map {
+				if (it.linkedLocation != null  && it.linkedLocation.name != locationsById[it.linkedLocation.id]?.name) {
+					StoryStructureSectionViewModel(
+						it.sectionTemplateName,
+						it.sectionId,
+						it.sectionValue,
+						it.subsections,
+						LocationItemViewModel(it.linkedLocation.id, locationsById[it.linkedLocation.id]?.name ?: "")
+					)
+				} else it
+			},
+			availableLocations = availableLocations
+		)
+	}
 }
 
 class StoryStructureSectionViewModel(val sectionTemplateName: String, val sectionId: String, val sectionValue: String, val subsections: List<SubSectionViewModel>, val linkedLocation: LocationItemViewModel?)

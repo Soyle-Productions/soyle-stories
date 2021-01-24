@@ -12,10 +12,8 @@ class CloseProjectOutputContinuation(
         outputPort.receiveCloseProjectFailure(failure)
     }
 
-    override fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
+    override suspend fun receiveCloseProjectResponse(response: CloseProject.ResponseModel) {
         outputPort.receiveCloseProjectResponse(response)
-        runBlocking {
-            openProject.invoke(location, outputPort)
-        }
+        openProject.invoke(location, outputPort)
     }
 }

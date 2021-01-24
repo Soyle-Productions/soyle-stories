@@ -1,15 +1,12 @@
-apply from: "$rootDir/kotlin-module.gradle"
-apply from: "$rootDir/local-repositories.gradle"
 
-repositories {
-    jcenter()
-}
+apply from: "$rootDir/$SUBPROJECT_CONFIG"
+
 
 dependencies {
     implementation libraries.soyle_stories_core
     implementation libraries.coroutines
+    implementation project(":data")
     testImplementation libraries.assertj
-    testImplementation project(":data")
 
     implementation project(":application")
     implementation libraries.reflectionKt

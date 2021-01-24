@@ -1,12 +1,12 @@
 package com.soyle.stories.location.deleteLocationDialog
 
-import com.soyle.stories.gui.ThreadTransformer
-import com.soyle.stories.location.controllers.DeleteLocationController
+import com.soyle.stories.entities.Location
+import com.soyle.stories.location.deleteLocation.DeleteLocationController
+import java.util.*
 
 class DeleteLocationDialogController(
-  private val threadTransformer: ThreadTransformer,
-  private val deleteLocationController: DeleteLocationController,
-  private val presenter: DeleteLocationDialogPresenter
+	private val deleteLocationController: DeleteLocationController,
+	private val presenter: DeleteLocationDialogPresenter
 ) : DeleteLocationDialogViewListener {
 
 	override fun getValidState(locationId: String, locationName: String) {
@@ -14,8 +14,6 @@ class DeleteLocationDialogController(
 	}
 
 	override fun deleteLocation(locationId: String) {
-		threadTransformer.async {
-			deleteLocationController.deleteLocation(locationId)
-		}
+		deleteLocationController.deleteLocation(Location.Id(UUID.fromString(locationId)))
 	}
 }

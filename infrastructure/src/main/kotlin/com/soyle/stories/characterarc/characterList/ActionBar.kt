@@ -1,6 +1,5 @@
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
@@ -23,13 +22,6 @@ internal class ActionBar : View() {
     override val root = hbox(alignment = Pos.CENTER, spacing = 10.0) {
         isFillHeight = false
         padding = Insets(5.0, 0.0, 5.0, 0.0)
-        button("New Character") {
-            isDisable = false
-            action {
-                createCharacterDialog(scope)
-            }
-            isMnemonicParsing = false
-        }
         button("New Character Arc") {
             enableWhen { model.selectedItem.isNotNull }
             action {
@@ -41,12 +33,11 @@ internal class ActionBar : View() {
             isMnemonicParsing = false
         }
         button("Delete") {
-            id = "actionBar_deleteLocation"
+            id = "actionBar_delete"
             enableWhen { model.selectedItem.isNotNull }
             action {
                 when (val selectedItem = model.selectedItem.value) {
-                    is CharacterTreeItemViewModel ->
-                        confirmDeleteCharacter(selectedItem.id, selectedItem.name, characterListViewListener)
+                    is CharacterTreeItemViewModel -> characterListViewListener.removeCharacter(selectedItem.id)
                     is CharacterArcItemViewModel ->
                         confirmDeleteCharacterArc(selectedItem.characterId, selectedItem.themeId, selectedItem.name, characterListViewListener)
                 }

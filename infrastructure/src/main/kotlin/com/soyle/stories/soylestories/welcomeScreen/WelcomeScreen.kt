@@ -5,6 +5,7 @@ import com.soyle.stories.di.resolve
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
+import com.soyle.stories.soylestories.Styles.Companion.logo
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.geometry.Pos
@@ -25,7 +26,7 @@ class WelcomeScreen : View() {
         isFillWidth = false
         minWidth = 400.0
         setStyle("-fx-background-color: linear-gradient(from 0% 15% to 100% 100%, #3A518E, #862F89)")
-        imageview(SoyleStories.logo) {
+        imageview(logo) {
             fitHeight = 200.0
             isPreserveRatio = true
         }
@@ -60,8 +61,10 @@ class WelcomeScreen : View() {
 
     init {
         titleProperty.bind(model.title)
-        model.isOpen.onChange {
+        model.isOpen.onChangeWithCurrent {
             if (it == true) {
+                primaryStage.titleProperty().bind(titleProperty)
+                primaryStage.scene.root = root
                 primaryStage.show()
             } else {
                 primaryStage.hide()

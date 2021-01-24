@@ -3,19 +3,22 @@ package com.soyle.stories.project
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.async
 import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
-import com.soyle.stories.location.createLocationDialog.CreateLocationDialogModel
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
-import com.soyle.stories.project.layout.Dialog
+import com.soyle.stories.project.dialogs.ActiveDialogsView
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
-import com.soyle.stories.soylestories.SoyleStories
+import com.soyle.stories.soylestories.Styles
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
+import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
+import com.soyle.stories.writer.settingsDialog.SettingsDialog
 import javafx.scene.Parent
 import javafx.stage.Screen
 import tornadofx.*
@@ -31,6 +34,7 @@ class WorkBench : View() {
 
     private val projectViewListener = resolve<ProjectListViewListener>(scope = scope.applicationScope)
     private val layoutViewListener = resolve<LayoutViewListener>()
+    private val activeDialogsView = resolve<ActiveDialogsView>()
     private val model = resolve<WorkBenchModel>()
 
     override val root: Parent = borderpane {
@@ -50,13 +54,19 @@ class WorkBench : View() {
                     }
                     item("Location") {
                         id = "file_new_location"
-                        action {
-                            layoutViewListener.openDialog(Dialog.CreateLocation)
-                        }
+                        action { createLocationDialog(scope) }
                     }
                     item("Scene") {
                         id = "file_new_scene"
                         action { createSceneDialog(scope) }
+                    }
+                    item("Theme") {
+                        id = "file_new_theme"
+                        action { scope.get<CreateThemeDialog>().show(currentWindow) }
+                    }
+                    item("Symbol") {
+                        id = "file_new_symbol"
+                        action { scope.get<CreateSymbolDialog>().show(themeId = null, parentWindow = currentWindow) }
                     }
                     /*
                     item("Plot Point") {
@@ -66,6 +76,10 @@ class WorkBench : View() {
                     item("Section") {
                         // action { controller.createSection() }
                     }*/
+                }
+                item("Settings") {
+                    id = "file_settings"
+                    action { scope.get<SettingsDialog>().show() }
                 }
             }
             menu("Edit") {
@@ -78,11 +92,11 @@ class WorkBench : View() {
                 id = "tools"
                 items.bind(model.staticTools) {
                     checkmenuitem(it.name) {
-                        id = "tools_${it.name}"
+                        id = "tools_${it.type.toString().toLowerCase()}"
                         isSelected = it.isOpen
                         action {
                             async(scope) {
-                                layoutViewListener.toggleToolOpen(it.toolId)
+                                layoutViewListener.toggleToolOpen(it.type)
                             }
                         }
                     }
@@ -134,11 +148,6 @@ class WorkBench : View() {
                 }
             }
         }
-        find<CreateLocationDialogModel>().isOpen.onChange {
-            if (it == true) {
-                createLocationDialog(this.currentStage)
-            }
-        }
 
         // moved below model listeners because, if it returns immediately, the listeners aren't attached in time and
         // miss the first update.
@@ -147,7 +156,7 @@ class WorkBench : View() {
 
     private fun createWindow() {
         openWindow(escapeClosesWindow = false, owner = null, block = false, resizable = true)?.apply {
-            icons += SoyleStories.appIcon
+            icons += Styles.appIcon
             val primaryScreen = Screen.getScreensForRectangle(this.x, this.y, this.width, this.height)
             primaryScreen.firstOrNull()?.visualBounds?.let {
                 x = it.minX

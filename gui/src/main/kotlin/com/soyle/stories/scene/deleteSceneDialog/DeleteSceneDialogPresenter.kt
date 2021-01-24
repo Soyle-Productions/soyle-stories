@@ -4,10 +4,12 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
+import com.soyle.stories.writer.usecases.DialogPreference
+import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
 
 class DeleteSceneDialogPresenter(
   private val view: View.Nullable<DeleteSceneDialogViewModel>
-) : DeleteScene.OutputPort {
+) : DeleteScene.OutputPort, GetDialogPreferences.OutputPort {
 
 	internal fun displayDeleteSceneDialog(sceneItem: SceneItemViewModel)
 	{
@@ -18,7 +20,25 @@ class DeleteSceneDialogPresenter(
 			  content = "Are you sure you want to delete this scene?",
 			  deleteButtonLabel = "Delete",
 			  cancelButtonLabel = "Cancel",
-			  errorMessage = null
+			  errorMessage = null,
+			  showAgain = null
+			)
+		}
+	}
+
+	override fun gotDialogPreferences(response: DialogPreference)
+	{
+		view.updateOrInvalidated {
+			copy(
+			  showAgain = response.shouldShow
+			)
+		}
+	}
+
+	override fun failedToGetDialogPreferences(failure: Exception) {
+		view.updateOrInvalidated {
+			copy(
+			  showAgain = false
 			)
 		}
 	}
@@ -31,8 +51,6 @@ class DeleteSceneDialogPresenter(
 		}
 	}
 
-	override fun receiveDeleteSceneResponse(responseModel: DeleteScene.ResponseModel) {
-
-	}
+	override fun receiveDeleteSceneResponse(responseModel: DeleteScene.ResponseModel) {}
 
 }

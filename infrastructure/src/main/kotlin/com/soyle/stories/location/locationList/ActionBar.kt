@@ -1,11 +1,8 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.di.resolve
+import com.soyle.stories.location.createLocationDialog.createLocationDialog
 import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
-import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.layout.Dialog
-import com.soyle.stories.project.layout.LayoutViewListener
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import tornadofx.*
@@ -20,7 +17,6 @@ internal class ActionBar : View() {
     override val scope: ProjectScope = super.scope as ProjectScope
 
     private val model by inject<LocationListModel>()
-    private val layoutViewListener: LayoutViewListener = resolve()
 
     override val root = hbox(alignment = Pos.CENTER, spacing = 10.0) {
         isFillHeight = false
@@ -29,7 +25,7 @@ internal class ActionBar : View() {
             id = "actionBar_createLocation"
             isDisable = false
             action {
-                layoutViewListener.openDialog(Dialog.CreateLocation)
+                createLocationDialog(scope)
             }
             isMnemonicParsing = false
         }
@@ -37,9 +33,8 @@ internal class ActionBar : View() {
             id = "actionBar_deleteLocation"
             enableWhen { model.selectedItem.isNotNull }
             action {
-                when (val selectedItem = model.selectedItem.value) {
-                    is LocationItemViewModel -> deleteLocationDialog(scope, selectedItem)
-                }
+                val selectedItem = model.selectedItem.value ?: return@action
+                deleteLocationDialog(scope, selectedItem)
             }
             isMnemonicParsing = false
         }

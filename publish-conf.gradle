@@ -1,0 +1,35 @@
+static def snapshotId() {
+    def calendar = new GregorianCalendar()
+    def year = calendar.get(Calendar.YEAR).toString().substring(2)
+    def week = calendar.get(Calendar.WEEK_OF_YEAR)
+    return "${year}w${week}"
+}
+
+task nightly {
+    group = "release"
+
+    githubRelease {
+
+        token project.findProperty("gpr.token").toString()
+        owner "soyle-productions"
+        repo "soyle-stories-desktop"
+        targetCommitish "develop"
+        tagName "latest"
+        releaseName "Daily Release"
+        draft false
+        prerelease true
+        def versionFilter = { it.isFile() && it.name.contains(project.version) }
+        releaseAssets project(':infrastructure').buildDir.listFiles().findAll  {
+            it.name.toLowerCase().endsWith(".zip")
+        }.collect()
+
+        overwrite true
+        client
+
+    }
+
+    configure {
+        dependsOn(buildAndPackage, 'githubRelease')
+    }
+
+}

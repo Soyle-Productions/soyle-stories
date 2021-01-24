@@ -1,6 +1,6 @@
 package com.soyle.stories.project.eventbus
 
-import com.soyle.stories.eventbus.Notifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProject
 import com.soyle.stories.workspace.usecases.openProject.OpenProject
 import com.soyle.stories.workspace.usecases.requestCloseProject.RequestCloseProject
