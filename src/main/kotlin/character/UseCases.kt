@@ -1,7 +1,10 @@
 package com.soyle.stories.desktop.config.character
 
+import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
@@ -85,6 +88,7 @@ object UseCases {
             }
 
             renameCharacter()
+            removeCharacterFromStory()
             viewBaseStoryStructure()
 
         }
@@ -99,6 +103,16 @@ object UseCases {
         }
         provide<RenameCharacterController> {
             RenameCharacterControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.removeCharacterFromStory() {
+        provide<RemoveCharacterFromStory> {
+            RemoveCharacterFromStoryUseCase(get(), get(), get())
+        }
+
+        provide(RemoveCharacterFromStory.OutputPort::class) {
+            RemoveCharacterFromStoryOutput(get(), get(), get())
         }
     }
 

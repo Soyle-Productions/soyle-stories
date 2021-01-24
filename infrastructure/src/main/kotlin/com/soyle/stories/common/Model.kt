@@ -2,6 +2,7 @@ package com.soyle.stories.common
 
 import com.soyle.stories.di.resolve
 import com.soyle.stories.gui.View
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.*
 import javafx.beans.value.ObservableValue
@@ -11,7 +12,12 @@ import kotlin.error
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
-abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable<VM>, Component(), ScopedInstance {
+abstract class ProjectScopedModel<VM : Any> : Model<ProjectScope, VM>(ProjectScope::class) {
+	override val applicationScope: ApplicationScope
+		get() = scope.applicationScope
+}
+
+abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View<VM>, View.Nullable<VM>, Component(), ScopedInstance {
 
 	override val scope: S = if (scopeClass.isInstance(super.scope))
 		@Suppress("UNCHECKED_CAST")

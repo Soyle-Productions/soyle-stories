@@ -118,7 +118,7 @@ class SceneSteps : En {
             sceneDriver.getSceneByNameOrError(sceneName)
         }
         Then("the {string} scene should have been deleted") { sceneName: String ->
-            sceneDriver.getSceneByName(sceneName)
+            assertNull(sceneDriver.getSceneByName(sceneName))
         }
     }
 
@@ -341,8 +341,8 @@ class SceneSteps : En {
         }
         Given("I have mentioned the {location} in the {scene}'s prose") { location: Location, scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            SceneDriver(workbench).givenSceneHasProse(scene, listOf("Paragraph", location.name.value))
-            SceneDriver(workbench).givenSceneProseMentionsEntity(scene, location.id.mentioned(), 10, location.name.length)
+            SceneDriver(workbench).givenSceneHasProse(scene, listOf(location.name.value))
+            SceneDriver(workbench).givenSceneProseMentionsEntity(scene, location.id.mentioned(), 0, location.name.length)
         }
         Given("the user has wanted to edit the {scene}") { scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()

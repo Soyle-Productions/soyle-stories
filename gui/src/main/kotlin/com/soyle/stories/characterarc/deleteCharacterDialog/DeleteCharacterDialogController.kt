@@ -1,6 +1,7 @@
 package com.soyle.stories.characterarc.deleteCharacterDialog
 
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.entities.Character
 import com.soyle.stories.gui.View
 
@@ -11,12 +12,12 @@ class DeleteCharacterDialogController(
 
     private val presenter by lazy { DeleteCharacterDialogPresenter(view) }
 
-    override fun confirmCharacter(name: String) {
-        presenter.displayForCharacter(name)
+    override fun getValidState(request: RemoveCharacterFromStory.ConfirmationRequest) {
+        presenter.displayForCharacter(request.characterName)
     }
 
     override fun deleteCharacter(characterId: Character.Id, shouldShowAgain: Boolean) {
-        removeCharacterFromStoryController.removeCharacter(characterId.uuid.toString())
+        removeCharacterFromStoryController.confirmRemoveCharacter(characterId)
     }
 
 }

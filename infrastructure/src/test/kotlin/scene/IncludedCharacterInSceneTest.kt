@@ -2,11 +2,9 @@ package com.soyle.stories.scene
 
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogView
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
-import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
 import com.soyle.stories.common.SyncThreadTransformer
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.components.menuChipGroup.MenuChipGroup
-import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.layout.config.dynamic.SceneDetails
@@ -18,17 +16,12 @@ import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharacter
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewModel
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.scene.control.Menu
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testfx.api.FxRobot
-import org.testfx.api.FxRobotContext
 import org.testfx.api.FxToolkit
-import org.testfx.framework.junit5.ApplicationTest
 import tornadofx.FX
-import tornadofx.item
 import tornadofx.singleAssign
 import tornadofx.uiComponent
 import java.util.*
@@ -133,7 +126,7 @@ class IncludedCharacterInSceneTest {
         ).get<IncludedCharactersInSceneState>()
 
         robot.interact {
-            includedCharactersState.update {
+            includedCharactersState.updateOrInvalidated {
                 IncludedCharactersInSceneViewModel(
                     "", "", "", "", "", "", "", "", listOf(
                         IncludedCharacterInSceneViewModel(

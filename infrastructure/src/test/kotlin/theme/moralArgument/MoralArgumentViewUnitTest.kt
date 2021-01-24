@@ -44,7 +44,7 @@ class MoralArgumentViewUnitTest : FxRobot() {
 
     @BeforeEach
     fun setInitialState() {
-        state.update {
+        state.updateOrInvalidated {
             MoralArgumentViewModel(
                 moralProblemLabel = "",
                 moralProblemValue = "",

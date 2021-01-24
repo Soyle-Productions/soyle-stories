@@ -1,8 +1,8 @@
 package com.soyle.stories.characterarc.deleteCharacterDialog
 
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
-import com.soyle.stories.entities.Character
 import com.soyle.stories.project.ProjectScope
 import javafx.scene.Parent
 import javafx.scene.control.Alert
@@ -52,15 +52,15 @@ class DeleteCharacterDialogView : Fragment() {
         }
     }
 
-    fun show(characterId: Character.Id, characterName: String) {
+    fun show(request: RemoveCharacterFromStory.ConfirmationRequest) {
         alert.resultProperty().onChangeOnce {
             when (it?.buttonData) {
-                Delete -> viewListener.deleteCharacter(characterId, ! model.doDefaultAction.value)
+                Delete -> viewListener.deleteCharacter(request.characterId, ! model.doDefaultAction.value)
                 else -> {}
             }
             close()
         }
-        viewListener.confirmCharacter(characterName)
+        viewListener.getValidState(request)
     }
 
     companion object {

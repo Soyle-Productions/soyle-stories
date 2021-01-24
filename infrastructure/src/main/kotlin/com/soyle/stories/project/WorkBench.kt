@@ -8,6 +8,7 @@ import com.soyle.stories.di.resolve
 import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.project.dialogs.ActiveDialogsView
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
@@ -33,6 +34,7 @@ class WorkBench : View() {
 
     private val projectViewListener = resolve<ProjectListViewListener>(scope = scope.applicationScope)
     private val layoutViewListener = resolve<LayoutViewListener>()
+    private val activeDialogsView = resolve<ActiveDialogsView>()
     private val model = resolve<WorkBenchModel>()
 
     override val root: Parent = borderpane {

@@ -55,6 +55,11 @@ class CharacterSteps : En {
                     .givenCharacterRenamedTo(character.id, newName)
             }
         }
+        Given("I am deleting the {character}") { character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .givenDeleteCharacterDialogHasBeenOpened(character.id)
+        }
         Given("I have removed the {character} from the story") { character: Character ->
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenCharacterRemoved(character)
@@ -85,6 +90,17 @@ class CharacterSteps : En {
                 .givenCharacterListToolHasBeenOpened()
                 .renameCharacterTo(character.id, newName)
         }
+        When("I want to delete the {character}") { character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .openDeleteCharacterDialog(character.id)
+        }
+        When("I confirm I want to delete the {character}") { character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .givenDeleteCharacterDialogHasBeenOpened(character.id)
+                .confirmDelete()
+        }
         When("I remove the {character} from the story") { character: Character ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCharacterListToolHasBeenOpened()
@@ -99,6 +115,15 @@ class CharacterSteps : En {
         ) { name: String ->
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .getCharacterByNameOrError(name)
+        }
+        Then("I should be prompted to confirm deleting the {character}") { character: Character ->
+            getDeleteCharacterDialogOrError()
+        }
+        Then("the {string} character should not have been deleted") { characterName: String ->
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByNameOrError(characterName)
+        }
+        Then("the {string} character should have been deleted") { characterName: String ->
+            assertNull(CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByName(characterName))
         }
         Then(
             "the {character}'s character arc for the {theme} should have been renamed to {string}"

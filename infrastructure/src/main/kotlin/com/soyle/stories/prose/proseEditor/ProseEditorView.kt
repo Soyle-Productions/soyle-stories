@@ -139,8 +139,8 @@ class ProseEditorView : Fragment() {
             textArea.moveTo(currentPosition.coerceAtMost(textArea.text.length).coerceAtLeast(0))
             pushingUpdate = false
         }
-        textArea.textProperty().onChange {
-            if (pushingUpdate) return@onChange
+        textArea.richChanges().feedTo {
+            if (pushingUpdate) return@feedTo
             updateCausedByInput = true
             state.content.setAll(textArea.paragraphs.flatMap { it.segments + BasicText("\n") }.dropLast(1))
             updateCausedByInput = false
@@ -272,7 +272,7 @@ class ProseEditorView : Fragment() {
             is MentionedLocationId -> MenuItem("Create New Location").apply {
                 action {
                     createLocationDialog(scope.projectScope, onCreateLocation = {
-                        onNewMentionedEntity(Mention(it.locationName, Character.Id(it.locationId).mentioned()))
+                        onNewMentionedEntity(Mention(it.locationName, Location.Id(it.locationId).mentioned()))
                     })
                 }
             }

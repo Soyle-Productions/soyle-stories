@@ -39,9 +39,10 @@ class ProseEditorTextArea : GenericStyledArea<Unit, ContentElement, Collection<S
         var offset = 0
         return content.paragraphs.asSequence()
             .flatMap { it.segments.asSequence() + BasicText("\n") }
-            .onEach { offset += it.text.length }
             .find {
-                characterIndex in offset - it.text.length .. offset
+                val start = offset
+                offset += it.text.length
+                characterIndex in start .. offset
             }
     }
 

@@ -3,13 +3,11 @@ package com.soyle.stories.characterarc.characterList
 import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.components.characterCard
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
-import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogView
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.resolve
-import com.soyle.stories.entities.Character
 import com.soyle.stories.project.ProjectScope
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
@@ -61,10 +59,7 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterTreeItemViewModel) {
-                    find<DeleteCharacterDialogView>().show(
-                        Character.Id(UUID.fromString(selectedItem.id)),
-                        selectedItem.name
-                    )
+                    characterListViewListener.removeCharacter(selectedItem.id)
                 }
             }
         }
