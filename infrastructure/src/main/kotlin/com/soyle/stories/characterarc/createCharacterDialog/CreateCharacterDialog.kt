@@ -4,6 +4,7 @@ import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterReceiver
 import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
@@ -27,7 +28,9 @@ class CreateCharacterDialog : Fragment("New Character") {
 
     private val createdCharacterReceiver: CreatedCharacterReceiver = object : CreatedCharacterReceiver {
         override suspend fun receiveCreatedCharacter(createdCharacter: CreatedCharacter) {
-            onCharacterCreated(createdCharacter)
+            scope.applicationScope.get<ThreadTransformer>().gui {
+                onCharacterCreated(createdCharacter)
+            }
             createdCharacterNotifier.removeListener(this)
         }
     }

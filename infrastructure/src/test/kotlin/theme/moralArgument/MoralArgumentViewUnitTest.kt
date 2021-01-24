@@ -11,20 +11,18 @@ import com.soyle.stories.layout.config.dynamic.MoralArgument
 import com.soyle.stories.project.makeProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.testfx.api.FxRobot
 import org.testfx.api.FxToolkit
 import org.testfx.assertions.api.Assertions
-import org.testfx.assertions.api.NodeAssert
 import tornadofx.FX
 import java.util.*
-import kotlin.math.min
 import kotlin.reflect.KFunction
 
 class MoralArgumentViewUnitTest : FxRobot() {
@@ -285,7 +283,8 @@ class MoralArgumentViewUnitTest : FxRobot() {
                 MoralArgumentSectionTypeViewModel(
                     "",
                     "Type $it",
-                    canBeCreated = it % 2 == 0
+                    canBeCreated = it % 2 == 0,
+                    ""
                 )
             }
             val movableSectionTypeMessageGenerator: (MoralArgumentSectionTypeViewModel) -> String = {
@@ -570,7 +569,7 @@ class MoralArgumentViewUnitTest : FxRobot() {
 
                 state.updateOrInvalidated {
                     copy(
-                        availableSectionTypes = listOf(MoralArgumentSectionTypeViewModel(sectionTypeId.toString(), typeName, true))
+                        availableSectionTypes = listOf(MoralArgumentSectionTypeViewModel(sectionTypeId.toString(), typeName, true, ""))
                     )
                 }
 
