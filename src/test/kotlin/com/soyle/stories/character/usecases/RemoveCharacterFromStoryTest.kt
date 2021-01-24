@@ -9,9 +9,10 @@ import com.soyle.stories.common.shouldBe
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
-import com.soyle.stories.entities.*
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.storyevent.characterDoesNotExist
-import com.soyle.stories.theme.asCharacterArcSection
 import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class RemoveCharacterFromStoryTest {
 
@@ -37,6 +37,7 @@ class RemoveCharacterFromStoryTest {
 
     // output
     private var responseModel: RemoveCharacterFromStory.ResponseModel? = null
+    private var confirmationRequest: RemoveCharacterFromStory.ConfirmationRequest? = null
 
     @Nested
     inner class Degenerates {
@@ -57,18 +58,30 @@ class RemoveCharacterFromStoryTest {
             degenerate<CharacterDoesNotExist>() shouldBe characterDoesNotExist(characterId)
         }
 
+        @Test
+        fun `removal not yet confirmed`() {
+            characterRepository.givenCharacter(character)
+            removeCharacterFromStory(confirmed = false)
+            assertNull(responseModel)
+            confirmationRequest!!.let {
+                it.characterId.mustEqual(character.id)
+                it.characterName.mustEqual(character.name.value)
+            }
+        }
+
     }
 
     @Nested
     inner class `Happy Paths` {
 
         init {
-            givenCharacter()
+            characterRepository.givenCharacter(character)
         }
 
         @AfterEach
         fun `check post conditions`() {
             assertEquals(character.id, removedCharacter)
+            assertNull(confirmationRequest)
         }
 
         @AfterEach
@@ -191,9 +204,6 @@ class RemoveCharacterFromStoryTest {
         removedCharacterArcs = removedCharacterArcs?.plus(it) ?: listOf(it)
     })
 
-    private fun givenCharacter() {
-        characterRepository.characters[character.id] = character
-    }
     private fun givenANumberOfThemesIncludeCharacter(count: Int, asMajorCharacter: Boolean = false)
     {
         val themes = themes.take(count).map {
@@ -215,18 +225,21 @@ class RemoveCharacterFromStoryTest {
         }
     }
 
-    private fun removeCharacterFromStory()
+    private fun removeCharacterFromStory(confirmed: Boolean = true)
     {
         val useCase: RemoveCharacterFromStory = RemoveCharacterFromStoryUseCase(
             characterRepository, themeRepository, characterArcRepository
         )
         val output = object : RemoveCharacterFromStory.OutputPort {
+            override suspend fun confirmDeleteCharacter(request: RemoveCharacterFromStory.ConfirmationRequest) {
+                confirmationRequest = request
+            }
             override suspend fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
                 responseModel = response
             }
         }
         runBlocking {
-            useCase.invoke(characterId, output)
+            useCase.invoke(characterId, confirmed, output)
         }
     }
 
