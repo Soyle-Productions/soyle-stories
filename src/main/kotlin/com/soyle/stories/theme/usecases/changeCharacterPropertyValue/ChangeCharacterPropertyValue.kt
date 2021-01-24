@@ -18,7 +18,8 @@ interface ChangeCharacterPropertyValue {
 
     enum class Property {
         Archetype,
-        VariationOnMoral
+        VariationOnMoral,
+        Ability
     }
 
     interface OutputPort {

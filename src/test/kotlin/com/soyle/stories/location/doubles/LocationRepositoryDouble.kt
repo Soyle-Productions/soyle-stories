@@ -3,8 +3,6 @@ package com.soyle.stories.location.doubles
 import com.soyle.stories.entities.Location
 import com.soyle.stories.entities.Project
 import com.soyle.stories.location.repositories.LocationRepository
-import kotlin.reflect.KFunction
-import kotlin.reflect.KSuspendFunction1
 
 class LocationRepositoryDouble(
   initialLocations: List<Location> = emptyList(),
@@ -14,7 +12,11 @@ class LocationRepositoryDouble(
   private val onRemoveLocation: (Location) -> Unit = {}
 ) : LocationRepository {
 
-	private val locations = initialLocations.associateBy { it.id }.toMutableMap()
+	val locations = initialLocations.associateBy { it.id }.toMutableMap()
+
+	fun givenLocation(location: Location) {
+		locations[location.id] = location
+	}
 
 	private val _persistedItems = mutableListOf<PersistenceLog>()
 	val persistedItems: List<PersistenceLog>
@@ -48,5 +50,9 @@ class LocationRepositoryDouble(
 		log(location)
 		onRemoveLocation.invoke(location)
 		locations.remove(location.id)
+	}
+
+	override suspend fun getLocationIdsThatDoNotExist(locationIdsToTest: Set<Location.Id>): Set<Location.Id> {
+		return locationIdsToTest.filterNot { it in locations }.toSet()
 	}
 }

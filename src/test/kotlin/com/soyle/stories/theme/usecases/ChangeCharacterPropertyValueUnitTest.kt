@@ -1,7 +1,9 @@
 package com.soyle.stories.theme.usecases
 
 import arrow.core.identity
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
@@ -85,6 +87,20 @@ class ChangeCharacterPropertyValueUnitTest {
             assertEquals(inputValue, persisted.getIncludedCharacterById(Character.Id(characterId))!!.variationOnMoral)
         }
 
+        @Test
+        fun `update ability`() {
+            whenUseCaseIsExecuted(Property.Ability)
+            val result = result.asValidResponseModel()
+            assertEquals(Property.Ability, result.property)
+        }
+
+        @Test
+        fun `persist ability`() {
+            whenUseCaseIsExecuted(Property.Ability)
+            val persisted = updatedTheme!!
+            assertEquals(inputValue, persisted.getIncludedCharacterById(Character.Id(characterId))!!.position)
+        }
+
         fun Any?.asValidResponseModel(): ChangeCharacterPropertyValue.ResponseModel {
             this as ChangeCharacterPropertyValue.ResponseModel
             assertEquals(this@ChangeCharacterPropertyValueUnitTest.themeId, this.themeId)
@@ -103,9 +119,12 @@ class ChangeCharacterPropertyValueUnitTest {
         )
     }
     private fun givenThemeWithId(themeId: UUID, andCharacter: UUID? = null) {
-        val theme = Theme(Theme.Id(themeId), "", emptyMap(), emptyMap()).let {
+        val theme = makeTheme(Theme.Id(themeId)).let {
             if (andCharacter == null) it
-            else it.includeCharacter(Character(Character.Id(andCharacter), UUID.randomUUID(), "Bob")).fold({ throw it }, ::identity)
+            else {
+                val character = makeCharacter(Character.Id(andCharacter), Project.Id())
+                it.withCharacterIncluded(character.id, character.name.value, character.media)
+            }
         }
         context = setupContext(
             initialThemes = listOf(theme),

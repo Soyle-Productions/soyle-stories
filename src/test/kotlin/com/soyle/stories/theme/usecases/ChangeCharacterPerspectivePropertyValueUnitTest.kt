@@ -2,7 +2,10 @@ package com.soyle.stories.theme.usecases
 
 import arrow.core.Either
 import arrow.core.identity
+import com.soyle.stories.character.characterName
+import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
@@ -151,15 +154,14 @@ class ChangeCharacterPerspectivePropertyValueUnitTest {
     }
 
     private fun givenThemeWith(themeId: UUID, andMajorCharacter: UUID? = null, vararg andCharacters: UUID) {
-        val theme = Theme(Theme.Id(themeId), "", emptyMap(), emptyMap()).let {
+        val theme = makeTheme(Theme.Id(themeId)).let {
             andCharacters.fold(it) { nextTheme, characterId ->
-                nextTheme.includeCharacter(Character(Character.Id(characterId), UUID.randomUUID(), "Bob"))
-                    .fold({ throw it }, ::identity)
+                val character = makeCharacter(Character.Id(characterId), Project.Id())
+                nextTheme.withCharacterIncluded(character.id, character.name.value, character.media)
             }
         }.let { theme ->
             if (andMajorCharacter != null) theme.getMinorCharacterById(Character.Id(andMajorCharacter))?.let {
-                theme.promoteCharacter(it)
-                    .fold({ throw it }, ::identity)
+                theme.withCharacterPromoted(it.id)
             } ?: theme else theme
         }
         context = setupContext(
@@ -177,7 +179,7 @@ class ChangeCharacterPerspectivePropertyValueUnitTest {
                 result = failure
             }
 
-            override fun receiveChangeCharacterPerspectivePropertyValueResponse(response: ChangeCharacterPerspectivePropertyValue.ResponseModel) {
+            override suspend fun receiveChangeCharacterPerspectivePropertyValueResponse(response: ChangeCharacterPerspectivePropertyValue.ResponseModel) {
                 result = response
             }
         }

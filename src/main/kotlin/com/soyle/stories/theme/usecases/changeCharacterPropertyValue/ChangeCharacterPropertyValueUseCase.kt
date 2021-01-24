@@ -2,7 +2,7 @@ package com.soyle.stories.theme.usecases.changeCharacterPropertyValue
 
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.Context
 import com.soyle.stories.theme.ThemeDoesNotExist
@@ -36,12 +36,18 @@ class ChangeCharacterPropertyValueUseCase(
         theme: Theme
     ) {
         when (request.property) {
-            Property.Archetype -> theme.changeArchetype(characterInTheme, request.value)
-            Property.VariationOnMoral -> theme.changeVariationOnMoral(characterInTheme, request.value)
-        }.fold(
-            { throw it },
-            { context.themeRepository.updateTheme(it) }
-        )
+            Property.Archetype -> theme.changeArchetype(characterInTheme, request.value).fold(
+                { throw it },
+                { context.themeRepository.updateTheme(it) }
+            )
+            Property.VariationOnMoral -> theme.changeVariationOnMoral(characterInTheme, request.value).fold(
+                { throw it },
+                { context.themeRepository.updateTheme(it) }
+            )
+            Property.Ability -> theme.withCharacterHoldingPosition(characterInTheme.id, request.value).let {
+                context.themeRepository.updateTheme(it)
+            }
+        }
     }
 
     private suspend fun getTheme(themeId: UUID) =

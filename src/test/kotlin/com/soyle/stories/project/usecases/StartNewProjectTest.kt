@@ -32,7 +32,7 @@ class StartNewProjectTest {
 				result = failure.left()
 			}
 
-			override fun receiveStartNewProjectResponse(response: StartNewProject.ResponseModel) {
+			override suspend fun receiveStartNewProjectResponse(response: StartNewProject.ResponseModel) {
 				result = response.right()
 			}
 		}

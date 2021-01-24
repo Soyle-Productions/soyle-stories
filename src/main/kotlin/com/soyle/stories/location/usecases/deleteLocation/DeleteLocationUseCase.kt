@@ -3,7 +3,6 @@ package com.soyle.stories.location.usecases.deleteLocation
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Location
 import com.soyle.stories.location.LocationDoesNotExist
-import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.repositories.CharacterArcSectionRepository
 import com.soyle.stories.location.repositories.LocationRepository
 import java.util.*
@@ -13,19 +12,15 @@ class DeleteLocationUseCase(
   private val characterArcSectionRepository: CharacterArcSectionRepository
 ) : DeleteLocation {
 	override suspend fun invoke(id: UUID, output: DeleteLocation.OutputPort) {
-		val response = try {
-			deleteLocation(id)
-		} catch (l: LocationException) {
-			return output.receiveDeleteLocationFailure(l)
-		}
-		output.receiveDeleteLocationResponse(response)
+		output.receiveDeleteLocationResponse(deleteLocation(id))
 	}
 
 	private suspend fun deleteLocation(id: UUID): DeleteLocation.ResponseModel {
 		val location = getLocationOrFail(id)
 		val arcSections = updateLinkedArcSections(location)
 		locationRepository.removeLocation(location)
-		return DeleteLocation.ResponseModel(id, arcSections.map { it.id.uuid }.toSet())
+		val deletedLocation = DeletedLocation(location.id)
+		return DeleteLocation.ResponseModel(deletedLocation, arcSections.map { it.id.uuid }.toSet())
 	}
 
 	private fun updateLinkedArcSections(location: Location): List<CharacterArcSection> {

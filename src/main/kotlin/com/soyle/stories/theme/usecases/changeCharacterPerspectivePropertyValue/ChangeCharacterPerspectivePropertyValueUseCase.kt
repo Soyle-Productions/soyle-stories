@@ -1,10 +1,11 @@
 package com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue
 
 import arrow.core.Either
+import arrow.core.right
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.CharacterInTheme
-import com.soyle.stories.entities.theme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.theme.*
 import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue.*
 import java.util.*
@@ -52,7 +53,11 @@ class ChangeCharacterPerspectivePropertyValueUseCase(
 
     private fun changeAppropriateProperty(theme: Theme, perspectiveCharacter: MajorCharacter, request: RequestModel): Either<ThemeException, Theme> {
         return when (request.property) {
-            Property.Attack -> theme.changeAttack(perspectiveCharacter, Character.Id(request.targetCharacterId), request.value)
+            Property.Attack -> theme.withCharacterAttackingMajorCharacter(
+                Character.Id(request.targetCharacterId),
+                request.value,
+                perspectiveCharacter.id
+            ).right()
             Property.Similarities -> theme.changeSimilarities(perspectiveCharacter.id, Character.Id(request.targetCharacterId), request.value)
         }
     }

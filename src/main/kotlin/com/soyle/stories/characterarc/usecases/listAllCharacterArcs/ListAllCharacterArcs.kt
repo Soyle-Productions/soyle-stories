@@ -1,5 +1,7 @@
 package com.soyle.stories.characterarc.usecases.listAllCharacterArcs
 
+import java.util.*
+
 /**
  * Created by Brendan
  * Date: 2/23/2020
@@ -7,12 +9,10 @@ package com.soyle.stories.characterarc.usecases.listAllCharacterArcs
  */
 interface ListAllCharacterArcs {
 
-    suspend operator fun invoke(outputPort: OutputPort)
-
-    class ResponseModel(val characters: Map<CharacterItem, List<CharacterArcItem>>)
+    suspend operator fun invoke(projectId: UUID, outputPort: OutputPort)
 
     interface OutputPort {
-        fun receiveCharacterArcList(response: ResponseModel)
+        suspend fun receiveCharacterArcList(response: CharacterArcsByCharacter)
     }
 
 }

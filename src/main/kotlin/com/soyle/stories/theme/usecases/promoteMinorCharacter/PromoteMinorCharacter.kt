@@ -1,23 +1,20 @@
-/**
- * Created by Brendan
- * Date: 3/4/2020
- * Time: 10:37 PM
- */
 package com.soyle.stories.theme.usecases.promoteMinorCharacter
 
+import com.soyle.stories.characterarc.usecases.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.theme.ThemeException
 import java.util.*
 
 interface PromoteMinorCharacter {
 
-    class RequestModel(val themeId: UUID, val characterId: UUID, val characterArcName: String? = null)
+    class RequestModel(val themeId: UUID, val characterId: UUID)
 
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
-    class ResponseModel(val themeId: UUID, val characterId: UUID, val characterArcName: String)
+    class ResponseModel(
+        val createdCharacterArc: CreatedCharacterArc
+    )
 
     interface OutputPort {
-        fun receivePromoteMinorCharacterFailure(failure: ThemeException)
-        fun receivePromoteMinorCharacterResponse(response: ResponseModel)
+        suspend fun receivePromoteMinorCharacterResponse(response: ResponseModel)
     }
 }

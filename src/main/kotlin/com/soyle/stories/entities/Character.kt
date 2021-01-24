@@ -1,9 +1,7 @@
 package com.soyle.stories.entities
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import com.soyle.stories.common.Entity
+import com.soyle.stories.common.NonBlankString
 import java.util.*
 
 /**
@@ -12,44 +10,29 @@ import java.util.*
  * Time: 8:19 PM
  */
 class Character(
-    override val id: Id,
-    val projectId: UUID,
-    // Characters have a name
-    val name: String
+  override val id: Id,
+  val projectId: Project.Id,
+  // Characters have a name
+  val name: NonBlankString,
+  val media: Media.Id?
 ) : Entity<Character.Id> {
 
-    init {
-        if (name.isBlank()) throw com.soyle.stories.character.CharacterNameCannotBeBlank(id.uuid)
-    }
+	constructor(projectId: Project.Id, name: NonBlankString, media: Media.Id? = null) : this(Id(), projectId, name, media)
 
-    fun rename(name: String): Either<com.soyle.stories.character.CharacterException, Character> {
-        return try {
-            Character(
-                id,
-                projectId,
-                name
-            ).right()
-        } catch (e: com.soyle.stories.character.CharacterException) {
-            e.left()
-        }
-    }
+	private fun copy(
+		name: NonBlankString = this.name,
+		media: Media.Id? = this.media
+	) = Character(id, projectId, name, media)
 
-    data class Id(val uuid: UUID = UUID.randomUUID())
+	fun withName(name: NonBlankString): Character = copy(name = name)
 
-    companion object {
-        fun buildNewCharacter(
-            projectId: UUID,
-            name: String
-        ): Either<com.soyle.stories.character.CharacterException, Character> {
-            return try {
-                Character(
-                    Id(UUID.randomUUID()),
-                    projectId,
-                    name
-                ).right()
-            } catch (e: com.soyle.stories.character.CharacterException) {
-                e.left()
-            }
-        }
-    }
+	data class Id(val uuid: UUID = UUID.randomUUID()) {
+		override fun toString(): String = "Character($uuid)"
+	}
+
+	companion object {
+		fun buildNewCharacter(projectId: Project.Id, name: NonBlankString): Character = Character(projectId, name)
+	}
 }
+
+class CharacterRenamed(val characterId: Character.Id, val newName: String)

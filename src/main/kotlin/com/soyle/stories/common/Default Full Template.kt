@@ -3,27 +3,28 @@ package com.soyle.stories.common
 import com.soyle.stories.entities.CharacterArcTemplateSection
 import java.util.*
 
-/**
- * Created by Brendan
- * Date: 2/5/2020
- * Time: 3:59 PM
- */
-fun template(name: String) = CharacterArcTemplateSection(
-    CharacterArcTemplateSection.Id(UUID.randomUUID()), name
+fun template(name: String, required: Boolean = true, multiple: Boolean = false, moral: Boolean = false) = CharacterArcTemplateSection(
+    CharacterArcTemplateSection.Id(UUID.randomUUID()), name, required, multiple, moral
 )
 
-val PsychologicalWeakness = template("Psychological Weakness")
-val MoralWeakness = template("Moral Weakness")
+val PsychologicalWeakness = template("Psychological Weakness", false)
+val MoralWeakness = template("Moral Weakness", false, moral = true)
 val PsychologicalNeed = template("Psychological Need")
-val MoralNeed = template("Moral Need")
-val Desire = template("Desire")
-val ValuesOrBeliefs = template("Values or Beliefs")
+val MoralNeed = template("Moral Need", moral = true)
+val Desire = template("Desire", moral = true)
+val ValuesOrBeliefs = template("Values or Beliefs", false)
 val Opponent = template("Opponent")
 val Plan = template("Plan")
-val Battle = template("Battle")
+val Battle = template("Battle", moral = true)
 val PsychologicalSelfRevelation = template("Psychological Self-Revelation")
-val MoralSelfRevelation = template("Moral Self-Revelation")
+val MoralSelfRevelation = template("Moral Self-Revelation", moral = true)
 val NewEquilibrium = template("New Equilibrium")
+// moral argument
+val ImmoralAction = template("Immoral Action", required = false, multiple = true, moral = true)
+val Drive = template("Drive", required = false, multiple = true, moral = true)
+val AttackByAlly = template("Attack by Ally", required = false, multiple = true, moral = true)
+val FinalActionAgainstOpponent = template("Final Action Against Opponent", required = false, multiple = false, moral = true)
+val MoralDecision = template("Moral Decision", required = false, multiple = false, moral = true)
 
 private const val Required = true
 private const val Optional = false

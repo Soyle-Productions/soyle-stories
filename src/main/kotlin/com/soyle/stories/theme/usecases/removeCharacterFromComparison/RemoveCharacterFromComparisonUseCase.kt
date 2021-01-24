@@ -1,71 +1,55 @@
 package com.soyle.stories.theme.usecases.removeCharacterFromComparison
 
-import arrow.core.identity
+import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.theme.Context
+import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.theme.CharacterNotInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
-import com.soyle.stories.theme.ThemeException
+import com.soyle.stories.theme.repositories.CharacterArcRepository
+import com.soyle.stories.theme.repositories.CharacterRepository
+import com.soyle.stories.theme.repositories.ThemeRepository
 import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison.OutputPort
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison.ResponseModel
 import java.util.*
 
 class RemoveCharacterFromComparisonUseCase(
-    private val context: Context
+    private val themeRepository: ThemeRepository,
+    private val characterArcRepository: CharacterArcRepository
 ) : RemoveCharacterFromComparison {
 
     override suspend fun invoke(themeId: UUID, characterId: UUID, outputPort: OutputPort) {
-        val response: ResponseModel = try {
-            removeCharacterFromComparison(themeId, characterId)
-        } catch (t: ThemeException) {
-            return outputPort.receiveRemoveCharacterFromComparisonFailure(t)
-        }
-        outputPort.receiveRemoveCharacterFromComparisonResponse(response)
-    }
-
-    private suspend fun removeCharacterFromComparison(themeId: UUID, characterId: UUID): ResponseModel {
         val theme = getTheme(themeId)
-        val needToRemoveCharacterArc = determineIfCharacterArcMustBeRemoved(theme, characterId)
-        val updatedTheme = getThemeAfterCharacterRemoved(theme, characterId)
-        val shouldDelete = determineIfThemeShouldBeDeleted(updatedTheme)
-        persistTheme(updatedTheme, shouldDelete)
-        removeCharacterArcIfNecessary(theme.id, Character.Id(characterId), needToRemoveCharacterArc)
-        return ResponseModel(themeId, characterId, shouldDelete)
+        val characterInTheme = getCharacterInTheme(characterId, theme)
+
+        val deletedCharacterArc = removeCharacterArcFromMajorCharacter(characterInTheme, theme.id)
+
+        themeRepository.updateTheme(theme.withoutCharacter(characterInTheme.id))
+        val response = RemovedCharacterFromTheme(themeId, characterId)
+
+        deletedCharacterArc?.let { outputPort.characterArcDeleted(it) }
+        outputPort.receiveRemoveCharacterFromComparisonResponse(response)
     }
 
     private suspend fun getTheme(themeId: UUID): Theme
     {
-        return context.themeRepository.getThemeById(Theme.Id(themeId))
+        return themeRepository.getThemeById(Theme.Id(themeId))
             ?: throw ThemeDoesNotExist(themeId)
     }
 
-    private fun getThemeAfterCharacterRemoved(theme: Theme, characterId: UUID): Theme
-    {
-        return theme.removeCharacter(Character.Id(characterId))
-            .fold({ throw it }, ::identity)
-    }
+    private fun getCharacterInTheme(characterId: UUID, theme: Theme) =
+        theme.getIncludedCharacterById(Character.Id(characterId))
+            ?: throw CharacterNotInTheme(theme.id.uuid, characterId)
 
-    private fun determineIfCharacterArcMustBeRemoved(theme: Theme, characterId: UUID): Boolean
-    {
-        return theme.getMajorCharacterById(Character.Id(characterId)) != null
-    }
-
-    private fun determineIfThemeShouldBeDeleted(theme: Theme): Boolean
-    {
-        return theme.characters.none { it is MajorCharacter }
-    }
-
-    private suspend fun persistTheme(theme: Theme, delete: Boolean)
-    {
-        if (delete) {
-            context.themeRepository.deleteTheme(theme)
-        } else {
-            context.themeRepository.updateTheme(theme)
+    private suspend fun removeCharacterArcFromMajorCharacter(
+        characterInTheme: CharacterInTheme,
+        themeId: Theme.Id
+    ): DeletedCharacterArc? {
+        if (characterInTheme is MajorCharacter) {
+            val characterArc = characterArcRepository.getCharacterArcByCharacterAndThemeId(characterInTheme.id, themeId)!!
+            return DeletedCharacterArc(characterArc.characterId.uuid, themeId.uuid)
         }
+        return null
     }
 
-    private suspend fun removeCharacterArcIfNecessary(themeId: Theme.Id, characterId: Character.Id, isNecessary: Boolean) {
-        if (isNecessary) context.characterArcRepository.removeCharacterArc(themeId, characterId)
-    }
 }

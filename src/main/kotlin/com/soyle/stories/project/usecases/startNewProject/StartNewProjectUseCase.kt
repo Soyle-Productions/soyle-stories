@@ -12,6 +12,7 @@ import com.soyle.stories.project.repositories.ProjectRepository
 class StartNewProjectUseCase(
     private val projectRepository: ProjectRepository
 ) : StartNewProject {
+
     override suspend fun invoke(name: String, output: StartNewProject.OutputPort) {
         val projectResponse = Project.startNew(name)
 

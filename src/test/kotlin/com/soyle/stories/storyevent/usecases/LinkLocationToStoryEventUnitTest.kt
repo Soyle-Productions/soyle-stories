@@ -5,6 +5,7 @@ import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
+import com.soyle.stories.location.makeLocation
 import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.storyevent.doubles.StoryEventRepositoryDouble
@@ -89,7 +90,7 @@ class LinkLocationToStoryEventUnitTest {
 	private fun makeLocationRepo(locationIds: List<UUID>): LocationRepository
 	{
 		return LocationRepositoryDouble(initialLocations = locationIds.map {
-			Location(Location.Id(it), projectId, "", "")
+			makeLocation(id = Location.Id(it), projectId = projectId)
 		})
 	}
 

@@ -1,16 +1,17 @@
 package com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection
 
 import com.soyle.stories.characterarc.CharacterArcSectionDoesNotExist
+import com.soyle.stories.entities.CharacterArc
 import com.soyle.stories.entities.CharacterArcSection
 import com.soyle.stories.entities.Location
 import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.repositories.LocationRepository
-import com.soyle.stories.theme.repositories.CharacterArcSectionRepository
+import com.soyle.stories.theme.repositories.CharacterArcRepository
 import java.util.*
 
 class LinkLocationToCharacterArcSectionUseCase(
-  private val characterArcSectionRepository: CharacterArcSectionRepository,
-  private val locationRepository: LocationRepository
+	private val characterArcRepository: CharacterArcRepository,
+	private val locationRepository: LocationRepository
 ) : LinkLocationToCharacterArcSection {
 	override suspend fun invoke(characterArcSectionId: UUID, locationId: UUID, output: LinkLocationToCharacterArcSection.OutputPort) {
 		val response = try {
@@ -23,15 +24,21 @@ class LinkLocationToCharacterArcSectionUseCase(
 
 	private suspend fun linkLocationToCharacterArcSection(characterArcSectionId: UUID, locationId: UUID): LinkLocationToCharacterArcSection.ResponseModel
 	{
-		val characterArcSection = getCharacterArcSection(characterArcSectionId)
+		val characterArc = getCharacterArc(characterArcSectionId)
 		val location = getLocation(locationId)
-		updateCharacterArcSectionIfNeeded(characterArcSection, location)
+		updateCharacterArcSectionIfNeeded(characterArc, CharacterArcSection.Id(characterArcSectionId), location)
 		return LinkLocationToCharacterArcSection.ResponseModel(characterArcSectionId, locationId)
 	}
 
-	private suspend fun updateCharacterArcSectionIfNeeded(characterArcSection: CharacterArcSection, location: Location) {
+	private suspend fun updateCharacterArcSectionIfNeeded(characterArc: CharacterArc, characterArcSectionId: CharacterArcSection.Id, location: Location) {
+		val characterArcSection = characterArc.arcSections.find { it.id == characterArcSectionId }!!
 		if (characterArcSection.linkedLocation != location.id) {
-			characterArcSectionRepository.updateCharacterArcSection(characterArcSection.withLinkedLocation(location.id))
+			characterArcRepository.replaceCharacterArcs(
+				characterArc.withArcSectionsMapped {
+					if (it.id == characterArcSectionId) it.withLinkedLocation(location.id)
+					else it
+				}
+			)
 		}
 	}
 
@@ -39,9 +46,9 @@ class LinkLocationToCharacterArcSectionUseCase(
 	  (locationRepository.getLocationById(Location.Id(locationId))
 		?: throw LocationDoesNotExist(locationId))
 
-	private suspend fun getCharacterArcSection(characterArcSectionId: UUID): CharacterArcSection {
-		return (characterArcSectionRepository
-		  .getCharacterArcSectionById(CharacterArcSection.Id(characterArcSectionId))
+	private suspend fun getCharacterArc(characterArcSectionId: UUID): CharacterArc {
+		return (characterArcRepository
+		  .getCharacterArcContainingArcSection(CharacterArcSection.Id(characterArcSectionId))
 		  ?: throw CharacterArcSectionDoesNotExist(characterArcSectionId))
 	}
 }

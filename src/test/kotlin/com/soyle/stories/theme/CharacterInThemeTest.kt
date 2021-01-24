@@ -2,10 +2,11 @@ package com.soyle.stories.theme
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.soyle.stories.entities.theme.MajorCharacter
-import com.soyle.stories.entities.theme.MinorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.entities.theme.characterInTheme.MinorCharacter
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 /**
  * Created by Brendan
@@ -59,15 +60,6 @@ class CharacterInThemeTest {
 	}
 
 	@Test
-	fun `character in theme has a value for each thematic template section`() {
-		val sections = themeWithCharacter.getIncludedCharacterById(newCharacter.id)!!.thematicSections
-
-		val templateSections = themeWithCharacter.thematicTemplate.sections.toSet()
-
-		assertEquals(templateSections, sections.map { it.template }.toSet())
-	}
-
-	@Test
 	fun `can promote minor characters`() {
 		val (theme) = promoteCharacter() as Either.Right
 		assert(theme.getMajorCharacterById(newCharacter.id) != null)
@@ -76,9 +68,9 @@ class CharacterInThemeTest {
 	@Test
 	fun `cannot promote characters not in theme`() {
 		val characterInTheme = themeWithCharacter.getMinorCharacterById(newCharacter.id)!!
-		val (error) = themeWithoutCharacter
-			.promoteCharacter(characterInTheme) as Either.Left
-		assert(error is CharacterNotInTheme)
+		assertThrows<CharacterNotInTheme> {
+			themeWithoutCharacter.withCharacterPromoted(characterInTheme.id)
+		}
 	}
 
 	@Test

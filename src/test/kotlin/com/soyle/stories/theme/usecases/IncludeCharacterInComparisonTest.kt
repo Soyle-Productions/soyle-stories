@@ -4,12 +4,14 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import com.soyle.stories.character.CharacterDoesNotExist
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.character.characterName
+import com.soyle.stories.character.makeCharacter
+import com.soyle.stories.entities.*
 import com.soyle.stories.theme.CharacterAlreadyIncludedInTheme
 import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.theme.makeTheme
 import com.soyle.stories.theme.setupContext
+import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
 import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparisonUseCase
 import com.soyle.stories.translators.asMinorCharacter
@@ -30,26 +32,25 @@ class IncludeCharacterInComparisonTest {
         characters: List<Character>,
         themes: List<Theme>,
         updateTheme: (Theme) -> Unit = {},
-        addNewArcSections: (List<CharacterArcSection>) -> Unit = {}
-    ): (UUID, UUID) -> Either<*, IncludeCharacterInComparison.ResponseModel> {
+        updateCharacterArc: (CharacterArc) -> Unit = {}
+    ): (UUID, UUID) -> Either<*, CharacterIncludedInTheme> {
         val context = setupContext(
             initialCharacters = characters,
             initialThemes = themes,
             updateTheme = updateTheme,
-            addNewCharacterArcSections = addNewArcSections
+            updateCharacterArc = updateCharacterArc
         )
         val useCase: IncludeCharacterInComparison = IncludeCharacterInComparisonUseCase(
             context.characterRepository,
-            context.themeRepository,
-            context.characterArcSectionRepository
+            context.themeRepository
         )
         val output = object : IncludeCharacterInComparison.OutputPort {
-            var result: Either<Exception, IncludeCharacterInComparison.ResponseModel>? = null
+            var result: Either<Exception, CharacterIncludedInTheme>? = null
             override fun receiveIncludeCharacterInComparisonFailure(failure: Exception) {
                 result = failure.left()
             }
 
-            override fun receiveIncludeCharacterInComparisonResponse(response: IncludeCharacterInComparison.ResponseModel) {
+            override suspend fun receiveIncludeCharacterInComparisonResponse(response: CharacterIncludedInTheme) {
                 result = response.right()
             }
         }
@@ -64,10 +65,10 @@ class IncludeCharacterInComparisonTest {
     val characterUUID = UUID.randomUUID()
     val projectUUID = UUID.randomUUID()
     val themeUUID = UUID.randomUUID()
-    val characterName = "Bob the Builder"
-    val character = Character(
-        Character.Id(characterUUID), themeUUID, characterName
+    val character = makeCharacter(
+        Character.Id(characterUUID), Project.Id()
     )
+    val characterName = character.name
 
     @Nested
     inner class GivenCharacterDoesNotExist {
@@ -104,13 +105,9 @@ class IncludeCharacterInComparisonTest {
         val useCase = given(
             characters = listOf(character),
             themes = listOf(
-                Theme(
-                    Theme.Id(themeUUID), "", mapOf(
-                        Character.Id(characterUUID) to character.asMinorCharacter(
-                            listOf()
-                        )
-                    ), mapOf()
-                )
+                makeTheme(Theme.Id(themeUUID), includedCharacters = mapOf(
+                    Character.Id(characterUUID) to character.asMinorCharacter()
+                ))
             )
         )
 
@@ -128,11 +125,7 @@ class IncludeCharacterInComparisonTest {
         val result = (given(
             characters = listOf(character),
             themes = listOf(
-                Theme(
-                    Theme.Id(
-                        themeUUID
-                    ), "", mapOf(), mapOf()
-                )
+                makeTheme(Theme.Id(themeUUID))
             )
         ).invoke(characterUUID, themeUUID) as Either.Right).b
 
@@ -144,11 +137,7 @@ class IncludeCharacterInComparisonTest {
         @Test
         fun `should contain character id`() {
             assertEquals(characterUUID, result.characterId)
-        }
-
-        @Test
-        fun `should contain list of characters in theme`() {
-            assertEquals(1, result.includedCharacters.size)
+            assertEquals(characterName.value, result.characterName)
         }
 
         @Test
@@ -157,11 +146,7 @@ class IncludeCharacterInComparisonTest {
             given(
                 characters = listOf(character),
                 themes = listOf(
-                    Theme(
-                        Theme.Id(
-                            themeUUID
-                        ), "", mapOf(), mapOf()
-                    )
+                    makeTheme(Theme.Id(themeUUID))
                 ),
                 updateTheme = {
                     updatedTheme = it
@@ -169,32 +154,6 @@ class IncludeCharacterInComparisonTest {
             ).invoke(characterUUID, themeUUID)
             updatedTheme!!
 
-        }
-
-        @Test
-        fun `should create arc sections for thematic template sections`() {
-            var updatedTheme: Theme? = null
-            val addedSections = mutableListOf<CharacterArcSection>()
-            given(
-                characters = listOf(character),
-                themes = listOf(
-                    Theme(
-                        Theme.Id(
-                            themeUUID
-                        ), "", mapOf(), mapOf()
-                    )
-                ),
-                updateTheme = {
-                    updatedTheme = it
-                },
-                addNewArcSections = {
-                    addedSections.addAll(it)
-                }
-            ).invoke(characterUUID, themeUUID)
-            assertEquals(
-                updatedTheme!!.thematicTemplate.sections.size,
-                addedSections.size
-            )
         }
 
     }

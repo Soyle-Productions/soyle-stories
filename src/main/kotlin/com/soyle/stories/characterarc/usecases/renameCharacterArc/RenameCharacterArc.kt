@@ -11,7 +11,6 @@ interface RenameCharacterArc {
 	class ResponseModel(val characterId: UUID, val themeId: UUID, val newName: String)
 
 	interface OutputPort {
-		fun receiveRenameCharacterArcFailure(failure: Exception)
 		fun receiveRenameCharacterArcResponse(response: ResponseModel)
 	}
 
