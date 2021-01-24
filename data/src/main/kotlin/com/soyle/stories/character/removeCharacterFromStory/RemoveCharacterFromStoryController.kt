@@ -1,7 +1,10 @@
 package com.soyle.stories.character.removeCharacterFromStory
 
+import com.soyle.stories.entities.Character
+
 interface RemoveCharacterFromStoryController {
 
-    fun removeCharacter(characterId: String)
+    fun requestRemoveCharacter(characterId: String)
+    fun confirmRemoveCharacter(characterId: Character.Id)
 
 }

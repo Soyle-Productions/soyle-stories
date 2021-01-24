@@ -5,7 +5,6 @@ import com.soyle.stories.character.CreateArcSectionDialogViewAssert.Companion.ge
 import com.soyle.stories.character.CreateArcSectionDialogViewAssert.Companion.getDescriptionField
 import com.soyle.stories.character.CreateArcSectionDialogViewAssert.Companion.getPrimaryButton
 import com.soyle.stories.character.CreateArcSectionDialogViewAssert.Companion.getSectionTypeSelectionField
-import com.soyle.stories.character.CreateArcSectionDialogViewAssert.DescriptionFieldAssert.Companion.assertThatDescriptionField
 import com.soyle.stories.character.CreateArcSectionDialogViewAssert.DescriptionFieldAssert.Companion.getTextInput
 import com.soyle.stories.character.CreateArcSectionDialogViewAssert.SectionTypeFieldAssert.Companion.getSelection
 import com.soyle.stories.characterarc.createArcSectionDialog.*
@@ -17,8 +16,6 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.projectList.ProjectFileViewModel
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.scene.control.*
-import javafx.stage.Modality
-import javafx.stage.Stage
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -75,7 +72,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
             @BeforeEach
             fun `select and close first dialog`() {
-                projectScope.get<CreateArcSectionDialogState>().update { viewModel.copy(sectionTypeOptions = listOf(SectionTypeOption("", ""))) }
+                projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated { viewModel.copy(sectionTypeOptions = listOf(SectionTypeOption("", ""))) }
                 interact {
                     dialog.getSectionTypeSelectionField().getSelection().items.first().fire()
                     dialog.getDescriptionField().getTextInput().text = "Not empty"
@@ -124,7 +121,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
             @Test
             fun `should properly display view model values`() {
-                projectScope.get<CreateArcSectionDialogState>().update { vm }
+                projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated { vm }
 
                 assertThat(dialog) {
                     hasTitle(vm.defaultTitle)
@@ -183,7 +180,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
                 @BeforeEach
                 fun updateState() {
                     projectScope.get<CreateArcSectionDialogState>()
-                        .update { viewModel.copy(sectionTypeOptions = listOf(unusedOption)) }
+                        .updateOrInvalidated { viewModel.copy(sectionTypeOptions = listOf(unusedOption)) }
                 }
 
                 @Test
@@ -205,7 +202,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
                 @BeforeEach
                 fun updateState() {
-                    projectScope.get<CreateArcSectionDialogState>().update {
+                    projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated {
                         viewModel.copy(
                             sectionTypeOptions = listOf(
                                 unusedOption,
@@ -238,7 +235,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
                 @BeforeEach
                 fun updateState() {
-                    projectScope.get<CreateArcSectionDialogState>().update {
+                    projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated {
                         viewModel.copy(sectionTypeOptions = listOf(unusedOption, alreadyUsedOption))
                     }
                     interact {
@@ -283,7 +280,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
                 @BeforeEach
                 fun updateState() {
                     projectScope.get<CreateArcSectionDialogState>()
-                        .update { viewModel.copy(sectionTypeOptions = listOf(alreadyUsedOption)) }
+                        .updateOrInvalidated { viewModel.copy(sectionTypeOptions = listOf(alreadyUsedOption)) }
                 }
 
                 @Test
@@ -305,7 +302,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
                 @BeforeEach
                 fun updateState() {
-                    projectScope.get<CreateArcSectionDialogState>().update {
+                    projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated {
                         viewModel.copy(sectionTypeOptions = listOf(alreadyUsedOption, unusedOption))
                     }
                     interact {
@@ -349,7 +346,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
                 @BeforeEach
                 fun updateState() {
-                    projectScope.get<CreateArcSectionDialogState>().update {
+                    projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated {
                         viewModel.copy(sectionTypeOptions = listOf(alreadyUsedOption, otherUsedOption))
                     }
                     interact {
@@ -404,7 +401,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
         @BeforeEach
         fun updateState() {
-            projectScope.get<CreateArcSectionDialogState>().update {
+            projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated {
                 viewModel.copy(sectionTypeOptions = listOf(selectedOptionAttempt, initialSelectedOption))
             }
             interact {
@@ -465,7 +462,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
             @BeforeEach
             fun `update state`() {
-                projectScope.get<CreateArcSectionDialogState>().update { vm }
+                projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated { vm }
                 interact {
                     dialog.getSectionTypeSelectionField().getSelection().items.first().fire()
                     dialog.getDescriptionField().getTextInput().text = newDescription
@@ -499,7 +496,7 @@ class CreateArcSectionDialogViewTest : ApplicationTest() {
 
             @BeforeEach
             fun `update state`() {
-                projectScope.get<CreateArcSectionDialogState>().update { vm }
+                projectScope.get<CreateArcSectionDialogState>().updateOrInvalidated { vm }
                 interact {
                     dialog.getSectionTypeSelectionField().getSelection().items.first().fire()
                     dialog.getDescriptionField().getTextInput().text = newDescription

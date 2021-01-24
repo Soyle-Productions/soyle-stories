@@ -161,12 +161,24 @@ class ProseEditorPresenter internal constructor(
             var offset = 0
             copy(
                 content = content.flatMap { element ->
-                    if (range.intersect(offset..offset + element.text.length).isNotEmpty()) {
-                        listOfNotNull(
-                            BasicText(element.text.substring(0 until range.first - offset)).takeUnless { it.text.isEmpty() },
-                            newElement,
-                            BasicText(element.text.substring(range.last - offset)).takeUnless { it.text.isEmpty() }
-                        )
+                    if (range.intersect(offset until offset + element.text.length).isNotEmpty()) {
+                        try {
+                            listOfNotNull(
+                                BasicText(element.text.substring(0 until range.first - offset)).takeUnless { it.text.isEmpty() },
+                                newElement,
+                                BasicText(element.text.substring(range.last - offset)).takeUnless { it.text.isEmpty() }
+                            ).also {
+                                offset += newElement.text.length
+                            }
+                        } catch (t: StringIndexOutOfBoundsException) {
+                            throw IllegalStateException(
+                                """Substring failed:
+                                     range: $range
+                                     mention: $mention
+                                     offset: $offset
+                                     element: $element
+                            """.trimIndent(), t)
+                        }
                     } else {
                         offset += element.text.length
                         listOf(element)

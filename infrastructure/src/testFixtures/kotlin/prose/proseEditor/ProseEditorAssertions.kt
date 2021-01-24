@@ -38,7 +38,7 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
     {
         val mention = driver.getMentionAt(position.index, position.index + position.length)!!
         assertEquals(entityId, mention.entityId)
-        assertNotNull(mention.issue)
+        assertNotNull(mention.issue) { "Mention does not have an issue" }
     }
 
     fun suggestedMentionListIsVisible() {

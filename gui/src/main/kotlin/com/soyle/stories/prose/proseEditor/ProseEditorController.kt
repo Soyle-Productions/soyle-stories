@@ -69,66 +69,9 @@ class ProseEditorController private constructor(
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
-    override fun clearMention(mention: Mention) {
-        val viewModel = view.viewModel ?: return
-        if (viewModel.isLocked) return
-        val content = viewModel.content.map {
-            if (it === mention) BasicText(it.text)
-            else it
-        }.collapseAdjacentBasicTexts()
-        updateProse(content)
-    }
-
-    override fun clearAllMentionsOfEntity(entityId: MentionedEntityId<*>) {
-        val viewModel = view.viewModel ?: return
-        if (viewModel.isLocked) return
-        val content = viewModel.content.map {
-            if (it is Mention && it.entityId == entityId) BasicText(it.text)
-            else it
-        }.collapseAdjacentBasicTexts()
-        updateProse(content)
-    }
-
-    override fun removeMention(mention: Mention) {
-        val viewModel = view.viewModel ?: return
-        if (viewModel.isLocked) return
-        val content = viewModel.content.filterNot {
-            it === mention
-        }.collapseAdjacentBasicTexts()
-        updateProse(content)
-    }
-
-    override fun removeAllMentionsOfEntity(entityId: MentionedEntityId<*>) {
-        val viewModel = view.viewModel ?: return
-        if (viewModel.isLocked) return
-        val content = viewModel.content.filterNot {
-            it is Mention && it.entityId == entityId
-        }.collapseAdjacentBasicTexts()
-        updateProse(content)
-    }
 
     override fun getMentionReplacementOptions(mention: Mention) {
         onLoadMentionReplacements.invoke(mention.entityId, presenter)
-    }
-
-    override fun replaceMention(mention: Mention, element: ReplacementElementViewModel) {
-        val viewModel = view.viewModel ?: return
-        if (viewModel.isLocked) return
-        val content = viewModel.content.map {
-            if (it === mention) it.copy(element.name, element.id)
-            else it
-        }.collapseAdjacentBasicTexts()
-        updateProse(content)
-    }
-
-    override fun replaceAllMentionsOfEntity(entityId: MentionedEntityId<*>, element: ReplacementElementViewModel) {
-        val viewModel = view.viewModel ?: return
-        if (viewModel.isLocked) return
-        val content = viewModel.content.map {
-            if (it is Mention && it.entityId == entityId) it.copy(element.name, element.id)
-            else it
-        }.collapseAdjacentBasicTexts()
-        updateProse(content)
     }
 
     override fun primeMentionQuery(primedIndex: Int) {
@@ -244,7 +187,7 @@ class ProseEditorController private constructor(
                 is BasicText -> when {
                     previousMention == null && previousElement != null -> {
                         resultList.removeLast()
-                        resultList.add(ProseContent(previousElement.text + "\n" + element.text, null))
+                        resultList.add(ProseContent(previousElement.text + element.text, null))
                     }
                     else -> {
                         resultList.add(ProseContent(element.text, null))

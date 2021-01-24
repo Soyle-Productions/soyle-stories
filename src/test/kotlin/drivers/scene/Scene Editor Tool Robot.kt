@@ -182,7 +182,7 @@ fun SceneEditorView.investigateMention(mentionName: String) {
     driver().getProseEditor()
         .drive {
             textArea.requestFocus()
-            textArea.moveTo(textArea.text.indexOf(mentionName))
+            textArea.moveTo(textArea.text.indexOf(mentionName) + 1)
             textArea.onContextMenuRequested.handle(
                 ContextMenuEvent(
                     ContextMenuEvent.CONTEXT_MENU_REQUESTED,

@@ -1,7 +1,6 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
@@ -57,7 +56,7 @@ class CharacterListController(
     }
 
     override fun removeCharacter(characterId: String) {
-        removeCharacterFromStoryController.removeCharacter(characterId)
+        removeCharacterFromStoryController.requestRemoveCharacter(characterId)
     }
 
     override fun removeCharacterArc(characterId: String, themeId: String) {

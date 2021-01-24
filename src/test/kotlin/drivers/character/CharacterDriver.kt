@@ -103,7 +103,7 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
 
     fun givenCharacterRemoved(character: Character) {
         projectScope.get<RemoveCharacterFromStoryController>()
-            .removeCharacter(character.id.uuid.toString())
+            .confirmRemoveCharacter(character.id)
     }
 
     companion object {

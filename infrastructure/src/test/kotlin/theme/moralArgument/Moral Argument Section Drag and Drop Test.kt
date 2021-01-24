@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test
 import org.testfx.api.FxRobot
 import org.testfx.api.FxToolkit
 import tornadofx.FX
-import tornadofx.swap
 import java.util.*
 
 class `Moral Argument Section Drag and Drop Test` : FxRobot() {
@@ -41,7 +40,7 @@ class `Moral Argument Section Drag and Drop Test` : FxRobot() {
 
     @BeforeEach
     fun setInitialState() {
-        state.update {
+        state.updateOrInvalidated {
             MoralArgumentViewModel(
                 moralProblemLabel = "moralProblemLabel",
                 moralProblemValue = "moralProblemValue",

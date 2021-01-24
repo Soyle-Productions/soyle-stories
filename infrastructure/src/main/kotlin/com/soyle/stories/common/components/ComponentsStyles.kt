@@ -159,6 +159,7 @@ class ComponentsStyles : Stylesheet() {
             backgroundColor += Color.WHITE
             borderColor += box(Styles.Purple)
             borderWidth += box(1.px)
+            borderInsets = multi(box((-1).px))
         }
         hasProblem {
             borderWidth += box(0.px, 0.px, 2.px, 0.px)

@@ -2,6 +2,7 @@ package com.soyle.stories.character.removeCharacterFromStory
 
 import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.entities.Character
 import java.util.*
 
 class RemoveCharacterFromStoryControllerImpl(
@@ -10,10 +11,16 @@ class RemoveCharacterFromStoryControllerImpl(
     private val removeCharacterFromStoryOutput: RemoveCharacterFromStory.OutputPort
 ) : RemoveCharacterFromStoryController {
 
-    override fun removeCharacter(characterId: String) {
+    override fun requestRemoveCharacter(characterId: String) {
         val preparedCharacterId = UUID.fromString(characterId)
         threadTransformer.async {
-            removeCharacterFromStory.invoke(preparedCharacterId, removeCharacterFromStoryOutput)
+            removeCharacterFromStory.invoke(preparedCharacterId, false, removeCharacterFromStoryOutput)
+        }
+    }
+
+    override fun confirmRemoveCharacter(characterId: Character.Id) {
+        threadTransformer.async {
+            removeCharacterFromStory.invoke(characterId.uuid, true, removeCharacterFromStoryOutput)
         }
     }
 

@@ -2,7 +2,6 @@ package com.soyle.stories.theme.addSymbolDialog
 
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
-import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addSymbolDialog.components.SymbolicCharacterList
 import com.soyle.stories.theme.addSymbolDialog.components.SymbolicLocationList
@@ -11,6 +10,7 @@ import javafx.scene.Parent
 import javafx.scene.control.TabPane
 import javafx.stage.Modality
 import javafx.stage.StageStyle
+import javafx.stage.Window
 import tornadofx.*
 
 class AddSymbolDialog : Fragment() {
@@ -36,7 +36,7 @@ class AddSymbolDialog : Fragment() {
         }
     }
 
-    fun show(themeId: String, oppositionId: String)
+    fun show(ownerWindow: Window?, themeId: String, oppositionId: String)
     {
         if (currentStage != null && subScope?.isClosed != true) {
             val subScope = AddSymbolDialogScope(scope, themeId, oppositionId)
@@ -46,7 +46,7 @@ class AddSymbolDialog : Fragment() {
                 if (it != false) subScope.get<AddSymbolDialogViewListener>().getValidState()
             }
             subScope.get<AddSymbolDialogViewListener>().getValidState()
-            openModal(modality = Modality.APPLICATION_MODAL, stageStyle = StageStyle.UTILITY, escapeClosesWindow = true)?.apply {
+            openModal(modality = Modality.WINDOW_MODAL, stageStyle = StageStyle.UTILITY, escapeClosesWindow = true, owner = ownerWindow)?.apply {
                 setOnHidden {
                     subScope.close()
                 }

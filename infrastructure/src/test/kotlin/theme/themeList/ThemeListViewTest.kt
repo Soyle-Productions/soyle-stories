@@ -50,7 +50,7 @@ class ThemeListViewTest : ApplicationTest() {
 
     @Test
     fun `all items rendered`() {
-        projectScope.get<ThemeListModel>().update {
+        projectScope.get<ThemeListModel>().updateOrInvalidated {
             ThemeListViewModel(
                 "",
                 "",

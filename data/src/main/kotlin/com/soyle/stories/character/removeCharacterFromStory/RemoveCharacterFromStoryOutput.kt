@@ -5,8 +5,13 @@ import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFro
 
 class RemoveCharacterFromStoryOutput(
     private val characterRemovedReceiver: RemovedCharacterReceiver,
-    private val removedCharacterFromThemeReceiver: RemovedCharacterFromThemeReceiver
+    private val removedCharacterFromThemeReceiver: RemovedCharacterFromThemeReceiver,
+    private val removeCharacterConfirmationReceiver: RemoveCharacterConfirmationReceiver
 ) : RemoveCharacterFromStory.OutputPort {
+
+    override suspend fun confirmDeleteCharacter(request: RemoveCharacterFromStory.ConfirmationRequest) {
+        removeCharacterConfirmationReceiver.receiveRemoveCharacterConfirmationRequest(request)
+    }
 
     override suspend fun receiveRemoveCharacterFromStoryResponse(response: RemoveCharacterFromStory.ResponseModel) {
         characterRemovedReceiver.receiveCharacterRemoved(response.removedCharacter)

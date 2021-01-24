@@ -2,13 +2,11 @@ package com.soyle.stories.characterarc.characterList.components
 
 import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.*
-import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogView
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.components.ComponentsStyles.Companion.liftedCard
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.entities.Character
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.property.SimpleBooleanProperty
@@ -144,10 +142,7 @@ class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
 
     private fun deleteCharacter() {
         val characterItem = item ?: return
-        find<DeleteCharacterDialogView>().show(
-            Character.Id(UUID.fromString(characterItem.id)),
-            characterItem.name
-        )
+        viewListener.removeCharacter(characterItem.id)
     }
 
     private fun VBox.displayCharacterArcsButton(): Button {

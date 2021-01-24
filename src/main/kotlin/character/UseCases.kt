@@ -1,7 +1,10 @@
 package com.soyle.stories.desktop.config.character
 
+import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
 import com.soyle.stories.character.usecases.renameCharacter.RenameCharacterUseCase
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
@@ -20,6 +23,9 @@ import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArg
 import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentUseCase
 import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgument
 import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentUseCase
+import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
+import com.soyle.stories.characterarc.viewBaseStoryStructure.ViewBaseStoryStructureController
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -48,7 +54,6 @@ object UseCases {
             provide<AddCharacterArcSectionToMoralArgument.OutputPort> {
                 AddCharacterArcSectionToMoralArgumentOutput(get())
             }
-
 
 
 
@@ -83,6 +88,8 @@ object UseCases {
             }
 
             renameCharacter()
+            removeCharacterFromStory()
+            viewBaseStoryStructure()
 
         }
     }
@@ -96,6 +103,28 @@ object UseCases {
         }
         provide<RenameCharacterController> {
             RenameCharacterControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.removeCharacterFromStory() {
+        provide<RemoveCharacterFromStory> {
+            RemoveCharacterFromStoryUseCase(get(), get(), get())
+        }
+
+        provide(RemoveCharacterFromStory.OutputPort::class) {
+            RemoveCharacterFromStoryOutput(get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.viewBaseStoryStructure() {
+        provide {
+            ViewBaseStoryStructureController(
+                applicationScope.get(),
+                get()
+            )
+        }
+        provide<ViewBaseStoryStructure> {
+            ViewBaseStoryStructureUseCase(get(), get())
         }
     }
 
