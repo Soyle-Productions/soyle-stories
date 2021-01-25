@@ -4,15 +4,20 @@ import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.doubles.CharacterRepositoryDouble
 import com.soyle.stories.doubles.ProseRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.mentioned
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.makeLocation
 import com.soyle.stories.prose.ProseDoesNotExist
 import com.soyle.stories.prose.makeProse
 import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentionsUseCase
+import com.soyle.stories.theme.makeSymbol
+import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Nested
@@ -28,6 +33,7 @@ class `Detect Invalidated Mentions Unit Test` {
 
     private val characterRepository = CharacterRepositoryDouble()
     private val locationRepository = LocationRepositoryDouble()
+    private val themeRepository = ThemeRepositoryDouble()
     private val proseRepository = ProseRepositoryDouble()
 
     private fun resetTest()
@@ -66,6 +72,12 @@ class `Detect Invalidated Mentions Unit Test` {
                     val location = makeLocation()
                     locationRepository.givenLocation(location)
                     location.id.mentioned()
+                },
+                {
+                    val symbol = makeSymbol()
+                    val theme = makeTheme(symbols = listOf(symbol))
+                    themeRepository.givenTheme(theme)
+                    symbol.id.mentioned(theme.id)
                 }
             ).map {
                 val mentionedEntityId = it()
@@ -88,7 +100,8 @@ class `Detect Invalidated Mentions Unit Test` {
 
             private val pastEntityGenerator = listOf(
                 { Character.Id().mentioned() },
-                { Location.Id().mentioned() }
+                { Location.Id().mentioned() },
+                { Symbol.Id().mentioned(Theme.Id()) }
             )
 
             @TestFactory
@@ -143,7 +156,7 @@ class `Detect Invalidated Mentions Unit Test` {
 
     private fun detectInvalidatedMentions() {
         val useCase: DetectInvalidatedMentions =
-            DetectInvalidatedMentionsUseCase(proseRepository, characterRepository, locationRepository)
+            DetectInvalidatedMentionsUseCase(proseRepository, characterRepository, locationRepository, themeRepository)
         val output = object : DetectInvalidatedMentions.OutputPort {
             override suspend fun receiveDetectedInvalidatedMentions(response: DetectInvalidatedMentions.ResponseModel) {
                 result = response

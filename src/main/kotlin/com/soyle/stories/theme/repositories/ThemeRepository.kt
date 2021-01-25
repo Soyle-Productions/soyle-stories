@@ -2,8 +2,8 @@ package com.soyle.stories.theme.repositories
 
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import java.util.*
 
@@ -23,4 +23,5 @@ interface ThemeRepository {
     suspend fun updateTheme(theme: Theme)
     suspend fun updateThemes(themes: List<Theme>)
     suspend fun deleteTheme(theme: Theme)
+    suspend fun getSymbolIdsThatDoNotExist(symbolIds: Set<Symbol.Id>): Set<Symbol.Id>
 }
