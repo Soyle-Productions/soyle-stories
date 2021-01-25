@@ -114,6 +114,11 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
         ProseDriver(projectScope.get()).givenProseMentionsEntity(prose, entityId, index, length)
     }
 
+    fun givenSceneProseMentionsEntity(scene: Scene, entityId: MentionedEntityId<*>, name: String) {
+        val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
+        ProseDriver(projectScope.get()).givenProseMentionsEntity(prose, entityId, name)
+    }
+
     companion object {
         init {
             scoped<ProjectScope> { provide { SceneDriver(this) } }

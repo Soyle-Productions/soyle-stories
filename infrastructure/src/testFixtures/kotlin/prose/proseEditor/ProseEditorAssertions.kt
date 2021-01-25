@@ -89,7 +89,7 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
     {
         assertNotNull(with(driver) {
             mentionIssueMenu!!.replacementOption()!!.items.find { it.text == expectedOption }
-        })
+        }) { "Could not find replacement option with name $expectedOption" }
     }
 
     fun doesNotHaveAnyReplacementMentionElementsListed()

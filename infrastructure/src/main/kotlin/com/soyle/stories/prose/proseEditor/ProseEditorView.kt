@@ -4,7 +4,9 @@ import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialo
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
 import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Menu
@@ -13,6 +15,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import tornadofx.*
 import java.util.*
+import kotlin.collections.set
 
 class ProseEditorView : Fragment() {
 
@@ -209,7 +212,8 @@ class ProseEditorView : Fragment() {
                 val creationOption = getCreationReplacementOption(
                     mention.entityId,
                     onNewMentionedEntity = {
-                        val oldMention = textArea.getSegmentContaining(hitIndex) as? Mention ?: return@getCreationReplacementOption
+                        val oldMention =
+                            textArea.getSegmentContaining(hitIndex) as? Mention ?: return@getCreationReplacementOption
                         textArea.replaceMention(oldMention, with = it)
                         viewListener.save()
                     }
@@ -260,7 +264,10 @@ class ProseEditorView : Fragment() {
         }
     }
 
-    private fun getCreationReplacementOption(entityId: MentionedEntityId<*>, onNewMentionedEntity: (Mention) -> Unit): MenuItem {
+    private fun getCreationReplacementOption(
+        entityId: MentionedEntityId<*>,
+        onNewMentionedEntity: (Mention) -> Unit
+    ): MenuItem {
         return when (entityId) {
             is MentionedCharacterId -> MenuItem("Create New Character").apply {
                 action {
@@ -276,7 +283,21 @@ class ProseEditorView : Fragment() {
                     })
                 }
             }
-            is MentionedSymbolId -> TODO("No functionality defined")
+            is MentionedSymbolId -> MenuItem("Create New Symbol").apply {
+                action {
+                    CreateSymbolDialog(
+                        scope.projectScope,
+                        entityId.themeId.uuid.toString()
+                    ) { createdSymbol ->
+                        onNewMentionedEntity(
+                            Mention(
+                                createdSymbol.symbolName,
+                                Symbol.Id(createdSymbol.symbolId).mentioned(Theme.Id(createdSymbol.themeId))
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 

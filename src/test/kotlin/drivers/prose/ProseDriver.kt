@@ -40,6 +40,23 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
         } + ProseContent(prose.content.substring(lastMentionEnd), null)
         controller.updateProse(prose.id, content)
     }
+    fun givenProseMentionsEntity(prose: Prose, entityId: MentionedEntityId<*>, name: String) {
+        val scope = ProseEditorScope(projectScope, prose.id, { _, _ -> }, {}) { _, _ -> }.apply {
+            get<ProseEditorState>().versionNumber.set(prose.revision)
+        }
+        val controller = scope.get<EditProseController>()
+        val appendedText = prose.content + name
+        var lastMentionEnd = 0
+        val content = (prose.mentions + ProseMention(entityId, ProseMentionRange(prose.content.length, name.length))).map { mention ->
+            ProseContent(
+                appendedText.substring(lastMentionEnd, mention.start()),
+                mention.entityId to (countLines(appendedText.substring(mention.start(), mention.end())) as SingleLine)
+            ).also {
+                lastMentionEnd = mention.end()
+            }
+        } + ProseContent(appendedText.substring(lastMentionEnd), null)
+        controller.updateProse(prose.id, content)
+    }
 
     companion object {
         init {

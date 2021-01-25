@@ -300,7 +300,7 @@ object UseCases {
         }
 
         provide<ListOptionsToReplaceMentionInSceneProse> {
-            ListOptionsToReplaceMentionInSceneProseUseCase(get(), get(), get())
+            ListOptionsToReplaceMentionInSceneProseUseCase(get(), get(), get(), get())
         }
     }
 

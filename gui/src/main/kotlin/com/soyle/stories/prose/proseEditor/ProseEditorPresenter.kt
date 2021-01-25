@@ -116,8 +116,9 @@ class ProseEditorPresenter internal constructor(
 
     override fun loadedReplacements(replacements: List<ListOptionsToReplaceMentionInSceneProse.MentionOption<*>>) {
         view.updateOrInvalidated {
+            val mentionedEntities = content.asSequence().filterIsInstance<Mention>().map { it.entityId }.toSet()
             copy(
-                replacementOptions = replacements.map {
+                replacementOptions = replacements.sortedBy { it.entityId !in mentionedEntities }.map {
                     ReplacementElementViewModel(it.name, it.entityId)
                 }
             )

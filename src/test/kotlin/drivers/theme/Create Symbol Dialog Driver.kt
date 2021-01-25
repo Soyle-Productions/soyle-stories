@@ -20,6 +20,9 @@ fun ThemeList.openCreateSymbolDialogForThemeNamed(themeName: String): CreateSymb
     return getCreateSymbolDialog() ?: error("Theme list did not properly open Create Symbol Dialog for theme \"$themeName\"")
 }
 
+fun getCreateSymbolDialogOrError(): CreateSymbolDialog =
+    getCreateSymbolDialog() ?: error("Create Symbol Dialog is not open in this project")
+
 fun getCreateSymbolDialog(): CreateSymbolDialog? =
     robot.listWindows().asSequence()
         .mapNotNull { it.scene.root.uiComponent<CreateSymbolDialog>() }
@@ -28,8 +31,22 @@ fun getCreateSymbolDialog(): CreateSymbolDialog? =
 
 fun CreateSymbolDialog.createSymbolWithName(symbolName: String) {
     val driver = CreateSymbolDialogDriver(this)
-    val nameInput = driver.getNameInput()
+    val nameInput = driver.nameInput
     driver.interact {
+        nameInput.text = symbolName
+        nameInput.fireEvent(ActionEvent())
+    }
+}
+
+fun CreateSymbolDialog.createSymbolAndThemeNamed(themeName: String, symbolName: String) {
+    val driver = CreateSymbolDialogDriver(this)
+    val nameInput = driver.nameInput
+    if (! driver.themeWillBeCreated) {
+        driver.interact { driver.themeToggleButton.fire() }
+    }
+    val themeNameInput = driver.themeNameInput
+    driver.interact {
+        themeNameInput.text = themeName
         nameInput.text = symbolName
         nameInput.fireEvent(ActionEvent())
     }

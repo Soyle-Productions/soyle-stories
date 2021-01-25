@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.config.drivers.scene
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
 import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialogOrError
 import com.soyle.stories.desktop.config.drivers.location.getCreateLocationDialogOrError
+import com.soyle.stories.desktop.config.drivers.theme.getCreateSymbolDialogOrError
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.drive
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.driver
@@ -16,6 +17,7 @@ import com.soyle.stories.prose.proseEditor.ContentElement
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
 import com.soyle.stories.scene.sceneEditor.SceneEditorView
 import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.scene.input.ContextMenuEvent
 import javafx.scene.input.KeyCode
 import javafx.scene.input.PickResult
@@ -220,8 +222,9 @@ fun SceneEditorView.selectReplacementSuggestion(suggestionText: String)
     val replacementOption = with(driver().getProseEditor().driver()) {
         mentionIssueMenu!!.replacementOption()!!
     }
+    val replacementSuggestion = replacementOption.items.find { it.text == suggestionText } ?: error("No replacement suggestion available named $suggestionText")
     driver().interact {
-        replacementOption.items.find { it.text == suggestionText }!!.fire()
+        replacementSuggestion.fire()
     }
 }
 
@@ -245,4 +248,15 @@ fun SceneEditorView.givenReplacingInvestigatedMentionWithNewLocation(): CreateLo
         replacementOption.items.first().fire()
     }
     return getCreateLocationDialogOrError()
+}
+
+fun SceneEditorView.givenReplacingInvestigatedMentionWithNewSymbol(): CreateSymbolDialog
+{
+    val replacementOption = with(driver().getProseEditor().driver()) {
+        mentionIssueMenu!!.replacementOption()!!
+    }
+    driver().interact {
+        replacementOption.items.first().fire()
+    }
+    return getCreateSymbolDialogOrError()
 }
