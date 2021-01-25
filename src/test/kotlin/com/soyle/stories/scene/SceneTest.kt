@@ -4,14 +4,16 @@ import com.soyle.stories.character.characterName
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.character.makeCharacterArcSection
 import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.entities.*
+import com.soyle.stories.theme.makeSymbol
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class SceneTest {
 
@@ -71,10 +73,65 @@ class SceneTest {
     }
 
     @Test
-    fun `character not in scene has null character arc sections`()
-    {
+    fun `character not in scene has null character arc sections`() {
         val character = Character.buildNewCharacter(Project.Id(), characterName())
         val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
         assertNull(scene.getCoveredCharacterArcSectionsForCharacter(character.id))
+    }
+
+    @Nested
+    inner class `Track Symbols in Scene` {
+
+        @Test
+        fun `can track a symbol in a scene`() {
+            val symbol = makeSymbol()
+            val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(symbol)
+            scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
+        }
+
+        @Test
+        fun `can list all tracked symbols`() {
+            val symbols = List(3) { makeSymbol() }
+            val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(symbols[0])
+                .withSymbolTracked(symbols[1])
+                .withSymbolTracked(symbols[2])
+            scene.trackedSymbols.size.mustEqual(3)
+            scene.trackedSymbols.forEachIndexed { index, trackedSymbol ->
+                trackedSymbol.symbolId.mustEqual(symbols[index].id)
+                trackedSymbol.symbolName.mustEqual(symbols[index].name)
+            }
+        }
+
+        @Test
+        fun `cannot add symbol more than once`() {
+            val symbol = makeSymbol()
+            val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(symbol)
+                .withSymbolTracked(symbol)
+            scene.trackedSymbols.size.mustEqual(1)
+        }
+
+        @Test
+        fun `cannot create scene with same symbol more than once`() {
+            val symbol = makeSymbol()
+            assertThrows<IllegalStateException> {
+                Scene(Scene.Id(), Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), setOf(), Prose.Id(), listOf(), symbols = List(2) {
+                    Scene.TrackedSymbol(symbol.id, symbol.name + it)
+                })
+            }
+        }
+
+        @Test
+        fun `adding same symbol with new name should update name`() {
+            val symbol = makeSymbol()
+            val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(symbol)
+                .withSymbolTracked(symbol.withName("New Symbol Name"))
+            scene.trackedSymbols.size.mustEqual(1)
+            scene.trackedSymbols.single().symbolName.mustEqual("New Symbol Name")
+        }
+
     }
 }

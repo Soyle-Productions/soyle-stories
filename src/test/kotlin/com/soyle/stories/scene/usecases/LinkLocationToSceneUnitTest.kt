@@ -7,6 +7,7 @@ import com.soyle.stories.location.locationDoesNotExist
 import com.soyle.stories.location.makeLocation
 import com.soyle.stories.scene.doubles.LocaleDouble
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
+import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.sceneDoesNotExist
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToSceneUseCase
@@ -78,7 +79,7 @@ class LinkLocationToSceneUnitTest {
 
 	private fun givenSceneExists(hasLinkedLocation: Boolean = false)
 	{
-		sceneRepository.scenes[sceneId] = Scene(sceneId, Project.Id(), nonBlankStr(), StoryEvent.Id(), setOfNotNull(locationId.takeIf { hasLinkedLocation }), Prose.Id(), listOf())
+		sceneRepository.scenes[sceneId] = makeScene(sceneId, Project.Id(), nonBlankStr(), StoryEvent.Id(), setOfNotNull(locationId.takeIf { hasLinkedLocation }), Prose.Id(), listOf())
 	}
 
 	private fun givenLocationExists()

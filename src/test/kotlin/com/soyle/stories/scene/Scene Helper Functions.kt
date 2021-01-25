@@ -11,7 +11,8 @@ fun makeScene(
     storyEventId: StoryEvent.Id = StoryEvent.Id(),
     settings: Set<Location.Id> = emptySet(),
     proseId: Prose.Id = Prose.Id(),
-    charactersInScene: List<CharacterInScene> = listOf()
+    charactersInScene: List<CharacterInScene> = listOf(),
+    symbols: Collection<Scene.TrackedSymbol> = listOf()
 ) = Scene(
     sceneId,
     projectId,
@@ -19,7 +20,8 @@ fun makeScene(
     storyEventId,
     settings,
     proseId,
-    charactersInScene
+    charactersInScene,
+    symbols
 )
 
 fun Scene.charactersInScene() = includedCharacters.map {
