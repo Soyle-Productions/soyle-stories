@@ -2,9 +2,7 @@ package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.common.SingleLine
 import com.soyle.stories.common.countLines
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.ProseMention
+import com.soyle.stories.entities.*
 import com.soyle.stories.gui.View
 import com.soyle.stories.prose.ContentReplaced
 import com.soyle.stories.prose.MentionTextReplaced
@@ -61,11 +59,12 @@ class ProseEditorPresenter internal constructor(
             }.map {
                 MatchingStoryElementViewModel(
                     countLines(it.name) as SingleLine,
+                    it.parentEntityName?.let { countLines(it) as? SingleLine },
                     it.name.indexOf(query, ignoreCase = true).let { it until it + query.length },
-                    when (it.entityId.id) {
-                        is Character.Id -> "character"
-                        is Location.Id -> "location"
-                        else -> error("unrecognized entity type")
+                    when (it.entityId) {
+                        is MentionedCharacterId -> "character"
+                        is MentionedLocationId -> "location"
+                        is MentionedSymbolId -> "symbol"
                     },
                     it.entityId
                 )

@@ -4,8 +4,8 @@ import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbench
 import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert.Companion.assertThat
+import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import io.cucumber.java8.PendingException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 
@@ -23,6 +23,18 @@ class SymbolSteps : En {
             val themeDriver = ThemeDriver(workbench)
             val theme = themeDriver.getThemeByNameOrError(themeName)
             themeDriver.givenSymbolInThemeNamed(theme.id, symbolName)
+        }
+        Given("I have created the following themes and symbols") { dataTable: DataTable ->
+            val dataLists = dataTable.asLists()
+            val themeNames = dataLists.first()
+            val themeDriver = ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError())
+            themeNames.forEachIndexed { index, name ->
+                val theme = themeDriver.givenThemeNamed(name)
+                dataLists.drop(1).forEach { row ->
+                    val symbolName = row.getOrNull(index)?.takeUnless { it.isBlank() } ?: return@forEach
+                    themeDriver.givenSymbolInThemeNamed(theme.id, symbolName)
+                }
+            }
         }
     }
 

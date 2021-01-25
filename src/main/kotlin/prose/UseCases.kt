@@ -91,6 +91,7 @@ object UseCases {
             GetStoryElementsToMentionInSceneUseCase(
                 get(),
                 get(),
+                get(),
                 get()
             )
         }
@@ -112,7 +113,7 @@ object UseCases {
         }
 
         provide<DetectInvalidatedMentions> {
-            DetectInvalidatedMentionsUseCase(get(), get(), get())
+            DetectInvalidatedMentionsUseCase(get(), get(), get(), get())
         }
     }
 

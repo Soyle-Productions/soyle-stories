@@ -276,6 +276,7 @@ class ProseEditorView : Fragment() {
                     })
                 }
             }
+            is MentionedSymbolId -> TODO("No functionality defined")
         }
     }
 
