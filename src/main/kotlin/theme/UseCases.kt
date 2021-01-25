@@ -3,7 +3,7 @@ package com.soyle.stories.desktop.config.theme
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.theme.changeThemeDetails.*
+import com.soyle.stories.theme.changeThemeDetails.ChangeThemeDetailsOutput
 import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
 import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangeCentralMoralQuestionControllerImpl
 import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.ChangeThematicRevelationController

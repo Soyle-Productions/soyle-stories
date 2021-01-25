@@ -1,34 +1,33 @@
 package com.soyle.stories.theme.themeList
 
-import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
-import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
+import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
+import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
 import com.soyle.stories.theme.usecases.SymbolItem
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
-import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.SymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.symbols
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.theme
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
-import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 import java.util.*
 
 class ThemeListPresenter(
     private val view: View.Nullable<ThemeListViewModel>
 ) : ListSymbolsByTheme.OutputPort,
     CreatedThemeReceiver,
-    DeleteTheme.OutputPort,
+    ThemeDeletedReceiver,
     RenamedThemeReceiver,
     SymbolAddedToThemeReceiver,
-    RemoveSymbolFromTheme.OutputPort,
+    SymbolRemovedFromThemeReceiver,
     RenameSymbol.OutputPort {
 
     override suspend fun symbolsListedByTheme(response: SymbolsByTheme) {
@@ -54,8 +53,8 @@ class ThemeListPresenter(
         }
     }
 
-    override fun themeDeleted(response: DeletedTheme) {
-        val themeId = response.themeId.toString()
+    override suspend fun receiveDeletedTheme(deletedTheme: DeletedTheme) {
+        val themeId = deletedTheme.themeId.toString()
         view.updateOrInvalidated {
             copy(
                 themes = themes.filterNot {
@@ -95,9 +94,9 @@ class ThemeListPresenter(
         }
     }
 
-    override suspend fun removedSymbolFromTheme(response: SymbolRemovedFromTheme) {
-        val themeId = response.themeId.toString()
-        val symbolId = response.symbolId.toString()
+    override suspend fun receiveSymbolRemovedFromTheme(symbolRemovedFromTheme: SymbolRemovedFromTheme) {
+        val themeId = symbolRemovedFromTheme.themeId.toString()
+        val symbolId = symbolRemovedFromTheme.symbolId.toString()
         view.updateOrInvalidated {
             copy(
                 themes = themes.map {
@@ -128,10 +127,6 @@ class ThemeListPresenter(
                 }
             )
         }
-    }
-
-    override suspend fun characterArcsDeleted(response: List<DeletedCharacterArc>) {
-        // do nothing
     }
 
     private fun sortedThemes(themes: List<ThemeListItemViewModel>) = themes.sortedBy { it.themeName.toLowerCase() }

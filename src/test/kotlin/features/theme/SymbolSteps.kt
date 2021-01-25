@@ -4,6 +4,7 @@ import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbench
 import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert.Companion.assertThat
+import com.soyle.stories.entities.Theme
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -18,6 +19,11 @@ class SymbolSteps : En {
     }
 
     private fun givens() {
+        Given("I have created a symbol named {string} in the {theme}") { symbolName: String, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val themeDriver = ThemeDriver(workbench)
+            themeDriver.givenSymbolInThemeNamed(theme.id, symbolName)
+        }
         Given("a symbol named {string} has been created in the {string} theme") { symbolName: String, themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val themeDriver = ThemeDriver(workbench)
@@ -36,6 +42,11 @@ class SymbolSteps : En {
                 }
             }
         }
+        Given("I have removed the {string} symbol from the {theme}") { symbolName: String, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val themeDriver = ThemeDriver(workbench)
+            themeDriver.givenSymbolRemovedFromTheme(theme, symbolName)
+        }
     }
 
     private fun whens() {
@@ -51,6 +62,12 @@ class SymbolSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenThemeListToolHasBeenOpened()
                 .renameSymbolInThemeTo(originalSymbolName, themeName, newName)
+        }
+        When("I remove the {string} symbol from the {theme}") { symbolName: String, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenThemeListToolHasBeenOpened()
+                .openDeleteSymbolDialogForSymbolInTheme(theme, symbolName)
+                ?.confirmDeleteSymbol()
         }
         When("the {string} symbol in the {string} theme is deleted") { symbolName: String, themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()

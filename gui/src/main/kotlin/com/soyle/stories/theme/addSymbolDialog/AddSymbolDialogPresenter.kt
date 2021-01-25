@@ -16,12 +16,12 @@ import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
+import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
 import com.soyle.stories.theme.themeList.SymbolListItemViewModel
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.EntitiesAvailableToAddToOpposition
 import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
 import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
@@ -34,7 +34,7 @@ class AddSymbolDialogPresenter(
 ) : ListAvailableEntitiesToAddToOpposition.OutputPort,
     CreatedCharacterReceiver, CharacterRenamedReceiver, RemovedCharacterReceiver,
     CreateNewLocation.OutputPort, LocationRenamedReceiver, DeletedLocationReceiver, SymbolAddedToThemeReceiver,
-    RenameSymbol.OutputPort, RemoveSymbolFromTheme.OutputPort, AddSymbolicItemToOpposition.OutputPort {
+    RenameSymbol.OutputPort, SymbolRemovedFromThemeReceiver, AddSymbolicItemToOpposition.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
     private val oppositionId = UUID.fromString(oppositionId)
@@ -146,9 +146,9 @@ class AddSymbolDialogPresenter(
         }
     }
 
-    override suspend fun removedSymbolFromTheme(response: SymbolRemovedFromTheme) {
-        if (response.themeId != themeId) return
-        val symbolId = response.symbolId.toString()
+    override suspend fun receiveSymbolRemovedFromTheme(symbolRemovedFromTheme: SymbolRemovedFromTheme) {
+        if (symbolRemovedFromTheme.themeId != themeId) return
+        val symbolId = symbolRemovedFromTheme.symbolId.toString()
         view.updateOrInvalidated {
             copyOrDefault(
                 symbols = symbols.filterNot { it.symbolId == symbolId }

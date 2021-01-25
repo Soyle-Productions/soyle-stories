@@ -62,6 +62,9 @@ class ThemeSteps : En {
             val arc = arcDriver.getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
             arcDriver.givenArcHasArcSectionInMoralArgument(arc, template)
         }
+        Given("I have deleted the {string} theme") { themeName: String ->
+            ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).givenThemeDeletedNamed(themeName)
+        }
     }
 
     private fun whens() {
@@ -74,6 +77,12 @@ class ThemeSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenThemeListToolHasBeenOpened()
                 .renameThemeTo(theme, newName)
+        }
+        When("I delete the {theme}") { theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenThemeListToolHasBeenOpened()
+                .openDeleteThemeDialogForThemeNamed(theme.name)
+                ?.confirmDeleteTheme()
         }
         When("the {string} theme is deleted") { themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()

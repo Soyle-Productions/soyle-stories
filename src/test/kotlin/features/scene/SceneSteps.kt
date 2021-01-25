@@ -380,6 +380,20 @@ class SceneSteps : En {
                 .givenSceneEditorToolHasBeenOpened(scene)
                 .givenMentionIsBeingInvestigated(mentionText)
         }
+        Given(
+            "I have mentioned the {string} symbol from the {theme} in the {scene}'s prose"
+        ) { symbolName: String, theme: Theme, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val symbol = theme.symbols.find { it.name == symbolName }!!
+            SceneDriver(workbench).givenSceneHasProse(scene, listOf(symbolName))
+            SceneDriver(workbench).givenSceneProseMentionsEntity(
+                scene,
+                symbol.id.mentioned(theme.id),
+                0,
+                symbolName.length
+            )
+
+        }
     }
 
     private fun whens() {

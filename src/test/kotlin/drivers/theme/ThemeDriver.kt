@@ -19,7 +19,9 @@ import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 import com.soyle.stories.theme.createTheme.CreateThemeController
+import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController
+import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -72,6 +74,16 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
         return runBlocking { themeId to themeRepository.getThemeById(themeId) }
     }
 
+    fun givenThemeDeletedNamed(themeName: String)
+    {
+        val theme = getThemeByName(themeName) ?: return
+        deleteTheme(theme)
+    }
+
+    private fun deleteTheme(theme: Theme)
+    {
+        projectScope.get<DeleteThemeController>().deleteTheme(theme.id.uuid.toString())
+    }
 
     /**
      * Promote Character in Theme
@@ -172,6 +184,19 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
         return runBlocking { symbolId to themeRepository.getThemeById(themeId)?.symbols?.find { it.id == symbolId } }
     }
 
+    /**
+     *
+     */
+
+    fun givenSymbolRemovedFromTheme(theme: Theme, symbolName: String) {
+        val symbol = theme.symbols.find { it.name == symbolName } ?: return
+        removeSymbolFromTheme(symbol)
+    }
+
+    private fun removeSymbolFromTheme(symbol: Symbol)
+    {
+        projectScope.get<RemoveSymbolFromThemeController>().removeSymbolFromTheme(symbol.id.uuid.toString())
+    }
 
     /**
      * Create Value Web in Theme with Name

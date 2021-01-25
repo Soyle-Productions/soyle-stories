@@ -5,7 +5,7 @@ import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedChar
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
+import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
 import java.util.*
@@ -15,7 +15,7 @@ class RemoveSymbolicItemControllerImpl(
     private val removeSymbolicItem: RemoveSymbolicItem,
     private val removeSymbolicItemOutputPort: RemoveSymbolicItem.OutputPort
 ) : RemoveSymbolicItemController, RemovedCharacterReceiver,
-    DeletedLocationReceiver, RemoveSymbolFromTheme.OutputPort {
+    DeletedLocationReceiver, SymbolRemovedFromThemeReceiver {
 
     override fun removeItemFromOpposition(oppositionId: String, itemId: String, onError: (Throwable) -> Unit) {
         val preparedOppositionId = UUID.fromString(oppositionId)
@@ -49,9 +49,9 @@ class RemoveSymbolicItemControllerImpl(
         }
     }
 
-    override suspend fun removedSymbolFromTheme(response: SymbolRemovedFromTheme) {
+    override suspend fun receiveSymbolRemovedFromTheme(symbolRemovedFromTheme: SymbolRemovedFromTheme) {
         removeSymbolicItem.removeSymbolicItemFromAllThemes(
-            response.symbolId,
+            symbolRemovedFromTheme.symbolId,
             removeSymbolicItemOutputPort
         )
     }

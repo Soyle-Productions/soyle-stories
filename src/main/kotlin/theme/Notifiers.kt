@@ -8,6 +8,8 @@ import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.Chang
 import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.ChangedThematicRevelationReceiver
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangedThemeLineNotifier
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangedThemeLineReceiver
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedNotifier
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
 
 object Notifiers {
 
@@ -23,6 +25,10 @@ object Notifiers {
 
             provide(ChangedThematicRevelationReceiver::class) {
                 ChangedThematicRevelationNotifier()
+            }
+
+            provide(ThemeDeletedReceiver::class) {
+                ThemeDeletedNotifier()
             }
         }
     }

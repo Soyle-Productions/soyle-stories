@@ -20,6 +20,10 @@ import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedM
 import com.soyle.stories.prose.usecases.readProse.ReadProse
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
 import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
+import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
+import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
+import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
 
 fun interface OnLoadMentionQueryOutput : (List<GetStoryElementsToMentionInScene.MatchingStoryElement>) -> Unit
 fun interface OnLoadMentionReplacementsOutput {
@@ -37,7 +41,7 @@ class ProseEditorController private constructor(
     private val onLoadMentionReplacements: (MentionedEntityId<*>, OnLoadMentionReplacementsOutput) -> Unit,
     private val presenter: ProseEditorPresenter
 ) : ReadProse.OutputPort, ProseEditorViewListener, ContentReplacedReceiver, MentionTextReplacedReceiver,
-    DetectInvalidatedMentions.OutputPort, RemovedCharacterReceiver, DeletedLocationReceiver {
+    DetectInvalidatedMentions.OutputPort, RemovedCharacterReceiver, DeletedLocationReceiver, ThemeDeletedReceiver, SymbolRemovedFromThemeReceiver {
 
     constructor(
         proseId: Prose.Id,
@@ -153,6 +157,14 @@ class ProseEditorController private constructor(
     }
 
     override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
+        invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
+    }
+
+    override suspend fun receiveDeletedTheme(deletedTheme: DeletedTheme) {
+        invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
+    }
+
+    override suspend fun receiveSymbolRemovedFromTheme(symbolRemovedFromTheme: SymbolRemovedFromTheme) {
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
