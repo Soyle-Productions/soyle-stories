@@ -8,7 +8,7 @@ interface DeleteTheme {
     suspend operator fun invoke(themeId: UUID, output: OutputPort)
 
     interface OutputPort {
-        fun themeDeleted(response: DeletedTheme)
+        suspend fun themeDeleted(response: DeletedTheme)
         suspend fun characterArcsDeleted(response: List<DeletedCharacterArc>)
     }
 
