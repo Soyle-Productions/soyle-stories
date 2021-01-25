@@ -3,10 +3,9 @@ package com.soyle.stories.scene.usecases
 import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.doubles.CharacterRepositoryDouble
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.MentionedEntityId
-import com.soyle.stories.entities.mentioned
+import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.makeLocation
 import com.soyle.stories.scene.SceneDoesNotExist
@@ -14,6 +13,8 @@ import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProseUseCase
+import com.soyle.stories.theme.makeSymbol
+import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -26,6 +27,7 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
     private val sceneRepository = SceneRepositoryDouble()
     private val characterRepository = CharacterRepositoryDouble()
     private val locationRepository = LocationRepositoryDouble()
+    private val themeRepository = ThemeRepositoryDouble()
 
     private var result: ListOptionsToReplaceMentionInSceneProse.ResponseModel<*>? = null
 
@@ -65,7 +67,7 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
                     result!!.let {
                         it.entityIdToReplace.mustEqual(characterId)
                         it.options.mustEqual(charactersInProject.map {
-                            ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value)
+                            ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value, null)
                         })
                     }
                 }
@@ -88,7 +90,8 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
                                 (charactersInProject.takeLast(2) + charactersInProject.dropLast(2)).map {
                                     ListOptionsToReplaceMentionInSceneProse.MentionOption(
                                         it.id.mentioned(),
-                                        it.name.value
+                                        it.name.value,
+                                        null
                                     )
                                 })
                         }
@@ -117,10 +120,12 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
                     result!!.let {
                         it.entityIdToReplace.mustEqual(locationId)
                         it.options.mustEqual(locationsInProject.map {
-                            ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value)
+                            ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value, null)
                         })
                     }
-                }@Nested
+                }
+
+                @Nested
                 inner class `When Location Used in Scene` {
 
                     init {
@@ -138,7 +143,8 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
                                 (locationsInProject.takeLast(2) + locationsInProject.dropLast(2)).map {
                                     ListOptionsToReplaceMentionInSceneProse.MentionOption(
                                         it.id.mentioned(),
-                                        it.name.value
+                                        it.name.value,
+                                        null
                                     )
                                 })
                         }
@@ -148,12 +154,42 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
 
             }
 
+            @Nested
+            inner class `When mention is symbol id`
+            {
+
+                private val themeId = Theme.Id()
+                private val symbolId = Symbol.Id().mentioned(themeId)
+
+                private val themesInProject = List(4) { makeTheme(projectId = scene.projectId, symbols = List(3) { makeSymbol() }) }
+                private val themesInOtherProjects = List(3) { makeTheme(symbols = List(2) { makeSymbol() }) }
+
+                init {
+                    themesInProject.forEach(themeRepository::givenTheme)
+                    themesInOtherProjects.forEach(themeRepository::givenTheme)
+                }
+
+                @Test
+                fun `should list all symbols in the project`() {
+                    listOptionsToReplaceMentionInSceneProse(symbolId)
+                    result!!.let {
+                        it.entityIdToReplace.mustEqual(symbolId)
+                        it.options.mustEqual(themesInProject.flatMap { theme ->
+                            theme.symbols.map {
+                                ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(theme.id), it.name, theme.name)
+                            }
+                        })
+                    }
+                }
+
+            }
+
         }
     }
 
     private fun listOptionsToReplaceMentionInSceneProse(entityId: MentionedEntityId<*>) {
         val useCase: ListOptionsToReplaceMentionInSceneProse =
-            ListOptionsToReplaceMentionInSceneProseUseCase(sceneRepository, characterRepository, locationRepository)
+            ListOptionsToReplaceMentionInSceneProseUseCase(sceneRepository, characterRepository, locationRepository, themeRepository)
         val output = object : ListOptionsToReplaceMentionInSceneProse.OutputPort {
             override suspend fun receiveOptionsToReplaceMention(response: ListOptionsToReplaceMentionInSceneProse.ResponseModel<*>) {
                 result = response
