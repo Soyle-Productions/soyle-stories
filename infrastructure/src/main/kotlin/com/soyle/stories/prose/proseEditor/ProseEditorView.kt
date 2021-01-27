@@ -8,7 +8,6 @@ import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.collections.ObservableList
-import javafx.scene.control.ContextMenu
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.Priority
@@ -26,7 +25,7 @@ class ProseEditorView : Fragment() {
 
     private val textArea = ProseEditorTextArea()
     private val mentionMenu = MatchingStoryElementsPopup(scope, state.mentionQueryState)
-    private val mentionIssueMenu = ContextMenu()
+    private val mentionIssueMenu = MentionIssueMenu(this)
     private fun mentionIssueItems(hitIndex: Int, mention: Mention) = listOf(
         clearMentionOption(mention),
         clearAllMentionOption(mention),

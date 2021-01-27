@@ -5,7 +5,7 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.entities.CharacterRenamed
 import com.soyle.stories.entities.LocationRenamed
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
-import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
+import com.soyle.stories.theme.renameSymbol.RenamedSymbolReceiver
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
 import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItem
 
@@ -13,7 +13,7 @@ class RenameSymbolicItemController(
     private val threadTransformer: ThreadTransformer,
     private val renameSymbolicItem: RenameSymbolicItem,
     private val renameSymbolicItemOutputPort: RenameSymbolicItem.OutputPort
-) : CharacterRenamedReceiver, LocationRenamedReceiver, RenameSymbol.OutputPort {
+) : CharacterRenamedReceiver, LocationRenamedReceiver, RenamedSymbolReceiver {
 
     override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
         threadTransformer.async {
@@ -25,8 +25,8 @@ class RenameSymbolicItemController(
         renameSymbolicItem.invoke(locationRenamed.locationId.uuid, locationRenamed.newName, renameSymbolicItemOutputPort)
     }
 
-    override suspend fun symbolRenamed(response: RenamedSymbol) {
-        renameSymbolicItem.invoke(response.symbolId, response.newName, renameSymbolicItemOutputPort)
+    override suspend fun receiveRenamedSymbol(renamedSymbol: RenamedSymbol) {
+        renameSymbolicItem.invoke(renamedSymbol.symbolId, renamedSymbol.newName, renameSymbolicItemOutputPort)
     }
 
 }

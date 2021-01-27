@@ -14,6 +14,7 @@ import com.soyle.stories.entities.Scene
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.proseEditor.ContentElement
+import com.soyle.stories.prose.proseEditor.MentionIssueMenu
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
 import com.soyle.stories.scene.sceneEditor.SceneEditorView
 import com.soyle.stories.scene.sceneList.SceneList
@@ -180,8 +181,8 @@ fun SceneEditorView.isMentionBeingInvestigated(mentionName: String): Boolean = d
     isShowingMentionIssueMenu() && mentionIssueMenuIsRelatedToMention(mentionName)
 }
 
-fun SceneEditorView.investigateMention(mentionName: String) {
-    driver().getProseEditor()
+fun SceneEditorView.investigateMention(mentionName: String): MentionIssueMenu? {
+    return driver().getProseEditor()
         .drive {
             textArea.requestFocus()
             textArea.moveTo(textArea.text.indexOf(mentionName) + 1)
@@ -196,7 +197,7 @@ fun SceneEditorView.investigateMention(mentionName: String) {
                     PickResult(textArea, 0.0, 0.0)
                 )
             )
-        }
+        }.mentionIssueMenu?.takeIf { it.isShowing }
 }
 
 fun SceneEditorView.clearAllMentionsOfEntity() {
@@ -205,15 +206,6 @@ fun SceneEditorView.clearAllMentionsOfEntity() {
     }
     driver().interact {
         clearMentionOption.fire()
-    }
-}
-
-fun SceneEditorView.removeMention() {
-    val removeMentionOption = with(driver().getProseEditor().driver()) {
-        mentionIssueMenu!!.removeMentionOption()!!
-    }
-    driver().interact {
-        removeMentionOption.fire()
     }
 }
 

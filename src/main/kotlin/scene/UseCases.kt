@@ -1,10 +1,14 @@
 package com.soyle.stories.desktop.config.scene
 
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.prose.editProse.ContentReplacedNotifier
+import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
+import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneControllerImpl
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverCharacterArcSectionsInSceneOutputPort
@@ -33,6 +37,8 @@ import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseController
+import com.soyle.stories.scene.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseOutput
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
@@ -61,6 +67,8 @@ import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
 import com.soyle.stories.scene.usecases.reorderScene.ReorderSceneUseCase
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
+import com.soyle.stories.scene.usecases.trackSymbolInScene.SynchronizeTrackedSymbolsWithProse
+import com.soyle.stories.scene.usecases.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseUseCase
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 
 object UseCases {
@@ -79,6 +87,7 @@ object UseCases {
             reorderScene()
             coverCharacterArcSectionsInScene()
             listOptionsToReplaceMention()
+            synchronizeTrackedSymbolsWithProse()
         }
     }
 
@@ -301,6 +310,20 @@ object UseCases {
 
         provide<ListOptionsToReplaceMentionInSceneProse> {
             ListOptionsToReplaceMentionInSceneProseUseCase(get(), get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.synchronizeTrackedSymbolsWithProse() {
+        provide {
+            SynchronizeTrackedSymbolsWithProseController(get(), get()).also {
+                it listensTo get<ContentReplacedNotifier>()
+            }
+        }
+        provide<SynchronizeTrackedSymbolsWithProse> {
+            SynchronizeTrackedSymbolsWithProseUseCase(get(), get(), get())
+        }
+        provide<SynchronizeTrackedSymbolsWithProse.OutputPort> {
+            SynchronizeTrackedSymbolsWithProseOutput(get(), get())
         }
     }
 

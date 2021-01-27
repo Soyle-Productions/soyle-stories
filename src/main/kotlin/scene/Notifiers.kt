@@ -10,6 +10,7 @@ import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCover
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneNotifier
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneReceiver
+import com.soyle.stories.scene.trackSymbolInScene.*
 
 object Notifiers {
 
@@ -24,8 +25,14 @@ object Notifiers {
             provide(CharacterArcSectionUncoveredInSceneReceiver::class) {
                 CharacterArcSectionUncoveredInSceneNotifier()
             }
-            provide(DetectInvalidatedMentions.OutputPort::class) {
-                DetectInvalidatedMentionsOutput()
+            provide(TrackedSymbolsRemovedReceiver::class) {
+                TrackedSymbolsRemovedNotifier()
+            }
+            provide(SymbolsTrackedInSceneReceiver::class) {
+                SymbolsTrackedInSceneNotifier()
+            }
+            provide(TrackedSymbolsRenamedReceiver::class) {
+                TrackedSymbolsRenamedNotifier()
             }
         }
     }

@@ -47,16 +47,22 @@ class ProseEditorPresenter internal constructor(
     }
 
     internal fun MentionQueryLoaded.updateQuery(query: String): MentionQueryState {
+        val mentionedIds = view.viewModel!!.content.asSequence().filterIsInstance<Mention>().map { it.entityId }.toSet()
         val newMatches = matchesForInitialQuery
             .filter { it.name.contains(query, ignoreCase = true) }
-            .sortedBy {
-                val index = it.name.indexOf(query, ignoreCase = true)
-                when {
-                    index == 0 -> 0
-                    it.name.substring(index - 1, index) == " " -> 1
-                    else -> 2
+            .sortedWith(compareBy(
+                {
+                    it.entityId !in mentionedIds
+                },
+                {
+                    val index = it.name.indexOf(query, ignoreCase = true)
+                    when {
+                        index == 0 -> 0
+                        it.name.substring(index - 1, index) == " " -> 1
+                        else -> 2
+                    }
                 }
-            }.map {
+            )).map {
                 MatchingStoryElementViewModel(
                     countLines(it.name) as SingleLine,
                     it.parentEntityName?.let { countLines(it) as? SingleLine },

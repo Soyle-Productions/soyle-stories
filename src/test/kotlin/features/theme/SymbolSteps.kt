@@ -63,6 +63,13 @@ class SymbolSteps : En {
             workbench.givenThemeListToolHasBeenOpened()
                 .renameSymbolInThemeTo(originalSymbolName, themeName, newName)
         }
+        When(
+            "I rename the symbol {string} in the {theme} to {string}"
+        ) { symbolName: String, theme: Theme, newName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenThemeListToolHasBeenOpened()
+                .renameSymbolInThemeTo(symbolName, theme.name, newName)
+        }
         When("I remove the {string} symbol from the {theme}") { symbolName: String, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenThemeListToolHasBeenOpened()

@@ -13,6 +13,7 @@ import com.soyle.stories.entities.mentioned
 import com.soyle.stories.scene.sceneList.SceneList
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import org.junit.jupiter.api.Assertions.assertTrue
 
 class `Scene Prose Steps` : En {
 
@@ -31,6 +32,13 @@ class `Scene Prose Steps` : En {
                 val symbol = theme.symbols.find { it.name == symbolName }!!
                 SceneDriver(workbench).givenSceneProseMentionsEntity(scene, symbol.id.mentioned(theme.id), symbolName)
             }
+        }
+        Given(
+            "I have mentioned the {string} symbol from the {theme} in the {scene}'s prose again"
+        ) { symbolName: String, theme: Theme, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val symbol = theme.symbols.find { it.name == symbolName }!!
+            SceneDriver(workbench).givenSceneProseMentionsEntity(scene, symbol.id.mentioned(theme.id), symbolName)
         }
 
         When(

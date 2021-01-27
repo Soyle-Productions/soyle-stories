@@ -2,7 +2,6 @@ package com.soyle.stories.desktop.view.prose.proseEditor
 
 import com.soyle.stories.prose.proseEditor.*
 import javafx.geometry.Point2D
-import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListView
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
@@ -75,7 +74,7 @@ class ProseEditorDriver(private val proseEditor: ProseEditorView) : FxRobot() {
         return Point2D(mentionBounds.minX + 2, mentionBounds.minY + 2)
     }
 
-    val mentionIssueMenu: ContextMenu?
+    val mentionIssueMenu: MentionIssueMenu?
         get() = textArea.contextMenu
 
     fun isShowingMentionIssueMenu(): Boolean = mentionIssueMenu?.isShowing == true
@@ -83,8 +82,8 @@ class ProseEditorDriver(private val proseEditor: ProseEditorView) : FxRobot() {
         it is Mention && it.text == mentionText
     } == true
 
-    fun ContextMenu.clearMentionOption(): MenuItem? = items.find { it.id == "clear-mention" }
-    fun ContextMenu.removeMentionOption(): MenuItem? = items.find { it.id == "remove-mention" }
-    fun ContextMenu.replacementOption(): Menu? = items.find { it.id == "replace-mention" } as? Menu
+    fun MentionIssueMenu.clearMentionOption(): MenuItem? = items.find { it.id == "clear-mention" }
+    fun MentionIssueMenu.removeMentionOption(): MenuItem? = items.find { it.id == "remove-mention" }
+    fun MentionIssueMenu.replacementOption(): Menu? = items.find { it.id == "replace-mention" } as? Menu
 
 }

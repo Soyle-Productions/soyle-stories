@@ -10,6 +10,8 @@ import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangedThemeLi
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangedThemeLineReceiver
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedNotifier
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
+import com.soyle.stories.theme.renameSymbol.RenamedSymbolNotifier
+import com.soyle.stories.theme.renameSymbol.RenamedSymbolReceiver
 
 object Notifiers {
 
@@ -29,6 +31,10 @@ object Notifiers {
 
             provide(ThemeDeletedReceiver::class) {
                 ThemeDeletedNotifier()
+            }
+
+            provide(RenamedSymbolReceiver::class) {
+                RenamedSymbolNotifier()
             }
         }
     }

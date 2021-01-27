@@ -97,6 +97,10 @@ class ProseEditorTextArea : GenericStyledArea<Unit, ContentElement, Collection<S
         )
     }
 
+    override fun getContextMenu(): MentionIssueMenu? {
+        return super.getContextMenu() as? MentionIssueMenu
+    }
+
     init {
         addClass(proseEditorTextArea)
         preventArrowKeysFromEnteringMentions()

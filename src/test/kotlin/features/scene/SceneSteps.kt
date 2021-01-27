@@ -7,10 +7,7 @@ import com.soyle.stories.desktop.config.drivers.character.createCharacterWithNam
 import com.soyle.stories.desktop.config.drivers.character.createSectionForTemplate
 import com.soyle.stories.desktop.config.drivers.location.LocationDriver
 import com.soyle.stories.desktop.config.drivers.location.createLocationWithName
-import com.soyle.stories.desktop.config.drivers.prose.ProseAssertions
-import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
-import com.soyle.stories.desktop.config.drivers.prose.getMentionByEntityIdOrError
-import com.soyle.stories.desktop.config.drivers.prose.getMentionByText
+import com.soyle.stories.desktop.config.drivers.prose.*
 import com.soyle.stories.desktop.config.drivers.scene.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.features.getParagraphs
@@ -488,8 +485,10 @@ class SceneSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenSceneListToolHasBeenOpened()
                 .givenSceneEditorToolHasBeenOpened(scene)
-                .givenMentionIsBeingInvestigated(mentionText)
-                .removeMention()
+                .run {
+                    investigateMention(mentionText)?.removeMention()
+                        ?: atRightOfMention(mentionText).typeKey(KeyCode.BACK_SPACE)
+                }
         }
         When(
             "I select {string} to replace the {string} mention in the {scene}'s prose"

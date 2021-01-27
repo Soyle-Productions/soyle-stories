@@ -6,6 +6,7 @@ import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiv
 import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
 import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
+import com.soyle.stories.theme.renameSymbol.RenamedSymbolReceiver
 import com.soyle.stories.theme.usecases.SymbolItem
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
 import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
@@ -16,7 +17,6 @@ import com.soyle.stories.theme.usecases.listSymbolsByTheme.SymbolsByTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.symbols
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.theme
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
-import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
 import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
 import java.util.*
 
@@ -28,7 +28,7 @@ class ThemeListPresenter(
     RenamedThemeReceiver,
     SymbolAddedToThemeReceiver,
     SymbolRemovedFromThemeReceiver,
-    RenameSymbol.OutputPort {
+    RenamedSymbolReceiver {
 
     override suspend fun symbolsListedByTheme(response: SymbolsByTheme) {
         val viewModel = ThemeListViewModel(
@@ -109,9 +109,9 @@ class ThemeListPresenter(
         }
     }
 
-    override suspend fun symbolRenamed(response: RenamedSymbol) {
-        val themeId = response.themeId.toString()
-        val symbolId = response.symbolId.toString()
+    override suspend fun receiveRenamedSymbol(renamedSymbol: RenamedSymbol) {
+        val themeId = renamedSymbol.themeId.toString()
+        val symbolId = renamedSymbol.symbolId.toString()
         view.updateOrInvalidated {
             copy(
                 themes = themes.map {
@@ -120,7 +120,7 @@ class ThemeListPresenter(
                         symbols = sortedSymbols(it.symbols.map {
                             if (it.symbolId != symbolId) it
                             else it.copy(
-                                symbolName = response.newName
+                                symbolName = renamedSymbol.newName
                             )
                         })
                     )

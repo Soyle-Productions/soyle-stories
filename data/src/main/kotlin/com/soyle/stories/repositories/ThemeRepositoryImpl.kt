@@ -10,7 +10,9 @@ import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import java.util.*
 
 class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositories.ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository {
+
 	val themes = mutableMapOf<Theme.Id, Theme>()
+
 	override suspend fun addNewTheme(theme: Theme) {
 		themes[theme.id] = theme
 	}
@@ -26,6 +28,7 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 
 	override suspend fun updateTheme(theme: Theme) {
 		themes[theme.id] = theme
+
 	}
 
 	override suspend fun getThemeContainingOppositionsWithSymbolicEntityId(symbolicId: UUID): List<Theme> {
@@ -46,12 +49,12 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 
 	override suspend fun deleteThemes(themes: List<Theme>) {
 		themes.forEach {
-			this.themes.remove(it.id)
+			deleteTheme(it)
 		}
 	}
 
 	override suspend fun deleteTheme(theme: Theme) {
-		deleteThemes(listOf(theme))
+		themes.remove(theme.id)
 	}
 
 	override suspend fun getThemesWithCharacterIncluded(characterId: Character.Id): List<Theme> {
@@ -72,11 +75,11 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 		}
 	}
 
-	override suspend fun updateThemes(themes: List<Theme>) {
-		this.themes.putAll(themes.map { it.id to it })
-	}
+	override suspend fun updateThemes(themes: List<Theme>) = themes.forEach { updateTheme(it) }
 
 	override suspend fun getSymbolIdsThatDoNotExist(symbolIds: Set<Symbol.Id>): Set<Symbol.Id> {
 		return symbolIds - themes.values.asSequence().flatMap { it.symbols.asSequence() }.map { it.id }.toSet()
 	}
+
+	override suspend fun getThemesById(themeIds: Set<Theme.Id>): Set<Theme> = themeIds.mapNotNull { themes[it] }.toSet()
 }
