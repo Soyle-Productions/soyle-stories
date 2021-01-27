@@ -153,7 +153,7 @@ class Scene private constructor(
         }
     }
 
-    fun withoutSymbolTracked(symbolId: Symbol.Id): SceneUpdate<SceneEvent> {
+    fun withoutSymbolTracked(symbolId: Symbol.Id): SceneUpdate<TrackedSymbolRemoved> {
         val trackedSymbol = trackedSymbols.getSymbolById(symbolId) ?: return NoUpdate(this)
         return Single(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
     }
