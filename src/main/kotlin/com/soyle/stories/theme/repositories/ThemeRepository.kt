@@ -15,6 +15,7 @@ import java.util.*
 interface ThemeRepository {
     suspend fun listThemesInProject(projectId: Project.Id): List<Theme>
     suspend fun getThemeById(id: Theme.Id): Theme?
+    suspend fun getThemesById(themeIds: Set<Theme.Id>): Set<Theme>
     suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme?
     suspend fun getThemeContainingValueWebWithId(valueWebId: ValueWeb.Id): Theme?
     suspend fun getThemeContainingOppositionValueWithId(oppositionValueId: OppositionValue.Id): Theme?

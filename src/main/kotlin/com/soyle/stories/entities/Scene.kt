@@ -143,13 +143,19 @@ class Scene private constructor(
         )
     }
 
-    fun withSymbolTracked(symbol: Symbol): Scene {
+    fun withSymbolTracked(symbol: Symbol): SceneUpdate<SceneEvent> {
         val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name)
         return if (trackedSymbols.isSymbolTracked(symbol.id)) {
-            copy(symbols = trackedSymbols.withoutSymbol(symbol.id) + newTrackedSymbol)
+            if (trackedSymbols.getSymbolById(symbol.id)!!.symbolName == symbol.name) NoUpdate(this)
+           else Single(copy(symbols = trackedSymbols.withoutSymbol(symbol.id) + newTrackedSymbol), TrackedSymbolRenamed(id, newTrackedSymbol))
         } else {
-            copy(symbols = symbols + newTrackedSymbol)
+            Single(copy(symbols = symbols + newTrackedSymbol), SymbolTrackedInScene(id, newTrackedSymbol))
         }
+    }
+
+    fun withoutSymbolTracked(symbolId: Symbol.Id): SceneUpdate<SceneEvent> {
+        val trackedSymbol = trackedSymbols.getSymbolById(symbolId) ?: return NoUpdate(this)
+        return Single(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
     }
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
@@ -166,8 +172,29 @@ class Scene private constructor(
         internal constructor() : this(symbols.associateBy { it.symbolId })
 
         fun isSymbolTracked(symbolId: Symbol.Id): Boolean = symbolsById.containsKey(symbolId)
+        fun getSymbolById(symbolId: Symbol.Id) = symbolsById[symbolId]
         internal fun withoutSymbol(symbolId: Symbol.Id): Collection<TrackedSymbol> = symbolsById.minus(symbolId).values
     }
 
     data class TrackedSymbol(val symbolId: Symbol.Id, val symbolName: String)
 }
+
+sealed class SceneUpdate<out T> {
+    abstract val scene: Scene
+    operator fun component1() = scene
+}
+class NoUpdate(override val scene: Scene) : SceneUpdate<Nothing>()
+class Single<out T : SceneEvent>(override val scene: Scene, val event: T) : SceneUpdate<T>() {
+    operator fun component2() = event
+}
+class Multi<T : SceneEvent>(override val scene: Scene, val events: List<T>) : SceneUpdate<List<T>>() {
+    operator fun component2() = events
+}
+
+abstract class SceneEvent
+{
+    abstract val sceneId: Scene.Id
+}
+data class SymbolTrackedInScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
+data class TrackedSymbolRenamed(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
+data class TrackedSymbolRemoved(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()

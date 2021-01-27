@@ -85,18 +85,31 @@ class SceneTest {
         @Test
         fun `can track a symbol in a scene`() {
             val symbol = makeSymbol()
-            val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
                 .withSymbolTracked(symbol)
-            scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
+            update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
+            update as Single
+            update.event as SymbolTrackedInScene
+        }
+
+        @Test
+        fun `can stop tracking a symbol in a scene`() {
+            val symbol = makeSymbol()
+            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(symbol).scene
+                .withoutSymbolTracked(symbol.id)
+            update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(false) { "Did not stop tracking symbol"}
+            update as Single
+            update.event as TrackedSymbolRemoved
         }
 
         @Test
         fun `can list all tracked symbols`() {
             val symbols = List(3) { makeSymbol() }
             val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(symbols[0])
-                .withSymbolTracked(symbols[1])
-                .withSymbolTracked(symbols[2])
+                .withSymbolTracked(symbols[0]).scene
+                .withSymbolTracked(symbols[1]).scene
+                .withSymbolTracked(symbols[2]).scene
             scene.trackedSymbols.size.mustEqual(3)
             scene.trackedSymbols.forEachIndexed { index, trackedSymbol ->
                 trackedSymbol.symbolId.mustEqual(symbols[index].id)
@@ -107,10 +120,11 @@ class SceneTest {
         @Test
         fun `cannot add symbol more than once`() {
             val symbol = makeSymbol()
-            val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(symbol).scene
                 .withSymbolTracked(symbol)
-                .withSymbolTracked(symbol)
-            scene.trackedSymbols.size.mustEqual(1)
+            update.scene.trackedSymbols.size.mustEqual(1)
+            update as NoUpdate
         }
 
         @Test
@@ -126,11 +140,15 @@ class SceneTest {
         @Test
         fun `adding same symbol with new name should update name`() {
             val symbol = makeSymbol()
-            val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(symbol)
+            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(symbol).scene
                 .withSymbolTracked(symbol.withName("New Symbol Name"))
-            scene.trackedSymbols.size.mustEqual(1)
-            scene.trackedSymbols.single().symbolName.mustEqual("New Symbol Name")
+            update.scene.trackedSymbols.size.mustEqual(1)
+            update.scene.trackedSymbols.single().symbolName.mustEqual("New Symbol Name")
+            update as Single
+            with (update.event as TrackedSymbolRenamed) {
+                trackedSymbol.symbolName.mustEqual("New Symbol Name")
+            }
         }
 
     }

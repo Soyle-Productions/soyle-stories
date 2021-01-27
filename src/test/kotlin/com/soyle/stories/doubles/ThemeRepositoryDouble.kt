@@ -29,6 +29,10 @@ class ThemeRepositoryDouble(
 
     override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]
 
+    override suspend fun getThemesById(themeIds: Set<Theme.Id>): Set<Theme> {
+        return themeIds.mapNotNull(themes::get).toSet()
+    }
+
     override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
         return themes.values.find { it.symbols.any { it.id == symbolId } }
     }
