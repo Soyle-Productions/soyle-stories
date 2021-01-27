@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.theme
 
+import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
@@ -10,10 +11,13 @@ import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.Chang
 import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.ChangeThematicRevelationControllerImpl
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineController
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineControllerImpl
+import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeOutput
 import com.soyle.stories.theme.usecases.changeThemeDetails.*
 import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralArgumentFrame
 import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgument
 import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
+import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
+import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
 
 object UseCases {
 
@@ -65,7 +69,15 @@ object UseCases {
                 )
             }
 
+            removeSymbolFromTheme()
+        }
+    }
 
+    private fun InProjectScope.removeSymbolFromTheme()
+    {
+        provide<RemoveSymbolFromTheme> { RemoveSymbolFromThemeUseCase(get(), get()) }
+        provide(RemoveSymbolFromTheme.OutputPort::class) {
+            RemoveSymbolFromThemeOutput(get(), get())
         }
     }
 

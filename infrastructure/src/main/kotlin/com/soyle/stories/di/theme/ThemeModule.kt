@@ -80,7 +80,6 @@ import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFrom
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebNotifier
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeControllerImpl
-import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeOutput
 import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeNotifier
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemController
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
@@ -150,8 +149,6 @@ import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.RemoveCharacte
 import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.RemoveCharacterAsOpponentUseCase
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWebUseCase
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItemUseCase
 import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromTheme
@@ -202,7 +199,6 @@ object ThemeModule {
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
         provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get(), get()) }
-        provide<RemoveSymbolFromTheme> { RemoveSymbolFromThemeUseCase(get()) }
         provide<RenameSymbol> { RenameSymbolUseCase(get(), get()) }
         provide<ListOppositionsInValueWeb> { ListOppositionsInValueWebUseCase(get()) }
         provide<AddOppositionToValueWeb> { AddOppositionToValueWebUseCase(get(), get()) }
@@ -280,9 +276,6 @@ object ThemeModule {
         }
         provide(AddValueWebToTheme.OutputPort::class) {
             AddValueWebToThemeNotifier(get())
-        }
-        provide(RemoveSymbolFromTheme.OutputPort::class) {
-            RemoveSymbolFromThemeOutput(get())
         }
         provide(RenameSymbol.OutputPort::class) {
             RenameSymbolOutput(get(), get())

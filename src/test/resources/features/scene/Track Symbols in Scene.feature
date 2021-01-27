@@ -83,4 +83,4 @@ Feature: Track Symbols in Scene
       And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
       And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose again
       When I remove the "Ring" symbol from the "Growing Up" theme
-      Then the "Ring" symbol for the "Growing Up" theme should not be tracked in the "Big Battle" scene
+      Then the "Ring" symbol from the "Growing Up" theme should not be tracked in the "Big Battle" scene
