@@ -37,6 +37,13 @@ class ThemeRepositoryDouble(
         return themes.values.find { it.symbols.any { it.id == symbolId } }
     }
 
+    override suspend fun getThemesContainingSymbols(symbolIds: Set<Symbol.Id>): Map<Symbol.Id, Theme> {
+        return themes.values.asSequence()
+            .flatMap { theme -> theme.symbols.asSequence().map { it.id to theme } }
+            .filter { it.first in symbolIds }
+            .toMap()
+    }
+
     override suspend fun getThemeContainingValueWebWithId(valueWebId: ValueWeb.Id): Theme? {
         return themes.values.find { it.valueWebs.any { it.id == valueWebId } }
     }

@@ -83,7 +83,8 @@ class `Synchronize Tracked Symbols with Scene Prose Unit Test` {
                         listOf(
                             SymbolTrackedInScene(
                                 scene.id,
-                                Scene.TrackedSymbol(symbol.id, symbol.name)
+                                theme.name,
+                                Scene.TrackedSymbol(symbol.id, symbol.name, theme.id)
                             )
                         )
                     )
@@ -94,7 +95,7 @@ class `Synchronize Tracked Symbols with Scene Prose Unit Test` {
             inner class `Given scene already tracks symbol` {
 
                 init {
-                    sceneRepository.givenScene(scene.withSymbolTracked(symbol).scene)
+                    sceneRepository.givenScene(scene.withSymbolTracked(theme, symbol).scene)
                 }
 
                 @Test
@@ -125,7 +126,7 @@ class `Synchronize Tracked Symbols with Scene Prose Unit Test` {
                         result!!.let {
                             assertTrue(it.symbolsTrackedInScene.isEmpty())
                             it.symbolsNoLongerTrackedInScene.mustEqual(listOf(
-                                TrackedSymbolRemoved(scene.id, Scene.TrackedSymbol(symbol.id, symbol.name))
+                                TrackedSymbolRemoved(scene.id, Scene.TrackedSymbol(symbol.id, symbol.name, theme.id))
                             ))
                         }
                     }

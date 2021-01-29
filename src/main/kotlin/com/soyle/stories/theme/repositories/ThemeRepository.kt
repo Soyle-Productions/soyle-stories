@@ -17,6 +17,7 @@ interface ThemeRepository {
     suspend fun getThemeById(id: Theme.Id): Theme?
     suspend fun getThemesById(themeIds: Set<Theme.Id>): Set<Theme>
     suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme?
+    suspend fun getThemesContainingSymbols(symbolIds: Set<Symbol.Id>): Map<Symbol.Id, Theme>
     suspend fun getThemeContainingValueWebWithId(valueWebId: ValueWeb.Id): Theme?
     suspend fun getThemeContainingOppositionValueWithId(oppositionValueId: OppositionValue.Id): Theme?
     suspend fun getThemeContainingOppositionsWithSymbolicEntityId(symbolicId: UUID): List<Theme>

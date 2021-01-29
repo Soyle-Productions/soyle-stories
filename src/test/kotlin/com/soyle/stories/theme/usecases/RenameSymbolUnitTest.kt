@@ -79,14 +79,14 @@ class RenameSymbolUnitTest {
     {
 
         private val scenesWithSymbol = List(5) {
-            makeScene(symbols = listOf(Scene.TrackedSymbol(symbol.id, symbol.name)))
+            makeScene(symbols = listOf(Scene.TrackedSymbol(symbol.id, symbol.name, themeId)))
         }
         private val scenesWithoutSymbol = List(4) {
             makeScene()
         }
 
         init {
-            themeRepository.givenTheme(makeTheme(symbols = listOf(symbol)))
+            themeRepository.givenTheme(makeTheme(themeId, symbols = listOf(symbol)))
             scenesWithSymbol.forEach(sceneRepository::givenScene)
             scenesWithoutSymbol.forEach(sceneRepository::givenScene)
         }

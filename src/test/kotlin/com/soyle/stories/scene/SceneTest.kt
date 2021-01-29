@@ -9,6 +9,7 @@ import com.soyle.stories.common.shouldBe
 import com.soyle.stories.common.str
 import com.soyle.stories.entities.*
 import com.soyle.stories.theme.makeSymbol
+import com.soyle.stories.theme.makeTheme
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
@@ -82,11 +83,23 @@ class SceneTest {
     @Nested
     inner class `Track Symbols in Scene` {
 
+        private val symbol = makeSymbol()
+        private val theme = makeTheme(symbols = listOf(symbol))
+
+        @Test
+        fun `symbol must be in theme`() {
+            val failureTheme = makeTheme()
+            val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+            val error = assertThrows<IllegalArgumentException> {
+                scene.withSymbolTracked(failureTheme, symbol)
+            }
+            error.message.mustEqual("Symbol ${symbol.name} is not contained within the ${failureTheme.name} theme")
+        }
+
         @Test
         fun `can track a symbol in a scene`() {
-            val symbol = makeSymbol()
             val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(symbol)
+                .withSymbolTracked(theme, symbol)
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
             update as Single
             update.event as SymbolTrackedInScene
@@ -94,9 +107,8 @@ class SceneTest {
 
         @Test
         fun `can stop tracking a symbol in a scene`() {
-            val symbol = makeSymbol()
             val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(symbol).scene
+                .withSymbolTracked(theme, symbol).scene
                 .withoutSymbolTracked(symbol.id)
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(false) { "Did not stop tracking symbol"}
             update as Single
@@ -106,10 +118,11 @@ class SceneTest {
         @Test
         fun `can list all tracked symbols`() {
             val symbols = List(3) { makeSymbol() }
+            val theme = makeTheme(symbols = symbols)
             val scene: Scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(symbols[0]).scene
-                .withSymbolTracked(symbols[1]).scene
-                .withSymbolTracked(symbols[2]).scene
+                .withSymbolTracked(theme, symbols[0]).scene
+                .withSymbolTracked(theme, symbols[1]).scene
+                .withSymbolTracked(theme, symbols[2]).scene
             scene.trackedSymbols.size.mustEqual(3)
             scene.trackedSymbols.forEachIndexed { index, trackedSymbol ->
                 trackedSymbol.symbolId.mustEqual(symbols[index].id)
@@ -119,30 +132,27 @@ class SceneTest {
 
         @Test
         fun `cannot add symbol more than once`() {
-            val symbol = makeSymbol()
             val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(symbol).scene
-                .withSymbolTracked(symbol)
+                .withSymbolTracked(theme, symbol).scene
+                .withSymbolTracked(theme, symbol)
             update.scene.trackedSymbols.size.mustEqual(1)
             update as NoUpdate
         }
 
         @Test
         fun `cannot create scene with same symbol more than once`() {
-            val symbol = makeSymbol()
             assertThrows<IllegalStateException> {
                 Scene(Scene.Id(), Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), setOf(), Prose.Id(), listOf(), symbols = List(2) {
-                    Scene.TrackedSymbol(symbol.id, symbol.name + it)
+                    Scene.TrackedSymbol(symbol.id, symbol.name + it, theme.id)
                 })
             }
         }
 
         @Test
         fun `adding same symbol with new name should update name`() {
-            val symbol = makeSymbol()
             val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(symbol).scene
-                .withSymbolTracked(symbol.withName("New Symbol Name"))
+                .withSymbolTracked(theme, symbol).scene
+                .withSymbolTracked(theme, symbol.withName("New Symbol Name"))
             update.scene.trackedSymbols.size.mustEqual(1)
             update.scene.trackedSymbols.single().symbolName.mustEqual("New Symbol Name")
             update as Single

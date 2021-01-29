@@ -66,7 +66,7 @@ class RemoveSymbolFromThemeUnitTest {
         inner class `Given symbol tracked in scenes`
         {
 
-            private val scenesWithSymbol = List(5) { makeScene().withSymbolTracked(symbol).scene }
+            private val scenesWithSymbol = List(5) { makeScene().withSymbolTracked(theme, symbol).scene }
             private val scenesWithoutSymbol = List(4) { makeScene() }
 
             init {
@@ -87,6 +87,7 @@ class RemoveSymbolFromThemeUnitTest {
                 removeSymbolFromTheme()
                 result!!.trackedSymbolsRemoved.size.mustEqual(scenesWithSymbol.size)
                 result!!.trackedSymbolsRemoved.map { it.sceneId }.toSet().mustEqual(scenesWithSymbol.map { it.id }.toSet())
+                result!!.trackedSymbolsRemoved.forEach { it.trackedSymbol.themeId.mustEqual(theme.id) }
                 result!!.trackedSymbolsRemoved.forEach { it.trackedSymbol.symbolId.mustEqual(symbol.id) }
                 result!!.trackedSymbolsRemoved.forEach { it.trackedSymbol.symbolName.mustEqual(symbol.name) }
             }

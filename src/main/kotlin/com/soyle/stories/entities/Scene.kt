@@ -143,13 +143,14 @@ class Scene private constructor(
         )
     }
 
-    fun withSymbolTracked(symbol: Symbol): SceneUpdate<SceneEvent> {
-        val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name)
+    fun withSymbolTracked(theme: Theme, symbol: Symbol): SceneUpdate<SceneEvent> {
+        theme.symbols.find { it.id == symbol.id } ?: throw IllegalArgumentException("Symbol ${symbol.name} is not contained within the ${theme.name} theme")
+        val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name, theme.id)
         return if (trackedSymbols.isSymbolTracked(symbol.id)) {
             if (trackedSymbols.getSymbolById(symbol.id)!!.symbolName == symbol.name) NoUpdate(this)
            else Single(copy(symbols = trackedSymbols.withoutSymbol(symbol.id) + newTrackedSymbol), TrackedSymbolRenamed(id, newTrackedSymbol))
         } else {
-            Single(copy(symbols = symbols + newTrackedSymbol), SymbolTrackedInScene(id, newTrackedSymbol))
+            Single(copy(symbols = symbols + newTrackedSymbol), SymbolTrackedInScene(id, theme.name, newTrackedSymbol))
         }
     }
 
@@ -176,7 +177,7 @@ class Scene private constructor(
         internal fun withoutSymbol(symbolId: Symbol.Id): Collection<TrackedSymbol> = symbolsById.minus(symbolId).values
     }
 
-    data class TrackedSymbol(val symbolId: Symbol.Id, val symbolName: String)
+    data class TrackedSymbol(val symbolId: Symbol.Id, val symbolName: String, val themeId: Theme.Id)
 }
 
 sealed class SceneUpdate<out T> {
@@ -195,6 +196,6 @@ abstract class SceneEvent
 {
     abstract val sceneId: Scene.Id
 }
-data class SymbolTrackedInScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
+data class SymbolTrackedInScene(override val sceneId: Scene.Id, val themeName: String, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRenamed(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRemoved(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()

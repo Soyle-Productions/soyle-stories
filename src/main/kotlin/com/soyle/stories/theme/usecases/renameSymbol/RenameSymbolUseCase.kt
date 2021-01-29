@@ -1,9 +1,6 @@
 package com.soyle.stories.theme.usecases.renameSymbol
 
-import com.soyle.stories.entities.SceneEvent
-import com.soyle.stories.entities.SceneUpdate
-import com.soyle.stories.entities.Single
-import com.soyle.stories.entities.TrackedSymbolRenamed
+import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.theme.SymbolAlreadyHasName
@@ -24,7 +21,7 @@ class RenameSymbolUseCase(
         if (symbol.name == name) throw SymbolAlreadyHasName(symbolId, name)
         val renamedSymbol = symbol.withName(name)
 
-        val sceneUpdates = updatedTrackedSymbolsInScenes(renamedSymbol)
+        val sceneUpdates = updatedTrackedSymbolsInScenes(theme, renamedSymbol)
 
         themeRepository.updateTheme(theme.withoutSymbol(symbol.id).withSymbol(renamedSymbol))
         output.symbolRenamed(
@@ -36,10 +33,11 @@ class RenameSymbolUseCase(
     }
 
     private suspend fun updatedTrackedSymbolsInScenes(
+        containingTheme: Theme,
         renamedSymbol: Symbol
     ): List<SceneUpdate<SceneEvent>> {
         val sceneUpdates = sceneRepository.getScenesTrackingSymbol(renamedSymbol.id)
-            .map { it.withSymbolTracked(renamedSymbol) }
+            .map { it.withSymbolTracked(containingTheme, renamedSymbol) }
         if (sceneUpdates.isNotEmpty()) {
             sceneRepository.updateScenes(sceneUpdates.map { it.scene })
         }

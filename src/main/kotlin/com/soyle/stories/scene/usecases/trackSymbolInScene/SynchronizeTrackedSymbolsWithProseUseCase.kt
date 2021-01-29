@@ -18,10 +18,13 @@ class SynchronizeTrackedSymbolsWithProseUseCase(
         val symbolMentions = prose.mentions.mapNotNull { it.entityId as? MentionedSymbolId }
         val symbolIds = symbolMentions.map { it.id }.toSet()
         val themes = themeRepository.getThemesById(symbolMentions.map { it.themeId }.toSet())
-        val symbols = themes.flatMap { theme -> theme.symbols.filter { it.id in symbolIds } }
+        val symbols = themes.flatMap { theme ->
+            theme.symbols.asSequence().filter { it.id in symbolIds }
+                .map { theme to it }
+        }
         val events = mutableListOf<SceneEvent>()
-        val sceneWithSymbols = symbols.fold(scene) { nextScene, symbol ->
-            val update = nextScene.withSymbolTracked(symbol)
+        val sceneWithSymbols = symbols.fold(scene) { nextScene, (theme, symbol) ->
+            val update = nextScene.withSymbolTracked(theme, symbol)
             when (update) {
                 is NoUpdate -> {
                 }
