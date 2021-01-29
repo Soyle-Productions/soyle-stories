@@ -2,10 +2,11 @@ package com.soyle.stories.theme.usecases
 
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.shouldBe
+import com.soyle.stories.doubles.ProseRepositoryDouble
 import com.soyle.stories.doubles.ThemeRepositoryDouble
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.prose.makeProse
 import com.soyle.stories.scene.doubles.SceneRepositoryDouble
 import com.soyle.stories.scene.makeScene
 import com.soyle.stories.theme.*
@@ -27,9 +28,11 @@ class RenameSymbolUnitTest {
 
     private var updatedTheme: Theme? = null
     private var updatedScenes: MutableList<Scene> = mutableListOf()
+    private var updatedProse: Prose? = null
 
     private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = { updatedTheme = it })
     private val sceneRepository = SceneRepositoryDouble(onUpdateScene = updatedScenes::add)
+    private val proseRepository = ProseRepositoryDouble(onReplaceProse = ::updatedProse::set)
 
     @Test
     fun `new name is invalid`() {
@@ -75,6 +78,45 @@ class RenameSymbolUnitTest {
     }
 
     @Nested
+    inner class `Rule - All Prose that mention the symbol should update the mention of that symbol` {
+
+        private val prose = makeProse(
+            content = symbol.name, mentions = listOf(
+                ProseMention(symbol.id.mentioned(themeId), ProseMentionRange(0, symbol.name.length))
+            )
+        )
+
+        init {
+            themeRepository.givenTheme(makeTheme(themeId, symbols = listOf(symbol)))
+            proseRepository.givenProse(prose)
+        }
+
+        @Test
+        fun `should update prose`() {
+            renameSymbol("Valid New Name")
+            updatedProse!!.let {
+                it.content.mustEqual("Valid New Name") { "prose with only mention should have entire content replaced" }
+                it.mentions.mustEqual(listOf(
+                    ProseMention(symbol.id.mentioned(themeId), ProseMentionRange(0, "Valid New Name".length))
+                ))
+            }
+        }
+
+        @Test
+        fun `should output prose mention text replaced events`() {
+            renameSymbol("Valid New Name")
+            result!!.mentionTextReplaced.single().let {
+                it.deletedText.mustEqual(symbol.name)
+                it.entityId.mustEqual(symbol.id.mentioned(themeId))
+                it.insertedText.mustEqual("Valid New Name")
+                it.newContent.mustEqual(updatedProse!!.content)
+                it.newMentions.mustEqual(updatedProse!!.mentions)
+            }
+        }
+
+    }
+
+    @Nested
     inner class `Symbol tracked in scenes`
     {
 
@@ -111,7 +153,7 @@ class RenameSymbolUnitTest {
     }
 
     private fun renameSymbol(name: String = "") {
-        val useCase: RenameSymbol = RenameSymbolUseCase(themeRepository, sceneRepository)
+        val useCase: RenameSymbol = RenameSymbolUseCase(themeRepository, sceneRepository, proseRepository)
         val output = object : RenameSymbol.OutputPort {
             override suspend fun symbolRenamed(response: RenameSymbol.ResponseModel) {
                 result = response
