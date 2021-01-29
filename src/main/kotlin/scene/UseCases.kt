@@ -7,8 +7,6 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.editProse.ContentReplacedNotifier
-import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
-import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneControllerImpl
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverCharacterArcSectionsInSceneOutputPort
@@ -26,6 +24,8 @@ import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionControllerImpl
+import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneController
+import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneControllerImpl
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
@@ -59,6 +59,8 @@ import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenesUseCase
 import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProseUseCase
+import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInSceneUseCase
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
@@ -88,6 +90,7 @@ object UseCases {
             coverCharacterArcSectionsInScene()
             listOptionsToReplaceMention()
             synchronizeTrackedSymbolsWithProse()
+            listSymbolsInScene()
         }
     }
 
@@ -324,6 +327,16 @@ object UseCases {
         }
         provide<SynchronizeTrackedSymbolsWithProse.OutputPort> {
             SynchronizeTrackedSymbolsWithProseOutput(get(), get())
+        }
+    }
+
+    private fun InProjectScope.listSymbolsInScene()
+    {
+        provide<ListSymbolsInScene> {
+            ListSymbolsInSceneUseCase(get(), get())
+        }
+        provide<ListSymbolsInSceneController> {
+            ListSymbolsInSceneControllerImpl(applicationScope.get(), get())
         }
     }
 

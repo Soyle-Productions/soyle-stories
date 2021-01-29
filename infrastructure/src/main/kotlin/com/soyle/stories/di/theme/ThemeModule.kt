@@ -199,7 +199,7 @@ object ThemeModule {
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
         provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get(), get()) }
-        provide<RenameSymbol> { RenameSymbolUseCase(get(), get()) }
+        provide<RenameSymbol> { RenameSymbolUseCase(get(), get(), get()) }
         provide<ListOppositionsInValueWeb> { ListOppositionsInValueWebUseCase(get()) }
         provide<AddOppositionToValueWeb> { AddOppositionToValueWebUseCase(get(), get()) }
         provide<RenameOppositionValue> { RenameOppositionValueUseCase(get()) }
@@ -278,7 +278,7 @@ object ThemeModule {
             AddValueWebToThemeNotifier(get())
         }
         provide(RenameSymbol.OutputPort::class) {
-            RenameSymbolOutput(get(), get())
+            RenameSymbolOutput(get(), get(), get())
         }
         provide(AddOppositionToValueWeb.OutputPort::class) {
             AddOppositionToValueWebNotifier(get())

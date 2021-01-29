@@ -4,6 +4,7 @@ import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -45,7 +46,13 @@ import com.soyle.stories.scene.sceneList.SceneListController
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneList.SceneListPresenter
 import com.soyle.stories.scene.sceneList.SceneListViewListener
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneController
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneViewListener
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.trackSymbolInScene.SymbolsTrackedInSceneNotifier
+import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRemovedNotifier
+import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRenamedNotifier
 
 object Presentation {
 
@@ -56,7 +63,7 @@ object Presentation {
             reorderSceneDialog()
 
             sceneList()
-
+            symbolsInScene()
         }
         sceneEditor()
 
@@ -189,6 +196,19 @@ object Presentation {
                 get(),
                 get()
             )
+        }
+    }
+
+    private fun InProjectScope.symbolsInScene() {
+        provide<SymbolsInSceneViewListener> {
+            SymbolsInSceneController(
+                get<SymbolsInSceneState>(),
+                get()
+            ).also {
+                it listensTo get<SymbolsTrackedInSceneNotifier>()
+                it listensTo get<TrackedSymbolsRenamedNotifier>()
+                it listensTo get<TrackedSymbolsRemovedNotifier>()
+            }
         }
     }
 

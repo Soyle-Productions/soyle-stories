@@ -22,6 +22,7 @@ import com.soyle.stories.theme.createTheme.CreateThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
+import com.soyle.stories.theme.renameSymbol.RenameSymbolController
 import com.soyle.stories.theme.repositories.ThemeRepository
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -182,6 +183,14 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
         val symbolId = previouslyNamedSymbols[themeId to previousSymbolName] ?: return (null to null)
         val themeRepository = projectScope.get<ThemeRepository>()
         return runBlocking { symbolId to themeRepository.getThemeById(themeId)?.symbols?.find { it.id == symbolId } }
+    }
+
+    /**
+     *
+     */
+
+    fun renameSymbolTo(theme: Theme, symbol: Symbol, newName: String) {
+        projectScope.get<RenameSymbolController>().renameSymbol(symbol.id.uuid.toString(), newName) { throw it }
     }
 
     /**

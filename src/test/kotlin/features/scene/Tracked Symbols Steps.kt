@@ -1,6 +1,11 @@
 package com.soyle.stories.desktop.config.features.scene
 
 
+import com.soyle.stories.desktop.config.drivers.scene.givenFocusedOn
+import com.soyle.stories.desktop.config.drivers.scene.givenSymbolsInSceneToolHasBeenOpened
+import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
+import com.soyle.stories.desktop.config.features.soyleStories
+import com.soyle.stories.desktop.view.scene.sceneSymbols.SymbolsInSceneAssertions
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.Theme
 import io.cucumber.java8.En
@@ -17,7 +22,11 @@ class `Tracked Symbols Steps` : En {
     }
 
     private fun givens() {
-
+        Given("I am tracking symbols in the {scene}") { scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSymbolsInSceneToolHasBeenOpened()
+                .givenFocusedOn(scene)
+        }
     }
 
     private fun whens() {
@@ -33,7 +42,13 @@ class `Tracked Symbols Steps` : En {
             Assertions.assertTrue(scene.trackedSymbols.isSymbolTracked(symbol.id))
             assertEquals(symbol.name, scene.trackedSymbols.getSymbolById(symbol.id)!!.symbolName)
 
-            TODO("Ensure scene symbol tool has updated")
+            val symbolsInSceneView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSymbolsInSceneToolHasBeenOpened()
+                .givenFocusedOn(scene)
+
+            SymbolsInSceneAssertions.assertThat(symbolsInSceneView) {
+                hasTrackedSymbol(theme.id, theme.name, symbol.id, symbol.name)
+            }
         }
 
         Then(
@@ -46,7 +61,13 @@ class `Tracked Symbols Steps` : En {
                 assertFalse(scene.trackedSymbols.isSymbolTracked(symbol.id))
             }
 
-            TODO("Ensure scene symbol tool has updated")
+            val symbolsInSceneView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSymbolsInSceneToolHasBeenOpened()
+                .givenFocusedOn(scene)
+
+            SymbolsInSceneAssertions.assertThat(symbolsInSceneView) {
+                doesNotHaveTrackedSymbol(theme.id, theme.name, symbol?.id, symbolName)
+            }
         }
     }
 

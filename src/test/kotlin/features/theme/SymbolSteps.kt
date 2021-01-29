@@ -42,6 +42,17 @@ class SymbolSteps : En {
                 }
             }
         }
+        Given(
+            "I have renamed the symbol {string} in the {theme} to {string}"
+        ) { originalSymbolName: String, theme: Theme, newName: String ->
+            val symbol = theme.symbols.find { it.name == originalSymbolName }
+            if (symbol == null && theme.symbols.any { it.name == newName }) {
+                return@Given
+            }
+
+            ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .renameSymbolTo(theme, symbol!!, newName)
+        }
         Given("I have removed the {string} symbol from the {theme}") { symbolName: String, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val themeDriver = ThemeDriver(workbench)

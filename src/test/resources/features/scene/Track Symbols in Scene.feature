@@ -16,6 +16,16 @@ Feature: Track Symbols in Scene
       Then I should see "Butterfly" mentioned in the "Big Battle" scene's prose
       And the "Butterfly" symbol for the "Transformation" theme should be tracked in the "Big Battle" scene
 
+    Scenario: Mention a Symbol while Tracking Symbols in Scene
+      Given I have created the following themes and symbols
+        | Growing Up | Transformation | Becoming a Leader |
+        | Flower     | Butterfly      | A Border          |
+      And I am tracking symbols in the "Big Battle" scene
+      And I have requested story elements that match "B" for the "Big Battle" scene
+      When I select "Butterfly" from the list of matching story elements for the "Big Battle" scene
+      Then I should see "Butterfly" mentioned in the "Big Battle" scene's prose
+      And the "Butterfly" symbol for the "Transformation" theme should be tracked in the "Big Battle" scene
+
   Rule: Removing the last mention of a symbol should automatically remove that symbol from the scene
 
     Scenario: Delete Mention of Symbol
@@ -33,6 +43,15 @@ Feature: Track Symbols in Scene
       And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose again
       When I remove the "Ring" mention from the "Big Battle" scene's prose
       Then the "Ring" symbol for the "Growing Up" theme should be tracked in the "Big Battle" scene
+
+    Scenario: Delete Last Mention while Tracking Symbols in Scene
+      Given I have created a theme named "Growing Up"
+      And I have created a symbol named "Ring" in the "Growing Up" theme
+      And I am tracking symbols in the "Big Battle" scene
+      And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
+      When I remove the "Ring" mention from the "Big Battle" scene's prose
+      Then the "Ring" mention should not be in the "Big Battle" scene's prose
+      And the "Ring" symbol from the "Growing Up" theme should not be tracked in the "Big Battle" scene
 
   Rule: Previously used symbols in the scene should be prioritized when requesting symbols to mention.
 
@@ -68,6 +87,14 @@ Feature: Track Symbols in Scene
       When I rename the symbol "Ring" in the "Growing Up" theme to "Cube"
       Then the "Cube" symbol for the "Growing Up" theme should be tracked in the "Big Battle" scene
 
+    Scenario: Rename Symbol while Tracking Symbols in Scene
+      Given I have created a theme named "Growing Up"
+      And I have created a symbol named "Ring" in the "Growing Up" theme
+      And I am tracking symbols in the "Big Battle" scene
+      And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
+      When I rename the symbol "Ring" in the "Growing Up" theme to "Cube"
+      Then the "Cube" symbol for the "Growing Up" theme should be tracked in the "Big Battle" scene
+
   Rule: Deleted Symbols should no longer be tracked
 
     Scenario: Delete symbol only mentioned once
@@ -82,5 +109,13 @@ Feature: Track Symbols in Scene
       And I have created a symbol named "Ring" in the "Growing Up" theme
       And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
       And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose again
+      When I remove the "Ring" symbol from the "Growing Up" theme
+      Then the "Ring" symbol from the "Growing Up" theme should not be tracked in the "Big Battle" scene
+
+    Scenario: Delete Symbol while Tracking Symbols in Scene
+      Given I have created a theme named "Growing Up"
+      And I have created a symbol named "Ring" in the "Growing Up" theme
+      And I am tracking symbols in the "Big Battle" scene
+      And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
       When I remove the "Ring" symbol from the "Growing Up" theme
       Then the "Ring" symbol from the "Growing Up" theme should not be tracked in the "Big Battle" scene

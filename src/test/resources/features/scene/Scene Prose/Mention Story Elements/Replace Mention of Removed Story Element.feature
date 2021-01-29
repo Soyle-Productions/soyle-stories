@@ -117,7 +117,7 @@ Feature: Replace Mention of Removed Story Element
       And I am editing the "Big Battle" scene's prose
       When I investigate the "Flower" mention in the "Big Battle" scene's prose
       Then the suggested elements with which to replace "Flower" in the "Big Battle" scene's prose should be as follows
-        | Volcano | Gold | Mountain | Butterfly | River |
+        | Volcano | Gold | Butterfly | River | Mountain |
 
   Rule: Should have option to create a new story element to replace removed element
 

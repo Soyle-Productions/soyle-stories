@@ -3,10 +3,7 @@ package com.soyle.stories.di.layout
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.config.dynamic.*
-import com.soyle.stories.layout.config.fixed.CharacterList
-import com.soyle.stories.layout.config.fixed.LocationList
-import com.soyle.stories.layout.config.fixed.SceneList
-import com.soyle.stories.layout.config.fixed.ThemeList
+import com.soyle.stories.layout.config.fixed.*
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamificationsConfig
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamificationsConfig
 import com.soyle.stories.layout.tools.FixedTool
@@ -26,6 +23,7 @@ object ToolModule : RegisteredToolsConfig {
         SceneList.getRegistration(),
         LocationList.getRegistration(),
         ThemeList.getRegistration(),
+        SceneSymbols.getRegistration(),
         /**
          * Dynamic Tools
          */

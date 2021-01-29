@@ -19,8 +19,7 @@ Feature: Mention a Story Element
     Then I should not see any matching story elements for the "Big Battle" scene
 
   Scenario: Some Matching Story Elements
-    Given I have created a scene named "Big Battle"
-    And I have created the following characters
+    Given I have created the following characters
       | Bob | Brooke | Billy Bob | Frank |
     And I have created the following locations
       | Bomb Shelter | Bay Bridge | Golden Gate Bridge | Hobo Den |
@@ -38,8 +37,7 @@ Feature: Mention a Story Element
       | Hobo Den     | location     |
 
   Scenario Outline: Mention a Story Element
-    Given I have created a scene named "Big Battle"
-    And I have created the following characters
+    Given I have created the following characters
       | Bob | Brooke | Billy Bob | Frank |
     And I have created the following locations
       | Bomb Shelter | Bay Bridge | Golden Gate Bridge | Hobo Den |
@@ -99,3 +97,19 @@ Feature: Mention a Story Element
         | element   | name   | new name |
         | character | "Bob"  | "Frank"  |
         | location  | "Home" | "Work"   |
+
+    Scenario: Rename a Mentioned Symbol and then Read the Scene
+      Given I have created a theme named "Growing Up"
+      And I have created a symbol named "Ring" in the "Growing Up" theme
+      And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
+      And I have renamed the symbol "Ring" in the "Growing Up" theme to "Cube"
+      When I edit the "Big Battle" scene's prose
+      Then the "Ring" mention in the "Big Battle" scene's prose should read "Cube"
+
+    Scenario: Renamed a Mentioned Symbol while Reading Scene Prose
+      Given I have created a theme named "Growing Up"
+      And I have created a symbol named "Ring" in the "Growing Up" theme
+      And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
+      And I am editing the "Big Battle" scene's prose
+      When I rename the symbol "Ring" in the "Growing Up" theme to "Cube"
+      Then the "Ring" mention in the "Big Battle" scene's prose should read "Cube"

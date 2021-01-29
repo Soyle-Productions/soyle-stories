@@ -4,6 +4,7 @@ import com.soyle.stories.common.editingCell
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListDriver
+import com.soyle.stories.desktop.view.scene.sceneList.driver
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.sceneList.SceneList
@@ -27,6 +28,17 @@ fun WorkBench.openSceneListTool(): SceneList
     findMenuItemById("tools_scenelist")!!
         .apply { robot.interact { fire() } }
     return getSceneListToolOrError()
+}
+
+fun SceneList.selectScene(scene: Scene)
+{
+    with(driver()) {
+        val sceneItem = getSceneItemOrError(scene.name.value)
+        val tree = tree
+        interact {
+            tree.selectionModel.select(sceneItem)
+        }
+    }
 }
 
 fun SceneList.renameSceneTo(scene: Scene, newName: String)

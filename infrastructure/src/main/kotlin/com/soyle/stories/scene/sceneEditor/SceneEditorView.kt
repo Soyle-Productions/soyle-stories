@@ -4,11 +4,11 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.prose.proseEditor.ProseEditorView
+import com.soyle.stories.scene.SceneTargeted
+import com.soyle.stories.scene.items.SceneItemViewModel
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
-import tornadofx.View
-import tornadofx.hbox
-import tornadofx.hgrow
+import tornadofx.*
 
 class SceneEditorView : View() {
 
@@ -27,6 +27,22 @@ class SceneEditorView : View() {
         ).get<ProseEditorView>()
         add(proseEditor)
         proseEditor.root.hgrow = Priority.ALWAYS
+    }
+
+    init {
+        root.focusedProperty().onChange {
+            if (it) FX.eventbus.fire(
+                SceneTargeted(
+                    SceneItemViewModel(
+                        scope.sceneId.uuid.toString(),
+                        scope.type.proseId,
+                        "Dummy Scene Name",
+                        0,
+                        false
+                    )
+                )
+            )
+        }
     }
 
 }

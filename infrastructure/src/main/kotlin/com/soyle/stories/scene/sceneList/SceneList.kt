@@ -7,6 +7,7 @@ import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.scene.deleteSceneDialog.deleteSceneDialog
 import com.soyle.stories.scene.items.SceneItemViewModel
@@ -62,7 +63,13 @@ class SceneList : View() {
 
                     oldValue
                 }
-                selectionModel.selectedItemProperty().onChange { model.selectedItem.value = it?.value }
+                selectionModel.selectedItemProperty().onChange {
+                    val selectedItem = it?.value
+                    model.selectedItem.value = selectedItem
+                    if (selectedItem != null) {
+                        FX.eventbus.fire(SceneTargeted(selectedItem))
+                    }
+                }
                 model.selectedItem.onChange { newSelection -> selectionModel.select(root.children.find { it.value?.id == newSelection?.id }) }
                 model.selectedItem.onChange {
                     contextMenu = when (it) {
