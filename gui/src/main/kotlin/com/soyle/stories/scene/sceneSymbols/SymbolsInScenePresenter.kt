@@ -5,6 +5,7 @@ import com.soyle.stories.entities.TrackedSymbolRemoved
 import com.soyle.stories.entities.TrackedSymbolRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 
 class SymbolsInScenePresenter(
     internal val view: View.Nullable<SymbolsInSceneViewModel>
@@ -81,6 +82,20 @@ class SymbolsInScenePresenter(
                         )
                     }
                     else it
+                }
+            )
+        }
+    }
+
+    override suspend fun receiveRenamedTheme(renamedTheme: RenamedTheme) {
+        view.updateOrInvalidated {
+            copy(
+                themesInScene = themesInScene.map {
+                    if (it.themeId.uuid == renamedTheme.themeId) {
+                        it.copy(
+                            themeName = renamedTheme.newName
+                        )
+                    } else it
                 }
             )
         }

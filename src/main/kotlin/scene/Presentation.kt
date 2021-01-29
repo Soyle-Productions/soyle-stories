@@ -53,6 +53,7 @@ import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationFor
 import com.soyle.stories.scene.trackSymbolInScene.SymbolsTrackedInSceneNotifier
 import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRemovedNotifier
 import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRenamedNotifier
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
 
 object Presentation {
 
@@ -208,6 +209,7 @@ object Presentation {
                 it listensTo get<SymbolsTrackedInSceneNotifier>()
                 it listensTo get<TrackedSymbolsRenamedNotifier>()
                 it listensTo get<TrackedSymbolsRemovedNotifier>()
+                it listensTo get<RenamedThemeNotifier>()
             }
         }
     }

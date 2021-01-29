@@ -6,6 +6,7 @@ import com.soyle.stories.entities.TrackedSymbolRemoved
 import com.soyle.stories.entities.TrackedSymbolRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneController
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 
 class SymbolsInSceneController(
     view: View.Nullable<SymbolsInSceneViewModel>,
@@ -37,6 +38,12 @@ class SymbolsInSceneController(
         val relevantEvents = trackedSymbolsRemoved.filter { it.sceneId.uuid.toString() == sceneId }
         if (relevantEvents.isNotEmpty()) {
             presenter.receiveTrackedSymbolsRemoved(relevantEvents)
+        }
+    }
+
+    override suspend fun receiveRenamedTheme(renamedTheme: RenamedTheme) {
+        if (presenter.view.viewModel?.themesInScene?.any { it.themeId.uuid == renamedTheme.themeId } == true) {
+            presenter.receiveRenamedTheme(renamedTheme)
         }
     }
 
