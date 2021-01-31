@@ -101,6 +101,17 @@ class SceneTest {
             val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
                 .withSymbolTracked(theme, symbol)
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
+            update.scene.trackedSymbols.single().isPinned.mustEqual(false)
+            update as Single
+            update.event as SymbolTrackedInScene
+        }
+
+        @Test
+        fun `can manually track a symbol in a scene`() {
+            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(theme, symbol, true)
+            update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
+            update.scene.trackedSymbols.single().isPinned.mustEqual(true)
             update as Single
             update.event as SymbolTrackedInScene
         }

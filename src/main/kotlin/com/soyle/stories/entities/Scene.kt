@@ -143,9 +143,9 @@ class Scene private constructor(
         )
     }
 
-    fun withSymbolTracked(theme: Theme, symbol: Symbol): SceneUpdate<SceneEvent> {
+    fun withSymbolTracked(theme: Theme, symbol: Symbol, pin: Boolean = false): SceneUpdate<SceneEvent> {
         theme.symbols.find { it.id == symbol.id } ?: throw IllegalArgumentException("Symbol ${symbol.name} is not contained within the ${theme.name} theme")
-        val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name, theme.id)
+        val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name, theme.id, pin)
         return if (trackedSymbols.isSymbolTracked(symbol.id)) {
             if (trackedSymbols.getSymbolById(symbol.id)!!.symbolName == symbol.name) NoUpdate(this)
            else Single(copy(symbols = trackedSymbols.withoutSymbol(symbol.id) + newTrackedSymbol), TrackedSymbolRenamed(id, newTrackedSymbol))
@@ -177,7 +177,7 @@ class Scene private constructor(
         internal fun withoutSymbol(symbolId: Symbol.Id): Collection<TrackedSymbol> = symbolsById.minus(symbolId).values
     }
 
-    data class TrackedSymbol(val symbolId: Symbol.Id, val symbolName: String, val themeId: Theme.Id)
+    data class TrackedSymbol(val symbolId: Symbol.Id, val symbolName: String, val themeId: Theme.Id, val isPinned: Boolean = false)
 }
 
 sealed class SceneUpdate<out T> {
