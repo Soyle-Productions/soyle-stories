@@ -131,6 +131,23 @@ class `Synchronize Tracked Symbols with Scene Prose Unit Test` {
                         }
                     }
 
+                    @Nested
+                    inner class `Given symbol is pinned in scene`
+                    {
+
+                        init {
+                            sceneRepository.givenScene(scene.withSymbolTracked(theme, symbol).scene.withSymbolPinned(symbol.id).scene)
+                        }
+
+                        @Test
+                        fun `should not update scene or output event`() {
+                            trackSymbolInScene()
+                            assertNull(updatedScene)
+                            assertNull(result)
+                        }
+
+                    }
+
                 }
 
             }

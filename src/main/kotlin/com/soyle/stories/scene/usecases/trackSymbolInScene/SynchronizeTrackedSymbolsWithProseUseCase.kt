@@ -33,7 +33,7 @@ class SynchronizeTrackedSymbolsWithProseUseCase(
             update.scene
         }
         val sceneWithoutSymbols = sceneWithSymbols.trackedSymbols.fold(sceneWithSymbols) { nextScene, trackedSymbol ->
-            if (trackedSymbol.symbolId !in symbolIds) {
+            if (! trackedSymbol.isPinned && trackedSymbol.symbolId !in symbolIds) {
                 val update = nextScene.withoutSymbolTracked(trackedSymbol.symbolId)
                 when (update) {
                     is NoUpdate -> {
