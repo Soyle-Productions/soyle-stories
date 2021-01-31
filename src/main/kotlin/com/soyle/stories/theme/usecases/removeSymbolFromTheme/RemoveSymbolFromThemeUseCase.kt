@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.usecases.removeSymbolFromTheme
 
 import com.soyle.stories.entities.SceneUpdate
-import com.soyle.stories.entities.Single
+import com.soyle.stories.entities.Updated
 import com.soyle.stories.entities.TrackedSymbolRemoved
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.scene.repositories.SceneRepository
@@ -21,7 +21,7 @@ class RemoveSymbolFromThemeUseCase(
         output.removedSymbolFromTheme(
             RemoveSymbolFromTheme.ResponseModel(
                 symbolRemovedFromTheme,
-                sceneUpdates.mapNotNull { (it as? Single)?.event }
+                sceneUpdates.mapNotNull { (it as? Updated)?.event }
             )
         )
     }

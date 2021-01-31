@@ -31,7 +31,7 @@ class RenameSymbolUseCase(
         output.symbolRenamed(
             RenameSymbol.ResponseModel(
                 RenamedSymbol(theme.id.uuid, symbolId, name),
-                sceneUpdates.mapNotNull { (it as? Single<*>)?.event as? TrackedSymbolRenamed },
+                sceneUpdates.mapNotNull { (it as? Updated<*>)?.event as? TrackedSymbolRenamed },
                 proseUpdates
             )
         )

@@ -15,6 +15,10 @@ class SceneDoesNotExist(private val locale: Locale?, val sceneId: UUID): SceneEx
 class NoSceneExistsWithStoryEventId(val storyEventId: UUID) : SceneException()
 class CharacterNotInScene(val sceneId: UUID, val characterId: UUID) : SceneException()
 class SceneDoesNotTrackSymbol(val sceneId: Scene.Id, val symbolId: Symbol.Id) : EntityNotFoundException(symbolId.uuid)
+{
+	override val message: String?
+		get() = "$sceneId does not track $symbolId"
+}
 
 class SceneAlreadyContainsCharacter(val sceneId: UUID, val characterId: UUID) : DuplicateOperationException()
 

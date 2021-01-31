@@ -28,7 +28,7 @@ class SynchronizeTrackedSymbolsWithProseUseCase(
             when (update) {
                 is NoUpdate -> {
                 }
-                is Single -> events.add(update.event)
+                is Updated -> events.add(update.event)
             }
             update.scene
         }
@@ -38,7 +38,7 @@ class SynchronizeTrackedSymbolsWithProseUseCase(
                 when (update) {
                     is NoUpdate -> {
                     }
-                    is Single -> events.add(update.event)
+                    is Updated -> events.add(update.event)
                 }
                 update.scene
             } else nextScene

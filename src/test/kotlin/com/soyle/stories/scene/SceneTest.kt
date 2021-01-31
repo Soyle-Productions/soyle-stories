@@ -102,7 +102,7 @@ class SceneTest {
                 .withSymbolTracked(theme, symbol)
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
             update.scene.trackedSymbols.single().isPinned.mustEqual(false)
-            update as Single
+            update as Updated
             update.event as SymbolTrackedInScene
         }
 
@@ -134,7 +134,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol, true)
                 update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
                 update.scene.trackedSymbols.single().isPinned.mustEqual(true)
-                update as Single
+                update as Updated
                 update.event as SymbolTrackedInScene
             }
 
@@ -152,7 +152,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol).scene
                     .withSymbolPinned(symbol.id)
                 update.scene.trackedSymbols.single().isPinned.mustEqual(true)
-                update as Single
+                update as Updated
             }
 
             @Test
@@ -178,7 +178,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol, true).scene
                     .withSymbolUnpinned(symbol.id)
                 update.scene.trackedSymbols.single().isPinned.mustEqual(false)
-                update as Single
+                update as Updated
             }
 
             @Test
@@ -207,7 +207,7 @@ class SceneTest {
                 .withSymbolRenamed(symbol.id, "New Symbol Name")
             update.scene.trackedSymbols.size.mustEqual(1)
             update.scene.trackedSymbols.single().symbolName.mustEqual("New Symbol Name")
-            update as Single
+            update as Updated
             with (update.event) {
                 trackedSymbol.symbolName.mustEqual("New Symbol Name")
             }
@@ -228,7 +228,7 @@ class SceneTest {
                 .withSymbolTracked(theme, symbol).scene
                 .withoutSymbolTracked(symbol.id)
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(false) { "Did not stop tracking symbol"}
-            update as Single
+            update as Updated
             update.event as TrackedSymbolRemoved
         }
 

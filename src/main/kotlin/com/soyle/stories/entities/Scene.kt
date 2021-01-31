@@ -149,7 +149,7 @@ class Scene private constructor(
         val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name, theme.id, pin)
         return if (trackedSymbols.isSymbolTracked(symbol.id)) noUpdate()
         else {
-            Single(copy(symbols = symbols + newTrackedSymbol), SymbolTrackedInScene(id, theme.name, newTrackedSymbol))
+            Updated(copy(symbols = symbols + newTrackedSymbol), SymbolTrackedInScene(id, theme.name, newTrackedSymbol))
         }
     }
 
@@ -158,7 +158,7 @@ class Scene private constructor(
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
         if (existingSymbol.symbolName == newName) return noUpdate()
         val trackedSymbol = trackedSymbols.getSymbolById(symbolId)!!.copy(symbolName = newName)
-        return Single(copy(symbols = symbols + trackedSymbol), TrackedSymbolRenamed(id, trackedSymbol))
+        return Updated(copy(symbols = symbols + trackedSymbol), TrackedSymbolRenamed(id, trackedSymbol))
     }
 
     fun withSymbolPinned(symbolId: Symbol.Id): SceneUpdate<SymbolPinnedToScene>
@@ -166,7 +166,7 @@ class Scene private constructor(
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
         if (existingSymbol.isPinned) return noUpdate()
         val trackedSymbol = existingSymbol.copy(isPinned = true)
-        return Single(copy(symbols = symbols + trackedSymbol), SymbolPinnedToScene(id, trackedSymbol))
+        return Updated(copy(symbols = symbols + trackedSymbol), SymbolPinnedToScene(id, trackedSymbol))
     }
 
     fun withSymbolUnpinned(symbolId: Symbol.Id): SceneUpdate<SymbolUnpinnedFromScene>
@@ -174,12 +174,12 @@ class Scene private constructor(
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
         if (! existingSymbol.isPinned) return noUpdate()
         val trackedSymbol = existingSymbol.copy(isPinned = false)
-        return Single(copy(symbols = symbols + trackedSymbol), SymbolUnpinnedFromScene(id, trackedSymbol))
+        return Updated(copy(symbols = symbols + trackedSymbol), SymbolUnpinnedFromScene(id, trackedSymbol))
     }
 
     fun withoutSymbolTracked(symbolId: Symbol.Id): SceneUpdate<TrackedSymbolRemoved> {
         val trackedSymbol = trackedSymbols.getSymbolById(symbolId) ?: return noUpdate()
-        return Single(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
+        return Updated(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
     }
 
     fun noUpdate() = NoUpdate(this)
@@ -211,7 +211,7 @@ sealed class SceneUpdate<out T> {
     operator fun component1() = scene
 }
 class NoUpdate(override val scene: Scene) : SceneUpdate<Nothing>()
-class Single<out T : SceneEvent>(override val scene: Scene, val event: T) : SceneUpdate<T>() {
+class Updated<out T : SceneEvent>(override val scene: Scene, val event: T) : SceneUpdate<T>() {
     operator fun component2() = event
 }
 
