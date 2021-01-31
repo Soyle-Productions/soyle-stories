@@ -27,9 +27,9 @@ object SceneSymbols : ToolConfig<SceneSymbols>, FixedTool() {
 
     override fun getTabConfig(tool: ToolViewModel, type: SceneSymbols): ToolTabConfig = object : ToolTabConfig {
         override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-            val tool = projectScope.get<SymbolsInSceneView>()
-            tool.title = getViewModelConfig(type).toolName()
-            return tabPane.tab(tool)
+            val view = projectScope.get<SymbolsInSceneView>()
+            view.title = getViewModelConfig(type).toolName()
+            return tabPane.tab(view)
         }
     }
 

@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.scene.items.SceneItemViewModel
+import com.soyle.stories.soylestories.Styles
 import javafx.scene.SnapshotParameters
 import javafx.scene.control.TreeCell
 import javafx.scene.input.ClipboardContent
@@ -14,12 +15,7 @@ private val idFormat = DataFormat("entity/scene-id")
 private val nameFormat = DataFormat("entity/scene-name")
 private val indexFormat = DataFormat("entity/scene-index")
 
-fun TreeCell<SceneItemViewModel?>.setOnSceneDragged(consumer: (String, String, Int) -> Unit)
-{
-	enableDrag()
-	enableDrop(consumer)
-}
-private fun TreeCell<SceneItemViewModel?>.enableDrag()
+fun TreeCell<SceneItemViewModel?>.enableDrag()
 {
 	setOnDragDetected {
 		setDraggingCell()
@@ -31,7 +27,7 @@ private fun TreeCell<SceneItemViewModel?>.enableDrag()
 		it.consume()
 	}
 }
-private fun TreeCell<SceneItemViewModel?>.enableDrop(consumer: (String, String, Int) -> Unit)
+fun TreeCell<SceneItemViewModel?>.enableDrop(consumer: (String, String, Int) -> Unit)
 {
 	setOnDragOver {
 		style = ""
@@ -73,11 +69,11 @@ private fun TreeCell<SceneItemViewModel?>.setDraggingCell() {
 }
 
 private fun TreeCell<SceneItemViewModel?>.setDraggingStyle() {
-	addClass(Styles.draggingCell)
+	addClass(SceneListView.Styles.draggingCell)
 	graphic?.isVisible = false
 }
 private fun TreeCell<SceneItemViewModel?>.removeDraggingStyle() {
-	removeClass(Styles.draggingCell)
+	removeClass(SceneListView.Styles.draggingCell)
 	graphic?.isVisible = true
 }
 private fun DragEvent.wouldDropAtStartingPlace(receivingCell: TreeCell<SceneItemViewModel?>): Boolean
@@ -100,12 +96,10 @@ private fun TreeCell<SceneItemViewModel?>.acceptDragDrop(event: DragEvent)
 {
 	val halfHeight = height / 2
 	if (event.y < halfHeight) style {
-		borderWidth += box(2.px, 0.px, 0.px, 0.px)
-		borderColor += box(Color.ALICEBLUE, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT)
+		borderColor += box(Styles.Purple, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT)
 	}
 	else style {
-		borderWidth += box(0.px, 0.px, 2.px, 0.px)
-		borderColor += box(Color.TRANSPARENT, Color.TRANSPARENT, Color.ALICEBLUE, Color.TRANSPARENT)
+		borderColor += box(Color.TRANSPARENT, Color.TRANSPARENT, Styles.Purple, Color.TRANSPARENT)
 	}
 	event.acceptTransferModes(TransferMode.MOVE)
 }

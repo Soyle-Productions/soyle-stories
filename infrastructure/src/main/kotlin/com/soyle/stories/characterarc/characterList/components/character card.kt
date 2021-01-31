@@ -120,7 +120,7 @@ class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
     }
 
     private fun Parent.characterOptionsButton(): MenuButton {
-        return buttonCombo {
+        return menubutton {
             graphic = MaterialIconView(MaterialIcon.MORE_VERT)
             this@characterOptionsButton.visibleProperty().onChange { isFocusTraversable = it }
             item("Rename") {
@@ -238,7 +238,7 @@ class CharacterArcItem : ItemFragment<CharacterArcItemViewModel>()
         viewListener.renameCharacterArc(arcItem.characterId, arcItem.themeId, newName)
     }
 
-    private fun Parent.characterArcOptionsButton() = buttonCombo {
+    private fun Parent.characterArcOptionsButton() = menubutton {
         visibleWhen(root.hoverProperty()
             .or(nameField.focusedProperty())
             .or(focusedProperty()))

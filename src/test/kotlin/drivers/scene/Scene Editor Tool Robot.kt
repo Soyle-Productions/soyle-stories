@@ -17,7 +17,7 @@ import com.soyle.stories.prose.proseEditor.ContentElement
 import com.soyle.stories.prose.proseEditor.MentionIssueMenu
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
 import com.soyle.stories.scene.sceneEditor.SceneEditorView
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.scene.input.ContextMenuEvent
 import javafx.scene.input.KeyCode
@@ -26,7 +26,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import tornadofx.FX
 
-fun SceneList.givenSceneEditorToolHasBeenOpened(scene: Scene): SceneEditorView =
+fun SceneListView.givenSceneEditorToolHasBeenOpened(scene: Scene): SceneEditorView =
     scope.getSceneEditorTool(scene) ?: openSceneEditorTool(scene).let { scope.getSceneEditorToolOrError(scene) }
 
 fun ProjectScope.getSceneEditorToolOrError(scene: Scene): SceneEditorView =
@@ -39,7 +39,7 @@ fun ProjectScope.getSceneEditorTool(scene: Scene): SceneEditorView? {
         ?.let { FX.getComponents(it)[SceneEditorView::class] as? SceneEditorView }
 }
 
-fun SceneList.openSceneEditorTool(scene: Scene) {
+fun SceneListView.openSceneEditorTool(scene: Scene) {
     val driver = SceneListDriver(this)
     val item = driver.getSceneItemOrError(scene.name.value)
     driver.interact {

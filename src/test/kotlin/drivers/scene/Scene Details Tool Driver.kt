@@ -11,20 +11,20 @@ import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.scene.sceneDetails.SceneDetails
 import com.soyle.stories.scene.sceneDetails.SceneDetailsScope
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
 
-fun SceneList.givenSceneDetailsToolHasBeenOpened(scene: Scene): SceneDetails =
+fun SceneListView.givenSceneDetailsToolHasBeenOpened(scene: Scene): SceneDetails =
     getOpenSceneDetails(scene) ?: openSceneDetails(scene).run { getOpenSceneDetailsOrError(scene) }
 
-fun SceneList.getOpenSceneDetailsOrError(scene: Scene): SceneDetails =
+fun SceneListView.getOpenSceneDetailsOrError(scene: Scene): SceneDetails =
     getOpenSceneDetails(scene) ?: error("Scene details tool is not open for the scene ${scene.name}")
 
-fun SceneList.getOpenSceneDetails(scene: Scene): SceneDetails? =
+fun SceneListView.getOpenSceneDetails(scene: Scene): SceneDetails? =
     scope.toolScopes.asSequence().filterIsInstance<SceneDetailsScope>()
         .filter { it.sceneId == scene.id.uuid }.firstOrNull()
         ?.get<SceneDetails>().takeIf { it?.currentStage?.isShowing == true }
 
-private fun SceneList.openSceneDetails(scene: Scene) {
+private fun SceneListView.openSceneDetails(scene: Scene) {
     val sceneItem = driver().getSceneItemOrError(scene.name.value)
     drive {
         tree.selectionModel.select(sceneItem)

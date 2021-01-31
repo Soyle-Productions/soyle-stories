@@ -21,6 +21,7 @@ class SceneListModel : ItemViewModel<SceneListViewModel>(), View.Nullable<SceneL
 	val hasScenes = bind(SceneListViewModel::hasScenes)
 	val renameSceneFailureMessage = bind(SceneListViewModel::renameSceneFailureMessage)
 
+	val editingItem = SimpleObjectProperty<SceneItemViewModel?>(null)
 	val selectedItem = SimpleObjectProperty<SceneItemViewModel?>(null)
 
 	private val threadTransformer by resolveLater<ThreadTransformer>(scope.applicationScope)

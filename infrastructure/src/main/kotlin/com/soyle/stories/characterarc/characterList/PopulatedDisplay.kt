@@ -124,7 +124,7 @@ internal class PopulatedDisplay : View() {
                 isMnemonicParsing = false
             }
             spacer()
-            buttonCombo("View As ...") {
+            menubutton("View As ...") {
                 graphic = MaterialIconView(MaterialIcon.VISIBILITY, "1.5em")
                 checkmenuitem("List") {
                     graphic = MaterialIconView(MaterialIcon.VIEW_LIST, "1.5em")

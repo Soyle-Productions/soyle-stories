@@ -1,6 +1,7 @@
 package com.soyle.stories.layout.openTool
 
 import com.soyle.stories.entities.Prose
+import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
 
 interface OpenToolController {
 
@@ -15,5 +16,6 @@ interface OpenToolController {
 	fun openCentralConflict(themeId: String, characterId: String?)
 	fun openMoralArgument(themeId: String)
 	fun openSceneEditor(sceneId: String, proseId: Prose.Id)
+	fun openSymbolsInScene(sceneItem: SceneItem?)
 
 }

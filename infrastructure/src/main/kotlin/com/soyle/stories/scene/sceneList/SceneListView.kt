@@ -1,0 +1,150 @@
+package com.soyle.stories.scene.sceneList
+
+import com.soyle.stories.common.components.buttons.inviteButton
+import com.soyle.stories.common.components.buttons.primaryButton
+import com.soyle.stories.di.resolve
+import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.SceneTargeted
+import com.soyle.stories.scene.createSceneDialog.createSceneDialog
+import com.soyle.stories.scene.items.SceneItemViewModel
+import javafx.geometry.Pos
+import javafx.scene.Parent
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.TreeItem
+import javafx.scene.effect.BlurType
+import javafx.scene.effect.DropShadow
+import javafx.scene.effect.InnerShadow
+import javafx.scene.layout.Priority
+import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
+import javafx.scene.text.TextAlignment
+import tornadofx.*
+
+class SceneListView : View() {
+
+    override val scope: ProjectScope = super.scope as ProjectScope
+
+    private val model = resolve<SceneListModel>()
+
+    private val viewListener = resolve<SceneListViewListener>()
+
+    val sceneContextMenu = ContextMenu().apply {
+        model.selectedItem.onChange {
+            if (it == null) items.clear()
+            else items.setAll(sceneOptionsMenu(viewListener, scope, it))
+        }
+    }
+
+    override val root: Parent = stackpane {
+        hgrow = Priority.SOMETIMES
+        vgrow = Priority.ALWAYS
+        dynamicContent(model.hasScenes) {
+            if (it == true) populatedDisplay()
+            else emptyDisplay()
+        }
+    }
+
+    private fun Parent.emptyDisplay() = vbox(spacing = 16.0) {
+        style { padding = box(16.px) }
+        addClass("empty-display")
+        hgrow = Priority.SOMETIMES
+        vgrow = Priority.ALWAYS
+        alignment = Pos.CENTER
+        imageview("com/soyle/stories/scene/Scenes-Icon.png") {
+            alignment = Pos.CENTER
+        }
+        label("Scenes") {
+            style {
+                fontSize = 24.pt
+                fontWeight = FontWeight.BOLD
+                textAlignment = TextAlignment.CENTER
+            }
+        }
+        label("Scenes are where your story happens.  Create your first scene by clicking the button below and get started!") {
+            textAlignment = TextAlignment.CENTER
+            isWrapText = true
+        }
+        inviteButton(model.createSceneButtonLabel) {
+            addClass("center-button")
+            alignment = Pos.CENTER
+            isMnemonicParsing = false
+            action { createSceneDialog(scope) }
+        }
+    }
+    private fun Parent.populatedDisplay() = vbox {
+        visibleWhen { model.hasScenes }
+        managedProperty().bind(visibleProperty())
+        minWidth = 200.0
+        minHeight = 100.0
+        vgrow = Priority.ALWAYS
+        hbox(spacing = 10.0) {
+            style {
+                isFillHeight = false
+                padding = box(8.px)
+                backgroundColor += Color.WHITE
+                effect = DropShadow(BlurType.GAUSSIAN, Color.rgb(0,0,0,0.25), 4.0, 0.0, 0.0, 4.0)
+            }
+            primaryButton(model.createSceneButtonLabel) {
+                id = "actionBar_create"
+                isDisable = false
+                action {
+                    createSceneDialog(scope)
+                }
+                isMnemonicParsing = false
+            }
+            spacer()
+            menubutton("Options") {
+                enableWhen { model.selectedItem.isNotNull }
+                model.selectedItem.onChange {
+                    if (it == null) items.clear()
+                    else items.setAll(sceneOptionsMenu(viewListener, scope, it))
+                }
+            }
+            viewOrder = 0.0
+        }
+        treeview<SceneItemViewModel?>(TreeItem(null)) {
+            viewOrder = 1.0
+
+            isShowRoot = false
+            vgrow = Priority.ALWAYS
+            selectionModel.selectedItemProperty().onChange {
+                val selectedItem = it?.value
+                model.selectedItem.value = selectedItem
+                if (selectedItem != null) {
+                    FX.eventbus.fire(SceneTargeted(selectedItem))
+                }
+            }
+            model.selectedItem.onChange { newSelection ->
+                selectionModel.select(root.children.find { it.value?.id == newSelection?.id })
+            }
+            contextMenu = sceneContextMenu
+            cellFragment(scope, SceneListItem::class)
+            root.children.bind(model.scenes) { TreeItem(it) }
+        }
+    }
+
+    init {
+        titleProperty.bind(model.toolTitle)
+
+        viewListener.getValidState()
+    }
+
+    class Styles : Stylesheet() {
+        companion object {
+            val draggingCell by cssclass()
+
+            init {
+                importStylesheet(Styles::class)
+            }
+        }
+
+        init {
+            draggingCell {
+                backgroundColor += Color.GREY
+                textFill = Color.GREY
+                effect = InnerShadow(BlurType.THREE_PASS_BOX, Color.BLACK, 2.0, 0.0, 0.0, 1.0)
+            }
+        }
+    }
+
+}

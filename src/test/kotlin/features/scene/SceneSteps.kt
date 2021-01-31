@@ -17,7 +17,7 @@ import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert.Companion.assertThat
 import com.soyle.stories.entities.*
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import javafx.scene.input.KeyCode
@@ -40,7 +40,7 @@ class SceneSteps : En {
     private val sceneDriver: SceneDriver
         get() = SceneDriver.invoke(soyleStories.getAnyOpenWorkbenchOrError())
 
-    private val sceneListTool: SceneList
+    private val sceneListView: SceneListView
         get() = soyleStories.getAnyOpenWorkbenchOrError()
             .givenSceneListToolHasBeenOpened()
 
@@ -62,7 +62,7 @@ class SceneSteps : En {
         Then("a scene named {string} should have been created") { sceneName: String ->
             SceneAssertions.assertSceneExistsWithName(sceneName)
 
-            assertThat(sceneListTool) {
+            assertThat(sceneListView) {
                 hasSceneNamed(sceneName)
             }
         }
@@ -70,7 +70,7 @@ class SceneSteps : En {
 
     private fun renameSceneSteps() {
         When("I rename the {scene} to {string}") { scene: Scene, newName: String ->
-            sceneListTool.renameSceneTo(scene, newName)
+            sceneListView.renameSceneTo(scene, newName)
         }
         // thens
         Then(
@@ -79,7 +79,7 @@ class SceneSteps : En {
             val (scene) = sceneDriver.getScenesAtOnePointNamed(originalName)
             assertEquals(newName, scene.name.value)
 
-            assertThat(sceneListTool) {
+            assertThat(sceneListView) {
                 doesNotHaveSceneNamed(originalName)
                 hasSceneNamed(newName)
             }
@@ -93,7 +93,7 @@ class SceneSteps : En {
         }
         // whens
         When("I want to delete the {scene}") { scene: Scene ->
-            sceneListTool.deleteScene(scene)
+            sceneListView.deleteScene(scene)
         }
         When("I confirm I want to delete the {scene}") { scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
@@ -101,7 +101,7 @@ class SceneSteps : En {
                 .confirmDelete()
         }
         When("I delete the {scene}") { scene: Scene ->
-            sceneListTool.openDeleteSceneDialog(scene)
+            sceneListView.openDeleteSceneDialog(scene)
             soyleStories.getAnyOpenWorkbenchOrError()
                 .getOpenDeleteSceneDialog(scene)
                 ?.confirmDelete()
@@ -167,14 +167,14 @@ class SceneSteps : En {
         Given(
             "I have requested which arc sections for the {character} can be covered in the {scene}"
         ) { character: Character, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
                 .givenPositionOnArcInputForCharacterHasBeenSelected(character)
         }
         Given(
             "I have requested which arc sections for the {character} can be uncovered in the {scene}"
         ) { character: Character, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
                 .givenPositionOnArcInputForCharacterHasBeenSelected(character)
         }
@@ -183,21 +183,21 @@ class SceneSteps : En {
         When(
             "I request which arc sections for the {character} can be covered in the {scene}"
         ) { character: Character, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
                 .selectPositionOnArcInputForCharacter(character)
         }
         When(
             "I request which arc sections for the {character} can be uncovered in the {scene}"
         ) { character: Character, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
                 .selectPositionOnArcInputForCharacter(character)
         }
         When(
             "I cover the {string} section from the {character}'s {string} character arc in the {scene}"
         ) { sectionName: String, character: Character, arcName: String, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
                 .givenPositionOnArcInputForCharacterHasBeenSelected(character)
                 .coverSectionInArc(arcName, sectionName)
@@ -205,7 +205,7 @@ class SceneSteps : En {
         When(
             "I uncover the {string} section from the {character}'s {string} character arc in the {scene}"
         ) { sectionName: String, character: Character, arcName: String, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
                 .givenPositionOnArcInputForCharacterHasBeenSelected(character)
                 .uncoverSectionInArc(arcName, sectionName)
@@ -213,7 +213,7 @@ class SceneSteps : En {
         When(
             "I create a new {string} arc section in the {character}'s {string} arc to cover in the {scene}"
         ) { sectionName: String, character: Character, arcName: String, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
                 .givenPositionOnArcInputForCharacterHasBeenSelected(character)
                 .givenCreateNewSectionInArcSelected(arcName)
@@ -226,7 +226,7 @@ class SceneSteps : En {
         ) { scene: Scene, character: Character ->
             assertTrue(scene.getMotivationForCharacter(character.id)!!.isInherited())
 
-            val sceneDetailsTool = sceneListTool
+            val sceneDetailsTool = sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
             SceneDetailsAssertions.assertThat(sceneDetailsTool) {
                 andCharacter(character.id.uuid.toString()) {
@@ -239,7 +239,7 @@ class SceneSteps : En {
         ) { scene: Scene, expectedMotivation: String, character: Character ->
             assertTrue(scene.getMotivationForCharacter(character.id)!!.isInherited())
 
-            val sceneDetailsTool = sceneListTool
+            val sceneDetailsTool = sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
 
             SceneDetailsAssertions.assertThat(sceneDetailsTool) {
@@ -251,7 +251,7 @@ class SceneSteps : En {
         Then(
             "all of the {character}'s arc sections that are covered in the {scene} should indicate they have been covered"
         ) { character: Character, scene: Scene ->
-            val sceneDetails = sceneListTool
+            val sceneDetails = sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
             SceneDetailsAssertions.assertThat(sceneDetails) {
                 andCharacter(character.id.uuid.toString()) {
@@ -265,7 +265,7 @@ class SceneSteps : En {
             "all of the {character}'s arc sections that have not yet been covered in the {scene} should be listed"
         ) { character: Character, scene: Scene ->
             val arcs = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterArcsForCharacter(character)
-            val sceneDetails = sceneListTool
+            val sceneDetails = sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
             SceneDetailsAssertions.assertThat(sceneDetails) {
                 andCharacter(character.id.uuid.toString()) {
@@ -281,7 +281,7 @@ class SceneSteps : En {
             "all of the {character}'s arc sections that have been covered in the {scene} should be listed"
         ) { character: Character, scene: Scene ->
             val arcs = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterArcsForCharacter(character)
-            val sceneDetails = sceneListTool
+            val sceneDetails = sceneListView
                 .givenSceneDetailsToolHasBeenOpened(scene)
             SceneDetailsAssertions.assertThat(sceneDetails) {
                 andCharacter(character.id.uuid.toString()) {
@@ -502,7 +502,7 @@ class SceneSteps : En {
         When(
             "I create a character named {string} to replace the {string} mention in the {scene}'s prose"
         ) { newCharacterName: String, mentionText: String, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneEditorToolHasBeenOpened(scene)
                 .givenMentionIsBeingInvestigated(mentionText)
                 .givenReplacingInvestigatedMentionWithNewCharacter()
@@ -511,7 +511,7 @@ class SceneSteps : En {
         When(
             "I create a location named {string} to replace the {string} mention in the {scene}'s prose"
         ) { newLocationName: String, mentionText: String, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneEditorToolHasBeenOpened(scene)
                 .givenMentionIsBeingInvestigated(mentionText)
                 .givenReplacingInvestigatedMentionWithNewLocation()
@@ -864,7 +864,7 @@ class SceneSteps : En {
         Then(
             "the suggested elements with which to replace {string} in the {scene}'s prose should be as follows"
         ) { mentionText: String, scene: Scene, dataTable: DataTable ->
-            val sceneEditor = sceneListTool
+            val sceneEditor = sceneListView
                 .givenSceneEditorToolHasBeenOpened(scene)
                 .givenMentionIsBeingInvestigated(mentionText)
             SceneEditorAssertions.assertThat(sceneEditor) {

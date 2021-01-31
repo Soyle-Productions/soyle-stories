@@ -10,14 +10,13 @@ import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.mentioned
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import org.junit.jupiter.api.Assertions.assertTrue
 
 class `Scene Prose Steps` : En {
 
-    private val sceneListTool: SceneList
+    private val sceneListView: SceneListView
         get() = soyleStories.getAnyOpenWorkbenchOrError()
             .givenSceneListToolHasBeenOpened()
 
@@ -44,7 +43,7 @@ class `Scene Prose Steps` : En {
         When(
             "I create a symbol named {string} and a theme named {string} to replace the {string} mention in the {scene}'s prose"
         ) { newSymbolName: String, newThemeName: String, mentionText: String, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneEditorToolHasBeenOpened(scene)
                 .givenMentionIsBeingInvestigated(mentionText)
                 .givenReplacingInvestigatedMentionWithNewSymbol()
@@ -53,7 +52,7 @@ class `Scene Prose Steps` : En {
         When(
             "I create symbol named {string} in the {theme} to replace the {string} mention in the {scene}'s prose"
         ) { newSymbolName: String, theme: Theme, mentionText: String, scene: Scene ->
-            sceneListTool
+            sceneListView
                 .givenSceneEditorToolHasBeenOpened(scene)
                 .givenMentionIsBeingInvestigated(mentionText)
                 .givenReplacingInvestigatedMentionWithNewSymbol()

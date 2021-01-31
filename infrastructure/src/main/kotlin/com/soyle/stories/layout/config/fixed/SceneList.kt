@@ -22,7 +22,7 @@ object SceneList : ToolConfig<SceneList>, FixedTool() {
 
 	override fun getTabConfig(tool: ToolViewModel, type: SceneList): ToolTabConfig = object : ToolTabConfig {
 		override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-			val list = projectScope.get<com.soyle.stories.scene.sceneList.SceneList>()
+			val list = projectScope.get<com.soyle.stories.scene.sceneList.SceneListView>()
 			return tabPane.tab(list)
 		}
 	}
