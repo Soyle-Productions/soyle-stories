@@ -9,7 +9,7 @@ interface ListSymbolsInScene {
 
     class ResponseModel(symbols: List<SymbolInScene>) : List<SymbolInScene> by symbols
 
-    class SymbolInScene(val themeId: Theme.Id, val themeName: String, val symbolId: Symbol.Id, val symbolName: String)
+    class SymbolInScene(val themeId: Theme.Id, val themeName: String, val symbolId: Symbol.Id, val symbolName: String, val isPinned: Boolean)
 
     interface OutputPort {
         suspend fun receiveSymbolsInSceneList(response: ResponseModel)

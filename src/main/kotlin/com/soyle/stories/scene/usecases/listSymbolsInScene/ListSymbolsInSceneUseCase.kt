@@ -23,7 +23,8 @@ class ListSymbolsInSceneUseCase(
                 theme.id,
                 theme.name,
                 it.symbolId,
-                it.symbolName
+                it.symbolName,
+                it.isPinned
             )
         }
         output.receiveSymbolsInSceneList(ListSymbolsInScene.ResponseModel(symbolsInScene))

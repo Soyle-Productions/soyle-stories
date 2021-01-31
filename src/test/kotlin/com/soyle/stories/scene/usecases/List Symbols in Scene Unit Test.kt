@@ -72,10 +72,17 @@ class `List Symbols in Scene Unit Test` {
 
                 private val symbols = List(8) { makeSymbol() } + symbol
                 private val themes = List(5) { makeTheme(symbols = listOf(symbols[it], makeSymbol())) } + makeTheme(symbols = symbols.takeLast(4))
+                private val pinnedSymbols = symbols.withIndex().partition { it.index % 2 == 0 }.first.map { it.value }
+                private val unpinnedSymbols = symbols.withIndex().partition { it.index % 2 == 0 }.second.map { it.value }
 
                 init {
-                    symbols.fold(scene) { nextScene, symbol -> nextScene.withSymbolTracked(makeTheme(symbols = listOf(symbol)), symbol).scene }
-                        .let(sceneRepository::givenScene)
+                    pinnedSymbols.fold(scene) { nextScene, pinnedSymbol ->
+                        nextScene.withSymbolTracked(makeTheme(symbols = listOf(pinnedSymbol)), pinnedSymbol, true).scene
+                    }.let {
+                        unpinnedSymbols.fold(it) { nextScene, unpinnedSymbol ->
+                            nextScene.withSymbolTracked(makeTheme(symbols = listOf(unpinnedSymbol)), unpinnedSymbol).scene
+                        }
+                    }.let(sceneRepository::givenScene)
                     themes.forEach(themeRepository::givenTheme)
                 }
 
@@ -88,6 +95,9 @@ class `List Symbols in Scene Unit Test` {
                         map { it.themeId }.toSet().mustEqual(themes.map { it.id }.toSet())
                         forEach { symbolInScene ->
                             symbolInScene.symbolName.mustEqual(symbols.find { it.id == symbolInScene.symbolId }!!.name)
+                        }
+                        forEach { symbolInScene ->
+                            symbolInScene.isPinned.mustEqual(pinnedSymbols.any { it.id == symbolInScene.symbolId })
                         }
                     }
                 }
