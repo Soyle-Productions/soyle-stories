@@ -29,7 +29,6 @@ class SynchronizeTrackedSymbolsWithProseUseCase(
                 is NoUpdate -> {
                 }
                 is Single -> events.add(update.event)
-                is Multi<*> -> events.addAll(update.events)
             }
             update.scene
         }
@@ -40,7 +39,6 @@ class SynchronizeTrackedSymbolsWithProseUseCase(
                     is NoUpdate -> {
                     }
                     is Single -> events.add(update.event)
-                    is Multi<*> -> events.addAll(update.events)
                 }
                 update.scene
             } else nextScene

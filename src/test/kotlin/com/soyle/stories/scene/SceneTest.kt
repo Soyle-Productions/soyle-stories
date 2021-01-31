@@ -107,13 +107,119 @@ class SceneTest {
         }
 
         @Test
-        fun `can manually track a symbol in a scene`() {
+        fun `cannot add symbol more than once`() {
             val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(theme, symbol, true)
-            update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
-            update.scene.trackedSymbols.single().isPinned.mustEqual(true)
+                .withSymbolTracked(theme, symbol).scene
+                .withSymbolTracked(theme, symbol)
+            update.scene.trackedSymbols.size.mustEqual(1)
+            update as NoUpdate
+        }
+
+        @Test
+        fun `cannot create scene with same symbol more than once`() {
+            assertThrows<IllegalStateException> {
+                Scene(Scene.Id(), Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), setOf(), Prose.Id(), listOf(), symbols = List(2) {
+                    Scene.TrackedSymbol(symbol.id, symbol.name + it, theme.id)
+                })
+            }
+        }
+
+        @Nested
+        inner class `Pin symbol to scene`
+        {
+
+            @Test
+            fun `can manually track a symbol in a scene`() {
+                val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                    .withSymbolTracked(theme, symbol, true)
+                update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
+                update.scene.trackedSymbols.single().isPinned.mustEqual(true)
+                update as Single
+                update.event as SymbolTrackedInScene
+            }
+
+            @Test
+            fun `symbol must be tracked in scene to pin`() {
+                val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                assertThrows<SceneDoesNotTrackSymbol> {
+                    scene.withSymbolPinned(symbol.id)
+                }
+            }
+
+            @Test
+            fun `can update a tracked symbol to pin the symbol`() {
+                val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                    .withSymbolTracked(theme, symbol).scene
+                    .withSymbolPinned(symbol.id)
+                update.scene.trackedSymbols.single().isPinned.mustEqual(true)
+                update as Single
+            }
+
+            @Test
+            fun `no update if already pinned`() {
+                val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                    .withSymbolTracked(theme, symbol, true).scene
+                    .withSymbolPinned(symbol.id)
+                update.scene.trackedSymbols.single().isPinned.mustEqual(true)
+                update as NoUpdate
+            }
+
+            @Test
+            fun `symbol must be tracked in scene to unpin`() {
+                val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                assertThrows<SceneDoesNotTrackSymbol> {
+                    scene.withSymbolUnpinned(symbol.id)
+                }
+            }
+
+            @Test
+            fun `can update a tracked symbol to unpin the symbol`() {
+                val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                    .withSymbolTracked(theme, symbol, true).scene
+                    .withSymbolUnpinned(symbol.id)
+                update.scene.trackedSymbols.single().isPinned.mustEqual(false)
+                update as Single
+            }
+
+            @Test
+            fun `no update if already unpinned`() {
+                val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                    .withSymbolTracked(theme, symbol).scene
+                    .withSymbolUnpinned(symbol.id)
+                update.scene.trackedSymbols.single().isPinned.mustEqual(false)
+                update as NoUpdate
+            }
+
+        }
+
+        @Test
+        fun `symbol must be tracked in scene to rename`() {
+            val scene = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+            assertThrows<SceneDoesNotTrackSymbol> {
+                scene.withSymbolRenamed(symbol.id, "whatever")
+            }
+        }
+
+        @Test
+        fun `can update tracked symbol name`() {
+            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(theme, symbol).scene
+                .withSymbolRenamed(symbol.id, "New Symbol Name")
+            update.scene.trackedSymbols.size.mustEqual(1)
+            update.scene.trackedSymbols.single().symbolName.mustEqual("New Symbol Name")
             update as Single
-            update.event as SymbolTrackedInScene
+            with (update.event) {
+                trackedSymbol.symbolName.mustEqual("New Symbol Name")
+            }
+        }
+
+        @Test
+        fun `no update if name is equal`() {
+            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
+                .withSymbolTracked(theme, symbol).scene
+                .withSymbolRenamed(symbol.id, symbol.name)
+            update.scene.trackedSymbols.single().symbolName.mustEqual(symbol.name)
+            update as NoUpdate
         }
 
         @Test
@@ -138,37 +244,6 @@ class SceneTest {
             scene.trackedSymbols.forEachIndexed { index, trackedSymbol ->
                 trackedSymbol.symbolId.mustEqual(symbols[index].id)
                 trackedSymbol.symbolName.mustEqual(symbols[index].name)
-            }
-        }
-
-        @Test
-        fun `cannot add symbol more than once`() {
-            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(theme, symbol).scene
-                .withSymbolTracked(theme, symbol)
-            update.scene.trackedSymbols.size.mustEqual(1)
-            update as NoUpdate
-        }
-
-        @Test
-        fun `cannot create scene with same symbol more than once`() {
-            assertThrows<IllegalStateException> {
-                Scene(Scene.Id(), Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), setOf(), Prose.Id(), listOf(), symbols = List(2) {
-                    Scene.TrackedSymbol(symbol.id, symbol.name + it, theme.id)
-                })
-            }
-        }
-
-        @Test
-        fun `adding same symbol with new name should update name`() {
-            val update = Scene(Project.Id(), NonBlankString.create(str())!!, StoryEvent.Id(), Prose.Id())
-                .withSymbolTracked(theme, symbol).scene
-                .withSymbolTracked(theme, symbol.withName("New Symbol Name"))
-            update.scene.trackedSymbols.size.mustEqual(1)
-            update.scene.trackedSymbols.single().symbolName.mustEqual("New Symbol Name")
-            update as Single
-            with (update.event as TrackedSymbolRenamed) {
-                trackedSymbol.symbolName.mustEqual("New Symbol Name")
             }
         }
 

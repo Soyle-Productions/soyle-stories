@@ -5,6 +5,7 @@ import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.scene.CharacterNotInScene
 import com.soyle.stories.scene.SceneAlreadyContainsCharacter
+import com.soyle.stories.scene.SceneDoesNotTrackSymbol
 import java.util.*
 
 class Scene private constructor(
@@ -143,21 +144,45 @@ class Scene private constructor(
         )
     }
 
-    fun withSymbolTracked(theme: Theme, symbol: Symbol, pin: Boolean = false): SceneUpdate<SceneEvent> {
+    fun withSymbolTracked(theme: Theme, symbol: Symbol, pin: Boolean = false): SceneUpdate<SymbolTrackedInScene> {
         theme.symbols.find { it.id == symbol.id } ?: throw IllegalArgumentException("Symbol ${symbol.name} is not contained within the ${theme.name} theme")
         val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name, theme.id, pin)
-        return if (trackedSymbols.isSymbolTracked(symbol.id)) {
-            if (trackedSymbols.getSymbolById(symbol.id)!!.symbolName == symbol.name) NoUpdate(this)
-           else Single(copy(symbols = trackedSymbols.withoutSymbol(symbol.id) + newTrackedSymbol), TrackedSymbolRenamed(id, newTrackedSymbol))
-        } else {
+        return if (trackedSymbols.isSymbolTracked(symbol.id)) noUpdate()
+        else {
             Single(copy(symbols = symbols + newTrackedSymbol), SymbolTrackedInScene(id, theme.name, newTrackedSymbol))
         }
     }
 
+    fun withSymbolRenamed(symbolId: Symbol.Id, newName: String): SceneUpdate<TrackedSymbolRenamed>
+    {
+        val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
+        if (existingSymbol.symbolName == newName) return noUpdate()
+        val trackedSymbol = trackedSymbols.getSymbolById(symbolId)!!.copy(symbolName = newName)
+        return Single(copy(symbols = symbols + trackedSymbol), TrackedSymbolRenamed(id, trackedSymbol))
+    }
+
+    fun withSymbolPinned(symbolId: Symbol.Id): SceneUpdate<SymbolPinnedToScene>
+    {
+        val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
+        if (existingSymbol.isPinned) return noUpdate()
+        val trackedSymbol = existingSymbol.copy(isPinned = true)
+        return Single(copy(symbols = symbols + trackedSymbol), SymbolPinnedToScene(id, trackedSymbol))
+    }
+
+    fun withSymbolUnpinned(symbolId: Symbol.Id): SceneUpdate<SymbolUnpinnedFromScene>
+    {
+        val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
+        if (! existingSymbol.isPinned) return noUpdate()
+        val trackedSymbol = existingSymbol.copy(isPinned = false)
+        return Single(copy(symbols = symbols + trackedSymbol), SymbolUnpinnedFromScene(id, trackedSymbol))
+    }
+
     fun withoutSymbolTracked(symbolId: Symbol.Id): SceneUpdate<TrackedSymbolRemoved> {
-        val trackedSymbol = trackedSymbols.getSymbolById(symbolId) ?: return NoUpdate(this)
+        val trackedSymbol = trackedSymbols.getSymbolById(symbolId) ?: return noUpdate()
         return Single(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
     }
+
+    fun noUpdate() = NoUpdate(this)
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "Scene($uuid)"
@@ -174,6 +199,7 @@ class Scene private constructor(
 
         fun isSymbolTracked(symbolId: Symbol.Id): Boolean = symbolsById.containsKey(symbolId)
         fun getSymbolById(symbolId: Symbol.Id) = symbolsById[symbolId]
+        fun getSymbolByIdOrError(symbolId: Symbol.Id) = symbolsById.getOrElse(symbolId) { throw SceneDoesNotTrackSymbol(id, symbolId) }
         internal fun withoutSymbol(symbolId: Symbol.Id): Collection<TrackedSymbol> = symbolsById.minus(symbolId).values
     }
 
@@ -188,14 +214,13 @@ class NoUpdate(override val scene: Scene) : SceneUpdate<Nothing>()
 class Single<out T : SceneEvent>(override val scene: Scene, val event: T) : SceneUpdate<T>() {
     operator fun component2() = event
 }
-class Multi<T : SceneEvent>(override val scene: Scene, val events: List<T>) : SceneUpdate<List<T>>() {
-    operator fun component2() = events
-}
 
 abstract class SceneEvent
 {
     abstract val sceneId: Scene.Id
 }
 data class SymbolTrackedInScene(override val sceneId: Scene.Id, val themeName: String, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
+data class SymbolPinnedToScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
+data class SymbolUnpinnedFromScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRenamed(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRemoved(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()

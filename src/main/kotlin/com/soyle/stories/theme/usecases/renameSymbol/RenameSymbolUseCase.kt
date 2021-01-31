@@ -24,7 +24,7 @@ class RenameSymbolUseCase(
         if (symbol.name == name) throw SymbolAlreadyHasName(symbolId, name)
         val renamedSymbol = symbol.withName(name)
 
-        val sceneUpdates = updatedTrackedSymbolsInScenes(theme, renamedSymbol)
+        val sceneUpdates = updatedTrackedSymbolsInScenes(renamedSymbol)
         val proseUpdates = replaceProseMentionText(theme.id, symbol, name)
 
         themeRepository.updateTheme(theme.withoutSymbol(symbol.id).withSymbol(renamedSymbol))
@@ -38,11 +38,10 @@ class RenameSymbolUseCase(
     }
 
     private suspend fun updatedTrackedSymbolsInScenes(
-        containingTheme: Theme,
         renamedSymbol: Symbol
     ): List<SceneUpdate<SceneEvent>> {
         val sceneUpdates = sceneRepository.getScenesTrackingSymbol(renamedSymbol.id)
-            .map { it.withSymbolTracked(containingTheme, renamedSymbol) }
+            .map { it.withSymbolRenamed(renamedSymbol.id, renamedSymbol.name) }
         if (sceneUpdates.isNotEmpty()) {
             sceneRepository.updateScenes(sceneUpdates.map { it.scene })
         }
