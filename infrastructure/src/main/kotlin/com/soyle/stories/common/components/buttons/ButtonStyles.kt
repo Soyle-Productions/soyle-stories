@@ -5,13 +5,13 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import tornadofx.*
 
-class Styles : Stylesheet() {
+class ButtonStyles : Stylesheet() {
     companion object {
         val primaryButton by cssclass()
         val inviteButton by cssclass()
 
         init {
-            importStylesheet<Styles>()
+            importStylesheet<ButtonStyles>()
         }
     }
     init {

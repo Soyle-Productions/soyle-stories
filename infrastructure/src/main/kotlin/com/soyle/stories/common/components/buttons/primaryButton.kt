@@ -9,12 +9,12 @@ import tornadofx.button
 
 fun EventTarget.primaryButton(text: String = "", graphic: Node? = null, op: Button.() -> Unit = {}) =
     button(text, graphic) {
-        addClass(Styles.primaryButton)
+        addClass(ButtonStyles.primaryButton)
         op()
     }
 
 fun EventTarget.primaryButton(text: ObservableValue<String>, graphic: Node? = null, op: Button.() -> Unit = {}) =
     button(text, graphic) {
-        addClass(Styles.primaryButton)
+        addClass(ButtonStyles.primaryButton)
         op()
     }

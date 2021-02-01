@@ -34,6 +34,9 @@ fun getCreateSymbolDialog(): CreateSymbolDialog? =
 fun SymbolsInSceneView.givenCreatingNewSymbolForTheme(theme: Theme): CreateSymbolDialog =
     getCreateSymbolDialog() ?: openCreateSymbolDialogForTheme(theme).run { getCreateSymbolDialogOrError() }
 
+fun SymbolsInSceneView.givenCreatingNewThemeAndSymbol(): CreateSymbolDialog =
+    getCreateSymbolDialog() ?: openCreateSymbolDialog().run { getCreateSymbolDialogOrError() }
+
 fun SymbolsInSceneView.openCreateSymbolDialogForTheme(theme: Theme)
 {
     drive {
@@ -41,6 +44,15 @@ fun SymbolsInSceneView.openCreateSymbolDialogForTheme(theme: Theme)
         if (! pinSymbolButton.isShowing) pinSymbolButton.fire()
         val themeItem = pinSymbolButton.themeItem(theme.id)!!
         themeItem.createSymbolOption.fire()
+    }
+}
+
+fun SymbolsInSceneView.openCreateSymbolDialog()
+{
+    drive {
+        val pinSymbolButton = pinSymbolButton!!
+        if (! pinSymbolButton.isShowing) pinSymbolButton.fire()
+        pinSymbolButton.createThemeAndSymbolOption.fire()
     }
 }
 

@@ -2,6 +2,7 @@ package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.common.components.buttons.inviteButton
 import com.soyle.stories.common.components.buttons.primaryButton
+import com.soyle.stories.common.components.text.mainHeader
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.SceneTargeted
@@ -16,7 +17,6 @@ import javafx.scene.effect.DropShadow
 import javafx.scene.effect.InnerShadow
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
-import javafx.scene.text.FontWeight
 import javafx.scene.text.TextAlignment
 import tornadofx.*
 
@@ -53,12 +53,8 @@ class SceneListView : View() {
         imageview("com/soyle/stories/scene/Scenes-Icon.png") {
             alignment = Pos.CENTER
         }
-        label("Scenes") {
-            style {
-                fontSize = 24.pt
-                fontWeight = FontWeight.BOLD
-                textAlignment = TextAlignment.CENTER
-            }
+        mainHeader("Scenes") {
+            textAlignment = TextAlignment.CENTER
         }
         label("Scenes are where your story happens.  Create your first scene by clicking the button below and get started!") {
             textAlignment = TextAlignment.CENTER

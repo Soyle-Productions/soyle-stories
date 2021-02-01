@@ -1,15 +1,18 @@
 package com.soyle.stories.scene.sceneSymbols
 
 import com.soyle.stories.common.components.ComponentsStyles
-import com.soyle.stories.common.components.Styles.Companion.fieldLabel
-import com.soyle.stories.common.components.buttons.Styles.Companion.primaryButton
+import com.soyle.stories.common.components.buttons.ButtonStyles.Companion.inviteButton
+import com.soyle.stories.common.components.buttons.ButtonStyles.Companion.primaryButton
 import com.soyle.stories.common.components.fieldLabel
+import com.soyle.stories.common.components.text.mainHeader
 import com.soyle.stories.di.resolve
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.proseEditor.ProseEditorView
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.hasSymbols
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.symbolTracker
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
 import javafx.scene.Node
@@ -62,7 +65,7 @@ class SymbolTracker : Fragment() {
                 this.isSmooth = true
                 fitHeight = 260.0
             }
-            label("Track Symbols in Scene") { addClass(fieldLabel) }
+            mainHeader("Track Symbols in Scene")
             textflow {
                 textAlignment = TextAlignment.CENTER
                 text("When you ")
@@ -70,9 +73,14 @@ class SymbolTracker : Fragment() {
                     addClass(ProseEditorView.Styles.mention)
                     style { fontWeight = FontWeight.BOLD }
                 })
-                text(" a symbol in the scene, it will automatically be added here.")
+                text(" " + """
+                    a symbol in the scene, it will automatically be added here.  However, you can also choose to pin a 
+                    symbol to this scene by clicking the button below.  Pinned symbols will not be automatically 
+                    removed if they are no longer mentioned within the scene.
+                """.trimIndent().filterNot { it == '\n' })
             }
             pinSymbolMenuButton {
+                addClass(inviteButton)
                 alignment = Pos.CENTER
             }
         }
@@ -80,13 +88,10 @@ class SymbolTracker : Fragment() {
 
     private fun Parent.hasSymbolsState(themes: List<SymbolsInSceneViewModel.ThemeInScene>): Node {
         return vbox {
-
             hbox {
-                label("Tracked Symbols") { addClass(fieldLabel) }
+                mainHeader("Tracked Symbols")
                 spacer()
-                pinSymbolMenuButton {
-
-                }
+                pinSymbolMenuButton {}
             }
             vbox {
                 addClass("symbol-list")
@@ -118,7 +123,18 @@ class SymbolTracker : Fragment() {
     }
 
     private fun availableSymbolOptions(availableSymbols: List<SymbolsInSceneViewModel.AvailableTheme>?): List<MenuItem> {
-        val createNewSymbolAndThemeItem = MenuItem("Create New Symbol and Theme")
+        val createNewSymbolAndThemeItem = MenuItem("Create New Symbol and Theme").apply {
+            action {
+                CreateSymbolDialog(
+                    scope as ProjectScope,
+                    null,
+                    null,
+                    currentWindow
+                ) {
+                    pinSymbol(Symbol.Id(it.symbolId))
+                }
+            }
+        }
         return when {
             availableSymbols == null -> listOf(MenuItem("Loading ...").apply {
                 parentPopupProperty().onChange {
@@ -126,8 +142,8 @@ class SymbolTracker : Fragment() {
                 }
             })
             availableSymbols.isEmpty() -> listOf(
+                createNewSymbolAndThemeItem,
                 MenuItem("No Symbols Left to Track").apply { isDisable = true },
-                createNewSymbolAndThemeItem
             )
             else -> listOf(
                 createNewSymbolAndThemeItem
@@ -138,7 +154,21 @@ class SymbolTracker : Fragment() {
     private fun availableThemeItem(availableTheme: SymbolsInSceneViewModel.AvailableTheme): MenuItem {
         return Menu(availableTheme.themeName).apply {
             id = availableTheme.themeId.toString()
-            item("Create New Symbol")
+            item("Create New Symbol") {
+                action {
+                    CreateSymbolDialog(
+                        scope as ProjectScope,
+                        availableTheme.themeId.uuid.toString(),
+                        null,
+                        currentWindow
+                    ) {
+                        pinSymbol(Symbol.Id(it.symbolId))
+                    }
+                }
+            }
+            if (availableTheme.symbolsInScene.isEmpty()) {
+                item("No Symbols Left to Track") { isDisable = true }
+            }
             availableTheme.symbolsInScene.forEach {
                 item(it.symbolName) {
                     action { pinSymbol(it.symbolId) }

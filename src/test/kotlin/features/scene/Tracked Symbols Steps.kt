@@ -3,8 +3,10 @@ package com.soyle.stories.desktop.config.features.scene
 
 import com.soyle.stories.desktop.config.drivers.scene.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
+import com.soyle.stories.desktop.config.drivers.theme.createSymbolAndThemeNamed
 import com.soyle.stories.desktop.config.drivers.theme.createSymbolWithName
 import com.soyle.stories.desktop.config.drivers.theme.givenCreatingNewSymbolForTheme
+import com.soyle.stories.desktop.config.drivers.theme.givenCreatingNewThemeAndSymbol
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.scene.sceneSymbols.SymbolsInSceneAssertions
 import com.soyle.stories.entities.Scene
@@ -37,15 +39,6 @@ class `Tracked Symbols Steps` : En {
 
     private fun whens() {
         When(
-            "I create a new symbol named {string} in the {theme} to be pinned in the {scene}"
-        ) { symbolName: String, theme: Theme, scene: Scene ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            workbench.givenSymbolsInSceneToolHasBeenOpened()
-                .givenFocusedOn(scene)
-                .givenCreatingNewSymbolForTheme(theme)
-                .createSymbolWithName(symbolName)
-        }
-        When(
             "I pin the {string} symbol from the {theme} to the {scene}"
         ) { symbolName: String, theme: Theme, scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
@@ -60,6 +53,24 @@ class `Tracked Symbols Steps` : En {
             workbench.givenSymbolsInSceneToolHasBeenOpened()
                 .givenFocusedOn(scene)
                 .unpinSymbol(theme, symbolName)
+        }
+        When(
+            "I create a new symbol named {string} in the {theme} to be pinned in the {scene}"
+        ) { symbolName: String, theme: Theme, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSymbolsInSceneToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .givenCreatingNewSymbolForTheme(theme)
+                .createSymbolWithName(symbolName)
+        }
+        When(
+            "I create a new theme named {string} and a new symbol named {string} to be pinned in the {scene}"
+        ) { themeName: String, symbolName: String, scene: Scene ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenSymbolsInSceneToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .givenCreatingNewThemeAndSymbol()
+                .createSymbolAndThemeNamed(themeName, symbolName)
         }
     }
 

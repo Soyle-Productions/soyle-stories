@@ -35,6 +35,9 @@ class SymbolsInSceneDriver (private val symbolsInSceneView: SymbolsInSceneView) 
     val Menu.createSymbolOption: MenuItem
         get() = items.find { it.text == "Create New Symbol" }!!
 
+    val MenuButton.createThemeAndSymbolOption: MenuItem
+        get() = items.find { it.text == "Create New Symbol and Theme" }!!
+
     fun Menu.symbolItem(symbolName: String): MenuItem?
     {
         return items.find { it.text == symbolName }

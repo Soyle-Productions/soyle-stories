@@ -9,12 +9,12 @@ import tornadofx.addClass
 
 fun EventTarget.inviteButton(text: String = "", graphic: Node? = null, op: Button.() -> Unit = {}) =
     primaryButton(text, graphic) {
-        addClass(Styles.inviteButton)
+        addClass(ButtonStyles.inviteButton)
         op()
     }
 
 fun EventTarget.inviteButton(text: ObservableValue<String>, graphic: Node? = null, op: Button.() -> Unit = {}) =
     primaryButton(text, graphic) {
-        addClass(Styles.inviteButton)
+        addClass(ButtonStyles.inviteButton)
         op()
     }
