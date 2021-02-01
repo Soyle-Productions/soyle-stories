@@ -1,16 +1,20 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.SymbolTrackedInScene
-import com.soyle.stories.entities.TrackedSymbolRemoved
-import com.soyle.stories.entities.TrackedSymbolRenamed
+import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneController
+import com.soyle.stories.scene.trackSymbolInScene.ListAvailableSymbolsToTrackInSceneController
+import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
+import com.soyle.stories.scene.trackSymbolInScene.UnpinSymbolFromSceneController
 import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 
 class SymbolsInSceneController(
     view: View.Nullable<SymbolsInSceneViewModel>,
-    private val listSymbolsInSceneController: ListSymbolsInSceneController
+    private val listSymbolsInSceneController: ListSymbolsInSceneController,
+    private val listAvailableSymbolsToTrackInSceneController: ListAvailableSymbolsToTrackInSceneController,
+    private val pinSymbolToSceneController: PinSymbolToSceneController,
+    private val unpinSymbolFromSceneController: UnpinSymbolFromSceneController
 ) : SymbolsInSceneViewListener,
     SymbolsInSceneEventReceiver
 {
@@ -47,11 +51,35 @@ class SymbolsInSceneController(
         }
     }
 
+    override suspend fun receiveSymbolPinnedToScene(symbolPinnedToScene: SymbolPinnedToScene) {
+        if (presenter.view.viewModel?.targetScene?.id == symbolPinnedToScene.sceneId.uuid.toString()) {
+            presenter.receiveSymbolPinnedToScene(symbolPinnedToScene)
+        }
+    }
+
+    override suspend fun receiveSymbolUnpinnedFromScene(symbolUnpinnedFromScene: SymbolUnpinnedFromScene) {
+        if (presenter.view.viewModel?.targetScene?.id == symbolUnpinnedFromScene.sceneId.uuid.toString()) {
+            presenter.receiveSymbolUnpinnedFromScene(symbolUnpinnedFromScene)
+        }
+    }
+
     override fun openSceneListTool() {
     }
 
     override fun getSymbolsInScene(sceneId: Scene.Id) {
         listSymbolsInSceneController.listSymbolsInScene(sceneId, presenter)
+    }
+
+    override fun listAvailableSymbolsToTrack(sceneId: Scene.Id) {
+        listAvailableSymbolsToTrackInSceneController.listAvailableSymbolsToTrackInScene(sceneId, presenter)
+    }
+
+    override fun pinSymbol(sceneId: Scene.Id, symbolId: Symbol.Id) {
+        pinSymbolToSceneController.pinSymbolToScene(sceneId, symbolId)
+    }
+
+    override fun unpinSymbol(sceneId: Scene.Id, symbolId: Symbol.Id) {
+        unpinSymbolFromSceneController.unpinSymbolFromScene(sceneId, symbolId)
     }
 
 }

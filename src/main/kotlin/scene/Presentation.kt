@@ -50,9 +50,7 @@ import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneController
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneViewListener
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
-import com.soyle.stories.scene.trackSymbolInScene.SymbolsTrackedInSceneNotifier
-import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRemovedNotifier
-import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRenamedNotifier
+import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
 
 object Presentation {
@@ -204,12 +202,17 @@ object Presentation {
         provide<SymbolsInSceneViewListener> {
             SymbolsInSceneController(
                 get<SymbolsInSceneState>(),
+                get(),
+                get(),
+                get(),
                 get()
             ).also {
                 it listensTo get<SymbolsTrackedInSceneNotifier>()
                 it listensTo get<TrackedSymbolsRenamedNotifier>()
                 it listensTo get<TrackedSymbolsRemovedNotifier>()
                 it listensTo get<RenamedThemeNotifier>()
+                it listensTo get<SymbolPinnedToSceneNotifier>()
+                it listensTo get<SymbolUnpinnedFromSceneNotifier>()
             }
         }
     }

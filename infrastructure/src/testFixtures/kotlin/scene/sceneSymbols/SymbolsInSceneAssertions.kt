@@ -1,10 +1,9 @@
 package com.soyle.stories.desktop.view.scene.sceneSymbols
 
-import com.soyle.stories.entities.Theme
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
+import javafx.scene.control.Label
+import org.junit.jupiter.api.Assertions.*
 
 class SymbolsInSceneAssertions private constructor(private val driver: SymbolsInSceneDriver) {
 
@@ -15,12 +14,30 @@ class SymbolsInSceneAssertions private constructor(private val driver: SymbolsIn
         }
     }
 
-    fun hasTrackedSymbol(themeId: Theme.Id, expectedThemeName: String, symbolId: Symbol.Id, expectedSymbolName: String) {
-        assertNotNull(driver.getSymbolChip(expectedSymbolName))
+    fun hasTrackedSymbol(symbolId: Symbol.Id, expectedSymbolName: String) {
+        val symbolChip = driver.getSymbolChip(symbolId)!!
+        assertEquals(expectedSymbolName, symbolChip.text)
     }
 
-    fun doesNotHaveTrackedSymbol(themeId: Theme.Id, expectedThemeName: String, symbolId: Symbol.Id?, expectedSymbolName: String) {
+    fun doesNotHaveTrackedSymbol(symbolId: Symbol.Id?, expectedSymbolName: String) {
+        if (symbolId != null) {
+            assertNull(driver.getSymbolChip(symbolId))
+        }
         assertNull(driver.getSymbolChip(expectedSymbolName))
+    }
+
+    fun andSymbol(symbolId: Symbol.Id, assertions: SymbolChipAssertions.() -> Unit)
+    {
+        SymbolChipAssertions(driver.getSymbolChip(symbolId)!!).assertions()
+    }
+
+    inner class SymbolChipAssertions internal constructor(private val chip: Label) {
+        fun isPinned() {
+            assertTrue(with(driver) { chip.isPinned() })
+        }
+        fun isNotPinned() {
+            assertFalse(with(driver) { chip.isPinned() })
+        }
     }
 
 }

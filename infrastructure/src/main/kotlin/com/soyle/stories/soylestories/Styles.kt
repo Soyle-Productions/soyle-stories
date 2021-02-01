@@ -1,10 +1,8 @@
 package com.soyle.stories.soylestories
 
-import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.scene.image.Image
 import javafx.scene.paint.Color
 import tornadofx.*
-import tornadofx.Stylesheet.Companion.box
 
 class Styles : Stylesheet() {
 
@@ -36,6 +34,10 @@ class Styles : Stylesheet() {
         }
         scrollPane {
             backgroundColor = multi(Color.TRANSPARENT) // Why would it have a border?
+        }
+        tooltip {
+            backgroundColor = multi(Color.WHITE)
+            textFill = Color.BLACK
         }
     }
 

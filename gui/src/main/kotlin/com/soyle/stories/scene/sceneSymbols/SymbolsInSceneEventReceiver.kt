@@ -1,9 +1,7 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.scene.trackSymbolInScene.SymbolsTrackedInSceneReceiver
-import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRemovedReceiver
-import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRenamedReceiver
+import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
 
 interface SymbolsInSceneEventReceiver : TrackedSymbolsRenamedReceiver, TrackedSymbolsRemovedReceiver,
-    SymbolsTrackedInSceneReceiver, RenamedThemeReceiver
+    SymbolsTrackedInSceneReceiver, RenamedThemeReceiver, SymbolPinnedToSceneReceiver, SymbolUnpinnedFromSceneReceiver
