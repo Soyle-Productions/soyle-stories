@@ -6,7 +6,8 @@ import com.soyle.stories.scene.items.SceneItemViewModel
 
 data class SymbolsInSceneViewModel(
     val targetScene: SceneItemViewModel?,
-    val themesInScene: List<ThemeInScene>
+    val themesInScene: List<ThemeInScene>,
+    val availableThemesToTrack: List<AvailableTheme>
 ) {
 
     data class ThemeInScene(
@@ -16,6 +17,18 @@ data class SymbolsInSceneViewModel(
     )
 
     class SymbolInScene(
+        val symbolId: Symbol.Id,
+        val symbolName: String,
+        val isPinned: Boolean
+    )
+
+    data class AvailableTheme(
+        val themeId: Theme.Id,
+        val themeName: String,
+        val symbolsInScene: List<AvailableSymbol>
+    )
+
+    class AvailableSymbol(
         val symbolId: Symbol.Id,
         val symbolName: String
     )

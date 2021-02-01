@@ -20,6 +20,14 @@ class Styles : Stylesheet() {
             textFill = Color.WHITE
             fontWeight = FontWeight.BOLD
         }
+        primaryButton and menuButton {
+            arrow {
+                backgroundColor = multi(Color.WHITE)
+            }
+            popup {
+                backgroundColor = multi(Color.WHITE)
+            }
+        }
         inviteButton {
             padding = box(8.px, 16.px)
         }

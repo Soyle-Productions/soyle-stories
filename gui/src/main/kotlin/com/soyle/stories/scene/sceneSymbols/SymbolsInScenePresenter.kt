@@ -1,15 +1,16 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.entities.SymbolTrackedInScene
-import com.soyle.stories.entities.TrackedSymbolRemoved
-import com.soyle.stories.entities.TrackedSymbolRenamed
+import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.scene.usecases.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
 import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
+import com.soyle.stories.theme.usecases.listSymbolsByTheme.SymbolsByTheme
 
 class SymbolsInScenePresenter(
     internal val view: View.Nullable<SymbolsInSceneViewModel>
-) : ListSymbolsInScene.OutputPort, SymbolsInSceneEventReceiver {
+) : ListSymbolsInScene.OutputPort, ListAvailableSymbolsToTrackInScene.OutputPort, SymbolsInSceneEventReceiver {
 
     override suspend fun receiveSymbolsInSceneList(response: ListSymbolsInScene.ResponseModel) {
         view.update {
@@ -22,11 +23,13 @@ class SymbolsInScenePresenter(
                         symbolsInScene = symbols.map {
                             SymbolsInSceneViewModel.SymbolInScene(
                                 it.symbolId,
-                                it.symbolName
+                                it.symbolName,
+                                it.isPinned
                             )
                         }
                     )
-                }
+                },
+                availableThemesToTrack = listOf()
             )
         }
     }
@@ -44,12 +47,12 @@ class SymbolsInScenePresenter(
                             symbolsInScene = it.symbolsInScene + newSymbolsInScene.map {
                                 SymbolsInSceneViewModel.SymbolInScene(
                                     it.trackedSymbol.symbolId,
-                                    it.trackedSymbol.symbolName
+                                    it.trackedSymbol.symbolName,
+                                    it.trackedSymbol.isPinned
                                 )
                             }
                         )
-                    }
-                    else it
+                    } else it
                 } + newThemesInScene.map { (themeId, symbols) ->
                     SymbolsInSceneViewModel.ThemeInScene(
                         themeId,
@@ -57,7 +60,8 @@ class SymbolsInScenePresenter(
                         symbolsInScene = symbols.map {
                             SymbolsInSceneViewModel.SymbolInScene(
                                 it.trackedSymbol.symbolId,
-                                it.trackedSymbol.symbolName
+                                it.trackedSymbol.symbolName,
+                                it.trackedSymbol.isPinned
                             )
                         }
                     )
@@ -68,7 +72,8 @@ class SymbolsInScenePresenter(
 
     override suspend fun receiveTrackedSymbolsRenamed(trackedSymbolsRenamed: List<TrackedSymbolRenamed>) {
         val affectedThemeIds = trackedSymbolsRenamed.map { it.trackedSymbol.themeId }.toSet()
-        val newNamesBySymbolId = trackedSymbolsRenamed.associate { it.trackedSymbol.symbolId to it.trackedSymbol.symbolName }
+        val newNamesBySymbolId =
+            trackedSymbolsRenamed.associate { it.trackedSymbol.symbolId to it.trackedSymbol.symbolName }
         view.updateOrInvalidated {
             copy(
                 themesInScene = themesInScene.map {
@@ -76,12 +81,59 @@ class SymbolsInScenePresenter(
                         it.copy(
                             symbolsInScene = it.symbolsInScene.map {
                                 if (it.symbolId in newNamesBySymbolId) {
-                                    SymbolsInSceneViewModel.SymbolInScene(it.symbolId, newNamesBySymbolId.getValue(it.symbolId))
+                                    SymbolsInSceneViewModel.SymbolInScene(
+                                        it.symbolId,
+                                        newNamesBySymbolId.getValue(it.symbolId),
+                                        it.isPinned
+                                    )
                                 } else it
                             }
                         )
-                    }
-                    else it
+                    } else it
+                }
+            )
+        }
+    }
+
+    override suspend fun receiveSymbolPinnedToScene(symbolPinnedToScene: SymbolPinnedToScene) {
+        view.updateOrInvalidated {
+            copy(
+                themesInScene = themesInScene.map {
+                    if (it.themeId == symbolPinnedToScene.trackedSymbol.themeId) {
+                        it.copy(
+                            symbolsInScene = it.symbolsInScene.map {
+                                if (it.symbolId == symbolPinnedToScene.trackedSymbol.symbolId) {
+                                    SymbolsInSceneViewModel.SymbolInScene(
+                                        it.symbolId,
+                                        it.symbolName,
+                                        true
+                                    )
+                                } else it
+                            }
+                        )
+                    } else it
+                }
+            )
+        }
+    }
+
+    override suspend fun receiveSymbolUnpinnedFromScene(symbolUnpinnedFromScene: SymbolUnpinnedFromScene) {
+        view.updateOrInvalidated {
+            copy(
+                themesInScene = themesInScene.map {
+                    if (it.themeId == symbolUnpinnedFromScene.trackedSymbol.themeId) {
+                        it.copy(
+                            symbolsInScene = it.symbolsInScene.map {
+                                if (it.symbolId == symbolUnpinnedFromScene.trackedSymbol.symbolId) {
+                                    SymbolsInSceneViewModel.SymbolInScene(
+                                        it.symbolId,
+                                        it.symbolName,
+                                        false
+                                    )
+                                } else it
+                            }
+                        )
+                    } else it
                 }
             )
         }
@@ -111,9 +163,23 @@ class SymbolsInScenePresenter(
                         it.copy(
                             symbolsInScene = it.symbolsInScene.filterNot { it.symbolId in removedSymbolIds }
                         )
-                    }
-                    else it
+                    } else it
                 }.filterNot { it.symbolsInScene.isEmpty() }.toList()
+            )
+        }
+    }
+
+    override suspend fun receiveAvailableSymbolsToTrackInScene(response: SymbolsByTheme) {
+        view.updateOrInvalidated {
+            copy(
+                availableThemesToTrack = response.themes.map { (themeItem, symbolItems) ->
+                    SymbolsInSceneViewModel.AvailableTheme(
+                        Theme.Id(themeItem.themeId),
+                        themeItem.themeName,
+                        symbolItems.map {
+                            SymbolsInSceneViewModel.AvailableSymbol(Symbol.Id(it.symbolId), it.symbolName)
+                        })
+                }
             )
         }
     }

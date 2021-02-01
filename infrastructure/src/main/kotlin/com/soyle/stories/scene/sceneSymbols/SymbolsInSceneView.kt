@@ -13,6 +13,7 @@ import com.soyle.stories.soylestories.Styles.Companion.Orange
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
+import javafx.scene.control.ContentDisplay
 import javafx.scene.effect.BlurType
 import javafx.scene.effect.DropShadow
 import javafx.scene.layout.Priority
@@ -117,6 +118,7 @@ class SymbolsInSceneView : View() {
             val hasSymbols by csspseudoclass()
 
             val trackedSymbolChip by cssclass()
+            val pinned by csspseudoclass()
 
             val warningLabel by cssclass()
 
@@ -138,6 +140,18 @@ class SymbolsInSceneView : View() {
                 borderRadius = multi(box(12.px))
                 backgroundRadius = multi(box(16.px))
                 backgroundColor = multi(Color.LAVENDER)
+                contentDisplay = ContentDisplay.RIGHT
+
+                button {
+                    padding = box(0.px)
+                    backgroundColor = multi(Color.TRANSPARENT)
+                    contentDisplay = ContentDisplay.GRAPHIC_ONLY
+
+                    imageView {
+                        translateX = 2.px
+                        translateY = (-2).px
+                    }
+                }
             }
             warningLabel {
                 textFill = Orange

@@ -1,8 +1,11 @@
 package com.soyle.stories.desktop.config.drivers.theme
 
 import com.soyle.stories.desktop.config.drivers.robot
+import com.soyle.stories.desktop.view.scene.sceneSymbols.drive
 import com.soyle.stories.desktop.view.theme.createSymbolDialog.CreateSymbolDialogDriver
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
+import com.soyle.stories.entities.Theme
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.themeList.ThemeList
 import javafx.event.ActionEvent
@@ -28,6 +31,18 @@ fun getCreateSymbolDialog(): CreateSymbolDialog? =
         .mapNotNull { it.scene.root.uiComponent<CreateSymbolDialog>() }
         .firstOrNull { it.currentStage?.isShowing == true }
 
+fun SymbolsInSceneView.givenCreatingNewSymbolForTheme(theme: Theme): CreateSymbolDialog =
+    getCreateSymbolDialog() ?: openCreateSymbolDialogForTheme(theme).run { getCreateSymbolDialogOrError() }
+
+fun SymbolsInSceneView.openCreateSymbolDialogForTheme(theme: Theme)
+{
+    drive {
+        val pinSymbolButton = pinSymbolButton!!
+        if (! pinSymbolButton.isShowing) pinSymbolButton.fire()
+        val themeItem = pinSymbolButton.themeItem(theme.id)!!
+        themeItem.createSymbolOption.fire()
+    }
+}
 
 fun CreateSymbolDialog.createSymbolWithName(symbolName: String) {
     val driver = CreateSymbolDialogDriver(this)
@@ -41,7 +56,7 @@ fun CreateSymbolDialog.createSymbolWithName(symbolName: String) {
 fun CreateSymbolDialog.createSymbolAndThemeNamed(themeName: String, symbolName: String) {
     val driver = CreateSymbolDialogDriver(this)
     val nameInput = driver.nameInput
-    if (! driver.themeWillBeCreated) {
+    if (!driver.themeWillBeCreated) {
         driver.interact { driver.themeToggleButton.fire() }
     }
     val themeNameInput = driver.themeNameInput

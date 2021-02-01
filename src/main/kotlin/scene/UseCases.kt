@@ -37,8 +37,7 @@ import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
-import com.soyle.stories.scene.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseController
-import com.soyle.stories.scene.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseOutput
+import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
@@ -69,8 +68,7 @@ import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
 import com.soyle.stories.scene.usecases.reorderScene.ReorderSceneUseCase
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
-import com.soyle.stories.scene.usecases.trackSymbolInScene.SynchronizeTrackedSymbolsWithProse
-import com.soyle.stories.scene.usecases.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseUseCase
+import com.soyle.stories.scene.usecases.trackSymbolInScene.*
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 
 object UseCases {
@@ -91,6 +89,9 @@ object UseCases {
             listOptionsToReplaceMention()
             synchronizeTrackedSymbolsWithProse()
             listSymbolsInScene()
+            listAvailableSymbolsToTrackInScene()
+            pinSymbolToScene()
+            unpinSymbolFromScene()
         }
     }
 
@@ -337,6 +338,43 @@ object UseCases {
         }
         provide<ListSymbolsInSceneController> {
             ListSymbolsInSceneControllerImpl(applicationScope.get(), get())
+        }
+    }
+
+    private fun InProjectScope.listAvailableSymbolsToTrackInScene()
+    {
+        provide<ListAvailableSymbolsToTrackInSceneController> {
+            ListAvailableSymbolsToTrackInSceneControllerImpl(applicationScope.get(), get())
+        }
+
+        provide<ListAvailableSymbolsToTrackInScene> {
+            ListAvailableSymbolsToTrackInSceneUseCase(get(), get())
+        }
+    }
+
+    private fun InProjectScope.pinSymbolToScene()
+    {
+        provide<PinSymbolToScene> {
+            PinSymbolToSceneUseCase(get(), get())
+        }
+        provide(PinSymbolToScene.OutputPort::class) {
+            PinSymbolToSceneOutput(get(), get())
+        }
+        provide<PinSymbolToSceneController> {
+            PinSymbolToSceneControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.unpinSymbolFromScene()
+    {
+        provide<UnpinSymbolFromScene> {
+            UnpinSymbolFromSceneUseCase(get(), get())
+        }
+        provide(UnpinSymbolFromScene.OutputPort::class) {
+            UnpinSymbolFromSceneOutput(get(), get())
+        }
+        provide<UnpinSymbolFromSceneController> {
+            UnpinSymbolFromSceneControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
