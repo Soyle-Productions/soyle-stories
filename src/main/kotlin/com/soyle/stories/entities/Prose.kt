@@ -58,8 +58,10 @@ class Prose private constructor(
     }
 
     private val sortedMentionSet: Set<ProseMention<*>> by lazy { sortedSetOf(compareBy { it.start() }, *mentions.toTypedArray()) }
+    private val mentionsByEntityId: Map<Any, ProseMention<*>> by lazy { mentions.associateBy { it.entityId.id } }
 
     // reads
+    fun containsMentionOf(entityId: Any): Boolean = mentionsByEntityId.containsKey(entityId)
 
     // updates
     private fun copy(
