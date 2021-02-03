@@ -14,7 +14,9 @@ class DetectUnusedSymbolsInSceneUseCase(
         val scene = sceneRepository.getSceneOrError(sceneId.uuid)
         val prose = proseRepository.getProseOrError(scene.proseId)
 
-        output.receiveDetectedUnusedSymbols(DetectUnusedSymbolsInScene.ResponseModel(scene.trackedSymbols
+        output.receiveDetectedUnusedSymbols(DetectUnusedSymbolsInScene.ResponseModel(
+            scene.id,
+            scene.trackedSymbols
             .asSequence()
             .filterNot { prose.containsMentionOf(it.symbolId) }
             .map { it.symbolId }

@@ -64,6 +64,7 @@ class `Detect Unused Symbols Unit Test` {
             @Test
             fun `should output empty result`() {
                 detectUnusedSymbols()
+                assertEquals(scene.id, result!!.sceneId)
                 assertTrue(result!!.unusedSymbolIds.isEmpty())
             }
 
@@ -89,6 +90,7 @@ class `Detect Unused Symbols Unit Test` {
                 @Test
                 fun `should output symbol ids`() {
                     detectUnusedSymbols()
+                    assertEquals(scene.id, result!!.sceneId)
                     assertEquals(symbolsNotMentioned.map { it.id }.toSet(), result!!.unusedSymbolIds)
                 }
 

@@ -7,6 +7,7 @@ interface DetectUnusedSymbolsInScene {
     suspend operator fun invoke(sceneId: Scene.Id, output: OutputPort)
 
     class ResponseModel(
+        val sceneId: Scene.Id,
         val unusedSymbolIds: Set<Symbol.Id>
     )
 
