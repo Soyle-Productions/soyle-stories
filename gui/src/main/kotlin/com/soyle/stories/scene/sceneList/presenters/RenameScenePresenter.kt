@@ -2,7 +2,6 @@ package com.soyle.stories.scene.sceneList.presenters
 
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.SceneException
-import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListViewModel
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
 
@@ -14,7 +13,7 @@ class RenameScenePresenter(
 			copy(
 			  scenes = scenes.map {
 				  if (it.id == response.sceneId.toString()) {
-					  SceneItemViewModel(it.id, it.proseId, response.newName, it.index, false)
+				  	it.copy(name = response.newName)
 				  } else it
 			  },
 			  renameSceneFailureMessage = null

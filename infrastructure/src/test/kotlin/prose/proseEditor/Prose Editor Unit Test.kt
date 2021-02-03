@@ -1,45 +1,15 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.common.*
-import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorAssertions
-import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorAssertions.Companion.assertThat
-import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver
-import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.drive
-import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.driver
-import com.soyle.stories.desktop.view.type
-import com.soyle.stories.di.get
-import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.*
-import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.projectList.ProjectFileViewModel
-import com.soyle.stories.soylestories.ApplicationScope
-import javafx.scene.control.IndexRange
-import javafx.scene.control.ListCell
-import javafx.scene.control.TextField
-import javafx.scene.control.skin.VirtualFlow
-import javafx.scene.input.KeyCode
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.testfx.api.FxToolkit
 import org.testfx.framework.junit5.ApplicationTest
-import tornadofx.FX
-import tornadofx.plusAssign
-import java.util.*
-import kotlin.reflect.KFunction
 
-class `Prose Editor Unit Test` : ApplicationTest() {
+class `Prose Editor Unit Test` : ApplicationTest() {/*
 
     private val scope =
-        ProseEditorScope(ProjectScope(ApplicationScope(), ProjectFileViewModel(UUID.randomUUID(), "", "")), Prose.Id(), { _, _ ->
-
-        }) {
-
-        }
+        ProseEditorScope(
+            ProjectScope(ApplicationScope(), ProjectFileViewModel(UUID.randomUUID(), "", "")),
+            Prose.Id(),
+            { _, _ -> },
+            {}) { _, _ -> }
     private val proseEditorView: ProseEditorView
     private val viewListener = object : ProseEditorViewListener {
 
@@ -94,12 +64,14 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         @Test
         fun `content should be displayed`() {
             scope.get<ProseEditorState>().update {
-                ProseEditorViewModel(0L, false, listOf(
-                    BasicText("I'm "),
-                    Mention("content", mentions[0].entityId),
-                    BasicText(" to be "),
-                    Mention("tested", mentions[1].entityId)
-                ), NoQuery)
+                ProseEditorViewModel(
+                    0L, false, listOf(
+                        BasicText("I'm "),
+                        Mention("content", mentions[0].entityId),
+                        BasicText(" to be "),
+                        Mention("tested", mentions[1].entityId)
+                    ), NoQuery
+                )
             }
             ProseEditorAssertions.assertThat(proseEditorView) {
                 hasContent("I'm content to be tested")
@@ -109,9 +81,11 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         @Test
         fun `if content is not updated, typed characters should not be overridden`() {
             scope.get<ProseEditorState>().update {
-                ProseEditorViewModel(0L, false, listOf(
-                    BasicText("I'm content to be tested")
-                ), NoQuery)
+                ProseEditorViewModel(
+                    0L, false, listOf(
+                        BasicText("I'm content to be tested")
+                    ), NoQuery
+                )
             }
             proseEditorView.drive {
                 textArea.requestFocus()
@@ -141,12 +115,14 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         @Test
         fun `associated text range should be styled`() {
             scope.get<ProseEditorState>().update {
-                ProseEditorViewModel(0L, false, listOf(
-                    BasicText("I'm "),
-                    Mention("content", mentions[0].entityId),
-                    BasicText(" to be "),
-                    Mention("tested", mentions[1].entityId)
-                ), NoQuery)
+                ProseEditorViewModel(
+                    0L, false, listOf(
+                        BasicText("I'm "),
+                        Mention("content", mentions[0].entityId),
+                        BasicText(" to be "),
+                        Mention("tested", mentions[1].entityId)
+                    ), NoQuery
+                )
             }
             ProseEditorAssertions.assertThat(proseEditorView) {
                 hasMention(mentions[0].entityId, mentions[0].position)
@@ -185,7 +161,12 @@ class `Prose Editor Unit Test` : ApplicationTest() {
             @Test
             fun `mention list should be visible`() {
                 scope.get<ProseEditorState>().update {
-                    ProseEditorViewModel(0L, false, listOf(BasicText("I'm content to be tested")), MentionQueryLoading("B", "B", 0))
+                    ProseEditorViewModel(
+                        0L,
+                        false,
+                        listOf(BasicText("I'm content to be tested")),
+                        MentionQueryLoading("B", "B", 0)
+                    )
                 }
                 ProseEditorAssertions.assertThat(proseEditorView) {
                     suggestedMentionListIsVisible()
@@ -200,7 +181,12 @@ class `Prose Editor Unit Test` : ApplicationTest() {
             @Test
             fun `mention list should be visible`() {
                 scope.get<ProseEditorState>().update {
-                    ProseEditorViewModel(0L, false, listOf(BasicText("I'm content to be tested")), MentionQueryLoaded("B", "B", 0, listOf(), listOf()))
+                    ProseEditorViewModel(
+                        0L,
+                        false,
+                        listOf(BasicText("I'm content to be tested")),
+                        MentionQueryLoaded("B", "B", 0, listOf(), listOf())
+                    )
                 }
                 ProseEditorAssertions.assertThat(proseEditorView) {
                     suggestedMentionListIsVisible()
@@ -219,7 +205,11 @@ class `Prose Editor Unit Test` : ApplicationTest() {
                             "B",
                             0,
                             matchesForInitialQuery = listOf(),
-                            prioritizedMatches = listOf(storyElement("Bob"), storyElement("Joe Bob"), storyElement("Robert"))
+                            prioritizedMatches = listOf(
+                                storyElement("Bob"),
+                                storyElement("Joe Bob"),
+                                storyElement("Robert")
+                            )
                         )
                     )
                 }
@@ -235,8 +225,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
     }
 
     @Nested
-    inner class `When Locked`
-    {
+    inner class `When Locked` {
 
         @Test
         fun `input should be disabled`() {
@@ -256,8 +245,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
     }
 
     @Nested
-    inner class `When Focus is Lost`
-    {
+    inner class `When Focus is Lost` {
 
         private val characterId = Character.Id()
 
@@ -317,22 +305,22 @@ class `Prose Editor Unit Test` : ApplicationTest() {
     }
 
     @Nested
-    inner class `Rule - Cannot place cursor inside a mention`
-    {
+    inner class `Rule - Cannot place cursor inside a mention` {
 
         init {
             scope.get<ProseEditorState>().update {
-                ProseEditorViewModel(0L, false, listOf(
-                    BasicText("I'm on one side of "),
-                    Mention("Frank", Character.Id().mentioned()),
-                    BasicText(" and I'm on the other"),
-                ), NoQuery)
+                ProseEditorViewModel(
+                    0L, false, listOf(
+                        BasicText("I'm on one side of "),
+                        Mention("Frank", Character.Id().mentioned()),
+                        BasicText(" and I'm on the other"),
+                    ), NoQuery
+                )
             }
         }
 
         @Nested
-        inner class `When Mouse clicked inside`
-        {
+        inner class `When Mouse clicked inside` {
 
             @Test
             fun `when closer to beginning of mention, should move to beginning of mention`() {
@@ -355,8 +343,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         }
 
         @Nested
-        inner class `When mouse selection dragged over`
-        {
+        inner class `When mouse selection dragged over` {
 
             @Test
             fun `should not select mention until over halfway covered by selection`() {
@@ -383,8 +370,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         }
 
         @Nested
-        inner class `When Arrow Keys are pressed at the edge of a mention`
-        {
+        inner class `When Arrow Keys are pressed at the edge of a mention` {
 
             @Test
             fun `right arrow should jump to end of mention`() {
@@ -433,8 +419,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         }
 
         @Nested
-        inner class `When arrow keys are pressed above or below a mention`
-        {
+        inner class `When arrow keys are pressed above or below a mention` {
 
             /* The lines are currently rendered like this:
             I'm on one side of
@@ -443,8 +428,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
              */
 
             @Nested
-            inner class `When Up Arrow is pressed`
-            {
+            inner class `When Up Arrow is pressed` {
 
                 @Test
                 fun `up arrow should jump to nearest edge of mention`() {
@@ -500,8 +484,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
 
 
             @Nested
-            inner class `When Down Arrow is pressed`
-            {
+            inner class `When Down Arrow is pressed` {
 
                 @Test
                 fun `down arrow should jump to nearest edge of mention`() {
@@ -560,24 +543,24 @@ class `Prose Editor Unit Test` : ApplicationTest() {
     }
 
     @Nested
-    inner class `Updating state`
-    {
+    inner class `Updating state` {
 
         private val frankId = Character.Id()
 
         init {
             scope.get<ProseEditorState>().update {
-                ProseEditorViewModel(0L, false, listOf(
-                    BasicText("I'm on one side of "),
-                    Mention("Frank", frankId.mentioned()),
-                    BasicText(" and I'm on the other"),
-                ), NoQuery)
+                ProseEditorViewModel(
+                    0L, false, listOf(
+                        BasicText("I'm on one side of "),
+                        Mention("Frank", frankId.mentioned()),
+                        BasicText(" and I'm on the other"),
+                    ), NoQuery
+                )
             }
         }
 
         @Nested
-        inner class `Enter Text`
-        {
+        inner class `Enter Text` {
 
             @Test
             fun `typing into a paragraph should update prose after`() {
@@ -619,12 +602,10 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         }
 
         @Nested
-        inner class `Deleting Mentions`
-        {
+        inner class `Deleting Mentions` {
 
             @Nested
-            inner class `When Delete Key is pressed`
-            {
+            inner class `When Delete Key is pressed` {
 
                 @Test
                 fun `if caret is at beginning of mention, should delete entire mention`() {
@@ -640,8 +621,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
             }
 
             @Nested
-            inner class `When Backspace key is pressed`
-            {
+            inner class `When Backspace key is pressed` {
 
                 @Test
                 fun `if caret is at end of mention, should delete entire mention`() {
@@ -661,14 +641,15 @@ class `Prose Editor Unit Test` : ApplicationTest() {
     }
 
     @Nested
-    inner class `Query for Mentions`
-    {
+    inner class `Query for Mentions` {
 
         init {
             scope.get<ProseEditorState>().update {
-                ProseEditorViewModel(0L, false, listOf(
-                    BasicText("Starting text")
-                ), NoQuery)
+                ProseEditorViewModel(
+                    0L, false, listOf(
+                        BasicText("Starting text")
+                    ), NoQuery
+                )
             }
         }
 
@@ -687,8 +668,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         }
 
         @Nested
-        inner class `When character is typed`
-        {
+        inner class `When character is typed` {
 
             @Test
             fun `if query is primed, should search for mentions with typed character`() {
@@ -724,7 +704,7 @@ class `Prose Editor Unit Test` : ApplicationTest() {
                 scope.get<ProseEditorState>().updateOrInvalidated {
                     copy(
                         content = listOf(BasicText("Starting @btext")),
-                        mentionQueryState = MentionQueryLoading("b", "b" , 9)
+                        mentionQueryState = MentionQueryLoading("b", "b", 9)
                     )
                 }
                 proseEditorView.drive {
@@ -761,10 +741,8 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         }
 
 
-
         @Nested
-        inner class `Selecting Mention Option`
-        {
+        inner class `Selecting Mention Option` {
 
             init {
                 proseEditorView.drive {
@@ -785,11 +763,28 @@ class `Prose Editor Unit Test` : ApplicationTest() {
                 }
                 scope.get<ProseEditorState>().updateOrInvalidated {
                     copy(
-                        mentionQueryState = MentionQueryLoaded("b", "b", 9, listOf(), listOf(
-                            MatchingStoryElementViewModel(countLines("Bob") as SingleLine, 0..1, "character", Character.Id().mentioned()),
-                            MatchingStoryElementViewModel(countLines("Billy") as SingleLine, 0..1, "character", Character.Id().mentioned()),
-                            MatchingStoryElementViewModel(countLines("Boyd") as SingleLine, 0..1, "character", Character.Id().mentioned())
-                        ))
+                        mentionQueryState = MentionQueryLoaded(
+                            "b", "b", 9, listOf(), listOf(
+                                MatchingStoryElementViewModel(
+                                    countLines("Bob") as SingleLine,
+                                    0..1,
+                                    "character",
+                                    Character.Id().mentioned()
+                                ),
+                                MatchingStoryElementViewModel(
+                                    countLines("Billy") as SingleLine,
+                                    0..1,
+                                    "character",
+                                    Character.Id().mentioned()
+                                ),
+                                MatchingStoryElementViewModel(
+                                    countLines("Boyd") as SingleLine,
+                                    0..1,
+                                    "character",
+                                    Character.Id().mentioned()
+                                )
+                            )
+                        )
                     )
                 }
             }
@@ -827,13 +822,16 @@ class `Prose Editor Unit Test` : ApplicationTest() {
     @Test
     fun playground() {
         scope.get<ProseEditorState>().update {
-            ProseEditorViewModel(0L, false, listOf(
-                BasicText("I'm on one side of "),
-                Mention("Frank", Character.Id().mentioned()),
-                BasicText(" and I'm on the other"),
-            ), NoQuery)
+            ProseEditorViewModel(
+                0L, false, listOf(
+                    BasicText("I'm on one side of "),
+                    Mention("Frank", Character.Id().mentioned()),
+                    BasicText(" and I'm on the other"),
+                ), NoQuery
+            )
         }
-        while(proseEditorView.currentStage?.isShowing == true) {}
+        while (proseEditorView.currentStage?.isShowing == true) {
+        }
     }
 
     init {
@@ -861,9 +859,8 @@ class `Prose Editor Unit Test` : ApplicationTest() {
         }
     }
 
-    private fun storyElement(name: String): MatchingStoryElementViewModel
-    {
+    private fun storyElement(name: String): MatchingStoryElementViewModel {
         return MatchingStoryElementViewModel(countLines(name) as SingleLine, 0..1, "test", Character.Id().mentioned())
     }
-
+*/
 }

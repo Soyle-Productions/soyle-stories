@@ -11,16 +11,21 @@ Feature: Mention a Story Element
       | Bob | Brooke | Billy Bob | Frank |
     Given I have created the following locations
       | Bomb Shelter | Bay Bridge | Golden Gate Bridge | Hobo Den |
+    Given I have created the following themes and symbols
+      | Growing Up | Transformation | Becoming a Leader |
+      | Flower     | Butterfly      | Gold              |
     And I am editing the "Big Battle" scene's prose
     When I request story elements that match "P" for the "Big Battle" scene
     Then I should not see any matching story elements for the "Big Battle" scene
 
   Scenario: Some Matching Story Elements
-    Given I have created a scene named "Big Battle"
-    And I have created the following characters
+    Given I have created the following characters
       | Bob | Brooke | Billy Bob | Frank |
     And I have created the following locations
       | Bomb Shelter | Bay Bridge | Golden Gate Bridge | Hobo Den |
+    Given I have created the following themes and symbols
+      | Growing Up | Transformation | Becoming a Leader |
+      | Flower     | Butterfly      | A Border          |
     And I am editing the "Big Battle" scene's prose
     When I request story elements that match "Bo" for the "Big Battle" scene
     Then I should see the following matching story elements for the "Big Battle" scene in this order
@@ -28,16 +33,19 @@ Feature: Mention a Story Element
       | Bob          | character    |
       | Bomb Shelter | location     |
       | Billy Bob    | character    |
+      | A Border     | symbol       |
       | Hobo Den     | location     |
 
   Scenario Outline: Mention a Story Element
-    Given I have created a scene named "Big Battle"
-    And I have created the following characters
+    Given I have created the following characters
       | Bob | Brooke | Billy Bob | Frank |
     And I have created the following locations
       | Bomb Shelter | Bay Bridge | Golden Gate Bridge | Hobo Den |
+    Given I have created the following themes and symbols
+      | Growing Up | Transformation | Becoming a Leader |
+      | Flower     | Butterfly      | A Border          |
     And I am editing the "Big Battle" scene's prose
-    And I have requested story elements that match "Bo" for the "Big Battle" scene
+    And I have requested story elements that match "B" for the "Big Battle" scene
     When I select "<name>" from the list of matching story elements for the "Big Battle" scene
     Then I should see "<name>" mentioned in the "Big Battle" scene's prose
 
@@ -45,6 +53,7 @@ Feature: Mention a Story Element
       | element   | name      |
       | character | Billy Bob |
       | location  | Hobo Den  |
+      | symbol    | Butterfly |
 
   Scenario: Mention and Include a Character
     Given I have created the following characters
@@ -88,3 +97,19 @@ Feature: Mention a Story Element
         | element   | name   | new name |
         | character | "Bob"  | "Frank"  |
         | location  | "Home" | "Work"   |
+
+    Scenario: Rename a Mentioned Symbol and then Read the Scene
+      Given I have created a theme named "Growing Up"
+      And I have created a symbol named "Ring" in the "Growing Up" theme
+      And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
+      And I have renamed the symbol "Ring" in the "Growing Up" theme to "Cube"
+      When I edit the "Big Battle" scene's prose
+      Then the "Ring" mention in the "Big Battle" scene's prose should read "Cube"
+
+    Scenario: Renamed a Mentioned Symbol while Reading Scene Prose
+      Given I have created a theme named "Growing Up"
+      And I have created a symbol named "Ring" in the "Growing Up" theme
+      And I have mentioned the "Ring" symbol from the "Growing Up" theme in the "Big Battle" scene's prose
+      And I am editing the "Big Battle" scene's prose
+      When I rename the symbol "Ring" in the "Growing Up" theme to "Cube"
+      Then the "Ring" mention in the "Big Battle" scene's prose should read "Cube"

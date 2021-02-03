@@ -1,15 +1,12 @@
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogView
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
-import com.soyle.stories.entities.Character
 import com.soyle.stories.project.ProjectScope
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import tornadofx.*
-import java.util.*
 
 /**
  * Created by Brendan
@@ -40,7 +37,7 @@ internal class ActionBar : View() {
             enableWhen { model.selectedItem.isNotNull }
             action {
                 when (val selectedItem = model.selectedItem.value) {
-                    is CharacterTreeItemViewModel -> find<DeleteCharacterDialogView>().show(Character.Id(UUID.fromString(selectedItem.id)), selectedItem.name)
+                    is CharacterTreeItemViewModel -> characterListViewListener.removeCharacter(selectedItem.id)
                     is CharacterArcItemViewModel ->
                         confirmDeleteCharacterArc(selectedItem.characterId, selectedItem.themeId, selectedItem.name, characterListViewListener)
                 }

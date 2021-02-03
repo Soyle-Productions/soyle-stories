@@ -1,22 +1,18 @@
 package com.soyle.stories.theme.characterConflict
 
-import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.Model
-import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.cleanBind
-import tornadofx.onChange
 
 class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictViewModel>(CharacterConflictScope::class) {
 
     val centralConflictFieldLabel = bind(CharacterConflictViewModel::centralConflictFieldLabel)
     val centralConflict = bind(CharacterConflictViewModel::centralConflict)
     val perspectiveCharacterLabel = bind(CharacterConflictViewModel::perspectiveCharacterLabel)
-    val selectedPerspectiveCharacter = SimpleObjectProperty<CharacterItemViewModel?>(null)
-    val availablePerspectiveCharacters = SimpleObjectProperty<List<AvailablePerspectiveCharacterViewModel>?>(null)
+    val selectedPerspectiveCharacter = bind(CharacterConflictViewModel::selectedPerspectiveCharacter)
+    val availablePerspectiveCharacters = bind(CharacterConflictViewModel::availablePerspectiveCharacters)
     val desireLabel = bind(CharacterConflictViewModel::desireLabel)
     val desire = bind(CharacterConflictViewModel::desire)
     val psychologicalWeaknessLabel = bind(CharacterConflictViewModel::psychologicalWeaknessLabel)
@@ -32,7 +28,7 @@ class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictVi
     val powerStatusOrAbilitiesLabel = bind(CharacterConflictViewModel::powerStatusOrAbilitiesLabel)
     val mainOpponent = bind(CharacterConflictViewModel::mainOpponent)
     val opponents = bind(CharacterConflictViewModel::opponents)
-    val availableOpponents = SimpleObjectProperty<List<AvailableOpponentViewModel>?>(null)
+    val availableOpponents = bind(CharacterConflictViewModel::availableOpponents)
 
     val isSmall = SimpleBooleanProperty()
     val isLarge = isSmall.not()
@@ -43,18 +39,8 @@ class CharacterConflictModel : Model<CharacterConflictScope, CharacterConflictVi
 
     override fun viewModel(): CharacterConflictViewModel? {
         return item?.copy(
-            selectedPerspectiveCharacter = selectedPerspectiveCharacter.value,
-            availablePerspectiveCharacters = availablePerspectiveCharacters.value,
             availableOpponents = availableOpponents.value
         )
-    }
-
-    init {
-        itemProperty().onChange {
-            selectedPerspectiveCharacter.value = it?.selectedPerspectiveCharacter
-            availablePerspectiveCharacters.value = it?.availablePerspectiveCharacters
-            availableOpponents.value = it?.availableOpponents
-        }
     }
 
     override val applicationScope: ApplicationScope

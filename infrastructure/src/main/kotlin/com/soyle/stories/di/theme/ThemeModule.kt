@@ -64,7 +64,8 @@ import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogViewList
 import com.soyle.stories.theme.deleteSymbolDialog.*
 import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.deleteTheme.DeleteThemeControllerImpl
-import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
+import com.soyle.stories.theme.deleteTheme.DeleteThemeOutput
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedNotifier
 import com.soyle.stories.theme.deleteThemeDialog.*
 import com.soyle.stories.theme.deleteValueWebDialog.*
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeNotifier
@@ -79,7 +80,7 @@ import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFrom
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebNotifier
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeControllerImpl
-import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeNotifier
+import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeNotifier
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemController
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemNotifier
@@ -91,7 +92,8 @@ import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueContro
 import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueNotifier
 import com.soyle.stories.theme.renameSymbol.RenameSymbolController
 import com.soyle.stories.theme.renameSymbol.RenameSymbolControllerImpl
-import com.soyle.stories.theme.renameSymbol.RenameSymbolNotifier
+import com.soyle.stories.theme.renameSymbol.RenameSymbolOutput
+import com.soyle.stories.theme.renameSymbol.RenamedSymbolNotifier
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemController
 import com.soyle.stories.theme.renameSymbolicItems.RenameSymbolicItemNotifier
 import com.soyle.stories.theme.renameValueWeb.RenameValueWebController
@@ -147,8 +149,6 @@ import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.RemoveCharacte
 import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.RemoveCharacterAsOpponentUseCase
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
 import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWebUseCase
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
 import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItemUseCase
 import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromTheme
@@ -199,8 +199,7 @@ object ThemeModule {
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
         provide<AddValueWebToTheme> { AddValueWebToThemeUseCase(get(), get()) }
-        provide<RemoveSymbolFromTheme> { RemoveSymbolFromThemeUseCase(get()) }
-        provide<RenameSymbol> { RenameSymbolUseCase(get()) }
+        provide<RenameSymbol> { RenameSymbolUseCase(get(), get(), get()) }
         provide<ListOppositionsInValueWeb> { ListOppositionsInValueWebUseCase(get()) }
         provide<AddOppositionToValueWeb> { AddOppositionToValueWebUseCase(get(), get()) }
         provide<RenameOppositionValue> { RenameOppositionValueUseCase(get()) }
@@ -270,7 +269,7 @@ object ThemeModule {
             CreateThemeOutput(get(), get())
         }
         provide(DeleteTheme.OutputPort::class) {
-            DeleteThemeNotifier(applicationScope.get(), get())
+            DeleteThemeOutput(get(), get())
         }
         provide(AddSymbolToTheme.OutputPort::class) {
             AddSymbolToThemeOutput(get())
@@ -278,15 +277,8 @@ object ThemeModule {
         provide(AddValueWebToTheme.OutputPort::class) {
             AddValueWebToThemeNotifier(get())
         }
-        provide(RemoveSymbolFromTheme.OutputPort::class) {
-            RemoveSymbolFromThemeNotifier().also {
-                get<RemoveSymbolicItemControllerImpl>() listensTo it
-            }
-        }
         provide(RenameSymbol.OutputPort::class) {
-            RenameSymbolNotifier().also {
-                get<RenameSymbolicItemController>() listensTo it
-            }
+            RenameSymbolOutput(get(), get(), get())
         }
         provide(AddOppositionToValueWeb.OutputPort::class) {
             AddOppositionToValueWebNotifier(get())
@@ -428,7 +420,7 @@ object ThemeModule {
 
             presenter listensTo get<SymbolAddedToThemeNotifier>()
             presenter listensTo get<CreatedThemeNotifier>()
-            presenter listensTo get<DeleteThemeNotifier>()
+            presenter listensTo get<ThemeDeletedNotifier>()
             presenter listensTo get<RenamedThemeNotifier>()
 
             CreateSymbolDialogController(
@@ -448,11 +440,11 @@ object ThemeModule {
             )
 
             presenter listensTo get<CreatedThemeNotifier>()
-            presenter listensTo get<DeleteThemeNotifier>()
+            presenter listensTo get<ThemeDeletedNotifier>()
             presenter listensTo get<RenamedThemeNotifier>()
             presenter listensTo get<SymbolAddedToThemeNotifier>()
-            presenter listensTo get<RemoveSymbolFromThemeNotifier>()
-            presenter listensTo get<RenameSymbolNotifier>()
+            presenter listensTo get<SymbolRemovedFromThemeNotifier>()
+            presenter listensTo get<RenamedSymbolNotifier>()
 
             ThemeListController(
                 projectId.toString(),
@@ -484,7 +476,7 @@ object ThemeModule {
                     themeId, themeName, projectScope.get<DeleteThemeDialogModel>()
                 )
 
-                presenter listensTo projectScope.get<DeleteThemeNotifier>()
+                presenter listensTo projectScope.get<ThemeDeletedNotifier>()
 
                 DeleteThemeDialogController(
                     themeId,
@@ -503,7 +495,7 @@ object ThemeModule {
                     symbolId, symbolName, projectScope.get<DeleteSymbolDialogModel>()
                 )
 
-                presenter listensTo projectScope.get<RemoveSymbolFromThemeNotifier>()
+                presenter listensTo projectScope.get<SymbolRemovedFromThemeNotifier>()
 
                 DeleteSymbolDialogController(
                     symbolId,
@@ -631,8 +623,8 @@ object ThemeModule {
                 presenter listensTo projectScope.get<DeletedLocationNotifier>()
 
                 presenter listensTo projectScope.get<SymbolAddedToThemeNotifier>()
-                presenter listensTo projectScope.get<RenameSymbolNotifier>()
-                presenter listensTo projectScope.get<RemoveSymbolFromThemeNotifier>()
+                presenter listensTo projectScope.get<RenamedSymbolNotifier>()
+                presenter listensTo projectScope.get<SymbolRemovedFromThemeNotifier>()
 
                 presenter listensTo projectScope.get<AddSymbolicItemToOppositionNotifier>()
 

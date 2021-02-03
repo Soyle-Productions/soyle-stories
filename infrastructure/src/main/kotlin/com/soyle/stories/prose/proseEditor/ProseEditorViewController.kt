@@ -11,7 +11,6 @@ class ProseEditorViewController(
 ) {
 
     fun onTextAreaFocusLost() = viewListener.save()
-    fun onClickInNewArea() = viewListener.cancelQuery()
 
     fun onCaretMoved(caretPosition: Int?)
     {
@@ -42,12 +41,16 @@ class ProseEditorViewController(
         val mentionQueryState = state.mentionQueryState.value
         if (mentionQueryState is PrimedQuery) {
             val query: NonBlankString? = if (mentionQueryState is TriggeredQuery) {
-                NonBlankString.create(mentionQueryState.query + character)
+                if (character == "\b") NonBlankString.create(mentionQueryState.query.dropLast(1))
+                else NonBlankString.create(mentionQueryState.query + character)
             } else {
-                NonBlankString.create(character)
+                if (character == "\b") null
+                else NonBlankString.create(character)
             }
             if (query is NonBlankString) {
                 viewListener.getStoryElementsContaining(query)
+            } else {
+                viewListener.cancelQuery()
             }
         } else {
             if (character == "@") {

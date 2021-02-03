@@ -41,8 +41,6 @@ class MatchingStoryElementsPopup(
     private fun itemList(): ListView<MatchingStoryElementViewModel>
     {
         return ListView<MatchingStoryElementViewModel>().apply {
-            translateX = 1.0
-            translateY = 1.0
             cellFragment(scope, MentionSuggestion::class)
             whenMentionQueryStateIsLoaded {
                 items.setAll(it.prioritizedMatches)

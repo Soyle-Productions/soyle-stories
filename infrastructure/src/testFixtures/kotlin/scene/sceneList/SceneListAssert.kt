@@ -1,6 +1,6 @@
 package com.soyle.stories.desktop.view.scene.sceneList
 
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 class SceneListAssert private constructor(private val driver: SceneListDriver) {
 
     companion object {
-        fun assertThat(sceneList: SceneList, assertions: SceneListAssert.() -> Unit) {
+        fun assertThat(sceneList: SceneListView, assertions: SceneListAssert.() -> Unit) {
             SceneListAssert(SceneListDriver(sceneList)).assertions()
         }
     }

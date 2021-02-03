@@ -14,7 +14,7 @@ class LocationListPresenter(
 {
 
 	override fun receiveListAllLocationsResponse(response: ListAllLocations.ResponseModel) {
-		view.update {
+		view.updateOrInvalidated {
 			response.locations.map {
 				LocationItemViewModel(it)
 			}
@@ -22,14 +22,14 @@ class LocationListPresenter(
 	}
 
 	override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
-		view.update {
+		view.updateOrInvalidated {
 			this + LocationItemViewModel(response.locationId.toString(), response.locationName)
 		}
 	}
 
 	override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
 		val locationId = deletedLocation.location.uuid.toString()
-		view.update {
+		view.updateOrInvalidated {
 			this.filterNot { it.id == locationId }
 		}
 	}

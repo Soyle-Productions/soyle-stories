@@ -7,6 +7,8 @@ import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogContr
 import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogModel
 import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogPresenter
 import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogViewListener
+import com.soyle.stories.location.locationDetails.*
+import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.project.ProjectScope
 
 object Presentation {
@@ -15,6 +17,7 @@ object Presentation {
         scoped<ProjectScope> {
             deleteLocationDialog()
         }
+        locationDetails()
     }
 
     private fun InProjectScope.deleteLocationDialog() {
@@ -27,6 +30,27 @@ object Presentation {
                 get(),
                 presenter
             )
+        }
+    }
+
+    private fun locationDetails() {
+        scoped<LocationDetailsScope> {
+
+            provide<LocationDetailsViewListener> {
+                LocationDetailsController(
+                    projectScope.applicationScope.get(),
+                    locationId,
+                    projectScope.get(),
+                    LocationDetailsPresenter(
+                        locationId,
+                        get<LocationDetailsModel>(),
+                        projectScope.get(),
+                        projectScope.get<LocationRenamedNotifier>()
+                    ),
+                    projectScope.get()
+                )
+            }
+
         }
     }
 

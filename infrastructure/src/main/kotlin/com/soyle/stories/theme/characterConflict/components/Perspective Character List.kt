@@ -1,18 +1,16 @@
 package com.soyle.stories.theme.characterConflict.components
 
-import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
 import com.soyle.stories.theme.characterConflict.CharacterConflictModel
-import com.soyle.stories.theme.characterConflict.CharacterConflictViewModel
+import javafx.collections.ObservableList
 import javafx.scene.control.MenuButton
 import javafx.scene.control.MenuItem
 import javafx.util.Duration
 import tornadofx.*
 
 internal fun MenuButton.populatePerspectiveCharacterList(model: CharacterConflictModel) {
-    model.availablePerspectiveCharacters.onChange { list ->
+    model.availablePerspectiveCharacters.onChange { list: ObservableList<AvailablePerspectiveCharacterViewModel>? ->
         items.clear()
         when {
             list == null -> loading()

@@ -3,30 +3,39 @@ package com.soyle.stories.characterarc.baseStoryStructure
 import com.soyle.stories.common.ToolView
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.resolve
+import com.soyle.stories.location.createLocationDialog.createLocationDialog
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Orientation
-import javafx.geometry.Side
 import javafx.scene.Parent
-import javafx.scene.control.ContextMenu
+import javafx.scene.control.CheckMenuItem
+import javafx.scene.control.MenuItem
+import javafx.scene.control.ScrollPane
 import javafx.scene.layout.Priority
 import tornadofx.*
 
 class BaseStoryStructure : ToolView() {
 
+    override val scope: BaseStoryStructureScope = super.scope as BaseStoryStructureScope
+
     val model = find<BaseStoryStructureModel>()
     private val baseStoryStructureViewListener = resolve<BaseStoryStructureViewListener>()
 
-    override val root: Parent = form {
-        fieldset(labelPosition = Orientation.VERTICAL) {
-            model.sections.indices.forEach {
-                addStoryStructureItem(it)
-            }
-            model.sections.select { SimpleIntegerProperty(it.size) }.addListener { _, i, i2 ->
-                val originalSize = i?.toInt() ?: 0
-                val newSize = i2?.toInt() ?: 0
-                if (newSize > originalSize) {
-                    (originalSize until newSize).forEach { addStoryStructureItem(it) }
+    override val root: Parent = scrollpane {
+        hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
+        vbarPolicy = ScrollPane.ScrollBarPolicy.AS_NEEDED
+        isFitToWidth = true
+        content = form {
+            fieldset(labelPosition = Orientation.VERTICAL) {
+                model.sections.indices.forEach {
+                    addStoryStructureItem(it)
+                }
+                model.sections.select { SimpleIntegerProperty(it.size) }.addListener { _, i, i2 ->
+                    val originalSize = i?.toInt() ?: 0
+                    val newSize = i2?.toInt() ?: 0
+                    if (newSize > originalSize) {
+                        (originalSize until newSize).forEach { addStoryStructureItem(it) }
+                    }
                 }
             }
         }
@@ -36,26 +45,26 @@ class BaseStoryStructure : ToolView() {
         baseStoryStructureViewListener.getBaseStoryStructure()
     }
 
-    private val linkedLocationContextMenuSection: SimpleObjectProperty<StoryStructureSectionViewModel?> = SimpleObjectProperty(null)
-    private val linkedLocationContextMenu = ContextMenu().apply {
-        isAutoHide = true
-        items.bind(model.availableLocations) {
-            checkmenuitem(it.name) {
-                id = it.id
-                linkedLocationContextMenuSection.select { section -> (section?.linkedLocation?.id == it.id).toProperty() }.onChange {
-                    isSelected = it == true
-                }
+    private fun linkedLocationOptions(section: StoryStructureSectionViewModel): List<MenuItem> {
+        return listOf(
+            MenuItem("Create Location").apply {
                 action {
-                    val section = linkedLocationContextMenuSection.get()
-                    val sectionId = section?.sectionId ?: return@action
+                    createLocationDialog(scope.projectScope) {
+                        baseStoryStructureViewListener.linkLocation(section.sectionId, it.locationId.toString())
+                    }
+                }
+            }
+        ) + model.availableLocations.map {
+            CheckMenuItem(it.name).apply {
+                id = it.id
+                isSelected = section.linkedLocation?.id == it.id
+                action {
                     if (section.linkedLocation?.id == it.id) {
-                        baseStoryStructureViewListener.unlinkLocation(sectionId)
-                        this@apply.hide()
+                        baseStoryStructureViewListener.unlinkLocation(section.sectionId)
                         return@action
                     }
                     val locationId = it?.id ?: return@action
-                    baseStoryStructureViewListener.linkLocation(sectionId, locationId)
-                    this@apply.hide()
+                    baseStoryStructureViewListener.linkLocation(section.sectionId, locationId)
                 }
             }
         }
@@ -82,16 +91,15 @@ class BaseStoryStructure : ToolView() {
             }
             field("Linked Location") {
                 hgrow = Priority.SOMETIMES
-                button {
+                menubutton {
                     textProperty().bind(section.select { (it.linkedLocation?.name ?: "[link]").toProperty() })
                     addClass("location-select")
-                    enableWhen { model.locationsAvailable }
                     fitToParentWidth()
-                    action {
-                        contextMenu = linkedLocationContextMenu
-                        linkedLocationContextMenuSection.set(section.get())
-                        contextMenu.show(this, Side.BOTTOM, 0.0, 0.0)
+                    setOnShowing {
+                        val sectionValue = section.get() ?: return@setOnShowing
+                        items.setAll(linkedLocationOptions(sectionValue))
                     }
+                    setOnHidden { items.clear() }
                 }
             }
         }
@@ -101,6 +109,6 @@ class BaseStoryStructure : ToolView() {
     }
 
     init {
-    	title = "Base Story Structure"
+        title = "Base Story Structure"
     }
 }

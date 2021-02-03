@@ -1,10 +1,7 @@
 package com.soyle.stories.layout.config
 
 import com.soyle.stories.entities.Project
-import com.soyle.stories.layout.config.fixed.CharacterList
-import com.soyle.stories.layout.config.fixed.LocationList
-import com.soyle.stories.layout.config.fixed.SceneList
-import com.soyle.stories.layout.config.fixed.ThemeList
+import com.soyle.stories.layout.config.fixed.*
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications
 import com.soyle.stories.layout.entities.Layout
@@ -36,6 +33,7 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                 primaryStack(6) {}
                 stack(2) {
                     tool(Tool(ThemeList, isOpen = false))
+                    tool(Tool(SceneSymbols, isOpen = false))
                     //openTool(ToolType.NoteList)
                 }
             }

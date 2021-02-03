@@ -2,6 +2,7 @@ package com.soyle.stories.common
 
 import com.soyle.stories.di.resolve
 import com.soyle.stories.gui.View
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.*
 import javafx.beans.value.ObservableValue
@@ -11,7 +12,12 @@ import kotlin.error
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
-abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable<VM>, Component(), ScopedInstance {
+abstract class ProjectScopedModel<VM : Any> : Model<ProjectScope, VM>(ProjectScope::class) {
+	override val applicationScope: ApplicationScope
+		get() = scope.applicationScope
+}
+
+abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View<VM>, View.Nullable<VM>, Component(), ScopedInstance {
 
 	override val scope: S = if (scopeClass.isInstance(super.scope))
 		@Suppress("UNCHECKED_CAST")
@@ -20,8 +26,16 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 
 	private val itemProperty: ReadOnlyObjectWrapper<VM?> = ReadOnlyObjectWrapper(null)
 	fun itemProperty(): ReadOnlyObjectProperty<VM?> = itemProperty.readOnlyProperty
-	var item by itemProperty
-		protected set
+
+	var item: VM?
+		get() = itemProperty.get()
+		set(value) {
+			itemProperty.set(value)
+			props.forEach { prop ->
+				value?.let { prop.update(it) }
+			}
+		}
+
 
 	abstract val applicationScope: ApplicationScope
 
@@ -35,7 +49,7 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 
 	open fun viewModel(): VM? = item
 
-	override val viewModel: VM?
+	final override val viewModel: VM?
 		get() = viewModel()
 
 	override fun update(update: VM?.() -> VM) {
@@ -62,14 +76,6 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View.Nullable
 		}
 	}
 	private val props = mutableListOf<BoundProperty<*>>()
-
-	init {
-		itemProperty.onChange { vm ->
-			props.forEach { prop ->
-				vm?.let { prop.update(it) }
-			}
-		}
-	}
 
 	@JvmName("bindInt")
 	protected fun bind(prop: KProperty1<VM, Int>): SimpleIntegerProperty {

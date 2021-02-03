@@ -17,7 +17,7 @@ private class LocationListModel(
 		LocationListPresenter(this)
 	}
 
-	override fun update(update: List<LocationItemViewModel>.() -> List<LocationItemViewModel>) {
+	override fun updateOrInvalidated(update: List<LocationItemViewModel>.() -> List<LocationItemViewModel>) {
 		threadTransformer.gui { model.set(model.get().update().toObservable()) }
 	}
 }

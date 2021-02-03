@@ -2,16 +2,16 @@ package com.soyle.stories.theme.characterConflict.components
 
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.theme.characterConflict.AvailableOpponentViewModel
-import com.soyle.stories.theme.characterConflict.AvailablePerspectiveCharacterViewModel
 import com.soyle.stories.theme.characterConflict.CharacterConflictModel
-import javafx.beans.value.ObservableValue
+import javafx.collections.ObservableList
 import javafx.scene.control.MenuButton
 import javafx.util.Duration
 import tornadofx.*
 
 internal fun MenuButton.populateOpponentList(model: CharacterConflictModel)
 {
-    model.availableOpponents.onChange { list ->
+    setOnHidden { model.availableOpponents.clear() }
+    model.availableOpponents.onChange { list: ObservableList<AvailableOpponentViewModel>? ->
         items.clear()
         when {
             list == null -> loading()

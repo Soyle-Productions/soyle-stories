@@ -2,9 +2,7 @@ package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.common.SingleLine
 import com.soyle.stories.common.countLines
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.ProseMention
+import com.soyle.stories.entities.*
 import com.soyle.stories.gui.View
 import com.soyle.stories.prose.ContentReplaced
 import com.soyle.stories.prose.MentionTextReplaced
@@ -49,23 +47,30 @@ class ProseEditorPresenter internal constructor(
     }
 
     internal fun MentionQueryLoaded.updateQuery(query: String): MentionQueryState {
+        val mentionedIds = view.viewModel!!.content.asSequence().filterIsInstance<Mention>().map { it.entityId }.toSet()
         val newMatches = matchesForInitialQuery
             .filter { it.name.contains(query, ignoreCase = true) }
-            .sortedBy {
-                val index = it.name.indexOf(query, ignoreCase = true)
-                when {
-                    index == 0 -> 0
-                    it.name.substring(index - 1, index) == " " -> 1
-                    else -> 2
+            .sortedWith(compareBy(
+                {
+                    it.entityId !in mentionedIds
+                },
+                {
+                    val index = it.name.indexOf(query, ignoreCase = true)
+                    when {
+                        index == 0 -> 0
+                        it.name.substring(index - 1, index) == " " -> 1
+                        else -> 2
+                    }
                 }
-            }.map {
+            )).map {
                 MatchingStoryElementViewModel(
                     countLines(it.name) as SingleLine,
+                    it.parentEntityName?.let { countLines(it) as? SingleLine },
                     it.name.indexOf(query, ignoreCase = true).let { it until it + query.length },
-                    when (it.entityId.id) {
-                        is Character.Id -> "character"
-                        is Location.Id -> "location"
-                        else -> error("unrecognized entity type")
+                    when (it.entityId) {
+                        is MentionedCharacterId -> "character"
+                        is MentionedLocationId -> "location"
+                        is MentionedSymbolId -> "symbol"
                     },
                     it.entityId
                 )
@@ -117,8 +122,9 @@ class ProseEditorPresenter internal constructor(
 
     override fun loadedReplacements(replacements: List<ListOptionsToReplaceMentionInSceneProse.MentionOption<*>>) {
         view.updateOrInvalidated {
+            val mentionedEntities = content.asSequence().filterIsInstance<Mention>().map { it.entityId }.toSet()
             copy(
-                replacementOptions = replacements.map {
+                replacementOptions = replacements.sortedBy { it.entityId !in mentionedEntities }.map {
                     ReplacementElementViewModel(it.name, it.entityId)
                 }
             )
@@ -161,12 +167,24 @@ class ProseEditorPresenter internal constructor(
             var offset = 0
             copy(
                 content = content.flatMap { element ->
-                    if (range.intersect(offset..offset + element.text.length).isNotEmpty()) {
-                        listOfNotNull(
-                            BasicText(element.text.substring(0 until range.first - offset)).takeUnless { it.text.isEmpty() },
-                            newElement,
-                            BasicText(element.text.substring(range.last - offset)).takeUnless { it.text.isEmpty() }
-                        )
+                    if (range.intersect(offset until offset + element.text.length).isNotEmpty()) {
+                        try {
+                            listOfNotNull(
+                                BasicText(element.text.substring(0 until range.first - offset)).takeUnless { it.text.isEmpty() },
+                                newElement,
+                                BasicText(element.text.substring(range.last - offset)).takeUnless { it.text.isEmpty() }
+                            ).also {
+                                offset += newElement.text.length
+                            }
+                        } catch (t: StringIndexOutOfBoundsException) {
+                            throw IllegalStateException(
+                                """Substring failed:
+                                     range: $range
+                                     mention: $mention
+                                     offset: $offset
+                                     element: $element
+                            """.trimIndent(), t)
+                        }
                     } else {
                         offset += element.text.length
                         listOf(element)

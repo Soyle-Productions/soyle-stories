@@ -264,7 +264,6 @@ class CharacterConflict : View() {
                     model.selectedPerspectiveCharacter.value?.characterId ?: return@setOnShowing
                 viewListener.getAvailableOpponents(perspectiveCharacterId)
             }
-            setOnHidden { model.availableOpponents.value = null }
             populateOpponentList(model)
             onCreateCharacter = onCreateCharacter@{
                 val perspectiveCharacterId =

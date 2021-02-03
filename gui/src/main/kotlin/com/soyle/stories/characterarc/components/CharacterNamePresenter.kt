@@ -14,7 +14,7 @@ class CharacterNamePresenter(
 
 	override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
 		if (characterRenamed.characterId.uuid != characterId) return
-		view.update { characterRenamed.newName }
+		view.updateOrInvalidated { characterRenamed.newName }
 	}
 
 }

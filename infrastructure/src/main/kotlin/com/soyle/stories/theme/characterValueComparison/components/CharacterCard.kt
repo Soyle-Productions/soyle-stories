@@ -22,9 +22,7 @@ import javafx.event.Event
 import javafx.scene.Parent
 import javafx.scene.control.MenuItem
 import javafx.scene.control.Tooltip
-import javafx.scene.control.TreeItem
 import javafx.scene.layout.Region
-import javafx.scene.paint.Color
 import javafx.util.Duration
 import tornadofx.*
 
@@ -107,7 +105,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
                     style { fontSize = 1.2.em }
                 }
                 spacer()
-                buttonCombo {
+                menubutton {
                     this.textProperty().bind(addValueButtonLabelProperty)
                     val loadingItem = item("Loading...") {
                         isDisable = true

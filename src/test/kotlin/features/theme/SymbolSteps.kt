@@ -4,8 +4,9 @@ import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbench
 import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert.Companion.assertThat
+import com.soyle.stories.entities.Theme
+import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import io.cucumber.java8.PendingException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 
@@ -18,11 +19,44 @@ class SymbolSteps : En {
     }
 
     private fun givens() {
+        Given("I have created a symbol named {string} in the {theme}") { symbolName: String, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val themeDriver = ThemeDriver(workbench)
+            themeDriver.givenSymbolInThemeNamed(theme.id, symbolName)
+        }
         Given("a symbol named {string} has been created in the {string} theme") { symbolName: String, themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val themeDriver = ThemeDriver(workbench)
             val theme = themeDriver.getThemeByNameOrError(themeName)
             themeDriver.givenSymbolInThemeNamed(theme.id, symbolName)
+        }
+        Given("I have created the following themes and symbols") { dataTable: DataTable ->
+            val dataLists = dataTable.asLists()
+            val themeNames = dataLists.first()
+            val themeDriver = ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError())
+            themeNames.forEachIndexed { index, name ->
+                val theme = themeDriver.givenThemeNamed(name)
+                dataLists.drop(1).forEach { row ->
+                    val symbolName = row.getOrNull(index)?.takeUnless { it.isBlank() } ?: return@forEach
+                    themeDriver.givenSymbolInThemeNamed(theme.id, symbolName)
+                }
+            }
+        }
+        Given(
+            "I have renamed the symbol {string} in the {theme} to {string}"
+        ) { originalSymbolName: String, theme: Theme, newName: String ->
+            val symbol = theme.symbols.find { it.name == originalSymbolName }
+            if (symbol == null && theme.symbols.any { it.name == newName }) {
+                return@Given
+            }
+
+            ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .renameSymbolTo(theme, symbol!!, newName)
+        }
+        Given("I have removed the {string} symbol from the {theme}") { symbolName: String, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            val themeDriver = ThemeDriver(workbench)
+            themeDriver.givenSymbolRemovedFromTheme(theme, symbolName)
         }
     }
 
@@ -39,6 +73,19 @@ class SymbolSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             workbench.givenThemeListToolHasBeenOpened()
                 .renameSymbolInThemeTo(originalSymbolName, themeName, newName)
+        }
+        When(
+            "I rename the symbol {string} in the {theme} to {string}"
+        ) { symbolName: String, theme: Theme, newName: String ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenThemeListToolHasBeenOpened()
+                .renameSymbolInThemeTo(symbolName, theme.name, newName)
+        }
+        When("I remove the {string} symbol from the {theme}") { symbolName: String, theme: Theme ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenThemeListToolHasBeenOpened()
+                .openDeleteSymbolDialogForSymbolInTheme(theme, symbolName)
+                ?.confirmDeleteSymbol()
         }
         When("the {string} symbol in the {string} theme is deleted") { symbolName: String, themeName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()

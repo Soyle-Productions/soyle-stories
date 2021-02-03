@@ -12,6 +12,8 @@ import com.soyle.stories.prose.proseEditor.ProseEditorController
 import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.prose.proseEditor.ProseEditorState
 import com.soyle.stories.prose.proseEditor.ProseEditorViewListener
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedNotifier
+import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeNotifier
 
 object Presentation {
 
@@ -33,6 +35,8 @@ object Presentation {
                     it listensTo projectScope.get<DetectInvalidatedMentionsOutput>()
                     it listensTo projectScope.get<RemovedCharacterNotifier>()
                     it listensTo projectScope.get<DeletedLocationNotifier>()
+                    it listensTo projectScope.get<ThemeDeletedNotifier>()
+                    it listensTo projectScope.get<SymbolRemovedFromThemeNotifier>()
                 }
             }
         }

@@ -5,6 +5,7 @@ import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.prose.editProse.EditProseController
@@ -15,6 +16,7 @@ import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneCo
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
+import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
 import kotlinx.coroutines.runBlocking
 
 class SceneDriver private constructor(private val projectScope: ProjectScope) {
@@ -112,6 +114,22 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
     fun givenSceneProseMentionsEntity(scene: Scene, entityId: MentionedEntityId<*>, index: Int, length: Int) {
         val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
         ProseDriver(projectScope.get()).givenProseMentionsEntity(prose, entityId, index, length)
+    }
+
+    fun givenSceneProseMentionsEntity(scene: Scene, entityId: MentionedEntityId<*>, name: String) {
+        val prose = ProseDriver(projectScope.get()).getProseByIdOrError(scene.proseId)
+        ProseDriver(projectScope.get()).givenProseMentionsEntity(prose, entityId, name)
+    }
+
+    fun givenSceneProseDoesNotMention(scene: Scene, mentionText: String) {
+        val proseDriver = ProseDriver(projectScope.get())
+        val prose = proseDriver.getProseByIdOrError(scene.proseId)
+        proseDriver.givenProseDoesNotMention(prose, mentionText)
+    }
+
+    fun givenSymbolPinnedInScene(scene: Scene, theme: Theme, symbol: Symbol)
+    {
+        projectScope.get<PinSymbolToSceneController>().pinSymbolToScene(scene.id, symbol.id)
     }
 
     companion object {

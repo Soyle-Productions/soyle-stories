@@ -1,9 +1,6 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.common.SingleLine
-import com.soyle.stories.common.SingleNonBlankLine
-import com.soyle.stories.common.countLines
-import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.common.*
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.location.LocationException
@@ -19,6 +16,7 @@ import tornadofx.*
 
 class CreateLocationDialog : Fragment("New Location") {
 
+    override val scope: ProjectScope = super.scope as ProjectScope
     private val model = find<CreateLocationDialogModel>()
     private val createLocationDialogViewListener: CreateLocationDialogViewListener = resolve()
 
@@ -28,7 +26,9 @@ class CreateLocationDialog : Fragment("New Location") {
 
     private val createdLocationReceiver = object : CreateNewLocation.OutputPort {
         override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
-            onCreateLocation.invoke(response)
+            scope.applicationScope.get<ThreadTransformer>().gui {
+                onCreateLocation.invoke(response)
+            }
             createdLocationNotifier.removeListener(this)
         }
 

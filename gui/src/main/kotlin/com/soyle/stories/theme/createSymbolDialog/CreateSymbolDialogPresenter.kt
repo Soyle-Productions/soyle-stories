@@ -1,23 +1,22 @@
 package com.soyle.stories.theme.createSymbolDialog
 
-import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.ThemeNameCannotBeBlank
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
-import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
+import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
 import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
 import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
+import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
-import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
 import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
 import com.soyle.stories.theme.usecases.listThemes.ListThemes
 import com.soyle.stories.theme.usecases.listThemes.ThemeList
-import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 
 class CreateSymbolDialogPresenter(
     private val view: View.Nullable<CreateSymbolDialogViewModel>
-) : ListThemes.OutputPort, DeleteTheme.OutputPort, RenamedThemeReceiver, CreatedThemeReceiver, SymbolAddedToThemeReceiver {
+) : ListThemes.OutputPort, ThemeDeletedReceiver, RenamedThemeReceiver, CreatedThemeReceiver, SymbolAddedToThemeReceiver {
 
     override suspend fun themesListed(response: ThemeList) {
         view.update {
@@ -43,8 +42,8 @@ class CreateSymbolDialogPresenter(
         }
     }
 
-    override fun themeDeleted(response: DeletedTheme) {
-        val themeId = response.themeId.toString()
+    override suspend fun receiveDeletedTheme(deletedTheme: DeletedTheme) {
+        val themeId = deletedTheme.themeId.toString()
         view.updateOrInvalidated {
             copy(
                 themes = themes.filterNot { it.themeId == themeId }
@@ -86,10 +85,6 @@ class CreateSymbolDialogPresenter(
         view.update {
             CreateSymbolDialogViewModel("", "", null, null, emptyList(), createdId = symbolAddedToTheme.symbolId.toString())
         }
-    }
-
-    override suspend fun characterArcsDeleted(response: List<DeletedCharacterArc>) {
-        // do nothing
     }
 
 }

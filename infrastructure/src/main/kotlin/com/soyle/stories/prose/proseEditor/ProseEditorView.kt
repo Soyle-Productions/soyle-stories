@@ -4,22 +4,17 @@ import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialo
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
 import com.soyle.stories.entities.*
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
-import com.soyle.stories.prose.proseEditor.ProseEditorTextArea.Styles.Companion.proseEditorTextArea
-import javafx.beans.property.SimpleObjectProperty
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.collections.ObservableList
-import javafx.scene.control.ContextMenu
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
-import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyCombination
 import javafx.scene.layout.Priority
-import org.fxmisc.richtext.NavigationActions
-import org.fxmisc.wellbehaved.event.EventPattern
-import org.fxmisc.wellbehaved.event.InputMap
-import org.fxmisc.wellbehaved.event.Nodes
+import javafx.scene.paint.Color
 import tornadofx.*
 import java.util.*
+import kotlin.collections.set
 
 class ProseEditorView : Fragment() {
 
@@ -30,13 +25,13 @@ class ProseEditorView : Fragment() {
 
     private val textArea = ProseEditorTextArea()
     private val mentionMenu = MatchingStoryElementsPopup(scope, state.mentionQueryState)
-    private val mentionIssueMenu = ContextMenu()
-    private fun mentionIssueItems(mention: Mention) = listOf(
+    private val mentionIssueMenu = MentionIssueMenu(this)
+    private fun mentionIssueItems(hitIndex: Int, mention: Mention) = listOf(
         clearMentionOption(mention),
         clearAllMentionOption(mention),
         removeMentionOption(mention),
         removeAllMentionsOption(mention)
-    ) + replaceMentionOptions(mention)
+    ) + replaceMentionOptions(hitIndex, mention)
 
     override val root = hbox {
         addClass(Styles.proseEditor)
@@ -59,11 +54,7 @@ class ProseEditorView : Fragment() {
         with(textArea) {
             disableWhen(state.isLocked)
             onLoseFocus(viewController::onTextAreaFocusLost)
-            val onOutsideSelectionMousePressed = this.onOutsideSelectionMousePressed
-            setOnOutsideSelectionMousePressed {
-                viewController.onClickInNewArea()
-                onOutsideSelectionMousePressed.handle(it)
-            }
+            cancelActiveQueryWhenClickedOutsideSelection()
             caretPositionProperty().onChange { viewController.onCaretMoved(it) }
             caretSelectionBind.underlyingSelection.rangeProperty().onChange {
                 if (it == null) return@onChange
@@ -79,14 +70,14 @@ class ProseEditorView : Fragment() {
                     if (optionalIndex.isEmpty) return@setOnContextMenuRequested
                     else optionalIndex.asInt
                 }
-                val segment = findSegment { mention, i -> characterIndex in i..i + mention.text.length }
-                if (segment?.first is Mention && segment.first.issue != null) {
-                    mentionIssueMenu.properties["relative-mention"] = segment.first
-                    mentionIssueMenu.items.setAll(mentionIssueItems(segment.first))
+                val segment = textArea.getSegmentContaining(characterIndex)
+                if (segment is Mention && segment.issue != null) {
+                    mentionIssueMenu.properties["relative-mention"] = segment
+                    mentionIssueMenu.items.setAll(mentionIssueItems(characterIndex, segment))
                     it.consume()
                     if (it.isKeyboardTrigger) {
                         val screenPosition =
-                            getCharacterBoundsOnScreen(segment.second, segment.second + segment.first.text.length).get()
+                            getCharacterBoundsOnScreen(characterIndex, characterIndex + 1).get()
                         mentionIssueMenu.show(this, screenPosition.minX, screenPosition.maxY)
                     } else {
                         mentionIssueMenu.show(this, it.screenX, it.screenY)
@@ -96,6 +87,14 @@ class ProseEditorView : Fragment() {
                     mentionIssueMenu.items.clear()
                 }
             }
+        }
+    }
+
+    private fun ProseEditorTextArea.cancelActiveQueryWhenClickedOutsideSelection() {
+        val onOutsideSelectionMousePressed = this.onOutsideSelectionMousePressed
+        setOnOutsideSelectionMousePressed {
+            viewListener.cancelQuery()
+            onOutsideSelectionMousePressed.handle(it)
         }
     }
 
@@ -131,48 +130,25 @@ class ProseEditorView : Fragment() {
             if (updateCausedByInput) return@onChange
             pushingUpdate = true
             val currentPosition = textArea.caretPosition
+            textArea.undoManager.forgetHistory()
             textArea.clear()
             elements?.forEach {
-                textArea.append(it, listOf())
+                when (it) {
+                    is BasicText -> textArea.appendText(it.text)
+                    is Mention -> textArea.append(it, listOf())
+                }
             }
             textArea.moveTo(currentPosition.coerceAtMost(textArea.text.length).coerceAtLeast(0))
             pushingUpdate = false
         }
-        textArea.textProperty().onChange {
-            if (pushingUpdate) return@onChange
+        textArea.richChanges().feedTo {
+            if (pushingUpdate) return@feedTo
             updateCausedByInput = true
-            state.content.setAll(textArea.paragraphs.flatMap { it.segments })
+            state.content.setAll(textArea.paragraphs.flatMap { it.segments + BasicText("\n") }.dropLast(1))
             updateCausedByInput = false
         }
         textArea.moveTo(0)
         textArea.requestFollowCaret()
-        preventArrowKeysFromEnteringMentions()
-
-        val mentionOnLeftOfCaretProperty = SimpleObjectProperty<Mention?>()
-        val mentionOnRightOfCaretProperty = SimpleObjectProperty<Mention?>()
-        Nodes.addInputMap(textArea, InputMap.consumeWhen(EventPattern.keyPressed(KeyCode.DELETE), {
-            if (textArea.selection.length > 0) false
-            else {
-                mentionOnRightOfCaretProperty.value =
-                    findSegment { mention, offset -> offset == textArea.caretPosition }?.first
-                mentionOnRightOfCaretProperty.value != null
-            }
-        }) {
-            val mentionOnRightOfCaret = mentionOnRightOfCaretProperty.value!!
-            textArea.deleteText(textArea.caretPosition, textArea.caretPosition + mentionOnRightOfCaret.text.length)
-
-        })
-        Nodes.addInputMap(textArea, InputMap.consumeWhen(EventPattern.keyPressed(KeyCode.BACK_SPACE), {
-            if (textArea.selection.length > 0) false
-            else {
-                mentionOnLeftOfCaretProperty.value =
-                    findSegment { mention, offset -> offset + mention.text.length == textArea.caretPosition }?.first
-                mentionOnLeftOfCaretProperty.value != null
-            }
-        }) {
-            val mentionOnLeftOfCaret = mentionOnLeftOfCaretProperty.value!!
-            textArea.deleteText(textArea.caretPosition - mentionOnLeftOfCaret.text.length, textArea.caretPosition)
-        })
 
         viewListener.getValidState()
     }
@@ -180,14 +156,20 @@ class ProseEditorView : Fragment() {
     private fun clearMentionOption(mention: Mention): MenuItem {
         return MenuItem("Clear this Mention of ${mention.text} and Use Normal Text").apply {
             id = "clear-mention"
-            action { viewListener.clearMention(mention) }
+            action {
+                textArea.clearMention(mention)
+                viewListener.save()
+            }
         }
     }
 
     private fun clearAllMentionOption(mention: Mention): MenuItem {
         return MenuItem("Clear all Mentions of ${mention.text} and Use Normal Text").apply {
             id = "clear-mentions"
-            action { viewListener.clearAllMentionsOfEntity(mention.entityId) }
+            action {
+                textArea.clearAllMentionsOfEntity(mention)
+                viewListener.save()
+            }
         }
     }
 
@@ -195,7 +177,8 @@ class ProseEditorView : Fragment() {
         return MenuItem("Remove this Mention of ${mention.text} and Remove the Text").apply {
             id = "remove-mention"
             action {
-                viewListener.removeMention(mention)
+                textArea.removeMention(mention)
+                viewListener.save()
             }
         }
     }
@@ -204,57 +187,43 @@ class ProseEditorView : Fragment() {
         return MenuItem("Remove all Mentions of ${mention.text} and Remove the Text").apply {
             id = "remove-mentions"
             action {
-                viewListener.removeAllMentionsOfEntity(mention.entityId)
+                textArea.removeAllMentionsOfEntity(mention)
+                viewListener.save()
             }
         }
     }
 
-    private fun replaceMentionOptions(mention: Mention): List<MenuItem> {
+    private fun replaceMentionOptions(hitIndex: Int, mention: Mention): List<MenuItem> {
+        state.replacementOptions.clear()
         val items = listOf(
-            replaceMentionOption(mention),
+            replaceMentionOption(hitIndex, mention),
             replaceAllMentionsOption(mention)
         )
         viewListener.getMentionReplacementOptions(mention)
         return items
     }
 
-    private fun replaceMentionOption(mention: Mention): MenuItem {
+    private fun replaceMentionOption(hitIndex: Int, mention: Mention): MenuItem {
         return Menu("Replace this Mention of ${mention.text} with...").apply {
             id = "replace-mention"
             state.replacementOptions.onChangeOnce {
                 if (it == null) return@onChangeOnce
-                val creationOption = when (mention.entityId) {
-                    is MentionedCharacterId -> MenuItem("Create New Character").apply {
-                        action {
-                            createCharacterDialog(scope.projectScope, onCharacterCreated = {
-                                viewListener.replaceMention(
-                                    mention,
-                                    ReplacementElementViewModel(
-                                        it.characterName,
-                                        Character.Id(it.characterId).mentioned()
-                                    )
-                                )
-                            })
-                        }
+                val creationOption = getCreationReplacementOption(
+                    mention.entityId,
+                    onNewMentionedEntity = {
+                        val oldMention =
+                            textArea.getSegmentContaining(hitIndex) as? Mention ?: return@getCreationReplacementOption
+                        textArea.replaceMention(oldMention, with = it)
+                        viewListener.save()
                     }
-                    is MentionedLocationId -> MenuItem("Create New Location").apply {
-                        action {
-                            createLocationDialog(scope.projectScope, onCreateLocation = {
-                                viewListener.replaceMention(
-                                    mention,
-                                    ReplacementElementViewModel(
-                                        it.locationName,
-                                        Location.Id(it.locationId).mentioned()
-                                    )
-                                )
-                            })
-                        }
-                    }
-                }
+                )
                 items.setAll(
                     *(listOf(creationOption) + state.replacementOptions.map {
                         MenuItem(it.name).apply {
-                            action { viewListener.replaceMention(mention, it) }
+                            action {
+                                textArea.replaceMention(mention, Mention(it.name, it.id))
+                                viewListener.save()
+                            }
                         }
                     }).toTypedArray()
                 )
@@ -270,38 +239,20 @@ class ProseEditorView : Fragment() {
             id = "replace-mentions"
             state.replacementOptions.onChangeOnce {
                 if (it == null) return@onChangeOnce
-                val creationOption = when (mention.entityId) {
-                    is MentionedCharacterId -> MenuItem("Create New Character").apply {
-                        action {
-                            createCharacterDialog(scope.projectScope, onCharacterCreated = {
-                                viewListener.replaceAllMentionsOfEntity(
-                                    mention.entityId,
-                                    ReplacementElementViewModel(
-                                        it.characterName,
-                                        Character.Id(it.characterId).mentioned()
-                                    )
-                                )
-                            })
-                        }
+                val creationOption = getCreationReplacementOption(
+                    mention.entityId,
+                    onNewMentionedEntity = {
+                        textArea.replaceAllMentionsOfEntity(mention, with = it)
+                        viewListener.save()
                     }
-                    is MentionedLocationId -> MenuItem("Create New Location").apply {
-                        action {
-                            createLocationDialog(scope.projectScope, onCreateLocation = {
-                                viewListener.replaceAllMentionsOfEntity(
-                                    mention.entityId,
-                                    ReplacementElementViewModel(
-                                        it.locationName,
-                                        Location.Id(it.locationId).mentioned()
-                                    )
-                                )
-                            })
-                        }
-                    }
-                }
+                )
                 items.setAll(
                     *(listOf(creationOption) + state.replacementOptions.map {
                         MenuItem(it.name).apply {
-                            action { viewListener.replaceAllMentionsOfEntity(mention.entityId, it) }
+                            action {
+                                textArea.replaceAllMentionsOfEntity(mention, with = Mention(it.name, it.id))
+                                viewListener.save()
+                            }
                         }
                     }).toTypedArray()
                 )
@@ -312,79 +263,49 @@ class ProseEditorView : Fragment() {
         }
     }
 
-    private fun preventArrowKeysFromEnteringMentions() {
-        // without this function, the arrow keys would only adjust the caret position by a single character length.
-        // For any mention with a length greater than 1, it would never jump over due to the caret adjustment code,
-        // so, we override the caret movement behavior due to an arrow key
-
-        preventRightArrowFromEnteringMentions()
-        preventLeftArrowFromEnteringMentions()
-    }
-
-    private fun preventRightArrowFromEnteringMentions() {
-        consumeArrowKeysPressed(
-            listOf(KeyCode.RIGHT, KeyCode.KP_RIGHT),
-            whenMention = { _, offset -> offset == textArea.caretPosition },
-            insteadMoveTo = { (mention, offset) -> offset + mention.text.length }
-        )
-    }
-
-    private fun preventLeftArrowFromEnteringMentions() {
-        consumeArrowKeysPressed(
-            listOf(KeyCode.LEFT, KeyCode.KP_LEFT),
-            whenMention = { mention, offset -> offset + mention.text.length == textArea.caretPosition },
-            insteadMoveTo = { (_, offset) -> offset }
-        )
-    }
-
-    private fun consumeArrowKeysPressed(
-        keyCodes: List<KeyCode>,
-        whenMention: (Mention, Int) -> Boolean,
-        insteadMoveTo: (Pair<Mention, Int>) -> Int
-    ) {
-        Nodes.addInputMap(
-            textArea,
-            InputMap.consumeWhen(
-                EventPattern.anyOf(
-                    *keyCodes.map {
-                        EventPattern.keyPressed(it, KeyCombination.SHIFT_ANY)
-                    }.toTypedArray()
-                ),
-                { findSegment(whenMention) != null }
-            ) {
-                val mention = findSegment(whenMention)!!
-                if (it.isShiftDown) {
-                    textArea.moveTo(insteadMoveTo(mention), NavigationActions.SelectionPolicy.ADJUST)
-                } else {
-                    textArea.moveTo(insteadMoveTo(mention))
+    private fun getCreationReplacementOption(
+        entityId: MentionedEntityId<*>,
+        onNewMentionedEntity: (Mention) -> Unit
+    ): MenuItem {
+        return when (entityId) {
+            is MentionedCharacterId -> MenuItem("Create New Character").apply {
+                action {
+                    createCharacterDialog(scope.projectScope, onCharacterCreated = {
+                        onNewMentionedEntity(Mention(it.characterName, Character.Id(it.characterId).mentioned()))
+                    })
                 }
             }
-        )
-    }
-
-    private fun findSegment(predicate: (Mention, Int) -> Boolean): Pair<Mention, Int>? {
-        var offset = 0
-        return textArea.paragraphs.asSequence()
-            .flatMap { it.segments.asSequence() }
-            .find {
-                if (it !is Mention) {
-                    offset += it.text.length
-                    return@find false
+            is MentionedLocationId -> MenuItem("Create New Location").apply {
+                action {
+                    createLocationDialog(scope.projectScope, onCreateLocation = {
+                        onNewMentionedEntity(Mention(it.locationName, Location.Id(it.locationId).mentioned()))
+                    })
                 }
-                val predicateResult = predicate(it, offset)
-                if (predicateResult) true
-                else {
-                    offset += it.text.length
-                    false
-                }
-            }?.let {
-                it as Mention to offset
             }
+            is MentionedSymbolId -> MenuItem("Create New Symbol").apply {
+                action {
+                    CreateSymbolDialog(
+                        scope.projectScope,
+                        entityId.themeId.uuid.toString()
+                    ) { createdSymbol ->
+                        onNewMentionedEntity(
+                            Mention(
+                                createdSymbol.symbolName,
+                                Symbol.Id(createdSymbol.symbolId).mentioned(Theme.Id(createdSymbol.themeId))
+                            )
+                        )
+                    }
+                }
+            }
+        }
     }
 
     class Styles : Stylesheet() {
         companion object {
 
+            val proseEditorTextArea by cssclass()
+            val mention by cssclass()
+            val problem by cssclass()
             val proseEditor by cssclass()
 
             init {
@@ -400,6 +321,26 @@ class ProseEditorView : Fragment() {
                 proseEditorTextArea {
                     padding = box(32.px)
                 }
+            }
+            mention {
+                val transparentHighlight = Color.rgb(
+                    (com.soyle.stories.soylestories.Styles.Blue.red * 255).toInt(),
+                    (com.soyle.stories.soylestories.Styles.Blue.green * 255).toInt(),
+                    (com.soyle.stories.soylestories.Styles.Blue.blue * 255).toInt(),
+                    0.2,
+                )
+                unsafe("-rtfx-background-color", raw(transparentHighlight.css))
+                fill = com.soyle.stories.soylestories.Styles.Blue
+            }
+            problem {
+                val transparentHighlight = Color.rgb(
+                    (com.soyle.stories.soylestories.Styles.Orange.red * 255).toInt(),
+                    (com.soyle.stories.soylestories.Styles.Orange.green * 255).toInt(),
+                    (com.soyle.stories.soylestories.Styles.Orange.blue * 255).toInt(),
+                    0.2,
+                )
+                unsafe("-rtfx-background-color", raw(transparentHighlight.css))
+                fill = com.soyle.stories.soylestories.Styles.Orange
             }
         }
     }

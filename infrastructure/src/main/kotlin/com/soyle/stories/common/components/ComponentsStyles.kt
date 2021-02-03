@@ -18,7 +18,6 @@ class ComponentsStyles : Stylesheet() {
         val firstChild by csspseudoclass("first-child")
         val notFirstChild by csspseudoclass("not-first-child")
 
-        val buttonCombo by cssclass()
         val arrowIconButton by cssclass()
         val iconButton by cssclass()
 
@@ -63,15 +62,6 @@ class ComponentsStyles : Stylesheet() {
             }
         }
 
-        buttonCombo {
-            arrowButton {
-                padding = box(0.px)
-                arrow {
-                    padding = box(0.px)
-                    backgroundColor = multi(Color.TRANSPARENT)
-                }
-            }
-        }
         arrowIconButton {
             label {
                 padding = box(0.em)
@@ -159,6 +149,7 @@ class ComponentsStyles : Stylesheet() {
             backgroundColor += Color.WHITE
             borderColor += box(Styles.Purple)
             borderWidth += box(1.px)
+            borderInsets = multi(box((-1).px))
         }
         hasProblem {
             borderWidth += box(0.px, 0.px, 2.px, 0.px)
