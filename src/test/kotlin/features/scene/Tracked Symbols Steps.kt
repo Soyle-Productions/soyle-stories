@@ -85,7 +85,7 @@ class `Tracked Symbols Steps` : En {
             "the {string} symbol for the {theme} should be tracked in the {scene}"
         ) { symbolName: String, theme: Theme, scene: Scene ->
             val symbol = theme.symbols.find { it.name == symbolName }!!
-            Assertions.assertTrue(scene.trackedSymbols.isSymbolTracked(symbol.id))
+            assertTrue(scene.trackedSymbols.isSymbolTracked(symbol.id))
             assertEquals(symbol.name, scene.trackedSymbols.getSymbolById(symbol.id)!!.symbolName)
 
             val symbolsInSceneView = soyleStories.getAnyOpenWorkbenchOrError()

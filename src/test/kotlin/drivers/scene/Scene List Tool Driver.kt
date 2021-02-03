@@ -37,6 +37,7 @@ fun SceneListView.selectScene(scene: Scene)
         val sceneItem = getSceneItemOrError(scene.name.value)
         val tree = tree
         interact {
+            tree.selectionModel.clearSelection()
             tree.selectionModel.select(sceneItem)
         }
     }
