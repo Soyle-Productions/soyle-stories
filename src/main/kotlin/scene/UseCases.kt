@@ -92,6 +92,7 @@ object UseCases {
             listAvailableSymbolsToTrackInScene()
             pinSymbolToScene()
             unpinSymbolFromScene()
+            detectUnusedSymbols()
         }
     }
 
@@ -375,6 +376,19 @@ object UseCases {
         }
         provide<UnpinSymbolFromSceneController> {
             UnpinSymbolFromSceneControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.detectUnusedSymbols()
+    {
+        provide<DetectUnusedSymbolsInScene> {
+            DetectUnusedSymbolsInSceneUseCase(get(), get())
+        }
+        provide(DetectUnusedSymbolsInScene.OutputPort::class) {
+            DetectUnusedSymbolsOutput()
+        }
+        provide<DetectUnusedSymbolsInSceneController> {
+            DetectUnusedSymbolsInSceneControllerImpl(applicationScope.get(), get(), get())
         }
     }
 

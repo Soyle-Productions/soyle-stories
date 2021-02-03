@@ -7,6 +7,7 @@ import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.pinned
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.unused
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Label
@@ -60,6 +61,11 @@ class SymbolsInSceneDriver (private val symbolsInSceneView: SymbolsInSceneView) 
     fun Node.isPinned(): Boolean
     {
         return hasPseudoClass(pinned.name)
+    }
+
+    fun Node.isUnused(): Boolean
+    {
+        return hasPseudoClass(unused.name)
     }
 
 

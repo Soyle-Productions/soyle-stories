@@ -72,6 +72,11 @@ class `Tracked Symbols Steps` : En {
                 .givenCreatingNewThemeAndSymbol()
                 .createSymbolAndThemeNamed(themeName, symbolName)
         }
+        When("I track symbols in the {scene}") { scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSymbolsInSceneToolHasBeenOpened()
+                .focusOn(scene)
+        }
     }
 
     private fun thens() {
@@ -153,6 +158,34 @@ class `Tracked Symbols Steps` : En {
                     andSymbol(symbol.id) {
                         isNotPinned()
                     }
+                }
+            }
+        }
+        Then(
+            "the {string} symbol from the {theme} pinned to the {scene} should indicate it is unused"
+        ) { symbolName: String, theme: Theme, scene: Scene ->
+            val symbol = theme.symbols.find { it.name == symbolName }!!
+            val symbolsInSceneView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSymbolsInSceneToolHasBeenOpened()
+                .givenFocusedOn(scene)
+
+            SymbolsInSceneAssertions.assertThat(symbolsInSceneView) {
+                andSymbol(symbol.id) {
+                    isUnused()
+                }
+            }
+        }
+        Then(
+            "the {string} symbol from the {theme} pinned to the {scene} should not indicate it is unused"
+        ) { symbolName: String, theme: Theme, scene: Scene ->
+            val symbol = theme.symbols.find { it.name == symbolName }!!
+            val symbolsInSceneView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSymbolsInSceneToolHasBeenOpened()
+                .givenFocusedOn(scene)
+
+            SymbolsInSceneAssertions.assertThat(symbolsInSceneView) {
+                andSymbol(symbol.id) {
+                    isUsed()
                 }
             }
         }

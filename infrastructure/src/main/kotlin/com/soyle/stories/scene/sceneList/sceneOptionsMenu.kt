@@ -11,14 +11,12 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.SeparatorMenuItem
 import javafx.util.Duration
-import tornadofx.FX
-import tornadofx.action
-import tornadofx.item
-import tornadofx.runLater
+import tornadofx.*
 
 internal fun sceneOptionsMenu(viewListener: SceneListViewListener, scope: ProjectScope, sceneItemViewModel: SceneItemViewModel): List<MenuItem> = listOf(
     MenuItem("Edit").apply {
         id = "edit"
+        toggleClass(SceneListItem.Styles.hasIssue, sceneItemViewModel.invalidEntitiesMentioned)
         action { viewListener.editScene(sceneItemViewModel.id, sceneItemViewModel.proseId) }
     },
     MenuItem("Inspect Details").apply {
@@ -27,6 +25,7 @@ internal fun sceneOptionsMenu(viewListener: SceneListViewListener, scope: Projec
     },
     MenuItem("Track Symbols").apply {
         id = "open_scene_symbols"
+        toggleClass(SceneListItem.Styles.hasIssue, sceneItemViewModel.unusedSymbols)
         action {
             FX.eventbus.fire(SceneTargeted(sceneItemViewModel))
             viewListener.trackSymbols(sceneItemViewModel)

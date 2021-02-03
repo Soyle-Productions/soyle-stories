@@ -4,6 +4,7 @@ import com.soyle.stories.entities.*
 import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.scene.usecases.trackSymbolInScene.DetectUnusedSymbolsInScene
 import com.soyle.stories.scene.usecases.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
 import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
 import com.soyle.stories.theme.usecases.listSymbolsByTheme.SymbolsByTheme
@@ -24,7 +25,8 @@ class SymbolsInScenePresenter(
                             SymbolsInSceneViewModel.SymbolInScene(
                                 it.symbolId,
                                 it.symbolName,
-                                it.isPinned
+                                it.isPinned,
+                                false
                             )
                         }
                     )
@@ -48,7 +50,8 @@ class SymbolsInScenePresenter(
                                 SymbolsInSceneViewModel.SymbolInScene(
                                     it.trackedSymbol.symbolId,
                                     it.trackedSymbol.symbolName,
-                                    it.trackedSymbol.isPinned
+                                    it.trackedSymbol.isPinned,
+                                    false
                                 )
                             }
                         )
@@ -61,7 +64,8 @@ class SymbolsInScenePresenter(
                             SymbolsInSceneViewModel.SymbolInScene(
                                 it.trackedSymbol.symbolId,
                                 it.trackedSymbol.symbolName,
-                                it.trackedSymbol.isPinned
+                                it.trackedSymbol.isPinned,
+                                false
                             )
                         }
                     )
@@ -84,7 +88,8 @@ class SymbolsInScenePresenter(
                                     SymbolsInSceneViewModel.SymbolInScene(
                                         it.symbolId,
                                         newNamesBySymbolId.getValue(it.symbolId),
-                                        it.isPinned
+                                        it.isPinned,
+                                        false
                                     )
                                 } else it
                             }
@@ -106,7 +111,8 @@ class SymbolsInScenePresenter(
                                     SymbolsInSceneViewModel.SymbolInScene(
                                         it.symbolId,
                                         it.symbolName,
-                                        true
+                                        true,
+                                        false
                                     )
                                 } else it
                             }
@@ -128,6 +134,7 @@ class SymbolsInScenePresenter(
                                     SymbolsInSceneViewModel.SymbolInScene(
                                         it.symbolId,
                                         it.symbolName,
+                                        false,
                                         false
                                     )
                                 } else it
@@ -179,6 +186,22 @@ class SymbolsInScenePresenter(
                         symbolItems.map {
                             SymbolsInSceneViewModel.AvailableSymbol(Symbol.Id(it.symbolId), it.symbolName)
                         })
+                }
+            )
+        }
+    }
+
+    override suspend fun receiveDetectedUnusedSymbols(response: DetectUnusedSymbolsInScene.ResponseModel) {
+        view.updateOrInvalidated {
+            copy(
+                themesInScene = themesInScene.map {
+                    it.copy(
+                        symbolsInScene = it.symbolsInScene.map {
+                            it.copy(
+                                isUnused = it.symbolId in response.unusedSymbolIds
+                            )
+                        }
+                    )
                 }
             )
         }

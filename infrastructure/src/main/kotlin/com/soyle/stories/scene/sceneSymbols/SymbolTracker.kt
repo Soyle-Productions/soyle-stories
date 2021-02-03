@@ -89,6 +89,7 @@ class SymbolTracker : Fragment() {
     private fun Parent.hasSymbolsState(themes: List<SymbolsInSceneViewModel.ThemeInScene>): Node {
         return vbox {
             hbox {
+                alignment = Pos.CENTER_LEFT
                 mainHeader("Tracked Symbols")
                 spacer()
                 pinSymbolMenuButton {}

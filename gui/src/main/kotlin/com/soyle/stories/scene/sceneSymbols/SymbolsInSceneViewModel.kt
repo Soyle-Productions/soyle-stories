@@ -16,10 +16,11 @@ data class SymbolsInSceneViewModel(
         val symbolsInScene: List<SymbolInScene>
     )
 
-    class SymbolInScene(
+    data class SymbolInScene(
         val symbolId: Symbol.Id,
         val symbolName: String,
-        val isPinned: Boolean
+        val isPinned: Boolean,
+        val isUnused: Boolean
     )
 
     data class AvailableTheme(

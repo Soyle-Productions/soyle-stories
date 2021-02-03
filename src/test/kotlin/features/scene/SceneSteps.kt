@@ -714,7 +714,7 @@ class SceneSteps : En {
             val workBench = soyleStories.getAnyOpenWorkbenchOrError()
             val sceneList = workBench
                 .givenSceneListToolHasBeenOpened()
-            SceneListAssert.assertThat(sceneList) {
+            assertThat(sceneList) {
                 indicatesSceneHasAnIssue(scene.name.value)
             }
         }

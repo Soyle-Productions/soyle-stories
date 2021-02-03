@@ -8,10 +8,12 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.scene.items.SceneItemViewModel
+import javafx.collections.ObservableList
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.effect.BlurType
 import javafx.scene.effect.DropShadow
 import javafx.scene.effect.InnerShadow
@@ -115,8 +117,25 @@ class SceneListView : View() {
             }
             contextMenu = sceneContextMenu
             cellFragment(scope, SceneListItem::class)
-            root.children.bind(model.scenes) { TreeItem(it) }
+            model.scenes.onChange { scenes: ObservableList<SceneItemViewModel>? ->
+                val currentlyFocused = isFocused
+                val currentSelection = model.selectedItem.value?.id
+                val newItems = setSceneItems(scenes)
+                if (currentSelection != null) {
+                    selectionModel.select(newItems.find { it.value.id == currentSelection } as? TreeItem<SceneItemViewModel?>)
+                }
+                if (currentlyFocused) {
+                    requestFocus()
+                }
+            }
+            setSceneItems(model.scenes)
         }
+    }
+
+    private fun TreeView<SceneItemViewModel?>.setSceneItems(scenes: ObservableList<SceneItemViewModel>?): List<TreeItem<SceneItemViewModel>> {
+        val newItems = scenes?.map { TreeItem(it) } ?: listOf()
+        root.children.setAll(newItems)
+        return newItems
     }
 
     init {

@@ -58,6 +58,17 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
         controller.updateProse(prose.id, content)
     }
 
+    fun givenProseDoesNotMention(prose: Prose, mentionText: String)
+    {
+        if (prose.mentions.any { prose.content.substring(it.start(), it.end()) == mentionText}) {
+            val scope = ProseEditorScope(projectScope, prose.id, { _, _ -> }, {}) { _, _ -> }.apply {
+                get<ProseEditorState>().versionNumber.set(prose.revision)
+            }
+            val controller = scope.get<EditProseController>()
+            controller.updateProse(prose.id, listOf())
+        }
+    }
+
     companion object {
         init {
             scoped<ProjectScope> { provide { ProseDriver(this) } }

@@ -9,6 +9,7 @@ import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.prose.editProse.ContentReplacedNotifier
 import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneNotifier
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneNotifier
@@ -189,7 +190,8 @@ object Presentation {
                     get<RenameSceneNotifier>(),
                     get<DeleteSceneNotifier>(),
                     get<ReorderSceneNotifier>(),
-                    get<DetectInvalidatedMentionsOutput>()
+                    get<DetectInvalidatedMentionsOutput>(),
+                    get<DetectUnusedSymbolsOutput>()
                 ),
                 get(),
                 get(),
@@ -205,6 +207,8 @@ object Presentation {
                 get(),
                 get(),
                 get(),
+                get(),
+                get(),
                 get()
             ).also {
                 it listensTo get<SymbolsTrackedInSceneNotifier>()
@@ -213,6 +217,8 @@ object Presentation {
                 it listensTo get<RenamedThemeNotifier>()
                 it listensTo get<SymbolPinnedToSceneNotifier>()
                 it listensTo get<SymbolUnpinnedFromSceneNotifier>()
+                it listensTo get<ContentReplacedNotifier>()
+                it listensTo get<DetectUnusedSymbolsOutput>()
             }
         }
     }

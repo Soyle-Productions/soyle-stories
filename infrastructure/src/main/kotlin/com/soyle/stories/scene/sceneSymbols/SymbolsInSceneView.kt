@@ -119,6 +119,7 @@ class SymbolsInSceneView : View() {
 
             val trackedSymbolChip by cssclass()
             val pinned by csspseudoclass()
+            val unused by csspseudoclass()
 
             val warningLabel by cssclass()
 
@@ -152,6 +153,11 @@ class SymbolsInSceneView : View() {
                         translateY = (-2).px
                     }
                 }
+            }
+            trackedSymbolChip and unused {
+                backgroundColor = multi(Color.TRANSPARENT)
+                borderColor = multi(box(Orange))
+                borderWidth += box(2.px)
             }
             warningLabel {
                 textFill = Orange

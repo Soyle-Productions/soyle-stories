@@ -38,6 +38,12 @@ class SymbolsInSceneAssertions private constructor(private val driver: SymbolsIn
         fun isNotPinned() {
             assertFalse(with(driver) { chip.isPinned() })
         }
+        fun isUnused() {
+            assertTrue(with(driver) { chip.isUnused() })
+        }
+        fun isUsed() {
+            assertFalse(with(driver) { chip.isUnused() })
+        }
     }
 
 }

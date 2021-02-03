@@ -5,6 +5,7 @@ import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
 
 interface OpenToolController {
 
+	fun openSceneList()
 	fun openLocationDetailsTool(locationId: String)
 	fun openBaseStoryStructureTool(themeId: String, characterId: String)
 	fun openCharacterValueComparison(themeId: String)

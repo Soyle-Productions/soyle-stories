@@ -121,6 +121,12 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
         ProseDriver(projectScope.get()).givenProseMentionsEntity(prose, entityId, name)
     }
 
+    fun givenSceneProseDoesNotMention(scene: Scene, mentionText: String) {
+        val proseDriver = ProseDriver(projectScope.get())
+        val prose = proseDriver.getProseByIdOrError(scene.proseId)
+        proseDriver.givenProseDoesNotMention(prose, mentionText)
+    }
+
     fun givenSymbolPinnedInScene(scene: Scene, theme: Theme, symbol: Symbol)
     {
         projectScope.get<PinSymbolToSceneController>().pinSymbolToScene(scene.id, symbol.id)

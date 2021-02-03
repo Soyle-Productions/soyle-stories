@@ -39,6 +39,13 @@ class `Scene Prose Steps` : En {
             val symbol = theme.symbols.find { it.name == symbolName }!!
             SceneDriver(workbench).givenSceneProseMentionsEntity(scene, symbol.id.mentioned(theme.id), symbolName)
         }
+        Given(
+            "I have removed the {string} mention from the {scene}'s prose"
+        ) { mentionName: String, scene: Scene ->
+            SceneDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .givenSceneProseDoesNotMention(scene, mentionName)
+        }
+
 
         When(
             "I create a symbol named {string} and a theme named {string} to replace the {string} mention in the {scene}'s prose"
@@ -57,6 +64,16 @@ class `Scene Prose Steps` : En {
                 .givenMentionIsBeingInvestigated(mentionText)
                 .givenReplacingInvestigatedMentionWithNewSymbol()
                 .createSymbolWithName(newSymbolName)
+        }
+        When(
+            "I mention the {string} symbol from the {theme} in the {scene}'s prose"
+        ) { symbolName: String, theme: Theme, scene: Scene ->
+            sceneListView
+                .givenSceneEditorToolHasBeenOpened(scene)
+                .run {
+                    query(symbolName)
+                    selectMentionSuggestion(symbolName)
+                }
         }
 
         Then(
