@@ -4,8 +4,10 @@ import com.soyle.stories.character.makeCharacter
 import com.soyle.stories.common.mustEqual
 import com.soyle.stories.common.nonBlankStr
 import com.soyle.stories.doubles.CharacterRepositoryDouble
+import com.soyle.stories.doubles.ThemeRepositoryDouble
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Location
+import com.soyle.stories.entities.MentionedSymbolId
 import com.soyle.stories.entities.mentioned
 import com.soyle.stories.location.doubles.LocationRepositoryDouble
 import com.soyle.stories.location.locationName
@@ -16,6 +18,8 @@ import com.soyle.stories.scene.makeScene
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene.MatchingStoryElement
 import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInSceneUseCase
+import com.soyle.stories.theme.makeSymbol
+import com.soyle.stories.theme.makeTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
@@ -28,6 +32,7 @@ class `Get Story Elements to Mention in Scene Unit Test` {
     private val sceneRepository = SceneRepositoryDouble()
     private val characterRepository = CharacterRepositoryDouble()
     private val locationRepository = LocationRepositoryDouble()
+    private val themeRepository = ThemeRepositoryDouble()
 
     private var result: GetStoryElementsToMentionInScene.ResponseModel? = null
 
@@ -73,9 +78,9 @@ class `Get Story Elements to Mention in Scene Unit Test` {
             getStoryElementsToMentionInScene("b")
             result!!.toList().mustEqual(
                 listOf(
-                    MatchingStoryElement(charactersByName.getValue("Billy").id.mentioned(), "Billy"),
-                    MatchingStoryElement(charactersByName.getValue("John Boy").id.mentioned(), "John Boy"),
-                    MatchingStoryElement(charactersByName.getValue("Hallboid").id.mentioned(), "Hallboid"),
+                    MatchingStoryElement(charactersByName.getValue("Billy").id.mentioned(), "Billy", null),
+                    MatchingStoryElement(charactersByName.getValue("John Boy").id.mentioned(), "John Boy", null),
+                    MatchingStoryElement(charactersByName.getValue("Hallboid").id.mentioned(), "Hallboid", null),
                 )
             )
         }
@@ -104,10 +109,88 @@ class `Get Story Elements to Mention in Scene Unit Test` {
             getStoryElementsToMentionInScene("b")
             result!!.toList().mustEqual(
                 listOf(
-                    MatchingStoryElement(locationsByName.getValue("Barcelona").id.mentioned(), "Barcelona"),
-                    MatchingStoryElement(locationsByName.getValue("Golden Gate Bridge").id.mentioned(), "Golden Gate Bridge"),
-                    MatchingStoryElement(locationsByName.getValue("Mt. Grumble").id.mentioned(), "Mt. Grumble"),
+                    MatchingStoryElement(locationsByName.getValue("Barcelona").id.mentioned(), "Barcelona", null),
+                    MatchingStoryElement(
+                        locationsByName.getValue("Golden Gate Bridge").id.mentioned(),
+                        "Golden Gate Bridge", null
+                    ),
+                    MatchingStoryElement(locationsByName.getValue("Mt. Grumble").id.mentioned(), "Mt. Grumble", null),
                 )
+            )
+        }
+
+    }
+
+    @Nested
+    inner class `Symbols with String Matching` {
+
+        init {
+            sceneRepository.givenScene(scene)
+            listOf(
+                makeTheme(
+                    projectId = scene.projectId,
+                    name = "Save the World",
+                    symbols = listOf(
+                        makeSymbol(name = "Stinger"),
+                        makeSymbol(name = "Seven"),
+                        makeSymbol(name = "Grapes"),
+                        makeSymbol(name = "Some Glue")
+                    )
+                ),
+                makeTheme(
+                    projectId = scene.projectId,
+                    name = "Save the Galaxy",
+                    symbols = listOf(
+                        makeSymbol(name = "Ghost"),
+                        makeSymbol(name = "The Globe"),
+                        makeSymbol(name = "Ring"),
+                        makeSymbol(name = "Cat")
+                    )
+                ),
+                makeTheme(
+                    projectId = scene.projectId,
+                    name = "Save the Universe",
+                    symbols = listOf(
+                        makeSymbol(name = "Pineapple"),
+                        makeSymbol(name = "Bazinga"),
+                        makeSymbol(name = "Orange Gummy Bear"),
+                        makeSymbol(name = "Gorilla")
+                    )
+                ),
+                makeTheme(
+                    name = "Save no one",
+                    symbols = List(3) { makeSymbol() })
+            ).onEach(themeRepository::givenTheme)
+        }
+
+        @Test
+        fun `should list symbols with matching string in same project`() {
+            getStoryElementsToMentionInScene("G")
+            result!!.map { it.name }.mustEqual(
+                listOf(
+                    "Stinger",
+                    "Grapes",
+                    "Some Glue",
+                    "Ghost",
+                    "The Globe",
+                    "Ring",
+                    "Bazinga",
+                    "Orange Gummy Bear",
+                    "Gorilla",
+                )
+            )
+        }
+
+        @Test
+        fun `each symbol should be listed with the associated theme`() {
+            getStoryElementsToMentionInScene("G")
+            result!!.map { it.entityId }.filterIsInstance<MentionedSymbolId>().forEach { mentionedSymbolId ->
+                themeRepository.themes[mentionedSymbolId.themeId]!!.symbols.find { it.id == mentionedSymbolId.id }!!
+            }
+            result!!.map { it.parentEntityName }.mustEqual(
+                List(3) { "Save the World" } +
+                        List(3) { "Save the Galaxy" } +
+                        List(3) { "Save the Universe" }
             )
         }
 
@@ -120,7 +203,12 @@ class `Get Story Elements to Mention in Scene Unit Test` {
             }
         }
         val useCase: GetStoryElementsToMentionInScene =
-            GetStoryElementsToMentionInSceneUseCase(sceneRepository, characterRepository, locationRepository)
+            GetStoryElementsToMentionInSceneUseCase(
+                sceneRepository,
+                characterRepository,
+                locationRepository,
+                themeRepository
+            )
         runBlocking {
             useCase.invoke(scene.id, nonBlankStr(query), output)
         }

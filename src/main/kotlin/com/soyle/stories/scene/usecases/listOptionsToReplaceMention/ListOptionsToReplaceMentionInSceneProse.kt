@@ -12,7 +12,7 @@ interface ListOptionsToReplaceMentionInSceneProse {
         val options: List<MentionOption<Id>>
     )
 
-    data class MentionOption<Id: Any>(val entityId: MentionedEntityId<Id>, val name: String)
+    data class MentionOption<Id: Any>(val entityId: MentionedEntityId<Id>, val name: String, val parentName: String?)
 
     interface OutputPort {
         suspend fun receiveOptionsToReplaceMention(response: ResponseModel<*>)

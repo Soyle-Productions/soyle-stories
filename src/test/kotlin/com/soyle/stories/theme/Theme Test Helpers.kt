@@ -67,6 +67,15 @@ fun makeOppositionValue(
     representations: List<SymbolicRepresentation> = listOf()
 ) = OppositionValue(id, name, representations)
 
+fun makeSymbol(
+	id: Symbol.Id = Symbol.Id(),
+	name: String = symbolName()
+) = Symbol(
+	id, name
+)
+
+fun symbolName() = "Symbol ${str()}"
+
 fun takeNoteOfTheme(expectedId: UUID): Theme =
 	makeTheme(id = Theme.Id(expectedId))
 

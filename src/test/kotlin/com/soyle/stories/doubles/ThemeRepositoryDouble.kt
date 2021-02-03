@@ -3,8 +3,8 @@ package com.soyle.stories.doubles
 import com.soyle.stories.entities.Character
 import com.soyle.stories.entities.Project
 import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
 import com.soyle.stories.entities.theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*
@@ -29,8 +29,19 @@ class ThemeRepositoryDouble(
 
     override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]
 
+    override suspend fun getThemesById(themeIds: Set<Theme.Id>): Set<Theme> {
+        return themeIds.mapNotNull(themes::get).toSet()
+    }
+
     override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
         return themes.values.find { it.symbols.any { it.id == symbolId } }
+    }
+
+    override suspend fun getThemesContainingSymbols(symbolIds: Set<Symbol.Id>): Map<Symbol.Id, Theme> {
+        return themes.values.asSequence()
+            .flatMap { theme -> theme.symbols.asSequence().map { it.id to theme } }
+            .filter { it.first in symbolIds }
+            .toMap()
     }
 
     override suspend fun getThemeContainingValueWebWithId(valueWebId: ValueWeb.Id): Theme? {
@@ -83,4 +94,8 @@ class ThemeRepositoryDouble(
 
     override suspend fun getThemesWithCharacterIncluded(characterId: Character.Id): List<Theme> =
         themes.values.filter { it.containsCharacter(characterId) }
+
+    override suspend fun getSymbolIdsThatDoNotExist(symbolIds: Set<Symbol.Id>): Set<Symbol.Id> {
+        return symbolIds - themes.values.asSequence().flatMap { it.symbols.asSequence() }.map { it.id }.toSet()
+    }
 }

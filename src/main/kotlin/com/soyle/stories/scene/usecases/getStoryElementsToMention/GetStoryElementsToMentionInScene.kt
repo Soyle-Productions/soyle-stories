@@ -9,7 +9,7 @@ interface GetStoryElementsToMentionInScene {
     suspend operator fun invoke(sceneId: Scene.Id, query: NonBlankString, output: OutputPort)
 
     class ResponseModel(matchingStoryElements: List<MatchingStoryElement>) : List<MatchingStoryElement> by matchingStoryElements
-    data class MatchingStoryElement(val entityId: MentionedEntityId<*>, val name: String)
+    data class MatchingStoryElement(val entityId: MentionedEntityId<*>, val name: String, val parentEntityName: String?)
 
     interface OutputPort {
         suspend fun receiveStoryElementsToMentionInScene(response: ResponseModel)
