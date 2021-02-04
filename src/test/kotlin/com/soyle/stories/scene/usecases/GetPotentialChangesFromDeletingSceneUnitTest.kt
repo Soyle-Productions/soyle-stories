@@ -326,7 +326,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
 		}
 		val targetScene = orderedScenes.selector()
 		sceneRepository.scenes.remove(targetScene.id)
-		sceneRepository.scenes[sceneId] = Scene(sceneId, targetScene.projectId, targetScene.name, targetScene.storyEventId, emptySet(), Prose.Id(), targetScene.charactersInScene())
+		sceneRepository.scenes[sceneId] = makeScene(sceneId, targetScene.projectId, targetScene.name, targetScene.storyEventId, emptySet(), Prose.Id(), targetScene.charactersInScene())
 		sceneRepository.sceneOrder[projectId] = sceneRepository.sceneOrder.getValue(projectId).map {
 			if (it == targetScene.id) sceneId
 			else it

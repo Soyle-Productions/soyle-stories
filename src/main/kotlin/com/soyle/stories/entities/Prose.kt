@@ -2,6 +2,7 @@ package com.soyle.stories.entities
 
 import com.soyle.stories.common.Entity
 import com.soyle.stories.common.SingleLine
+import com.soyle.stories.entities.theme.Symbol
 import com.soyle.stories.prose.*
 import java.util.*
 
@@ -57,8 +58,10 @@ class Prose private constructor(
     }
 
     private val sortedMentionSet: Set<ProseMention<*>> by lazy { sortedSetOf(compareBy { it.start() }, *mentions.toTypedArray()) }
+    private val mentionsByEntityId: Map<Any, ProseMention<*>> by lazy { mentions.associateBy { it.entityId.id } }
 
     // reads
+    fun containsMentionOf(entityId: Any): Boolean = mentionsByEntityId.containsKey(entityId)
 
     // updates
     private fun copy(
@@ -194,9 +197,11 @@ sealed class MentionedEntityId<Id : Any> {
 
 data class MentionedCharacterId(override val id: Character.Id) : MentionedEntityId<Character.Id>()
 data class MentionedLocationId(override val id: Location.Id) : MentionedEntityId<Location.Id>()
+data class MentionedSymbolId(override val id: Symbol.Id, val themeId: Theme.Id) : MentionedEntityId<Symbol.Id>()
 
 fun Character.Id.mentioned() = MentionedCharacterId(this)
 fun Location.Id.mentioned() = MentionedLocationId(this)
+fun Symbol.Id.mentioned(fromTheme: Theme.Id) = MentionedSymbolId(this, fromTheme)
 
 data class ProseMention<Id : Any>(val entityId: MentionedEntityId<Id>, val position: ProseMentionRange) {
     fun start(): Int = position.index

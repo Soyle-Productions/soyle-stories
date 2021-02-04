@@ -1,7 +1,10 @@
 package com.soyle.stories.scene
 
 import com.soyle.stories.common.DuplicateOperationException
+import com.soyle.stories.common.EntityNotFoundException
 import com.soyle.stories.common.ValidationException
+import com.soyle.stories.entities.Scene
+import com.soyle.stories.entities.theme.Symbol
 import java.util.*
 
 abstract class SceneException : Exception()
@@ -11,6 +14,11 @@ class SceneDoesNotExist(private val locale: Locale?, val sceneId: UUID): SceneEx
 }
 class NoSceneExistsWithStoryEventId(val storyEventId: UUID) : SceneException()
 class CharacterNotInScene(val sceneId: UUID, val characterId: UUID) : SceneException()
+class SceneDoesNotTrackSymbol(val sceneId: Scene.Id, val symbolId: Symbol.Id) : EntityNotFoundException(symbolId.uuid)
+{
+	override val message: String?
+		get() = "$sceneId does not track $symbolId"
+}
 
 class SceneAlreadyContainsCharacter(val sceneId: UUID, val characterId: UUID) : DuplicateOperationException()
 

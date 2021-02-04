@@ -6,14 +6,15 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.doubles.CharacterArcRepositoryDouble
-import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.entities.theme.valueWeb.ValueWeb
+import com.soyle.stories.doubles.ThemeRepositoryDouble
+import com.soyle.stories.entities.Character
+import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.entities.Project
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.repositories.CharacterArcRepository
 import com.soyle.stories.theme.repositories.CharacterRepository
 import com.soyle.stories.theme.repositories.ThemeRepository
-import java.util.*
+import kotlinx.coroutines.runBlocking
 
 fun setupContext(
     initialThemes: List<Theme> = emptyList(),
@@ -46,51 +47,15 @@ fun setupContext(
             characters[character.id] = character
         }
     }
-    override val themeRepository: ThemeRepository = object : ThemeRepository {
-        val themes = mutableMapOf<Theme.Id, Theme>()
-        init {
-            themes.putAll(initialThemes.map { it.id to it })
+    override val themeRepository: ThemeRepository = ThemeRepositoryDouble(
+        onUpdateTheme = updateTheme,
+        onDeleteTheme = deleteTheme
+    )
+    init {
+        runBlocking {
+            initialThemes.forEach {
+                themeRepository.addTheme(it)
+            }
         }
-        override suspend fun updateThemes(themes: List<Theme>) {
-            TODO("Not yet implemented")
-        }
-
-
-        override suspend fun addTheme(theme: Theme) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getThemeContainingOppositionsWithSymbolicEntityId(symbolicId: UUID): List<Theme> {
-            TODO("Not yet implemented")
-        }
-
-
-        override suspend fun getThemeContainingOppositionValueWithId(oppositionValueId: OppositionValue.Id): Theme? {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getThemeContainingValueWebWithId(valueWebId: ValueWeb.Id): Theme? {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
-            TODO("Not yet implemented")
-        }
-        override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]
-
-        override suspend fun updateTheme(theme: Theme) {
-            updateTheme.invoke(theme)
-            themes[theme.id] = theme
-        }
-
-        override suspend fun deleteTheme(theme: Theme) {
-            deleteTheme.invoke(theme)
-            themes.remove(theme.id)
-        }
-
     }
 }
