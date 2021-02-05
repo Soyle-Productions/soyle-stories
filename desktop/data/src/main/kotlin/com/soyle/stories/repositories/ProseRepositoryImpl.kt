@@ -29,7 +29,7 @@ class ProseRepositoryImpl : ProseRepository {
     }
 
     override suspend fun getProseEvents(proseId: Prose.Id, sinceRevision: Long): List<ProseEvent> {
-        val events = eventTable.getOrDefault(proseId, listOf())
+        val events = eventTable.getOrDefault(proseId, mutableListOf())
         val firstEvent = events.firstOrNull() ?: return emptyList()
         val startingIndex = sinceRevision - firstEvent.revision
         return events.subList(startingIndex.toInt() + 1, events.size).toList()
