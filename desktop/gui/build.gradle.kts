@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     implementation(project(":core"))
-    implementation( project(":desktop:data"))
+    implementation( project(":desktop:adapters"))
     implementation( project(":desktop:application"))
     implementation( Libraries.kotlin.coroutines)
     testImplementation( Libraries.assertJ)

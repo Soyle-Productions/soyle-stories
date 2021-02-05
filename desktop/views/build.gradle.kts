@@ -74,7 +74,7 @@ dependencies {
     // use of api is temporary until more things are moved to root config project
     api( project(":core"))
     api( project(":desktop:application"))
-    api( project(":desktop:data"))
+    api( project(":desktop:adapters"))
     api( project(":desktop:gui"))
     api( "no.tornado:tornadofx:1.7.20") {
         exclude(group = "org.jetbrains.kotlin")

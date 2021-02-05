@@ -18,7 +18,7 @@ application {
 
 
 dependencies {
-    implementation(project(":desktop:infrastructure"))
+    implementation(project(":desktop:views"))
 
 
     testImplementation("io.cucumber:cucumber-java8:6.1.1")
@@ -28,7 +28,7 @@ dependencies {
     testImplementation("org.testfx:openjfx-monocle:jdk-12.0.1+2")
     testImplementation(librarires.Libraries.junit.api)
 
-    testImplementation(testFixtures(project(path = ":desktop:infrastructure"))) {
+    testImplementation(testFixtures(project(path = ":desktop:views"))) {
         if (this is ModuleDependency) {
             exclude(group = "com.soyle.stories")
         }
