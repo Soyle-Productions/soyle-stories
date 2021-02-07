@@ -1,7 +1,5 @@
 package com.soyle.stories.domain.theme
 
-import arrow.core.Either
-import arrow.core.flatMap
 import com.soyle.stories.domain.character.makeCharacter
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
@@ -53,18 +51,18 @@ class ThemeTest {
 	@Test
 	fun `character can be removed from a theme`() {
 		val newCharacter = makeCharacter()
-		val (theme) = makeTheme()
+		val theme = makeTheme()
 			.withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
-			.removeCharacter(newCharacter.id) as Either.Right
+			.withoutCharacter(newCharacter.id)
 		assert(! theme.containsCharacter(newCharacter.id))
 	}
 
 	@Test
 	fun `cannot remove character not in theme`() {
 		val newCharacter = makeCharacter()
-		val (error) = makeTheme()
-			.removeCharacter(newCharacter.id) as Either.Left
-		assert(error is CharacterNotInTheme)
+		assertThrows<CharacterNotInTheme> {
+			makeTheme().withoutCharacter(newCharacter.id)
+		}
 	}
 
 	@Nested
@@ -82,31 +80,31 @@ class ThemeTest {
 		fun `pairs of characters have similarities`() {
 			themeWithCharacterA
 				.withCharacterIncluded(characterB.id, characterB.name.value, characterB.media)
-				.getSimilarities(characterA.id, characterB.id)
+				.getSimilaritiesBetweenCharacters(characterA.id, characterB.id)
 		}
 
 		@Test
 		fun `characters not in theme are not similar`() {
-			val (error) = themeWithCharacterA
-				.getSimilarities(characterA.id, characterB.id) as Either.Left
-
-			assert(error is CharacterNotInTheme)
+			assertThrows<CharacterNotInTheme> {
+				themeWithCharacterA.getSimilaritiesBetweenCharacters(characterA.id, characterB.id)
+			}
 		}
 
 		@Test
 		fun `can change similarities`() {
-			val (similarities) = themeWithCharacterA
+			val similarities = themeWithCharacterA
 				.withCharacterIncluded(characterB.id, characterB.name.value, characterB.media)
-				.changeSimilarities(characterA.id, characterB.id, newSimilarities)
-				.flatMap { it.getSimilarities(characterA.id, characterB.id) } as Either.Right
+				.withCharactersSimilarToEachOther(characterA.id, characterB.id, newSimilarities)
+				.getSimilaritiesBetweenCharacters(characterA.id, characterB.id)
 			assertEquals(newSimilarities, similarities)
 		}
 
 		@Test
 		fun `character must be in theme to change similarities`() {
-			val (error) = themeWithCharacterA
-				.changeSimilarities(characterA.id, characterB.id, newSimilarities) as Either.Left
-			assert(error is CharacterNotInTheme)
+			assertThrows<CharacterNotInTheme> {
+				themeWithCharacterA
+					.withCharactersSimilarToEachOther(characterA.id, characterB.id, newSimilarities)
+			}
 		}
 
 	}

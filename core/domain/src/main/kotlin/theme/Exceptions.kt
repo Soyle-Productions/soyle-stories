@@ -6,18 +6,14 @@ import com.soyle.stories.domain.validation.EntityNotFoundException
 import com.soyle.stories.domain.validation.ValidationException
 import java.util.*
 
-abstract class ThemeException : Exception() {
-    abstract val themeId: UUID
-}
-
-class CharacterAlreadyIncludedInTheme(val characterId: UUID, override val themeId: UUID) : ThemeException()
-class CharacterNotInTheme(override val themeId: UUID, val characterId: UUID) : ThemeException()
+class CharacterAlreadyIncludedInTheme(val characterId: UUID, val themeId: UUID) : DuplicateOperationException()
+class CharacterNotInTheme(val themeId: UUID, val characterId: UUID) : EntityNotFoundException(characterId)
 class StoryFunctionAlreadyApplied(
-    override val themeId: UUID,
+    val themeId: UUID,
     val perspectiveCharacterId: UUID,
     val appliedCharacterId: UUID,
     val storyFunction: StoryFunction
-) : ThemeException()
+) : DuplicateOperationException()
 
 class CharacterIsNotAnOpponentOfPerspectiveCharacter(
     val themeId: UUID,
@@ -25,7 +21,7 @@ class CharacterIsNotAnOpponentOfPerspectiveCharacter(
     val perspectiveCharacterId: UUID
 ) : ValidationException()
 
-class CharacterIsNotMajorCharacterInTheme(val characterId: UUID, override val themeId: UUID) : ThemeException()
+class CharacterIsNotMajorCharacterInTheme(val characterId: UUID, val themeId: UUID) : ValidationException()
 class CharacterIsAlreadyMajorCharacterInTheme(val characterId: UUID, val themeId: UUID) : DuplicateOperationException()
 class CharacterArcAlreadyExistsForCharacterInTheme(val characterId: UUID, val themeId: UUID) :
     DuplicateOperationException()

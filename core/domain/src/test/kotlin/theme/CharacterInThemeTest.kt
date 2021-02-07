@@ -1,6 +1,5 @@
 package com.soyle.stories.domain.theme
 
-import arrow.core.Either
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.theme.characterInTheme.MinorCharacter
@@ -28,8 +27,8 @@ class CharacterInThemeTest {
         @Test
         fun `can change archetype`() {
             val characterInTheme = themeWithCharacter.getIncludedCharacterById(character.id)!!
-            val (theme) = themeWithCharacter
-                .changeArchetype(characterInTheme, newArchetype) as Either.Right
+            val theme = themeWithCharacter
+                .withCharacterWithArchetype(characterInTheme, newArchetype)
             val archetype = theme.getIncludedCharacterById(character.id)!!.archetype
             assertEquals(newArchetype, archetype)
         }
@@ -37,9 +36,10 @@ class CharacterInThemeTest {
         @Test
         fun `cannot change archetype of character not in theme`() {
             val characterInTheme = themeWithCharacter.getIncludedCharacterById(character.id)!!
-            val (error) = themeWithoutCharacter
-                .changeArchetype(characterInTheme, newArchetype) as Either.Left
-            assert(error is CharacterNotInTheme)
+            assertThrows<CharacterNotInTheme> {
+                themeWithoutCharacter
+                    .withCharacterWithArchetype(characterInTheme, newArchetype)
+            }
         }
 
     }
@@ -55,8 +55,8 @@ class CharacterInThemeTest {
         @Test
         fun `can change variation on the central moral`() {
             val characterInTheme = themeWithCharacter.getIncludedCharacterById(character.id)!!
-            val (theme) = themeWithCharacter
-                .changeVariationOnMoral(characterInTheme, newVariationOnMoral) as Either.Right
+            val theme = themeWithCharacter
+                .withCharacterWithVariationOnMoral(characterInTheme, newVariationOnMoral)
             val variationOnMoral = theme.getIncludedCharacterById(character.id)!!.variationOnMoral
             assertEquals(newVariationOnMoral, variationOnMoral)
         }
@@ -64,9 +64,10 @@ class CharacterInThemeTest {
         @Test
         fun `cannot change variation on the central moral of character not in theme`() {
             val characterInTheme = themeWithCharacter.getIncludedCharacterById(character.id)!!
-            val (error) = themeWithoutCharacter
-                .changeVariationOnMoral(characterInTheme, newVariationOnMoral) as Either.Left
-            assert(error is CharacterNotInTheme)
+            assertThrows<CharacterNotInTheme> {
+                themeWithoutCharacter
+                    .withCharacterWithVariationOnMoral(characterInTheme, newVariationOnMoral)
+            }
         }
     }
 
@@ -96,20 +97,21 @@ class CharacterInThemeTest {
 
         @Test
         fun `can demote major characters`() {
-            val (theme) = themeWithMajorCharacter.demoteCharacter(
+            val theme = themeWithMajorCharacter.withCharacterDemoted(
                 themeWithMajorCharacter.getMajorCharacterByIdOrError(
                     character.id
                 )
-            ) as Either.Right
+            )
             assert(theme.getMinorCharacterById(character.id) is MinorCharacter)
         }
 
         @Test
         fun `cannot demote characters not in theme`() {
             val majorCharacterInTheme = themeWithMajorCharacter.getMajorCharacterByIdOrError(character.id)
-            val (error) = themeWithoutCharacter
-                .demoteCharacter(majorCharacterInTheme) as Either.Left
-            assert(error is CharacterNotInTheme)
+            assertThrows<CharacterNotInTheme> {
+                themeWithoutCharacter
+                    .withCharacterDemoted(majorCharacterInTheme)
+            }
         }
 
     }

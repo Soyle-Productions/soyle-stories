@@ -85,7 +85,7 @@ class Theme(
     }
 
     @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.withMoralProblem(question).right()"))
-    fun changeCentralMoralQuestion(question: String): Either<ThemeException, Theme> = withMoralProblem(question).right()
+    fun changeCentralMoralQuestion(question: String): Either<Exception, Theme> = withMoralProblem(question).right()
 
     fun withMoralProblem(moralProblem: String): Theme = copy(centralMoralProblem = moralProblem)
 
@@ -238,7 +238,8 @@ class Theme(
             ?: throw CharacterIsNotMajorCharacterInTheme(characterId.uuid, id.uuid))
 
 
-    fun removeCharacter(characterId: Character.Id): Either<ThemeException, Theme> {
+    @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.withoutCharacter(characterId).right()"))
+    fun removeCharacter(characterId: Character.Id): Either<Exception, Theme> {
 		try {
             mustContainCharacter(characterId)
         } catch (c: CharacterNotInTheme) {
@@ -278,7 +279,8 @@ class Theme(
     val characters: Collection<CharacterInTheme>
         get() = includedCharacters.values
 
-    fun getSimilarities(characterA: Character.Id, characterB: Character.Id): Either<ThemeException, String> {
+    @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.getSimilaritiesBetweenCharacters(characterA, characterB).right()"))
+    fun getSimilarities(characterA: Character.Id, characterB: Character.Id): Either<Exception, String> {
 		try {
             mustContainCharacter(characterA)
             mustContainCharacter(characterB)
@@ -290,7 +292,14 @@ class Theme(
         return similarities.right()
     }
 
-    fun withCharacterRenamed(character: CharacterInTheme, newName: String): Either<ThemeException, Theme>
+    fun getSimilaritiesBetweenCharacters(characterA: Character.Id, characterB: Character.Id): String {
+        mustContainCharacter(characterA)
+        mustContainCharacter(characterB)
+        return similaritiesBetweenCharacters[Couple(characterA, characterB)]
+            ?: throw error("Could not find similarities between $characterA and $characterB")
+    }
+
+    fun withCharacterRenamed(character: CharacterInTheme, newName: String): Either<Exception, Theme>
     {
         try {
             mustContainCharacter(character.id)
@@ -302,11 +311,12 @@ class Theme(
         ).right()
     }
 
+    @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.withCharactersSimilarToEachOther(characterA, characterB, similarities).right()"))
     fun changeSimilarities(
         characterA: Character.Id,
         characterB: Character.Id,
         similarities: String
-    ): Either<ThemeException, Theme> {
+    ): Either<Exception, Theme> {
 		try {
             mustContainCharacter(characterA)
             mustContainCharacter(characterB)
@@ -321,30 +331,57 @@ class Theme(
         ).right()
     }
 
-    fun changeArchetype(character: CharacterInTheme, archetype: String): Either<ThemeException, Theme> {
-		try {
-            mustContainCharacter(character.id)
+    fun withCharactersSimilarToEachOther(
+        characterA: Character.Id,
+        characterB: Character.Id,
+        similarities: String
+    ): Theme
+    {
+        mustContainCharacter(characterA)
+        mustContainCharacter(characterB)
+        val key = Couple(characterA, characterB)
+        return copy(
+            similaritiesBetweenCharacters = similaritiesBetweenCharacters
+                .minus(key = key)
+                .plus(key to similarities)
+        )
+    }
+
+    @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.withCharacterWithArchetype(character, archetype).right()"))
+    fun changeArchetype(character: CharacterInTheme, archetype: String): Either<Exception, Theme> {
+        return try {
+            withCharacterWithArchetype(character, archetype).right()
         } catch (c: CharacterNotInTheme) {
-            return c.left()
+            c.left()
         }
+    }
+
+    fun withCharacterWithArchetype(character: CharacterInTheme, archetype: String): Theme {
+        mustContainCharacter(character.id)
         return copy(
             includedCharacters = includedCharacters
                 .minus(character.id)
                 .plus(character.id to character.changeArchetype(archetype))
-        ).right()
+        )
     }
 
-    fun changeVariationOnMoral(character: CharacterInTheme, variation: String): Either<ThemeException, Theme> {
-		try {
-            mustContainCharacter(character.id)
+    @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.withCharacterWithVariationOnMoral(character, variation).right()"))
+    fun changeVariationOnMoral(character: CharacterInTheme, variation: String): Either<Exception, Theme> {
+		return try {
+            withCharacterWithVariationOnMoral(character, variation).right()
         } catch (c: CharacterNotInTheme) {
-            return c.left()
+            c.left()
         }
+    }
+
+    fun withCharacterWithVariationOnMoral(character: CharacterInTheme, variation: String): Theme
+    {
+        mustContainCharacter(character.id)
         return copy(
             includedCharacters = includedCharacters
                 .minus(character.id)
                 .plus(character.id to character.changeVariationOnMoral(variation))
-        ).right()
+        )
     }
 
     fun withCharacterPromoted(characterId: Character.Id): Theme
@@ -363,17 +400,23 @@ class Theme(
         )
     }
 
-    fun demoteCharacter(character: MajorCharacter): Either<ThemeException, Theme> {
-		try {
-            mustContainCharacter(character.id)
+    @Deprecated("Use of arrow", replaceWith = ReplaceWith("this.withCharacterDemoted(character).right()"))
+    fun demoteCharacter(character: MajorCharacter): Either<Exception, Theme> {
+		return try {
+            withCharacterDemoted(character).right()
         } catch (c: CharacterNotInTheme) {
-            return c.left()
+            c.left()
         }
+    }
+
+    fun withCharacterDemoted(character: MajorCharacter): Theme
+    {
+        mustContainCharacter(character.id)
         return copy(
             includedCharacters = includedCharacters
                 .minus(character.id)
                 .plus(character.id to character.demote())
-        ).right()
+        )
     }
 
     private fun MajorCharacter.demote() =
@@ -390,7 +433,7 @@ class Theme(
         majorCharacter: MajorCharacter,
         characterId: Character.Id,
         function: StoryFunction
-    ): Either<ThemeException, Theme> {
+    ): Either<Exception, Theme> {
 		try {
             mustContainCharacter(majorCharacter.id)
             mustContainCharacter(characterId)
@@ -429,7 +472,7 @@ class Theme(
     fun clearStoryFunctions(
         characterInTheme: MajorCharacter,
         characterId: Character.Id
-    ): Either<ThemeException, Theme> {
+    ): Either<Exception, Theme> {
 		try {
             mustContainCharacter(characterInTheme.id)
             mustContainCharacter(characterId)
@@ -488,24 +531,6 @@ class Theme(
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "Theme(${uuid})"
-    }
-
-    companion object {
-        fun takeNoteOf(projectId: Project.Id, name: String, centralMoralQuestion: String = ""): Either<ThemeException, Theme> {
-            return Theme(
-                Id(UUID.randomUUID()),
-                projectId,
-                name,
-                listOf(),
-                "",
-                centralMoralQuestion,
-                "",
-                "",
-                mapOf(),
-                mapOf(),
-                listOf()
-            ).right()
-        }
     }
 
 }

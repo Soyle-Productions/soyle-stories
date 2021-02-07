@@ -6,9 +6,7 @@ import com.soyle.stories.domain.validation.EntityNotFoundException
 import com.soyle.stories.domain.validation.ValidationException
 import java.util.*
 
-abstract class SceneException : Exception()
-class NoSceneExistsWithStoryEventId(val storyEventId: UUID) : SceneException()
-class CharacterNotInScene(val sceneId: UUID, val characterId: UUID) : SceneException()
+class CharacterNotInScene(val sceneId: UUID, val characterId: UUID) : EntityNotFoundException(characterId)
 class SceneDoesNotTrackSymbol(val sceneId: Scene.Id, val symbolId: Symbol.Id) : EntityNotFoundException(symbolId.uuid)
 {
 	override val message: String?
