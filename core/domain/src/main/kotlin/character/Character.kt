@@ -6,15 +6,9 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*
 
-/**
- * Created by Brendan
- * Date: 2/6/2020
- * Time: 8:19 PM
- */
 class Character(
 	override val id: Id,
 	val projectId: Project.Id,
-  // Characters have a name
 	val name: NonBlankString,
 	val media: Media.Id?
 ) : Entity<Character.Id> {

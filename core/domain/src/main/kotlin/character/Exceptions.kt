@@ -5,12 +5,6 @@ import com.soyle.stories.domain.validation.EntityNotFoundException
 import com.soyle.stories.domain.validation.ValidationException
 import java.util.*
 
-abstract class CharacterArcException : Exception()
-
-class CharacterArcNameCannotBeBlank(val characterId: UUID, val themeId: UUID) : CharacterArcException()
-class CharacterArcDoesNotExist(val characterId: UUID, val themeId: UUID) : CharacterArcException()
-class CharacterArcSectionDoesNotExist(val characterArcSectionId: UUID) : CharacterArcException()
-
 class CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
     val arcId: UUID,
     val characterId: UUID,
