@@ -1,17 +1,17 @@
 package com.soyle.stories.usecase.scene
 
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.theme.Theme
-import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
-import com.soyle.stories.domain.prose.mentioned
-import com.soyle.stories.domain.prose.ProseDoesNotExist
 import com.soyle.stories.domain.prose.makeProse
+import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.makeScene
-import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
-import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInSceneUseCase
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
+import com.soyle.stories.usecase.prose.ProseDoesNotExist
+import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
+import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInSceneUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

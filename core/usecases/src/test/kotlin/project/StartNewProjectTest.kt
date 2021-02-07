@@ -3,8 +3,9 @@ package com.soyle.stories.usecase.project
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import com.soyle.stories.domain.project.NameCannotBeBlank
+import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 import com.soyle.stories.usecase.project.startNewProject.StartNewProjectUseCase
 import kotlinx.coroutines.runBlocking
@@ -15,7 +16,7 @@ import java.util.*
 
 class StartNewProjectTest {
 
-	private fun given(addNewProject: (Project) -> Unit = {}): (String) -> Either<*, *> {
+	private fun given(addNewProject: (Project) -> Unit = {}): (NonBlankString) -> Either<*, *> {
 		val repo = object : ProjectRepository {
 			override suspend fun addNewProject(project: Project) = addNewProject.invoke(project)
 		}
@@ -39,13 +40,7 @@ class StartNewProjectTest {
 	}
 
 	private val authorUUID = UUID.randomUUID()
-	private val projectName = "My Awesome project"
-
-	@Test
-	fun `blank name should produce failure`() {
-		val (error) = given().invoke("  ") as Either.Left
-		error as NameCannotBeBlank
-	}
+	private val projectName = nonBlankStr("My Awesome project")
 
 	@Test
 	fun `valid name should produce project`() {

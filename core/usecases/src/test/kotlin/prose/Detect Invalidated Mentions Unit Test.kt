@@ -11,7 +11,6 @@ import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.location.makeLocation
-import com.soyle.stories.domain.prose.ProseDoesNotExist
 import com.soyle.stories.domain.prose.makeProse
 import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentionsUseCase

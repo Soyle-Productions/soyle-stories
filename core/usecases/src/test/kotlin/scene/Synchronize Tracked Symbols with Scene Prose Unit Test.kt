@@ -1,13 +1,17 @@
 package com.soyle.stories.usecase.scene
 
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.prose.ProseMention
+import com.soyle.stories.domain.prose.ProseMentionRange
+import com.soyle.stories.domain.prose.makeProse
+import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SymbolTrackedInScene
 import com.soyle.stories.domain.scene.TrackedSymbolRemoved
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
+import com.soyle.stories.usecase.prose.ProseDoesNotExist
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble

@@ -1,16 +1,16 @@
 package com.soyle.stories.usecase.scene
 
-import com.soyle.stories.domain.theme.Symbol
-import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
 import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.theme.Symbol
+import com.soyle.stories.domain.theme.makeSymbol
+import com.soyle.stories.domain.theme.makeTheme
+import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
+import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
 import com.soyle.stories.usecase.scene.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
 import com.soyle.stories.usecase.scene.trackSymbolInScene.ListAvailableSymbolsToTrackInSceneUseCase
 import com.soyle.stories.usecase.scene.trackSymbolInScene.PinSymbolToScene
 import com.soyle.stories.usecase.scene.trackSymbolInScene.PinSymbolToSceneUseCase
-import com.soyle.stories.domain.theme.makeSymbol
-import com.soyle.stories.domain.theme.makeTheme
 import com.soyle.stories.usecase.theme.listSymbolsByTheme.SymbolsByTheme
-import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
