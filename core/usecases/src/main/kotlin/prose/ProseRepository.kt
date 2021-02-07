@@ -2,7 +2,6 @@ package com.soyle.stories.usecase.prose
 
 import com.soyle.stories.domain.prose.MentionedEntityId
 import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.domain.prose.ProseDoesNotExist
 import com.soyle.stories.domain.prose.ProseEvent
 
 interface ProseRepository {

@@ -1,8 +1,8 @@
 package com.soyle.stories.usecase.prose.bulkUpdateProse
 
 import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.domain.prose.ProseDoesNotExist
 import com.soyle.stories.domain.prose.ProseEvent
+import com.soyle.stories.usecase.prose.ProseDoesNotExist
 import com.soyle.stories.usecase.prose.ProseRepository
 
 

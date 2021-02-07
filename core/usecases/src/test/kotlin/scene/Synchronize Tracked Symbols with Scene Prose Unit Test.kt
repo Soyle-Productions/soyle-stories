@@ -64,99 +64,106 @@ class `Synchronize Tracked Symbols with Scene Prose Unit Test` {
             error.proseId.mustEqual(prose.id)
         }
 
-        @Nested
-        inner class `Given prose exists` {
+    }
 
-            init {
-                proseRepository.givenProse(prose)
-                themeRepository.givenTheme(theme)
+    @Nested
+    inner class `Given prose exists` {
+
+        init {
+            sceneRepository.givenScene(scene)
+            proseRepository.givenProse(prose)
+            themeRepository.givenTheme(theme)
+        }
+
+        @Test
+        fun `should add symbol to scene`() {
+            trackSymbolInScene()
+            updatedScene!!.let {
+                it.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true)
             }
+        }
 
-            @Test
-            fun `should add symbol to scene`() {
-                trackSymbolInScene()
-                updatedScene!!.let {
-                    it.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true)
-                }
-            }
-
-            @Test
-            fun `should output event`() {
-                trackSymbolInScene()
-                result!!.let {
-                    it.symbolsTrackedInScene.mustEqual(
-                        listOf(
-                            SymbolTrackedInScene(
-                                scene.id,
-                                theme.name,
-                                Scene.TrackedSymbol(symbol.id, symbol.name, theme.id)
-                            )
+        @Test
+        fun `should output event`() {
+            trackSymbolInScene()
+            result!!.let {
+                it.symbolsTrackedInScene.mustEqual(
+                    listOf(
+                        SymbolTrackedInScene(
+                            scene.id,
+                            theme.name,
+                            Scene.TrackedSymbol(symbol.id, symbol.name, theme.id)
                         )
                     )
-                }
+                )
             }
+        }
 
-            @Nested
-            inner class `Given scene already tracks symbol` {
+    }
 
-                init {
-                    sceneRepository.givenScene(scene.withSymbolTracked(theme, symbol).scene)
-                }
+    @Nested
+    inner class `Given scene already tracks symbol` {
 
-                @Test
-                fun `should not update scene or output event`() {
-                    trackSymbolInScene()
-                    assertNull(updatedScene)
-                    assertNull(result)
-                }
+        init {
+            proseRepository.givenProse(prose)
+            themeRepository.givenTheme(theme)
+            sceneRepository.givenScene(scene.withSymbolTracked(theme, symbol).scene)
+        }
 
-                @Nested
-                inner class `Given prose no longer mentions symbol` {
+        @Test
+        fun `should not update scene or output event`() {
+            trackSymbolInScene()
+            assertNull(updatedScene)
+            assertNull(result)
+        }
 
-                    init {
-                        proseRepository.givenProse(prose.withContentReplaced(listOf()).prose)
-                    }
+    }
 
-                    @Test
-                    fun `should remove symbol from scene`() {
-                        trackSymbolInScene()
-                        updatedScene!!.let {
-                            it.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(false)
-                        }
-                    }
+    @Nested
+    inner class `Given prose no longer mentions symbol` {
 
-                    @Test
-                    fun `should output symbol removed event`() {
-                        trackSymbolInScene()
-                        result!!.let {
-                            assertTrue(it.symbolsTrackedInScene.isEmpty())
-                            it.symbolsNoLongerTrackedInScene.mustEqual(listOf(
-                                TrackedSymbolRemoved(scene.id, Scene.TrackedSymbol(symbol.id, symbol.name, theme.id))
-                            ))
-                        }
-                    }
+        init {
+            themeRepository.givenTheme(theme)
+            sceneRepository.givenScene(scene.withSymbolTracked(theme, symbol).scene)
+            proseRepository.givenProse(prose.withContentReplaced(listOf()).prose)
+        }
 
-                    @Nested
-                    inner class `Given symbol is pinned in scene`
-                    {
-
-                        init {
-                            sceneRepository.givenScene(scene.withSymbolTracked(theme, symbol).scene.withSymbolPinned(symbol.id).scene)
-                        }
-
-                        @Test
-                        fun `should not update scene or output event`() {
-                            trackSymbolInScene()
-                            assertNull(updatedScene)
-                            assertNull(result)
-                        }
-
-                    }
-
-                }
-
+        @Test
+        fun `should remove symbol from scene`() {
+            trackSymbolInScene()
+            updatedScene!!.let {
+                it.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(false)
             }
+        }
 
+        @Test
+        fun `should output symbol removed event`() {
+            trackSymbolInScene()
+            result!!.let {
+                assertTrue(it.symbolsTrackedInScene.isEmpty())
+                it.symbolsNoLongerTrackedInScene.mustEqual(listOf(
+                    TrackedSymbolRemoved(scene.id, Scene.TrackedSymbol(symbol.id, symbol.name, theme.id))
+                ))
+            }
+        }
+
+    }
+
+    @Nested
+    inner class `Given symbol is pinned in scene`
+    {
+
+        init {
+            themeRepository.givenTheme(theme)
+            sceneRepository.givenScene(scene.withSymbolTracked(theme, symbol).scene.withSymbolPinned(symbol.id).scene)
+            proseRepository.givenProse(prose.withContentReplaced(listOf()).prose)
+        }
+
+        @Test
+        fun `should not update scene or output event`() {
+            trackSymbolInScene()
+            assertNull(updatedScene)
+            assertNull(result)
         }
 
     }

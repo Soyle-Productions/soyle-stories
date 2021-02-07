@@ -43,151 +43,142 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
     }
 
     @Nested
-    inner class `When Prose Exists` {
+    inner class `When Mention is Character Id` {
+
+        private val characterId = Character.Id().mentioned()
+
+        private val charactersInProject = List(4) { makeCharacter(projectId = scene.projectId) }
+        private val charactersInOtherProjects = List(3) { makeCharacter() }
+
         init {
             sceneRepository.givenScene(scene)
+            charactersInProject.forEach(characterRepository::givenCharacter)
+            charactersInOtherProjects.forEach(characterRepository::givenCharacter)
+        }
+
+        @Test
+        fun `should list all characters in project`() {
+            listOptionsToReplaceMentionInSceneProse(characterId)
+            result!!.let {
+                it.entityIdToReplace.mustEqual(characterId)
+                it.options.mustEqual(charactersInProject.map {
+                    ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value, null)
+                })
+            }
         }
 
         @Nested
-        inner class `Should List Like-Kinded Entities` {
+        inner class `When Character is Included in Scene` {
 
-            @Nested
-            inner class `When Mention is Character Id` {
-
-                private val characterId = Character.Id().mentioned()
-
-                private val charactersInProject = List(4) { makeCharacter(projectId = scene.projectId) }
-                private val charactersInOtherProjects = List(3) { makeCharacter() }
-
-                init {
-                    charactersInProject.forEach(characterRepository::givenCharacter)
-                    charactersInOtherProjects.forEach(characterRepository::givenCharacter)
-                }
-
-                @Test
-                fun `should list all characters in project`() {
-                    listOptionsToReplaceMentionInSceneProse(characterId)
-                    result!!.let {
-                        it.entityIdToReplace.mustEqual(characterId)
-                        it.options.mustEqual(charactersInProject.map {
-                            ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value, null)
-                        })
-                    }
-                }
-
-                @Nested
-                inner class `When Character is Included in Scene` {
-
-                    init {
-                        charactersInProject.takeLast(2).fold(scene) { newScene, character ->
-                            newScene.withCharacterIncluded(character)
-                        }.let(sceneRepository::givenScene)
-                    }
-
-                    @Test
-                    fun `should prioritize included characters in result`() {
-                        listOptionsToReplaceMentionInSceneProse(characterId)
-                        result!!.let {
-                            it.entityIdToReplace.mustEqual(characterId)
-                            it.options.mustEqual(
-                                (charactersInProject.takeLast(2) + charactersInProject.dropLast(2)).map {
-                                    ListOptionsToReplaceMentionInSceneProse.MentionOption(
-                                        it.id.mentioned(),
-                                        it.name.value,
-                                        null
-                                    )
-                                })
-                        }
-                    }
-
-                }
-
+            init {
+                charactersInProject.takeLast(2).fold(scene) { newScene, character ->
+                    newScene.withCharacterIncluded(character)
+                }.let(sceneRepository::givenScene)
             }
 
-            @Nested
-            inner class `When Mention is Location Id` {
-
-                private val locationId = Location.Id().mentioned()
-
-                private val locationsInProject = List(4) { makeLocation(projectId = scene.projectId) }
-                private val locationsInOtherProjects = List(3) { makeLocation() }
-
-                init {
-                    locationsInProject.forEach(locationRepository::givenLocation)
-                    locationsInOtherProjects.forEach(locationRepository::givenLocation)
-                }
-
-                @Test
-                fun `should list all locations in project`() {
-                    listOptionsToReplaceMentionInSceneProse(locationId)
-                    result!!.let {
-                        it.entityIdToReplace.mustEqual(locationId)
-                        it.options.mustEqual(locationsInProject.map {
-                            ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value, null)
+            @Test
+            fun `should prioritize included characters in result`() {
+                listOptionsToReplaceMentionInSceneProse(characterId)
+                result!!.let {
+                    it.entityIdToReplace.mustEqual(characterId)
+                    it.options.mustEqual(
+                        (charactersInProject.takeLast(2) + charactersInProject.dropLast(2)).map {
+                            ListOptionsToReplaceMentionInSceneProse.MentionOption(
+                                it.id.mentioned(),
+                                it.name.value,
+                                null
+                            )
                         })
-                    }
                 }
-
-                @Nested
-                inner class `When Location Used in Scene` {
-
-                    init {
-                        locationsInProject.takeLast(2).fold(scene) { newScene, location ->
-                            newScene.withLocationLinked(location.id)
-                        }.let(sceneRepository::givenScene)
-                    }
-
-                    @Test
-                    fun `should prioritize used locations in result`() {
-                        listOptionsToReplaceMentionInSceneProse(locationId)
-                        result!!.let {
-                            it.entityIdToReplace.mustEqual(locationId)
-                            it.options.mustEqual(
-                                (locationsInProject.takeLast(2) + locationsInProject.dropLast(2)).map {
-                                    ListOptionsToReplaceMentionInSceneProse.MentionOption(
-                                        it.id.mentioned(),
-                                        it.name.value,
-                                        null
-                                    )
-                                })
-                        }
-                    }
-
-                }
-
-            }
-
-            @Nested
-            inner class `When mention is symbol id`
-            {
-
-                private val themeId = Theme.Id()
-                private val symbolId = Symbol.Id().mentioned(themeId)
-
-                private val themesInProject = List(4) { makeTheme(projectId = scene.projectId, symbols = List(3) { makeSymbol() }) }
-                private val themesInOtherProjects = List(3) { makeTheme(symbols = List(2) { makeSymbol() }) }
-
-                init {
-                    themesInProject.forEach(themeRepository::givenTheme)
-                    themesInOtherProjects.forEach(themeRepository::givenTheme)
-                }
-
-                @Test
-                fun `should list all symbols in the project`() {
-                    listOptionsToReplaceMentionInSceneProse(symbolId)
-                    result!!.let {
-                        it.entityIdToReplace.mustEqual(symbolId)
-                        it.options.mustEqual(themesInProject.flatMap { theme ->
-                            theme.symbols.map {
-                                ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(theme.id), it.name, theme.name)
-                            }
-                        })
-                    }
-                }
-
             }
 
         }
+
+    }
+
+    @Nested
+    inner class `When Mention is Location Id` {
+
+        private val locationId = Location.Id().mentioned()
+
+        private val locationsInProject = List(4) { makeLocation(projectId = scene.projectId) }
+        private val locationsInOtherProjects = List(3) { makeLocation() }
+
+        init {
+            sceneRepository.givenScene(scene)
+            locationsInProject.forEach(locationRepository::givenLocation)
+            locationsInOtherProjects.forEach(locationRepository::givenLocation)
+        }
+
+        @Test
+        fun `should list all locations in project`() {
+            listOptionsToReplaceMentionInSceneProse(locationId)
+            result!!.let {
+                it.entityIdToReplace.mustEqual(locationId)
+                it.options.mustEqual(locationsInProject.map {
+                    ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value, null)
+                })
+            }
+        }
+
+        @Nested
+        inner class `When Location Used in Scene` {
+
+            init {
+                locationsInProject.takeLast(2).fold(scene) { newScene, location ->
+                    newScene.withLocationLinked(location.id)
+                }.let(sceneRepository::givenScene)
+            }
+
+            @Test
+            fun `should prioritize used locations in result`() {
+                listOptionsToReplaceMentionInSceneProse(locationId)
+                result!!.let {
+                    it.entityIdToReplace.mustEqual(locationId)
+                    it.options.mustEqual(
+                        (locationsInProject.takeLast(2) + locationsInProject.dropLast(2)).map {
+                            ListOptionsToReplaceMentionInSceneProse.MentionOption(
+                                it.id.mentioned(),
+                                it.name.value,
+                                null
+                            )
+                        })
+                }
+            }
+
+        }
+
+    }
+
+    @Nested
+    inner class `When mention is symbol id`
+    {
+
+        private val themeId = Theme.Id()
+        private val symbolId = Symbol.Id().mentioned(themeId)
+
+        private val themesInProject = List(4) { makeTheme(projectId = scene.projectId, symbols = List(3) { makeSymbol() }) }
+        private val themesInOtherProjects = List(3) { makeTheme(symbols = List(2) { makeSymbol() }) }
+
+        init {
+            sceneRepository.givenScene(scene)
+            themesInProject.forEach(themeRepository::givenTheme)
+            themesInOtherProjects.forEach(themeRepository::givenTheme)
+        }
+
+        @Test
+        fun `should list all symbols in the project`() {
+            listOptionsToReplaceMentionInSceneProse(symbolId)
+            result!!.let {
+                it.entityIdToReplace.mustEqual(symbolId)
+                it.options.mustEqual(themesInProject.flatMap { theme ->
+                    theme.symbols.map {
+                        ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(theme.id), it.name, theme.name)
+                    }
+                })
+            }
+        }
+
     }
 
     private fun listOptionsToReplaceMentionInSceneProse(entityId: MentionedEntityId<*>) {

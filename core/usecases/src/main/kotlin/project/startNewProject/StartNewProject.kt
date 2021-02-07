@@ -1,14 +1,10 @@
-/**
- * Created by Brendan
- * Date: 2/29/2020
- * Time: 11:03 AM
- */
 package com.soyle.stories.usecase.project.startNewProject
 
+import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*
 
 interface StartNewProject {
-    suspend operator fun invoke(name: String, output: OutputPort)
+    suspend operator fun invoke(name: NonBlankString, output: OutputPort)
 
     class ResponseModel(val projectId: UUID, val projectName: String)
 

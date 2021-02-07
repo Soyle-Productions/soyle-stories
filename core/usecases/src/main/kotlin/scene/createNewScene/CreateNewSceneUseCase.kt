@@ -3,10 +3,9 @@ package com.soyle.stories.usecase.scene.createNewScene
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.usecase.scene.SceneDoesNotExist
-import com.soyle.stories.domain.scene.SceneException
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.usecase.prose.ProseRepository
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.SceneRepository
 import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
@@ -96,10 +95,7 @@ class CreateNewSceneUseCase(
 	}
 
 	private fun outputException(output: CreateNewScene.OutputPort, exception: Exception) {
-		when (exception) {
-			is SceneException -> output.receiveCreateNewSceneFailure(exception)
-			else -> output.receiveCreateNewSceneFailure(exception)
-		}
+		output.receiveCreateNewSceneFailure(exception)
 	}
 
 	private suspend fun createNewScene(storyEvent: StoryEvent, request: CreateNewScene.RequestModel): CreateNewScene.ResponseModel {

@@ -36,6 +36,7 @@ task<Test>("integrationTest") {
     testClassesDirs = sourceSets["integrationTest"].output.classesDirs
     classpath = sourceSets["integrationTest"].runtimeClasspath
     mustRunAfter(tasks["test"])
+    tasks.check.get().dependsOn(this)
 }
 
 tasks.withType<Test> {
@@ -44,6 +45,10 @@ tasks.withType<Test> {
 
 idea {
     module {
+        testSourceDirs.addAll(integrationTest.java.srcDirs)
+        integrationTest.withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+            testSourceDirs.addAll(kotlin.srcDirs)
+        }
         (this as ExtensionAware).configure<org.jetbrains.gradle.ext.ModuleSettings> {
             (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/main/kotlin"] = "com.soyle.stories.usecase"
             (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = "com.soyle.stories.usecase"

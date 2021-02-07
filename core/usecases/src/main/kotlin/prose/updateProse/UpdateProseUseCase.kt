@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.prose.updateProse
 
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.prose.ProseContent
-import com.soyle.stories.domain.prose.ProseDoesNotExist
+import com.soyle.stories.usecase.prose.ProseDoesNotExist
 import com.soyle.stories.usecase.prose.ProseRepository
 
 class UpdateProseUseCase(
