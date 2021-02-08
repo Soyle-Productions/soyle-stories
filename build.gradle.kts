@@ -32,4 +32,8 @@ allprojects {
         kotlinOptions.jvmTarget = plugin.constants.javaVersion
     }
 
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
 }
