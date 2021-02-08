@@ -1,9 +1,8 @@
 package com.soyle.stories.storyevent.storyEventDetails.presenters
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.storyevent.StoryEventException
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsViewModel
-import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
+import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 import java.util.*
 
 class RemoveCharacterFromStoryEventPresenter(
@@ -29,7 +28,7 @@ class RemoveCharacterFromStoryEventPresenter(
 		}
 	}
 
-	override fun receiveRemoveCharacterFromStoryEventFailure(failure: StoryEventException) {
+	override fun receiveRemoveCharacterFromStoryEventFailure(failure: Exception) {
 
 	}
 }

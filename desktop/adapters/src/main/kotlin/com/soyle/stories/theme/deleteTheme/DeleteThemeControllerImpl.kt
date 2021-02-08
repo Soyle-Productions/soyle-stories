@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.deleteTheme
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
+import com.soyle.stories.usecase.theme.deleteTheme.DeleteTheme
 import java.util.*
 
 class DeleteThemeControllerImpl(

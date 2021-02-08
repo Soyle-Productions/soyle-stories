@@ -2,6 +2,7 @@ package com.soyle.stories.project.startProjectDialog
 
 import com.soyle.stories.common.async
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.Styles.Companion.errorState
 import com.soyle.stories.soylestories.ApplicationModel
@@ -101,11 +102,17 @@ class StartProjectDialog : View("Start New Project") {
                 enableWhen { isValid }
                 isDefaultButton = true
                 action {
-                    async(scope) {
-                        projectListViewListener.startNewProject(selectedDirectoryFile.value!!.absolutePath, projectName.value)
-                        runLater {
-                            if (model.value == null) {
-                                close()
+                    val nonBlankName = NonBlankString.create(projectName.value)
+                    if (nonBlankName != null) {
+                        async(scope) {
+                            projectListViewListener.startNewProject(
+                                selectedDirectoryFile.value!!.absolutePath,
+                                nonBlankName
+                            )
+                            runLater {
+                                if (model.value == null) {
+                                    close()
+                                }
                             }
                         }
                     }

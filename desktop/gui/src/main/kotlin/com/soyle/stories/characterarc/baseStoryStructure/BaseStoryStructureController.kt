@@ -5,7 +5,7 @@ import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.Unli
 import com.soyle.stories.characterarc.usecaseControllers.ChangeThematicSectionValueController
 import com.soyle.stories.characterarc.viewBaseStoryStructure.ViewBaseStoryStructureController
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.usecase.location.listAllLocations.ListAllLocations
 
 class BaseStoryStructureController(
   private val threadTransformer: ThreadTransformer,

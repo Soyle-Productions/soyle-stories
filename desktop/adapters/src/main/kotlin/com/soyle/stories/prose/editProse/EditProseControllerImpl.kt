@@ -1,9 +1,9 @@
 package com.soyle.stories.prose.editProse
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.ProseContent
-import com.soyle.stories.prose.usecases.updateProse.UpdateProse
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.prose.ProseContent
+import com.soyle.stories.usecase.prose.updateProse.UpdateProse
 import kotlinx.coroutines.Job
 
 class EditProseControllerImpl(

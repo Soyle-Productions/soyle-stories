@@ -1,6 +1,6 @@
 package com.soyle.stories.layout.config
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.layout.config.fixed.*
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications

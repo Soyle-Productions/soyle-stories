@@ -1,7 +1,7 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.validation.SingleNonBlankLine
 import com.soyle.stories.location.controllers.CreateNewLocationController
 
 class CreateLocationDialogController(

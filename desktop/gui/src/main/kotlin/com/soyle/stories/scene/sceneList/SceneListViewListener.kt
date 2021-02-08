@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.sceneList
 
-import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.entities.Prose
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.scene.items.SceneItemViewModel
 
 interface SceneListViewListener {

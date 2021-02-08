@@ -1,9 +1,9 @@
 package com.soyle.stories.scene.createNewScene
 
 import com.soyle.stories.common.LocaleManager
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
+import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import java.util.*
 
 class CreateNewSceneControllerImpl(

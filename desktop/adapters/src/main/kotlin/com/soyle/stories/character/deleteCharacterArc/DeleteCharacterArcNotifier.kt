@@ -2,7 +2,7 @@ package com.soyle.stories.character.deleteCharacterArc
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
+import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
 
 class DeleteCharacterArcNotifier(
     private val threadTransformer: ThreadTransformer

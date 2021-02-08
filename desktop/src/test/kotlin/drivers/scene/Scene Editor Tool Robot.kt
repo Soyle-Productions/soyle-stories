@@ -10,7 +10,7 @@ import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Compan
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorDriver.Companion.driver
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListDriver
 import com.soyle.stories.desktop.view.type
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.proseEditor.ContentElement

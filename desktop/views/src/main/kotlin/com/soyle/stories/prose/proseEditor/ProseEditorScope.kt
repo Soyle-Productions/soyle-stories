@@ -1,10 +1,10 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.SubProjectScope
-import com.soyle.stories.entities.MentionedEntityId
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.ProseMention
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.prose.ProseMention
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 
 class ProseEditorScope(

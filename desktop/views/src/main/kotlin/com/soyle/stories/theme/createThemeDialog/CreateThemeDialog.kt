@@ -2,13 +2,13 @@ package com.soyle.stories.theme.createThemeDialog
 
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.validation.NonBlankString
 import javafx.geometry.Orientation
 import javafx.scene.Parent
 import javafx.stage.Modality
 import javafx.stage.StageStyle
 import javafx.stage.Window
 import tornadofx.*
-import kotlin.properties.Delegates
 
 class CreateThemeDialog : Fragment() {
 
@@ -25,7 +25,12 @@ class CreateThemeDialog : Fragment() {
                         if (it != null) addDecorator(SimpleMessageDecorator(it, ValidationSeverity.Error))
                     }
                     action {
-                        viewListener.createTheme(text)
+                        val nonBlankName = NonBlankString.create(text)
+                        if (nonBlankName != null) {
+                            viewListener.createTheme(nonBlankName)
+                        } else {
+                            model.errorMessage.value = "Name cannot be blank"
+                        }
                     }
                 }
             }

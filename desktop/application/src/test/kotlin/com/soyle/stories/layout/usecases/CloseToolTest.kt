@@ -1,6 +1,6 @@
 package com.soyle.stories.layout.usecases
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.layout.LayoutException
 import com.soyle.stories.layout.ToolDoesNotExist
 import com.soyle.stories.layout.assertLayoutDoesNotExist

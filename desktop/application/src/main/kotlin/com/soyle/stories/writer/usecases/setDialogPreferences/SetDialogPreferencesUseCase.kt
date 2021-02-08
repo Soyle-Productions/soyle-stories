@@ -1,9 +1,9 @@
 package com.soyle.stories.writer.usecases.setDialogPreferences
 
-import com.soyle.stories.entities.Writer
+import com.soyle.stories.domain.writer.Writer
+import com.soyle.stories.usecase.writer.WriterNotRegistered
+import com.soyle.stories.usecase.writer.WriterRepository
 import com.soyle.stories.writer.DialogType
-import com.soyle.stories.writer.WriterNotRegistered
-import com.soyle.stories.writer.repositories.WriterRepository
 import java.util.*
 
 class SetDialogPreferencesUseCase(

@@ -2,10 +2,9 @@ package com.soyle.stories.layout.removeToolsWithId
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.usecases.removeToolsWithId.RemoveToolsWithId
-import com.soyle.stories.scene.SceneException
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
-import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
+import com.soyle.stories.usecase.theme.deleteTheme.DeletedTheme
 
 class RemoveToolsWithIdController(
     private val threadTransformer: ThreadTransformer,
@@ -29,5 +28,5 @@ class RemoveToolsWithIdController(
         )
     }
 
-    override fun receiveDeleteSceneFailure(failure: SceneException) {}
+    override fun receiveDeleteSceneFailure(failure: Exception) {}
 }

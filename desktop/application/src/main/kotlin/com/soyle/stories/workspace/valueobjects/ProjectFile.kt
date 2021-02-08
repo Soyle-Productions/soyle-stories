@@ -5,7 +5,7 @@
  */
 package com.soyle.stories.workspace.valueobjects
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 
 
 class ProjectFile(

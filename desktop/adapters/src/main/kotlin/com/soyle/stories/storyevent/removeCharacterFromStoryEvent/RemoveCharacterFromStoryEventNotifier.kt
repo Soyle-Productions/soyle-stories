@@ -2,8 +2,7 @@ package com.soyle.stories.storyevent.removeCharacterFromStoryEvent
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.storyevent.StoryEventException
-import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
+import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 
 class RemoveCharacterFromStoryEventNotifier(
 	private val threadTransformer: ThreadTransformer
@@ -14,7 +13,7 @@ class RemoveCharacterFromStoryEventNotifier(
 		}
 	}
 
-	override fun receiveRemoveCharacterFromStoryEventFailure(failure: StoryEventException) {
+	override fun receiveRemoveCharacterFromStoryEventFailure(failure: Exception) {
 		threadTransformer.async {
 			notifyAll { it.receiveRemoveCharacterFromStoryEventFailure(failure) }
 		}

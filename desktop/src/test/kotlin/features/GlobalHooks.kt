@@ -10,7 +10,11 @@ import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.soylestories.configureModules
 import com.soyle.stories.desktop.view.runHeadless
 import com.soyle.stories.di.DI
-import com.soyle.stories.entities.*
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArcTemplate
+import com.soyle.stories.domain.character.CharacterArcTemplateSection
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
@@ -80,7 +84,7 @@ class GlobalHooks : En {
         ParameterType<Theme>("moral argument", "moral argument \"(.*?)\"|\"(.*?)\" moral argument") { name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
         }
-        ParameterType<com.soyle.stories.entities.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { name: String ->
+        ParameterType<com.soyle.stories.domain.scene.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { name: String ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).getSceneByNameOrError(name)
         }
         ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { name: String ->

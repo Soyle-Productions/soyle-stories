@@ -1,5 +1,7 @@
 package com.soyle.stories.theme.themeList
 
+import com.soyle.stories.domain.validation.NonBlankString
+
 interface ThemeListViewListener {
 
     fun getValidState()
@@ -7,7 +9,7 @@ interface ThemeListViewListener {
     fun openCharacterComparison(themeId: String)
     fun openCentralConflict(themeId: String)
     fun openMoralArgument(themeId: String)
-    fun renameTheme(themeId: String, newName: String)
-    fun renameSymbol(symbolId: String, newName: String)
+    fun renameTheme(themeId: String, newName: NonBlankString)
+    fun renameSymbol(symbolId: String, newName: NonBlankString)
 
 }

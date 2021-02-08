@@ -1,6 +1,6 @@
 package com.soyle.stories.layout.entities
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.layout.tools.TemporaryTool
 import java.util.*
 import kotlin.reflect.KClass

@@ -4,8 +4,8 @@ import com.soyle.stories.character.CharacterArcSteps
 import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.character.CharacterSteps
 import com.soyle.stories.character.CreateCharacterDialogDriver
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.location.LocationListDriver
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.CreateProjectDialogDriver

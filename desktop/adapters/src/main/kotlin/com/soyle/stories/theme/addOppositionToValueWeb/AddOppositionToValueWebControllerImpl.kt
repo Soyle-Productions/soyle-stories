@@ -1,9 +1,10 @@
 package com.soyle.stories.theme.addOppositionToValueWeb
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
-import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb.RequestModel
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.theme.addOppositionToValueWeb.AddOppositionToValueWeb
+import com.soyle.stories.usecase.theme.addOppositionToValueWeb.AddOppositionToValueWeb.RequestModel
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.CharacterId
 import java.util.*
 
 class AddOppositionToValueWebControllerImpl(
@@ -19,7 +20,7 @@ class AddOppositionToValueWebControllerImpl(
         addOppositionToValueWeb(request)
     }
 
-    override fun addOppositionWithCharacter(valueWebId: String, name: String, characterId: String) {
+    override fun addOppositionWithCharacter(valueWebId: String, name: NonBlankString, characterId: String) {
         val request = RequestModel(
             UUID.fromString(valueWebId),
             name,

@@ -1,6 +1,6 @@
 package com.soyle.stories.location.renameLocation
 
-import com.soyle.stories.location.usecases.renameLocation.RenameLocation
+import com.soyle.stories.usecase.location.renameLocation.RenameLocation
 import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
 
 class RenameLocationOutput(

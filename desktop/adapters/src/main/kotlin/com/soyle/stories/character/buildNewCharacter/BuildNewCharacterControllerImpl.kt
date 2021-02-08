@@ -1,9 +1,9 @@
 package com.soyle.stories.character.buildNewCharacter
 
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacter
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacter
+import com.soyle.stories.usecase.character.createPerspectiveCharacter.CreatePerspectiveCharacter
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*
 
 class BuildNewCharacterControllerImpl(

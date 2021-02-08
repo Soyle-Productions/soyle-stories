@@ -4,10 +4,10 @@ import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.components.characterCard
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
@@ -102,7 +102,12 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterArcItemViewModel) {
-                    confirmDeleteCharacterArc(selectedItem.characterId, selectedItem.themeId, selectedItem.name, characterListViewListener)
+                    confirmDeleteCharacterArc(
+                        selectedItem.characterId,
+                        selectedItem.themeId,
+                        selectedItem.name,
+                        characterListViewListener
+                    )
                 }
             }
         }
@@ -115,7 +120,7 @@ internal class PopulatedDisplay : View() {
         minHeight = 100.0
         vgrow = Priority.ALWAYS
         hbox(spacing = 10.0) {
-            padding = Insets(8.0, 8.0, 8.0,  8.0)
+            padding = Insets(8.0, 8.0, 8.0, 8.0)
             button("New Character") {
                 isDisable = false
                 action {
@@ -158,13 +163,16 @@ internal class PopulatedDisplay : View() {
                 else null
 
             }) { newName, oldValue ->
-
+                val newNonBlankName = NonBlankString.create(newName) ?: return@makeEditable oldValue
                 when (oldValue) {
                     is CharacterTreeItemViewModel -> {
-                        val newNonBlankName = NonBlankString.create(newName) ?: return@makeEditable oldValue
                         characterListViewListener.renameCharacter(oldValue.id, newNonBlankName)
                     }
-                    is CharacterArcItemViewModel -> characterListViewListener.renameCharacterArc(oldValue.characterId, oldValue.themeId, newName)
+                    is CharacterArcItemViewModel -> characterListViewListener.renameCharacterArc(
+                        oldValue.characterId,
+                        oldValue.themeId,
+                        newNonBlankName
+                    )
                 }
 
                 oldValue

@@ -1,6 +1,6 @@
 package com.soyle.stories.character.buildNewCharacter
 
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.domain.validation.NonBlankString
 
 interface BuildNewCharacterController {
 

@@ -1,6 +1,6 @@
 package com.soyle.stories.project.dialogs
 
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
 
 data class ActiveDialogsViewModel(
     val confirmDeleteCharacter: ActiveDialogViewModel<RemoveCharacterFromStory.ConfirmationRequest> = ActiveDialogViewModel(null)

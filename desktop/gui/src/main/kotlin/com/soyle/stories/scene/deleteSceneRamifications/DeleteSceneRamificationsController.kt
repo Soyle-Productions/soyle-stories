@@ -6,7 +6,7 @@ import com.soyle.stories.layout.closeTool.CloseToolController
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.layout.usecases.closeTool.CloseTool
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
-import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
+import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import java.util.*
 
 class DeleteSceneRamificationsController(

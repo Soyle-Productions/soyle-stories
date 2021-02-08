@@ -3,15 +3,15 @@ package com.soyle.stories.scene.sceneList
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
-import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
+import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.presenters.*
-import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
-import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
-import com.soyle.stories.scene.usecases.renameScene.RenameScene
-import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
-import com.soyle.stories.scene.usecases.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
+import com.soyle.stories.usecase.scene.renameScene.RenameScene
+import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
+import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
 
 class SceneListPresenter(
     private val view: View.Nullable<SceneListViewModel>,

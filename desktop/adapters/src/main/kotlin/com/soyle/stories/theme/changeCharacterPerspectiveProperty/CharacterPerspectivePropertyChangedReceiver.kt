@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.changeCharacterPerspectiveProperty
 
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
+import com.soyle.stories.usecase.theme.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 
 interface CharacterPerspectivePropertyChangedReceiver {
 

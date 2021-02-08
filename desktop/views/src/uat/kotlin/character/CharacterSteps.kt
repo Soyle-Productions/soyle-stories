@@ -3,8 +3,8 @@ package com.soyle.stories.character
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
 import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble

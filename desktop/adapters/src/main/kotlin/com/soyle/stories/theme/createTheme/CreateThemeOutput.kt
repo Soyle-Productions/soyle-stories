@@ -1,10 +1,9 @@
 package com.soyle.stories.theme.createTheme
 
-import com.soyle.stories.common.Notifier
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
-import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
-import com.soyle.stories.theme.usecases.createTheme.CreateTheme
-import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
+import com.soyle.stories.usecase.theme.addSymbolToTheme.SymbolAddedToTheme
+import com.soyle.stories.usecase.theme.createTheme.CreateTheme
+import com.soyle.stories.usecase.theme.createTheme.CreatedTheme
 
 class CreateThemeOutput(
     private val createdThemeReceiver: CreatedThemeReceiver,

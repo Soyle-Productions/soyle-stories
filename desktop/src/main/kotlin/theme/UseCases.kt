@@ -12,12 +12,12 @@ import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.Chang
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineController
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineControllerImpl
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeOutput
-import com.soyle.stories.theme.usecases.changeThemeDetails.*
-import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralArgumentFrame
-import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgument
-import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
+import com.soyle.stories.usecase.theme.changeThemeDetails.*
+import com.soyle.stories.usecase.theme.outlineMoralArgument.GetMoralArgumentFrame
+import com.soyle.stories.usecase.theme.outlineMoralArgument.OutlineMoralArgument
+import com.soyle.stories.usecase.theme.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
+import com.soyle.stories.usecase.theme.removeSymbolFromTheme.RemoveSymbolFromTheme
+import com.soyle.stories.usecase.theme.removeSymbolFromTheme.RemoveSymbolFromThemeUseCase
 
 object UseCases {
 

@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.includeCharacterInTheme
 
-import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.IncludeCharacterInComparison
 
 class IncludeCharacterInComparisonOutput(
     private val characterIncludedInThemeReceiver: CharacterIncludedInThemeReceiver

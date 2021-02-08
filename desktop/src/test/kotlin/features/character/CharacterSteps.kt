@@ -1,6 +1,5 @@
 package com.soyle.stories.desktop.config.features.character
 
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.desktop.config.drivers.character.*
 import com.soyle.stories.desktop.config.drivers.soylestories.ScenarioContext
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
@@ -9,8 +8,9 @@ import com.soyle.stories.desktop.config.drivers.theme.givenMoralArgumentToolHasB
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.character.characterList.CharacterListAssertions
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.validation.NonBlankString
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.*

@@ -1,9 +1,8 @@
 package com.soyle.stories.scene.deleteSceneRamifications.presenters
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamificationsViewModel
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 
 internal class DeleteScenePresenter(
   private val view: View.Nullable<DeleteSceneRamificationsViewModel>
@@ -21,5 +20,5 @@ internal class DeleteScenePresenter(
 		}
 	}
 
-	override fun receiveDeleteSceneFailure(failure: SceneException) {}
+	override fun receiveDeleteSceneFailure(failure: Exception) {}
 }

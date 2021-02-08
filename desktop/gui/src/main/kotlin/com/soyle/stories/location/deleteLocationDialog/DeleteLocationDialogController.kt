@@ -1,6 +1,6 @@
 package com.soyle.stories.location.deleteLocationDialog
 
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.location.deleteLocation.DeleteLocationController
 import java.util.*
 

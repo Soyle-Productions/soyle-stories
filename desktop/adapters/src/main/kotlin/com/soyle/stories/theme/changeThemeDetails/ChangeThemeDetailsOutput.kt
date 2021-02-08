@@ -5,7 +5,7 @@ import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.Cha
 import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.ChangedThematicRevelationReceiver
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangedThemeLineReceiver
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
-import com.soyle.stories.theme.usecases.changeThemeDetails.*
+import com.soyle.stories.usecase.theme.changeThemeDetails.*
 
 class ChangeThemeDetailsOutput(
     private val renamedThemeReceiver: RenamedThemeReceiver,

@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.sceneList
 
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.get

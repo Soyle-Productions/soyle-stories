@@ -6,7 +6,7 @@ import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
 import com.soyle.stories.desktop.view.character.characterList.drive
 import com.soyle.stories.desktop.view.character.characterList.driver
-import com.soyle.stories.entities.Character
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.project.WorkBench
 import javafx.event.ActionEvent
 import javafx.scene.control.TextField

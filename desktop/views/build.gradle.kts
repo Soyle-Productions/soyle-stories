@@ -7,7 +7,7 @@ import org.openjfx.gradle.JavaFXPlatform
 plugins {
     kotlin("jvm")
     id(plugin.constants.javafx) version plugin.constants.javaFxVersion
-    id(plugin.constants.ideaExt) version plugin.constants.ideaExtVersion
+    id(plugin.constants.ideaExt)
     id("java-test-fixtures")
 }
 
@@ -72,7 +72,7 @@ val javaFXOptions = convention.findByType<JavaFXOptions>()
 dependencies {
 
     // use of api is temporary until more things are moved to root config project
-    api( project(":core"))
+    api( project(":usecases"))
     api( project(":desktop:application"))
     api( project(":desktop:adapters"))
     api( project(":desktop:gui"))

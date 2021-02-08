@@ -2,6 +2,7 @@ package com.soyle.stories.theme.createOppositionValueDialog
 
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.validation.NonBlankString
 import javafx.geometry.Orientation
 import javafx.scene.Parent
 import javafx.stage.Modality
@@ -31,7 +32,12 @@ class CreateOppositionValueDialog : Fragment() {
                         if (it != null) addDecorator(SimpleMessageDecorator(it, ValidationSeverity.Error))
                     }
                     action {
-                        viewListener.createOppositionValue(valueWebId, text, characterId)
+                        val nonBlankText = NonBlankString.create(text)
+                        if (nonBlankText != null) {
+                            viewListener.createOppositionValue(valueWebId, nonBlankText, characterId)
+                        } else {
+                            model.errorMessage.set("Name cannot be blank")
+                        }
                     }
                 }
             }

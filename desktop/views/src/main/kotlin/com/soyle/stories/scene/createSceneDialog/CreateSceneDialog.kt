@@ -1,9 +1,9 @@
 package com.soyle.stories.scene.createSceneDialog
 
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogViewListener

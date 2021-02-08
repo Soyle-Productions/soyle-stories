@@ -1,13 +1,16 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.common.*
+import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
-import com.soyle.stories.location.LocationException
+import com.soyle.stories.domain.validation.SingleLine
+import com.soyle.stories.domain.validation.SingleNonBlankLine
+import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.location.events.CreateNewLocationNotifier
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.stage.Modality
@@ -32,7 +35,7 @@ class CreateLocationDialog : Fragment("New Location") {
             createdLocationNotifier.removeListener(this)
         }
 
-        override fun receiveCreateNewLocationFailure(failure: LocationException) {
+        override fun receiveCreateNewLocationFailure(failure: Exception) {
             createdLocationNotifier.removeListener(this)
         }
     }

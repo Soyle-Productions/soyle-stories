@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.linkLocationToCharacterArcSection
 
-import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
+import com.soyle.stories.usecase.character.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 

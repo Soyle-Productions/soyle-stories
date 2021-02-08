@@ -2,6 +2,7 @@ package com.soyle.stories.storyevent.createStoryEventDialog
 
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import javafx.event.EventHandler
@@ -31,14 +32,20 @@ class CreateStoryEventDialog : Fragment() {
 			}
 			onAction = EventHandler {
 				it.consume()
-				model.isExecuting.set(true)
-				viewListener.createStoryEvent(text, relativeStoryEventId,
-				  when (isBefore) {
-					  null -> null
-					  true -> "before"
-					  else -> "after"
-				  }
-				)
+				val nonBlankName = NonBlankString.create(text)
+				if (nonBlankName != null) {
+					model.isExecuting.set(true)
+					viewListener.createStoryEvent(
+						nonBlankName, relativeStoryEventId,
+						when (isBefore) {
+							null -> null
+							true -> "before"
+							else -> "after"
+						}
+					)
+				} else {
+					model.errorMessage.value = "Name cannot be blank"
+				}
 			}
 		}
 	}

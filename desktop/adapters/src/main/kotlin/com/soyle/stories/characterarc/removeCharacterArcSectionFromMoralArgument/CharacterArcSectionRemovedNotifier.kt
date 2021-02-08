@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument
 
-import com.soyle.stories.characterarc.usecases.removeCharacterArcSectionFromMoralArgument.CharacterArcSectionRemoved
+import com.soyle.stories.usecase.character.removeCharacterArcSectionFromMoralArgument.CharacterArcSectionRemoved
 import com.soyle.stories.common.Notifier
 
 class CharacterArcSectionRemovedNotifier : CharacterArcSectionRemovedReceiver,

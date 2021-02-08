@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.createOppositionValueDialog
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialogViewModel
-import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
+import com.soyle.stories.usecase.theme.addOppositionToValueWeb.AddOppositionToValueWeb
 
 class CreateOppositionValueDialogPresenter(
     private val view: View.Nullable<CreateOppositionValueDialogViewModel>

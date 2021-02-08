@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.removeSymbolFromTheme
 
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
+import com.soyle.stories.usecase.theme.removeSymbolFromTheme.SymbolRemovedFromTheme
 
 interface SymbolRemovedFromThemeReceiver {
 

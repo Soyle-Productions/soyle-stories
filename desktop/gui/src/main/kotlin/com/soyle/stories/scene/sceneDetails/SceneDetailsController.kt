@@ -6,7 +6,7 @@ import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
-import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
+import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetails
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import java.util.*

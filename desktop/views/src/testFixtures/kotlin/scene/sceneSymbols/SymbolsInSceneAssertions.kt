@@ -1,7 +1,6 @@
-package com.soyle.stories.desktop.view.scene.sceneSymbols
+package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView
+import com.soyle.stories.domain.theme.Symbol
 import javafx.scene.control.Label
 import org.junit.jupiter.api.Assertions.*
 

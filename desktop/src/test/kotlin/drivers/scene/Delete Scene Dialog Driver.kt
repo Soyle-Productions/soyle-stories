@@ -5,7 +5,7 @@ import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.desktop.view.scene.deleteSceneDialog.DeleteSceneDialogDriver
 import com.soyle.stories.desktop.view.scene.sceneList.drive
 import com.soyle.stories.desktop.view.scene.sceneList.driver
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialog
 import com.soyle.stories.scene.sceneList.SceneListView

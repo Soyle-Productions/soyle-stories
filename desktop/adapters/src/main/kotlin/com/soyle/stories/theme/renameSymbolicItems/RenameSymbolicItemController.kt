@@ -2,12 +2,12 @@ package com.soyle.stories.theme.renameSymbolicItems
 
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.CharacterRenamed
-import com.soyle.stories.entities.LocationRenamed
+import com.soyle.stories.domain.character.CharacterRenamed
+import com.soyle.stories.domain.location.LocationRenamed
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.theme.renameSymbol.RenamedSymbolReceiver
-import com.soyle.stories.theme.usecases.renameSymbol.RenamedSymbol
-import com.soyle.stories.theme.usecases.renameSymbolicItems.RenameSymbolicItem
+import com.soyle.stories.usecase.theme.renameSymbol.RenamedSymbol
+import com.soyle.stories.usecase.theme.renameSymbolicItems.RenameSymbolicItem
 
 class RenameSymbolicItemController(
     private val threadTransformer: ThreadTransformer,

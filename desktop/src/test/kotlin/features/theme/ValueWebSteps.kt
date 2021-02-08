@@ -79,7 +79,7 @@ class ValueWebSteps : En {
             val theme = themeDriver.getThemeByNameOrError(themeName)
             val valueWeb = themeDriver.getValueWebInThemeAtOnePointNamedOrError(theme.id, originalValueWebName).second!!
 
-            assertEquals(newValueWebName, valueWeb.name)
+            assertEquals(newValueWebName, valueWeb.name.value)
 
             assertThat(workbench.givenValueWebToolHasBeenOpenedForThemeNamed(themeName)) {
                 doesNotHaveValueWebNamed(originalValueWebName)

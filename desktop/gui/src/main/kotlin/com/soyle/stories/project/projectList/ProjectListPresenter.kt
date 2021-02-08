@@ -1,23 +1,14 @@
 package com.soyle.stories.project.projectList
 
-import com.soyle.stories.common.Notifier
-import com.soyle.stories.common.listensTo
 import com.soyle.stories.project.closeProject.CloseProjectRequestReceiver
 import com.soyle.stories.project.closeProject.ClosedProjectReceiver
-import com.soyle.stories.project.eventbus.ProjectEvents
 import com.soyle.stories.project.openProject.ProjectOpenedReceiver
 import com.soyle.stories.project.projectList.presenters.CloseProjectPresenter
 import com.soyle.stories.project.projectList.presenters.OpenProjectPresenter
-import com.soyle.stories.project.projectList.presenters.StartNewLocalProjectPresenter
-import com.soyle.stories.project.startNewProject.ProjectStartedReceiver
-import com.soyle.stories.project.usecases.startNewProject.StartNewProject
-import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProject
 import com.soyle.stories.workspace.ExpectedProjectDoesNotExistAtLocation
 import com.soyle.stories.workspace.ExpectedProjectException
 import com.soyle.stories.workspace.UnexpectedProjectExistsAtLocation
 import com.soyle.stories.workspace.usecases.listOpenProjects.ListOpenProjects
-import com.soyle.stories.workspace.usecases.openProject.OpenProject
-import com.soyle.stories.workspace.usecases.requestCloseProject.RequestCloseProject
 
 class ProjectListPresenter(
     private val view: ProjectListView

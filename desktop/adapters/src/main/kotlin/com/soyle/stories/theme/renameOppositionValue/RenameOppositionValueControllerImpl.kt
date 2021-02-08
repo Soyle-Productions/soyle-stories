@@ -1,8 +1,9 @@
 package com.soyle.stories.theme.renameOppositionValue
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.OppositionValueAlreadyHasName
-import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValue
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.theme.OppositionValueAlreadyHasName
+import com.soyle.stories.usecase.theme.renameOppositionValue.RenameOppositionValue
 import java.util.*
 
 class RenameOppositionValueControllerImpl(
@@ -11,7 +12,7 @@ class RenameOppositionValueControllerImpl(
     private val renameOppositionValueOutputPort: RenameOppositionValue.OutputPort
 ) : RenameOppositionValueController {
 
-    override fun renameOpposition(oppositionValueId: String, newName: String, onError: (Throwable) -> Unit) {
+    override fun renameOpposition(oppositionValueId: String, newName: NonBlankString, onError: (Throwable) -> Unit) {
         val preparedOppositionValueId = UUID.fromString(oppositionValueId)
         threadTransformer.async {
             try {

@@ -1,10 +1,10 @@
 package com.soyle.stories.theme.addSymbolicItemToOpposition
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.LocationId
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.SymbolId
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.CharacterId
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.LocationId
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.SymbolId
 import java.util.*
 
 class AddSymbolicItemToOppositionControllerImpl(

@@ -1,8 +1,8 @@
 package com.soyle.stories.scene.sceneEditor
 
-import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.entities.MentionedEntityId
-import com.soyle.stories.entities.ProseMention
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.prose.ProseMention
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.prose.proseEditor.OnLoadMentionQueryOutput
 import com.soyle.stories.prose.proseEditor.OnLoadMentionReplacementsOutput
 

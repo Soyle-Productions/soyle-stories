@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.removeCharacterAsOpponent
 
-import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.RemoveCharacterAsOpponent
+import com.soyle.stories.usecase.theme.removeCharacterAsOpponent.RemoveCharacterAsOpponent
 
 class RemoveCharacterAsOpponentOutput(
     private val characterRemovedAsOpponentReceiver: CharacterRemovedAsOpponentReceiver

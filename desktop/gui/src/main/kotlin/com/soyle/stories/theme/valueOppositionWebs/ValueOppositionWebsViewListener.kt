@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.valueOppositionWebs
 
-import java.util.*
+import com.soyle.stories.domain.validation.NonBlankString
 
 interface ValueOppositionWebsViewListener {
 
@@ -8,8 +8,8 @@ interface ValueOppositionWebsViewListener {
     fun selectValueWeb(valueWebId: String)
     fun addOpposition(valueWebId: String)
     fun removeOpposition(valueWebId: String, oppositionId: String)
-    fun renameOppositionValue(oppositionId: String, name: String)
-    fun renameValueWeb(valueWebId: String, name: String)
+    fun renameOppositionValue(oppositionId: String, name: NonBlankString)
+    fun renameValueWeb(valueWebId: String, name: NonBlankString)
     fun removeSymbolicItem(oppositionId: String, itemId: String)
 
 }

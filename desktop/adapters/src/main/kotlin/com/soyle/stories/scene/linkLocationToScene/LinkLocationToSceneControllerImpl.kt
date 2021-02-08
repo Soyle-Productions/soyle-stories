@@ -2,7 +2,7 @@ package com.soyle.stories.scene.linkLocationToScene
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
+import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
 import java.util.*
 
 class LinkLocationToSceneControllerImpl(

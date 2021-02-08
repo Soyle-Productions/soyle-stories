@@ -2,7 +2,7 @@ package com.soyle.stories.scene.deleteScene
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import java.util.*
 
 class DeleteSceneControllerImpl(

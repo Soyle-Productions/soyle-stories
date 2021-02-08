@@ -1,10 +1,10 @@
 package com.soyle.stories.repositories
 
-import com.soyle.stories.characterarc.repositories.CharacterRepository
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.usecase.character.CharacterRepository
 
-class CharacterRepositoryImpl : CharacterRepository, com.soyle.stories.character.repositories.CharacterRepository, com.soyle.stories.theme.repositories.CharacterRepository {
+class CharacterRepositoryImpl : CharacterRepository {
 
 	val characters = mutableMapOf<Character.Id, Character>()
 

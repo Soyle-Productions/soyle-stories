@@ -1,8 +1,8 @@
 package com.soyle.stories.scene.listSymbolsInScene
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInScene
 import kotlinx.coroutines.Job
 
 class ListSymbolsInSceneControllerImpl(

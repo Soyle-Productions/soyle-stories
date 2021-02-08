@@ -1,15 +1,19 @@
 package com.soyle.stories.scene.sceneEditor
 
-import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.entities.*
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.prose.ProseMention
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.prose.proseEditor.OnLoadMentionQueryOutput
 import com.soyle.stories.prose.proseEditor.OnLoadMentionReplacementsOutput
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
-import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
-import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
+import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 
 class SceneEditorController(
     private val sceneId: Scene.Id,

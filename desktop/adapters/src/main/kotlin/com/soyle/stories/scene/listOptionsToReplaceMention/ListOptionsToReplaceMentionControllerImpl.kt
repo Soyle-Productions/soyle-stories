@@ -2,9 +2,9 @@ package com.soyle.stories.scene.listOptionsToReplaceMention
 
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.MentionedEntityId
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 
 class ListOptionsToReplaceMentionControllerImpl(
     private val threadTransformer: ThreadTransformer,

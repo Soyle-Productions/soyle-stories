@@ -1,9 +1,8 @@
 package com.soyle.stories.theme.changeCharacterPerspectiveProperty
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
+import com.soyle.stories.usecase.theme.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import java.util.*
-import kotlin.concurrent.thread
 
 class ChangeCharacterPerspectivePropertyControllerImpl(
 	private val threadTransformer: ThreadTransformer,

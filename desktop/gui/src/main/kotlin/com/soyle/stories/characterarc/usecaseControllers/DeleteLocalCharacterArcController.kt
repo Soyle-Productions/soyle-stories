@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.usecaseControllers
 
-import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArc
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
+import com.soyle.stories.usecase.character.deleteCharacterArc.DeleteCharacterArc
+import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
 import java.util.*
 
 class DeleteLocalCharacterArcController(

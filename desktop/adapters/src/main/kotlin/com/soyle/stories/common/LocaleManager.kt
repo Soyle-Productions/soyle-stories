@@ -1,9 +1,9 @@
 package com.soyle.stories.common
 
-import com.soyle.stories.scene.Locale
+import com.soyle.stories.domain.scene.SceneLocale
 
 interface LocaleManager {
 
-	suspend fun getCurrentLocale(): Locale
+	suspend fun getCurrentLocale(): SceneLocale
 
 }

@@ -1,8 +1,8 @@
 package com.soyle.stories.theme.changeThemeDetails.renameTheme
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
-import com.soyle.stories.theme.usecases.changeThemeDetails.RenameTheme
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.theme.changeThemeDetails.RenameTheme
 import java.util.*
 
 class RenameThemeControllerImpl(
@@ -11,7 +11,7 @@ class RenameThemeControllerImpl(
     private val renameThemeOutputPort: RenameTheme.OutputPort
 ) : RenameThemeController {
 
-    override fun renameTheme(themeId: String, newName: String) {
+    override fun renameTheme(themeId: String, newName: NonBlankString) {
         val preparedThemeId = UUID.fromString(themeId)
         threadTransformer.async {
             renameTheme.invoke(

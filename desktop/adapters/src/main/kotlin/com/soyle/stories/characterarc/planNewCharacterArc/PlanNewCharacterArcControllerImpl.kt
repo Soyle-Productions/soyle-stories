@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.planNewCharacterArc
 
-import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
+import com.soyle.stories.usecase.character.planNewCharacterArc.PlanNewCharacterArc
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 

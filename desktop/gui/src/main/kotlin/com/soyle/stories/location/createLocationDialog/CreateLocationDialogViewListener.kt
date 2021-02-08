@@ -1,6 +1,6 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.common.SingleNonBlankLine
+import com.soyle.stories.domain.validation.SingleNonBlankLine
 
 interface CreateLocationDialogViewListener {
 

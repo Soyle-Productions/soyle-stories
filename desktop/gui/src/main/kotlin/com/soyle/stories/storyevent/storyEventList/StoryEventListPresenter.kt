@@ -6,9 +6,9 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.storyEventList.presenters.CreateStoryEventPresenter
 import com.soyle.stories.storyevent.storyEventList.presenters.RenameStoryEventPresenter
-import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
-import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEvents
-import com.soyle.stories.storyevent.usecases.renameStoryEvent.RenameStoryEvent
+import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
+import com.soyle.stories.usecase.storyevent.renameStoryEvent.RenameStoryEvent
 
 class StoryEventListPresenter(
   private val view: View.Nullable<StoryEventListViewModel>,

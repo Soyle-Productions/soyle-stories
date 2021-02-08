@@ -3,7 +3,7 @@ package com.soyle.stories.desktop.config.scene
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.repositories.SceneRepositoryImpl
-import com.soyle.stories.scene.repositories.SceneRepository
+import com.soyle.stories.usecase.scene.SceneRepository
 
 object Persistence {
 

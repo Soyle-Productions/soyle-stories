@@ -1,7 +1,7 @@
 package com.soyle.stories.prose.readProse
 
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.prose.usecases.readProse.ReadProse
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.usecase.prose.readProse.ReadProse
 
 interface ReadProseController {
     fun readProse(proseId: Prose.Id, receiver: ReadProse.OutputPort)

@@ -1,9 +1,8 @@
 package com.soyle.stories.scene.deleteSceneDialog
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.items.SceneItemViewModel
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
 
@@ -43,7 +42,7 @@ class DeleteSceneDialogPresenter(
 		}
 	}
 
-	override fun receiveDeleteSceneFailure(failure: SceneException) {
+	override fun receiveDeleteSceneFailure(failure: Exception) {
 		view.updateOrInvalidated {
 			copy(
 			  errorMessage = failure.localizedMessage.takeIf { it.isNotBlank() } ?: "Failure"

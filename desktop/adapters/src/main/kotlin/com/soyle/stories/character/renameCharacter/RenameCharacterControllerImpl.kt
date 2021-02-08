@@ -1,7 +1,7 @@
 package com.soyle.stories.character.renameCharacter
 
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.usecase.character.renameCharacter.RenameCharacter
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 

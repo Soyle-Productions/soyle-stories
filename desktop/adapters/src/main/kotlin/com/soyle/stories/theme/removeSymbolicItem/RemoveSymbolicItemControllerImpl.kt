@@ -1,13 +1,13 @@
 package com.soyle.stories.theme.removeSymbolicItem
 
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
-import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
+import com.soyle.stories.usecase.location.deleteLocation.DeletedLocation
 import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
-import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
+import com.soyle.stories.usecase.theme.removeSymbolFromTheme.SymbolRemovedFromTheme
+import com.soyle.stories.usecase.theme.removeSymbolicItem.RemoveSymbolicItem
 import java.util.*
 
 class RemoveSymbolicItemControllerImpl(

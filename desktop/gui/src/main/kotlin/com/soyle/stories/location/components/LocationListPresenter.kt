@@ -1,12 +1,11 @@
 package com.soyle.stories.location.components
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.items.LocationItemViewModel
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
-import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
+import com.soyle.stories.usecase.location.deleteLocation.DeletedLocation
+import com.soyle.stories.usecase.location.listAllLocations.ListAllLocations
 
 class LocationListPresenter(
   private val view: View<List<LocationItemViewModel>>
@@ -34,5 +33,5 @@ class LocationListPresenter(
 		}
 	}
 
-	override fun receiveCreateNewLocationFailure(failure: LocationException) {}
+	override fun receiveCreateNewLocationFailure(failure: Exception) {}
 }

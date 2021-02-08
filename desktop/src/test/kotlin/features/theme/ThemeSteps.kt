@@ -7,9 +7,9 @@ import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert.Companion.assertThat
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListAssert.Companion.assertThat
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcTemplateSection
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArcTemplateSection
+import com.soyle.stories.domain.theme.Theme
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.assertEquals

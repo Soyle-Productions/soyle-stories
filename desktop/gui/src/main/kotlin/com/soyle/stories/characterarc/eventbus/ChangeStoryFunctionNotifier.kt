@@ -7,7 +7,7 @@ package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
+import com.soyle.stories.usecase.theme.changeStoryFunction.ChangeStoryFunction
 
 class ChangeStoryFunctionNotifier(private val threadTransformer: ThreadTransformer) : Notifier<ChangeStoryFunction.OutputPort>(), ChangeStoryFunction.OutputPort {
     override fun receiveChangeStoryFunctionFailure(failure: Exception) {

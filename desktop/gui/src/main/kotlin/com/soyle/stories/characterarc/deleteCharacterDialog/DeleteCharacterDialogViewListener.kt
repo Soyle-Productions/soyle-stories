@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.deleteCharacterDialog
 
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
-import com.soyle.stories.entities.Character
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.domain.character.Character
 
 interface DeleteCharacterDialogViewListener {
     fun getValidState(request: RemoveCharacterFromStory.ConfirmationRequest)

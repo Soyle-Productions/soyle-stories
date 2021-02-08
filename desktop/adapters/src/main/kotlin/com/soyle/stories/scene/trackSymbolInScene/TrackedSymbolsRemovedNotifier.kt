@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.trackSymbolInScene
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.entities.TrackedSymbolRemoved
+import com.soyle.stories.domain.scene.TrackedSymbolRemoved
 
 class TrackedSymbolsRemovedNotifier : Notifier<TrackedSymbolsRemovedReceiver>(), TrackedSymbolsRemovedReceiver {
     override suspend fun receiveTrackedSymbolsRemoved(trackedSymbolsRemoved: List<TrackedSymbolRemoved>) {

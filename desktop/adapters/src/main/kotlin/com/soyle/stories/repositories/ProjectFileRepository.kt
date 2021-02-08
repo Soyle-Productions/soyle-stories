@@ -1,6 +1,7 @@
 package com.soyle.stories.repositories
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.stores.FileStore
 import com.soyle.stories.workspace.repositories.FileRepository
 import com.soyle.stories.workspace.repositories.ProjectRepository
@@ -9,7 +10,7 @@ import java.io.File
 
 class ProjectFileRepository(
     private val fileStore: FileStore<ProjectFile>
-) : ProjectRepository, com.soyle.stories.project.repositories.ProjectRepository, FileRepository {
+) : ProjectRepository, com.soyle.stories.usecase.project.ProjectRepository, FileRepository {
 
     private val fileSystem: Map<String, MutableSet<String>> = mapOf(
         "directories" to mutableSetOf(),
@@ -36,6 +37,6 @@ class ProjectFileRepository(
     override suspend fun addNewProject(project: Project) {}
 
     override suspend fun getProjectAtLocation(location: String): Project? = fileStore.getFileAt(location)?.let {
-        Project(it.projectId, it.projectName)
+        Project(it.projectId, NonBlankString.create(it.projectName)!!)
     }
 }

@@ -2,7 +2,7 @@ package com.soyle.stories.storyevent.storyEventDetails.presenters
 
 import com.soyle.stories.gui.View
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsViewModel
-import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
+import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEvent
 import java.util.*
 
 internal class LinkLocationToStoryEventPresenter(

@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.removeValueWebFromTheme
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromTheme
+import com.soyle.stories.usecase.theme.removeValueWebFromTheme.RemoveValueWebFromTheme
 import java.util.*
 
 class RemoveValueWebFromThemeControllerImpl(

@@ -10,8 +10,8 @@ import com.soyle.stories.common.async
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.project.layout.LayoutViewListener

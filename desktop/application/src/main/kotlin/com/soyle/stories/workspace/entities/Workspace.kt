@@ -7,7 +7,7 @@ package com.soyle.stories.workspace.entities
 
 import arrow.core.Either
 import arrow.core.right
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.workspace.valueobjects.ProjectFile
 
 class Workspace(

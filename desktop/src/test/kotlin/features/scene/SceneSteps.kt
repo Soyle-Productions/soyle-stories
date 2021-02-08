@@ -1,7 +1,5 @@
 package com.soyle.stories.desktop.config.features.scene
 
-import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.common.anyNewLineCharacter
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.character.createCharacterWithName
 import com.soyle.stories.desktop.config.drivers.character.createSectionForTemplate
@@ -16,7 +14,13 @@ import com.soyle.stories.desktop.view.scene.sceneDetails.SceneDetailsAssertions
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert.Companion.assertThat
-import com.soyle.stories.entities.*
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.prose.mentioned
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.domain.validation.anyNewLineCharacter
 import com.soyle.stories.scene.sceneList.SceneListView
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En

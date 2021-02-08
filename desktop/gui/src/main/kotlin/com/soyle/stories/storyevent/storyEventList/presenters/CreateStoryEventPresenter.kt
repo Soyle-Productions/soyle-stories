@@ -1,10 +1,9 @@
 package com.soyle.stories.storyevent.storyEventList.presenters
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.storyevent.StoryEventException
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.storyEventList.StoryEventListViewModel
-import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
 
 internal class CreateStoryEventPresenter(
   private val view: View.Nullable<StoryEventListViewModel>
@@ -26,7 +25,7 @@ internal class CreateStoryEventPresenter(
 		}
 	}
 
-	override fun receiveCreateStoryEventFailure(failure: StoryEventException) {
+	override fun receiveCreateStoryEventFailure(failure: Exception) {
 		// no-op
 	}
 }

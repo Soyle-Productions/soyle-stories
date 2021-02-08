@@ -3,7 +3,7 @@ package com.soyle.stories.storyevent.storyEventList
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventController
-import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEvents
+import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
 import java.util.*
 
 class StoryEventListController(

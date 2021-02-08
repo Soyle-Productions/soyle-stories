@@ -1,9 +1,7 @@
 package com.soyle.stories.theme.createValueWebDialog
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.createThemeDialog.CreateThemeDialogViewModel
-import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
-import com.soyle.stories.theme.usecases.addValueWebToTheme.ValueWebAddedToTheme
+import com.soyle.stories.usecase.theme.addValueWebToTheme.AddValueWebToTheme
 
 class CreateValueWebDialogPresenter(
     private val view: View.Nullable<CreateValueWebDialogViewModel>

@@ -2,7 +2,7 @@ package com.soyle.stories.storyevent.linkLocationToStoryEvent
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
+import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEvent
 
 class LinkLocationToStoryEventNotifier(
 	private val threadTransformer: ThreadTransformer

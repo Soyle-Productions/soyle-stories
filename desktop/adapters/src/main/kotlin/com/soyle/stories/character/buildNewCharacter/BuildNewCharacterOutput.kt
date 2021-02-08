@@ -1,15 +1,12 @@
 package com.soyle.stories.character.buildNewCharacter
 
-import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
-import com.soyle.stories.theme.useCharacterAsOpponent.UseCharacterAsOpponentOutput
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.UseCharacterAsOpponent
+import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacter
+import com.soyle.stories.usecase.character.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.usecase.theme.useCharacterAsOpponent.CharacterUsedAsOpponent
 
 class BuildNewCharacterOutput(
     private val createdCharacterReceiver: CreatedCharacterReceiver,
@@ -17,7 +14,7 @@ class BuildNewCharacterOutput(
     private val useCharacterAsOpponentReceiver: CharacterUsedAsOpponentReceiver
 ) : BuildNewCharacter.OutputPort {
 
-    override fun receiveBuildNewCharacterFailure(failure: CharacterException) {
+    override fun receiveBuildNewCharacterFailure(failure: Exception) {
         throw failure
     }
 

@@ -2,8 +2,7 @@ package com.soyle.stories.storyevent.renameStoryEvent
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.storyevent.StoryEventException
-import com.soyle.stories.storyevent.usecases.renameStoryEvent.RenameStoryEvent
+import com.soyle.stories.usecase.storyevent.renameStoryEvent.RenameStoryEvent
 
 class RenameStoryEventNotifier(
 	private val threadTransformer: ThreadTransformer
@@ -14,7 +13,7 @@ class RenameStoryEventNotifier(
 		}
 	}
 
-	override fun receiveRenameStoryEventFailure(failure: StoryEventException) {
+	override fun receiveRenameStoryEventFailure(failure: Exception) {
 		threadTransformer.async {
 			notifyAll { it.receiveRenameStoryEventFailure(failure) }
 		}

@@ -3,10 +3,10 @@ package com.soyle.stories.characterarc.characterList.components
 import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.components.ComponentsStyles.Companion.liftedCard
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.domain.validation.NonBlankString
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.property.SimpleBooleanProperty
@@ -235,7 +235,8 @@ class CharacterArcItem : ItemFragment<CharacterArcItemViewModel>()
     private fun renameCharacterArc(newName: String)
     {
         val arcItem = item ?: return
-        viewListener.renameCharacterArc(arcItem.characterId, arcItem.themeId, newName)
+        val nonBlankName = NonBlankString.create(newName) ?: return
+        viewListener.renameCharacterArc(arcItem.characterId, arcItem.themeId, nonBlankName)
     }
 
     private fun Parent.characterArcOptionsButton() = menubutton {

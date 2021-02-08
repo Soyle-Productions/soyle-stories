@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.includeCharacterInScene
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
+import com.soyle.stories.usecase.scene.common.IncludedCharacterInScene
 
 class IncludedCharacterInSceneNotifier : Notifier<IncludedCharacterInSceneReceiver>(), IncludedCharacterInSceneReceiver {
 

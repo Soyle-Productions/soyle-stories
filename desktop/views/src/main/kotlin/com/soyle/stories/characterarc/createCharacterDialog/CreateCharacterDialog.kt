@@ -2,8 +2,8 @@ package com.soyle.stories.characterarc.createCharacterDialog
 
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterReceiver
-import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.usecase.character.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve

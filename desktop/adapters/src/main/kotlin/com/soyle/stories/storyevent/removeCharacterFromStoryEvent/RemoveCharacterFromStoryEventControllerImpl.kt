@@ -1,10 +1,10 @@
 package com.soyle.stories.storyevent.removeCharacterFromStoryEvent
 
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
+import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 import java.util.*
 
 class RemoveCharacterFromStoryEventControllerImpl(

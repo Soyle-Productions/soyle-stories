@@ -2,7 +2,7 @@ package com.soyle.stories.theme.deleteThemeDialog
 
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
-import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
+import com.soyle.stories.usecase.theme.deleteTheme.DeletedTheme
 import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
 

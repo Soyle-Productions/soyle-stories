@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.createValueWebDialog
 
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.addValueWebToTheme.AddValueWebToThemeController
 
 class CreateValueWebDialogController(
@@ -11,11 +12,11 @@ class CreateValueWebDialogController(
         presenter.presentDialog()
     }
 
-    override fun createValueWeb(themeId: String, name: String) {
+    override fun createValueWeb(themeId: String, name: NonBlankString) {
         addValueWebToThemeController.addValueWebToTheme(themeId, name, presenter::presentError)
     }
 
-    override fun createValueWebAndLinkCharacter(themeId: String, name: String, characterId: String) {
+    override fun createValueWebAndLinkCharacter(themeId: String, name: NonBlankString, characterId: String) {
         addValueWebToThemeController.addValueWebToThemeWithCharacter(themeId, name, characterId, presenter::presentError)
     }
 

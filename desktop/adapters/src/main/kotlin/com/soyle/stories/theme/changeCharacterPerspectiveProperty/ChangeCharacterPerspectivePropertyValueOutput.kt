@@ -1,7 +1,6 @@
 package com.soyle.stories.theme.changeCharacterPerspectiveProperty
 
-import com.soyle.stories.theme.ThemeException
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
+import com.soyle.stories.usecase.theme.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 
 class ChangeCharacterPerspectivePropertyValueOutput(
     private val characterPerspectivePropertyChangedReceiver: CharacterPerspectivePropertyChangedReceiver
@@ -11,7 +10,7 @@ class ChangeCharacterPerspectivePropertyValueOutput(
         characterPerspectivePropertyChangedReceiver.receiveCharacterPerspectivePropertyChanged(response)
     }
 
-    override fun receiveChangeCharacterPerspectivePropertyValueFailure(failure: ThemeException) {
+    override fun receiveChangeCharacterPerspectivePropertyValueFailure(failure: Exception) {
         throw failure
     }
 }

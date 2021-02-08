@@ -3,8 +3,8 @@ package com.soyle.stories.scene.sceneList.presenters
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListViewModel
-import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
-import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
+import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
 
 class CreateScenePresenter(
     private val view: View.Nullable<SceneListViewModel>

@@ -4,7 +4,7 @@ import com.soyle.stories.common.components.ComponentsStyles.Companion.cardBody
 import com.soyle.stories.common.components.Styles.Companion.fieldLabel
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.symbolsInScene

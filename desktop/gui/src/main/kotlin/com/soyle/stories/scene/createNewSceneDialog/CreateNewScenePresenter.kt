@@ -1,8 +1,8 @@
 package com.soyle.stories.scene.createNewSceneDialog
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
-import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
+import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
 
 class CreateNewScenePresenter(
   private val view: View.Nullable<CreateNewSceneDialogViewModel>

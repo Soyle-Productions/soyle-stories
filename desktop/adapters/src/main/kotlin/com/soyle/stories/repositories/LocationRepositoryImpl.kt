@@ -1,8 +1,8 @@
 package com.soyle.stories.repositories
 
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.location.repositories.LocationRepository
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.usecase.location.LocationRepository
 
 class LocationRepositoryImpl : LocationRepository {
 

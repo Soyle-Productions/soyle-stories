@@ -1,6 +1,6 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.location.usecases.listAllLocations.LocationItem
+import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 
 interface LocationListListener {
 

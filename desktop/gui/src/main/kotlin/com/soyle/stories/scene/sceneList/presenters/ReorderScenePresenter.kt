@@ -3,7 +3,7 @@ package com.soyle.stories.scene.sceneList.presenters
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListViewModel
-import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
+import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 
 class ReorderScenePresenter(
   private val view: View.Nullable<SceneListViewModel>

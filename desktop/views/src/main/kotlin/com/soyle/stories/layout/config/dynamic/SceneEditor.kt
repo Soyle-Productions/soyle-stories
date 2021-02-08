@@ -1,8 +1,8 @@
 package com.soyle.stories.layout.config.dynamic
 
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.repositories.OpenToolContext
@@ -11,7 +11,6 @@ import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
-import com.soyle.stories.scene.repositories.getSceneOrError
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
 import com.soyle.stories.scene.sceneEditor.SceneEditorView
 import javafx.scene.control.Tab

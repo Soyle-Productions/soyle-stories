@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.addSymbolToTheme
 
-import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
-import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
+import com.soyle.stories.usecase.theme.addSymbolToTheme.AddSymbolToTheme
+import com.soyle.stories.usecase.theme.addSymbolToTheme.SymbolAddedToTheme
 
 class AddSymbolToThemeOutput(
     private val symbolAddedToThemeReceiver: SymbolAddedToThemeReceiver

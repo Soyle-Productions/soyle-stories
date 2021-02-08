@@ -4,7 +4,6 @@ import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbench
 import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.oppositionWebTool.ValueOppositionWebAssert.Companion.assertThat
-import com.soyle.stories.desktop.view.theme.oppositionWebTool.ValueOppositionWebDriver
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -63,7 +62,7 @@ class OppositionValueSteps : En {
             val theme = themeDriver.getThemeByNameOrError(themeName)
             val valueWeb = themeDriver.getValueWebInThemeNamedOrError(theme.id, valueWebName)
 
-            assertEquals(oppositionValueName, valueWeb.oppositions.component2().name) { "Second opposition value in value web $valueWebName was not created and named properly" }
+            assertEquals(oppositionValueName, valueWeb.oppositions.component2().name.value) { "Second opposition value in value web $valueWebName was not created and named properly" }
 
             val valueWebTool = workbench.givenValueWebToolHasBeenOpenedForThemeNamed(themeName)
             valueWebTool.givenValueWebHasBeenSelectedNamed(valueWebName)
@@ -81,14 +80,14 @@ class OppositionValueSteps : En {
             val theme = themeDriver.getThemeByNameOrError(themeName)
             val valueWeb = themeDriver.getValueWebInThemeNamedOrError(theme.id, valueWebName)
 
-            assertEquals(expectedOppositionValueName, valueWeb.oppositions.first().name) { "First opposition value in value web $valueWebName was not renamed" }
+            assertEquals(expectedOppositionValueName, valueWeb.oppositions.first().name.value) { "First opposition value in value web $valueWebName was not renamed" }
 
             val valueWebTool = workbench.givenValueWebToolHasBeenOpenedForThemeNamed(themeName)
             valueWebTool.givenValueWebHasBeenSelectedNamed(valueWebName)
             assertThat(valueWebTool) {
                 andValueWebContent {
                     hasOppositionValueNamed(expectedOppositionValueName)
-                    doesNotHaveOppositionValueNamed(valueWeb.name)
+                    doesNotHaveOppositionValueNamed(valueWeb.name.value)
                 }
             }
         }

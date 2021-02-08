@@ -6,8 +6,8 @@ import com.soyle.stories.common.components.buttons.ButtonStyles.Companion.primar
 import com.soyle.stories.common.components.fieldLabel
 import com.soyle.stories.common.components.text.mainHeader
 import com.soyle.stories.di.resolve
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.proseEditor.ProseEditorView
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.hasSymbols

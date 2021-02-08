@@ -1,8 +1,8 @@
 package com.soyle.stories.repositories
 
-import com.soyle.stories.entities.Preferences
-import com.soyle.stories.entities.Writer
-import com.soyle.stories.writer.repositories.WriterRepository
+import com.soyle.stories.domain.writer.Preferences
+import com.soyle.stories.domain.writer.Writer
+import com.soyle.stories.usecase.writer.WriterRepository
 import java.util.*
 
 class WriterRepositoryImpl(

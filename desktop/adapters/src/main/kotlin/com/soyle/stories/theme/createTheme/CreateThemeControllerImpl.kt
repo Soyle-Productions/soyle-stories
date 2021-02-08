@@ -1,7 +1,8 @@
 package com.soyle.stories.theme.createTheme
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.createTheme.CreateTheme
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.theme.createTheme.CreateTheme
 import java.util.*
 
 class CreateThemeControllerImpl(
@@ -13,7 +14,7 @@ class CreateThemeControllerImpl(
 
     private val projectId = UUID.fromString(projectId)
 
-    override fun createTheme(name: String, onError: (Throwable) -> Unit) {
+    override fun createTheme(name: NonBlankString, onError: (Throwable) -> Unit) {
         val request = CreateTheme.RequestModel(
             projectId,
             name
@@ -21,7 +22,7 @@ class CreateThemeControllerImpl(
         createTheme(request, onError)
     }
 
-    override fun createThemeAndFirstSymbol(themeName: String, symbolName: String, onError: (Throwable) -> Unit) {
+    override fun createThemeAndFirstSymbol(themeName: NonBlankString, symbolName: NonBlankString, onError: (Throwable) -> Unit) {
         val request = CreateTheme.RequestModel(
             projectId,
             themeName,

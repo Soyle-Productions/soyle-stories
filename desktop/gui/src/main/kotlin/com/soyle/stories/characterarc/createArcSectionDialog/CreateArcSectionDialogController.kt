@@ -3,7 +3,7 @@ package com.soyle.stories.characterarc.createArcSectionDialog
 import com.soyle.stories.character.createArcSection.CreateArcSectionController
 import com.soyle.stories.characterarc.changeSectionValue.ChangeSectionValueController
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 import java.util.*
 
 class CreateArcSectionDialogController(

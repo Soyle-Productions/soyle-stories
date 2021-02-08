@@ -1,10 +1,8 @@
 package com.soyle.stories.theme.deleteValueWebDialog
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
-import com.soyle.stories.theme.usecases.removeValueWebFromTheme.RemoveValueWebFromTheme
-import com.soyle.stories.theme.usecases.removeValueWebFromTheme.ValueWebRemovedFromTheme
+import com.soyle.stories.usecase.theme.removeValueWebFromTheme.RemoveValueWebFromTheme
+import com.soyle.stories.usecase.theme.removeValueWebFromTheme.ValueWebRemovedFromTheme
 import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
 

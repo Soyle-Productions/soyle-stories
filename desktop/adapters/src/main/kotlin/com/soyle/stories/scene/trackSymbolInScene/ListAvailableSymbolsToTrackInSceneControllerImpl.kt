@@ -1,8 +1,8 @@
 package com.soyle.stories.scene.trackSymbolInScene
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.scene.usecases.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.usecase.scene.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
 
 class ListAvailableSymbolsToTrackInSceneControllerImpl(
     private val threadTransformer: ThreadTransformer,

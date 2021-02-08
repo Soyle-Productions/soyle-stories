@@ -1,29 +1,27 @@
 package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
-import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.common.SingleLine
-import com.soyle.stories.common.countLines
-import com.soyle.stories.entities.*
+import com.soyle.stories.domain.prose.*
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.domain.validation.SingleLine
+import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
-import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
-import com.soyle.stories.prose.ContentReplaced
-import com.soyle.stories.prose.MentionTextReplaced
+import com.soyle.stories.usecase.location.deleteLocation.DeletedLocation
 import com.soyle.stories.prose.editProse.ContentReplacedReceiver
 import com.soyle.stories.prose.editProse.EditProseController
 import com.soyle.stories.prose.invalidateRemovedMentions.InvalidateRemovedMentionsController
 import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
 import com.soyle.stories.prose.readProse.ReadProseController
-import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
-import com.soyle.stories.prose.usecases.readProse.ReadProse
-import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
-import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
+import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
+import com.soyle.stories.usecase.prose.readProse.ReadProse
+import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
 import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
-import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
+import com.soyle.stories.usecase.theme.deleteTheme.DeletedTheme
+import com.soyle.stories.usecase.theme.removeSymbolFromTheme.SymbolRemovedFromTheme
 
 fun interface OnLoadMentionQueryOutput : (List<GetStoryElementsToMentionInScene.MatchingStoryElement>) -> Unit
 fun interface OnLoadMentionReplacementsOutput {

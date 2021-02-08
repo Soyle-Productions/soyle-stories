@@ -3,7 +3,7 @@ package com.soyle.stories.location
 import com.soyle.stories.common.async
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.location.LocationListDriver.interact
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationList

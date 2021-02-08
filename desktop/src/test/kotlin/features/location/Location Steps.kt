@@ -3,7 +3,7 @@ package com.soyle.stories.desktop.config.features.location
 import com.soyle.stories.desktop.config.drivers.location.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 

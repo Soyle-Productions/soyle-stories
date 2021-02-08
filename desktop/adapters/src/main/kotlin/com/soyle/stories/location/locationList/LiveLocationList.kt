@@ -2,14 +2,13 @@ package com.soyle.stories.location.locationList
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.LocationRenamed
-import com.soyle.stories.location.LocationException
+import com.soyle.stories.domain.location.LocationRenamed
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
-import com.soyle.stories.location.usecases.deleteLocation.DeletedLocation
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
-import com.soyle.stories.location.usecases.listAllLocations.LocationItem
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
+import com.soyle.stories.usecase.location.deleteLocation.DeletedLocation
+import com.soyle.stories.usecase.location.listAllLocations.ListAllLocations
+import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 
 class LiveLocationList(
     private val threadTransformer: ThreadTransformer,
@@ -69,7 +68,7 @@ class LiveLocationList(
             }
         }
 
-        override fun receiveCreateNewLocationFailure(failure: LocationException) {}
+        override fun receiveCreateNewLocationFailure(failure: Exception) {}
     }
 
     override fun addListener(listener: LocationListListener) {

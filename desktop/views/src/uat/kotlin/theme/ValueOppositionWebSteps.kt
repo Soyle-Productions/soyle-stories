@@ -4,7 +4,7 @@ import com.soyle.stories.common.components.ComponentsStyles.Companion.cardBody
 import com.soyle.stories.common.components.PopOutEditBox
 import com.soyle.stories.common.components.popOutEditBox
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps

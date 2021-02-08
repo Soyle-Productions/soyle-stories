@@ -5,7 +5,7 @@
  */
 package com.soyle.stories.workspace.usecases
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.workspace.ProjectDoesNotExistAtLocation
 import com.soyle.stories.workspace.ProjectException
 import com.soyle.stories.workspace.UnexpectedProjectAlreadyOpenAtLocation

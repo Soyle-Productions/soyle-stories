@@ -5,7 +5,7 @@
  */
 package com.soyle.stories.characterarc.viewBaseStoryStructure
 
-import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.usecase.character.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 

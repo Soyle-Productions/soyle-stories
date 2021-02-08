@@ -2,7 +2,7 @@ package com.soyle.stories.scene.reorderScene
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
+import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import java.util.*
 
 class ReorderSceneControllerImpl(

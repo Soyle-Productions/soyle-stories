@@ -1,10 +1,10 @@
 package com.soyle.stories.theme.deleteTheme
 
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
-import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
-import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
-import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
+import com.soyle.stories.usecase.character.deleteCharacterArc.DeletedCharacterArc
+import com.soyle.stories.usecase.theme.deleteTheme.DeleteTheme
+import com.soyle.stories.usecase.theme.deleteTheme.DeletedTheme
+import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
 
 class DeleteThemeOutput(
     private val themeDeletedReceiver: ThemeDeletedReceiver,

@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.removeCharacterFromComparison
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
-import kotlin.coroutines.coroutineContext
+import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemovedCharacterFromTheme
 
 class RemovedCharacterFromThemeNotifier : RemovedCharacterFromThemeReceiver, Notifier<RemovedCharacterFromThemeReceiver>() {
 

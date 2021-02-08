@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument
 
-import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgument
+import com.soyle.stories.usecase.character.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgument
 
 interface CharacterArcSectionMovedInMoralArgumentReceiver {
 

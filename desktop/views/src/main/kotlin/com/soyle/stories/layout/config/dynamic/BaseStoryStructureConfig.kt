@@ -1,9 +1,8 @@
 package com.soyle.stories.layout.config.dynamic
 
-import com.soyle.stories.character.CharacterDoesNotExist
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureScope
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.repositories.OpenToolContext
@@ -12,7 +11,8 @@ import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
-import com.soyle.stories.theme.ThemeDoesNotExist
+import com.soyle.stories.usecase.character.CharacterDoesNotExist
+import com.soyle.stories.usecase.theme.ThemeDoesNotExist
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import tornadofx.find

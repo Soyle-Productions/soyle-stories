@@ -1,13 +1,12 @@
 package com.soyle.stories.storyevent.storyEventDetails.presenters
 
-import com.soyle.stories.character.CharacterException
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.gui.View
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsViewModel
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
+import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacter
+import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.usecase.theme.useCharacterAsOpponent.CharacterUsedAsOpponent
 
 class BuildNewCharacterPresenter(
   private val view: View.Nullable<StoryEventDetailsViewModel>
@@ -28,7 +27,7 @@ class BuildNewCharacterPresenter(
 		// do nothing
 	}
 
-	override fun receiveBuildNewCharacterFailure(failure: CharacterException) {
+	override fun receiveBuildNewCharacterFailure(failure: Exception) {
 		// no-op
 	}
 

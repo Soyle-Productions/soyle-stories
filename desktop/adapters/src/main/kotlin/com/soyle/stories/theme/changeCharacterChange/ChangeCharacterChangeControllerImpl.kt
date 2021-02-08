@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.changeCharacterChange
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.changeCharacterChange.ChangeCharacterChange
+import com.soyle.stories.usecase.theme.changeCharacterChange.ChangeCharacterChange
 import java.util.*
 
 class ChangeCharacterChangeControllerImpl(

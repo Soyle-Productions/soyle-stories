@@ -1,17 +1,15 @@
 package com.soyle.stories.scene.reorderSceneRamifications
 
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.deleteSceneRamifications.CharacterRamificationsViewModel
 import com.soyle.stories.scene.deleteSceneRamifications.SceneRamificationsViewModel
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
-import com.soyle.stories.scene.usecases.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
-import com.soyle.stories.scene.usecases.getPotentialChangeFromReorderingScene.PotentialChangesFromReorderingScene
-import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
-import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
+import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.PotentialChangesFromReorderingScene
+import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 
 class ReorderSceneRamificationsPresenter(
     private val view: View.Nullable<ReorderSceneRamificationsViewModel>,
@@ -61,7 +59,7 @@ class ReorderSceneRamificationsPresenter(
         view.updateOrInvalidated { copy(invalid = true) }
     }
 
-    override fun receiveDeleteSceneFailure(failure: SceneException) {}
+    override fun receiveDeleteSceneFailure(failure: Exception) {}
     override fun failedToRemoveCharacterFromScene(failure: Exception) {}
     override fun failedToSetMotivationForCharacterInScene(failure: Exception) {}
 }

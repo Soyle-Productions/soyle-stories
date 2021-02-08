@@ -1,18 +1,18 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.characterarc.baseStoryStructure.presenters.*
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
-import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
-import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
-import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
-import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.usecase.character.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
+import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.usecase.character.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.usecase.location.listAllLocations.ListAllLocations
+import com.soyle.stories.usecase.theme.changeThematicSectionValue.ChangeThematicSectionValue
 
 class BaseStoryStructurePresenter(
     private val view: View.Nullable<BaseStoryStructureViewModel>,

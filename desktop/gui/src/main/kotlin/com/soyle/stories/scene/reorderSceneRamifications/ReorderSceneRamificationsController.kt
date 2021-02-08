@@ -3,7 +3,7 @@ package com.soyle.stories.scene.reorderSceneRamifications
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.closeTool.CloseToolController
 import com.soyle.stories.scene.reorderScene.ReorderSceneController
-import com.soyle.stories.scene.usecases.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
+import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
 import java.util.*
 
 class ReorderSceneRamificationsController(

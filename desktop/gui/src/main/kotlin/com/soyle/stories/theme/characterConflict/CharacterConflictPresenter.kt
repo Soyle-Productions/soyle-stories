@@ -3,11 +3,8 @@ package com.soyle.stories.theme.characterConflict
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ArcSectionType
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
-import com.soyle.stories.entities.CharacterRenamed
+import com.soyle.stories.domain.character.CharacterRenamed
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeReceiver
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
 import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
@@ -15,20 +12,22 @@ import com.soyle.stories.theme.removeCharacterAsOpponent.CharacterRemovedAsOppon
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
 import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
-import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
-import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
-import com.soyle.stories.theme.usecases.changeThemeDetails.CentralConflictChanged
-import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
-import com.soyle.stories.theme.usecases.examineCentralConflictOfTheme.ExaminedCentralConflict
-import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
-import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
-import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.CharacterRemovedAsOpponent
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.AvailableCharactersToUseAsOpponents
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsMainOpponent
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.CharacterUsedAsOpponent
-import com.soyle.stories.theme.usecases.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ArcSectionType
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.usecase.theme.changeCharacterChange.ChangedCharacterChange
+import com.soyle.stories.usecase.theme.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
+import com.soyle.stories.usecase.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValue
+import com.soyle.stories.usecase.theme.changeThemeDetails.CentralConflictChanged
+import com.soyle.stories.usecase.theme.examineCentralConflictOfTheme.ExamineCentralConflictOfTheme
+import com.soyle.stories.usecase.theme.examineCentralConflictOfTheme.ExaminedCentralConflict
+import com.soyle.stories.usecase.theme.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
+import com.soyle.stories.usecase.theme.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
+import com.soyle.stories.usecase.theme.removeCharacterAsOpponent.CharacterRemovedAsOpponent
+import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemovedCharacterFromTheme
+import com.soyle.stories.usecase.theme.useCharacterAsOpponent.AvailableCharactersToUseAsOpponents
+import com.soyle.stories.usecase.theme.useCharacterAsOpponent.CharacterUsedAsMainOpponent
+import com.soyle.stories.usecase.theme.useCharacterAsOpponent.CharacterUsedAsOpponent
+import com.soyle.stories.usecase.theme.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
 import java.util.*
 
 class CharacterConflictPresenter(
@@ -315,7 +314,7 @@ class CharacterConflictPresenter(
         }
     }
 
-    override fun receiveChangeCharacterPropertyValueFailure(failure: ThemeException) {
+    override fun receiveChangeCharacterPropertyValueFailure(failure: Exception) {
         /* no-op */
     }
 

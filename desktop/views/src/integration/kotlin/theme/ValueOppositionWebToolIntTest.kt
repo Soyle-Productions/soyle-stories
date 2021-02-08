@@ -3,8 +3,8 @@ package com.soyle.stories.theme
 import com.soyle.stories.common.SoyleStoriesIntegrationDouble
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.projectList.ProjectListViewListener

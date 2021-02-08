@@ -2,10 +2,9 @@ package com.soyle.stories.theme.createValueWebDialog
 
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.validation.NonBlankString
 import javafx.geometry.Orientation
-import javafx.geometry.Pos
 import javafx.scene.Parent
-import javafx.scene.layout.Priority
 import javafx.stage.Modality
 import javafx.stage.StageStyle
 import javafx.stage.Window
@@ -29,10 +28,15 @@ class CreateValueWebDialog : Fragment() {
                         if (it != null) addDecorator(SimpleMessageDecorator(it, ValidationSeverity.Error))
                     }
                     action {
-                        if (characterId != null) {
-                            viewListener.createValueWebAndLinkCharacter(themeId, text, characterId!!)
+                        val nonBlankName = NonBlankString.create(text)
+                        if (nonBlankName != null) {
+                            if (characterId != null) {
+                                viewListener.createValueWebAndLinkCharacter(themeId, nonBlankName, characterId!!)
+                            } else {
+                                viewListener.createValueWeb(themeId, nonBlankName)
+                            }
                         } else {
-                            viewListener.createValueWeb(themeId, text)
+                            model.errorMessage.value = "Name cannot be blank"
                         }
                     }
                 }

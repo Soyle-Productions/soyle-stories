@@ -1,8 +1,8 @@
 package com.soyle.stories.location.deleteLocation
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.Location
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.usecase.location.deleteLocation.DeleteLocation
 
 class DeleteLocationControllerImpl(
     private val threadTransformer: ThreadTransformer,

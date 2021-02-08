@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.domain.validation.NonBlankString
 
 interface CharacterListViewListener {
 
@@ -11,6 +11,6 @@ interface CharacterListViewListener {
     fun removeCharacter(characterId: String)
     fun removeCharacterArc(characterId: String, themeId: String)
     fun renameCharacter(characterId: String, newName: NonBlankString)
-    fun renameCharacterArc(characterId: String, themeId: String, newName: String)
+    fun renameCharacterArc(characterId: String, themeId: String, newName: NonBlankString)
 
 }

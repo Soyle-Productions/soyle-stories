@@ -1,17 +1,15 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.common.SingleLine
-import com.soyle.stories.common.countLines
-import com.soyle.stories.entities.*
+import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.validation.SingleLine
+import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.gui.View
-import com.soyle.stories.prose.ContentReplaced
-import com.soyle.stories.prose.MentionTextReplaced
 import com.soyle.stories.prose.editProse.ContentReplacedReceiver
 import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
-import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
-import com.soyle.stories.prose.usecases.readProse.ReadProse
-import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
-import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
+import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
+import com.soyle.stories.usecase.prose.readProse.ReadProse
+import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 
 class ProseEditorPresenter internal constructor(
     private val view: View.Nullable<ProseEditorViewModel>

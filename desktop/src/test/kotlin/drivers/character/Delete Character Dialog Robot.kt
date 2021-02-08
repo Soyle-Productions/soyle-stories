@@ -6,7 +6,7 @@ import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.view.character.characterList.drive
 import com.soyle.stories.desktop.view.character.characterList.driver
 import com.soyle.stories.desktop.view.character.deleteCharacterDialog.DeleteCharacterDialogDriver
-import com.soyle.stories.entities.Character
+import com.soyle.stories.domain.character.Character
 import javafx.scene.control.TreeItem
 import tornadofx.uiComponent
 

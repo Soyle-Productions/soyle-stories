@@ -1,13 +1,14 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.scene.*
+import com.soyle.stories.domain.theme.Symbol
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInScene
-import com.soyle.stories.scene.usecases.trackSymbolInScene.DetectUnusedSymbolsInScene
-import com.soyle.stories.scene.usecases.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
-import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
-import com.soyle.stories.theme.usecases.listSymbolsByTheme.SymbolsByTheme
+import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.scene.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
+import com.soyle.stories.usecase.theme.changeThemeDetails.RenamedTheme
+import com.soyle.stories.usecase.theme.listSymbolsByTheme.SymbolsByTheme
 
 class SymbolsInScenePresenter(
     internal val view: View.Nullable<SymbolsInSceneViewModel>

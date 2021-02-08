@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.renameScene
 
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.domain.validation.NonBlankString
 
 interface RenameSceneController {
 

@@ -1,9 +1,10 @@
 package com.soyle.stories.theme.addValueWebToTheme
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.CharacterId
-import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
-import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme.RequestModel
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.CharacterId
+import com.soyle.stories.usecase.theme.addValueWebToTheme.AddValueWebToTheme
+import com.soyle.stories.usecase.theme.addValueWebToTheme.AddValueWebToTheme.RequestModel
 import java.util.*
 
 class AddValueWebToThemeControllerImpl(
@@ -12,7 +13,7 @@ class AddValueWebToThemeControllerImpl(
     private val addValueWebToThemeOutputPort: AddValueWebToTheme.OutputPort
 ) : AddValueWebToThemeController {
 
-    override fun addValueWebToTheme(themeId: String, name: String, onError: (Throwable) -> Unit) {
+    override fun addValueWebToTheme(themeId: String, name: NonBlankString, onError: (Throwable) -> Unit) {
         val preparedThemeId = UUID.fromString(themeId)
         threadTransformer.async {
             try {
@@ -28,7 +29,7 @@ class AddValueWebToThemeControllerImpl(
 
     override fun addValueWebToThemeWithCharacter(
         themeId: String,
-        name: String,
+        name: NonBlankString,
         characterId: String,
         onError: (Throwable) -> Unit
     ) {

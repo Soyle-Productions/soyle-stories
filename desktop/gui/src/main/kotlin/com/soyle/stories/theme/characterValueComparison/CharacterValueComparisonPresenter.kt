@@ -1,23 +1,22 @@
 package com.soyle.stories.theme.characterValueComparison
 
-import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.CharactersAvailableToIncludeInTheme
-import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.entities.theme.oppositionValue.CharacterAddedToOpposition
+import com.soyle.stories.domain.theme.oppositionValue.CharacterAddedToOpposition
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.ThemeException
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
-import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
-import com.soyle.stories.theme.usecases.compareCharacterValues.CharacterValueComparison
-import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
-import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
-import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.OppositionValuesAvailableForCharacterInTheme
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
-import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
-import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
+import com.soyle.stories.usecase.character.listCharactersAvailableToIncludeInTheme.CharactersAvailableToIncludeInTheme
+import com.soyle.stories.usecase.character.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
+import com.soyle.stories.usecase.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValue
+import com.soyle.stories.usecase.theme.compareCharacterValues.CharacterValueComparison
+import com.soyle.stories.usecase.theme.compareCharacterValues.CompareCharacterValues
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.usecase.theme.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
+import com.soyle.stories.usecase.theme.listAvailableOppositionValuesForCharacterInTheme.OppositionValuesAvailableForCharacterInTheme
+import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemovedCharacterFromTheme
+import com.soyle.stories.usecase.theme.removeSymbolicItem.RemoveSymbolicItem
+import com.soyle.stories.usecase.theme.removeSymbolicItem.RemovedSymbolicItem
 import java.util.*
 
 class CharacterValueComparisonPresenter(
@@ -191,7 +190,7 @@ class CharacterValueComparisonPresenter(
         }
     }
 
-    override fun receiveChangeCharacterPropertyValueFailure(failure: ThemeException) {
+    override fun receiveChangeCharacterPropertyValueFailure(failure: Exception) {
 
     }
 

@@ -9,7 +9,7 @@ import com.soyle.stories.location.locationList.LocationListListener
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
-import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
+import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetails
 import java.util.*
 
 class StoryEventDetailsController(

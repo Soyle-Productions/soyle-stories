@@ -1,16 +1,16 @@
 package com.soyle.stories.layout.config.dynamic
 
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.layout.tools.DynamicTool
 import com.soyle.stories.layout.tools.FixedTool
-import com.soyle.stories.location.LocationDoesNotExist
 import com.soyle.stories.location.locationDetails.LocationDetailsScope
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
+import com.soyle.stories.usecase.location.LocationDoesNotExist
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import tornadofx.find

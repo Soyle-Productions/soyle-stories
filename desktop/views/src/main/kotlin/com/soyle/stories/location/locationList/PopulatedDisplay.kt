@@ -2,7 +2,10 @@ package com.soyle.stories.location.locationList
 
 import com.soyle.stories.common.*
 import com.soyle.stories.di.resolve
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.validation.SingleLine
+import com.soyle.stories.domain.validation.SingleNonBlankLine
+import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope

@@ -1,18 +1,18 @@
 package com.soyle.stories.desktop.config.drivers.location
 
-import com.soyle.stories.common.SingleLine
-import com.soyle.stories.common.SingleNonBlankLine
-import com.soyle.stories.common.countLines
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.validation.SingleLine
+import com.soyle.stories.domain.validation.SingleNonBlankLine
+import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.location.controllers.CreateNewLocationController
 import com.soyle.stories.location.controllers.RenameLocationController
 import com.soyle.stories.location.deleteLocation.DeleteLocationController
-import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
+import com.soyle.stories.usecase.location.LocationRepository
 import kotlinx.coroutines.runBlocking
 
 class LocationDriver private constructor(private val projectScope: ProjectScope) {

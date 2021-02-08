@@ -2,7 +2,7 @@ package com.soyle.stories.scene.sceneDetails.includedCharacters
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
-import com.soyle.stories.scene.usecases.includeCharacterInScene.GetAvailableCharactersToAddToScene
+import com.soyle.stories.usecase.scene.includeCharacterInScene.GetAvailableCharactersToAddToScene
 import java.util.*
 
 class IncludedCharactersInSceneController(

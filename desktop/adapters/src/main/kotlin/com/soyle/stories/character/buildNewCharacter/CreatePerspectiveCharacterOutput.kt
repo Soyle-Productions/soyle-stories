@@ -1,6 +1,6 @@
 package com.soyle.stories.character.buildNewCharacter
 
-import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacter
+import com.soyle.stories.usecase.character.createPerspectiveCharacter.CreatePerspectiveCharacter
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 
 class CreatePerspectiveCharacterOutput(

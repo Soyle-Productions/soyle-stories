@@ -1,8 +1,8 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.common.SingleLine
-import com.soyle.stories.entities.MentionedEntityId
-import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.validation.SingleLine
+import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
 
 data class ProseEditorViewModel(
     val versionNumber: Long,

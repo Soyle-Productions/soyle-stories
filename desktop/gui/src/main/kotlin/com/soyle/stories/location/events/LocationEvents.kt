@@ -2,9 +2,9 @@ package com.soyle.stories.location.events
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
-import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
-import com.soyle.stories.location.usecases.renameLocation.RenameLocation
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
+import com.soyle.stories.usecase.location.redescribeLocation.ReDescribeLocation
+import com.soyle.stories.usecase.location.renameLocation.RenameLocation
 
 interface LocationEvents {
 

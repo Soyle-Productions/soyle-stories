@@ -3,7 +3,7 @@ package com.soyle.stories.characterarc.baseStoryStructure.presenters
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureViewModel
 import com.soyle.stories.characterarc.baseStoryStructure.StoryStructureSectionViewModel
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
+import com.soyle.stories.usecase.theme.changeThematicSectionValue.ChangeThematicSectionValue
 
 internal class ChangeThematicSectionValuePresenter(
     private val view: View.Nullable<BaseStoryStructureViewModel>

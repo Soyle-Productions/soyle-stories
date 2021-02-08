@@ -1,8 +1,8 @@
 package com.soyle.stories.scene.deleteSceneRamifications.presenters
 
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamificationsViewModel
 

@@ -17,16 +17,16 @@ import com.soyle.stories.location.redescribeLocation.ReDescribeLocationNotifier
 import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.location.renameLocation.RenameLocationOutput
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocationUseCase
-import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetails
-import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetailsUseCase
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocationsUseCase
-import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocation
-import com.soyle.stories.location.usecases.redescribeLocation.ReDescribeLocationUseCase
-import com.soyle.stories.location.usecases.renameLocation.RenameLocation
-import com.soyle.stories.location.usecases.renameLocation.RenameLocationUseCase
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocationUseCase
+import com.soyle.stories.usecase.location.getLocationDetails.GetLocationDetails
+import com.soyle.stories.usecase.location.getLocationDetails.GetLocationDetailsUseCase
+import com.soyle.stories.usecase.location.listAllLocations.ListAllLocations
+import com.soyle.stories.usecase.location.listAllLocations.ListAllLocationsUseCase
+import com.soyle.stories.usecase.location.redescribeLocation.ReDescribeLocation
+import com.soyle.stories.usecase.location.redescribeLocation.ReDescribeLocationUseCase
+import com.soyle.stories.usecase.location.renameLocation.RenameLocation
+import com.soyle.stories.usecase.location.renameLocation.RenameLocationUseCase
 import com.soyle.stories.project.ProjectScope
 
 object LocationModule {

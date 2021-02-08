@@ -6,9 +6,9 @@ import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.UATLogger
 import com.soyle.stories.common.components.menuChipGroup.MenuChipGroup
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.CharacterArcSection
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArc
+import com.soyle.stories.domain.character.CharacterArcSection
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectSteps

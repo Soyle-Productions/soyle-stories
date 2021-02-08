@@ -1,9 +1,8 @@
-package com.soyle.stories.desktop.view.prose.proseEditor
+package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.common.PairOf
-import com.soyle.stories.entities.MentionedEntityId
-import com.soyle.stories.entities.ProseMentionRange
-import com.soyle.stories.prose.proseEditor.ProseEditorView
+import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.prose.ProseMentionRange
 import org.junit.jupiter.api.Assertions.*
 
 class ProseEditorAssertions private constructor(private val driver: ProseEditorDriver) {
@@ -58,7 +57,7 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
         assertEquals(expectedType, storyElement.type)
     }
 
-    fun isListingAllStoryElementsInOrder(elements: List<PairOf<String>>)
+    fun isListingAllStoryElementsInOrder(elements: List<Pair<String, String>>)
     {
         elements.forEachIndexed { index, pair -> isListingStoryElement(index, pair.first, pair.second) }
     }

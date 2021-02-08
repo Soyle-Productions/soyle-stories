@@ -1,26 +1,26 @@
 package com.soyle.stories.di.modules
 
-import com.soyle.stories.characterarc.repositories.CharacterRepository
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.layout.Context
 import com.soyle.stories.layout.repositories.LayoutRepository
 import com.soyle.stories.layout.repositories.OpenToolContext
-import com.soyle.stories.location.repositories.LocationRepository
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.repositories.ProjectRepository
-import com.soyle.stories.prose.repositories.ProseRepository
 import com.soyle.stories.repositories.*
-import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.soylestories.ApplicationScope
-import com.soyle.stories.storyevent.repositories.StoryEventRepository
-import com.soyle.stories.theme.Context
-import com.soyle.stories.theme.repositories.CharacterArcRepository
-import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.stores.ProjectFileStore
+import com.soyle.stories.usecase.character.CharacterArcRepository
+import com.soyle.stories.usecase.character.CharacterRepository
+import com.soyle.stories.usecase.location.LocationRepository
+import com.soyle.stories.usecase.project.ProjectRepository
+import com.soyle.stories.usecase.prose.ProseRepository
+import com.soyle.stories.usecase.scene.SceneRepository
+import com.soyle.stories.usecase.storyevent.StoryEventRepository
+import com.soyle.stories.usecase.theme.ThemeRepository
+import com.soyle.stories.usecase.writer.WriterRepository
 import com.soyle.stories.workspace.repositories.FileRepository
 import com.soyle.stories.workspace.repositories.WorkspaceRepository
-import com.soyle.stories.writer.repositories.WriterRepository
-import com.soyle.stories.stores.ProjectFileStore
 
 object DataModule {
 
@@ -50,34 +50,21 @@ object DataModule {
 
 			provide<LayoutRepository> { LayoutRepositoryImpl() }
 
-			provide(
-			  CharacterArcRepository::class
-			) {
+			provide(CharacterArcRepository::class) {
 				CharacterArcRepositoryImpl()
 			}
 
-			provide(
-			  CharacterRepository::class,
-			  com.soyle.stories.theme.repositories.CharacterRepository::class,
-			  com.soyle.stories.character.repositories.CharacterRepository::class
-			) {
+			provide<CharacterRepository> {
 				CharacterRepositoryImpl()
 			}
 
-			provide(
-			  ThemeRepository::class,
-			  com.soyle.stories.characterarc.repositories.ThemeRepository::class,
-			  com.soyle.stories.character.repositories.ThemeRepository::class
-			) { ThemeRepositoryImpl() }
+			provide<ThemeRepository> { ThemeRepositoryImpl() }
 
 			provide<LocationRepository> {
 				LocationRepositoryImpl()
 			}
 
-			provide(
-			  Context::class,
-			  com.soyle.stories.layout.Context::class
-			) {
+			provide<Context> {
 				ContextDouble(this)
 			}
 
@@ -99,7 +86,7 @@ object DataModule {
 
 			provide<OpenToolContext> {
 				object : OpenToolContext {
-					override val characterRepository: com.soyle.stories.character.repositories.CharacterRepository = get()
+					override val characterRepository: CharacterRepository = get()
 					override val locationRepository: LocationRepository = get()
 					override val sceneRepository: SceneRepository = get()
 					override val storyEventRepository: StoryEventRepository = get()
@@ -110,9 +97,6 @@ object DataModule {
 	}
 }
 
-class ContextDouble(scope: ProjectScope) : Context, com.soyle.stories.layout.Context {
-	override val characterArcRepository: com.soyle.stories.theme.repositories.CharacterArcRepository by DI.resolveLater(scope)
-	override val characterRepository: com.soyle.stories.theme.repositories.CharacterRepository by DI.resolveLater(scope)
-	override val themeRepository: ThemeRepository by DI.resolveLater(scope)
+class ContextDouble(scope: ProjectScope) : Context {
 	override val layoutRepository: LayoutRepository by DI.resolveLater(scope)
 }

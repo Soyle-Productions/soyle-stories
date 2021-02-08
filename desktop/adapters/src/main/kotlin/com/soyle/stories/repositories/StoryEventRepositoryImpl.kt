@@ -1,9 +1,9 @@
 package com.soyle.stories.repositories
 
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.StoryEvent
-import com.soyle.stories.storyevent.repositories.StoryEventRepository
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.usecase.storyevent.StoryEventRepository
 
 class StoryEventRepositoryImpl : StoryEventRepository {
 

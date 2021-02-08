@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.removeSymbolFromTheme
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
+import com.soyle.stories.usecase.theme.removeSymbolFromTheme.RemoveSymbolFromTheme
 import java.util.*
 
 class RemoveSymbolFromThemeControllerImpl(

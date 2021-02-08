@@ -1,11 +1,11 @@
 package com.soyle.stories.theme.createSymbolDialog
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
 import com.soyle.stories.theme.createTheme.CreateThemeController
-import com.soyle.stories.theme.usecases.createTheme.CreateTheme
-import com.soyle.stories.theme.usecases.listThemes.ListThemes
+import com.soyle.stories.usecase.theme.listThemes.ListThemes
 import java.util.*
 
 class CreateSymbolDialogController(
@@ -29,11 +29,11 @@ class CreateSymbolDialogController(
         }
     }
 
-    override fun createThemeAndSymbol(themeName: String, symbolName: String) {
+    override fun createThemeAndSymbol(themeName: NonBlankString, symbolName: NonBlankString) {
         createThemeController.createThemeAndFirstSymbol(themeName, symbolName, presenter::presentError)
     }
 
-    override fun createSymbol(themeId: String, name: String) {
+    override fun createSymbol(themeId: String, name: NonBlankString) {
         addSymbolToThemeController.addSymbolToTheme(themeId, name, presenter::presentError)
     }
 

@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.usecaseControllers
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
+import com.soyle.stories.usecase.theme.changeThematicSectionValue.ChangeThematicSectionValue
 import java.util.*
 
 class ChangeThematicSectionValueController(

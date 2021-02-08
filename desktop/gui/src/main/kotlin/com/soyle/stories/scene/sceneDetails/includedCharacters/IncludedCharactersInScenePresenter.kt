@@ -2,18 +2,18 @@ package com.soyle.stories.scene.sceneDetails.includedCharacters
 
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.usecase.character.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneReceiver
 import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterInSceneViewModel
 import com.soyle.stories.scene.sceneDetails.includedCharacter.PreviousMotivation
-import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
-import com.soyle.stories.scene.usecases.includeCharacterInScene.AvailableCharactersToAddToScene
-import com.soyle.stories.scene.usecases.includeCharacterInScene.GetAvailableCharactersToAddToScene
-import com.soyle.stories.scene.usecases.includeCharacterInScene.IncludeCharacterInScene
-import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.common.IncludedCharacterInScene
+import com.soyle.stories.usecase.scene.includeCharacterInScene.AvailableCharactersToAddToScene
+import com.soyle.stories.usecase.scene.includeCharacterInScene.GetAvailableCharactersToAddToScene
+import com.soyle.stories.usecase.scene.includeCharacterInScene.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromScene
 
 class IncludedCharactersInScenePresenter(
     private val sceneId: String,

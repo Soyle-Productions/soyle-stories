@@ -1,6 +1,6 @@
 package com.soyle.stories.character.removeCharacterFromStory
 
-import com.soyle.stories.entities.Character
+import com.soyle.stories.domain.character.Character
 
 interface RemoveCharacterFromStoryController {
 

@@ -2,41 +2,29 @@ package com.soyle.stories.theme.themeOppositionWebs
 
 import com.soyle.stories.common.components.editableText
 import com.soyle.stories.common.components.emptyListDisplay
-import com.soyle.stories.common.components.popOutEditBox
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import com.soyle.stories.theme.deleteValueWebDialog.DeleteValueWebDialog
 import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
 import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.valueWebList
 import com.soyle.stories.theme.themeOppositionWebs.components.oppositionValueCard
-import com.soyle.stories.theme.valueOppositionWebs.OppositionValueViewModel
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListener
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.animation.Timeline
-import javafx.animation.TranslateTransition
-import javafx.beans.property.ReadOnlyDoubleProperty
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleStringProperty
-import javafx.collections.ObservableList
-import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Node
 import javafx.scene.Parent
-import javafx.scene.effect.DropShadow
-import javafx.scene.layout.BorderStrokeStyle
 import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.paint.Color
-import javafx.scene.text.FontWeight
 import javafx.util.Duration
 import tornadofx.*
-import kotlin.math.floor
 import kotlin.math.max
 
 class ValueOppositionWebs : View() {
@@ -87,15 +75,16 @@ class ValueOppositionWebs : View() {
                     editableText(selectedValueWebName) {
                         id = "ValueWebName"
                         setOnAction {
-                            println("value web name action")
                             val selectedValueWeb = model.selectedValueWeb.value ?: return@setOnAction
                             val text = editedText ?: ""
                             if (text == selectedValueWeb.valueWebName) {
                                 hide()
                                 return@setOnAction
                             }
-                            println("value web name rename")
-                            viewListener.renameValueWeb(selectedValueWeb.valueWebId, text)
+                            val nonBlankName = NonBlankString.create(text)
+                            if (nonBlankName != null) {
+                                viewListener.renameValueWeb(selectedValueWeb.valueWebId, nonBlankName)
+                            }
                         }
                         onShowing {
                             if (model.errorSource.value == model.selectedValueWeb.value?.valueWebId) { model.errorSource.set(null) }

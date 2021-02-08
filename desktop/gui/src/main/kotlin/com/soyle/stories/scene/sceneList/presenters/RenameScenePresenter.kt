@@ -1,9 +1,8 @@
 package com.soyle.stories.scene.sceneList.presenters
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.sceneList.SceneListViewModel
-import com.soyle.stories.scene.usecases.renameScene.RenameScene
+import com.soyle.stories.usecase.scene.renameScene.RenameScene
 
 class RenameScenePresenter(
   private val view: View.Nullable<SceneListViewModel>
@@ -21,7 +20,7 @@ class RenameScenePresenter(
 		}
 	}
 
-	override fun receiveRenameSceneFailure(failure: SceneException) {
+	override fun receiveRenameSceneFailure(failure: Exception) {
 		view.updateOrInvalidated {
 			copy(
 			  renameSceneFailureMessage = failure.localizedMessage?.takeIf { it.isNotBlank() } ?: "Failure"

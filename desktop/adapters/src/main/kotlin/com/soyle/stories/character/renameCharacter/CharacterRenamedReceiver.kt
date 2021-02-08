@@ -1,6 +1,6 @@
 package com.soyle.stories.character.renameCharacter
 
-import com.soyle.stories.entities.CharacterRenamed
+import com.soyle.stories.domain.character.CharacterRenamed
 
 interface CharacterRenamedReceiver {
 

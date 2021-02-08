@@ -4,8 +4,8 @@ import com.soyle.stories.common.async
 import com.soyle.stories.common.editValidation
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.theme.Theme.Symbol
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.layout.LayoutViewListener

@@ -1,8 +1,8 @@
 package com.soyle.stories.theme.addSymbolToTheme
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.addSymbolToTheme.AddSymbolToTheme
-import com.soyle.stories.theme.usecases.createTheme.CreateTheme
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.theme.addSymbolToTheme.AddSymbolToTheme
 import java.util.*
 
 class AddSymbolToThemeControllerImpl(
@@ -11,7 +11,7 @@ class AddSymbolToThemeControllerImpl(
     private val addSymbolToThemeOutputPort: AddSymbolToTheme.OutputPort
 ) : AddSymbolToThemeController {
 
-    override fun addSymbolToTheme(themeId: String, name: String, onError: (Throwable) -> Unit) {
+    override fun addSymbolToTheme(themeId: String, name: NonBlankString, onError: (Throwable) -> Unit) {
         val preparedThemeId = UUID.fromString(themeId)
         threadTransformer.async {
             try {

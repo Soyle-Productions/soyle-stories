@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.ChangeCentralMoralQuestionController
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeCentralMoralQuestion
+import com.soyle.stories.usecase.theme.changeThemeDetails.ChangeCentralMoralQuestion
 import java.util.*
 
 class ChangeCentralMoralQuestionControllerImpl(

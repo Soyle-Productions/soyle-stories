@@ -1,6 +1,6 @@
 package com.soyle.stories.desktop.view.location.locationList
 
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationList
 import javafx.scene.control.Button

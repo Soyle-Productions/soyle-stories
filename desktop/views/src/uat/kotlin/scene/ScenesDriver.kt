@@ -3,13 +3,12 @@ package com.soyle.stories.scene
 import com.soyle.stories.DependentProperty
 import com.soyle.stories.UATLogger
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.scene.ScenesDriver.interact
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
@@ -19,7 +18,7 @@ import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationFor
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
-import com.soyle.stories.storyevent.repositories.StoryEventRepository
+import com.soyle.stories.storyevent.usecases.StoryEventRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.framework.junit5.ApplicationTest

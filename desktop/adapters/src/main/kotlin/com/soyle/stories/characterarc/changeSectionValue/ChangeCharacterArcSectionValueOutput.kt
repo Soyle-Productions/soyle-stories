@@ -1,9 +1,9 @@
 package com.soyle.stories.characterarc.changeSectionValue
 
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterDesire
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterDesire
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
 
 class ChangeCharacterArcSectionValueOutput(
     private val changedCharacterArcSectionValueReceiver: ChangedCharacterArcSectionValueReceiver

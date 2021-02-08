@@ -4,8 +4,8 @@ import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewDriver
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.theme.moralArgument.MoralArgumentScope
 import com.soyle.stories.theme.moralArgument.MoralArgumentSectionTypeViewModel

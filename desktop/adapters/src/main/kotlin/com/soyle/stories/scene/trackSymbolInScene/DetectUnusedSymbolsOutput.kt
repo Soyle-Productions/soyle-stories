@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.trackSymbolInScene
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.scene.usecases.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
 
 class DetectUnusedSymbolsOutput : Notifier<DetectUnusedSymbolsInScene.OutputPort>(),
     DetectUnusedSymbolsInScene.OutputPort {

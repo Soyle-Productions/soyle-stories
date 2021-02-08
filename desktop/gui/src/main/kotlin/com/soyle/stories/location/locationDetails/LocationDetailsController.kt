@@ -2,7 +2,7 @@ package com.soyle.stories.location.locationDetails
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
-import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetails
+import com.soyle.stories.usecase.location.getLocationDetails.GetLocationDetails
 import java.util.*
 
 class LocationDetailsController(

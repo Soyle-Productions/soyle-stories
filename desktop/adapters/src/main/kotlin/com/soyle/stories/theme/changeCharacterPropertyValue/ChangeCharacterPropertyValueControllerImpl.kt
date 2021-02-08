@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.changeCharacterPropertyValue
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
+import com.soyle.stories.usecase.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValue
 import java.util.*
 
 class ChangeCharacterPropertyValueControllerImpl(

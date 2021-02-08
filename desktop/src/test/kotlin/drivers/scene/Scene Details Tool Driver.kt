@@ -7,8 +7,8 @@ import com.soyle.stories.desktop.view.scene.sceneDetails.driver
 import com.soyle.stories.desktop.view.scene.sceneList.drive
 import com.soyle.stories.desktop.view.scene.sceneList.driver
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.sceneDetails.SceneDetails
 import com.soyle.stories.scene.sceneDetails.SceneDetailsScope
 import com.soyle.stories.scene.sceneList.SceneListView

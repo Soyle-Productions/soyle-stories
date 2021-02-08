@@ -1,6 +1,6 @@
 package com.soyle.stories.location.deleteLocation
 
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
 
 interface DeleteLocationController {
 

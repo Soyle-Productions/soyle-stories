@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.outlineMoralArgument
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
+import com.soyle.stories.usecase.theme.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
 import java.util.*
 
 class OutlineMoralArgumentControllerImpl(

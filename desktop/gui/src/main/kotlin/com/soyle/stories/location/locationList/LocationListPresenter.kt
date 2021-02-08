@@ -1,7 +1,7 @@
 package com.soyle.stories.location.locationList
 
 import com.soyle.stories.location.items.LocationItemViewModel
-import com.soyle.stories.location.usecases.listAllLocations.LocationItem
+import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 
 class LocationListPresenter(
   private val view: LocationListView

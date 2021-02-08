@@ -1,17 +1,16 @@
 package com.soyle.stories.desktop.config.drivers.character
 
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
-import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.CharacterArcTemplateSection
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArc
+import com.soyle.stories.domain.character.CharacterArcTemplateSection
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.theme.repositories.CharacterArcRepository
+import com.soyle.stories.usecase.character.CharacterArcRepository
 import kotlinx.coroutines.runBlocking
 
 class CharacterArcDriver private constructor(private val projectScope: ProjectScope) {
@@ -30,7 +29,7 @@ class CharacterArcDriver private constructor(private val projectScope: ProjectSc
     fun getCharacterArcsForTheme(themeId: Theme.Id): List<CharacterArc>
     {
         val characterArcRepository = projectScope.get<CharacterArcRepository>()
-        val arcs = runBlocking { characterArcRepository.listCharacterArcsForTheme(themeId) }
+        val arcs = runBlocking { characterArcRepository.listAllCharacterArcsInTheme(themeId) }
         arcs.forEach(::logNextVersion)
         return arcs
     }

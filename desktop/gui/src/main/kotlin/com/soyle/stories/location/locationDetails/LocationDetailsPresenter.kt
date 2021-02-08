@@ -2,12 +2,11 @@ package com.soyle.stories.location.locationDetails
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
-import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.locationDetails.presenters.LocationRenamedPresenter
 import com.soyle.stories.location.locationDetails.presenters.ReDescribeLocationPresenter
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
-import com.soyle.stories.location.usecases.getLocationDetails.GetLocationDetails
+import com.soyle.stories.usecase.location.getLocationDetails.GetLocationDetails
 
 class LocationDetailsPresenter(
     locationId: String,
@@ -32,7 +31,7 @@ class LocationDetailsPresenter(
         }
     }
 
-    override fun receiveGetLocationDetailsFailure(failure: LocationException) {
+    override fun receiveGetLocationDetailsFailure(failure: Exception) {
 
     }
 }

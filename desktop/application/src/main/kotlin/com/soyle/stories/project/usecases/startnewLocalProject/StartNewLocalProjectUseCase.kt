@@ -1,8 +1,9 @@
 package com.soyle.stories.project.usecases.startnewLocalProject
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.*
-import com.soyle.stories.project.usecases.startNewProject.StartNewProject
+import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 import com.soyle.stories.workspace.ProjectException
 import com.soyle.stories.workspace.repositories.FileRepository
 import com.soyle.stories.workspace.usecases.openProject.OpenProject
@@ -39,10 +40,10 @@ class StartNewLocalProjectUseCase(
 
     private suspend fun validateRequest(request: StartNewLocalProject.RequestModel) {
         validateDirectory(request.directory)
-        validateFileName(request.projectName, request.directory)
+        validateFileName(request.projectName.value, request.directory)
     }
 
-    private suspend fun startNewProject(projectName: String): StartNewProject.ResponseModel {
+    private suspend fun startNewProject(projectName: NonBlankString): StartNewProject.ResponseModel {
         return suspendCancellableCoroutine { continuation ->
             runBlocking {
                 startNewProjectUseCase.invoke(projectName, StartNewProjectOutputContinuation(continuation))

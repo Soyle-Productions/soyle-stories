@@ -1,7 +1,7 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog

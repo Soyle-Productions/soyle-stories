@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.addArcSectionToMoralArgument
 
-import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
+import com.soyle.stories.usecase.character.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 

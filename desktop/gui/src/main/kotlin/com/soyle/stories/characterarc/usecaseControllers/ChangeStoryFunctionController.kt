@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.usecaseControllers
 
-import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
+import com.soyle.stories.usecase.theme.changeStoryFunction.ChangeStoryFunction
 import java.util.*
 
 class ChangeStoryFunctionController(

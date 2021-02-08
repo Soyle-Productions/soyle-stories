@@ -1,10 +1,11 @@
 package com.soyle.stories.theme.themeList
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.theme.renameSymbol.RenameSymbolController
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenameThemeController
-import com.soyle.stories.theme.usecases.listSymbolsByTheme.ListSymbolsByTheme
+import com.soyle.stories.usecase.theme.listSymbolsByTheme.ListSymbolsByTheme
 import java.util.*
 
 class ThemeListController(
@@ -41,11 +42,11 @@ class ThemeListController(
         openToolController.openMoralArgument(themeId)
     }
 
-    override fun renameTheme(themeId: String, newName: String) {
+    override fun renameTheme(themeId: String, newName: NonBlankString) {
         renameThemeController.renameTheme(themeId, newName)
     }
 
-    override fun renameSymbol(symbolId: String, newName: String) {
+    override fun renameSymbol(symbolId: String, newName: NonBlankString) {
         renameSymbolController.renameSymbol(symbolId, newName) {}
     }
 

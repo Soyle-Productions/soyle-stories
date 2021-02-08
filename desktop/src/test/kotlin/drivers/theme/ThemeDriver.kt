@@ -3,16 +3,17 @@ package com.soyle.stories.desktop.config.drivers.theme
 import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterController
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.characterInTheme.CharacterInTheme
-import com.soyle.stories.entities.theme.characterInTheme.MajorCharacter
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
-import com.soyle.stories.entities.theme.valueWeb.ValueWeb
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.theme.Symbol
+import com.soyle.stories.domain.theme.SymbolicRepresentation
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.theme.characterInTheme.CharacterInTheme
+import com.soyle.stories.domain.theme.characterInTheme.MajorCharacter
+import com.soyle.stories.domain.theme.oppositionValue.OppositionValue
+import com.soyle.stories.domain.theme.valueWeb.ValueWeb
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
@@ -23,7 +24,7 @@ import com.soyle.stories.theme.deleteTheme.DeleteThemeController
 import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeController
 import com.soyle.stories.theme.renameSymbol.RenameSymbolController
-import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.usecase.theme.ThemeRepository
 import kotlinx.coroutines.runBlocking
 import java.util.*
 import kotlin.NoSuchElementException
@@ -59,7 +60,7 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
     fun createThemeWithName(themeName: String): Theme
     {
         projectScope.get<CreateThemeController>()
-            .createTheme(themeName) { throw it }
+            .createTheme(NonBlankString.create(themeName)!!) { throw it }
         return getThemeByNameOrError(themeName)
     }
 
@@ -167,7 +168,7 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
     fun createSymbolInThemeNamed(themeId: Theme.Id, symbolName: String): Symbol
     {
         projectScope.get<AddSymbolToThemeController>()
-            .addSymbolToTheme(themeId.uuid.toString(), symbolName) { throw it }
+            .addSymbolToTheme(themeId.uuid.toString(), NonBlankString.create(symbolName)!!) { throw it }
         return getSymbolInThemeNamedOrError(themeId, symbolName)
     }
 
@@ -190,7 +191,7 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
      */
 
     fun renameSymbolTo(theme: Theme, symbol: Symbol, newName: String) {
-        projectScope.get<RenameSymbolController>().renameSymbol(symbol.id.uuid.toString(), newName) { throw it }
+        projectScope.get<RenameSymbolController>().renameSymbol(symbol.id.uuid.toString(), NonBlankString.create(newName)!!) { throw it }
     }
 
     /**
@@ -223,7 +224,7 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
     {
         val themeRepository = projectScope.get<ThemeRepository>()
         val theme = runBlocking { themeRepository.getThemeById(themeId) } ?: throw NoSuchElementException("theme $themeId does not exist")
-        val valueWeb = theme.valueWebs.find { it.name == valueWebName }
+        val valueWeb = theme.valueWebs.find { it.name.value == valueWebName }
         valueWeb?.let { previouslyNamedValueWebs[theme.id to valueWebName] = valueWeb.id }
         return valueWeb
     }
@@ -231,7 +232,7 @@ class ThemeDriver private constructor(private val projectScope: ProjectScope)
     fun createValueWebInThemeNamed(themeId: Theme.Id, valueWebName: String): ValueWeb
     {
         projectScope.get<AddValueWebToThemeController>()
-            .addValueWebToTheme(themeId.uuid.toString(), valueWebName) { throw it }
+            .addValueWebToTheme(themeId.uuid.toString(), NonBlankString.create(valueWebName)!!) { throw it }
         return getValueWebInThemeNamedOrError(themeId, valueWebName)
     }
 

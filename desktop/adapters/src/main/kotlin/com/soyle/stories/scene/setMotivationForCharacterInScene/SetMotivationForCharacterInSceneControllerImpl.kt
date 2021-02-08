@@ -2,7 +2,7 @@ package com.soyle.stories.scene.setMotivationForCharacterInScene
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import java.util.*
 
 class SetMotivationForCharacterInSceneControllerImpl(

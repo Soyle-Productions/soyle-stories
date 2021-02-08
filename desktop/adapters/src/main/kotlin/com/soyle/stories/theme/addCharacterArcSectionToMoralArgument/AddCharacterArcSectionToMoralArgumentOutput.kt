@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.addCharacterArcSectionToMoralArgument
 
-import com.soyle.stories.characterarc.usecases.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
+import com.soyle.stories.usecase.character.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
 
 class AddCharacterArcSectionToMoralArgumentOutput(
     private val arcSectionAddedToCharacterArcReceiver: ArcSectionAddedToCharacterArcReceiver

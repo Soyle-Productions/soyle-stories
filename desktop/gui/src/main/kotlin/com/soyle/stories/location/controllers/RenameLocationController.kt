@@ -1,8 +1,8 @@
 package com.soyle.stories.location.controllers
 
-import com.soyle.stories.common.SingleNonBlankLine
-import com.soyle.stories.entities.Location
-import com.soyle.stories.location.usecases.renameLocation.RenameLocation
+import com.soyle.stories.domain.validation.SingleNonBlankLine
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.usecase.location.renameLocation.RenameLocation
 
 class RenameLocationController(
     private val renameLocation: RenameLocation,

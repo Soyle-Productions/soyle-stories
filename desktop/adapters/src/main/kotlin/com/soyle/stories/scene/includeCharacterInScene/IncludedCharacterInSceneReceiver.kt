@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.includeCharacterInScene
 
-import com.soyle.stories.scene.usecases.common.IncludedCharacterInScene
+import com.soyle.stories.usecase.scene.common.IncludedCharacterInScene
 
 interface IncludedCharacterInSceneReceiver {
 

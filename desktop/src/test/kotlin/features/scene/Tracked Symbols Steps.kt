@@ -8,9 +8,9 @@ import com.soyle.stories.desktop.config.drivers.theme.createSymbolWithName
 import com.soyle.stories.desktop.config.drivers.theme.givenCreatingNewSymbolForTheme
 import com.soyle.stories.desktop.config.drivers.theme.givenCreatingNewThemeAndSymbol
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.desktop.view.scene.sceneSymbols.SymbolsInSceneAssertions
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneAssertions
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*

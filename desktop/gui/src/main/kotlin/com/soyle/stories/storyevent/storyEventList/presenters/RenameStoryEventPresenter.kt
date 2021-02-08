@@ -1,10 +1,9 @@
 package com.soyle.stories.storyevent.storyEventList.presenters
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.storyevent.StoryEventException
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.storyEventList.StoryEventListViewModel
-import com.soyle.stories.storyevent.usecases.renameStoryEvent.RenameStoryEvent
+import com.soyle.stories.usecase.storyevent.renameStoryEvent.RenameStoryEvent
 
 class RenameStoryEventPresenter(
   private val view: View.Nullable<StoryEventListViewModel>
@@ -23,7 +22,7 @@ class RenameStoryEventPresenter(
 		}
 	}
 
-	override fun receiveRenameStoryEventFailure(failure: StoryEventException) {
+	override fun receiveRenameStoryEventFailure(failure: Exception) {
 
 	}
 

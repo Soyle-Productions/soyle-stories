@@ -1,6 +1,6 @@
 package com.soyle.stories.project.startNewProject
 
-import com.soyle.stories.project.usecases.startNewProject.StartNewProject
+import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 
 interface ProjectStartedReceiver {
 

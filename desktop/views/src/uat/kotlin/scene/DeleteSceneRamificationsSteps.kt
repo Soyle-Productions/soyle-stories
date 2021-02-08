@@ -3,7 +3,7 @@ package com.soyle.stories.scene
 import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectSteps

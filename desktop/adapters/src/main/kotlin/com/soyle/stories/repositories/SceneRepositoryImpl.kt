@@ -1,11 +1,11 @@
 package com.soyle.stories.repositories
 
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.StoryEvent
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.scene.repositories.SceneRepository
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.theme.Symbol
+import com.soyle.stories.usecase.scene.SceneRepository
 
 class SceneRepositoryImpl : SceneRepository {
 

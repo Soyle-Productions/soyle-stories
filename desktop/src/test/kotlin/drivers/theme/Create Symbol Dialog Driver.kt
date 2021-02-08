@@ -1,10 +1,10 @@
 package com.soyle.stories.desktop.config.drivers.theme
 
 import com.soyle.stories.desktop.config.drivers.robot
-import com.soyle.stories.desktop.view.scene.sceneSymbols.drive
+import com.soyle.stories.scene.sceneSymbols.drive
 import com.soyle.stories.desktop.view.theme.createSymbolDialog.CreateSymbolDialogDriver
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.themeList.ThemeList

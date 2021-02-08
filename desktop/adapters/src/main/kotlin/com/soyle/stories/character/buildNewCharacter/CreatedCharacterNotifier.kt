@@ -1,6 +1,6 @@
 package com.soyle.stories.character.buildNewCharacter
 
-import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.usecase.character.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.common.Notifier
 import kotlin.coroutines.coroutineContext
 

@@ -1,8 +1,8 @@
 package com.soyle.stories.prose.readProse
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.prose.usecases.readProse.ReadProse
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.usecase.prose.readProse.ReadProse
 
 class ReadProseControllerImpl(
     private val threadTransformer: ThreadTransformer,

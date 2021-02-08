@@ -1,6 +1,6 @@
 package com.soyle.stories.layout.doubles
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.entities.StoryEvent
 import com.soyle.stories.scene.repositories.SceneRepository

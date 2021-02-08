@@ -1,9 +1,10 @@
 package com.soyle.stories.project.startNewProject
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.openProject.OpenProjectController
-import com.soyle.stories.project.usecases.startNewProject.StartNewProject
-import com.soyle.stories.project.usecases.startNewProject.StartNewProjectUseCase
+import com.soyle.stories.usecase.project.startNewProject.StartNewProject
+import com.soyle.stories.usecase.project.startNewProject.StartNewProjectUseCase
 import com.soyle.stories.repositories.ProjectRepositoryImpl
 import com.soyle.stories.stores.ProjectFileStore
 import java.io.File
@@ -15,7 +16,7 @@ class StartProjectControllerImpl(
     private val openProjectController: OpenProjectController
 ) : StartProjectController {
 
-    override fun startProject(directory: String, name: String) {
+    override fun startProject(directory: String, name: NonBlankString) {
         val projectLocation = directory + File.separator + name + ".stry"
         val startProjectUseCase = StartNewProjectUseCase(
             ProjectRepositoryImpl(

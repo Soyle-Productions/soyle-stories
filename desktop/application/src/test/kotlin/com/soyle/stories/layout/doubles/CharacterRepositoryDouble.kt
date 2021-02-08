@@ -1,8 +1,8 @@
 package com.soyle.stories.layout.doubles
 
 import com.soyle.stories.character.repositories.CharacterRepository
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.project.Project
 
 class CharacterRepositoryDouble(
   initialCharacters: List<Character> = emptyList(),

@@ -2,8 +2,7 @@ package com.soyle.stories.storyevent.createStoryEvent
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.storyevent.StoryEventException
-import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
 
 class CreateStoryEventNotifier(
 	private val threadTransformer: ThreadTransformer
@@ -14,7 +13,7 @@ class CreateStoryEventNotifier(
 		}
 	}
 
-	override fun receiveCreateStoryEventFailure(failure: StoryEventException) {
+	override fun receiveCreateStoryEventFailure(failure: Exception) {
 		threadTransformer.async {
 			notifyAll { it.receiveCreateStoryEventFailure(failure) }
 		}

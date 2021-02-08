@@ -1,15 +1,15 @@
 package com.soyle.stories.scene.sceneDetails.includedCharacter
 
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
-import com.soyle.stories.entities.CharacterRenamed
+import com.soyle.stories.domain.character.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneReceiver
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CharacterArcSectionUncoveredInScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
-import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CharacterArcSectionUncoveredInScene
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
+import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 
 class IncludedCharacterInScenePresenter(
     private val sceneId: String,

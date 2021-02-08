@@ -7,7 +7,7 @@ package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
+import com.soyle.stories.usecase.theme.changeThematicSectionValue.ChangeThematicSectionValue
 
 class ChangeThematicSectionValueNotifier(
     private val threadTransformer: ThreadTransformer

@@ -1,10 +1,9 @@
 package com.soyle.stories.theme.addSymbolicItemToOpposition
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
-import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
-import kotlin.coroutines.coroutineContext
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.IncludeCharacterInComparison
+import com.soyle.stories.usecase.theme.removeSymbolicItem.RemoveSymbolicItem
 
 class AddSymbolicItemToOppositionNotifier(
     private val removeSymbolicItemOutputPort: RemoveSymbolicItem.OutputPort,

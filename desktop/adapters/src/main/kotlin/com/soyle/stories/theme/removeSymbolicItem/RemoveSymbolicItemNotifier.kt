@@ -1,9 +1,8 @@
 package com.soyle.stories.theme.removeSymbolicItem
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.removeSymbolicItem.RemoveSymbolicItem
-import com.soyle.stories.theme.usecases.removeSymbolicItem.RemovedSymbolicItem
-import kotlin.coroutines.coroutineContext
+import com.soyle.stories.usecase.theme.removeSymbolicItem.RemoveSymbolicItem
+import com.soyle.stories.usecase.theme.removeSymbolicItem.RemovedSymbolicItem
 
 class RemoveSymbolicItemNotifier : Notifier<RemoveSymbolicItem.OutputPort>(), RemoveSymbolicItem.OutputPort {
 

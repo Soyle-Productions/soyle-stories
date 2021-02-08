@@ -1,6 +1,6 @@
 package com.soyle.stories.storyevent.addCharacterToStoryEvent
 
-import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
+import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
 
 interface IncludedCharacterInStoryEventReceiver {
 

@@ -1,7 +1,7 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.common.SingleNonBlankLine
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.validation.SingleNonBlankLine
+import com.soyle.stories.domain.location.Location
 
 interface LocationListViewListener {
 

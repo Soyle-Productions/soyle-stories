@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.removeCharacterFromComparison
 
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemovedCharacterFromTheme
+import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemovedCharacterFromTheme
 
 interface RemovedCharacterFromThemeReceiver {
 

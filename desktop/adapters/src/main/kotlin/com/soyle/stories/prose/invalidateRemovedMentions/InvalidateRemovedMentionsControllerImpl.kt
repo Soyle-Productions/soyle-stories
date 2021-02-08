@@ -1,8 +1,8 @@
 package com.soyle.stories.prose.invalidateRemovedMentions
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
 
 class InvalidateRemovedMentionsControllerImpl(
     private val threadTransformer: ThreadTransformer,

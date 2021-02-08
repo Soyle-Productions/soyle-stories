@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.includeCharacterInTheme
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.IncludeCharacterInComparison
 import java.util.*
 
 class IncludeCharacterInComparisonControllerImpl(

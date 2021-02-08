@@ -2,13 +2,12 @@ package com.soyle.stories.location.events
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.location.LocationException
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
 
 class CreateNewLocationNotifier(
 	private val threadTransformer: ThreadTransformer
 ) : CreateNewLocation.OutputPort, Notifier<CreateNewLocation.OutputPort>() {
-	override fun receiveCreateNewLocationFailure(failure: LocationException) {
+	override fun receiveCreateNewLocationFailure(failure: Exception) {
 		threadTransformer.async {
 			notifyAll { it.receiveCreateNewLocationFailure(failure) }
 		}

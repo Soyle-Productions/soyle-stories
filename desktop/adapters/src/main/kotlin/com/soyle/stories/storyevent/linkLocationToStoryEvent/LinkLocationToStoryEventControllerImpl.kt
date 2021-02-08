@@ -1,7 +1,7 @@
 package com.soyle.stories.storyevent.linkLocationToStoryEvent
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
+import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEvent
 import java.util.*
 
 class LinkLocationToStoryEventControllerImpl(

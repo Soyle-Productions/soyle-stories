@@ -1,7 +1,7 @@
 package com.soyle.stories.storyevent.addCharacterToStoryEvent
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
+import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import java.util.*
 
 class AddCharacterToStoryEventControllerImpl(

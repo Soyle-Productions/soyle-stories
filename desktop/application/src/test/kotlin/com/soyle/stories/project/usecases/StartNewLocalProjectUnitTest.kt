@@ -1,11 +1,11 @@
 package com.soyle.stories.project.usecases
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.project.DirectoryDoesNotExist
 import com.soyle.stories.project.FileAlreadyExists
 import com.soyle.stories.project.LocalProjectException
 import com.soyle.stories.project.ProjectFailure
-import com.soyle.stories.project.usecases.startNewProject.StartNewProject
+import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProject
 import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProjectUseCase
 import com.soyle.stories.workspace.ProjectException

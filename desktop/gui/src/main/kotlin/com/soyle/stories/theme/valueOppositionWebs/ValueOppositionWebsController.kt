@@ -1,14 +1,14 @@
 package com.soyle.stories.theme.valueOppositionWebs
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWebController
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemController
 import com.soyle.stories.theme.renameOppositionValue.RenameOppositionValueController
 import com.soyle.stories.theme.renameValueWeb.RenameValueWebController
-import com.soyle.stories.theme.usecases.addOppositionToValueWeb.AddOppositionToValueWeb
-import com.soyle.stories.theme.usecases.listOppositionsInValueWeb.ListOppositionsInValueWeb
-import com.soyle.stories.theme.usecases.listValueWebsInTheme.ListValueWebsInTheme
+import com.soyle.stories.usecase.theme.listOppositionsInValueWeb.ListOppositionsInValueWeb
+import com.soyle.stories.usecase.theme.listValueWebsInTheme.ListValueWebsInTheme
 import java.util.*
 
 class ValueOppositionWebsController(
@@ -49,13 +49,13 @@ class ValueOppositionWebsController(
         addOppositionToValueWebController.addOpposition(valueWebId)
     }
 
-    override fun renameOppositionValue(oppositionId: String, name: String) {
+    override fun renameOppositionValue(oppositionId: String, name: NonBlankString) {
         renameOppositionValueController.renameOpposition(oppositionId, name) {
             presenter.presentError(oppositionId, it)
         }
     }
 
-    override fun renameValueWeb(valueWebId: String, name: String) {
+    override fun renameValueWeb(valueWebId: String, name: NonBlankString) {
         renameValueWebController.renameValueWeb(valueWebId, name) {
             presenter.presentError(valueWebId, it)
         }

@@ -1,7 +1,7 @@
 package com.soyle.stories.project.usecases.startnewLocalProject
 
 import com.soyle.stories.project.ProjectFailure
-import com.soyle.stories.project.usecases.startNewProject.StartNewProject
+import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 import kotlin.coroutines.Continuation
 
 internal class StartNewProjectOutputContinuation(private val continuation: Continuation<StartNewProject.ResponseModel>) : StartNewProject.OutputPort {

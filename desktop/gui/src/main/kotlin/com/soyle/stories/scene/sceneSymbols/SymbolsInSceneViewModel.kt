@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.scene.items.SceneItemViewModel
 
 data class SymbolsInSceneViewModel(

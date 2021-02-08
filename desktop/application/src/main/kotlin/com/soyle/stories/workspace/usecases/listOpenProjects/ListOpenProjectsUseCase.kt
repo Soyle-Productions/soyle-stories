@@ -35,12 +35,12 @@ class ListOpenProjectsUseCase(
                     ).left()
                     file.projectId != project.id -> UnexpectedProjectExistsAtLocation(
                         project.id.uuid,
-                        project.name,
+                        project.name.value,
                         file.projectId.uuid,
                         file.projectName,
                         file.location
                     ).left()
-                    else -> ListOpenProjects.OpenProjectItem(project.id.uuid, project.name, file.location).right()
+                    else -> ListOpenProjects.OpenProjectItem(project.id.uuid, project.name.value, file.location).right()
                 }
             }
 

@@ -4,7 +4,7 @@ import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
 import com.soyle.stories.storyevent.createStoryEventDialog.presenters.CreateStoryEventPresenter
-import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
 
 class CreateStoryEventDialogPresenter(
   private val view: View.Nullable<CreateStoryEventDialogViewModel>,

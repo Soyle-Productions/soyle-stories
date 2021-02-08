@@ -3,8 +3,8 @@ package com.soyle.stories.desktop.view.character.characterList
 import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
 import com.soyle.stories.characterarc.characterList.CharacterList
 import com.soyle.stories.characterarc.characterList.CharacterTreeItemViewModel
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.theme.Theme
 import javafx.scene.control.Button
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.TreeItem

@@ -3,7 +3,7 @@ package com.soyle.stories.scene
 import com.soyle.stories.DependentProperty
 import com.soyle.stories.ReadOnlyDependentProperty
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.scene.DeleteSceneDialogDriver.interact

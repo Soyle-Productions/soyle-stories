@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.trackSymbolInScene
 
-import com.soyle.stories.scene.usecases.trackSymbolInScene.UnpinSymbolFromScene
+import com.soyle.stories.usecase.scene.trackSymbolInScene.UnpinSymbolFromScene
 
 class UnpinSymbolFromSceneOutput(
     private val trackedSymbolsRemovedReceiver: TrackedSymbolsRemovedReceiver,

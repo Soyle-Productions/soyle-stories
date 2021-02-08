@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangeThematicRevelation
+import com.soyle.stories.usecase.theme.changeThemeDetails.ChangeThematicRevelation
 import java.util.*
 
 class ChangeThematicRevelationControllerImpl(

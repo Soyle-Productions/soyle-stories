@@ -1,12 +1,12 @@
 package com.soyle.stories.prose.editProse
 
-import com.soyle.stories.prose.EntityMentionedInProse
-import com.soyle.stories.prose.ProseCreated
-import com.soyle.stories.prose.TextInsertedIntoProse
+import com.soyle.stories.domain.prose.EntityMentionedInProse
+import com.soyle.stories.domain.prose.ProseCreated
+import com.soyle.stories.domain.prose.TextInsertedIntoProse
 import com.soyle.stories.prose.entityMentionedInProse.EntityMentionedInProseReceiver
 import com.soyle.stories.prose.proseCreated.ProseCreatedReceiver
 import com.soyle.stories.prose.textInsertedIntoProse.TextInsertedIntoProseReceiver
-import com.soyle.stories.prose.usecases.bulkUpdateProse.BulkUpdateProse
+import com.soyle.stories.usecase.prose.bulkUpdateProse.BulkUpdateProse
 
 class BulkUpdateProseOutput(
     private val proseCreatedReceiver: ProseCreatedReceiver,

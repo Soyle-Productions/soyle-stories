@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.removeCharacterAsOpponent
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.CharacterRemovedAsOpponent
-import kotlin.coroutines.coroutineContext
+import com.soyle.stories.usecase.theme.removeCharacterAsOpponent.CharacterRemovedAsOpponent
 
 class CharacterRemovedAsOpponentNotifier : CharacterRemovedAsOpponentReceiver, Notifier<CharacterRemovedAsOpponentReceiver>() {
 

@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.usecaseControllers
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
+import com.soyle.stories.usecase.theme.promoteMinorCharacter.PromoteMinorCharacter
 import java.util.*
 
 class PromoteMinorCharacterController(

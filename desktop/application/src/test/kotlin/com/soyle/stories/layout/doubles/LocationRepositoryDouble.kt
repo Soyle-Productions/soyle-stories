@@ -1,7 +1,7 @@
 package com.soyle.stories.layout.doubles
 
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.location.repositories.LocationRepository
 
 class LocationRepositoryDouble(

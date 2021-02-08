@@ -1,8 +1,8 @@
 package com.soyle.stories.scene.coverArcSectionsInScene
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
 import java.util.*
 
 class CoverArcSectionsInSceneControllerImpl(

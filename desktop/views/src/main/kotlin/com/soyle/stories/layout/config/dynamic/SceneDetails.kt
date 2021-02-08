@@ -1,6 +1,7 @@
 package com.soyle.stories.layout.config.dynamic
 
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.SceneLocale
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.repositories.OpenToolContext
@@ -9,9 +10,8 @@ import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
-import com.soyle.stories.scene.Locale
-import com.soyle.stories.scene.SceneDoesNotExist
 import com.soyle.stories.scene.sceneDetails.SceneDetailsScope
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import tornadofx.find
@@ -51,7 +51,7 @@ object SceneDetailsConfig : ToolConfig<SceneDetails> {
 
 }
 
-data class SceneDetails(val sceneId: UUID, private val locale: Locale) : DynamicTool() {
+data class SceneDetails(val sceneId: UUID, private val locale: SceneLocale) : DynamicTool() {
 
 	override suspend fun validate(context: OpenToolContext) {
 		context.sceneRepository.getSceneById(Scene.Id(sceneId))

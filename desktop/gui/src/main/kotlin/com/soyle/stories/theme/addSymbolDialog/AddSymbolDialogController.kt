@@ -1,13 +1,8 @@
 package com.soyle.stories.theme.addSymbolDialog
 
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
-import com.soyle.stories.theme.addSymbolToTheme.AddSymbolToThemeController
 import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
-import com.soyle.stories.theme.usecases.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
-import com.soyle.stories.theme.usecases.listSymbolsInTheme.ListSymbolsInTheme
+import com.soyle.stories.usecase.theme.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import java.util.*
 
 class AddSymbolDialogController(

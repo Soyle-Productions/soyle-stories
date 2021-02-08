@@ -1,10 +1,9 @@
 package com.soyle.stories.characterarc.baseStoryStructure.presenters
 
-import com.soyle.stories.characterarc.CharacterArcException
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureViewModel
 import com.soyle.stories.characterarc.baseStoryStructure.StoryStructureSectionViewModel
-import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.gui.View
+import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 
 class UnlinkLocationFromCharacterArcSectionPresenter(
   private val view: View.Nullable<BaseStoryStructureViewModel>
@@ -24,5 +23,5 @@ class UnlinkLocationFromCharacterArcSectionPresenter(
 		}
 	}
 
-	override fun receiveUnlinkLocationFromCharacterArcSectionFailure(failure: CharacterArcException) {}
+	override fun receiveUnlinkLocationFromCharacterArcSectionFailure(failure: Exception) {}
 }

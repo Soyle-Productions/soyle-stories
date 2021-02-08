@@ -6,8 +6,8 @@ import com.soyle.stories.di.scoped
 import com.soyle.stories.location.deleteLocation.DeleteLocationController
 import com.soyle.stories.location.deleteLocation.DeleteLocationControllerImpl
 import com.soyle.stories.location.deleteLocation.DeleteLocationOutput
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocation
-import com.soyle.stories.location.usecases.deleteLocation.DeleteLocationUseCase
+import com.soyle.stories.usecase.location.deleteLocation.DeleteLocation
+import com.soyle.stories.usecase.location.deleteLocation.DeleteLocationUseCase
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.repositories.CharacterArcRepositoryImpl
 

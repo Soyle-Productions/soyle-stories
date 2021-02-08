@@ -1,8 +1,8 @@
 package com.soyle.stories.scene.getStoryElementsToMention
 
-import com.soyle.stories.common.NonBlankString
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
 
 interface GetStoryElementsToMentionController {
 

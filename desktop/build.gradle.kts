@@ -1,6 +1,7 @@
 plugins {
     java
     kotlin("jvm")
+    id(plugin.constants.ideaExt) version plugin.constants.ideaExtVersion
     id(plugin.constants.shadow) version plugin.constants.shadowVersion
     id(plugin.constants.badassRuntime) version plugin.constants.badassRuntimeVersion
 }
@@ -19,7 +20,6 @@ application {
 
 dependencies {
     implementation(project(":desktop:views"))
-
 
     testImplementation("io.cucumber:cucumber-java8:6.1.1")
     testImplementation("io.cucumber:cucumber-junit:6.1.1")
@@ -63,5 +63,14 @@ tasks.withType<CreateStartScripts> {
 tasks.processResources {
     filesMatching("**/*.properties") {
         expand("APPLICATION_VERSION" to project.version)
+    }
+}
+
+idea {
+    module {
+        (this as ExtensionAware).configure<org.jetbrains.gradle.ext.ModuleSettings> {
+            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/main/kotlin"] = "com.soyle.stories.desktop.config"
+            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = "com.soyle.stories.desktop.config"
+        }
     }
 }

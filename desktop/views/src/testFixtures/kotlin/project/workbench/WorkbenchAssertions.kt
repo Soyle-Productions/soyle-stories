@@ -1,6 +1,7 @@
-package com.soyle.stories.desktop.view.project.workbench
+package com.soyle.stories.project.workbench
 
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.desktop.view.project.workbench.WorkbenchDriver
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.WorkBench
 import org.junit.jupiter.api.Assertions.assertNotNull
 

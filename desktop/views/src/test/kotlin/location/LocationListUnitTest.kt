@@ -3,7 +3,7 @@ package com.soyle.stories.location
 import com.soyle.stories.common.SingleNonBlankLine
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationList

@@ -4,14 +4,11 @@ import com.soyle.stories.common.components.emptyListDisplay
 import com.soyle.stories.common.makeEditable
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
-import com.soyle.stories.theme.ThemeNameCannotBeBlank
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
 import com.soyle.stories.theme.deleteSymbolDialog.DeleteSymbolDialog
 import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialog
-import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
-import com.soyle.stories.theme.usecases.validateSymbolName
-import com.soyle.stories.theme.usecases.validateThemeName
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Parent
@@ -51,32 +48,26 @@ class ThemeList : View() {
                 vgrow = Priority.ALWAYS
                 model.selectedItem.bind(selectionModel.selectedItemProperty().select { it.valueProperty() })
                 makeEditable({ newName, item ->
+                    val nonBlankName = NonBlankString.create(newName)
                     when (item) {
                         is ThemeListItemViewModel -> {
-                            try {
-                                validateThemeName(newName)
-                                null
-                            }
-                            catch (e: ThemeNameCannotBeBlank) { "Theme name cannot be blank." }
+                            if (nonBlankName == null) "Theme name cannot be blank."
+                            else null
                         }
                         is SymbolListItemViewModel -> {
-                            try {
-                                validateSymbolName(newName)
-                                null
-                            }
-                            catch (e: SymbolNameCannotBeBlank) {
-                                "Symbol name cannot be blank."
-                            }
+                            if (nonBlankName == null) "Symbol name cannot be blank."
+                            else null
                         }
                         else -> null
                     }
                 }) { newName, item ->
+                    val nonBlankName = NonBlankString.create(newName)
                     when (item) {
                         is ThemeListItemViewModel -> {
-                            viewListener.renameTheme(item.themeId, newName)
+                            if (nonBlankName != null) viewListener.renameTheme(item.themeId, nonBlankName)
                         }
                         is SymbolListItemViewModel -> {
-                            viewListener.renameSymbol(item.symbolId, newName)
+                            if (nonBlankName != null) viewListener.renameSymbol(item.symbolId, nonBlankName)
                         }
                     }
                     item

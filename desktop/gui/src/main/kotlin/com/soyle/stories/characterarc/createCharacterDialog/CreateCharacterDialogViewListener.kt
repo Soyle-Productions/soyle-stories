@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.createCharacterDialog
 
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.domain.validation.NonBlankString
 
 interface CreateCharacterDialogViewListener {
 

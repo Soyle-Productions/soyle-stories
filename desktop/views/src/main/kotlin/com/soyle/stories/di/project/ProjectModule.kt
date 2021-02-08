@@ -20,7 +20,7 @@ import com.soyle.stories.project.projectList.ProjectListPresenter
 import com.soyle.stories.project.projectList.ProjectListView
 import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startNewProject.*
-import com.soyle.stories.project.usecases.startNewProject.StartNewProject
+import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 import com.soyle.stories.project.usecases.startnewLocalProject.StartNewLocalProject
 import com.soyle.stories.soylestories.ApplicationModel
 import com.soyle.stories.soylestories.ApplicationScope

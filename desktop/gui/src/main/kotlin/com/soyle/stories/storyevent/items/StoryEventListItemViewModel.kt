@@ -1,6 +1,6 @@
 package com.soyle.stories.storyevent.items
 
-import com.soyle.stories.storyevent.usecases.StoryEventItem
+import com.soyle.stories.usecase.storyevent.StoryEventItem
 
 class StoryEventListItemViewModel (
   val id: String,

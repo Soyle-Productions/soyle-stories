@@ -3,6 +3,7 @@ package com.soyle.stories.theme.themeOppositionWebs.components
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.addSymbolDialog.AddSymbolDialog
 import com.soyle.stories.theme.themeOppositionWebs.Styles
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebs
@@ -46,7 +47,7 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
                 Priority.SOMETIMES
                 setOnAction {
                     val id = oppositionValueId.value ?: return@setOnAction
-                    val text = editedText ?: return@setOnAction
+                    val text = editedText?.let(NonBlankString::create) ?: return@setOnAction
                     viewListener.renameOppositionValue(id, text)
                 }
             }

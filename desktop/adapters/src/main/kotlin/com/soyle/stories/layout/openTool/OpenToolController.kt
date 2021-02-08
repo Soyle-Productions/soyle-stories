@@ -1,7 +1,7 @@
 package com.soyle.stories.layout.openTool
 
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 
 interface OpenToolController {
 

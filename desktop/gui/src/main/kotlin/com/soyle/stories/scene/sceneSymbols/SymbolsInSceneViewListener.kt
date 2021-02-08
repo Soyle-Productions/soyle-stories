@@ -1,7 +1,8 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.theme.Symbol
+
 
 interface SymbolsInSceneViewListener {
 

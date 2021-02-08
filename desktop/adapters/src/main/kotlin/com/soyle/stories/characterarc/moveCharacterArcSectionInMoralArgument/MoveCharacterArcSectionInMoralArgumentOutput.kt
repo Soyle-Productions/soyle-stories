@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument
 
-import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgument
+import com.soyle.stories.usecase.character.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgument
 
 class MoveCharacterArcSectionInMoralArgumentOutput(
     private val characterArcSectionMovedInMoralArgumentReceiver: CharacterArcSectionMovedInMoralArgumentReceiver

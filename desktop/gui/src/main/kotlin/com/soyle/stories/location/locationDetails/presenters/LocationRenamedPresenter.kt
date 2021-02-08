@@ -1,6 +1,6 @@
 package com.soyle.stories.location.locationDetails.presenters
 
-import com.soyle.stories.entities.LocationRenamed
+import com.soyle.stories.domain.location.LocationRenamed
 import com.soyle.stories.location.locationDetails.LocationDetailsView
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 

@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.removeCharacterAsOpponent
 
-import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.CharacterRemovedAsOpponent
+import com.soyle.stories.usecase.theme.removeCharacterAsOpponent.CharacterRemovedAsOpponent
 
 interface CharacterRemovedAsOpponentReceiver {
 

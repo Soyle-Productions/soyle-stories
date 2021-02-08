@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.removeCharacterAsOpponent
 
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.removeCharacterAsOpponent.RemoveCharacterAsOpponent
+import com.soyle.stories.usecase.theme.removeCharacterAsOpponent.RemoveCharacterAsOpponent
 import java.util.*
 
 class RemoveCharacterAsOpponentControllerImpl(

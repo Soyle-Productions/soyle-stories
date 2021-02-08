@@ -1,11 +1,18 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArcSection
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.prose.ProseContent
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.theme.Symbol
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.prose.editProse.EditProseController
@@ -14,9 +21,9 @@ import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneCo
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
-import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
+import com.soyle.stories.usecase.scene.SceneRepository
 import kotlinx.coroutines.runBlocking
 
 class SceneDriver private constructor(private val projectScope: ProjectScope) {

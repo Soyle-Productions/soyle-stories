@@ -1,7 +1,7 @@
 package com.soyle.stories.writer.usecases.getDialogPreferences
 
 import com.soyle.stories.writer.DialogType
-import com.soyle.stories.writer.repositories.WriterRepository
+import com.soyle.stories.usecase.writer.WriterRepository
 import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.getWriter
 import com.soyle.stories.writer.usecases.getWriterPreferenceFor

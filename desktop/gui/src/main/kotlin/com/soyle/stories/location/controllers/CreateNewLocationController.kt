@@ -1,7 +1,7 @@
 package com.soyle.stories.location.controllers
 
-import com.soyle.stories.common.SingleNonBlankLine
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
+import com.soyle.stories.domain.validation.SingleNonBlankLine
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
 
 class CreateNewLocationController(
   private val createNewLocation: CreateNewLocation,

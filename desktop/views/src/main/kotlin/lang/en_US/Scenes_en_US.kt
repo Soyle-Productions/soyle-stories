@@ -1,9 +1,9 @@
 package lang.en_US
 
-import com.soyle.stories.scene.Locale
+import com.soyle.stories.domain.scene.SceneLocale
 import java.util.*
 
-class Scenes_en_US : Locale, ListResourceBundle() {
+class Scenes_en_US : SceneLocale, ListResourceBundle() {
 
 	override val sceneNameCannotBeBlank: String = "Scene name cannot be blank"
 	override val sceneDoesNotExist: String = "Scene does not exist"

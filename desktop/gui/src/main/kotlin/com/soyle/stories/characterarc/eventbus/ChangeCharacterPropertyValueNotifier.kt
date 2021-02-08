@@ -2,11 +2,10 @@ package com.soyle.stories.characterarc.eventbus
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.ThemeException
-import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
+import com.soyle.stories.usecase.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValue
 
 class ChangeCharacterPropertyValueNotifier(private val threadTransformer: ThreadTransformer) : ChangeCharacterPropertyValue.OutputPort, Notifier<ChangeCharacterPropertyValue.OutputPort>() {
-    override fun receiveChangeCharacterPropertyValueFailure(failure: ThemeException) {
+    override fun receiveChangeCharacterPropertyValueFailure(failure: Exception) {
         threadTransformer.async {
             notifyAll { it.receiveChangeCharacterPropertyValueFailure(failure) }
         }

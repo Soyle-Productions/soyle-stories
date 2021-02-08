@@ -1,9 +1,9 @@
 package com.soyle.stories.repositories
 
-import com.soyle.stories.entities.MentionedEntityId
-import com.soyle.stories.entities.Prose
-import com.soyle.stories.prose.ProseEvent
-import com.soyle.stories.prose.repositories.ProseRepository
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.prose.ProseEvent
+import com.soyle.stories.usecase.prose.ProseRepository
 
 class ProseRepositoryImpl : ProseRepository {
 

@@ -1,6 +1,6 @@
 package com.soyle.stories.character.removeCharacterFromStory
 
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.Notifier
 
 class RemoveCharacterConfirmationNotifier : Notifier<RemoveCharacterConfirmationReceiver>(), RemoveCharacterConfirmationReceiver {

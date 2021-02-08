@@ -1,10 +1,10 @@
 package com.soyle.stories.layout.doubles
 
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.entities.theme.valueWeb.ValueWeb
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.theme.Theme.oppositionValue.OppositionValue
+import com.soyle.stories.domain.theme.Theme.Symbol
+import com.soyle.stories.domain.theme.Theme.valueWeb.ValueWeb
 import com.soyle.stories.theme.repositories.ThemeRepository
 import java.util.*
 

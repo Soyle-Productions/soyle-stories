@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.components
 
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
-import com.soyle.stories.entities.CharacterRenamed
+import com.soyle.stories.domain.character.CharacterRenamed
 import com.soyle.stories.gui.View
 import java.util.*
 

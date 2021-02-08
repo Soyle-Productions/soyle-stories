@@ -1,10 +1,13 @@
 package com.soyle.stories.prose.proseEditor
 
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
-import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.theme.Symbol
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.location.createLocationDialog.createLocationDialog
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.collections.ObservableList

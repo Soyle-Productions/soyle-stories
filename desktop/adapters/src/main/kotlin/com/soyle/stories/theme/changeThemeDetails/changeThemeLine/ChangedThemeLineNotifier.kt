@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.changeThemeDetails.changeThemeLine
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangedThemeLine
+import com.soyle.stories.usecase.theme.changeThemeDetails.ChangedThemeLine
 
 class ChangedThemeLineNotifier : ChangedThemeLineReceiver, Notifier<ChangedThemeLineReceiver>() {
 

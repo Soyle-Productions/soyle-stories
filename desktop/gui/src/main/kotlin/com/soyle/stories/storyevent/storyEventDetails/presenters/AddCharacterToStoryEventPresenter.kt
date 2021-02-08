@@ -3,8 +3,8 @@ package com.soyle.stories.storyevent.storyEventDetails.presenters
 import com.soyle.stories.gui.View
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEventReceiver
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsViewModel
-import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
-import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
+import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
+import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
 import java.util.*
 
 class AddCharacterToStoryEventPresenter(

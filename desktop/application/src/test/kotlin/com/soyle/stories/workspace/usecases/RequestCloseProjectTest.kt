@@ -8,7 +8,7 @@ package com.soyle.stories.workspace.usecases
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.workspace.ProjectNotOpen
 import com.soyle.stories.workspace.entities.Workspace
 import com.soyle.stories.workspace.repositories.WorkspaceRepository

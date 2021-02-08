@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.changeCharacterPerspectiveProperty
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
-import kotlin.coroutines.coroutineContext
+import com.soyle.stories.usecase.theme.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 
 class CharacterPerspectivePropertyChangedNotifier : CharacterPerspectivePropertyChangedReceiver, Notifier<CharacterPerspectivePropertyChangedReceiver>() {
 

@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.removeOppositionFromValueWeb
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
+import com.soyle.stories.usecase.theme.removeOppositionFromValueWeb.RemoveOppositionFromValueWeb
 import java.util.*
 
 class RemoveOppositionFromValueWebControllerImpl(

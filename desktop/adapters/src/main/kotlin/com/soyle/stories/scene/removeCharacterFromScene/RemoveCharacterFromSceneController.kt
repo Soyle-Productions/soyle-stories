@@ -2,9 +2,8 @@ package com.soyle.stories.scene.removeCharacterFromScene
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
-import com.soyle.stories.storyevent.StoryEventException
-import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
+import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 
 class RemoveCharacterFromSceneController(
   private val threadTransformer: ThreadTransformer,
@@ -24,6 +23,6 @@ class RemoveCharacterFromSceneController(
 		}
 	}
 
-	override fun receiveRemoveCharacterFromStoryEventFailure(failure: StoryEventException) {}
+	override fun receiveRemoveCharacterFromStoryEventFailure(failure: Exception) {}
 
 }

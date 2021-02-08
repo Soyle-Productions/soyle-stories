@@ -4,7 +4,7 @@ import com.soyle.stories.common.editingCell
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.theme.themeList.ThemeList
 import com.sun.javafx.tk.Toolkit

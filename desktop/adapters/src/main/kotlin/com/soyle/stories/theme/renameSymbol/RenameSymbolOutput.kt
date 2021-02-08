@@ -2,7 +2,7 @@ package com.soyle.stories.theme.renameSymbol
 
 import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
 import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRenamedReceiver
-import com.soyle.stories.theme.usecases.renameSymbol.RenameSymbol
+import com.soyle.stories.usecase.theme.renameSymbol.RenameSymbol
 
 class RenameSymbolOutput(
     private val renamedSymbolReceiver: RenamedSymbolReceiver,

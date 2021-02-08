@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.changeCharacterChange
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
-import kotlin.coroutines.coroutineContext
+import com.soyle.stories.usecase.theme.changeCharacterChange.ChangedCharacterChange
 
 class ChangedCharacterChangeNotifier : ChangedCharacterChangeReceiver, Notifier<ChangedCharacterChangeReceiver>() {
 

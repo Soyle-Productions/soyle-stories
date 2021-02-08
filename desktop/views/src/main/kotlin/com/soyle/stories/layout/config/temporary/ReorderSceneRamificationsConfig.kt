@@ -1,7 +1,8 @@
 package com.soyle.stories.layout.config.temporary
 
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Scene
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.SceneLocale
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.repositories.OpenToolContext
@@ -10,10 +11,8 @@ import com.soyle.stories.layout.tools.TemporaryTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
-import com.soyle.stories.scene.Locale
-import com.soyle.stories.scene.SceneDoesNotExist
-import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamificationsScope
 import com.soyle.stories.scene.reorderSceneRamifications.ReorderSceneRamificationsScope
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import tornadofx.onChange
@@ -53,7 +52,7 @@ object ReorderSceneRamificationsConfig : ToolConfig<ReorderSceneRamifications> {
     }
 }
 
-data class ReorderSceneRamifications(val sceneId: UUID, val newIndex: Int, private val locale: Locale) : TemporaryTool() {
+data class ReorderSceneRamifications(val sceneId: UUID, val newIndex: Int, private val locale: SceneLocale) : TemporaryTool() {
     override suspend fun validate(context: OpenToolContext) {
         context.sceneRepository.getSceneById(Scene.Id(sceneId))
             ?: throw SceneDoesNotExist(locale, sceneId)

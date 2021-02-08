@@ -1,7 +1,7 @@
 package com.soyle.stories.desktop.view.scene.sceneDetails
 
-import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.CharacterArcSection
+import com.soyle.stories.domain.character.CharacterArc
+import com.soyle.stories.domain.character.CharacterArcSection
 import com.soyle.stories.scene.sceneDetails.SceneDetails
 import javafx.scene.control.CheckBox
 import javafx.scene.control.CustomMenuItem

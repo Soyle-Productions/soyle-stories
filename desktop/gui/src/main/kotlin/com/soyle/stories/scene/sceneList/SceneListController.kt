@@ -1,14 +1,14 @@
 package com.soyle.stories.scene.sceneList
 
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.Prose
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.reorderScene.ReorderSceneController
-import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
-import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
+import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
+import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 import java.util.*
 
 class SceneListController(

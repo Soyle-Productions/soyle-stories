@@ -1,18 +1,18 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.entities.*
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.prose.ContentReplaced
+import com.soyle.stories.domain.scene.*
+import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.gui.View
 import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.prose.ContentReplaced
 import com.soyle.stories.prose.editProse.ContentReplacedReceiver
 import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneController
 import com.soyle.stories.scene.trackSymbolInScene.DetectUnusedSymbolsInSceneController
 import com.soyle.stories.scene.trackSymbolInScene.ListAvailableSymbolsToTrackInSceneController
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
 import com.soyle.stories.scene.trackSymbolInScene.UnpinSymbolFromSceneController
-import com.soyle.stories.scene.usecases.trackSymbolInScene.DetectUnusedSymbolsInScene
-import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
+import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.theme.changeThemeDetails.RenamedTheme
 import java.util.*
 
 class SymbolsInSceneController(

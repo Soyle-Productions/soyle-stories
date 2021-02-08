@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.removeCharacterFromComparison
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison
+import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemoveCharacterFromComparison
 import java.util.*
 
 class RemoveCharacterFromComparisonControllerImpl(

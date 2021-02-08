@@ -1,9 +1,9 @@
 package com.soyle.stories.desktop.view.character.characterList
 
 import com.soyle.stories.characterarc.characterList.CharacterList
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArc
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArc
+import com.soyle.stories.domain.theme.Theme
 import org.junit.jupiter.api.Assertions.assertEquals
 
 class CharacterListAssertions private constructor(private val driver: CharacterListDriver){

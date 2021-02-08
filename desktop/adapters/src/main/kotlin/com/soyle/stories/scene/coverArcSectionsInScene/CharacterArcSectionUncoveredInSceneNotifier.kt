@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.coverArcSectionsInScene
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CharacterArcSectionUncoveredInScene
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CharacterArcSectionUncoveredInScene
 
 class CharacterArcSectionUncoveredInSceneNotifier : CharacterArcSectionUncoveredInSceneReceiver, Notifier<CharacterArcSectionUncoveredInSceneReceiver>() {
 

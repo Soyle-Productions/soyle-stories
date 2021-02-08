@@ -1,6 +1,6 @@
 package com.soyle.stories.layout.usecases
 
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.layout.doubles.LayoutRepositoryDouble
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Window

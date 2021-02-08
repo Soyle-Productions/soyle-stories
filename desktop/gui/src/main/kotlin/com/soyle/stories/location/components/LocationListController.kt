@@ -1,7 +1,7 @@
 package com.soyle.stories.location.components
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.usecase.location.listAllLocations.ListAllLocations
 
 class LocationListController(
   threadTransformer: ThreadTransformer,

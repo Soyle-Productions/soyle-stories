@@ -1,7 +1,7 @@
 package com.soyle.stories.theme
 
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.theme.Symbol
+import com.soyle.stories.domain.theme.Theme.Symbol
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble

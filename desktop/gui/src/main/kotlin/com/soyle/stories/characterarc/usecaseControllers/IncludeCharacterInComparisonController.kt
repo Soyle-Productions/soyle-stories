@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.usecaseControllers
 
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.IncludeCharacterInComparison
 import java.util.*
 
 class IncludeCharacterInComparisonController(

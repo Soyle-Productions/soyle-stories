@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation
 
-import com.soyle.stories.theme.usecases.changeThemeDetails.ChangedThematicRevelation
+import com.soyle.stories.usecase.theme.changeThemeDetails.ChangedThematicRevelation
 
 interface ChangedThematicRevelationReceiver {
 

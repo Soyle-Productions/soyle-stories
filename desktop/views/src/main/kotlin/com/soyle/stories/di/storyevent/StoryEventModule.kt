@@ -24,20 +24,20 @@ import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacte
 import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventController
 import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventControllerImpl
 import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventNotifier
-import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEvent
-import com.soyle.stories.storyevent.usecases.addCharacterToStoryEvent.AddCharacterToStoryEventUseCase
-import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEvent
-import com.soyle.stories.storyevent.usecases.createStoryEvent.CreateStoryEventUseCase
-import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
-import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetailsUseCase
-import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
-import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEventUseCase
-import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEvents
-import com.soyle.stories.storyevent.usecases.listAllStoryEvents.ListAllStoryEventsUseCase
-import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
-import com.soyle.stories.storyevent.usecases.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventUseCase
-import com.soyle.stories.storyevent.usecases.renameStoryEvent.RenameStoryEvent
-import com.soyle.stories.storyevent.usecases.renameStoryEvent.RenameStoryEventUseCase
+import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
+import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventUseCase
+import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEventUseCase
+import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetails
+import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetailsUseCase
+import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEvent
+import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventUseCase
+import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
+import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEventsUseCase
+import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
+import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventUseCase
+import com.soyle.stories.usecase.storyevent.renameStoryEvent.RenameStoryEvent
+import com.soyle.stories.usecase.storyevent.renameStoryEvent.RenameStoryEventUseCase
 
 object StoryEventModule {
 

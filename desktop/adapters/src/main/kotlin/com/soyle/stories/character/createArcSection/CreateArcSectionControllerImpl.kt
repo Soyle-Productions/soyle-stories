@@ -1,7 +1,7 @@
 package com.soyle.stories.character.createArcSection
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
+import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
 import kotlinx.coroutines.runBlocking
 import java.util.*
 

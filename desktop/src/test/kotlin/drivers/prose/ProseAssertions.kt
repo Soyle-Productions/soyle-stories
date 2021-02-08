@@ -2,7 +2,7 @@ package com.soyle.stories.desktop.config.drivers.prose
 
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.entities.Prose
+import com.soyle.stories.domain.prose.Prose
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 

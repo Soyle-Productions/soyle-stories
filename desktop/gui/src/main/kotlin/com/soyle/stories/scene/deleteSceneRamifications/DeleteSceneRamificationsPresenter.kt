@@ -1,16 +1,16 @@
 package com.soyle.stories.scene.deleteSceneRamifications
 
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.DeleteCharacterPresenter
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.DeleteScenePresenter
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.Invalidater
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
-import com.soyle.stories.scene.usecases.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
-import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
+import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 
 class DeleteSceneRamificationsPresenter(
   private val view: View.Nullable<DeleteSceneRamificationsViewModel>,

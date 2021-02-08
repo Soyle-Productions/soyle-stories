@@ -1,7 +1,7 @@
 package com.soyle.stories.characterarc.baseStoryStructure.presenters
 
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureViewModel
-import com.soyle.stories.entities.LocationRenamed
+import com.soyle.stories.domain.location.LocationRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver

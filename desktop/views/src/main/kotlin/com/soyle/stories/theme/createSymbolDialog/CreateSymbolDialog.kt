@@ -4,10 +4,11 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeNotifier
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
-import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
+import com.soyle.stories.usecase.theme.addSymbolToTheme.SymbolAddedToTheme
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Orientation
@@ -160,10 +161,21 @@ class CreateSymbolDialog : Fragment() {
 
     private fun createSymbol() {
         val themeId = this.themeId.get()
+        val nonBlankSymbolName = NonBlankString.create(symbolName.get())
+        val nonBlankThemeName = NonBlankString.create(themeName.get())
         if (selectingExistingTheme.get()) {
             if (themeId != null) {
-                awaitNewSymbol()
-                viewListener.createSymbol(themeId, symbolName.get())
+                if (nonBlankSymbolName != null) {
+                    awaitNewSymbol()
+                    viewListener.createSymbol(themeId, nonBlankSymbolName)
+                } else {
+                    model.updateOrInvalidated {
+                        copy(
+                            errorMessage = "Symbol name cannot be blank",
+                            errorCause = "SymbolName"
+                        )
+                    }
+                }
             } else {
                 model.updateOrInvalidated {
                     copy(
@@ -173,8 +185,17 @@ class CreateSymbolDialog : Fragment() {
                 }
             }
         } else {
-            awaitNewSymbol()
-            viewListener.createThemeAndSymbol(themeName.get(), symbolName.get())
+            if (nonBlankSymbolName != null && nonBlankThemeName != null) {
+                awaitNewSymbol()
+                viewListener.createThemeAndSymbol(nonBlankThemeName, nonBlankSymbolName)
+            } else {
+                model.updateOrInvalidated {
+                    copy(
+                        errorMessage = "Name cannot be blank",
+                        errorCause = if (nonBlankSymbolName == null) "SymbolName" else "ThemeName"
+                    )
+                }
+            }
         }
     }
 

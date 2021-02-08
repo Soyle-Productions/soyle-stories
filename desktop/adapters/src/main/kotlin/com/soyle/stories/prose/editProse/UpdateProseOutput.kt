@@ -1,6 +1,6 @@
 package com.soyle.stories.prose.editProse
 
-import com.soyle.stories.prose.usecases.updateProse.UpdateProse
+import com.soyle.stories.usecase.prose.updateProse.UpdateProse
 
 class UpdateProseOutput(
     private val contentReplacedReceiver: ContentReplacedReceiver

@@ -1,10 +1,10 @@
 package com.soyle.stories.layout.repositories
 
-import com.soyle.stories.character.repositories.CharacterRepository
-import com.soyle.stories.location.repositories.LocationRepository
-import com.soyle.stories.scene.repositories.SceneRepository
-import com.soyle.stories.storyevent.repositories.StoryEventRepository
-import com.soyle.stories.theme.repositories.ThemeRepository
+import com.soyle.stories.usecase.character.CharacterRepository
+import com.soyle.stories.usecase.location.LocationRepository
+import com.soyle.stories.usecase.scene.SceneRepository
+import com.soyle.stories.usecase.storyevent.StoryEventRepository
+import com.soyle.stories.usecase.theme.ThemeRepository
 
 interface OpenToolContext {
 	val characterRepository: CharacterRepository

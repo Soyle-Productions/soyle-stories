@@ -1,9 +1,8 @@
 package com.soyle.stories.scene.sceneList.presenters
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.SceneException
 import com.soyle.stories.scene.sceneList.SceneListViewModel
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 
 class DeleteScenePresenter(
   private val view: View.Nullable<SceneListViewModel>
@@ -23,5 +22,5 @@ class DeleteScenePresenter(
 		}
 	}
 
-	override fun receiveDeleteSceneFailure(failure: SceneException) {}
+	override fun receiveDeleteSceneFailure(failure: Exception) {}
 }

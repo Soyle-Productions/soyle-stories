@@ -1,7 +1,7 @@
 package com.soyle.stories.project.startNewProject
 
 import com.soyle.stories.project.openProject.OpenProjectController
-import com.soyle.stories.project.usecases.startNewProject.StartNewProject
+import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 
 class StartNewProjectOutput(
     private val projectStartedReceiver: ProjectStartedReceiver,

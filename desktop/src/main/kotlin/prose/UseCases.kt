@@ -17,18 +17,18 @@ import com.soyle.stories.prose.readProse.ReadProseController
 import com.soyle.stories.prose.readProse.ReadProseControllerImpl
 import com.soyle.stories.prose.textInsertedIntoProse.TextInsertedIntoProseNotifier
 import com.soyle.stories.prose.textInsertedIntoProse.TextInsertedIntoProseReceiver
-import com.soyle.stories.prose.usecases.bulkUpdateProse.BulkUpdateProse
-import com.soyle.stories.prose.usecases.bulkUpdateProse.BulkUpdateProseUseCase
-import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentions
-import com.soyle.stories.prose.usecases.detectInvalidMentions.DetectInvalidatedMentionsUseCase
-import com.soyle.stories.prose.usecases.readProse.ReadProse
-import com.soyle.stories.prose.usecases.readProse.ReadProseUseCase
-import com.soyle.stories.prose.usecases.updateProse.UpdateProse
-import com.soyle.stories.prose.usecases.updateProse.UpdateProseUseCase
+import com.soyle.stories.usecase.prose.bulkUpdateProse.BulkUpdateProse
+import com.soyle.stories.usecase.prose.bulkUpdateProse.BulkUpdateProseUseCase
+import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
+import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentionsUseCase
+import com.soyle.stories.usecase.prose.readProse.ReadProse
+import com.soyle.stories.usecase.prose.readProse.ReadProseUseCase
+import com.soyle.stories.usecase.prose.updateProse.UpdateProse
+import com.soyle.stories.usecase.prose.updateProse.UpdateProseUseCase
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionControllerImpl
-import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInScene
-import com.soyle.stories.scene.usecases.getStoryElementsToMention.GetStoryElementsToMentionInSceneUseCase
+import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInSceneUseCase
 
 object UseCases {
 

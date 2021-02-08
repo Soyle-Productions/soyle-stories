@@ -1,8 +1,8 @@
 package com.soyle.stories.characterarc.baseStoryStructure
 
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueReceiver
-import com.soyle.stories.characterarc.usecases.viewBaseStoryStructure.ViewBaseStoryStructure
-import com.soyle.stories.location.usecases.listAllLocations.ListAllLocations
+import com.soyle.stories.usecase.character.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.usecase.location.listAllLocations.ListAllLocations
 
 interface BaseStoryStructureEventReceiver  : ViewBaseStoryStructure.OutputPort, ListAllLocations.OutputPort,
     ChangedCharacterArcSectionValueReceiver

@@ -1,18 +1,16 @@
 package com.soyle.stories.theme.createSymbolDialog
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.ThemeNameCannotBeBlank
 import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeReceiver
 import com.soyle.stories.theme.createTheme.CreatedThemeReceiver
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
-import com.soyle.stories.theme.usecases.SymbolNameCannotBeBlank
-import com.soyle.stories.theme.usecases.addSymbolToTheme.SymbolAddedToTheme
-import com.soyle.stories.theme.usecases.changeThemeDetails.RenamedTheme
-import com.soyle.stories.theme.usecases.createTheme.CreatedTheme
-import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
-import com.soyle.stories.theme.usecases.listThemes.ListThemes
-import com.soyle.stories.theme.usecases.listThemes.ThemeList
+import com.soyle.stories.usecase.theme.addSymbolToTheme.SymbolAddedToTheme
+import com.soyle.stories.usecase.theme.changeThemeDetails.RenamedTheme
+import com.soyle.stories.usecase.theme.createTheme.CreatedTheme
+import com.soyle.stories.usecase.theme.deleteTheme.DeletedTheme
+import com.soyle.stories.usecase.theme.listThemes.ListThemes
+import com.soyle.stories.usecase.theme.listThemes.ThemeList
 
 class CreateSymbolDialogPresenter(
     private val view: View.Nullable<CreateSymbolDialogViewModel>
@@ -66,17 +64,9 @@ class CreateSymbolDialogPresenter(
     internal fun presentError(t: Throwable) {
         view.updateOrInvalidated {
             copy(
-                errorMessage = when (t) {
-                    is ThemeNameCannotBeBlank -> "Theme name cannot be blank"
-                    is SymbolNameCannotBeBlank -> "Symbol name cannot be blank"
-                    else -> t.localizedMessage?.takeUnless { it.isBlank() }
-                        ?: "Something went wrong: ${t::class.simpleName}"
-                },
-                errorCause = when (t) {
-                    is ThemeNameCannotBeBlank -> "ThemeName"
-                    is SymbolNameCannotBeBlank -> "SymbolName"
-                    else -> null
-                }
+                errorMessage = t.localizedMessage?.takeUnless { it.isBlank() }
+                    ?: "Something went wrong: ${t::class.simpleName}",
+                errorCause = null
             )
         }
     }

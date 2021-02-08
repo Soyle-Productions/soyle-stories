@@ -1,22 +1,21 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
 import com.soyle.stories.character.characterList.CharacterListListener
-import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
-import com.soyle.stories.entities.CharacterRenamed
+import com.soyle.stories.domain.character.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LocationListListener
-import com.soyle.stories.location.usecases.listAllLocations.LocationItem
-import com.soyle.stories.storyevent.StoryEventException
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEventReceiver
 import com.soyle.stories.storyevent.storyEventDetails.presenters.AddCharacterToStoryEventPresenter
 import com.soyle.stories.storyevent.storyEventDetails.presenters.LinkLocationToStoryEventPresenter
-import com.soyle.stories.storyevent.usecases.getStoryEventDetails.GetStoryEventDetails
-import com.soyle.stories.storyevent.usecases.linkLocationToStoryEvent.LinkLocationToStoryEvent
+import com.soyle.stories.usecase.character.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.usecase.location.listAllLocations.LocationItem
+import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetails
+import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEvent
 import java.util.*
 
 class StoryEventDetailsPresenter(
@@ -137,7 +136,7 @@ class StoryEventDetailsPresenter(
 		}
 	}
 
-	override fun receiveGetStoryEventDetailsFailure(failure: StoryEventException) {
+	override fun receiveGetStoryEventDetailsFailure(failure: Exception) {
 
 	}
 

@@ -4,7 +4,7 @@ import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.view.location.deleteLocationDialog.DeleteLocationDialogDriver
 import com.soyle.stories.desktop.view.location.locationList.drive
 import com.soyle.stories.desktop.view.location.locationList.driver
-import com.soyle.stories.entities.Location
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialog
 import com.soyle.stories.location.locationList.LocationList
 import tornadofx.uiComponent

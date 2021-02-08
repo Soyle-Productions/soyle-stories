@@ -1,27 +1,26 @@
 package com.soyle.stories.repositories
 
-import com.soyle.stories.characterarc.repositories.ThemeRepository
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
-import com.soyle.stories.entities.theme.valueWeb.ValueWeb
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.theme.Symbol
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.theme.oppositionValue.OppositionValue
+import com.soyle.stories.domain.theme.valueWeb.ValueWeb
+import com.soyle.stories.usecase.theme.ThemeRepository
 import java.util.*
 
-class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositories.ThemeRepository, com.soyle.stories.character.repositories.ThemeRepository {
+class ThemeRepositoryImpl : ThemeRepository {
 
 	val themes = mutableMapOf<Theme.Id, Theme>()
 	private val themesBySymbolId = mutableMapOf<Symbol.Id, Theme.Id>()
 
-	override suspend fun addNewTheme(theme: Theme) {
+	override suspend fun addTheme(theme: Theme) {
 		themes[theme.id] = theme
 		theme.symbols.forEach {
 			themesBySymbolId[it.id] = theme.id
 		}
 	}
 
-	override suspend fun addTheme(theme: Theme) = addNewTheme(theme)
 
 	override suspend fun getThemeContainingSymbolWithId(symbolId: Symbol.Id): Theme? {
 		return themesBySymbolId[symbolId]?.let { themes[it] }
@@ -36,7 +35,6 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 	}
 
 	override suspend fun getThemeById(id: Theme.Id): Theme? = themes[id]
-	override suspend fun listAllThemesInProject(projectId: Project.Id): List<Theme> = listThemesInProject(projectId)
 
 	override suspend fun updateTheme(theme: Theme) {
 		deleteTheme(theme)
@@ -57,12 +55,6 @@ class ThemeRepositoryImpl : ThemeRepository, com.soyle.stories.theme.repositorie
 
 	override suspend fun listThemesInProject(projectId: Project.Id): List<Theme> {
 		return themes.values.filter { it.projectId == projectId }
-	}
-
-	override suspend fun deleteThemes(themes: List<Theme>) {
-		themes.forEach {
-			deleteTheme(it)
-		}
 	}
 
 	override suspend fun deleteTheme(theme: Theme) {

@@ -1,7 +1,7 @@
 package com.soyle.stories.storyevent.renameStoryEvent
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.storyevent.usecases.renameStoryEvent.RenameStoryEvent
+import com.soyle.stories.usecase.storyevent.renameStoryEvent.RenameStoryEvent
 import java.util.*
 
 class RenameStoryEventControllerImpl(

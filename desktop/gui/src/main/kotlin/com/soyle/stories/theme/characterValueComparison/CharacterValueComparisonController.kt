@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.characterValueComparison
 
-import com.soyle.stories.character.usecases.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
+import com.soyle.stories.usecase.character.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.theme.addSymbolicItemToOpposition.AddSymbolicItemToOppositionController
@@ -8,9 +8,8 @@ import com.soyle.stories.theme.changeCharacterPropertyValue.ChangeCharacterPrope
 import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInComparisonController
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonController
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemController
-import com.soyle.stories.theme.usecases.compareCharacterValues.CompareCharacterValues
-import com.soyle.stories.theme.usecases.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison
+import com.soyle.stories.usecase.theme.compareCharacterValues.CompareCharacterValues
+import com.soyle.stories.usecase.theme.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
 import java.util.*
 
 class CharacterValueComparisonController(

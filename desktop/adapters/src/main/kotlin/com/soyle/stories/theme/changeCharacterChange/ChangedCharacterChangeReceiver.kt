@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.changeCharacterChange
 
-import com.soyle.stories.theme.usecases.changeCharacterChange.ChangedCharacterChange
+import com.soyle.stories.usecase.theme.changeCharacterChange.ChangedCharacterChange
 
 interface ChangedCharacterChangeReceiver {
 

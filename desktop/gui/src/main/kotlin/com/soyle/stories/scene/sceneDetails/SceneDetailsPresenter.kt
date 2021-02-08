@@ -7,17 +7,16 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LiveLocationList
 import com.soyle.stories.location.locationList.LocationListListener
-import com.soyle.stories.location.usecases.listAllLocations.LocationItem
-import com.soyle.stories.scene.SceneException
+import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 import com.soyle.stories.scene.sceneDetails.includedCharacter.CoveredArcSectionViewModel
 import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterInScenePresenter
 import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterInSceneViewModel
 import com.soyle.stories.scene.sceneDetails.includedCharacter.PreviousMotivation
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewModel
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
-import com.soyle.stories.scene.usecases.getSceneDetails.GetSceneDetails
-import com.soyle.stories.scene.usecases.linkLocationToScene.LinkLocationToScene
-import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
+import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetails
+import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
+import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import java.util.*
 
 class SceneDetailsPresenter(
@@ -169,6 +168,6 @@ class SceneDetailsPresenter(
     }
 
     override fun failedToReorderScene(failure: Exception) {}
-    override fun receiveDeleteSceneFailure(failure: SceneException) {}
+    override fun receiveDeleteSceneFailure(failure: Exception) {}
 
 }

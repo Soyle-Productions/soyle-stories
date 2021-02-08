@@ -2,7 +2,7 @@ package com.soyle.stories.character.usecases.unlinkLocationFromCharacterArcSecti
 
 import com.soyle.stories.characterarc.CharacterArcException
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
-import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.common.ThreadTransformer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

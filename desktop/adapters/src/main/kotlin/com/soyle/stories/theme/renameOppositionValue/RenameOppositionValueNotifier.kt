@@ -1,9 +1,8 @@
 package com.soyle.stories.theme.renameOppositionValue
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.entities.theme.oppositionValue.RenamedOppositionValue
-import com.soyle.stories.theme.usecases.renameOppositionValue.RenameOppositionValue
-import kotlin.coroutines.coroutineContext
+import com.soyle.stories.domain.theme.oppositionValue.RenamedOppositionValue
+import com.soyle.stories.usecase.theme.renameOppositionValue.RenameOppositionValue
 
 class RenameOppositionValueNotifier : Notifier<RenameOppositionValue.OutputPort>(), RenameOppositionValue.OutputPort {
 

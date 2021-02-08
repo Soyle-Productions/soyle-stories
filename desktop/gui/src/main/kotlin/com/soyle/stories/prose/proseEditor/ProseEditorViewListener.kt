@@ -1,6 +1,6 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.common.NonBlankString
+import com.soyle.stories.domain.validation.NonBlankString
 
 interface ProseEditorViewListener {
     fun getValidState()

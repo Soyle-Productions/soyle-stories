@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.createThemeDialog
 
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.createTheme.CreateThemeController
 
 class CreateThemeDialogController(
@@ -11,7 +12,7 @@ class CreateThemeDialogController(
         presenter.presentDialog()
     }
 
-    override fun createTheme(name: String) {
+    override fun createTheme(name: NonBlankString) {
         createThemeController.createTheme(name) {
             presenter.presentError(it)
         }

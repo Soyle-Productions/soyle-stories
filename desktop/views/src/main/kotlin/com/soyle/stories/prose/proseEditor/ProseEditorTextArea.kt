@@ -1,6 +1,6 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.entities.MentionedEntityId
+import com.soyle.stories.domain.prose.MentionedEntityId
 import com.soyle.stories.prose.proseEditor.ProseEditorView.Styles.Companion.mention
 import com.soyle.stories.prose.proseEditor.ProseEditorView.Styles.Companion.problem
 import com.soyle.stories.prose.proseEditor.ProseEditorView.Styles.Companion.proseEditorTextArea

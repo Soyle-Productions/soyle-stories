@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.trackSymbolInScene
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.entities.SymbolPinnedToScene
+import com.soyle.stories.domain.scene.SymbolPinnedToScene
 
 class SymbolPinnedToSceneNotifier : Notifier<SymbolPinnedToSceneReceiver>(), SymbolPinnedToSceneReceiver {
     override suspend fun receiveSymbolPinnedToScene(symbolPinnedToScene: SymbolPinnedToScene) {

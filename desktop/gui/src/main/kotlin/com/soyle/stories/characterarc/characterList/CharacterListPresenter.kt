@@ -2,18 +2,18 @@ package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.character.characterList.LiveCharacterList
-import com.soyle.stories.character.usecases.buildNewCharacter.CreatedCharacter
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.usecase.character.buildNewCharacter.CreatedCharacter
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.characterarc.planNewCharacterArc.CreatedCharacterArcReceiver
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.CharacterArcsByCharacter
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
-import com.soyle.stories.characterarc.usecases.planNewCharacterArc.CreatedCharacterArc
-import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.entities.CharacterRenamed
+import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterArcsByCharacter
+import com.soyle.stories.usecase.character.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.usecase.character.planNewCharacterArc.CreatedCharacterArc
+import com.soyle.stories.usecase.character.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.domain.character.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.CharacterIncludedInTheme
+import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.CharacterIncludedInTheme
 
 class CharacterListPresenter(
     private val view: View.Nullable<CharacterListViewModel>,

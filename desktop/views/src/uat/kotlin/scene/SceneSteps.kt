@@ -8,9 +8,9 @@ import com.soyle.stories.character.CreateArcSectionDialogViewAssert.Companion.as
 import com.soyle.stories.character.getCreateArcSectionDialogOrError
 import com.soyle.stories.characterarc.createArcSectionDialog.SectionTypeOption
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.CharacterArcSection
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArcSection
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectScope

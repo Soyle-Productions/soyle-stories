@@ -1,11 +1,9 @@
-package com.soyle.stories.desktop.view.scene.sceneSymbols
+package com.soyle.stories.scene.sceneSymbols
 
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
-import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.theme.Symbol
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.pinned
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.unused
 import javafx.scene.Node

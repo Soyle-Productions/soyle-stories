@@ -1,8 +1,8 @@
 package com.soyle.stories.character.removeCharacterFromStory
 
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.entities.Character
+import com.soyle.stories.domain.character.Character
 import java.util.*
 
 class RemoveCharacterFromStoryControllerImpl(

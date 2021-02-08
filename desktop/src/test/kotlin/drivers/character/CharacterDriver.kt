@@ -3,15 +3,19 @@ package com.soyle.stories.desktop.config.drivers.character
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
-import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.*
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArc
+import com.soyle.stories.domain.character.CharacterArcSection
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.theme.repositories.CharacterArcRepository
+import com.soyle.stories.usecase.character.CharacterArcRepository
+import com.soyle.stories.usecase.character.CharacterRepository
 import kotlinx.coroutines.runBlocking
 
 class CharacterDriver private constructor(private val projectScope: ProjectScope) {

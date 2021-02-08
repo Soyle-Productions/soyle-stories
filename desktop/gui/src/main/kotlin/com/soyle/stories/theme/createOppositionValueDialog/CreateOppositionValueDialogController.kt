@@ -1,5 +1,6 @@
 package com.soyle.stories.theme.createOppositionValueDialog
 
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 
 class CreateOppositionValueDialogController(
@@ -11,7 +12,7 @@ class CreateOppositionValueDialogController(
         presenter.presentDialog()
     }
 
-    override fun createOppositionValue(valueWebId: String, name: String, linkedCharacterId: String) {
+    override fun createOppositionValue(valueWebId: String, name: NonBlankString, linkedCharacterId: String) {
         addOppositionToValueWebController.addOppositionWithCharacter(valueWebId, name, linkedCharacterId)
     }
 

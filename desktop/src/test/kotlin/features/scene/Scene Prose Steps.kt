@@ -7,9 +7,9 @@ import com.soyle.stories.desktop.config.drivers.theme.createSymbolAndThemeNamed
 import com.soyle.stories.desktop.config.drivers.theme.createSymbolWithName
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.mentioned
+import com.soyle.stories.domain.prose.mentioned
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.scene.sceneList.SceneListView
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En

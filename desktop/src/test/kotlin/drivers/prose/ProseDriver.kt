@@ -1,17 +1,17 @@
 package com.soyle.stories.desktop.config.drivers.prose
 
-import com.soyle.stories.common.SingleLine
-import com.soyle.stories.common.countLines
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.entities.*
+import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.validation.SingleLine
+import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.prose.ProseDoesNotExist
 import com.soyle.stories.prose.editProse.EditProseController
 import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.prose.proseEditor.ProseEditorState
-import com.soyle.stories.prose.repositories.ProseRepository
+import com.soyle.stories.usecase.prose.ProseDoesNotExist
+import com.soyle.stories.usecase.prose.ProseRepository
 import kotlinx.coroutines.runBlocking
 
 class ProseDriver private constructor(private val projectScope: ProjectScope) {

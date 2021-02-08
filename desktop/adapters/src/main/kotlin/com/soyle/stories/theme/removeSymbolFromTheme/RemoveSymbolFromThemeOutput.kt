@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.removeSymbolFromTheme
 
 import com.soyle.stories.scene.trackSymbolInScene.TrackedSymbolsRemovedReceiver
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
+import com.soyle.stories.usecase.theme.removeSymbolFromTheme.RemoveSymbolFromTheme
 
 class RemoveSymbolFromThemeOutput(
     private val symbolRemovedFromThemeReceiver: SymbolRemovedFromThemeReceiver,

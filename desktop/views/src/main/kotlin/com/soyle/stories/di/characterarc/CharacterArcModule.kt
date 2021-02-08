@@ -8,10 +8,6 @@ import com.soyle.stories.character.createArcSection.CreatedCharacterArcSectionRe
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryControllerImpl
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.character.usecases.buildNewCharacter.BuildNewCharacterUseCase
-import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacter
-import com.soyle.stories.character.usecases.createPerspectiveCharacter.CreatePerspectiveCharacterUseCase
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogPresenter
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
@@ -30,20 +26,6 @@ import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.Unli
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
 import com.soyle.stories.characterarc.usecaseControllers.ChangeThematicSectionValueController
 import com.soyle.stories.characterarc.usecaseControllers.PromoteMinorCharacterController
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
-import com.soyle.stories.characterarc.usecases.changeCharacterArcSectionValue.ChangeCharacterArcSectionValueUseCase
-import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArc
-import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeleteCharacterArcUseCase
-import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
-import com.soyle.stories.characterarc.usecases.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionUseCase
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcsUseCase
-import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArc
-import com.soyle.stories.characterarc.usecases.planNewCharacterArc.PlanNewCharacterArcUseCase
-import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArcUseCase
-import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
-import com.soyle.stories.characterarc.usecases.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionUseCase
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -55,24 +37,42 @@ import com.soyle.stories.theme.includeCharacterInTheme.IncludeCharacterInCompari
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonController
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonControllerImpl
 import com.soyle.stories.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonOutput
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
-import com.soyle.stories.theme.usecases.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValueUseCase
-import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValue
-import com.soyle.stories.theme.usecases.changeCharacterPropertyValue.ChangeCharacterPropertyValueUseCase
-import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunction
-import com.soyle.stories.theme.usecases.changeStoryFunction.ChangeStoryFunctionUseCase
-import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValue
-import com.soyle.stories.theme.usecases.changeThematicSectionValue.ChangeThematicSectionValueUseCase
-import com.soyle.stories.theme.usecases.compareCharacters.CompareCharacters
-import com.soyle.stories.theme.usecases.compareCharacters.CompareCharactersUseCase
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacterUseCase
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparison
-import com.soyle.stories.theme.usecases.includeCharacterInComparison.IncludeCharacterInComparisonUseCase
-import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacter
-import com.soyle.stories.theme.usecases.promoteMinorCharacter.PromoteMinorCharacterUseCase
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparison
-import com.soyle.stories.theme.usecases.removeCharacterFromComparison.RemoveCharacterFromComparisonUseCase
+import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacter
+import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacterUseCase
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
+import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterArcSectionValueUseCase
+import com.soyle.stories.usecase.character.createPerspectiveCharacter.CreatePerspectiveCharacter
+import com.soyle.stories.usecase.character.createPerspectiveCharacter.CreatePerspectiveCharacterUseCase
+import com.soyle.stories.usecase.character.deleteCharacterArc.DeleteCharacterArc
+import com.soyle.stories.usecase.character.deleteCharacterArc.DeleteCharacterArcUseCase
+import com.soyle.stories.usecase.character.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
+import com.soyle.stories.usecase.character.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSectionUseCase
+import com.soyle.stories.usecase.character.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.usecase.character.listAllCharacterArcs.ListAllCharacterArcsUseCase
+import com.soyle.stories.usecase.character.planNewCharacterArc.PlanNewCharacterArc
+import com.soyle.stories.usecase.character.planNewCharacterArc.PlanNewCharacterArcUseCase
+import com.soyle.stories.usecase.character.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.usecase.character.renameCharacterArc.RenameCharacterArcUseCase
+import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionUseCase
+import com.soyle.stories.usecase.theme.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
+import com.soyle.stories.usecase.theme.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValueUseCase
+import com.soyle.stories.usecase.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValue
+import com.soyle.stories.usecase.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValueUseCase
+import com.soyle.stories.usecase.theme.changeStoryFunction.ChangeStoryFunction
+import com.soyle.stories.usecase.theme.changeStoryFunction.ChangeStoryFunctionUseCase
+import com.soyle.stories.usecase.theme.changeThematicSectionValue.ChangeThematicSectionValue
+import com.soyle.stories.usecase.theme.changeThematicSectionValue.ChangeThematicSectionValueUseCase
+import com.soyle.stories.usecase.theme.compareCharacters.CompareCharacters
+import com.soyle.stories.usecase.theme.compareCharacters.CompareCharactersUseCase
+import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
+import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacterUseCase
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.IncludeCharacterInComparison
+import com.soyle.stories.usecase.theme.includeCharacterInComparison.IncludeCharacterInComparisonUseCase
+import com.soyle.stories.usecase.theme.promoteMinorCharacter.PromoteMinorCharacter
+import com.soyle.stories.usecase.theme.promoteMinorCharacter.PromoteMinorCharacterUseCase
+import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemoveCharacterFromComparison
+import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemoveCharacterFromComparisonUseCase
 
 object CharacterArcModule {
 
@@ -96,7 +96,7 @@ object CharacterArcModule {
             PromoteMinorCharacterUseCase(get(), get())
         }
         provide<DemoteMajorCharacter> {
-            DemoteMajorCharacterUseCase(get())
+            DemoteMajorCharacterUseCase(get(), get())
         }
         provide<DeleteCharacterArc> {
             DeleteCharacterArcUseCase(get())

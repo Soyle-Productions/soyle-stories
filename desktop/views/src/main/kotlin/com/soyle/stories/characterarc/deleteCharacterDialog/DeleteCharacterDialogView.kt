@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.deleteCharacterDialog
 
-import com.soyle.stories.character.usecases.removeCharacterFromStory.RemoveCharacterFromStory
+import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope

@@ -2,13 +2,13 @@ package com.soyle.stories.desktop.config.drivers.scene
 
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
-import com.soyle.stories.desktop.view.scene.sceneSymbols.drive
-import com.soyle.stories.desktop.view.scene.sceneSymbols.driver
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Scene
-import com.soyle.stories.entities.Theme
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView
+import com.soyle.stories.scene.sceneSymbols.drive
+import com.soyle.stories.scene.sceneSymbols.driver
 import javafx.scene.control.Button
 import tornadofx.FX
 

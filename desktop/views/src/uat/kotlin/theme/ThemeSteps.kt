@@ -2,14 +2,14 @@ package com.soyle.stories.theme
 
 import com.soyle.stories.character.CharacterDriver
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Location
-import com.soyle.stories.entities.Project
-import com.soyle.stories.entities.Theme
-import com.soyle.stories.entities.theme.oppositionValue.OppositionValue
-import com.soyle.stories.entities.theme.Symbol
-import com.soyle.stories.entities.theme.SymbolicRepresentation
-import com.soyle.stories.entities.theme.valueWeb.ValueWeb
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.theme.Theme.oppositionValue.OppositionValue
+import com.soyle.stories.domain.theme.Theme.Symbol
+import com.soyle.stories.domain.theme.Theme.SymbolicRepresentation
+import com.soyle.stories.domain.theme.Theme.valueWeb.ValueWeb
 import com.soyle.stories.location.LocationSteps
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.ProjectSteps

@@ -1,13 +1,13 @@
 package com.soyle.stories.characterarc.characterList
 
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
-import com.soyle.stories.character.usecases.renameCharacter.RenameCharacter
-import com.soyle.stories.characterarc.usecases.listAllCharacterArcs.ListAllCharacterArcs
-import com.soyle.stories.characterarc.usecases.renameCharacterArc.RenameCharacterArc
-import com.soyle.stories.common.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.theme.usecases.demoteMajorCharacter.DemoteMajorCharacter
+import com.soyle.stories.usecase.character.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.usecase.character.renameCharacter.RenameCharacter
+import com.soyle.stories.usecase.character.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
 import java.util.*
 
 class CharacterListController(
@@ -69,7 +69,7 @@ class CharacterListController(
         }
     }
 
-    override fun renameCharacterArc(characterId: String, themeId: String, newName: String) {
+    override fun renameCharacterArc(characterId: String, themeId: String, newName: NonBlankString) {
         threadTransformer.async {
             renameCharacterArc.invoke(
               RenameCharacterArc.RequestModel(

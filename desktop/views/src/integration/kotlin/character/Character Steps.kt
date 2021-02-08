@@ -3,8 +3,8 @@ package com.soyle.stories.character
 import com.soyle.stories.character.repositories.CharacterRepository
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialogViewListener
 import com.soyle.stories.di.get
-import com.soyle.stories.entities.Character
-import com.soyle.stories.entities.Project
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.project.ProjectScope
 import kotlinx.coroutines.runBlocking
 

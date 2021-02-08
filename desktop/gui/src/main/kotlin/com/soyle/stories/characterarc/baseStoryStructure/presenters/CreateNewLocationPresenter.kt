@@ -2,9 +2,8 @@ package com.soyle.stories.characterarc.baseStoryStructure.presenters
 
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureViewModel
 import com.soyle.stories.gui.View
-import com.soyle.stories.location.LocationException
 import com.soyle.stories.location.items.LocationItemViewModel
-import com.soyle.stories.location.usecases.createNewLocation.CreateNewLocation
+import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
 
 class CreateNewLocationPresenter(
   private val view: View.Nullable<BaseStoryStructureViewModel>
@@ -18,6 +17,6 @@ class CreateNewLocationPresenter(
 		}
 	}
 
-	override fun receiveCreateNewLocationFailure(failure: LocationException) {}
+	override fun receiveCreateNewLocationFailure(failure: Exception) {}
 
 }

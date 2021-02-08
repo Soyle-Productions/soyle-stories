@@ -1,9 +1,8 @@
 package com.soyle.stories.theme.addValueWebToTheme
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.theme.usecases.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
-import com.soyle.stories.theme.usecases.addValueWebToTheme.AddValueWebToTheme
-import kotlin.coroutines.coroutineContext
+import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.AddSymbolicItemToOpposition
+import com.soyle.stories.usecase.theme.addValueWebToTheme.AddValueWebToTheme
 
 class AddValueWebToThemeNotifier(
     private val symbolicItemAddedToOppositionOutputPort: AddSymbolicItemToOpposition.OutputPort
