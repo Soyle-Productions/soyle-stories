@@ -72,7 +72,7 @@ val javaFXOptions = convention.findByType<JavaFXOptions>()
 dependencies {
 
     // use of api is temporary until more things are moved to root config project
-    api( project(":usecases"))
+    api( project(":core:usecases"))
     api( project(":desktop:application"))
     api( project(":desktop:adapters"))
     api( project(":desktop:gui"))
@@ -150,10 +150,10 @@ idea {
         scopes["TEST"]?.get("plus")?.add(configurations.getByName("uatCompile"))
 
         (this as ExtensionAware).configure<org.jetbrains.gradle.ext.ModuleSettings> {
-            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = "com.soyle.stories"
-            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/integration/kotlin"] = "com.soyle.stories"
-            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/uat/kotlin"] = "com.soyle.stories"
-            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/testFixtures/kotlin"] = "com.soyle.stories"
+            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = "com.soyle.stories.desktop.view"
+            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/integration/kotlin"] = "com.soyle.stories.desktop.view"
+            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/uat/kotlin"] = "com.soyle.stories.desktop.view"
+            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/testFixtures/kotlin"] = "com.soyle.stories.desktop.view"
         }
     }
 }

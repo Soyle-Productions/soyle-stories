@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":usecases"))
+    implementation(project(":core:usecases"))
 
     implementation("io.arrow-kt:arrow-core:0.10.4")
     implementation("io.arrow-kt:arrow-core-data:0.10.4")

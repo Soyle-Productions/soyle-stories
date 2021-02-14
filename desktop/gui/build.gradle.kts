@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":usecases"))
+    implementation(project(":core:usecases"))
     implementation( project(":desktop:adapters"))
     implementation( project(":desktop:application"))
     implementation( Libraries.kotlin.coroutines)
