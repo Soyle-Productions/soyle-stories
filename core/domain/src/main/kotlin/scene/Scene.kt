@@ -22,6 +22,8 @@ class Scene private constructor(
     val proseId: Prose.Id,
     private val charactersInScene: List<CharacterInScene>,
     private val symbols: Collection<TrackedSymbol>,
+    val conflict: SceneConflict,
+    val resolution: SceneResolution,
 
     defaultConstructorMarker: Unit = Unit
 ) : Entity<Scene.Id> {
@@ -31,7 +33,7 @@ class Scene private constructor(
         name: NonBlankString,
         storyEventId: StoryEvent.Id,
         proseId: Prose.Id
-    ) : this(Id(), projectId, name, storyEventId, setOf(), proseId, listOf(), listOf())
+    ) : this(Id(), projectId, name, storyEventId, setOf(), proseId, listOf(), listOf(), SceneConflict(""), SceneResolution(""))
 
     constructor(
         id: Id,
@@ -41,9 +43,11 @@ class Scene private constructor(
         settings: Set<Location.Id>,
         proseId: Prose.Id,
         charactersInScene: List<CharacterInScene>,
-        symbols: Collection<TrackedSymbol>
+        symbols: Collection<TrackedSymbol>,
+        conflict: SceneConflict,
+        resolution: SceneResolution,
     ) : this(
-        id, projectId, name, storyEventId, settings, proseId, charactersInScene, symbols, defaultConstructorMarker = Unit
+        id, projectId, name, storyEventId, settings, proseId, charactersInScene, symbols, conflict, resolution, defaultConstructorMarker = Unit
     ) {
         if (trackedSymbols.size != symbols.size) {
             error("Cannot track the same symbol more than once in a scene.\n${symbols.groupBy { it.symbolId }.filter { it.value.size > 1 }}")
@@ -90,10 +94,26 @@ class Scene private constructor(
         name: NonBlankString = this.name,
         settings: Set<Location.Id> = this.settings,
         charactersInScene: List<CharacterInScene> = this.charactersInScene,
-        symbols: Collection<TrackedSymbol> = this.symbols
-    ) = Scene(id, projectId, name, storyEventId, settings, this.proseId, charactersInScene, symbols, defaultConstructorMarker = Unit)
+        symbols: Collection<TrackedSymbol> = this.symbols,
+        conflict: SceneConflict = this.conflict,
+        resolution: SceneResolution = this.resolution
+    ) = Scene(id, projectId, name, storyEventId, settings, this.proseId, charactersInScene, symbols, conflict, resolution, defaultConstructorMarker = Unit)
 
     fun withName(newName: NonBlankString) = copy(name = newName)
+
+    fun withSceneFrameValue(value: SceneFrameValue): SceneUpdate<SceneFrameValueChanged>
+    {
+        when (value) {
+            is SceneConflict -> {
+                if (value == conflict) return NoUpdate(this)
+                return Updated(copy(conflict = value), SceneFrameValueChanged(id, value))
+            }
+            is SceneResolution -> {
+                if (value == resolution) return NoUpdate(this)
+                return Updated(copy(resolution = value), SceneFrameValueChanged(id, value))
+            }
+        }
+    }
 
     fun withCharacterIncluded(character: Character): Scene {
         if (includesCharacter(character.id)) throw SceneAlreadyContainsCharacter(id.uuid, character.id.uuid)
@@ -229,3 +249,4 @@ data class SymbolPinnedToScene(override val sceneId: Scene.Id, val trackedSymbol
 data class SymbolUnpinnedFromScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRenamed(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRemoved(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
+class SceneFrameValueChanged(override val sceneId: Scene.Id, val newValue: SceneFrameValue) : SceneEvent()
