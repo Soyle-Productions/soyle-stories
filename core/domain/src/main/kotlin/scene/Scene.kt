@@ -249,4 +249,4 @@ data class SymbolPinnedToScene(override val sceneId: Scene.Id, val trackedSymbol
 data class SymbolUnpinnedFromScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRenamed(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRemoved(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
-class SceneFrameValueChanged(override val sceneId: Scene.Id, val newValue: SceneFrameValue) : SceneEvent()
+data class SceneFrameValueChanged(override val sceneId: Scene.Id, val newValue: SceneFrameValue) : SceneEvent()
