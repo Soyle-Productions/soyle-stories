@@ -16,7 +16,9 @@ fun makeScene(
     settings: Set<Location.Id> = emptySet(),
     proseId: Prose.Id = Prose.Id(),
     charactersInScene: List<CharacterInScene> = listOf(),
-    symbols: Collection<Scene.TrackedSymbol> = listOf()
+    symbols: Collection<Scene.TrackedSymbol> = listOf(),
+    conflict: SceneConflict = SceneConflict(""),
+    resolution: SceneResolution = SceneResolution("")
 ) = Scene(
     sceneId,
     projectId,
@@ -25,5 +27,7 @@ fun makeScene(
     settings,
     proseId,
     charactersInScene,
-    symbols
+    symbols,
+    conflict,
+    resolution
 )

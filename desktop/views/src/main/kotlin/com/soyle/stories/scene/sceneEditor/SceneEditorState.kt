@@ -9,4 +9,7 @@ class SceneEditorState : Model<SceneEditorScope, SceneEditorViewModel>(SceneEdit
     override val applicationScope: ApplicationScope
         get() = scope.projectScope.applicationScope
 
+    val conflict = bind(SceneEditorViewModel::conflict)
+    val resolution = bind(SceneEditorViewModel::resolution)
+
 }

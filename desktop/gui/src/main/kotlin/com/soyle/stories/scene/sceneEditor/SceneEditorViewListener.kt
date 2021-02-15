@@ -8,8 +8,11 @@ import com.soyle.stories.prose.proseEditor.OnLoadMentionReplacementsOutput
 
 interface SceneEditorViewListener {
 
+    fun getValidState()
     fun loadMentionSuggestionsForScene(query: NonBlankString, output: OnLoadMentionQueryOutput)
     fun useProseMentionInScene(mention: ProseMention<*>)
     fun loadMentionReplacements(entityId: MentionedEntityId<*>, output: OnLoadMentionReplacementsOutput)
+    fun changeConflict(conflict: String)
+    fun changeResolution(resolution: String)
 
 }

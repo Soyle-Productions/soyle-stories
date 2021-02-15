@@ -19,7 +19,7 @@ val integrationTest = sourceSets.create("integrationTest") {
 }
 
 dependencies {
-    api(project(":domain"))
+    api(project(":core:domain"))
     implementation(Libraries.kotlin.coroutines)
     implementation("io.arrow-kt:arrow-core:0.10.4")
     implementation( "io.arrow-kt:arrow-core-data:0.10.4")
@@ -27,7 +27,7 @@ dependencies {
     testImplementation(Libraries.junit.api)
     testImplementation(Libraries.junit.engine)
     testImplementation(Libraries.junit.params)
-    testImplementation(testFixtures(project(path = ":domain")))
+    testImplementation(testFixtures(project(path = ":core:domain")))
 }
 
 task<Test>("integrationTest") {

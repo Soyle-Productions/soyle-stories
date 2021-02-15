@@ -24,8 +24,12 @@ import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogModel
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogPresenter
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogViewListener
 import com.soyle.stories.scene.deleteSceneRamifications.*
+import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
+import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneNotifier
+import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
+import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
@@ -42,7 +46,10 @@ import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharacter
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewListener
 import com.soyle.stories.scene.sceneEditor.SceneEditorController
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
+import com.soyle.stories.scene.sceneEditor.SceneEditorState
 import com.soyle.stories.scene.sceneEditor.SceneEditorViewListener
+import com.soyle.stories.scene.sceneFrame.GetSceneFrameController
+import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
 import com.soyle.stories.scene.sceneList.SceneListController
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneList.SceneListPresenter
@@ -272,10 +279,21 @@ object Presentation {
             provide<SceneEditorViewListener> {
                 SceneEditorController(
                     sceneId,
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get()
+                    object : SceneEditorController.Dependencies {
+                        override val getSceneFrameController: GetSceneFrameController
+                            get() = projectScope.get()
+                        override val getStoryElementsToMentionController: GetStoryElementsToMentionController
+                            get() = projectScope.get()
+                        override val includeCharacterInSceneController: IncludeCharacterInSceneController
+                            get() = projectScope.get()
+                        override val linkLocationToSceneController: LinkLocationToSceneController
+                            get() = projectScope.get()
+                        override val listOptionsToReplaceMentionController: ListOptionsToReplaceMentionController
+                            get() = projectScope.get()
+                        override val setSceneFrameValueController: SetSceneFrameValueController
+                            get() = projectScope.get()
+                    },
+                    get<SceneEditorState>()
                 )
             }
         }

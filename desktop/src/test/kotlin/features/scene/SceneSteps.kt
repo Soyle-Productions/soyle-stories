@@ -395,6 +395,15 @@ class SceneSteps : En {
             )
 
         }
+        Given("I am constructing the {scene}'s frame") { scene: Scene ->
+            sceneListView.givenSceneEditorToolHasBeenOpened(scene)
+        }
+        Given("I have set the {scene}'s conflict to {string}") { scene: Scene, conflict: String ->
+            sceneDriver.givenSceneHasConflict(scene, conflict)
+        }
+        Given("I have set the {scene}'s resolution to {string}") { scene: Scene, resolution: String ->
+            sceneDriver.givenSceneHasResolution(scene, resolution)
+        }
     }
 
     private fun whens() {
@@ -520,6 +529,17 @@ class SceneSteps : En {
                 .givenMentionIsBeingInvestigated(mentionText)
                 .givenReplacingInvestigatedMentionWithNewLocation()
                 .createLocationWithName(newLocationName)
+        }
+        When("I construct the {scene}'s frame") { scene: Scene ->
+            sceneListView.openSceneEditorTool(scene)
+        }
+        When("I set the {scene}'s conflict to {string}") { scene: Scene, conflict: String ->
+            sceneListView.givenSceneEditorToolHasBeenOpened(scene)
+                .setConflict(conflict)
+        }
+        When("I set the {scene}'s resolution to {string}") { scene: Scene, resolution: String ->
+            sceneListView.givenSceneEditorToolHasBeenOpened(scene)
+                .setResolution(resolution)
         }
     }
 
@@ -876,6 +896,26 @@ class SceneSteps : En {
                     isShowingMentionIssueMenuForMention(mentionText)
                     isListingAllReplacementOptionsInOrder(dataTable.asList())
                 }
+            }
+        }
+        Then(
+            "the {scene}'s conflict should be {string}"
+        ) { scene: Scene, expectedConflict: String ->
+            assertEquals(expectedConflict, scene.conflict.value)
+
+            val sceneEditor = sceneListView.givenSceneEditorToolHasBeenOpened(scene)
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                hasConflict(expectedConflict)
+            }
+        }
+        Then(
+            "the {scene}'s resolution should be {string}"
+        ) { scene: Scene, expectedResolution: String ->
+            assertEquals(expectedResolution, scene.resolution.value)
+
+            val sceneEditor = sceneListView.givenSceneEditorToolHasBeenOpened(scene)
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                hasResolution(expectedResolution)
             }
         }
     }
