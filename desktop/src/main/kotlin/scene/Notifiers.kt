@@ -8,6 +8,8 @@ import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCover
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneNotifier
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneReceiver
+import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedNotifier
+import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedReceiver
 import com.soyle.stories.scene.trackSymbolInScene.*
 
 object Notifiers {
@@ -37,6 +39,9 @@ object Notifiers {
             }
             provide(SymbolUnpinnedFromSceneReceiver::class) {
                 SymbolUnpinnedFromSceneNotifier()
+            }
+            provide(SceneFrameValueChangedReceiver::class) {
+                SceneFrameValueChangedNotifier()
             }
         }
     }

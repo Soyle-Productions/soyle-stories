@@ -34,10 +34,12 @@ import com.soyle.stories.scene.renameScene.RenameSceneNotifier
 import com.soyle.stories.scene.reorderScene.ReorderSceneController
 import com.soyle.stories.scene.reorderScene.ReorderSceneControllerImpl
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
+import com.soyle.stories.scene.sceneFrame.*
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
 import com.soyle.stories.scene.trackSymbolInScene.*
+import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
@@ -66,10 +68,13 @@ import com.soyle.stories.usecase.scene.renameScene.RenameScene
 import com.soyle.stories.usecase.scene.renameScene.RenameSceneUseCase
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderSceneUseCase
+import com.soyle.stories.usecase.scene.sceneFrame.GetSceneFrame
+import com.soyle.stories.usecase.scene.sceneFrame.GetSceneFrameUseCase
+import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValue
+import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValueUseCase
 import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
 import com.soyle.stories.usecase.scene.trackSymbolInScene.*
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 
 object UseCases {
 
@@ -93,6 +98,8 @@ object UseCases {
             pinSymbolToScene()
             unpinSymbolFromScene()
             detectUnusedSymbols()
+            getSceneFrame()
+            setSceneFrameValue()
         }
     }
 
@@ -389,6 +396,27 @@ object UseCases {
         }
         provide<DetectUnusedSymbolsInSceneController> {
             DetectUnusedSymbolsInSceneControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.getSceneFrame() {
+        provide<GetSceneFrame> {
+            GetSceneFrameUseCase(get())
+        }
+        provide<GetSceneFrameController> {
+            GetSceneFrameControllerImpl(applicationScope.get(), get())
+        }
+    }
+
+    private fun InProjectScope.setSceneFrameValue() {
+        provide<SetSceneFrameValue> {
+            SetSceneFrameValueUseCase(get())
+        }
+        provide(SetSceneFrameValue.OutputPort::class) {
+            SetSceneFrameValueOutput(get())
+        }
+        provide<SetSceneFrameValueController> {
+            SetSceneFrameValueControllerImpl(applicationScope.get(), get(), get())
         }
     }
 

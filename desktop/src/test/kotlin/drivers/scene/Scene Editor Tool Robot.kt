@@ -7,6 +7,7 @@ import com.soyle.stories.desktop.config.drivers.theme.getCreateSymbolDialogOrErr
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.drive
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.driver
+import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorDriver.Companion.drive
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorDriver.Companion.driver
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListDriver
 import com.soyle.stories.desktop.view.type
@@ -47,6 +48,21 @@ fun SceneListView.openSceneEditorTool(scene: Scene) {
         with(driver) {
             item.getSceneEditorItem().fire()
         }
+    }
+}
+
+fun SceneEditorView.setConflict(conflict: String) {
+    drive {
+        conflictFieldInput.requestFocus()
+        conflictFieldInput.text = conflict
+        resolutionFieldInput.requestFocus()
+    }
+}
+fun SceneEditorView.setResolution(resolution: String) {
+    drive {
+        resolutionFieldInput.requestFocus()
+        resolutionFieldInput.text = resolution
+        conflictFieldInput.requestFocus()
     }
 }
 

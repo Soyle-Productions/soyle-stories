@@ -21,6 +21,7 @@ import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneCo
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -62,6 +63,27 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
             allScenes[it]
         }
     }
+
+
+    fun givenSceneHasConflict(scene: Scene, expectedConflict: String) {
+        if (scene.conflict.value == expectedConflict) return
+        setSceneConflict(scene.id, expectedConflict)
+    }
+
+    private fun setSceneConflict(sceneId: Scene.Id, conflict: String) {
+        projectScope.get<SetSceneFrameValueController>().setSceneConflict(sceneId, conflict)
+    }
+
+
+    fun givenSceneHasResolution(scene: Scene, expectedResolution: String) {
+        if (scene.resolution.value == expectedResolution) return
+        setSceneResolution(scene.id, expectedResolution)
+    }
+
+    private fun setSceneResolution(sceneId: Scene.Id, resolution: String) {
+        projectScope.get<SetSceneFrameValueController>().setSceneResolution(sceneId, resolution)
+    }
+
 
     fun givenCharacterIncludedInScene(scene: Scene, character: Character, motivation: String? = null) {
         if (!scene.includesCharacter(character.id)) includeCharacterInScene(scene, character)

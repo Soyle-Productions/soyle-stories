@@ -5,7 +5,7 @@ Feature: Construct Scene
     Given I have started a project
     And I have created a scene named "Big Battle"
 
-  Scenario: Read initial values
+  Scenario: Read initial Scene Frame values
     When I construct the "Big Battle" scene's frame
     Then the "Big Battle" scene's conflict should be ""
     And the "Big Battle" scene's resolution should be ""
@@ -22,7 +22,7 @@ Feature: Construct Scene
     Then the "Big Battle" scene's resolution should be "They split it in half"
     But the "Big Battle" scene's conflict should be ""
 
-  Scenario: Read Updated Values
+  Scenario: Read Updated Scene Frame Values
     Given I have set the "Big Battle" scene's conflict to "Two guys wrestling over a melon"
     And I have set the "Big Battle" scene's resolution to "They split it in half"
     When I construct the "Big Battle" scene's frame
