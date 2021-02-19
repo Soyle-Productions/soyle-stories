@@ -27,5 +27,5 @@ class ListAllLocationsUseCase(
 	  locationRepository.getAllLocationsInProject(projectId)
 
 	private fun convertLocationToLocationItem(location: Location): LocationItem =
-	  LocationItem(location.id.uuid, location.name.value)
+	  LocationItem(location.id, location.name.value)
 }
