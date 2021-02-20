@@ -1,10 +1,11 @@
-package com.soyle.stories.usecase.scene
+package com.soyle.stories.usecase.scene.locationsInScene
 
 import com.soyle.stories.domain.location.makeLocation
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.usecase.repositories.LocationRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.locationsInScene.listLocationsToUse.ListAvailableLocationsToUseInScene
 import com.soyle.stories.usecase.scene.locationsInScene.listLocationsToUse.ListAvailableLocationsToUseInSceneUseCase
 import kotlinx.coroutines.runBlocking

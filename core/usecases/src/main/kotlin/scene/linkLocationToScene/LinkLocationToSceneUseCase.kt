@@ -46,7 +46,7 @@ class LinkLocationToSceneUseCase(
 			val location = getLocation(request.locationId)
 			scene.withLocationLinked(location)
 		} else {
-			scene.settings.fold(scene) { newScene, location -> newScene.withoutLocation(location.id) }
+			scene.settings.fold(scene) { newScene, location -> newScene.withoutLocation(location.id).scene }
 		}
 		sceneRepository.updateScene(update)
 	}

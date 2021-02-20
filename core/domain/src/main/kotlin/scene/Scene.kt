@@ -35,7 +35,18 @@ class Scene private constructor(
         name: NonBlankString,
         storyEventId: StoryEvent.Id,
         proseId: Prose.Id
-    ) : this(Id(), projectId, name, storyEventId, entitySetOf(), proseId, listOf(), listOf(), SceneConflict(""), SceneResolution(""))
+    ) : this(
+        Id(),
+        projectId,
+        name,
+        storyEventId,
+        entitySetOf(),
+        proseId,
+        listOf(),
+        listOf(),
+        SceneConflict(""),
+        SceneResolution("")
+    )
 
     constructor(
         id: Id,
@@ -49,10 +60,24 @@ class Scene private constructor(
         conflict: SceneConflict,
         resolution: SceneResolution,
     ) : this(
-        id, projectId, name, storyEventId, settings, proseId, charactersInScene, symbols, conflict, resolution, defaultConstructorMarker = Unit
+        id,
+        projectId,
+        name,
+        storyEventId,
+        settings,
+        proseId,
+        charactersInScene,
+        symbols,
+        conflict,
+        resolution,
+        defaultConstructorMarker = Unit
     ) {
         if (trackedSymbols.size != symbols.size) {
-            error("Cannot track the same symbol more than once in a scene.\n${symbols.groupBy { it.symbolId }.filter { it.value.size > 1 }}")
+            error(
+                "Cannot track the same symbol more than once in a scene.\n${
+                    symbols.groupBy { it.symbolId }.filter { it.value.size > 1 }
+                }"
+            )
         }
     }
 
@@ -92,6 +117,8 @@ class Scene private constructor(
 
     fun hasCharacters(): Boolean = charactersInScene.isNotEmpty()
 
+    operator fun contains(locationId: Location.Id) = settings.containsEntityWithId(locationId)
+
     private fun copy(
         name: NonBlankString = this.name,
         settings: EntitySet<SceneSettingLocation> = this.settings,
@@ -99,12 +126,23 @@ class Scene private constructor(
         symbols: Collection<TrackedSymbol> = this.symbols,
         conflict: SceneConflict = this.conflict,
         resolution: SceneResolution = this.resolution
-    ) = Scene(id, projectId, name, storyEventId, settings, this.proseId, charactersInScene, symbols, conflict, resolution, defaultConstructorMarker = Unit)
+    ) = Scene(
+        id,
+        projectId,
+        name,
+        storyEventId,
+        settings,
+        this.proseId,
+        charactersInScene,
+        symbols,
+        conflict,
+        resolution,
+        defaultConstructorMarker = Unit
+    )
 
     fun withName(newName: NonBlankString) = copy(name = newName)
 
-    fun withSceneFrameValue(value: SceneFrameValue): SceneUpdate<SceneFrameValueChanged>
-    {
+    fun withSceneFrameValue(value: SceneFrameValue): SceneUpdate<SceneFrameValueChanged> {
         when (value) {
             is SceneConflict -> {
                 if (value == conflict) return NoUpdate(this)
@@ -145,7 +183,14 @@ class Scene private constructor(
     }
 
     fun withLocationLinked(location: Location) = copy(settings = settings + SceneSettingLocation(location))
-    fun withoutLocation(locationId: Location.Id) = copy(settings = settings.minus(locationId))
+    fun withoutLocation(locationId: Location.Id): SceneUpdate<LocationRemovedFromScene> {
+        val sceneSetting = settings.getEntityById(locationId) ?: return noUpdate()
+        return Updated(
+            copy(settings = settings.minus(sceneSetting)),
+            LocationRemovedFromScene(id, sceneSetting)
+        )
+    }
+
     fun withoutCharacter(characterId: Character.Id) =
         copy(charactersInScene = charactersInScene.filterNot { it.characterId == characterId })
 
@@ -172,7 +217,8 @@ class Scene private constructor(
     }
 
     fun withSymbolTracked(theme: Theme, symbol: Symbol, pin: Boolean = false): SceneUpdate<SymbolTrackedInScene> {
-        theme.symbols.find { it.id == symbol.id } ?: throw IllegalArgumentException("Symbol ${symbol.name} is not contained within the ${theme.name} theme")
+        theme.symbols.find { it.id == symbol.id }
+            ?: throw IllegalArgumentException("Symbol ${symbol.name} is not contained within the ${theme.name} theme")
         val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name, theme.id, pin)
         return if (trackedSymbols.isSymbolTracked(symbol.id)) noUpdate()
         else {
@@ -180,26 +226,23 @@ class Scene private constructor(
         }
     }
 
-    fun withSymbolRenamed(symbolId: Symbol.Id, newName: String): SceneUpdate<TrackedSymbolRenamed>
-    {
+    fun withSymbolRenamed(symbolId: Symbol.Id, newName: String): SceneUpdate<TrackedSymbolRenamed> {
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
         if (existingSymbol.symbolName == newName) return noUpdate()
         val trackedSymbol = trackedSymbols.getSymbolById(symbolId)!!.copy(symbolName = newName)
         return Updated(copy(symbols = symbols + trackedSymbol), TrackedSymbolRenamed(id, trackedSymbol))
     }
 
-    fun withSymbolPinned(symbolId: Symbol.Id): SceneUpdate<SymbolPinnedToScene>
-    {
+    fun withSymbolPinned(symbolId: Symbol.Id): SceneUpdate<SymbolPinnedToScene> {
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
         if (existingSymbol.isPinned) return noUpdate()
         val trackedSymbol = existingSymbol.copy(isPinned = true)
         return Updated(copy(symbols = symbols + trackedSymbol), SymbolPinnedToScene(id, trackedSymbol))
     }
 
-    fun withSymbolUnpinned(symbolId: Symbol.Id): SceneUpdate<SymbolUnpinnedFromScene>
-    {
+    fun withSymbolUnpinned(symbolId: Symbol.Id): SceneUpdate<SymbolUnpinnedFromScene> {
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
-        if (! existingSymbol.isPinned) return noUpdate()
+        if (!existingSymbol.isPinned) return noUpdate()
         val trackedSymbol = existingSymbol.copy(isPinned = false)
         return Updated(copy(symbols = symbols + trackedSymbol), SymbolUnpinnedFromScene(id, trackedSymbol))
     }
@@ -221,34 +264,52 @@ class Scene private constructor(
 
     class IncludedCharacter(val characterId: Character.Id, val characterName: String)
 
-    inner class TrackedSymbols private constructor(private val symbolsById: Map<Symbol.Id, TrackedSymbol>) : Collection<TrackedSymbol> by symbolsById.values {
+    inner class TrackedSymbols private constructor(private val symbolsById: Map<Symbol.Id, TrackedSymbol>) :
+        Collection<TrackedSymbol> by symbolsById.values {
         internal constructor() : this(symbols.associateBy { it.symbolId })
 
         fun isSymbolTracked(symbolId: Symbol.Id): Boolean = symbolsById.containsKey(symbolId)
         fun getSymbolById(symbolId: Symbol.Id) = symbolsById[symbolId]
-        fun getSymbolByIdOrError(symbolId: Symbol.Id) = symbolsById.getOrElse(symbolId) { throw SceneDoesNotTrackSymbol(id, symbolId) }
+        fun getSymbolByIdOrError(symbolId: Symbol.Id) =
+            symbolsById.getOrElse(symbolId) { throw SceneDoesNotTrackSymbol(id, symbolId) }
+
         internal fun withoutSymbol(symbolId: Symbol.Id): Collection<TrackedSymbol> = symbolsById.minus(symbolId).values
     }
 
-    data class TrackedSymbol(val symbolId: Symbol.Id, val symbolName: String, val themeId: Theme.Id, val isPinned: Boolean = false)
+    data class TrackedSymbol(
+        val symbolId: Symbol.Id,
+        val symbolName: String,
+        val themeId: Theme.Id,
+        val isPinned: Boolean = false
+    )
 }
 
 sealed class SceneUpdate<out T> {
     abstract val scene: Scene
     operator fun component1() = scene
 }
+
 class NoUpdate(override val scene: Scene) : SceneUpdate<Nothing>()
 class Updated<out T : SceneEvent>(override val scene: Scene, val event: T) : SceneUpdate<T>() {
     operator fun component2() = event
 }
 
-abstract class SceneEvent
-{
+abstract class SceneEvent {
     abstract val sceneId: Scene.Id
 }
-data class SymbolTrackedInScene(override val sceneId: Scene.Id, val themeName: String, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
+
+data class SymbolTrackedInScene(
+    override val sceneId: Scene.Id,
+    val themeName: String,
+    val trackedSymbol: Scene.TrackedSymbol
+) : SceneEvent()
+
 data class SymbolPinnedToScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
-data class SymbolUnpinnedFromScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
+data class SymbolUnpinnedFromScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) :
+    SceneEvent()
+
 data class TrackedSymbolRenamed(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRemoved(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class SceneFrameValueChanged(override val sceneId: Scene.Id, val newValue: SceneFrameValue) : SceneEvent()
+data class LocationRemovedFromScene(override val sceneId: Scene.Id, val sceneSetting: SceneSettingLocation) :
+    SceneEvent()

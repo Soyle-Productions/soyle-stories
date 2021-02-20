@@ -13,12 +13,22 @@ class EntitySet<E : Entity<*>> private constructor(private val _backingMap: Map<
         }
     }
 
+    override fun toString(): String = "EntitySet${_backingMap.values}"
+
+    override fun hashCode(): Int = _backingMap.hashCode()
+
+    override fun equals(other: Any?): Boolean {
+        return (other as? EntitySet<*>)?._backingMap?.equals(_backingMap) ?: false
+    }
+
     override fun containsAll(elements: Collection<E>): Boolean = elements.all(this::contains)
 
     override fun iterator(): Iterator<E> = _backingMap.values.iterator()
 
     override val size: Int
         get() = _backingMap.size
+
+    fun getEntityById(maybeId: Any) = _backingMap[maybeId]
 
     override fun contains(element: E): Boolean = _backingMap[element.id] == element
 
