@@ -51,7 +51,7 @@ class ListOptionsToReplaceMentionInSceneProseUseCase(
         val locations = locationRepository.getAllLocationsInProject(scene.projectId)
         return ListOptionsToReplaceMentionInSceneProse.ResponseModel(
             entityId,
-            locations.partition { scene.settings.contains(it.id) }.let { it.first + it.second }.map {
+            locations.partition { scene.settings.containsEntityWithId(it.id) }.let { it.first + it.second }.map {
                 ListOptionsToReplaceMentionInSceneProse.MentionOption(it.id.mentioned(), it.name.value, null)
             }
         )

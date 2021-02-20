@@ -15,7 +15,7 @@ class ListAvailableLocationsToUseInSceneUseCase(
         val locations = locationRepository.getAllLocationsInProject(scene.projectId)
         val response = ListAvailableLocationsToUseInScene.ResponseModel(
             locations.asSequence()
-                .filterNot { scene.settings.contains(it.id) }
+                .filterNot { scene.settings.containsEntityWithId(it.id) }
                 .map { LocationItem(it.id, it.name.value) }
                 .toList()
         )

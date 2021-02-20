@@ -10,7 +10,9 @@ import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.domain.validation.entitySetOf
 import java.util.*
 
 class Scene private constructor(
@@ -18,7 +20,7 @@ class Scene private constructor(
     val projectId: Project.Id,
     val name: NonBlankString,
     val storyEventId: StoryEvent.Id,
-    val settings: Set<Location.Id>,
+    val settings: EntitySet<SceneSettingLocation>,
     val proseId: Prose.Id,
     private val charactersInScene: List<CharacterInScene>,
     private val symbols: Collection<TrackedSymbol>,
@@ -33,14 +35,14 @@ class Scene private constructor(
         name: NonBlankString,
         storyEventId: StoryEvent.Id,
         proseId: Prose.Id
-    ) : this(Id(), projectId, name, storyEventId, setOf(), proseId, listOf(), listOf(), SceneConflict(""), SceneResolution(""))
+    ) : this(Id(), projectId, name, storyEventId, entitySetOf(), proseId, listOf(), listOf(), SceneConflict(""), SceneResolution(""))
 
     constructor(
         id: Id,
         projectId: Project.Id,
         name: NonBlankString,
         storyEventId: StoryEvent.Id,
-        settings: Set<Location.Id>,
+        settings: EntitySet<SceneSettingLocation>,
         proseId: Prose.Id,
         charactersInScene: List<CharacterInScene>,
         symbols: Collection<TrackedSymbol>,
@@ -92,7 +94,7 @@ class Scene private constructor(
 
     private fun copy(
         name: NonBlankString = this.name,
-        settings: Set<Location.Id> = this.settings,
+        settings: EntitySet<SceneSettingLocation> = this.settings,
         charactersInScene: List<CharacterInScene> = this.charactersInScene,
         symbols: Collection<TrackedSymbol> = this.symbols,
         conflict: SceneConflict = this.conflict,
@@ -142,7 +144,7 @@ class Scene private constructor(
         })
     }
 
-    fun withLocationLinked(locationId: Location.Id) = copy(settings = settings + locationId)
+    fun withLocationLinked(location: Location) = copy(settings = settings + SceneSettingLocation(location))
     fun withoutLocation(locationId: Location.Id) = copy(settings = settings.minus(locationId))
     fun withoutCharacter(characterId: Character.Id) =
         copy(charactersInScene = charactersInScene.filterNot { it.characterId == characterId })

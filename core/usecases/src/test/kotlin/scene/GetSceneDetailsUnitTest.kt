@@ -40,7 +40,7 @@ class GetSceneDetailsUnitTest {
     @ValueSource(booleans = [true, false])
     fun `linked location is output`(expectLocation: Boolean) {
         val scene = if (!expectLocation) scene
-        else scene.withLocationLinked(location.id)
+        else scene.withLocationLinked(location)
         sceneRepository.givenScene(scene)
         whenSceneDetailsRequested()
         result.shouldBe(responseModel(expectLocation = expectLocation))
