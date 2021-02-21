@@ -66,7 +66,7 @@ class `List Available Locations To Use In Scene Unit Test` {
 
                 private val location = locationsInProject.random()
                 init {
-                    sceneRepository.givenScene(scene.withLocationLinked(location))
+                    sceneRepository.givenScene(scene.withLocationLinked(location).scene)
                 }
 
                 @Test

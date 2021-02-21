@@ -51,7 +51,7 @@ class `Remove Location From Scene Unit Test` {
         @Nested
         inner class `Given scene uses location` {
             init {
-                sceneRepository.givenScene(scene.withLocationLinked(location))
+                sceneRepository.givenScene(scene.withLocationLinked(location).scene)
             }
 
             @Test

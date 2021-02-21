@@ -126,7 +126,7 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
 
             init {
                 locationsInProject.takeLast(2).fold(scene) { newScene, location ->
-                    newScene.withLocationLinked(location)
+                    newScene.withLocationLinked(location).scene
                 }.let(sceneRepository::givenScene)
             }
 

@@ -44,7 +44,7 @@ class `List Locations Used In Scene Unit Test` {
             private val linkedLocations = List(5) { makeLocation() }
 
             init {
-                linkedLocations.fold(scene) { nextScene, location -> nextScene.withLocationLinked(location) }
+                linkedLocations.fold(scene) { nextScene, location -> nextScene.withLocationLinked(location).scene }
                     .let(sceneRepository::givenScene)
             }
 
