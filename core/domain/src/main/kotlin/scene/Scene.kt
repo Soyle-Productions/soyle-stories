@@ -182,7 +182,11 @@ class Scene private constructor(
         })
     }
 
-    fun withLocationLinked(location: Location) = copy(settings = settings + SceneSettingLocation(location))
+    fun withLocationLinked(location: Location): SceneUpdate<LocationUsedInScene> {
+        if (settings.containsEntityWithId(location.id)) return noUpdate()
+        val sceneSetting = SceneSettingLocation(location)
+        return Updated(copy(settings = settings + sceneSetting), LocationUsedInScene(id, sceneSetting))
+    }
     fun withoutLocation(locationId: Location.Id): SceneUpdate<LocationRemovedFromScene> {
         val sceneSetting = settings.getEntityById(locationId) ?: return noUpdate()
         return Updated(
@@ -311,5 +315,6 @@ data class SymbolUnpinnedFromScene(override val sceneId: Scene.Id, val trackedSy
 data class TrackedSymbolRenamed(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class TrackedSymbolRemoved(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
 data class SceneFrameValueChanged(override val sceneId: Scene.Id, val newValue: SceneFrameValue) : SceneEvent()
+data class LocationUsedInScene(override val sceneId: Scene.Id, val sceneSetting: SceneSettingLocation) : SceneEvent()
 data class LocationRemovedFromScene(override val sceneId: Scene.Id, val sceneSetting: SceneSettingLocation) :
     SceneEvent()
