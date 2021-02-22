@@ -7,6 +7,7 @@ import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.items.SceneItemViewModel
+import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.symbolsInScene
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.warningLabel
 import com.soyle.stories.soylestories.Styles.Companion.Orange
@@ -98,13 +99,19 @@ class SymbolsInSceneView : View() {
             }
         }
     }
+    private fun targetSceneItem(sceneItem: SceneItemViewModel) {
+        if (state.targetScene.value?.id != sceneItem.id) {
+            viewListener.getSymbolsInScene(Scene.Id(UUID.fromString(sceneItem.id)))
+        }
+        state.targetScene.value = sceneItem
+    }
 
     init {
         subscribe<SceneTargeted> {
-            if (state.targetScene.value?.id != it.sceneItem.id) {
-                viewListener.getSymbolsInScene(Scene.Id(UUID.fromString(it.sceneItem.id)))
-            }
-            state.targetScene.value = it.sceneItem
+            targetSceneItem(it.sceneItem)
+        }
+        (FX.getComponents(scope)[SceneListModel::class] as? SceneListModel)?.let {
+            it.selectedItem.value?.let(this::targetSceneItem)
         }
     }
 

@@ -6,6 +6,7 @@ import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.items.SceneItemViewModel
+import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneSetting.SceneSettingView.Styles.Companion.sceneSetting
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.warningLabel
 import javafx.geometry.Pos
@@ -94,12 +95,19 @@ class SceneSettingView : View() {
         }
     }
 
+    private fun targetSceneItem(sceneItem: SceneItemViewModel) {
+        if (state.targetScene.value?.id != sceneItem.id) {
+            viewListener.getLocationsUsedForSceneSetting(Scene.Id(UUID.fromString(sceneItem.id)))
+        }
+        state.targetScene.value = sceneItem
+    }
+
     init {
         subscribe<SceneTargeted> {
-            if (state.targetScene.value?.id != it.sceneItem.id) {
-                viewListener.getLocationsUsedForSceneSetting(Scene.Id(UUID.fromString(it.sceneItem.id)))
-            }
-            state.targetScene.value = it.sceneItem
+            targetSceneItem(it.sceneItem)
+        }
+        (FX.getComponents(scope)[SceneListModel::class] as? SceneListModel)?.let {
+            it.selectedItem.value?.let(this::targetSceneItem)
         }
     }
 
