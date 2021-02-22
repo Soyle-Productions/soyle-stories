@@ -1,15 +1,17 @@
 package com.soyle.stories.usecase.scene.linkLocationToScene
 
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.scene.LocationUsedInScene
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocale
-import java.util.*
 
 interface LinkLocationToScene {
 
-	class RequestModel(val sceneId: UUID, val locationId: UUID?, val locale: SceneLocale)
+	class RequestModel(val sceneId: Scene.Id, val locationId: Location.Id, val locale: SceneLocale)
 
 	suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
-	class ResponseModel(val sceneId: UUID, val locationId: UUID?)
+	class ResponseModel(val locationUsedInScene: LocationUsedInScene)
 
 	interface OutputPort {
 		fun failedToLinkLocationToScene(failure: Exception)

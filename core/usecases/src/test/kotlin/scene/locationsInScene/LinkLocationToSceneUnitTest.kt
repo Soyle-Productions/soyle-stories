@@ -1,23 +1,25 @@
 package com.soyle.stories.usecase.scene.locationsInScene
 
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.makeLocation
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocaleDouble
 import com.soyle.stories.domain.scene.SceneSettingLocation
 import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.shouldBe
 import com.soyle.stories.domain.validation.entitySetOfNotNull
+import com.soyle.stories.usecase.location.LocationDoesNotExist
 import com.soyle.stories.usecase.location.locationDoesNotExist
 import com.soyle.stories.usecase.repositories.LocationRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToSceneUseCase
 import com.soyle.stories.usecase.scene.sceneDoesNotExist
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.api.assertThrows
 
 class LinkLocationToSceneUnitTest {
 
@@ -28,19 +30,28 @@ class LinkLocationToSceneUnitTest {
     private var updatedScene: Scene? = null
     private var result: Any? = null
 
+    private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::updatedScene::set)
+    private val locationRepository = LocationRepositoryDouble()
+
     @Test
     fun `scene does not exist`() {
-        whenLocationIsLinkedToScene()
+        val error = assertThrows<SceneDoesNotExist> {
+            whenLocationIsLinkedToScene()
+        }
+        error shouldBe sceneDoesNotExist(sceneId.uuid)
         assertNull(updatedScene)
-        sceneDoesNotExist(sceneId.uuid).invoke(result)
+        assertNull(result)
     }
 
     @Test
     fun `location does not exist`() {
         givenSceneExists()
-        whenLocationIsLinkedToScene()
+        val error = assertThrows<LocationDoesNotExist> {
+            whenLocationIsLinkedToScene()
+        }
+        error shouldBe locationDoesNotExist(locationId.uuid)
         assertNull(updatedScene)
-        locationDoesNotExist(locationId.uuid).invoke(result)
+        assertNull(result)
     }
 
     @Test
@@ -48,31 +59,36 @@ class LinkLocationToSceneUnitTest {
         givenSceneExists()
         givenLocationExists()
         whenLocationIsLinkedToScene()
-        updatedScene().invoke(updatedScene)
+        with (updatedScene as Scene) {
+            assertEquals(sceneId, id)
+            assertEquals(locationId, settings.firstOrNull()?.id)
+        }
         responseModel().invoke(result)
     }
 
     @Test
-    fun `clear location`() {
+    fun `link second location`() {
         givenSceneExists(hasLinkedLocation = true)
-        whenLocationIsClearedFromScene()
-        updatedScene(clearedLocation = true).invoke(updatedScene)
-        responseModel(clearedLocation = true).invoke(result)
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `same value`(hasLinkedLocation: Boolean) {
-        givenSceneExists(hasLinkedLocation = hasLinkedLocation)
         givenLocationExists()
-        if (hasLinkedLocation) whenLocationIsLinkedToScene()
-        else whenLocationIsClearedFromScene()
-        assertNull(updatedScene)
-        responseModel(clearedLocation = !hasLinkedLocation).invoke(result)
+        val secondLocation = makeLocation()
+        locationRepository.givenLocation(secondLocation)
+        whenLocationIsLinkedToScene(secondLocation)
+        with (updatedScene as Scene) {
+            assertEquals(sceneId, id)
+            assertTrue(settings.containsEntityWithId(location.id))
+            assertTrue(settings.containsEntityWithId(secondLocation.id))
+        }
+        responseModel(secondLocation.id).invoke(result)
     }
 
-    private val sceneRepository = SceneRepositoryDouble(onUpdateScene = { updatedScene = it })
-    private val locationRepository = LocationRepositoryDouble()
+    @Test
+    fun `linking the same location should not update scene`() {
+        givenSceneExists(hasLinkedLocation = true)
+        givenLocationExists()
+        whenLocationIsLinkedToScene()
+        assertNull(updatedScene)
+        assertNull(result)
+    }
 
     private fun givenSceneExists(hasLinkedLocation: Boolean = false) {
         sceneRepository.scenes[sceneId] = makeScene(
@@ -85,12 +101,8 @@ class LinkLocationToSceneUnitTest {
         locationRepository.locations[locationId] = makeLocation(id = locationId)
     }
 
-    private fun whenLocationIsClearedFromScene() {
-        whenUseCaseIsExecuted(LinkLocationToScene.RequestModel(sceneId.uuid, null, SceneLocaleDouble()))
-    }
-
-    private fun whenLocationIsLinkedToScene() {
-        whenUseCaseIsExecuted(LinkLocationToScene.RequestModel(sceneId.uuid, locationId.uuid, SceneLocaleDouble()))
+    private fun whenLocationIsLinkedToScene(location: Location = this.location) {
+        whenUseCaseIsExecuted(LinkLocationToScene.RequestModel(sceneId, location.id, SceneLocaleDouble()))
     }
 
     private fun whenUseCaseIsExecuted(requestModel: LinkLocationToScene.RequestModel) {
@@ -109,19 +121,11 @@ class LinkLocationToSceneUnitTest {
         }
     }
 
-    private fun updatedScene(clearedLocation: Boolean = false): (Any?) -> Unit = { actual ->
-        actual as Scene
-        assertEquals(sceneId, actual.id)
-        if (clearedLocation) assertNull(actual.settings.firstOrNull())
-        else assertEquals(locationId, actual.settings.firstOrNull()?.id)
-    }
-
-    private fun responseModel(clearedLocation: Boolean = false): (Any?) -> Unit = { actual ->
+    private fun responseModel(locationId: Location.Id = this.locationId): (Any?) -> Unit = { actual ->
         actual as LinkLocationToScene.ResponseModel
-        assertEquals(sceneId.uuid, actual.sceneId)
+        assertEquals(sceneId, actual.locationUsedInScene.sceneId)
 
-        if (clearedLocation) assertNull(actual.locationId)
-        else assertEquals(locationId.uuid, actual.locationId)
+        assertEquals(locationId, actual.locationUsedInScene.sceneSetting.id)
     }
 
 }

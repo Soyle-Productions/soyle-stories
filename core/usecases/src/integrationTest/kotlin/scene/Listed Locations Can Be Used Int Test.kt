@@ -102,7 +102,7 @@ class `Listed Locations Can Be Used Int Test` {
             }
         }
         runBlocking {
-            useCase.invoke(LinkLocationToScene.RequestModel(scene.id.uuid, locationId.uuid, sceneLocale), output)
+            useCase.invoke(LinkLocationToScene.RequestModel(scene.id, locationId, sceneLocale), output)
         }
         return result!!
     }
