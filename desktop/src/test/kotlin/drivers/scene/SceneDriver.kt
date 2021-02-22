@@ -20,7 +20,7 @@ import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
@@ -130,7 +130,7 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
 
     fun useLocationInScene(scene: Scene, location: Location)
     {
-        projectScope.get<LinkLocationToSceneController>().linkLocationToScene(scene.id.uuid.toString(), location.id.uuid.toString())
+        projectScope.get<LinkLocationToSceneController>().linkLocationToScene(scene.id, location.id)
     }
 
     fun givenSceneHasProse(scene: Scene, proseParagraphs: List<String>) {

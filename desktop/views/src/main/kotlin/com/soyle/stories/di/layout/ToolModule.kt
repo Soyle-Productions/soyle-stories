@@ -24,6 +24,7 @@ object ToolModule : RegisteredToolsConfig {
         LocationList.getRegistration(),
         ThemeList.getRegistration(),
         SceneSymbols.getRegistration(),
+        SceneSetting.getRegistration(),
         /**
          * Dynamic Tools
          */

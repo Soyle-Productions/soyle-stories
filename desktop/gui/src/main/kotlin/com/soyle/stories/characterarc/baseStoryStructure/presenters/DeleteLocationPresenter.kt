@@ -12,7 +12,7 @@ class DeleteLocationPresenter(
 	override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
 		view.updateOrInvalidated {
 			withLocations(
-			  availableLocations = availableLocations.filterNot { it.id == deletedLocation.location.uuid.toString() }
+			  availableLocations = availableLocations.filterNot { it.id == deletedLocation.location }
 			)
 		}
 	}

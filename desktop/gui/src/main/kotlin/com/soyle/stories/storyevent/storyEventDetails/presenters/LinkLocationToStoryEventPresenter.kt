@@ -14,12 +14,12 @@ internal class LinkLocationToStoryEventPresenter(
 		if (response.storyEventId != storyEventId) return
 		view.updateOrInvalidated {
 
-			val selectedLocationId = response.locationId?.toString()
+			val selectedLocationId = response.locationId
 
 			copy(
-			  selectedLocationId = selectedLocationId,
+			  selectedLocationId = selectedLocationId?.toString(),
 			  selectedLocation = selectedLocationId?.let {
-				  locations.find { it.id == selectedLocationId }
+				  locations.find { it.id.uuid == selectedLocationId }
 			  }
 			)
 		}

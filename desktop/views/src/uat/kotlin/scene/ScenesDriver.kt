@@ -11,7 +11,7 @@ import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.reorderScene.ReorderSceneController
 import com.soyle.stories.scene.repositories.SceneRepository
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController

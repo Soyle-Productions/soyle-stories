@@ -45,8 +45,8 @@ class StoryEventDetailsPresenter(
 			  title = "Story Event Details - ${response.storyEventName}",
 			  selectedLocationId = response.locationId.toString(),
 			  selectedLocation = response.locationId?.let {
-				  val selectedLocationId = it.toString()
-				  locations.find { it.id == selectedLocationId }
+				  val selectedLocationId = it
+				  locations.find { it.id.uuid == selectedLocationId }
 			  },
 			  includedCharacterIds = includedCharacterIds,
 			  includedCharacters = characters.filter {
@@ -75,7 +75,7 @@ class StoryEventDetailsPresenter(
 
 			if (this != null) copy(
 			  selectedLocation = selectedLocationId?.let {
-				  locationViewModels.find { it.id == selectedLocationId }
+				  locationViewModels.find { it.id.uuid.toString() == selectedLocationId }
 			  },
 			  locations = locationViewModels
 			)

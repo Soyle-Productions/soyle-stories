@@ -1,10 +1,10 @@
 package com.soyle.stories.scene.sceneDetails
 
-import com.soyle.stories.common.components.*
+import com.soyle.stories.common.components.fieldLabel
 import com.soyle.stories.di.resolve
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneView
 import javafx.scene.Parent
-import javafx.scene.control.*
+import javafx.scene.control.MenuItem
 import tornadofx.*
 
 class SceneDetails : View("Scene") {

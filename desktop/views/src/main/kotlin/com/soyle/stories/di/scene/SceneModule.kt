@@ -24,9 +24,9 @@ import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogPresenter
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogViewListener
 import com.soyle.stories.scene.deleteSceneRamifications.*
 import com.soyle.stories.scene.includeCharacterInScene.*
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneControllerImpl
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneControllerImpl
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
@@ -49,6 +49,7 @@ import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharacter
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
@@ -75,7 +76,6 @@ import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderSceneUseCase
 import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 
 object SceneModule {
 
@@ -176,9 +176,6 @@ object SceneModule {
                 IncludeCharacterInSceneOutput(get(), get())
             }
 
-            provide(LinkLocationToScene.OutputPort::class) {
-                LinkLocationToSceneNotifier(applicationScope.get())
-            }
             provide(RemoveCharacterFromScene.OutputPort::class) {
                 RemoveCharacterFromSceneNotifier(applicationScope.get())
             }
@@ -353,7 +350,7 @@ object SceneModule {
                     sceneId.toString(),
                     get<SceneDetailsModel>(),
                     projectScope.get(),
-                    projectScope.get<LinkLocationToSceneNotifier>(),
+                    projectScope.get<LocationUsedInSceneNotifier>(),
                     projectScope.get<ReorderSceneNotifier>(),
                 )
 

@@ -2,13 +2,10 @@ package com.soyle.stories.scene.sceneDetails
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneController
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
-import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetails
-import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
-import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import java.util.*
 
 class SceneDetailsController(
@@ -20,18 +17,18 @@ class SceneDetailsController(
   private val linkLocationToSceneController: LinkLocationToSceneController,
 ) : SceneDetailsViewListener {
 
-	private val sceneId = UUID.fromString(sceneId)
+	private val sceneId = Scene.Id(UUID.fromString(sceneId))
 
 	override fun getValidState() {
 		threadTransformer.async {
 			getSceneDetails.invoke(
-			  GetSceneDetails.RequestModel(sceneId, localeManager.getCurrentLocale()),
+			  GetSceneDetails.RequestModel(sceneId.uuid, localeManager.getCurrentLocale()),
 			  getSceneDetailsOutputPort
 			)
 		}
 	}
 
-	override fun linkLocation(locationId: String) {
-		linkLocationToSceneController.linkLocationToScene(sceneId.toString(), locationId)
+	override fun linkLocation(locationId: Location.Id) {
+		linkLocationToSceneController.linkLocationToScene(sceneId, locationId)
 	}
 }

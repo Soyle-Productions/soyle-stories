@@ -19,13 +19,20 @@ import com.soyle.stories.scene.deleteScene.DeleteSceneNotifier
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneControllerImpl
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneOutput
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneControllerImpl
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionControllerImpl
 import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneController
 import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneControllerImpl
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneControllerImpl
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneOutput
+import com.soyle.stories.scene.locationsInScene.listLocationsInScene.ListLocationsInSceneController
+import com.soyle.stories.scene.locationsInScene.listLocationsInScene.ListLocationsInSceneControllerImpl
+import com.soyle.stories.scene.locationsInScene.listLocationsToUse.ListLocationsToUseInSceneController
+import com.soyle.stories.scene.locationsInScene.listLocationsToUse.ListLocationsToUseInSceneControllerImpl
+import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneController
+import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneControllerImpl
+import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneOutput
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
@@ -62,6 +69,12 @@ import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsTo
 import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProseUseCase
 import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInScene
 import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInSceneUseCase
+import com.soyle.stories.usecase.scene.locationsInScene.listLocationsToUse.ListAvailableLocationsToUseInScene
+import com.soyle.stories.usecase.scene.locationsInScene.listLocationsToUse.ListAvailableLocationsToUseInSceneUseCase
+import com.soyle.stories.usecase.scene.locationsInScene.listLocationsUsed.ListLocationsUsedInScene
+import com.soyle.stories.usecase.scene.locationsInScene.listLocationsUsed.ListLocationsUsedInSceneUseCase
+import com.soyle.stories.usecase.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromScene
+import com.soyle.stories.usecase.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneUseCase
 import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.usecase.scene.renameScene.RenameScene
@@ -100,6 +113,9 @@ object UseCases {
             detectUnusedSymbols()
             getSceneFrame()
             setSceneFrameValue()
+            listLocationsInScene()
+            listLocationsToUse()
+            removeLocationFromScene()
         }
     }
 
@@ -231,7 +247,7 @@ object UseCases {
         }
 
         provide(LinkLocationToScene.OutputPort::class) {
-            LinkLocationToSceneNotifier(applicationScope.get())
+            LinkLocationToSceneOutput(get())
         }
     }
 
@@ -417,6 +433,36 @@ object UseCases {
         }
         provide<SetSceneFrameValueController> {
             SetSceneFrameValueControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.listLocationsInScene() {
+        provide<ListLocationsUsedInScene> {
+            ListLocationsUsedInSceneUseCase(get())
+        }
+        provide<ListLocationsInSceneController> {
+            ListLocationsInSceneControllerImpl(applicationScope.get(), get())
+        }
+    }
+
+    private fun InProjectScope.listLocationsToUse() {
+        provide<ListAvailableLocationsToUseInScene> {
+            ListAvailableLocationsToUseInSceneUseCase(get(), get())
+        }
+        provide<ListLocationsToUseInSceneController> {
+            ListLocationsToUseInSceneControllerImpl(applicationScope.get(), get())
+        }
+    }
+
+    private fun InProjectScope.removeLocationFromScene() {
+        provide<RemoveLocationFromScene> {
+            RemoveLocationFromSceneUseCase(get())
+        }
+        provide<RemoveLocationFromScene.OutputPort> {
+            RemoveLocationFromSceneOutput(get())
+        }
+        provide<RemoveLocationFromSceneController> {
+            RemoveLocationFromSceneControllerImpl(applicationScope.get(), get(), get())
         }
     }
 

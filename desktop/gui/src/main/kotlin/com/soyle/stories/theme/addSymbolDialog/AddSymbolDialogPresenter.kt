@@ -5,6 +5,7 @@ import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterRece
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.domain.character.CharacterRenamed
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.LocationRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
@@ -92,7 +93,7 @@ class AddSymbolDialogPresenter(
         view.updateOrInvalidated {
             copyOrDefault(
                 locations = locations + LocationItemViewModel(
-                    response.locationId.toString(),
+                    Location.Id(response.locationId),
                     response.locationName
                 )
             )
@@ -100,7 +101,7 @@ class AddSymbolDialogPresenter(
     }
 
     override suspend fun receiveLocationRenamed(locationRenamed: LocationRenamed) {
-        val locationId = locationRenamed.locationId.toString()
+        val locationId = locationRenamed.locationId
         view.updateOrInvalidated {
             copyOrDefault(
                 locations = locations.map {
@@ -112,7 +113,7 @@ class AddSymbolDialogPresenter(
     }
 
     override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
-        val locationId = deletedLocation.location.uuid.toString()
+        val locationId = deletedLocation.location
         view.updateOrInvalidated {
             copyOrDefault(
                 locations = locations.filterNot { it.id == locationId }

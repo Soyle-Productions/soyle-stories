@@ -3,11 +3,13 @@ package com.soyle.stories.desktop.config.scene
 import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.editProse.ContentReplacedNotifier
 import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
@@ -27,9 +29,15 @@ import com.soyle.stories.scene.deleteSceneRamifications.*
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneNotifier
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
+import com.soyle.stories.scene.locationsInScene.listLocationsInScene.ListLocationsInSceneController
+import com.soyle.stories.scene.locationsInScene.listLocationsToUse.ListLocationsToUseInSceneController
+import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneNotifier
+import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneReceiver
+import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneController
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
@@ -54,6 +62,9 @@ import com.soyle.stories.scene.sceneList.SceneListController
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneList.SceneListPresenter
 import com.soyle.stories.scene.sceneList.SceneListViewListener
+import com.soyle.stories.scene.sceneSetting.SceneSettingController
+import com.soyle.stories.scene.sceneSetting.SceneSettingState
+import com.soyle.stories.scene.sceneSetting.SceneSettingViewListener
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneController
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneViewListener
@@ -71,6 +82,7 @@ object Presentation {
 
             sceneList()
             symbolsInScene()
+            sceneSetting()
         }
         sceneEditor()
 
@@ -127,7 +139,7 @@ object Presentation {
                         sceneId.toString(),
                         get<SceneDetailsModel>(),
                         projectScope.get(),
-                        projectScope.get<LinkLocationToSceneNotifier>(),
+                        projectScope.get<LocationUsedInSceneNotifier>(),
                         projectScope.get<ReorderSceneNotifier>(),
                     ),
                     projectScope.get(),
@@ -227,6 +239,30 @@ object Presentation {
                 it listensTo get<ContentReplacedNotifier>()
                 it listensTo get<DetectUnusedSymbolsOutput>()
             }
+        }
+    }
+
+    private fun InProjectScope.sceneSetting() {
+        provide<SceneSettingViewListener> {
+            SceneSettingController(
+                object : SceneSettingController.Dependencies {
+                    override val openToolController: OpenToolController
+                        get() = get()
+                    override val listLocationsInSceneController: ListLocationsInSceneController
+                        get() = get()
+                    override val linkLocationToSceneController: LinkLocationToSceneController
+                        get() = get()
+                    override val listLocationsToUseInSceneController: ListLocationsToUseInSceneController
+                        get() = get()
+                    override val removeLocationFromSceneController: RemoveLocationFromSceneController
+                        get() = get()
+                    override val locationRemovedFromSceneNotifier: Notifier<LocationRemovedFromSceneReceiver>
+                        get() = get<LocationRemovedFromSceneNotifier>()
+                    override val locationUsedInSceneNotifier: Notifier<LocationUsedInSceneReceiver>
+                        get() = get<LocationUsedInSceneNotifier>()
+                },
+                get<SceneSettingState>(),
+            )
         }
     }
 

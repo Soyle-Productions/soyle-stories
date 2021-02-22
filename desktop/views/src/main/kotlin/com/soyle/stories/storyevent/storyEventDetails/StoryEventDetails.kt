@@ -1,13 +1,10 @@
 package com.soyle.stories.storyevent.storyEventDetails
 
 import com.soyle.stories.di.resolve
-import com.soyle.stories.project.ProjectScope
 import javafx.geometry.Pos
 import javafx.geometry.Side
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
 import tornadofx.*
 
 class StoryEventDetails : View() {
@@ -30,7 +27,7 @@ class StoryEventDetails : View() {
 					if (model.selectedLocation.value?.id == location.id) {
 						viewListener.deselectLocation()
 					} else {
-						viewListener.selectLocation(location.id)
+						viewListener.selectLocation(location.id.uuid.toString())
 					}
 					this@apply.hide()
 				}

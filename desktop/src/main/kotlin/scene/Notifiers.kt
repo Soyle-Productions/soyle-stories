@@ -8,6 +8,10 @@ import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCover
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneNotifier
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneReceiver
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
+import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneNotifier
+import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneReceiver
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedNotifier
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedReceiver
 import com.soyle.stories.scene.trackSymbolInScene.*
@@ -42,6 +46,12 @@ object Notifiers {
             }
             provide(SceneFrameValueChangedReceiver::class) {
                 SceneFrameValueChangedNotifier()
+            }
+            provide(LocationRemovedFromSceneReceiver::class) {
+                LocationRemovedFromSceneNotifier()
+            }
+            provide(LocationUsedInSceneReceiver::class) {
+                LocationUsedInSceneNotifier()
             }
         }
     }

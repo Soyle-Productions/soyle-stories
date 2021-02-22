@@ -3,19 +3,21 @@ package com.soyle.stories.scene.sceneDetails
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.scene.LocationUsedInScene
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.locationList.LiveLocationList
 import com.soyle.stories.location.locationList.LocationListListener
-import com.soyle.stories.usecase.location.listAllLocations.LocationItem
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
 import com.soyle.stories.scene.sceneDetails.includedCharacter.CoveredArcSectionViewModel
 import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterInScenePresenter
 import com.soyle.stories.scene.sceneDetails.includedCharacter.IncludedCharacterInSceneViewModel
 import com.soyle.stories.scene.sceneDetails.includedCharacter.PreviousMotivation
 import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewModel
+import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetails
-import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import java.util.*
 
@@ -23,11 +25,11 @@ class SceneDetailsPresenter(
     sceneId: String,
     private val view: View.Nullable<SceneDetailsViewModel>,
     locationList: LiveLocationList,
-    locationLinkedToScene: Notifier<LinkLocationToScene.OutputPort>,
+    locationUsedInScene: Notifier<LocationUsedInSceneReceiver>,
     sceneReordered: Notifier<ReorderScene.OutputPort>
 ) : GetSceneDetails.OutputPort,
     LocationListListener,
-    LinkLocationToScene.OutputPort,
+    LocationUsedInSceneReceiver,
     ReorderScene.OutputPort,
         DeleteScene.OutputPort
 {
@@ -36,7 +38,7 @@ class SceneDetailsPresenter(
 
     init {
         this listensTo locationList
-        this listensTo locationLinkedToScene
+        this listensTo locationUsedInScene
         this listensTo sceneReordered
     }
 
@@ -85,11 +87,11 @@ class SceneDetailsPresenter(
                     null
                 ),
                 selectedLocation = locationId?.let {
-                    (this?.locations ?: listOf()).find { it.id == locationId }
-                        ?: LocationItemViewModel(locationId, "")
+                    (this?.locations ?: listOf()).find { it.id.uuid.toString() == locationId }
+                        ?: LocationItemViewModel(Location.Id(UUID.fromString(locationId)), "")
                 },
                 availableLocations = (this?.locations ?: listOf()).filter {
-                    it.id != locationId
+                    it.id.uuid.toString() != locationId
                 }
             )
         }
@@ -99,7 +101,7 @@ class SceneDetailsPresenter(
         view.update {
             val locationId = this?.selectedLocation?.id
             val locationViewModels = locations.map {
-                LocationItemViewModel(it.id.toString(), it.locationName)
+                LocationItemViewModel(it.id, it.locationName)
             }
             copyOrDefault(
                 selectedLocation = locationId?.let {
@@ -113,14 +115,12 @@ class SceneDetailsPresenter(
         }
     }
 
-    override fun locationLinkedToScene(response: LinkLocationToScene.ResponseModel) {
-        if (response.sceneId != sceneId) return
+    override suspend fun receiveLocationUsedInScene(locationUsedInScene: LocationUsedInScene) {
+        if (locationUsedInScene.sceneId.uuid != sceneId) return
         view.updateOrInvalidated {
-            val locationId = response.locationId?.toString()
+            val locationId = locationUsedInScene.sceneSetting.id
             copyOrDefault(
-                selectedLocation = locationId?.let {
-                    locations.find { it.id == locationId }
-                },
+                selectedLocation = locations.find { it.id == locationId },
                 availableLocations = locations.filter {
                     it.id != locationId
                 }
@@ -163,9 +163,6 @@ class SceneDetailsPresenter(
     )
 
     override fun failedToGetSceneDetails(failure: Exception) {}
-    override fun failedToLinkLocationToScene(failure: Exception) {
-        println(failure)
-    }
 
     override fun failedToReorderScene(failure: Exception) {}
     override fun receiveDeleteSceneFailure(failure: Exception) {}

@@ -704,7 +704,7 @@ class SceneSteps : En {
         Then(
             "the {location} should be used in the {scene}"
         ) { location: Location, scene: Scene ->
-            assertTrue(scene.settings.contains(location.id))
+            assertTrue(scene.settings.containsEntityWithId(location.id))
         }
         Then(
             "the {string} mention in the {scene}'s prose should read {string}"
