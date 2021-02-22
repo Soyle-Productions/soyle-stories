@@ -93,12 +93,8 @@ class `Listed Locations Can Be Used Int Test` {
         val useCase: LinkLocationToScene = LinkLocationToSceneUseCase(sceneRepository, locationRepository)
         var result: LinkLocationToScene.ResponseModel? = null
         val output = object : LinkLocationToScene.OutputPort {
-            override fun locationLinkedToScene(response: LinkLocationToScene.ResponseModel) {
+            override suspend fun locationLinkedToScene(response: LinkLocationToScene.ResponseModel) {
                 result = response
-            }
-
-            override fun failedToLinkLocationToScene(failure: Exception) {
-                throw failure
             }
         }
         runBlocking {

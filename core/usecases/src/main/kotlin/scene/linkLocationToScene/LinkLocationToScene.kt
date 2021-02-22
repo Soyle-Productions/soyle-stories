@@ -14,7 +14,6 @@ interface LinkLocationToScene {
 	class ResponseModel(val locationUsedInScene: LocationUsedInScene)
 
 	interface OutputPort {
-		fun failedToLinkLocationToScene(failure: Exception)
-		fun locationLinkedToScene(response: ResponseModel)
+		suspend fun locationLinkedToScene(response: ResponseModel)
 	}
 }

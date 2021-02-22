@@ -108,11 +108,7 @@ class LinkLocationToSceneUnitTest {
     private fun whenUseCaseIsExecuted(requestModel: LinkLocationToScene.RequestModel) {
         val useCase: LinkLocationToScene = LinkLocationToSceneUseCase(sceneRepository, locationRepository)
         val output = object : LinkLocationToScene.OutputPort {
-            override fun failedToLinkLocationToScene(failure: Exception) {
-                result = failure
-            }
-
-            override fun locationLinkedToScene(response: LinkLocationToScene.ResponseModel) {
+            override suspend fun locationLinkedToScene(response: LinkLocationToScene.ResponseModel) {
                 result = response
             }
         }
