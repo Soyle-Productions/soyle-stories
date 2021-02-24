@@ -43,6 +43,10 @@ class `Scene Setting Driver`(private val view: SceneSettingView) : FxRobot() {
         return locationNode?.let { from(it).lookup(".label").queryLabeled() }
     }
 
+    fun getLocationItemByName(locationName: String): Labeled? {
+        return locationList?.let { from(it).lookup(locationName).queryAll<Labeled>().firstOrNull() }
+    }
+
     fun getRemoveLocationButton(locationId: Location.Id): ButtonBase?
     {
         val locationNode = locationList?.let { from(it).lookup("#${locationId}").queryAll<Node>().firstOrNull() }

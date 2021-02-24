@@ -4,8 +4,10 @@ import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.domain.scene.LocationRemovedFromScene
 import com.soyle.stories.domain.scene.LocationUsedInScene
+import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
+import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedReceiver
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneReceiver
 import com.soyle.stories.usecase.scene.locationsInScene.listLocationsToUse.ListAvailableLocationsToUseInScene
@@ -13,16 +15,19 @@ import com.soyle.stories.usecase.scene.locationsInScene.listLocationsUsed.ListLo
 
 internal class SceneSettingPresenter(
     private val view: View.Nullable<SceneSettingViewModel>,
-    locationRemovedFromSceneNotifier: Notifier<LocationRemovedFromSceneReceiver>,
-    locationUsedInSceneNotifier: Notifier<LocationUsedInSceneReceiver>
+    locationUsedInSceneNotifier: Notifier<LocationUsedInSceneReceiver>,
+    sceneSettingLocationRenamed: Notifier<SceneSettingLocationRenamedReceiver>,
+    locationRemovedFromScene: Notifier<LocationRemovedFromSceneReceiver>
 ) : ListLocationsUsedInScene.OutputPort,
     ListAvailableLocationsToUseInScene.OutputPort,
     LocationRemovedFromSceneReceiver,
-    LocationUsedInSceneReceiver {
+    LocationUsedInSceneReceiver,
+    SceneSettingLocationRenamedReceiver {
 
     init {
-        this listensTo locationRemovedFromSceneNotifier
         this listensTo locationUsedInSceneNotifier
+        this listensTo sceneSettingLocationRenamed
+        this listensTo locationRemovedFromScene
     }
 
     override suspend fun receiveLocationsUsedInScene(response: ListLocationsUsedInScene.ResponseModel) {
@@ -64,6 +69,21 @@ internal class SceneSettingPresenter(
                     locationUsedInScene.sceneSetting.id,
                     locationUsedInScene.sceneSetting.locationName
                 )
+            )
+        }
+    }
+
+    override suspend fun receiveSceneSettingLocationRenamed(sceneSettingLocationRenamed: SceneSettingLocationRenamed) {
+        view.updateOrInvalidated {
+            if (targetSceneId != sceneSettingLocationRenamed.sceneId) return@updateOrInvalidated this
+            copy(
+                usedLocations = usedLocations.map { item ->
+                    if (item.id == sceneSettingLocationRenamed.sceneSettingLocation.id) {
+                        item.copy(name = sceneSettingLocationRenamed.sceneSettingLocation.locationName)
+                    } else {
+                        item
+                    }
+                }
             )
         }
     }

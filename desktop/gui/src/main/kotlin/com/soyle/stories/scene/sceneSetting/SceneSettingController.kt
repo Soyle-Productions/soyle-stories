@@ -5,6 +5,7 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.gui.View
 import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedReceiver
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
 import com.soyle.stories.scene.locationsInScene.listLocationsInScene.ListLocationsInSceneController
@@ -30,6 +31,7 @@ class SceneSettingController private constructor(
 
         val locationRemovedFromSceneNotifier: Notifier<LocationRemovedFromSceneReceiver>
         val locationUsedInSceneNotifier: Notifier<LocationUsedInSceneReceiver>
+        val sceneSettingLocationRenamedNotifier: Notifier<SceneSettingLocationRenamedReceiver>
     }
 
     constructor(
@@ -43,8 +45,9 @@ class SceneSettingController private constructor(
         dependencies.removeLocationFromSceneController,
         SceneSettingPresenter(
             view,
-            dependencies.locationRemovedFromSceneNotifier,
-            dependencies.locationUsedInSceneNotifier
+            dependencies.locationUsedInSceneNotifier,
+            dependencies.sceneSettingLocationRenamedNotifier,
+            dependencies.locationRemovedFromSceneNotifier
         )
     )
 

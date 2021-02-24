@@ -30,6 +30,8 @@ import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMenti
 import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.includeCharacterInScene.IncludedCharacterInSceneNotifier
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
+import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedNotifier
+import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedReceiver
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
@@ -260,6 +262,8 @@ object Presentation {
                         get() = get<LocationRemovedFromSceneNotifier>()
                     override val locationUsedInSceneNotifier: Notifier<LocationUsedInSceneReceiver>
                         get() = get<LocationUsedInSceneNotifier>()
+                    override val sceneSettingLocationRenamedNotifier: Notifier<SceneSettingLocationRenamedReceiver>
+                        get() = get<SceneSettingLocationRenamedNotifier>()
                 },
                 get<SceneSettingState>(),
             )

@@ -22,6 +22,11 @@ class `Scene Setting Location Steps` : En {
         Given("I have used the {location} as a setting for the {scene}") { location: Location, scene: Scene ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).givenLocationUsedInScene(scene, location)
         }
+        Given("I am mapping the {scene}'s setting locations") { scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+        }
     }
 
     private fun whens() {
@@ -59,6 +64,16 @@ class `Scene Setting Location Steps` : En {
                 .givenFocusedOn(scene)
             SceneSettingAssertions.assertThat(sceneSettingView) {
                 doesNotHaveLocation(location)
+            }
+        }
+        Then("the {scene} should not have a setting named {string}") { scene: Scene, settingName: String ->
+            assertFalse(scene.settings.any { it.locationName == settingName })
+
+            val sceneSettingView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneSettingAssertions.assertThat(sceneSettingView) {
+                doesNotHaveLocationNamed(settingName)
             }
         }
     }

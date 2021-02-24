@@ -13,3 +13,16 @@ Feature: Use Locations as Scene Setting
     Given I have used the "Home" location as a setting for the "Big Battle" scene
     When I stop using the "Home" location as a setting for the "Big Battle" scene
     Then the "Home" location should not be a setting for the "Big Battle" scene
+
+  Scenario: Delete Location used in scene
+    Given I have used the "Home" location as a setting for the "Big Battle" scene
+    And I am mapping the "Big Battle" scene's setting locations
+    When I remove the "Home" location from the story
+    Then the "Big Battle" scene should not have a setting named "Home"
+
+  Scenario: Rename Location used in scene
+    Given I have used the "Home" location as a setting for the "Big Battle" scene
+    And I am mapping the "Big Battle" scene's setting locations
+    When I rename the "Home" location to "Work"
+    Then the "Big Battle" scene should not have a setting named "Home"
+    And the "Work" location should be a setting for the "Big Battle" scene

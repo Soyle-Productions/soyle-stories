@@ -23,4 +23,9 @@ class SceneSettingAssertions private constructor(private val driver: `Scene Sett
     {
         assertNull(driver.getLocationItem(location.id)) { "Location item found for ${location.name}, but should not have." }
     }
+
+    fun doesNotHaveLocationNamed(locationName: String)
+    {
+        assertNull(driver.getLocationItemByName(locationName)) { "Location item found for ${locationName}, but should not have." }
+    }
 }
