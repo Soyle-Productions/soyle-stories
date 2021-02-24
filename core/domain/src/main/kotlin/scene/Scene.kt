@@ -7,6 +7,7 @@ import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
@@ -193,6 +194,20 @@ class Scene private constructor(
             copy(settings = settings.minus(sceneSetting)),
             LocationRemovedFromScene(id, sceneSetting)
         )
+    }
+    fun withLocationRenamed(location: Location): SceneUpdate<SceneSettingLocationRenamed> {
+        val sceneSetting = getSceneSettingOrError(location.id)
+        if (sceneSetting.locationName == location.name.value) return noUpdate()
+        val newSceneSetting = sceneSetting.copy(locationName = location.name.value)
+        return Updated(
+            copy(settings = settings.minus(sceneSetting).plus(newSceneSetting)),
+            SceneSettingLocationRenamed(id, newSceneSetting)
+        )
+    }
+
+    private fun getSceneSettingOrError(locationId: Location.Id): SceneSettingLocation
+    {
+        return settings.getEntityById(locationId) ?: throw SceneDoesNotUseLocation(id, locationId)
     }
 
     fun withoutCharacter(characterId: Character.Id) =

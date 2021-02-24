@@ -1,5 +1,6 @@
 package com.soyle.stories.domain.scene
 
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.validation.DuplicateOperationException
 import com.soyle.stories.domain.validation.EntityNotFoundException
@@ -11,6 +12,11 @@ class SceneDoesNotTrackSymbol(val sceneId: Scene.Id, val symbolId: Symbol.Id) : 
 {
 	override val message: String?
 		get() = "$sceneId does not track $symbolId"
+}
+class SceneDoesNotUseLocation(val sceneId: Scene.Id, val locationId: Location.Id) : EntityNotFoundException(locationId.uuid) {
+
+	override val message: String?
+		get() = "$sceneId does not use $locationId"
 }
 
 class SceneAlreadyContainsCharacter(val sceneId: UUID, val characterId: UUID) : DuplicateOperationException()

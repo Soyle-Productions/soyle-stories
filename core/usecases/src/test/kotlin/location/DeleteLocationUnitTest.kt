@@ -4,79 +4,116 @@ import com.soyle.stories.domain.character.*
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.makeLocation
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.SceneSettingLocation
+import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.validation.entitySetOf
 import com.soyle.stories.usecase.location.deleteLocation.DeleteLocation
 import com.soyle.stories.usecase.location.deleteLocation.DeleteLocationUseCase
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.LocationRepositoryDouble
+import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class DeleteLocationUnitTest {
 
-	private val projectId = Project.Id(UUID.randomUUID())
-	private val locationId: UUID = UUID.randomUUID()
+    private val location = makeLocation()
 
+    private val updatedCharacterArcs = mutableListOf<CharacterArc>()
+    private var deletedLocation: Location? = null
+    private var updatedScenes = mutableListOf<Scene>()
+    private var result: DeleteLocation.ResponseModel? = null
 
-	private val updatedCharacterArcs = mutableListOf<CharacterArc>()
-	private var deletedLocation: Location? = null
-	private var result: DeleteLocation.ResponseModel? = null
+    private val locationRepository = LocationRepositoryDouble(onRemoveLocation = ::deletedLocation::set)
+    private val sceneRepository = SceneRepositoryDouble(onUpdateScene = updatedScenes::add)
+    private val characterArcSectionRepository =
+        CharacterArcRepositoryDouble(onUpdateCharacterArc = updatedCharacterArcs::add)
 
-	private val locationRepository = LocationRepositoryDouble(onRemoveLocation = ::deletedLocation::set)
-	private val characterArcSectionRepository = CharacterArcRepositoryDouble(onUpdateCharacterArc = updatedCharacterArcs::add)
+    @Test
+    fun `location does not exist`() {
+        val error = assertThrows<LocationDoesNotExist> {
+            deleteLocation()
+        }
+        error.locationId.mustEqual(location.id.uuid)
+    }
 
-	@Test
-	fun `location does not exist`() {
-		val error = assertThrows<LocationDoesNotExist> {
-			deleteLocation()
-		}
-		error.locationId.mustEqual(locationId)
-	}
+    @Test
+    fun `existing location is deleted`() {
+        locationRepository.givenLocation(location)
+        deleteLocation()
+        val deletedLocation = deletedLocation!!
+        deletedLocation.id.mustEqual(location.id)
+        val result = result as DeleteLocation.ResponseModel
+        result.deletedLocation.location.mustEqual(location.id)
+    }
 
-	@Test
-	fun `existing location is deleted`() {
-		locationRepository.givenLocation(makeLocation(id = Location.Id(locationId), projectId = projectId))
-		deleteLocation()
-		val deletedLocation = deletedLocation!!
-		deletedLocation.id.uuid.mustEqual(locationId)
-		val result = result as DeleteLocation.ResponseModel
-		result.deletedLocation.location.uuid.mustEqual(locationId)
-	}
+    @Test
+    fun `update linked character arc sections`() {
+        locationRepository.givenLocation(location)
+        val arcs = List(3) {
+            CharacterArc.planNewCharacterArc(Character.Id(), Theme.Id(), "")
+                .withArcSection(makeCharacterArcSection(linkedLocation = location.id, template = Drive))
+                .withArcSection(
+                    makeCharacterArcSection(
+                        linkedLocation = location.id,
+                        template = AttackByAlly
+                    )
+                )
+                .withArcSection(makeCharacterArcSection(template = MoralDecision))
+        }
+        val arcSections = arcs.flatMap { it.arcSections }.filter { it.linkedLocation == location.id }
+        arcs.forEach(characterArcSectionRepository::givenCharacterArc)
+        deleteLocation()
+        val updatedCharacterArcSectionsById = arcSections.associateBy { it.id }
+        arcSections.forEach { updatedCharacterArcSectionsById.getValue(it.id) }
+        updatedCharacterArcs.forEach {
+            assertTrue(it.arcSections.none { it.linkedLocation == location.id })
+        }
+        val result = result as DeleteLocation.ResponseModel
+        result.updatedArcSections.mustEqual(arcSections.map { it.id.uuid }.toSet())
+    }
 
-	@Test
-	fun `update linked character arc sections`() {
-		locationRepository.givenLocation(makeLocation(id = Location.Id(locationId), projectId = projectId))
-		val arcs = List(3) {
-			CharacterArc.planNewCharacterArc(Character.Id(), Theme.Id(), "")
-				.withArcSection(makeCharacterArcSection(linkedLocation = Location.Id(locationId), template = Drive))
-				.withArcSection(makeCharacterArcSection(linkedLocation = Location.Id(locationId), template = AttackByAlly))
-				.withArcSection(makeCharacterArcSection(template = MoralDecision))
-		}
-		val arcSections = arcs.flatMap { it.arcSections }.filter { it.linkedLocation?.uuid == locationId }
-		arcs.forEach(characterArcSectionRepository::givenCharacterArc)
-		deleteLocation()
-		val updatedCharacterArcSectionsById = arcSections.associateBy { it.id }
-		arcSections.forEach { updatedCharacterArcSectionsById.getValue(it.id) }
-		updatedCharacterArcs.forEach {
-			assertTrue(it.arcSections.none { it.linkedLocation?.uuid == locationId })
-		}
-		val result = result as DeleteLocation.ResponseModel
-		result.updatedArcSections.mustEqual(arcSections.map { it.id.uuid }.toSet())
-	}
+    @Nested
+    inner class `Given used in scene` {
 
-	private fun deleteLocation() {
-		val useCase: DeleteLocation = DeleteLocationUseCase(locationRepository, characterArcSectionRepository)
-		runBlocking {
-			useCase.invoke(locationId, object : DeleteLocation.OutputPort {
-				override suspend fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
-					result = response
-				}
-			})
-		}
-	}
+        private val scenes = List(5) { makeScene(settings = entitySetOf(SceneSettingLocation(location))) }
+
+        init {
+            locationRepository.givenLocation(location)
+            scenes.forEach(sceneRepository::givenScene)
+        }
+
+        @Test
+        fun `should remove location setting from scene`() {
+            deleteLocation()
+            updatedScenes.map { it.id }.toSet().mustEqual(scenes.map { it.id }.toSet())
+            assertTrue(updatedScenes.none { it.settings.containsEntityWithId(location.id) })
+        }
+
+        @Test
+        fun `should output location setting removed from scene event`() {
+            deleteLocation()
+            result!!.locationRemovedFromScenes.map { it.sceneId }.toSet().mustEqual(scenes.map { it.id }.toSet())
+            result!!.locationRemovedFromScenes.onEach { it.sceneSetting.id.mustEqual(location.id) }
+        }
+
+    }
+
+    private fun deleteLocation() {
+        val useCase: DeleteLocation =
+            DeleteLocationUseCase(locationRepository, characterArcSectionRepository, sceneRepository)
+        runBlocking {
+            useCase.invoke(location.id.uuid, object : DeleteLocation.OutputPort {
+                override suspend fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
+                    result = response
+                }
+            })
+        }
+    }
 
 }
