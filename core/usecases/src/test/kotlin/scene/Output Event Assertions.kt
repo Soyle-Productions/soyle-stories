@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.scene
 
 import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.CharacterArcSection
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.*
 

@@ -1,7 +1,7 @@
 package com.soyle.stories.usecase.scene.locationsInScene.removeLocationFromScene
 
 import com.soyle.stories.domain.location.Location
-import com.soyle.stories.domain.scene.LocationRemovedFromScene
+import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
 import com.soyle.stories.domain.scene.Scene
 
 interface RemoveLocationFromScene {

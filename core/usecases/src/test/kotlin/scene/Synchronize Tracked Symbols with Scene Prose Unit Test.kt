@@ -6,8 +6,8 @@ import com.soyle.stories.domain.prose.ProseMentionRange
 import com.soyle.stories.domain.prose.makeProse
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.SymbolTrackedInScene
-import com.soyle.stories.domain.scene.TrackedSymbolRemoved
+import com.soyle.stories.domain.scene.events.SymbolTrackedInScene
+import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme

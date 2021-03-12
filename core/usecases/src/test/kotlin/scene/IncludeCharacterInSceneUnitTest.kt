@@ -16,10 +16,10 @@ import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.scene.common.IncludedCharacterInScene
-import com.soyle.stories.usecase.scene.includeCharacterInScene.AvailableCharactersToAddToScene
-import com.soyle.stories.usecase.scene.includeCharacterInScene.GetAvailableCharactersToAddToScene
-import com.soyle.stories.usecase.scene.includeCharacterInScene.IncludeCharacterInScene
-import com.soyle.stories.usecase.scene.includeCharacterInScene.IncludeCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.AvailableCharactersToAddToScene
+import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
+import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneUseCase
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
 import com.soyle.stories.usecase.storyevent.characterDoesNotExist
@@ -72,11 +72,8 @@ class IncludeCharacterInSceneUnitTest {
         givenCharacterExists()
         givenSceneIncludesCharacter()
 
-        val error = assertThrows<SceneAlreadyContainsCharacter> {
-            whenCharacterIncludedInScene()
-        }
+        whenCharacterIncludedInScene()
 
-        error shouldBe sceneAlreadyContainsCharacter(sceneId, characterId)
         assertNull(savedStoryEvent)
         assertNull(savedScene)
     }
@@ -208,7 +205,7 @@ class IncludeCharacterInSceneUnitTest {
                     storyEventId = StoryEvent.Id(storyEventId)
                 )
             ) { nextScene, character ->
-                nextScene.withCharacterIncluded(character)
+                nextScene.withCharacterIncluded(character).scene
             }
         )
     }
@@ -231,7 +228,7 @@ class IncludeCharacterInSceneUnitTest {
                 Project.Id(),
                 characterName
             )
-        ).let {
+        ).scene.let {
             sceneRepository.scenes[it.id] = it
         }
     }
@@ -241,7 +238,7 @@ class IncludeCharacterInSceneUnitTest {
     private fun givenMotivationsForCharacterPreviouslySet() {
         repeat(5) {
             makeScene(projectId = projectId)
-                .withCharacterIncluded(characterRepository.characters.values.first())
+                .withCharacterIncluded(characterRepository.characters.values.first()).scene
                 .withMotivationForCharacter(Character.Id(characterId), "${UUID.randomUUID()}")
                 .let {
                     sceneRepository.scenes[it.id] = it
@@ -269,7 +266,7 @@ class IncludeCharacterInSceneUnitTest {
     }
 
     private val useCase = IncludeCharacterInSceneUseCase(sceneRepository, storyEventRepository, characterRepository)
-    private val output = object : IncludeCharacterInScene.OutputPort, GetAvailableCharactersToAddToScene.OutputPort {
+    private val output = object : IncludeCharacterInScene.OutputPort, ListAvailableCharactersToIncludeInScene.OutputPort {
 
         override suspend fun receiveAvailableCharactersToAddToScene(response: AvailableCharactersToAddToScene) {
             result = response

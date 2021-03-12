@@ -3,6 +3,8 @@ package com.soyle.stories.domain.scene
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.character.makeCharacterArcSection
 import com.soyle.stories.domain.mustEqual
+import com.soyle.stories.domain.scene.events.SymbolTrackedInScene
+import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,31 +16,11 @@ import org.junit.jupiter.api.assertThrows
 class SceneTest {
 
     @Test
-    fun `scene includes character`() {
-        val character = makeCharacter()
-        val scene = makeScene()
-        assert(
-            scene.withCharacterIncluded(character).includesCharacter(character.id)
-        )
-    }
-
-    @Test
-    fun `Scene cannot include character twice`() {
-        val character = makeCharacter()
-        val scene = makeScene().withCharacterIncluded(character)
-        val error = assertThrows<SceneAlreadyContainsCharacter> {
-            scene.withCharacterIncluded(character)
-        }
-        error.sceneId.mustEqual(scene.id.uuid)
-        error.characterId.mustEqual(character.id.uuid)
-    }
-
-    @Test
     fun `scene covers character arc section`() {
         val character = makeCharacter()
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val update = makeScene()
-            .withCharacterIncluded(character)
+            .withCharacterIncluded(character).scene
             .withCharacterArcSectionCovered(characterArcSection)
         val sections = update.getCoveredCharacterArcSectionsForCharacter(character.id)!!
         sections.single { it == characterArcSection.id }
@@ -49,11 +31,11 @@ class SceneTest {
         val character = makeCharacter()
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val scene = makeScene()
-        val error = assertThrows<CharacterNotInScene> {
+        val error = assertThrows<SceneDoesNotIncludeCharacter> {
             scene.withCharacterArcSectionCovered(characterArcSection)
         }
-        error.sceneId.mustEqual(scene.id.uuid)
-        error.characterId.mustEqual(character.id.uuid)
+        error.sceneId.mustEqual(scene.id)
+        error.characterId.mustEqual(character.id)
     }
 
     @Test
@@ -61,7 +43,7 @@ class SceneTest {
         val character = makeCharacter()
         val characterArcSection = makeCharacterArcSection(characterId = character.id)
         val scene = makeScene()
-            .withCharacterIncluded(character)
+            .withCharacterIncluded(character).scene
             .withCharacterArcSectionCovered(characterArcSection)
         val error = assertThrows<SceneAlreadyCoversCharacterArcSection> {
             scene.withCharacterArcSectionCovered(characterArcSection)
@@ -110,7 +92,7 @@ class SceneTest {
                 .withSymbolTracked(theme, symbol).scene
                 .withSymbolTracked(theme, symbol)
             update.scene.trackedSymbols.size.mustEqual(1)
-            update as NoUpdate
+            update as WithoutChange
         }
 
         @Test
@@ -159,7 +141,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol, true).scene
                     .withSymbolPinned(symbol.id)
                 update.scene.trackedSymbols.single().isPinned.mustEqual(true)
-                update as NoUpdate
+                update as WithoutChange
             }
 
             @Test
@@ -185,7 +167,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol).scene
                     .withSymbolUnpinned(symbol.id)
                 update.scene.trackedSymbols.single().isPinned.mustEqual(false)
-                update as NoUpdate
+                update as WithoutChange
             }
 
         }
@@ -217,7 +199,7 @@ class SceneTest {
                 .withSymbolTracked(theme, symbol).scene
                 .withSymbolRenamed(symbol.id, symbol.name)
             update.scene.trackedSymbols.single().symbolName.mustEqual(symbol.name)
-            update as NoUpdate
+            update as WithoutChange
         }
 
         @Test

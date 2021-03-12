@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.location.deleteLocation
 
-import com.soyle.stories.domain.scene.LocationRemovedFromScene
+import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
 import java.util.*
 
 interface DeleteLocation {

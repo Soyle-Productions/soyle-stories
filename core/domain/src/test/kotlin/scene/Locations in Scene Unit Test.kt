@@ -25,7 +25,7 @@ class `Locations in Scene Unit Test` {
     @Test
     fun `using the same location should emit no update`() {
         val update = scene.withLocationLinked(location).scene.withLocationLinked(location)
-        update as NoUpdate
+        update as WithoutChange
         update.scene.settings.containsEntityWithId(location.id).mustEqual(true)
     }
 
@@ -43,7 +43,7 @@ class `Locations in Scene Unit Test` {
     @Test
     fun `renaming a location with the same name should emit no update`() {
         val update = scene.withLocationLinked(location).scene.withLocationRenamed(location)
-        update as NoUpdate
+        update as WithoutChange
         update.scene.id.mustEqual(scene.id)
         update.scene.settings.getEntityById(location.id)!!.locationName.mustEqual(location.name.value)
     }

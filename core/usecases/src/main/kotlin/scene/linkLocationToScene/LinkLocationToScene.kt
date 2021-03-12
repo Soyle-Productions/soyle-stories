@@ -1,7 +1,7 @@
 package com.soyle.stories.usecase.scene.linkLocationToScene
 
 import com.soyle.stories.domain.location.Location
-import com.soyle.stories.domain.scene.LocationUsedInScene
+import com.soyle.stories.domain.scene.events.LocationUsedInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocale
 

@@ -2,6 +2,7 @@ package com.soyle.stories.usecase.scene
 
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.scene.*
+import com.soyle.stories.domain.scene.events.SceneFrameValueChanged
 import com.soyle.stories.domain.str
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValue

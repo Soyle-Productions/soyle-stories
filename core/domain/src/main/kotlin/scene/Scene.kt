@@ -7,7 +7,7 @@ import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
+import com.soyle.stories.domain.scene.events.*
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
@@ -146,31 +146,50 @@ class Scene private constructor(
     fun withSceneFrameValue(value: SceneFrameValue): SceneUpdate<SceneFrameValueChanged> {
         when (value) {
             is SceneConflict -> {
-                if (value == conflict) return NoUpdate(this)
+                if (value == conflict) return WithoutChange(this)
                 return Updated(copy(conflict = value), SceneFrameValueChanged(id, value))
             }
             is SceneResolution -> {
-                if (value == resolution) return NoUpdate(this)
+                if (value == resolution) return WithoutChange(this)
                 return Updated(copy(resolution = value), SceneFrameValueChanged(id, value))
             }
         }
     }
 
-    fun withCharacterIncluded(character: Character): Scene {
-        if (includesCharacter(character.id)) throw SceneAlreadyContainsCharacter(id.uuid, character.id.uuid)
-        return copy(
-            charactersInScene = charactersInScene + CharacterInScene(
-                character.id,
-                id,
-                character.name.value,
-                null,
-                listOf()
-            )
+    fun withCharacterIncluded(character: Character): SceneUpdate<IncludedCharacterInScene> {
+        if (includesCharacter(character.id)) return noUpdate()
+        val characterInScene = CharacterInScene(
+            character.id,
+            id,
+            character.name.value,
+            null,
+            listOf()
+        )
+        return Updated(
+            copy(
+                charactersInScene = charactersInScene + characterInScene
+            ),
+            IncludedCharacterInScene(id, IncludedCharacter(character.id, character.name.value))
         )
     }
 
+    fun withCharacterRenamed(character: Character): SceneUpdate<RenamedCharacterInScene>
+    {
+        val characterInScene = charactersById[character.id] ?: throw SceneDoesNotIncludeCharacter(id, character.id)
+        if (characterInScene.characterName == character.name.value) return noUpdate()
+        return Updated(
+            copy(
+                charactersInScene = charactersInScene.map {
+                    if (it.characterId == character.id) {
+                        it.withName(character.name.value)
+                    } else it
+                }
+            ),
+            RenamedCharacterInScene(id, IncludedCharacter(character.id, character.name.value)))
+    }
+
     fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene {
-        if (!includesCharacter(characterId)) throw CharacterNotInScene(id.uuid, characterId.uuid)
+        if (!includesCharacter(characterId)) throw SceneDoesNotIncludeCharacter(id, characterId)
         return copy(charactersInScene = charactersInScene.map {
             if (it.characterId == characterId) CharacterInScene(
                 it.characterId,
@@ -214,9 +233,9 @@ class Scene private constructor(
         copy(charactersInScene = charactersInScene.filterNot { it.characterId == characterId })
 
     fun withCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene {
-        charactersById[characterArcSection.characterId] ?: throw CharacterNotInScene(
-            id.uuid,
-            characterArcSection.characterId.uuid
+        charactersById[characterArcSection.characterId] ?: throw SceneDoesNotIncludeCharacter(
+            id,
+            characterArcSection.characterId
         )
         return copy(
             charactersInScene = charactersInScene.map {
@@ -271,7 +290,7 @@ class Scene private constructor(
         return Updated(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
     }
 
-    fun noUpdate() = NoUpdate(this)
+    fun noUpdate() = WithoutChange(this)
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "Scene($uuid)"
@@ -302,34 +321,3 @@ class Scene private constructor(
         val isPinned: Boolean = false
     )
 }
-
-sealed class SceneUpdate<out T> {
-    abstract val scene: Scene
-    operator fun component1() = scene
-}
-
-class NoUpdate(override val scene: Scene) : SceneUpdate<Nothing>()
-class Updated<out T : SceneEvent>(override val scene: Scene, val event: T) : SceneUpdate<T>() {
-    operator fun component2() = event
-}
-
-abstract class SceneEvent {
-    abstract val sceneId: Scene.Id
-}
-
-data class SymbolTrackedInScene(
-    override val sceneId: Scene.Id,
-    val themeName: String,
-    val trackedSymbol: Scene.TrackedSymbol
-) : SceneEvent()
-
-data class SymbolPinnedToScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
-data class SymbolUnpinnedFromScene(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) :
-    SceneEvent()
-
-data class TrackedSymbolRenamed(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
-data class TrackedSymbolRemoved(override val sceneId: Scene.Id, val trackedSymbol: Scene.TrackedSymbol) : SceneEvent()
-data class SceneFrameValueChanged(override val sceneId: Scene.Id, val newValue: SceneFrameValue) : SceneEvent()
-data class LocationUsedInScene(override val sceneId: Scene.Id, val sceneSetting: SceneSettingLocation) : SceneEvent()
-data class LocationRemovedFromScene(override val sceneId: Scene.Id, val sceneSetting: SceneSettingLocation) :
-    SceneEvent()

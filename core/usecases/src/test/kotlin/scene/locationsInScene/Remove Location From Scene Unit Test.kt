@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.scene.locationsInScene
 
 import com.soyle.stories.domain.location.makeLocation
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.scene.LocationRemovedFromScene
+import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneSettingLocation
 import com.soyle.stories.domain.scene.makeScene

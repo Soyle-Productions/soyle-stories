@@ -35,7 +35,7 @@ class `Scene Frame Value Unit Test` {
         fun `should output no update when conflict is the same`() {
             val update = scene.withSceneFrameValue(newConflict)
                 .scene.withSceneFrameValue(newConflict)
-            update as NoUpdate
+            update as WithoutChange
         }
 
     }
@@ -66,7 +66,7 @@ class `Scene Frame Value Unit Test` {
         fun `should output no update when conflict is the same`() {
             val update = scene.withSceneFrameValue(newResolution)
                 .scene.withSceneFrameValue(newResolution)
-            update as NoUpdate
+            update as WithoutChange
         }
 
     }

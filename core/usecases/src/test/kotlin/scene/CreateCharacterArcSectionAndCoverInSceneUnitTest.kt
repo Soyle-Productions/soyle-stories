@@ -11,10 +11,10 @@ import com.soyle.stories.usecase.character.CharacterArcDoesNotExist
 import com.soyle.stories.usecase.character.CharacterArcTemplateSectionDoesNotExist
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInSceneUseCase
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInSceneUseCase
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
@@ -27,7 +27,7 @@ class CreateCharacterArcSectionAndCoverInSceneUnitTest {
     // Preconditions
     private val character = makeCharacter()
     private val theme = makeTheme()
-    private val scene = makeScene().withCharacterIncluded(character)
+    private val scene = makeScene().withCharacterIncluded(character).scene
 
     // post conditions
     private var updatedArc: CharacterArc? = null

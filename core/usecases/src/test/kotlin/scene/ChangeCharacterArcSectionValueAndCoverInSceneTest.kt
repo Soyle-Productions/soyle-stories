@@ -15,9 +15,9 @@ import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.Change
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInSceneUseCase
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInSceneUseCase
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
 import com.soyle.stories.usecase.theme.ThemeDoesNotExist
 import com.soyle.stories.usecase.theme.characterIsNotMajorCharacterInTheme
 import com.soyle.stories.usecase.theme.characterNotInTheme
@@ -36,7 +36,7 @@ class ChangeCharacterArcSectionValueAndCoverInSceneTest {
         .withCharacterPromoted(character.id)
     private val characterArc = CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name)
     private val arcSection = characterArc.arcSections.random()
-    private val scene = makeScene().withCharacterIncluded(character)
+    private val scene = makeScene().withCharacterIncluded(character).scene
 
     // input
     private val themeId = theme.id.uuid
@@ -134,7 +134,7 @@ class ChangeCharacterArcSectionValueAndCoverInSceneTest {
         themeRepository.themes[theme.id] = if (asMajorCharacter) theme.also {
             characterArcRepository.givenCharacterArc(characterArc)
         } else {
-            (theme.demoteCharacter(theme.getMajorCharacterById(character.id)!!) as Either.Right).b
+            theme.withCharacterDemoted(theme.getMajorCharacterById(character.id)!!)
         }
     }
     private fun givenScene() {

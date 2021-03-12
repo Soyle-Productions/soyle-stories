@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.theme.removeSymbolFromTheme
 
-import com.soyle.stories.domain.scene.TrackedSymbolRemoved
+import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import java.util.*
 
 interface RemoveSymbolFromTheme {

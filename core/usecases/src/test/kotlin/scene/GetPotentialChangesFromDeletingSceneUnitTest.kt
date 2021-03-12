@@ -309,7 +309,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
                     "inherit" -> null
                     else -> motive
                 }
-                scene.withCharacterIncluded(character).withMotivationForCharacter(character.id, motiveInScene)
+                scene.withCharacterIncluded(character).scene.withMotivationForCharacter(character.id, motiveInScene)
             }
         }
         sceneRepository.sceneOrder[projectId] = scenes.map(Scene::id)

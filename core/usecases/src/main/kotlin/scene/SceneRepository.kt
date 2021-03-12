@@ -1,5 +1,6 @@
 package com.soyle.stories.usecase.scene
 
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
@@ -23,6 +24,7 @@ interface SceneRepository {
     suspend fun updateScene(scene: Scene)
     suspend fun updateScenes(scenes: List<Scene>)
     suspend fun removeScene(scene: Scene)
+    suspend fun getScenesIncludingCharacter(characterId: Character.Id): List<Scene>
     suspend fun getScenesTrackingSymbol(symbolId: Symbol.Id): List<Scene>
     suspend fun getScenesUsingLocation(locationId: Location.Id): List<Scene>
 }
