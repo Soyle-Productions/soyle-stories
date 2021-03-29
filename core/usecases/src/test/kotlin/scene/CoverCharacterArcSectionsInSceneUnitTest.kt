@@ -284,7 +284,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                     .let { assertFalse(it) { "Character Arc Section was not uncovered from scene" } }
             }
             with(result as CoverCharacterArcSectionsInScene.ResponseModel) {
-                val baseSections = characterArcSections.associateBy { it.id.uuid }
+                val baseSections = characterArcSections.drop(1).associateBy { it.id.uuid }
                 assertEquals(
                     baseSections.keys,
                     sectionsCoveredByScene.map { it.characterArcSectionId }.toSet()

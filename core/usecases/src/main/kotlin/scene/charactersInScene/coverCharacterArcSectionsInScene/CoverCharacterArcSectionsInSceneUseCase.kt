@@ -56,7 +56,7 @@ class CoverCharacterArcSectionsInSceneUseCase(
         sceneRepository.updateScene(updatedScene)
 
         val coveredSections = sectionsByArcs.flatMap { (arc, sections) ->
-            sections.map { section ->
+            sections.filterNot { it.id.uuid in removeSectionIdSet }.map { section ->
                 CharacterArcSectionCoveredByScene(
                     scene.id.uuid,
                     request.characterId,
