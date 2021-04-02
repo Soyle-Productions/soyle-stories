@@ -32,6 +32,9 @@ class CharacterArc private constructor(
         if (moralSectionIds != moralArgumentSectionOrder.keys) error("Not all moral argument sections have an ordered index")
     }
 
+    private val sectionTemplatesById by lazy { arcSections.associateBy { it.template.id } }
+    fun hasSectionTemplate(sectionTemplate: CharacterArcTemplateSection) = sectionTemplatesById.containsKey(sectionTemplate.id)
+
     private fun copy(
         name: String = this.name,
         arcSections: List<CharacterArcSection> = this.arcSections,
@@ -55,12 +58,12 @@ class CharacterArc private constructor(
     }
     fun withArcSection(arcSection: CharacterArcSection): CharacterArc
     {
-        if (template.sections.none { it isSameEntityAs arcSection.template}) {
+        if (! template.hasSection(arcSection.template.id)) {
             throw TemplateSectionIsNotPartOfArcTemplate(
                 id.uuid, characterId.uuid, themeId.uuid, arcSection.template.id.uuid
             )
         }
-        if (! arcSection.template.allowsMultiple && arcSections.any { it.template isSameEntityAs arcSection.template }) {
+        if (! arcSection.template.allowsMultiple && this.hasSectionTemplate(arcSection.template)) {
             throw CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
                 id.uuid, characterId.uuid, themeId.uuid, arcSection.template.id.uuid
             )

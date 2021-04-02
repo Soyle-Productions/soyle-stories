@@ -8,7 +8,7 @@ import com.soyle.stories.domain.theme.CharacterNotInTheme
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.characterInTheme.MinorCharacter
 import com.soyle.stories.usecase.character.CharacterArcRepository
-import com.soyle.stories.usecase.character.planNewCharacterArc.CreatedCharacterArc
+import com.soyle.stories.usecase.character.arc.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.usecase.theme.ThemeDoesNotExist
 import com.soyle.stories.usecase.theme.ThemeRepository
 

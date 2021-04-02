@@ -6,7 +6,7 @@ import com.soyle.stories.domain.theme.CharacterNotInTheme
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.characterInTheme.MajorCharacter
 import com.soyle.stories.usecase.character.CharacterArcRepository
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.usecase.scene.SceneRepository
 import com.soyle.stories.usecase.theme.ThemeRepository
 

@@ -1,7 +1,7 @@
 package com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene
 
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.usecase.character.planNewCharacterArc.CreatedCharacterArc
+import com.soyle.stories.usecase.character.arc.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.usecase.theme.createTheme.CreatedTheme
 import java.util.*
 

@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene
 
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import java.util.*
 
 interface ChangeCharacterArcSectionValueAndCoverInScene {

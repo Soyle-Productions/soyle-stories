@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.theme.removeCharacterFromComparison
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.theme.CharacterNotInTheme
-import com.soyle.stories.usecase.character.deleteCharacterArc.DeletedCharacterArc
+import com.soyle.stories.usecase.character.arc.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.characterInTheme.CharacterInTheme
 import com.soyle.stories.domain.theme.characterInTheme.MajorCharacter

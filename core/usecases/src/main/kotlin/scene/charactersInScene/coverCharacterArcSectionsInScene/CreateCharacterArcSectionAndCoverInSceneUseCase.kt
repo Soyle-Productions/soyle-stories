@@ -4,7 +4,7 @@ import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.CharacterArcTemplateSection
 import com.soyle.stories.usecase.character.CharacterArcRepository
 import com.soyle.stories.usecase.character.CharacterArcTemplateSectionDoesNotExist
-import com.soyle.stories.usecase.character.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
+import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import com.soyle.stories.usecase.scene.SceneRepository
 import java.util.*
 

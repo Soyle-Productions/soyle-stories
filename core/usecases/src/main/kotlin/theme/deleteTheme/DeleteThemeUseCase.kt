@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.theme.deleteTheme
 
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.usecase.character.CharacterArcRepository
-import com.soyle.stories.usecase.character.deleteCharacterArc.DeletedCharacterArc
+import com.soyle.stories.usecase.character.arc.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.usecase.theme.ThemeDoesNotExist
 import com.soyle.stories.usecase.theme.ThemeRepository
 import java.util.*

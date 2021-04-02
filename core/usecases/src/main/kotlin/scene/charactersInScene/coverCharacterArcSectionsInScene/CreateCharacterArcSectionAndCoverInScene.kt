@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene
 
-import com.soyle.stories.usecase.character.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
+import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import java.util.*
 
 interface CreateCharacterArcSectionAndCoverInScene {

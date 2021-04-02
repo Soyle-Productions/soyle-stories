@@ -1,7 +1,7 @@
 package com.soyle.stories.usecase.character.buildNewCharacter
 
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.usecase.theme.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.usecase.theme.useCharacterAsOpponent.CharacterUsedAsOpponent
 import java.util.*

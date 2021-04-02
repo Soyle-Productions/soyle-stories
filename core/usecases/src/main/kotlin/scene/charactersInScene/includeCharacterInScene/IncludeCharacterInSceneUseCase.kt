@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScen
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.usecase.character.CharacterRepository
-import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.Updated
 import com.soyle.stories.domain.storyevent.StoryEvent

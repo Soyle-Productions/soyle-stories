@@ -1,6 +1,5 @@
 package com.soyle.stories.usecase.scene
 
-import arrow.core.Either
 import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.location.Location
@@ -11,7 +10,7 @@ import com.soyle.stories.domain.str
 import com.soyle.stories.domain.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.domain.theme.CharacterNotInTheme
 import com.soyle.stories.domain.theme.makeTheme
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble

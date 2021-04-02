@@ -11,7 +11,7 @@ class CharacterArcTemplateSection(
     val isMoral: Boolean
 ) : Entity<CharacterArcTemplateSection.Id> {
 
-    data class Id(val uuid: UUID)
+    data class Id(val uuid: UUID = UUID.randomUUID())
 
     override fun toString(): String {
         return "CharacterArcTemplateSection(id=${id.uuid}, name='$name', isRequired=$isRequired, allowsMultiple=$allowsMultiple, isMoral=$isMoral)"

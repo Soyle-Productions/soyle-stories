@@ -8,7 +8,7 @@ import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.oppositionValue.OppositionValue
 import com.soyle.stories.usecase.character.CharacterRepository
-import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.usecase.location.LocationRepository
 import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 import com.soyle.stories.usecase.theme.SymbolItem
