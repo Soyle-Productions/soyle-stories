@@ -81,7 +81,7 @@ class `Characters in Scene Unit Test` {
 
             roleUpdate.scene.includedCharacters.getOrError(character.id).roleInScene.mustEqual(newRole)
             roleUpdate as Updated
-            roleUpdate.event.mustEqual(CharacterAssignedRoleInScene(scene.id, newRole))
+            roleUpdate.event.mustEqual(CharacterAssignedRoleInScene(scene.id, character.id, newRole))
         }
 
         @Test
@@ -92,7 +92,7 @@ class `Characters in Scene Unit Test` {
 
             assertNull(roleUpdate.scene.includedCharacters.getOrError(character.id).roleInScene)
             roleUpdate as Updated
-            roleUpdate.event.mustEqual(CharacterRoleInSceneCleared(scene.id))
+            roleUpdate.event.mustEqual(CharacterRoleInSceneCleared(scene.id, character.id))
         }
 
         @Test

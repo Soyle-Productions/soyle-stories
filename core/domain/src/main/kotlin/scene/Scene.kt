@@ -172,14 +172,14 @@ class Scene private constructor(
         )
     }
 
-    fun withRoleForCharacter(characterId: Character.Id, roleInScene: RoleInScene?): SceneUpdate<*> {
+    fun withRoleForCharacter(characterId: Character.Id, roleInScene: RoleInScene?): SceneUpdate<CharacterRoleInSceneChanged> {
         val characterInScene = includedCharacters.getOrError(characterId)
         if (characterInScene.roleInScene == roleInScene) return noUpdate()
 
         val newCharacter = characterInScene.withRoleInScene(roleInScene)
         val event = when(roleInScene) {
-            null -> CharacterRoleInSceneCleared(id)
-            else -> CharacterAssignedRoleInScene(id, roleInScene)
+            null -> CharacterRoleInSceneCleared(id, characterId)
+            else -> CharacterAssignedRoleInScene(id, characterId, roleInScene)
         }
         return Updated(
             copy(charactersInScene = charactersInScene.minus(characterId).plus(newCharacter)),

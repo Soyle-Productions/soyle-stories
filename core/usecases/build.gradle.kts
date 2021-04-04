@@ -28,6 +28,8 @@ dependencies {
     testImplementation(Libraries.junit.engine)
     testImplementation(Libraries.junit.params)
     testImplementation(testFixtures(project(path = ":core:domain")))
+
+    testFixturesImplementation(Libraries.junit.api)
 }
 
 task<Test>("integrationTest") {
