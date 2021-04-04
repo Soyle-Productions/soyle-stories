@@ -1,4 +1,4 @@
-package com.soyle.stories.usecase.scene
+package com.soyle.stories.usecase.scene.charactersInScene
 
 import com.soyle.stories.domain.character.*
 import com.soyle.stories.domain.mustEqual
@@ -11,6 +11,8 @@ import com.soyle.stories.usecase.character.CharacterArcDoesNotExist
 import com.soyle.stories.usecase.character.CharacterArcTemplateSectionDoesNotExist
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
+import com.soyle.stories.usecase.scene.characterArcSectionCoveredByScene
 import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
 import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
 import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInSceneUseCase

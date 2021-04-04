@@ -1,4 +1,4 @@
-package com.soyle.stories.usecase.scene
+package com.soyle.stories.usecase.scene.charactersInScene
 
 import com.soyle.stories.domain.character.*
 import com.soyle.stories.domain.mustEqual
@@ -12,10 +12,13 @@ import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.usecase.character.CharacterArcSectionDoesNotExist
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
+import com.soyle.stories.usecase.scene.characterArcSectionCoveredByScene
 import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
 import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
 import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
 import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
+import com.soyle.stories.usecase.scene.sceneDoesNotExist
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested

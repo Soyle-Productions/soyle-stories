@@ -1,4 +1,4 @@
-package com.soyle.stories.usecase.scene
+package com.soyle.stories.usecase.scene.charactersInScene
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.characterName
@@ -6,20 +6,21 @@ import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.SceneAlreadyContainsCharacter
 import com.soyle.stories.domain.scene.makeScene
-import com.soyle.stories.domain.scene.sceneAlreadyContainsCharacter
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.usecase.character.CharacterDoesNotExist
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
+import com.soyle.stories.usecase.scene.NoSceneExistsWithStoryEventId
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.common.IncludedCharacterInScene
 import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.AvailableCharactersToAddToScene
 import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
 import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.sceneDoesNotExist
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
 import com.soyle.stories.usecase.storyevent.characterDoesNotExist

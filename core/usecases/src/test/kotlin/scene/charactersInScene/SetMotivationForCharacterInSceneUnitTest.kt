@@ -1,4 +1,4 @@
-package com.soyle.stories.usecase.scene
+package com.soyle.stories.usecase.scene.charactersInScene
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.characterName
@@ -13,6 +13,7 @@ import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.sceneDoesNotExist
 import com.soyle.stories.usecase.storyevent.characterDoesNotExist
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals

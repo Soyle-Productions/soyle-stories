@@ -1,4 +1,4 @@
-package com.soyle.stories.usecase.scene
+package com.soyle.stories.usecase.scene.charactersInScene
 
 import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.CharacterArcTemplate
@@ -20,6 +20,9 @@ import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.character.CharacterArcTemplateSectionDoesNotExist
 import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
+import com.soyle.stories.usecase.scene.characterArcSectionCoveredByScene
+import com.soyle.stories.usecase.scene.sceneDoesNotExist
 import com.soyle.stories.usecase.storyevent.characterDoesNotExist
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue

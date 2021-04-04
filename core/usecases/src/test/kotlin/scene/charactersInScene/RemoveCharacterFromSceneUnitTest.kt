@@ -1,4 +1,4 @@
-package com.soyle.stories.usecase.scene
+package com.soyle.stories.usecase.scene.charactersInScene
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.project.Project
@@ -8,6 +8,7 @@ import com.soyle.stories.domain.validation.toEntitySet
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
+import com.soyle.stories.usecase.scene.sceneDoesNotExist
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -42,7 +43,7 @@ class RemoveCharacterFromSceneUnitTest {
 		givenSceneExists()
 		whenCharacterIsRemovedFromScene()
 		assertNull(updatedScene)
-		characterNotInScene(sceneId, characterId).invoke(result)
+		com.soyle.stories.usecase.scene.characterNotInScene(sceneId, characterId).invoke(result)
 	}
 
 	@Test
@@ -68,7 +69,7 @@ class RemoveCharacterFromSceneUnitTest {
 	private fun givenSceneExists(includesCharacter: Boolean = false)
 	{
 		sceneRepository.scenes[sceneId] = makeScene(sceneId, Project.Id(), storyEventId = storyEventId, charactersInScene = listOfNotNull(
-			characterId.takeIf { includesCharacter }?.let { CharacterInScene(it, sceneId, "", null, listOf()) }
+			characterId.takeIf { includesCharacter }?.let { CharacterInScene(sceneId, it, "") }
 		).toEntitySet())
 	}
 

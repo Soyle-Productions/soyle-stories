@@ -344,8 +344,9 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
             it.characterId,
             sceneId,
             it.characterName,
-            getMotivationForCharacter(it.characterId)!!.motivation,
-            getCoveredCharacterArcSectionsForCharacter(it.characterId)!!
+            it.roleInScene,
+            it.motivation,
+            it.coveredArcSections
         )
     }.toEntitySet()
 
