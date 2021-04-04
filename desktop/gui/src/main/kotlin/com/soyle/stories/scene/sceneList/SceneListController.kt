@@ -29,8 +29,26 @@ class SceneListController(
         openToolController.openSceneEditor(sceneId, proseId)
     }
 
-    override fun openSceneDetails(sceneId: String) {
-        openToolController.openSceneDetailsTool(sceneId)
+    override fun trackCharacters(sceneItem: SceneItemViewModel) {
+        openToolController.scene.openSceneCharacters(
+            SceneItem(
+                UUID.fromString(sceneItem.id),
+                sceneItem.proseId,
+                sceneItem.name,
+                sceneItem.index
+            )
+        )
+    }
+
+    override fun trackLocations(sceneItem: SceneItemViewModel) {
+        openToolController.scene.openSceneLocations(
+            SceneItem(
+                UUID.fromString(sceneItem.id),
+                sceneItem.proseId,
+                sceneItem.name,
+                sceneItem.index
+            )
+        )
     }
 
     override fun trackSymbols(sceneItem: SceneItemViewModel) {

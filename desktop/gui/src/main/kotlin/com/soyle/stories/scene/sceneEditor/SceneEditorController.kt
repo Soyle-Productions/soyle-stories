@@ -10,9 +10,9 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.prose.proseEditor.OnLoadMentionQueryOutput
 import com.soyle.stories.prose.proseEditor.OnLoadMentionReplacementsOutput
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
-import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.sceneFrame.GetSceneFrameController
 import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
 import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
@@ -76,7 +76,7 @@ class SceneEditorController private constructor(
     override fun useProseMentionInScene(mention: ProseMention<*>) {
         when (val id = mention.entityId.id) {
             is Character.Id -> includeCharacterInSceneController.includeCharacterInScene(sceneId.uuid.toString(), id.uuid.toString())
-            is Location.Id -> linkLocationToSceneController.linkLocationToScene(sceneId.uuid.toString(), id.uuid.toString())
+            is Location.Id -> linkLocationToSceneController.linkLocationToScene(sceneId, id)
         }
     }
 

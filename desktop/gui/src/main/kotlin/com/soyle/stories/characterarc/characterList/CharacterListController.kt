@@ -4,9 +4,9 @@ import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromS
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.usecase.character.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.ListAllCharacterArcs
 import com.soyle.stories.usecase.character.renameCharacter.RenameCharacter
-import com.soyle.stories.usecase.character.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.usecase.character.arc.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
 import java.util.*
 

@@ -2,7 +2,6 @@ package com.soyle.stories.location.locationList
 
 import com.soyle.stories.common.*
 import com.soyle.stories.di.resolve
-import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.validation.SingleLine
 import com.soyle.stories.domain.validation.SingleNonBlankLine
 import com.soyle.stories.domain.validation.countLines
@@ -38,7 +37,7 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is LocationItemViewModel) {
-                    locationListViewListener.openLocationDetails(selectedItem.id)
+                    locationListViewListener.openLocationDetails(selectedItem.id.uuid.toString())
                 }
             }
         }
@@ -79,7 +78,7 @@ internal class PopulatedDisplay : View() {
                         (countLines(newName) as? SingleLine)
                             ?.let { SingleNonBlankLine.create(it) }
                             ?.let {
-                                locationListViewListener.renameLocation(Location.Id(UUID.fromString(oldValue.id)), it)
+                                locationListViewListener.renameLocation(oldValue.id, it)
                             }
 
                     }

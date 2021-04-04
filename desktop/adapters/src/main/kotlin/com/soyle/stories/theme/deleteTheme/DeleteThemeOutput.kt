@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.deleteTheme
 
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
-import com.soyle.stories.usecase.character.deleteCharacterArc.DeletedCharacterArc
+import com.soyle.stories.usecase.character.arc.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.usecase.theme.deleteTheme.DeleteTheme
 import com.soyle.stories.usecase.theme.deleteTheme.DeletedTheme
 import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter

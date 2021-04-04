@@ -2,7 +2,7 @@ package com.soyle.stories.scene.deleteSceneRamifications.presenters
 
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamificationsViewModel
-import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 
 class Invalidater(
   private val view: View.Nullable<DeleteSceneRamificationsViewModel>

@@ -10,7 +10,6 @@ import com.soyle.stories.desktop.config.drivers.scene.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.features.getParagraphs
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.desktop.view.scene.sceneDetails.SceneDetailsAssertions
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListAssert.Companion.assertThat
@@ -125,9 +124,6 @@ class SceneSteps : En {
 
     private fun charactersInSceneSteps() {
         val characterDriver by lazy { CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()) }
-        Given("I have included the {character} in the {scene}") { character: Character, scene: Scene ->
-            sceneDriver.givenCharacterIncludedInScene(scene, character)
-        }
         Given("I have included the following characters in the {scene}") { scene: Scene, dataTable: DataTable ->
             val sceneDriver = sceneDriver
             dataTable.asList().forEach {
@@ -153,10 +149,6 @@ class SceneSteps : En {
             }
         }
         Given(
-            "I have covered the following character arc sections in the {scene} for the {character}"
-        ) { scene: Scene, character: Character, dataTable: DataTable ->
-        }
-        Given(
             "I have covered some character arc sections for the {character} in the {scene}"
         ) { character: Character, scene: Scene ->
             val sceneDriver = sceneDriver
@@ -168,149 +160,9 @@ class SceneSteps : En {
                 sceneDriver.givenSceneCoversArcSection(scene, it)
             }
         }
-        Given(
-            "I have requested which arc sections for the {character} can be covered in the {scene}"
-        ) { character: Character, scene: Scene ->
-            sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-                .givenPositionOnArcInputForCharacterHasBeenSelected(character)
-        }
-        Given(
-            "I have requested which arc sections for the {character} can be uncovered in the {scene}"
-        ) { character: Character, scene: Scene ->
-            sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-                .givenPositionOnArcInputForCharacterHasBeenSelected(character)
-        }
 
 
-        When(
-            "I request which arc sections for the {character} can be covered in the {scene}"
-        ) { character: Character, scene: Scene ->
-            sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-                .selectPositionOnArcInputForCharacter(character)
-        }
-        When(
-            "I request which arc sections for the {character} can be uncovered in the {scene}"
-        ) { character: Character, scene: Scene ->
-            sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-                .selectPositionOnArcInputForCharacter(character)
-        }
-        When(
-            "I cover the {string} section from the {character}'s {string} character arc in the {scene}"
-        ) { sectionName: String, character: Character, arcName: String, scene: Scene ->
-            sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-                .givenPositionOnArcInputForCharacterHasBeenSelected(character)
-                .coverSectionInArc(arcName, sectionName)
-        }
-        When(
-            "I uncover the {string} section from the {character}'s {string} character arc in the {scene}"
-        ) { sectionName: String, character: Character, arcName: String, scene: Scene ->
-            sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-                .givenPositionOnArcInputForCharacterHasBeenSelected(character)
-                .uncoverSectionInArc(arcName, sectionName)
-        }
-        When(
-            "I create a new {string} arc section in the {character}'s {string} arc to cover in the {scene}"
-        ) { sectionName: String, character: Character, arcName: String, scene: Scene ->
-            sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-                .givenPositionOnArcInputForCharacterHasBeenSelected(character)
-                .givenCreateNewSectionInArcSelected(arcName)
-                .createSectionForTemplate(sectionName)
-        }
 
-
-        Then(
-            "the {scene} should not have a motivation for the {character} anymore"
-        ) { scene: Scene, character: Character ->
-            assertTrue(scene.getMotivationForCharacter(character.id)!!.isInherited())
-
-            val sceneDetailsTool = sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-            SceneDetailsAssertions.assertThat(sceneDetailsTool) {
-                andCharacter(character.id.uuid.toString()) {
-                    hasMotivationValue("")
-                }
-            }
-        }
-        Then(
-            "the {scene} should have {string} as the {character}'s inherited motivation"
-        ) { scene: Scene, expectedMotivation: String, character: Character ->
-            assertTrue(scene.getMotivationForCharacter(character.id)!!.isInherited())
-
-            val sceneDetailsTool = sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-
-            SceneDetailsAssertions.assertThat(sceneDetailsTool) {
-                andCharacter(character.id.uuid.toString()) {
-                    hasInheritedMotivationValue(expectedMotivation)
-                }
-            }
-        }
-        Then(
-            "all of the {character}'s arc sections that are covered in the {scene} should indicate they have been covered"
-        ) { character: Character, scene: Scene ->
-            val sceneDetails = sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-            SceneDetailsAssertions.assertThat(sceneDetails) {
-                andCharacter(character.id.uuid.toString()) {
-                    scene.getCoveredCharacterArcSectionsForCharacter(character.id)!!.forEach {
-                        isListingAvailableArcSectionToCover(sectionId = it)
-                    }
-                }
-            }
-        }
-        Then(
-            "all of the {character}'s arc sections that have not yet been covered in the {scene} should be listed"
-        ) { character: Character, scene: Scene ->
-            val arcs = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterArcsForCharacter(character)
-            val sceneDetails = sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-            SceneDetailsAssertions.assertThat(sceneDetails) {
-                andCharacter(character.id.uuid.toString()) {
-                    arcs.forEach { arc ->
-                        arc.arcSections.filterNot { scene.coveredArcSectionIds.contains(it.id) }.forEach {
-                            isListingAvailableArcSectionToCover(arc.id, it.id, it.template.name)
-                        }
-                    }
-                }
-            }
-        }
-        Then(
-            "all of the {character}'s arc sections that have been covered in the {scene} should be listed"
-        ) { character: Character, scene: Scene ->
-            val arcs = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterArcsForCharacter(character)
-            val sceneDetails = sceneListView
-                .givenSceneDetailsToolHasBeenOpened(scene)
-            SceneDetailsAssertions.assertThat(sceneDetails) {
-                andCharacter(character.id.uuid.toString()) {
-                    arcs.forEach { arc ->
-                        arc.arcSections.filter { scene.coveredArcSectionIds.contains(it.id) }.forEach {
-                            isListingAvailableArcSectionToCover(arc.id, it.id, it.template.name)
-                        }
-                    }
-                }
-            }
-        }
-        Then(
-            "the {scene} should cover the {string} section from the {character}'s {string} character arc"
-        ) { scene: Scene, sectionName: String, character: Character, arcName: String ->
-            val arc = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterArcByNameOrError(character, arcName)
-            val section = arc.arcSections.find { it.template.name == sectionName }!!
-            assertTrue(scene.coveredArcSectionIds.contains(section.id))
-        }
-        Then(
-            "the {scene} should not cover the {string} section from the {character}'s {string} character arc"
-        ) { scene: Scene, sectionName: String, character: Character, arcName: String ->
-            val arc = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterArcByNameOrError(character, arcName)
-            val section = arc.arcSections.find { it.template.name == sectionName }!!
-            assertFalse(scene.coveredArcSectionIds.contains(section.id))
-        }
     }
 
     private fun locationsUsedInSceneSteps() {
@@ -365,14 +217,6 @@ class SceneSteps : En {
         }
         //endregion
 
-        Given(
-            "I am covering character arc sections for the {character} in the {scene}"
-        ) { character: Character, scene: Scene ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            workbench.givenSceneListToolHasBeenOpened()
-                .givenSceneDetailsToolHasBeenOpened(scene)
-                .givenPositionOnArcInputForCharacterHasBeenSelected(character)
-        }
         Given(
             "I am investigating the {string} mention in the {scene}'s prose"
         ) { mentionText: String, scene: Scene ->
@@ -704,7 +548,7 @@ class SceneSteps : En {
         Then(
             "the {location} should be used in the {scene}"
         ) { location: Location, scene: Scene ->
-            assertTrue(scene.settings.contains(location.id))
+            assertTrue(scene.settings.containsEntityWithId(location.id))
         }
         Then(
             "the {string} mention in the {scene}'s prose should read {string}"
@@ -754,26 +598,6 @@ class SceneSteps : En {
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
                     hasIssueWithMention(mention.entityId, mention.position)
-                }
-            }
-        }
-        Then(
-            "all of the {character}'s arcs and all their sections should be listed to cover in the {scene}"
-        ) { character: Character, scene: Scene ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val allArcs = CharacterDriver(workbench)
-                .getCharacterArcsForCharacter(character)
-
-            val sceneDetails = workbench.givenSceneListToolHasBeenOpened()
-                .givenSceneDetailsToolHasBeenOpened(scene)
-            SceneDetailsAssertions.assertThat(sceneDetails) {
-                andCharacter(character.id.uuid.toString()) {
-                    allArcs.forEach { arc ->
-                        isListingAvailableArcToCover(arc.id, arc.name)
-                        arc.arcSections.forEach {
-                            isListingAvailableArcSectionToCover(arc.id, it.id, it.template.name)
-                        }
-                    }
                 }
             }
         }

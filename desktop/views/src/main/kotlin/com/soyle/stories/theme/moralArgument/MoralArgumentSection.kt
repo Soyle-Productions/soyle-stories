@@ -1,7 +1,9 @@
 package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.common.components.dragHandle.DragHandleImpl.Companion.dragHandle
-import com.soyle.stories.common.components.fieldLabel
+import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
+import com.soyle.stories.common.components.text.SectionTitle.Companion.section
+import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.di.resolveLater
 import com.soyle.stories.theme.moralArgument.MoralArgumentInsertionPoint.Companion.insertionPoint
 import javafx.beans.value.ObservableValue
@@ -10,10 +12,10 @@ import javafx.scene.Parent
 import javafx.scene.input.DataFormat
 import javafx.scene.input.DragEvent
 import javafx.scene.input.TransferMode
+import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.paint.Color
 import tornadofx.*
-import com.soyle.stories.common.components.Styles as ComponentStyles
 
 class MoralArgumentSection : Fragment() {
 
@@ -66,8 +68,9 @@ class MoralArgumentSection : Fragment() {
         tryingToInsertProperty = insertionIndex.booleanBinding { root.indexInParent != -1 && it == root.indexInParent }
     )
     private val sectionField = root.vbox {
+        isFillWidth = true
         id = viewModel.arcSectionId
-        addClass(ComponentStyles.labeledSection)
+        addClass(TextStyles.section)
         hbox {
             fieldLabel(viewModel.arcSectionName)
             if (viewModel.canBeRemoved) {
@@ -82,7 +85,7 @@ class MoralArgumentSection : Fragment() {
         }
         hbox {
             spacing = 8.0
-            paddingLeft = -24
+            //paddingLeft = -24
             dragHandle {
                 targetNode = root
                 transferModes = listOf(TransferMode.MOVE)
@@ -96,7 +99,10 @@ class MoralArgumentSection : Fragment() {
                 onMoveDone = ::onMoveDone
                 onMoveCancelled = ::onMoveCancelled
             }
-            textfield(viewModel.arcSectionValue)
+            textfield(viewModel.arcSectionValue) {
+                useMaxWidth = true
+                hgrow = Priority.ALWAYS
+            }
         }
         paddingLeft = 32
     }
@@ -130,6 +136,7 @@ class MoralArgumentSection : Fragment() {
     }
 
     private fun onMoveDone() {
+        println("move done")
         root.parent ?: return
         val indexInParent = root.indexInParent
         if (originalIndexMovedFrom != null && indexInParent != originalIndexMovedFrom) onMoved()
@@ -211,6 +218,7 @@ class MoralArgumentSection : Fragment() {
 
         init {
             moralArgumentSection {
+                fillWidth = true
                 borderWidth = multi(box(4.px))
                 borderColor = multi(box(Color.TRANSPARENT))
             }

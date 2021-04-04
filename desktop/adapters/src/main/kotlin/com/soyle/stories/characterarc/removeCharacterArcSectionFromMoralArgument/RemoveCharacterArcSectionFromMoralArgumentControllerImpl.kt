@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument
 
-import com.soyle.stories.usecase.character.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgument
+import com.soyle.stories.usecase.character.arc.section.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgument
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 

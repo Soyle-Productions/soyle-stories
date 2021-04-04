@@ -17,6 +17,8 @@ class CharacterInScene(
         coveredArcSections: List<CharacterArcSection.Id> = this.coveredArcSections
     ) = CharacterInScene(characterId, sceneId, characterName, motivation, coveredArcSections)
 
+    fun withName(name: String): CharacterInScene = copy(characterName = name)
+
     fun withCoveredArcSection(characterArcSection: CharacterArcSection): CharacterInScene
     {
         if (characterArcSection.characterId != characterId) throw CharacterArcSectionIsNotPartOfCharactersArc(

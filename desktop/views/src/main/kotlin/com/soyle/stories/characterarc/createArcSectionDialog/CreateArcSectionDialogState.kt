@@ -18,15 +18,8 @@ class CreateArcSectionDialogState : Model<ProjectScope, CreateArcSectionDialogVi
     val confirmUnsavedDescriptionChanges = bind(CreateArcSectionDialogViewModel::confirmUnsavedDescriptionChanges)
     val defaultPrimaryButtonLabel = bind(CreateArcSectionDialogViewModel::defaultPrimaryButtonLabel)
     val modifyingPrimaryButtonLabel = bind(CreateArcSectionDialogViewModel::modifyingPrimaryButtonLabel)
-
-    val selectedType = SimpleObjectProperty<SectionTypeOption?>(null)
-    val description = SimpleStringProperty("")
+    val done = bind(CreateArcSectionDialogViewModel::done)
 
     val sectionTypeOptions = bind(CreateArcSectionDialogViewModel::sectionTypeOptions)
-
-    fun reset() {
-        selectedType.set(null)
-        description.set("")
-    }
 
 }

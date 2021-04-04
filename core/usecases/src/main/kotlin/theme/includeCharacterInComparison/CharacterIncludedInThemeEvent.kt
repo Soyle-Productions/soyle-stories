@@ -14,5 +14,5 @@ data class CharacterIncludedInTheme(
 class CharacterIncludedInThemeEvent(
     val themeId: UUID,
     val characterId: UUID,
-    val includedCharacters: List<com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem>
+    val includedCharacters: List<com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterItem>
 )

@@ -5,6 +5,8 @@ import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.makeCharacterInTheme
 import com.soyle.stories.domain.theme.makeTheme
@@ -13,6 +15,7 @@ import com.soyle.stories.usecase.character.renameCharacter.RenameCharacter
 import com.soyle.stories.usecase.character.renameCharacter.RenameCharacterUseCase
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
+import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
@@ -30,9 +33,11 @@ class RenameCharacterUnitTest {
     private var updatedCharacter: Character? = null
     private var updatedTheme: Theme? = null
     private var updatedProse: Prose? = null
+    private val updatedScenes: MutableList<Scene> = mutableListOf()
 
     private val characterRepository = CharacterRepositoryDouble(onUpdateCharacter = ::updatedCharacter::set)
     private val themeRepository = ThemeRepositoryDouble(onUpdateTheme = ::updatedTheme::set)
+    private val sceneRepository = SceneRepositoryDouble(onUpdateScene = updatedScenes::add)
     private val proseRepository = ProseRepositoryDouble(onReplaceProse = ::updatedProse::set)
     private var result: RenameCharacter.ResponseModel? = null
 
@@ -99,6 +104,37 @@ class RenameCharacterUnitTest {
 
         }
 
+        @Nested
+        inner class `When Character is in Scene` {
+
+            private val scenesWithCharacter = List(4) { makeScene().withCharacterIncluded(character).scene }
+
+            init {
+                scenesWithCharacter.forEach(sceneRepository::givenScene)
+            }
+
+            @Test
+            fun `should update scenes with character`() {
+                renameCharacter()
+                updatedScenes.map { it.id }.toSet().mustEqual(scenesWithCharacter.map { it.id }.toSet())
+                updatedScenes.forEach {
+                    it.includedCharacters.find { it.characterId == character.id }!!.characterName.mustEqual(inputName)
+                }
+            }
+
+            @Test
+            fun `should output character in scene renamed`() {
+                renameCharacter()
+                result!!.renamedCharacterInScenes.map { it.sceneId }.toSet()
+                    .mustEqual(scenesWithCharacter.map { it.id }.toSet())
+                result!!.renamedCharacterInScenes.forEach {
+                    it.renamedCharacter.characterId.mustEqual(character.id)
+                    it.renamedCharacter.characterName.mustEqual(inputName.value)
+                }
+            }
+
+        }
+
     }
 
     @Nested
@@ -120,9 +156,11 @@ class RenameCharacterUnitTest {
             renameCharacter()
             updatedProse!!.let {
                 it.content.mustEqual(inputName.value) { "prose with only mention should have entire content replaced" }
-                it.mentions.mustEqual(listOf(
-                    ProseMention(character.id.mentioned(), ProseMentionRange(0, inputName.length))
-                ))
+                it.mentions.mustEqual(
+                    listOf(
+                        ProseMention(character.id.mentioned(), ProseMentionRange(0, inputName.length))
+                    )
+                )
             }
         }
 
@@ -142,7 +180,8 @@ class RenameCharacterUnitTest {
     }
 
     private fun renameCharacter(inputName: NonBlankString = this.inputName) {
-        val useCase: RenameCharacter = RenameCharacterUseCase(characterRepository, themeRepository, proseRepository)
+        val useCase: RenameCharacter =
+            RenameCharacterUseCase(characterRepository, themeRepository, sceneRepository, proseRepository)
         val output = object : RenameCharacter.OutputPort {
 
             override suspend fun receiveRenameCharacterResponse(response: RenameCharacter.ResponseModel) {

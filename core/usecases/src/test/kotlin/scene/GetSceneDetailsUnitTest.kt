@@ -40,7 +40,7 @@ class GetSceneDetailsUnitTest {
     @ValueSource(booleans = [true, false])
     fun `linked location is output`(expectLocation: Boolean) {
         val scene = if (!expectLocation) scene
-        else scene.withLocationLinked(location.id)
+        else scene.withLocationLinked(location).scene
         sceneRepository.givenScene(scene)
         whenSceneDetailsRequested()
         result.shouldBe(responseModel(expectLocation = expectLocation))
@@ -61,7 +61,7 @@ class GetSceneDetailsUnitTest {
         val characters = List(5) { makeCharacter() }
         val scene = scene.withCharacters(characters)
         characters.forEach {
-            makeScene(projectId = scene.projectId).withCharacterIncluded(it)
+            makeScene(projectId = scene.projectId).withCharacterIncluded(it).scene
                 .withMotivationForCharacter(it.id, "Motivation ${str()}")
                 .let(sceneRepository::givenScene)
         }
@@ -110,7 +110,7 @@ class GetSceneDetailsUnitTest {
     }
 
     private fun Scene.withCharacters(characters: List<Character>) = characters.fold(this) { scene, character ->
-        scene.withCharacterIncluded(character)
+        scene.withCharacterIncluded(character).scene
     }
 
     private val sceneRepository = SceneRepositoryDouble()

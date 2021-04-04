@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection
 
-import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.usecase.character.arc.section.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 

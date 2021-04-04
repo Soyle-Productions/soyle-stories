@@ -16,7 +16,7 @@ import java.util.*
 class ListAllLocationsUnitTest {
 
 	private val projectId = Project.Id(UUID.randomUUID())
-	private val locationIds: List<UUID> = List(5) { UUID.randomUUID() }
+	private val locationIds = List(5) { Location.Id() }
 
 	private var storedLocations: List<Location> = emptyList()
 	private lateinit var locationRepository: LocationRepository
@@ -45,9 +45,9 @@ class ListAllLocationsUnitTest {
 	}
 
 	private fun givenNoLocations() = given()
-	private fun given(locationIds: List<UUID> = emptyList()) {
+	private fun given(locationIds: List<Location.Id> = emptyList()) {
 		storedLocations = locationIds.map {
-			makeLocation(id = Location.Id(it), projectId = projectId)
+			makeLocation(id = it, projectId = projectId)
 		}
 		locationRepository = LocationRepositoryDouble(
 		  initialLocations = storedLocations

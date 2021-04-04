@@ -17,7 +17,7 @@ import com.soyle.stories.domain.theme.makeTheme
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacterUseCase
-import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
 import com.soyle.stories.usecase.theme.ThemeDoesNotExist

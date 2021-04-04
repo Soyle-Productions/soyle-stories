@@ -8,6 +8,9 @@ import com.soyle.stories.characterarc.characterList.CharacterListController
 import com.soyle.stories.characterarc.characterList.CharacterListModel
 import com.soyle.stories.characterarc.characterList.CharacterListPresenter
 import com.soyle.stories.characterarc.characterList.CharacterListViewListener
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
 import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogController
 import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogState
 import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogViewListener
@@ -31,6 +34,8 @@ object Presentation {
 
             characterList()
             deleteCharacterDialog()
+
+            createCharacterArcSectionDialog()
 
         }
 
@@ -71,6 +76,19 @@ object Presentation {
             DeleteCharacterDialogController(
                 get<DeleteCharacterDialogState>(),
                 get()
+            )
+        }
+    }
+
+    private fun InProjectScope.createCharacterArcSectionDialog()
+    {
+        provide<CreateArcSectionDialogViewListener> {
+            CreateArcSectionDialogController(
+                applicationScope.get(),
+                get(),
+                get(),
+                get(),
+                get<CreateArcSectionDialogState>()
             )
         }
     }

@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.theme.deleteTheme
 
-import com.soyle.stories.usecase.character.deleteCharacterArc.DeletedCharacterArc
+import com.soyle.stories.usecase.character.arc.deleteCharacterArc.DeletedCharacterArc
 import java.util.*
 
 interface DeleteTheme {

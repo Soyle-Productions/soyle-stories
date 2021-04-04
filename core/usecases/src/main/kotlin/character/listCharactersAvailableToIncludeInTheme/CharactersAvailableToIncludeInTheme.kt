@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.character.listCharactersAvailableToIncludeInTheme
 
-import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterItem
 import java.util.*
 
 class CharactersAvailableToIncludeInTheme(

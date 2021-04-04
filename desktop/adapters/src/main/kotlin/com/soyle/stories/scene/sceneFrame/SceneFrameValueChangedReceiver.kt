@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.sceneFrame
 
-import com.soyle.stories.domain.scene.SceneFrameValueChanged
+import com.soyle.stories.domain.scene.events.SceneFrameValueChanged
 
 interface SceneFrameValueChangedReceiver {
 

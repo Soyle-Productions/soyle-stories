@@ -1,6 +1,7 @@
 package com.soyle.stories.characterarc.baseStoryStructure.presenters
 
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureViewModel
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
@@ -12,7 +13,7 @@ class CreateNewLocationPresenter(
 	override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
 		view.updateOrInvalidated {
 			withLocations(
-			  availableLocations = availableLocations + LocationItemViewModel(response.locationId.toString(), response.locationName)
+			  availableLocations = availableLocations + LocationItemViewModel(Location.Id(response.locationId), response.locationName)
 			)
 		}
 	}

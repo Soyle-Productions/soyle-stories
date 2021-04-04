@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument
 
-import com.soyle.stories.usecase.character.removeCharacterArcSectionFromMoralArgument.CharacterArcSectionRemoved
+import com.soyle.stories.usecase.character.arc.section.removeCharacterArcSectionFromMoralArgument.CharacterArcSectionRemoved
 
 interface CharacterArcSectionRemovedReceiver {
 

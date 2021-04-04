@@ -9,7 +9,8 @@ interface SceneListViewListener {
 	fun getValidState()
 	fun editScene(sceneId: String, proseId: Prose.Id)
 	fun renameScene(sceneId: String, newName: NonBlankString)
-	fun openSceneDetails(sceneId: String)
+	fun trackCharacters(sceneItem: SceneItemViewModel)
+	fun trackLocations(sceneItem: SceneItemViewModel)
 	fun trackSymbols(sceneItem: SceneItemViewModel)
 	fun reorderScene(sceneId: String, newIndex: Int)
 

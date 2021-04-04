@@ -1,7 +1,7 @@
 package com.soyle.stories.usecase.theme.removeSymbolFromTheme
 
 import com.soyle.stories.domain.scene.SceneUpdate
-import com.soyle.stories.domain.scene.TrackedSymbolRemoved
+import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import com.soyle.stories.domain.scene.Updated
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.usecase.scene.SceneRepository

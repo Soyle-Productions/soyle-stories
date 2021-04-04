@@ -17,9 +17,11 @@ import javafx.scene.control.skin.TextAreaSkin
 import javafx.scene.control.skin.VirtualFlow
 import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import tornadofx.*
 import java.util.*
 import kotlin.collections.LinkedHashSet
+import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 
 /**
@@ -107,8 +109,8 @@ private fun <S> TableColumn<S, *>.calculateIndex(index: Int): Int {
 	}
 }
 
-fun <T> async(scope: ApplicationScope, block: suspend CoroutineScope.() -> T) {
-	DI.resolve<ThreadTransformer>(scope).async { block() }
+fun <T> async(scope: ApplicationScope, block: suspend CoroutineScope.() -> T): Job {
+	return DI.resolve<ThreadTransformer>(scope).async { block() }
 }
 inline fun <T> async(scope: ProjectScope, noinline block: suspend CoroutineScope.() -> T) = async(scope.applicationScope, block)
 
@@ -211,5 +213,23 @@ fun <T> ListView<T>.sizeToFitItems(maximumVisibleItems: Double = 11.5)
 	maxHeight = 2.0 + maximumVisibleItems * ROW_HEIGHT
 	if (prefHeight != currentPrefHeight || maxHeight != currentMaxHeight) {
 		requestLayout()
+	}
+}
+
+/**
+ * Enables file-level values to have cssclass delegate
+ */
+operator fun CssClassDelegate.getValue(nothing: Nothing?, property: KProperty<*>): CssRule = getValue(fileObj, property)
+private val fileObj = Any()
+
+fun Node.applyContextMenu(contextMenu: ContextMenu)
+{
+	if (this is Control) {
+		this.contextMenu = contextMenu
+	} else {
+		setOnContextMenuRequested {
+			contextMenu.show(this, it.screenX, it.screenY)
+			it.consume()
+		}
 	}
 }

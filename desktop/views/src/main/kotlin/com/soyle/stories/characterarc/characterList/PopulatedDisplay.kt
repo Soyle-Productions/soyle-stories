@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.characterList
 
-import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
+import com.soyle.stories.characterarc.CharacterArcStyles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.components.characterCard
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
@@ -29,6 +29,7 @@ import java.util.*
  */
 internal class PopulatedDisplay : View() {
 
+    override val scope: ProjectScope = super.scope as ProjectScope
     private val model by inject<CharacterListModel>()
     private var treeView: TreeView<Any?> by singleAssign()
     internal val characterListViewListener = resolve<CharacterListViewListener>()
@@ -50,7 +51,7 @@ internal class PopulatedDisplay : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterTreeItemViewModel) {
-                    planCharacterArcDialog(selectedItem.id, currentStage)
+                    planCharacterArcDialog(scope, selectedItem.id, currentStage)
                 }
             }
         }

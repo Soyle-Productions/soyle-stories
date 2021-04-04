@@ -5,8 +5,8 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.*
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
-import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromScene
-import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
+import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -41,7 +41,7 @@ class RemoveCharacterFromSceneUnitTest {
 		givenSceneExists()
 		whenCharacterIsRemovedFromScene()
 		assertNull(updatedScene)
-		characterNotInScene(sceneId.uuid, characterId.uuid).invoke(result)
+		characterNotInScene(sceneId, characterId).invoke(result)
 	}
 
 	@Test
@@ -92,7 +92,7 @@ class RemoveCharacterFromSceneUnitTest {
 				result = failure
 			}
 
-			override fun characterRemovedFromScene(response: RemoveCharacterFromScene.ResponseModel) {
+			override suspend fun characterRemovedFromScene(response: RemoveCharacterFromScene.ResponseModel) {
 				result = response
 			}
 		}

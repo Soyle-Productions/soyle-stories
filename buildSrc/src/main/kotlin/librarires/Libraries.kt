@@ -3,7 +3,7 @@ package librarires
 object Libraries {
 
     val kotlin: KotlinLibraries = object : KotlinLibraries {
-        private val version = "1.4.30"
+        override val version = "1.4.30"
         private val coroutinesVersion = "1.4.2"
 
         override val std = "org.jetbrains.kotlin:kotlin-stdlib:$version"

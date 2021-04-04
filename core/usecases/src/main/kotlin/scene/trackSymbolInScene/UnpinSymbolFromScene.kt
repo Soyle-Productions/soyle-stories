@@ -1,8 +1,8 @@
 package com.soyle.stories.usecase.scene.trackSymbolInScene
 
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.SymbolUnpinnedFromScene
-import com.soyle.stories.domain.scene.TrackedSymbolRemoved
+import com.soyle.stories.domain.scene.events.SymbolUnpinnedFromScene
+import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import com.soyle.stories.domain.theme.Symbol
 
 interface UnpinSymbolFromScene {

@@ -1,13 +1,10 @@
 package com.soyle.stories.di.scene
 
-import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
-import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
-import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.coverArcSectionsInScene.*
+import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.*
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.createNewScene.CreateNewSceneControllerImpl
 import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
@@ -23,12 +20,12 @@ import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogModel
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogPresenter
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogViewListener
 import com.soyle.stories.scene.deleteSceneRamifications.*
-import com.soyle.stories.scene.includeCharacterInScene.*
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneControllerImpl
-import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
-import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
-import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
+import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.*
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
+import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneControllerImpl
+import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneControllerImpl
+import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneOutput
+import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
@@ -40,16 +37,11 @@ import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogModel
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogPresenter
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogViewListener
 import com.soyle.stories.scene.reorderSceneRamifications.*
-import com.soyle.stories.scene.sceneDetails.*
-import com.soyle.stories.scene.sceneDetails.includedCharacter.*
-import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneController
-import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInScenePresenter
-import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneState
-import com.soyle.stories.scene.sceneDetails.includedCharacters.IncludedCharactersInSceneViewListener
-import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
-import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
-import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.*
+import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
+import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
+import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
@@ -60,22 +52,21 @@ import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetP
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingSceneUseCase
 import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetails
 import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetailsUseCase
-import com.soyle.stories.usecase.scene.includeCharacterInScene.GetAvailableCharactersToAddToScene
-import com.soyle.stories.usecase.scene.includeCharacterInScene.IncludeCharacterInScene
-import com.soyle.stories.usecase.scene.includeCharacterInScene.IncludeCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
+import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneUseCase
 import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
 import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToSceneUseCase
 import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
 import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenesUseCase
-import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromScene
-import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
+import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.usecase.scene.renameScene.RenameScene
 import com.soyle.stories.usecase.scene.renameScene.RenameSceneUseCase
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderSceneUseCase
-import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
-import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
+import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
 
 object SceneModule {
 
@@ -108,7 +99,7 @@ object SceneModule {
                     get()
                 )
             }
-            provide(IncludeCharacterInScene::class, GetAvailableCharactersToAddToScene::class) {
+            provide(IncludeCharacterInScene::class, ListAvailableCharactersToIncludeInScene::class) {
                 IncludeCharacterInSceneUseCase(
                     get(),
                     get(),
@@ -176,12 +167,6 @@ object SceneModule {
                 IncludeCharacterInSceneOutput(get(), get())
             }
 
-            provide(LinkLocationToScene.OutputPort::class) {
-                LinkLocationToSceneNotifier(applicationScope.get())
-            }
-            provide(RemoveCharacterFromScene.OutputPort::class) {
-                RemoveCharacterFromSceneNotifier(applicationScope.get())
-            }
             provide(ReorderScene.OutputPort::class) {
                 ReorderSceneNotifier(applicationScope.get())
             }
@@ -242,7 +227,7 @@ object SceneModule {
                 )
             }
             provide {
-                RemoveCharacterFromSceneController(
+                RemoveCharacterFromSceneControllerImpl(
                     applicationScope.get(),
                     applicationScope.get(),
                     get(),
@@ -338,83 +323,11 @@ object SceneModule {
                     ReorderSceneRamificationsPresenter(
                         get<ReorderSceneRamificationsModel>(),
                         projectScope.get<DeleteSceneNotifier>(),
-                        projectScope.get<RemoveCharacterFromSceneNotifier>(),
+                        projectScope.get<RemovedCharacterFromSceneNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),
                     projectScope.get(),
                     projectScope.get()
-                )
-            }
-        }
-
-        scoped<SceneDetailsScope> {
-            provide<SceneDetailsViewListener> {
-                val presenter = SceneDetailsPresenter(
-                    sceneId.toString(),
-                    get<SceneDetailsModel>(),
-                    projectScope.get(),
-                    projectScope.get<LinkLocationToSceneNotifier>(),
-                    projectScope.get<ReorderSceneNotifier>(),
-                )
-
-                presenter listensTo projectScope.get<DeleteSceneNotifier>()
-
-                SceneDetailsController(
-                    sceneId.toString(),
-                    projectScope.applicationScope.get(),
-                    projectScope.applicationScope.get(),
-                    projectScope.get(),
-                    presenter,
-                    projectScope.get(),
-                )
-            }
-
-            provide<IncludedCharactersInSceneViewListener> {
-                val presenter = IncludedCharactersInScenePresenter(
-                    sceneId.toString(),
-                    get<IncludedCharactersInSceneState>()
-                ).also {
-                    it listensTo projectScope.get<CreatedCharacterNotifier>()
-                    it listensTo projectScope.get<RemovedCharacterNotifier>()
-                    it listensTo projectScope.get<IncludedCharacterInSceneNotifier>()
-                    it listensTo projectScope.get<RemoveCharacterFromSceneNotifier>()
-                }
-
-                IncludedCharactersInSceneController(
-                    sceneId.toString(),
-                    projectScope.get(),
-                    projectScope.applicationScope.get(),
-                    projectScope.get(),
-                    presenter
-                )
-            }
-        }
-
-        scoped<IncludedCharacterScope> {
-            provide<IncludedCharacterInSceneViewListener> {
-
-                val presenter = IncludedCharacterInScenePresenter(
-                    sceneDetailsScope.sceneId.toString(),
-                    characterId,
-                    get<IncludedCharacterInSceneState>()
-                ).apply {
-                    listensTo(projectScope.get<CharacterRenamedNotifier>())
-                    listensTo(projectScope.get<SetMotivationForCharacterInSceneNotifier>())
-                    listensTo(projectScope.get<CharacterArcSectionsCoveredBySceneNotifier>())
-                    listensTo(projectScope.get<CharacterArcSectionUncoveredInSceneNotifier>())
-                }
-
-                IncludedCharacterInSceneController(
-                    sceneDetailsScope.sceneId.toString(),
-                    storyEventId,
-                    characterId,
-                    projectScope.applicationScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    projectScope.get(),
-                    presenter
                 )
             }
         }

@@ -29,7 +29,7 @@ class LocationListDriver(private val locationList: LocationList) : FxRobot() {
     {
         return tree.root.children.asSequence().mapNotNull {
             val value = it.value as? LocationItemViewModel
-            if (value?.id == locationId.uuid.toString()) it as TreeItem<Any?>
+            if (value?.id == locationId) it as TreeItem<Any?>
             else null
         }.firstOrNull()
     }

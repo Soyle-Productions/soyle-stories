@@ -2,9 +2,9 @@ package com.soyle.stories.usecase.theme.renameSymbol
 
 import com.soyle.stories.domain.prose.MentionTextReplaced
 import com.soyle.stories.domain.prose.mentioned
-import com.soyle.stories.domain.scene.SceneEvent
+import com.soyle.stories.domain.scene.events.SceneEvent
 import com.soyle.stories.domain.scene.SceneUpdate
-import com.soyle.stories.domain.scene.TrackedSymbolRenamed
+import com.soyle.stories.domain.scene.events.TrackedSymbolRenamed
 import com.soyle.stories.domain.scene.Updated
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme

@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.scene
 
 import com.soyle.stories.domain.character.*
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.scene.CharacterNotInScene
+import com.soyle.stories.domain.scene.SceneDoesNotIncludeCharacter
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.characterNotInScene
 import com.soyle.stories.domain.scene.makeScene
@@ -12,10 +12,10 @@ import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.usecase.character.CharacterArcSectionDoesNotExist
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
@@ -80,11 +80,11 @@ class CoverCharacterArcSectionsInSceneUnitTest {
             // given
             givenSceneExists()
             // when
-            val error = assertThrows<CharacterNotInScene> {
+            val error = assertThrows<SceneDoesNotIncludeCharacter> {
                 listAvailableCharacterArcsForCharacterInScene()
             }
             // then
-            error shouldBe characterNotInScene(scene.id.uuid, character.id.uuid)
+            error shouldBe characterNotInScene(scene.id, character.id)
         }
 
         @Test
@@ -204,9 +204,9 @@ class CoverCharacterArcSectionsInSceneUnitTest {
         @Test
         fun `Character not in scene`() {
             givenSceneExists()
-            assertThrows<CharacterNotInScene> {
+            assertThrows<SceneDoesNotIncludeCharacter> {
                 coverSectionsInScene()
-            } shouldBe characterNotInScene(scene.id.uuid, character.id.uuid)
+            } shouldBe characterNotInScene(scene.id, character.id)
         }
 
         @Test
@@ -284,7 +284,7 @@ class CoverCharacterArcSectionsInSceneUnitTest {
                     .let { assertFalse(it) { "Character Arc Section was not uncovered from scene" } }
             }
             with(result as CoverCharacterArcSectionsInScene.ResponseModel) {
-                val baseSections = characterArcSections.associateBy { it.id.uuid }
+                val baseSections = characterArcSections.drop(1).associateBy { it.id.uuid }
                 assertEquals(
                     baseSections.keys,
                     sectionsCoveredByScene.map { it.characterArcSectionId }.toSet()
@@ -326,9 +326,9 @@ class CoverCharacterArcSectionsInSceneUnitTest {
     private fun givenSceneExists(withCharacterIncluded: Boolean = false, vararg additionalCharacters: Character) {
         sceneRepository.scenes[scene.id] = scene.run {
             if (withCharacterIncluded) {
-                withCharacterIncluded(character).let {
+                withCharacterIncluded(character).scene.let {
                     additionalCharacters.fold(it) { next, char ->
-                        next.withCharacterIncluded(char)
+                        next.withCharacterIncluded(char).scene
                     }
                 }
             } else this

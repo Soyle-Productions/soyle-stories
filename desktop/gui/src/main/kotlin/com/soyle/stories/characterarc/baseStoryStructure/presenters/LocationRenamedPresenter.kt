@@ -15,7 +15,7 @@ class LocationRenamedPresenter(
         view.updateOrInvalidated {
             withLocations(
                 availableLocations.map {
-                    if (it.id == renamedLocationId) LocationItemViewModel(it.id, locationRenamed.newName)
+                    if (it.id.uuid.toString() == renamedLocationId) LocationItemViewModel(it.id, locationRenamed.newName)
                     else it
                 }
             )

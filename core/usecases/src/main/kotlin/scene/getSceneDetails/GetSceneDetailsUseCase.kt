@@ -25,7 +25,7 @@ class GetSceneDetailsUseCase(
 		return GetSceneDetails.ResponseModel(
 		  scene.id.uuid,
 		  scene.storyEventId.uuid,
-            scene.settings.firstOrNull()?.uuid,
+            scene.settings.firstOrNull()?.id?.uuid,
 		  getIncludedCharacterDetails(scene)
 		)
 	}

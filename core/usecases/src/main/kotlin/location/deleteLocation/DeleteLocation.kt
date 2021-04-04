@@ -1,5 +1,6 @@
 package com.soyle.stories.usecase.location.deleteLocation
 
+import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
 import java.util.*
 
 interface DeleteLocation {
@@ -7,7 +8,8 @@ interface DeleteLocation {
 
 	class ResponseModel(
 		val deletedLocation: DeletedLocation,
-		val updatedArcSections: Set<UUID>
+		val updatedArcSections: Set<UUID>,
+		val locationRemovedFromScenes: List<LocationRemovedFromScene>
 		)
 
 	interface OutputPort {

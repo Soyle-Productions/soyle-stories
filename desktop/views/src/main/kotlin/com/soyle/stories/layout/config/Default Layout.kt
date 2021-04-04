@@ -34,6 +34,8 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                 stack(2) {
                     tool(Tool(ThemeList, isOpen = false))
                     tool(Tool(SceneSymbols, isOpen = false))
+                    tool(Tool(SceneSetting, isOpen = false))
+                    tool(Tool(SceneCharacters, isOpen = false))
                     //openTool(ToolType.NoteList)
                 }
             }

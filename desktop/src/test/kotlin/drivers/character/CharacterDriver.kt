@@ -97,7 +97,7 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
 
     private fun createCharacterArcWithName(character: Character, name: String) {
         projectScope.get<PlanNewCharacterArcController>()
-            .planCharacterArc(character.id.uuid.toString(), name) { throw it }
+            .planCharacterArc(character.id.uuid.toString(), name)
     }
 
     fun givenCharacterRenamedTo(characterId: Character.Id, name: String) {

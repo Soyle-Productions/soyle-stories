@@ -20,14 +20,6 @@ sourceSets {
         compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
         runtimeClasspath += output + compileClasspath
     }
-    val uat by creating {
-        java {
-            srcDir("src/uat/kotlin")
-            srcDir("src/uat/java")
-        }
-        compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
-        runtimeClasspath += output + compileClasspath
-    }
     testFixtures {
         java {
             srcDir("src/testFixtures/kotlin")
@@ -46,16 +38,6 @@ configurations {
         extendsFrom(configurations["testCompile"])
     }
     val integrationImplementation by getting {
-        extendsFrom(configurations["testImplementation"])
-    }
-
-    val uatRuntime by getting {
-        extendsFrom(configurations["testImplementation"])
-    }
-    val uatCompile by getting {
-        extendsFrom(configurations["testCompile"])
-    }
-    val uatImplementation by getting {
         extendsFrom(configurations["testImplementation"])
     }
 }
@@ -91,11 +73,7 @@ dependencies {
     implementation( "de.jensd:fontawesomefx-materialicons:2.2.0-11")
     implementation( "de.jensd:fontawesomefx-emojione:2.2.7-11")
 
-    "uatImplementation"( "io.cucumber:cucumber-java8:6.1.1")
-    "uatImplementation"( "io.cucumber:cucumber-junit:6.1.1")
-
     testImplementation( Libraries.kotlin.reflection)
-
 
     testFixturesApi( Libraries.junit.api)
     testFixturesApi( Libraries.junit.engine)
@@ -145,14 +123,10 @@ idea {
         testSourceDirs.add(file("src/integration/kotlin"))
         scopes["TEST"]?.get("plus")?.add(configurations.getByName("integrationCompile"))
 
-        testSourceDirs.add(file("src/uat/java"))
-        testSourceDirs.add(file("src/uat/kotlin"))
-        scopes["TEST"]?.get("plus")?.add(configurations.getByName("uatCompile"))
 
         (this as ExtensionAware).configure<org.jetbrains.gradle.ext.ModuleSettings> {
             (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = "com.soyle.stories.desktop.view"
             (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/integration/kotlin"] = "com.soyle.stories.desktop.view"
-            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/uat/kotlin"] = "com.soyle.stories.desktop.view"
             (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/testFixtures/kotlin"] = "com.soyle.stories.desktop.view"
         }
     }

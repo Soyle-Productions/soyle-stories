@@ -2,6 +2,7 @@ package com.soyle.stories.location.locationList
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.LocationRenamed
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
@@ -42,7 +43,7 @@ class LiveLocationList(
         }
 
         override fun receiveCreateNewLocationResponse(response: CreateNewLocation.ResponseModel) {
-            val locations = locations!! + LocationItem(response.locationId, response.locationName)
+            val locations = locations!! + LocationItem(Location.Id(response.locationId), response.locationName)
             this@LiveLocationList.locations = locations
             threadTransformer.async {
                 notifyAll { it.receiveLocationListUpdate(locations) }
@@ -50,8 +51,8 @@ class LiveLocationList(
         }
 
         override suspend fun receiveLocationRenamed(locationRenamed: LocationRenamed) {
-            val locations = locations!!.filterNot { it.id == locationRenamed.locationId.uuid } + LocationItem(
-                locationRenamed.locationId.uuid,
+            val locations = locations!!.filterNot { it.id == locationRenamed.locationId } + LocationItem(
+                locationRenamed.locationId,
                 locationRenamed.newName
             )
             this@LiveLocationList.locations = locations
@@ -61,7 +62,7 @@ class LiveLocationList(
         }
 
         override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
-            val locations = locations!!.filterNot { it.id == deletedLocation.location.uuid }
+            val locations = locations!!.filterNot { it.id == deletedLocation.location }
             this@LiveLocationList.locations = locations
             threadTransformer.async {
                 notifyAll { it.receiveLocationListUpdate(locations) }

@@ -167,7 +167,6 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View<VM>, Vie
 			props.add(BoundProperty(it) { vm ->
 				prop.get(vm).toObservable()
 			})
-			Unit
 		}
 	}
 

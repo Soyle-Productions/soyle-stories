@@ -20,13 +20,13 @@ class ControlledThreadTransformer : ThreadTransformer {
         }
     }
 
-
-    override fun async(task: suspend CoroutineScope.() -> Unit) {
-        if (asyncDelay == 0L) runBlocking {
+    override fun async(task: suspend CoroutineScope.() -> Unit): Job {
+        if (asyncDelay == 0L) return runBlocking {
             task()
+            Job().apply { complete() }
         }
         else {
-            CoroutineScope(Dispatchers.Default).launch {
+            return CoroutineScope(Dispatchers.Default).launch {
                 delay(asyncDelay)
                 task()
             }

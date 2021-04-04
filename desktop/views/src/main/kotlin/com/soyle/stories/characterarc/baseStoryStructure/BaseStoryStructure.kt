@@ -56,7 +56,7 @@ class BaseStoryStructure : ToolView() {
             }
         ) + model.availableLocations.map {
             CheckMenuItem(it.name).apply {
-                id = it.id
+                id = it.id.toString()
                 isSelected = section.linkedLocation?.id == it.id
                 action {
                     if (section.linkedLocation?.id == it.id) {
@@ -64,7 +64,7 @@ class BaseStoryStructure : ToolView() {
                         return@action
                     }
                     val locationId = it?.id ?: return@action
-                    baseStoryStructureViewListener.linkLocation(section.sectionId, locationId)
+                    baseStoryStructureViewListener.linkLocation(section.sectionId, locationId.uuid.toString())
                 }
             }
         }

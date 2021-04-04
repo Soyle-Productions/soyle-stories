@@ -2,6 +2,8 @@ package com.soyle.stories.theme.moralArgument
 
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.components.asyncMenuButton.AsyncMenuButton.Companion.asyncMenuButton
+import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
+import com.soyle.stories.common.components.text.SectionTitle.Companion.section
 import com.soyle.stories.common.mapObservableTo
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
@@ -33,6 +35,7 @@ class MoralArgumentView : View() {
         }
         moralArgument {
             hgrow = Priority.ALWAYS
+            vgrow = Priority.ALWAYS
             perspectiveCharacterField()
             arcSections {
                 moralArgumentSection(it)
@@ -64,7 +67,7 @@ class MoralArgumentView : View() {
         labelProperty: ObservableValue<String>,
         valueProperty: ObservableValue<String>,
         onChange: (String) -> Unit
-    ) = labeledSection(labelProperty) {
+    ) = section(labelProperty) {
         textfield {
             text = valueProperty.value ?: ""
             valueProperty.onChange { text = it }
@@ -81,6 +84,7 @@ class MoralArgumentView : View() {
     private fun Parent.perspectiveCharacterField() = hbox {
         id = "perspective-character-field"
         fieldLabel(state.perspectiveCharacterLabel)
+        spacer()
         asyncMenuButton<AvailablePerspectiveCharacterViewModel> {
             textProperty.bind(state.perspectiveCharacterDisplay)
             loadingLabelProperty.bind(state.loadingCharacterLabel)
@@ -127,11 +131,15 @@ class MoralArgumentView : View() {
         }
 
     private fun Parent.arcSections(op: VBox.(MoralArgumentSectionViewModel) -> MoralArgumentSection) {
-        scrollpane(fitToWidth = true) {
+        scrollpane {
+            isFitToHeight = true
+            isFitToWidth = true
             id = Styles.arcSections.name
-            content = vbox content@{
+            content = VBox().apply content@{
+                isFillWidth = true
                 visibleWhen(state.sections.isNotNull)
                 vbox {
+                    isFillWidth = true
                     state.sections.mapObservableTo(children, { it.arcSectionId }) {
                         val section = op(it).apply {
                             onSectionPlacedAbove = {

@@ -17,6 +17,7 @@ import com.soyle.stories.location.redescribeLocation.ReDescribeLocationNotifier
 import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.location.renameLocation.RenameLocationOutput
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
 import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocationUseCase
 import com.soyle.stories.usecase.location.getLocationDetails.GetLocationDetails
@@ -26,8 +27,6 @@ import com.soyle.stories.usecase.location.listAllLocations.ListAllLocationsUseCa
 import com.soyle.stories.usecase.location.redescribeLocation.ReDescribeLocation
 import com.soyle.stories.usecase.location.redescribeLocation.ReDescribeLocationUseCase
 import com.soyle.stories.usecase.location.renameLocation.RenameLocation
-import com.soyle.stories.usecase.location.renameLocation.RenameLocationUseCase
-import com.soyle.stories.project.ProjectScope
 
 object LocationModule {
 
@@ -37,9 +36,6 @@ object LocationModule {
 		}
 		provide<CreateNewLocation> {
 			CreateNewLocationUseCase(projectId, get())
-		}
-		provide<RenameLocation> {
-			RenameLocationUseCase(get(), get())
 		}
 		provide<GetLocationDetails> {
 			GetLocationDetailsUseCase(get())
@@ -55,9 +51,6 @@ object LocationModule {
 		}
 		provide(LocationRenamedReceiver::class) {
 			LocationRenamedNotifier()
-		}
-		provide<RenameLocation.OutputPort> {
-			RenameLocationOutput(get(), get())
 		}
 		provide(ReDescribeLocation.OutputPort::class) {
 			ReDescribeLocationNotifier(applicationScope.get())

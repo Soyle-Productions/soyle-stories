@@ -18,7 +18,7 @@ import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.character.CharacterArcTemplateSectionDoesNotExist
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.*
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.storyevent.characterDoesNotExist
 import kotlinx.coroutines.runBlocking
@@ -123,7 +123,7 @@ class CreateCharacterArcAndCoverSectionsInSceneUnitTest {
 
         // Preconditions
         private val character = makeCharacter()
-        private val scene = makeScene().withCharacterIncluded(character)
+        private val scene = makeScene().withCharacterIncluded(character).scene
 
         // input
         private val inputName = nonBlankStr()

@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.theme.promoteMinorCharacter
 
-import com.soyle.stories.usecase.character.planNewCharacterArc.CreatedCharacterArc
+import com.soyle.stories.usecase.character.arc.planNewCharacterArc.CreatedCharacterArc
 import java.util.*
 
 interface PromoteMinorCharacter {

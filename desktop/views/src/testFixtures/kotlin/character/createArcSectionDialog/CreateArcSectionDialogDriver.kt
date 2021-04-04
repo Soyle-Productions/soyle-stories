@@ -1,8 +1,7 @@
 package com.soyle.stories.desktop.view.character.createArcSectionDialog
 
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogView
-import com.soyle.stories.common.components.Styles
-import com.soyle.stories.common.components.Styles.Companion.labeledSection
+import com.soyle.stories.common.components.text.TextStyles
 import javafx.scene.control.Button
 import javafx.scene.control.CustomMenuItem
 import javafx.scene.control.Label
@@ -13,7 +12,7 @@ import org.testfx.api.FxRobot
 class CreateArcSectionDialogDriver(private val dialog: CreateArcSectionDialogView) : FxRobot() {
 
     val sectionTypeSelection: SectionTypeSelectionFieldDriver
-        get() = SectionTypeSelectionFieldDriver(from(dialog.root).lookup(".${labeledSection.name}").query())
+        get() = SectionTypeSelectionFieldDriver(from(dialog.root).lookup(".${TextStyles.section.name}").query())
 
     val primaryButton: Button
         get() = from(dialog.root).lookup(".button-bar .button").queryButton()
@@ -21,7 +20,7 @@ class CreateArcSectionDialogDriver(private val dialog: CreateArcSectionDialogVie
     inner class SectionTypeSelectionFieldDriver(private val section: VBox)
     {
         val label: String
-            get() = from(section).lookup(".${Styles.fieldLabel}").queryLabeled().text
+            get() = from(section).lookup(".${TextStyles.fieldLabel}").queryLabeled().text
 
         val selection: SectionTypeSelectionFieldDriver
             get() = SectionTypeSelectionFieldDriver(from(section).lookup(".menu-button").query())

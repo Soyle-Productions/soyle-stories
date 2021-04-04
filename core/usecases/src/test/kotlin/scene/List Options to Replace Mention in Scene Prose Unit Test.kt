@@ -72,7 +72,7 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
 
             init {
                 charactersInProject.takeLast(2).fold(scene) { newScene, character ->
-                    newScene.withCharacterIncluded(character)
+                    newScene.withCharacterIncluded(character).scene
                 }.let(sceneRepository::givenScene)
             }
 
@@ -126,7 +126,7 @@ class `List Options to Replace Mention in Scene Prose Unit Test` {
 
             init {
                 locationsInProject.takeLast(2).fold(scene) { newScene, location ->
-                    newScene.withLocationLinked(location.id)
+                    newScene.withLocationLinked(location).scene
                 }.let(sceneRepository::givenScene)
             }
 

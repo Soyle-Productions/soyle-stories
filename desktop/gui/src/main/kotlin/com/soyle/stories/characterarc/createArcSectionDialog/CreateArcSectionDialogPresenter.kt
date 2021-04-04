@@ -1,10 +1,12 @@
 package com.soyle.stories.characterarc.createArcSectionDialog
 
+import com.soyle.stories.domain.character.CharacterArcSection
+import com.soyle.stories.domain.character.CharacterArcTemplateSection
 import com.soyle.stories.gui.View
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 
-class CreateArcSectionDialogPresenter(
+internal class CreateArcSectionDialogPresenter(
     private val view: View.Nullable<CreateArcSectionDialogViewModel>
 ) : GetAvailableCharacterArcSectionTypesForCharacterArc.OutputPort {
 
@@ -20,23 +22,30 @@ class CreateArcSectionDialogPresenter(
                     val existingSection = it.existingSection
                     if (existingSection != null && ! it.multiple) {
                         SectionTypeOption.AlreadyUsed(
-                            it.templateSectionId.toString(),
+                            CharacterArcTemplateSection.Id(it.templateSectionId),
                             it.name,
-                            existingSection.first.toString(),
+                            CharacterArcSection.Id(existingSection.first),
                             existingSection.second,
                             "This character arc already includes a ${it.name}.  By selecting it, you will instead modify the value of the existing section and link it to this scene."
                         )
                     } else {
                         SectionTypeOption(
-                            it.templateSectionId.toString(),
+                            CharacterArcTemplateSection.Id(it.templateSectionId),
                             it.name
                         )
                     }
                 },
+                done = this?.done ?: false,
                 confirmUnsavedDescriptionChanges = "You have modified the description.  If you change the type, you will lose the changes you've made.",
                 defaultPrimaryButtonLabel = "Create",
                 modifyingPrimaryButtonLabel = "Change"
             )
+        }
+    }
+
+    fun complete() {
+        view.updateOrInvalidated {
+            copy(done = true)
         }
     }
 

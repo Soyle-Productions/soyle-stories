@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.scene.sceneFrame
 
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneFrameValue
-import com.soyle.stories.domain.scene.SceneFrameValueChanged
+import com.soyle.stories.domain.scene.events.SceneFrameValueChanged
 
 interface SetSceneFrameValue {
 

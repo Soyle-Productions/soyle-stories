@@ -4,7 +4,7 @@ import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.gui.View
 import com.soyle.stories.storyevent.storyEventDetails.StoryEventDetailsViewModel
 import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacter
-import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.usecase.theme.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.usecase.theme.useCharacterAsOpponent.CharacterUsedAsOpponent
 

@@ -27,7 +27,7 @@ internal class ActionBar : View() {
             action {
                 val selectedItem = model.selectedItem.value
                 if (selectedItem is CharacterTreeItemViewModel) {
-                    planCharacterArcDialog(selectedItem.id, currentStage)
+                    planCharacterArcDialog(scope, selectedItem.id, currentStage)
                 }
             }
             isMnemonicParsing = false

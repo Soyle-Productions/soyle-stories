@@ -7,7 +7,7 @@ import com.soyle.stories.domain.media.Media
 import com.soyle.stories.domain.shouldBe
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.makeTheme
-import com.soyle.stories.usecase.character.deleteCharacterArc.DeletedCharacterArc
+import com.soyle.stories.usecase.character.arc.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble

@@ -220,8 +220,8 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
                 val scene = sceneRepository.scenes.getValue(idOf(scenes[index]))
                 val newScene = when (motive) {
                     "_" -> return@forEachIndexed
-                    "-" -> scene.withCharacterIncluded(character)
-                    else -> scene.withCharacterIncluded(character).withMotivationForCharacter(character.id, motive)
+                    "-" -> scene.withCharacterIncluded(character).scene
+                    else -> scene.withCharacterIncluded(character).scene.withMotivationForCharacter(character.id, motive)
                 }
                 sceneRepository.scenes[scene.id] = newScene
             }

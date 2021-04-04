@@ -6,7 +6,10 @@ import com.soyle.stories.theme.addSymbolDialog.AddSymbolDialogModel
 import com.soyle.stories.theme.addSymbolDialog.AddSymbolDialogViewListener
 import javafx.scene.Parent
 import javafx.scene.control.SelectionMode
-import tornadofx.*
+import tornadofx.Fragment
+import tornadofx.bind
+import tornadofx.listview
+import tornadofx.onChange
 
 class SymbolicLocationList : Fragment("Locations") {
 
@@ -21,7 +24,7 @@ class SymbolicLocationList : Fragment("Locations") {
         selectionModel.selectionMode = SelectionMode.SINGLE
         selectionModel.selectedItemProperty().onChange {
             if (it != null) {
-                viewListener.selectLocation(it.id)
+                viewListener.selectLocation(it.id.uuid.toString())
             }
         }
     }

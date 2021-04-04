@@ -7,7 +7,7 @@ import com.soyle.stories.usecase.character.listCharactersAvailableToIncludeInThe
 import com.soyle.stories.usecase.character.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInThemeUseCase
 import com.soyle.stories.characterarc.changeSectionValue.*
 import com.soyle.stories.characterarc.eventbus.ChangeCharacterPropertyValueNotifier
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.*
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.*
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get

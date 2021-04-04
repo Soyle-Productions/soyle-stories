@@ -24,7 +24,7 @@ class DeleteLocationDialog : Fragment() {
 	fun show( locationItemViewModel: LocationItemViewModel) {
 		headerText.value = "Delete ${locationItemViewModel.name}?"
 		alert.resultProperty().onChangeOnce {
-			if (it == confirmButton) viewListener.deleteLocation(locationItemViewModel.id)
+			if (it == confirmButton) viewListener.deleteLocation(locationItemViewModel.id.uuid.toString())
 			close()
 		}
 		openWindow()

@@ -208,7 +208,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
                 actual.characters.map { it.characterName }.toSet()
             ) { "Character Names not properly mapped" }
 
-            assertEquals(locationIds, actual.locations.map { it.id }.toSet())
+            assertEquals(locationIds, actual.locations.map { it.id.uuid }.toSet())
             assertEquals(
                 locationIds.map { locationRepository.locations[Location.Id(it)]!!.name.value }.toSet(),
                 actual.locations.map { it.locationName }.toSet()

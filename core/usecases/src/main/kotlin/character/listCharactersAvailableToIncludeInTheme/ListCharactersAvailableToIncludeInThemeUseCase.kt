@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.character.listCharactersAvailableToIncludeInTh
 
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.usecase.character.CharacterRepository
-import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterItem
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterItem
 import com.soyle.stories.usecase.theme.ThemeDoesNotExist
 import com.soyle.stories.usecase.theme.ThemeRepository
 import java.util.*

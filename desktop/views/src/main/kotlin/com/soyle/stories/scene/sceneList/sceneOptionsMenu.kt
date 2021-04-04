@@ -2,7 +2,6 @@ package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.di.get
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.scene.deleteSceneDialog.deleteSceneDialog
 import com.soyle.stories.scene.items.SceneItemViewModel
@@ -10,8 +9,9 @@ import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialog
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.SeparatorMenuItem
-import javafx.util.Duration
-import tornadofx.*
+import tornadofx.action
+import tornadofx.item
+import tornadofx.toggleClass
 
 internal fun sceneOptionsMenu(viewListener: SceneListViewListener, scope: ProjectScope, sceneItemViewModel: SceneItemViewModel): List<MenuItem> = listOf(
     MenuItem("Edit").apply {
@@ -19,18 +19,20 @@ internal fun sceneOptionsMenu(viewListener: SceneListViewListener, scope: Projec
         toggleClass(SceneListItem.Styles.hasIssue, sceneItemViewModel.invalidEntitiesMentioned)
         action { viewListener.editScene(sceneItemViewModel.id, sceneItemViewModel.proseId) }
     },
-    MenuItem("Inspect Details").apply {
-        id = "open_details"
-        action { viewListener.openSceneDetails(sceneItemViewModel.id) }
+    MenuItem("Track Characters").apply {
+        id = "open_scene_characters"
+        toggleClass(SceneListItem.Styles.hasIssue, false)
+        action { viewListener.trackCharacters(sceneItemViewModel) }
+    },
+    MenuItem("Track Locations").apply {
+        id = "open_scene_locations"
+        toggleClass(SceneListItem.Styles.hasIssue, false)
+        action { viewListener.trackLocations(sceneItemViewModel) }
     },
     MenuItem("Track Symbols").apply {
         id = "open_scene_symbols"
         toggleClass(SceneListItem.Styles.hasIssue, sceneItemViewModel.unusedSymbols)
-        action {
-            FX.eventbus.fire(SceneTargeted(sceneItemViewModel))
-            viewListener.trackSymbols(sceneItemViewModel)
-            runLater(Duration(250.0)) { FX.eventbus.fire(SceneTargeted(sceneItemViewModel)) }
-        }
+        action { viewListener.trackSymbols(sceneItemViewModel) }
     },
     SeparatorMenuItem(),
     Menu("Insert").apply {
