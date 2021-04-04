@@ -75,7 +75,6 @@ dependencies {
 
     testImplementation( Libraries.kotlin.reflection)
 
-
     testFixturesApi( Libraries.junit.api)
     testFixturesApi( Libraries.junit.engine)
     testFixturesApi( Libraries.assertJ)

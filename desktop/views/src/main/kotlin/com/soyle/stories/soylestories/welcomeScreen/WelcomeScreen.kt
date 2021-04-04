@@ -1,5 +1,6 @@
 package com.soyle.stories.soylestories.welcomeScreen
 
+import com.soyle.stories.common.components.text.ApplicationTitle.Companion.applicationTitle
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
@@ -30,10 +31,10 @@ class WelcomeScreen : View() {
             fitHeight = 200.0
             isPreserveRatio = true
         }
-        label(model.applicationName) {
+        applicationTitle {
+            textProperty().bind(model.applicationName)
             style {
                 textFill = Color.WHITE
-                fontSize = 2.em
             }
         }
         vbox(alignment = Pos.CENTER_LEFT, spacing = 10) {

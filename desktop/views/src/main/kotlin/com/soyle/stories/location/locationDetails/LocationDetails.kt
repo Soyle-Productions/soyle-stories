@@ -1,6 +1,6 @@
 package com.soyle.stories.location.locationDetails
 
-import com.soyle.stories.common.components.labeledSection
+import com.soyle.stories.common.components.text.SectionTitle.Companion.section
 import com.soyle.stories.common.hideScrollbars
 import com.soyle.stories.common.rowCountProperty
 import com.soyle.stories.di.resolveLater
@@ -19,7 +19,7 @@ class LocationDetails : View() {
 		hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
 		vbarPolicy = ScrollPane.ScrollBarPolicy.AS_NEEDED
 		isFitToWidth = true
-		content = labeledSection(model.descriptionLabel) {
+		content = section(model.descriptionLabel) {
 			style { padding = box(16.px) }
 			textarea {
 				id = "description"

@@ -1,6 +1,6 @@
 package com.soyle.stories.desktop.view.theme.moralArgument
 
-import com.soyle.stories.common.components.Styles
+import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.theme.moralArgument.MoralArgumentView
 import javafx.scene.Node
 import javafx.scene.control.*
@@ -9,14 +9,14 @@ import org.testfx.api.FxRobot
 class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
 
     fun getMoralProblemFieldLabel(): Labeled {
-        return from(view.root).lookup("#moral-problem-field .${Styles.fieldLabel.name}").query()
+        return from(view.root).lookup("#moral-problem-field .${TextStyles.fieldLabel.name}").query()
     }
     fun getMoralProblemFieldInput(): TextInputControl {
         return from(view.root).lookup("#moral-problem-field .text-field").query()
     }
 
     fun getThemeLineFieldLabel(): Labeled {
-        return from(view.root).lookup("#theme-line-field .${Styles.fieldLabel.name}").query()
+        return from(view.root).lookup("#theme-line-field .${TextStyles.fieldLabel.name}").query()
     }
 
     fun getThemeLineFieldInput(): TextInputControl {
@@ -24,7 +24,7 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
     }
 
     fun getThematicRevelationFieldLabel(): Labeled {
-        return from(view.root).lookup("#thematic-revelation-field .${Styles.fieldLabel.name}").query()
+        return from(view.root).lookup("#thematic-revelation-field .${TextStyles.fieldLabel.name}").query()
     }
 
     fun getThematicRevelationFieldInput(): TextInputControl {
@@ -32,7 +32,7 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
     }
 
     fun getPerspectiveCharacterLabel(): Labeled {
-        return from(view.root).lookup("#perspective-character-field .${Styles.fieldLabel.name}").query()
+        return from(view.root).lookup("#perspective-character-field .${TextStyles.fieldLabel.name}").query()
     }
 
     fun getPerspectiveCharacterSelection(): MenuButton {
@@ -45,10 +45,10 @@ class MoralArgumentViewDriver(private val view: MoralArgumentView) : FxRobot() {
 
     internal fun getArcSectionNodes(): List<Node> {
         val arcSectionsContainer = getArcSectionsContainer()
-        return from(arcSectionsContainer).lookup(".${Styles.labeledSection.name}").queryAll<Node>().toList()
+        return from(arcSectionsContainer).lookup(".${TextStyles.section.name}").queryAll<Node>().toList()
     }
 
-    private fun getArcSectionLabel(sectionNode: Node): Labeled = from(sectionNode).lookup(".${Styles.fieldLabel.name}").query()
+    private fun getArcSectionLabel(sectionNode: Node): Labeled = from(sectionNode).lookup(".${TextStyles.fieldLabel.name}").query()
     fun getArcSectionLabels(): List<Labeled> = getArcSectionNodes().map(::getArcSectionLabel)
     fun getArcSectionLabel(index: Int): Labeled = getArcSectionLabel(getArcSectionNodes()[index])
 

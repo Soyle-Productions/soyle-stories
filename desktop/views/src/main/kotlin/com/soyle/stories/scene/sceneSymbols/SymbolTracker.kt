@@ -2,9 +2,11 @@ package com.soyle.stories.scene.sceneSymbols
 
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.buttons.ButtonStyles.Companion.inviteButton
-import com.soyle.stories.common.components.buttons.ButtonStyles.Companion.primaryButton
-import com.soyle.stories.common.components.fieldLabel
-import com.soyle.stories.common.components.text.mainHeader
+import com.soyle.stories.common.components.buttons.primaryMenuButton
+import com.soyle.stories.common.components.layouts.emptyToolInvitation
+import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
+import com.soyle.stories.common.components.text.SectionTitle.Companion.sectionTitle
+import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Symbol
@@ -57,15 +59,13 @@ class SymbolTracker : Fragment() {
     }
 
     private fun Parent.emptyState(): Node {
-        return vbox(spacing = 16) {
-            alignment = Pos.CENTER
-            addClass(ComponentsStyles.cardBody)
+        return emptyToolInvitation {
             imageview("com/soyle/stories/scene/Symbols-design.png") {
                 this.isPreserveRatio = true
                 this.isSmooth = true
                 fitHeight = 260.0
             }
-            mainHeader("Track Symbols in Scene")
+            toolTitle("Track Symbols in Scene")
             textflow {
                 textAlignment = TextAlignment.CENTER
                 text("When you ")
@@ -90,7 +90,7 @@ class SymbolTracker : Fragment() {
         return vbox {
             hbox {
                 alignment = Pos.CENTER_LEFT
-                mainHeader("Tracked Symbols")
+                sectionTitle("Tracked Symbols")
                 spacer()
                 pinSymbolMenuButton {}
             }
@@ -106,8 +106,7 @@ class SymbolTracker : Fragment() {
         }
     }
 
-    private fun Parent.pinSymbolMenuButton(op: MenuButton.() -> Unit) = menubutton("Pin Symbol") {
-        addClass(primaryButton)
+    private fun Parent.pinSymbolMenuButton(op: MenuButton.() -> Unit) = primaryMenuButton("Pin Symbol") {
         addClass("pin-symbol-button")
         setOnShowing { loadAvailableSymbolsToTrack() }
         state.availableSymbols.onChange { it: ObservableList<SymbolsInSceneViewModel.AvailableTheme>? ->

@@ -7,6 +7,7 @@ import com.soyle.stories.character.CreateArcSectionDialogViewAssert.SectionTypeF
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogView
 import com.soyle.stories.characterarc.createArcSectionDialog.SectionTypeOption
 import com.soyle.stories.common.components.ComponentsStyles
+import com.soyle.stories.common.components.text.TextStyles
 import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
@@ -165,7 +166,7 @@ class CreateArcSectionDialogViewAssert private constructor(private val dialog: C
 
         fun CreateArcSectionDialogView.getSectionTypeSelectionField(): VBox {
             return from(root)
-                .lookup("." + com.soyle.stories.common.components.Styles.labeledSection.name)
+                .lookup("." + TextStyles.section.name)
                 .queryAll<VBox>()
                 .toList()
                 .component1()
@@ -173,7 +174,7 @@ class CreateArcSectionDialogViewAssert private constructor(private val dialog: C
 
         fun CreateArcSectionDialogView.getDescriptionField(): VBox {
             return from(root)
-                .lookup("." + com.soyle.stories.common.components.Styles.labeledSection.name)
+                .lookup("." + TextStyles.section.name)
                 .queryAll<VBox>()
                 .toList()
                 .component2()

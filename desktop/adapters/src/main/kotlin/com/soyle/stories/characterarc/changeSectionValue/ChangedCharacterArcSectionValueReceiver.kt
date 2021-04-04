@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.changeSectionValue
 
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 
 interface ChangedCharacterArcSectionValueReceiver {
 

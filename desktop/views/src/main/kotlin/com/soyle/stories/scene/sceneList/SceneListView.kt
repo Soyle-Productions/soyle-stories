@@ -2,7 +2,7 @@ package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.common.components.buttons.inviteButton
 import com.soyle.stories.common.components.buttons.primaryButton
-import com.soyle.stories.common.components.text.mainHeader
+import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.SceneTargeted
@@ -55,7 +55,7 @@ class SceneListView : View() {
         imageview("com/soyle/stories/scene/Scenes-Icon.png") {
             alignment = Pos.CENTER
         }
-        mainHeader("Scenes") {
+        toolTitle("Scenes") {
             textAlignment = TextAlignment.CENTER
         }
         label("Scenes are where your story happens.  Create your first scene by clicking the button below and get started!") {

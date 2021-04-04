@@ -5,10 +5,10 @@ import com.soyle.stories.character.characterList.LiveCharacterList
 import com.soyle.stories.usecase.character.buildNewCharacter.CreatedCharacter
 import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.characterarc.planNewCharacterArc.CreatedCharacterArcReceiver
-import com.soyle.stories.usecase.character.listAllCharacterArcs.CharacterArcsByCharacter
-import com.soyle.stories.usecase.character.listAllCharacterArcs.ListAllCharacterArcs
-import com.soyle.stories.usecase.character.planNewCharacterArc.CreatedCharacterArc
-import com.soyle.stories.usecase.character.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.CharacterArcsByCharacter
+import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.ListAllCharacterArcs
+import com.soyle.stories.usecase.character.arc.planNewCharacterArc.CreatedCharacterArc
+import com.soyle.stories.usecase.character.arc.renameCharacterArc.RenameCharacterArc
 import com.soyle.stories.domain.character.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver

@@ -1,5 +1,7 @@
 package com.soyle.stories.common.components
 
+import com.soyle.stories.common.components.buttons.ButtonStyles
+import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.soylestories.Styles
 import javafx.scene.effect.BlurType
 import javafx.scene.effect.DropShadow
@@ -12,6 +14,9 @@ class ComponentsStyles : Stylesheet() {
         const val baseSpace = 8.0
 
         val card by cssclass()
+        val lifted = mixin {
+            effect = DropShadow(BlurType.GAUSSIAN, Color.rgb(0,0,0,0.2), 4.0, -2.0, 0.0, 3.0)
+        }
         val liftedCard by cssclass()
         val cardHeader by cssclass()
         val cardBody by cssclass()
@@ -32,8 +37,17 @@ class ComponentsStyles : Stylesheet() {
 
         val hasProblem by cssclass()
 
+        val primary by csspseudoclass()
+        val secondary by csspseudoclass()
+
+        val filled by csspseudoclass()
+        val outlined by csspseudoclass()
+
         init {
             importStylesheet<ComponentsStyles>()
+
+            ButtonStyles // reference to initilize
+            TextStyles // reference to initilize
         }
     }
 
@@ -47,7 +61,7 @@ class ComponentsStyles : Stylesheet() {
             minWidth = 275.px
         }
         liftedCard {
-            effect = DropShadow(BlurType.GAUSSIAN, Color.rgb(0,0,0,0.2), 4.0, -2.0, 0.0, 3.0)
+            +lifted
         }
         cardHeader {
             padding = box(16.px)
@@ -154,6 +168,38 @@ class ComponentsStyles : Stylesheet() {
         hasProblem {
             borderWidth += box(0.px, 0.px, 2.px, 0.px)
             borderColor += box(Color.TRANSPARENT, Color.TRANSPARENT, Styles.Orange, Color.TRANSPARENT)
+        }
+
+        radioButton {
+            radio {
+                borderColor = multi(box(Color.GREY))
+                borderRadius = multi(box(100.percent))
+                borderWidth = multi(box(2.px))
+            }
+        }
+        checkBox {
+            box {
+                borderColor = multi(box(Color.GREY))
+                borderWidth = multi(box(2.px))
+            }
+        }
+
+        radioButton and selected {
+            radio {
+                borderColor = multi(box(Styles.Purple))
+            }
+            dot {
+                backgroundColor = multi(Styles.Purple)
+            }
+        }
+
+        checkBox and selected {
+            box {
+                borderColor = multi(box(Styles.Purple))
+            }
+            mark {
+                backgroundColor = multi(Styles.Purple)
+            }
         }
     }
 }

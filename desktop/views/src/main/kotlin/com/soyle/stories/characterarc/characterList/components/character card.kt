@@ -1,12 +1,13 @@
 package com.soyle.stories.characterarc.characterList.components
 
-import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
+import com.soyle.stories.characterarc.CharacterArcStyles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.characterList.*
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.common.components.*
 import com.soyle.stories.common.components.ComponentsStyles.Companion.liftedCard
 import com.soyle.stories.di.resolveLater
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.project.ProjectScope
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.property.SimpleBooleanProperty
@@ -26,6 +27,7 @@ import java.util.*
 
 class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
 
+    override val scope: ProjectScope = super.scope as ProjectScope
     private val viewListener by resolveLater<CharacterListViewListener>()
 
     private val isDisplayingCharacterArcs = SimpleBooleanProperty(false)
@@ -137,7 +139,7 @@ class CharacterCard : ItemFragment<CharacterTreeItemViewModel>() {
 
     private fun planNewCharacterArc() {
         val characterId = item?.id ?: return
-        planCharacterArcDialog(characterId, currentStage)
+        planCharacterArcDialog(scope, characterId, currentStage)
     }
 
     private fun deleteCharacter() {

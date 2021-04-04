@@ -2,7 +2,7 @@ package com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.usecase.character.arc.section.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 
 class UnlinkLocationFromCharacterArcSectionNotifier(
 	private val threadTransformer: ThreadTransformer

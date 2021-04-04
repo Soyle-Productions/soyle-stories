@@ -1,14 +1,19 @@
 package com.soyle.stories.scene.sceneSetting
 
 import com.soyle.stories.common.components.ComponentsStyles
+import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chip
+import com.soyle.stories.common.components.layouts.emptyToolInvitation
+import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
+import com.soyle.stories.common.components.text.TextStyles
+import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.scene.SceneStyles
 import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneSetting.SceneSettingView.Styles.Companion.sceneSetting
-import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.warningLabel
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
@@ -40,15 +45,10 @@ class SceneSettingView : View() {
 
     private fun Parent.targetSceneHeader(): Node {
         return hbox {
-            style {
-                padding = box(16.px)
-                backgroundColor = multi(Color.WHITE)
-                effect = DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.25), 4.0, 0.0, 0.0, 4.0)
-
-            }
+            addClass(SceneStyles.selectedSceneHeader)
             label("Scene: ")
             label(state.targetScene.stringBinding { it?.name ?: "No Scene Targeted" }) {
-                toggleClass(warningLabel, state.targetScene.isNull)
+                toggleClass(TextStyles.warning, state.targetScene.isNull)
             }
         }
     }
@@ -71,15 +71,13 @@ class SceneSettingView : View() {
     }
 
     private fun Parent.emptyBody(): Node {
-        return vbox(spacing = 16) {
-            alignment = Pos.CENTER
-            addClass(ComponentsStyles.cardBody)
+        return emptyToolInvitation {
             imageview("com/soyle/stories/scene/Symbols-design.png") {
                 this.isPreserveRatio = true
                 this.isSmooth = true
                 fitHeight = 260.0
             }
-            label("Use Locations as Scene Setting") { addClass(com.soyle.stories.common.components.Styles.fieldLabel) }
+            toolTitle("Use Locations as Scene Setting")
             textflow {
                 textAlignment = TextAlignment.CENTER
 
@@ -89,7 +87,7 @@ class SceneSettingView : View() {
                     action { viewListener.openSceneListTool() }
                 }
                 text("to click anywhere in side of an open Scene Editor to ")
-                label("target") { addClass(warningLabel) }
+                label("target") { addClass(TextStyles.warning) }
                 text(" a scene and see what locations are being used.")
             }
         }
@@ -119,7 +117,7 @@ class SceneSettingView : View() {
             val locationSetter by cssclass()
             val hasLocations by csspseudoclass()
 
-            val sceneSettingChip by cssclass()
+            val locationList by cssclass()
 
             init {
                 importStylesheet<Styles>()
@@ -134,11 +132,16 @@ class SceneSettingView : View() {
                 padding = box(16.px)
                 backgroundColor = multi(Color.WHITE)
             }
+            locationList {
+                chip {
+                    backgroundColor = multi(Color.LAVENDER)
+                }
+            }/*
             sceneSettingChip {
+                backgroundColor = multi(Color.LAVENDER)
                 padding = box(5.px, 6.px)
                 borderRadius = multi(box(12.px))
                 backgroundRadius = multi(box(16.px))
-                backgroundColor = multi(Color.LAVENDER)
                 contentDisplay = ContentDisplay.RIGHT
 
                 Stylesheet.button {
@@ -151,7 +154,7 @@ class SceneSettingView : View() {
                         translateY = (-2).px
                     }
                 }
-            }
+            }*/
         }
 
     }

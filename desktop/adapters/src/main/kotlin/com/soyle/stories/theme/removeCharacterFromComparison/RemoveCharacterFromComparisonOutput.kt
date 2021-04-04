@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.removeCharacterFromComparison
 
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
-import com.soyle.stories.usecase.character.deleteCharacterArc.DeletedCharacterArc
+import com.soyle.stories.usecase.character.arc.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
 import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemoveCharacterFromComparison
 import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemovedCharacterFromTheme

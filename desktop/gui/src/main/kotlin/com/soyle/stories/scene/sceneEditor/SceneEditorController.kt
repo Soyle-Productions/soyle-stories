@@ -10,7 +10,7 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.prose.proseEditor.OnLoadMentionQueryOutput
 import com.soyle.stories.prose.proseEditor.OnLoadMentionReplacementsOutput
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
-import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
+import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.sceneFrame.GetSceneFrameController

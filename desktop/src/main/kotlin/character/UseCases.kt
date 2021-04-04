@@ -1,5 +1,8 @@
 package com.soyle.stories.desktop.config.character
 
+import com.soyle.stories.character.createArcSection.AddSectionToCharacterArcOutput
+import com.soyle.stories.character.createArcSection.CreateArcSectionController
+import com.soyle.stories.character.createArcSection.CreateArcSectionControllerImpl
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
@@ -16,21 +19,23 @@ import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.Mov
 import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentController
 import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentControllerImpl
 import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentOutput
-import com.soyle.stories.usecase.character.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
-import com.soyle.stories.usecase.character.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentUseCase
-import com.soyle.stories.usecase.character.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
-import com.soyle.stories.usecase.character.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgument
-import com.soyle.stories.usecase.character.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentUseCase
-import com.soyle.stories.usecase.character.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgument
-import com.soyle.stories.usecase.character.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentUseCase
-import com.soyle.stories.usecase.character.viewBaseStoryStructure.ViewBaseStoryStructure
-import com.soyle.stories.usecase.character.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
+import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgument
+import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentUseCase
+import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
+import com.soyle.stories.usecase.character.arc.section.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgument
+import com.soyle.stories.usecase.character.arc.section.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgumentUseCase
+import com.soyle.stories.usecase.character.arc.section.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgument
+import com.soyle.stories.usecase.character.arc.section.removeCharacterArcSectionFromMoralArgument.RemoveCharacterArcSectionFromMoralArgumentUseCase
+import com.soyle.stories.usecase.character.arc.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.usecase.character.arc.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.characterarc.viewBaseStoryStructure.ViewBaseStoryStructureController
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentOutput
+import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
+import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArcUseCase
 
 object UseCases {
 
@@ -50,6 +55,7 @@ object UseCases {
                     get()
                 )
             }
+
 
             provide<AddCharacterArcSectionToMoralArgument.OutputPort> {
                 AddCharacterArcSectionToMoralArgumentOutput(get())
@@ -87,6 +93,7 @@ object UseCases {
                 RemoveCharacterArcSectionFromMoralArgumentOutput(get(), get())
             }
 
+            addSectionToCharacterArc()
             renameCharacter()
             removeCharacterFromStory()
             viewBaseStoryStructure()
@@ -94,12 +101,24 @@ object UseCases {
         }
     }
 
+    private fun InProjectScope.addSectionToCharacterArc() {
+        provide<AddSectionToCharacterArc> {
+            AddSectionToCharacterArcUseCase(get())
+        }
+        provide<AddSectionToCharacterArc.OutputPort> {
+            AddSectionToCharacterArcOutput(get())
+        }
+        provide<CreateArcSectionController> {
+            CreateArcSectionControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get())
+        }
+    }
+
     private fun InProjectScope.renameCharacter() {
         provide<RenameCharacter> {
-            RenameCharacterUseCase(get(), get(), get())
+            RenameCharacterUseCase(get(), get(), get(), get())
         }
         provide(RenameCharacter.OutputPort::class) {
-            RenameCharacterOutput(get(), get())
+            RenameCharacterOutput(get(), get(), get())
         }
         provide<RenameCharacterController> {
             RenameCharacterControllerImpl(applicationScope.get(), get(), get())

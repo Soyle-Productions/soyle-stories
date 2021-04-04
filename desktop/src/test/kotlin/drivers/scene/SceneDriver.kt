@@ -17,12 +17,12 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.prose.editProse.EditProseController
 import com.soyle.stories.prose.proseEditor.ProseEditorScope
-import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneController
+import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
-import com.soyle.stories.scene.includeCharacterInScene.IncludeCharacterInSceneController
+import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
-import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
+import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
 import com.soyle.stories.usecase.scene.SceneRepository
 import kotlinx.coroutines.runBlocking

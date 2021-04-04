@@ -7,7 +7,7 @@ class PlanCharacterArcDialogController(
 ) : PlanCharacterArcDialogViewListener {
 
     override fun planCharacterArc(characterId: String, name: String) {
-        planNewCharacterArcController.planCharacterArc(characterId, name) {}
+        planNewCharacterArcController.planCharacterArc(characterId, name)
     }
 
 }

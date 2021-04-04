@@ -19,13 +19,20 @@ internal fun sceneOptionsMenu(viewListener: SceneListViewListener, scope: Projec
         toggleClass(SceneListItem.Styles.hasIssue, sceneItemViewModel.invalidEntitiesMentioned)
         action { viewListener.editScene(sceneItemViewModel.id, sceneItemViewModel.proseId) }
     },
-    MenuItem("Inspect Details").apply {
-        id = "open_details"
-        action { viewListener.openSceneDetails(sceneItemViewModel.id) }
+    MenuItem("Track Characters").apply {
+        id = "open_scene_characters"
+        toggleClass(SceneListItem.Styles.hasIssue, false)
+        action { viewListener.trackCharacters(sceneItemViewModel) }
+    },
+    MenuItem("Track Locations").apply {
+        id = "open_scene_locations"
+        toggleClass(SceneListItem.Styles.hasIssue, false)
+        action { viewListener.trackLocations(sceneItemViewModel) }
     },
     MenuItem("Track Symbols").apply {
         id = "open_scene_symbols"
         toggleClass(SceneListItem.Styles.hasIssue, sceneItemViewModel.unusedSymbols)
+        action { viewListener.trackSymbols(sceneItemViewModel) }
     },
     SeparatorMenuItem(),
     Menu("Insert").apply {

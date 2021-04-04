@@ -1,20 +1,13 @@
 package com.soyle.stories.common.components.menuChipGroup
 
-import com.soyle.stories.common.components.Chip
-import com.soyle.stories.common.components.ChipNode
-import com.soyle.stories.common.components.chip
+import com.soyle.stories.common.components.dataDisplay.chip.Chip
 import com.soyle.stories.common.exists
-import com.soyle.stories.common.onChangeUntil
 import com.sun.javafx.scene.NodeHelper
 import com.sun.javafx.scene.control.ContextMenuContent
 import com.sun.javafx.scene.control.ControlAcceleratorSupport
 import javafx.application.Platform
 import javafx.collections.ListChangeListener
-import javafx.collections.SetChangeListener
-import javafx.event.Event
-import javafx.event.EventHandler
 import javafx.geometry.Side
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.input.Mnemonic
@@ -152,10 +145,10 @@ class MenuChipGroupSkin(menuChipGroup: MenuChipGroup) : SkinBase<MenuChipGroup>(
                     // through the mnemonics code (especially in case they should be
                     // consumed to prevent them being used elsewhere).
                     // See JBS-8090026 for more detail.
-                    val scene = skinnable.scene
+                    val scene: Scene? = skinnable?.scene
                     val mnemonicsToRemove: List<Mnemonic> = mnemonics.toList()
                     mnemonics.clear()
-                    Platform.runLater { mnemonicsToRemove.forEach(scene::removeMnemonic) }
+                    Platform.runLater { mnemonicsToRemove.forEach { scene?.removeMnemonic(it) } }
                 }
             }
         }

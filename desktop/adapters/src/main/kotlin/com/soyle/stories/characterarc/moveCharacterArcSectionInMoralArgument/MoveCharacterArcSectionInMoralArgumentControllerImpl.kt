@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument
 
-import com.soyle.stories.usecase.character.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgument
+import com.soyle.stories.usecase.character.arc.section.moveCharacterArcSectionInMoralArgument.MoveCharacterArcSectionInMoralArgument
 import com.soyle.stories.common.ThreadTransformer
 import java.util.*
 

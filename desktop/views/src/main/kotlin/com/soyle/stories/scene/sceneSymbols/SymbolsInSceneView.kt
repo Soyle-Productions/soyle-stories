@@ -1,15 +1,18 @@
 package com.soyle.stories.scene.sceneSymbols
 
 import com.soyle.stories.common.components.ComponentsStyles.Companion.cardBody
-import com.soyle.stories.common.components.Styles.Companion.fieldLabel
+import com.soyle.stories.common.components.layouts.emptyToolInvitation
+import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
+import com.soyle.stories.common.components.text.TextStyles
+import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.scene.SceneStyles
 import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.symbolsInScene
-import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.warningLabel
 import com.soyle.stories.soylestories.Styles.Companion.Orange
 import javafx.geometry.Pos
 import javafx.scene.Node
@@ -43,15 +46,10 @@ class SymbolsInSceneView : View() {
     private fun Parent.targetSceneHeader(): Node
     {
         return hbox {
-            style {
-                padding = box(16.px)
-                backgroundColor = multi(Color.WHITE)
-                effect = DropShadow(BlurType.GAUSSIAN, Color.rgb(0,0,0,0.25), 4.0, 0.0, 0.0, 4.0)
-
-            }
+            addClass(SceneStyles.selectedSceneHeader)
             label("Scene: ")
             label(state.targetScene.stringBinding { it?.name ?: "No Scene Targeted" }) {
-                toggleClass(warningLabel, state.targetScene.isNull)
+                toggleClass(TextStyles.warning, state.targetScene.isNull)
             }
         }
     }
@@ -76,15 +74,13 @@ class SymbolsInSceneView : View() {
 
     private fun Parent.emptyBody(): Node
     {
-        return vbox(spacing = 16) {
-            alignment = Pos.CENTER
-            addClass(cardBody)
+        return emptyToolInvitation {
             imageview("com/soyle/stories/scene/Symbols-design.png") {
                 this.isPreserveRatio = true
                 this.isSmooth = true
                 fitHeight = 260.0
             }
-            label("Track Symbols in Scene") { addClass(fieldLabel) }
+            toolTitle("Track Symbols in Scene")
             textflow {
                 textAlignment = TextAlignment.CENTER
 
@@ -94,7 +90,7 @@ class SymbolsInSceneView : View() {
                     action { viewListener.openSceneListTool() }
                 }
                 text("to click anywhere in side of an open Scene Editor to ")
-                label("target") { addClass(warningLabel) }
+                label("target") { addClass(TextStyles.warning) }
                 text(" a scene and see what symbols are being tracked.")
             }
         }
@@ -127,8 +123,6 @@ class SymbolsInSceneView : View() {
             val trackedSymbolChip by cssclass()
             val pinned by csspseudoclass()
             val unused by csspseudoclass()
-
-            val warningLabel by cssclass()
 
             init {
                 importStylesheet<Styles>()
@@ -165,10 +159,6 @@ class SymbolsInSceneView : View() {
                 backgroundColor = multi(Color.TRANSPARENT)
                 borderColor = multi(box(Orange))
                 borderWidth += box(2.px)
-            }
-            warningLabel {
-                textFill = Orange
-                fontWeight = FontWeight.BOLD
             }
         }
 

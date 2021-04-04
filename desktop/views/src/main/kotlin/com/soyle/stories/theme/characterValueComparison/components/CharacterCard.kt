@@ -1,8 +1,9 @@
 package com.soyle.stories.theme.characterValueComparison.components
 
-import com.soyle.stories.characterarc.Styles
+import com.soyle.stories.characterarc.CharacterArcStyles
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.common.components.*
+import com.soyle.stories.common.components.dataDisplay.chip.Chip.Companion.chip
 import com.soyle.stories.common.components.ComponentsStyles.Companion.contextMenuSectionHeaderItem
 import com.soyle.stories.common.components.ComponentsStyles.Companion.contextMenuSectionedItem
 import com.soyle.stories.common.components.ComponentsStyles.Companion.discouragedSelection
@@ -52,7 +53,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
 
     override val root: Parent = card {
         cardHeader {
-            this += MaterialIconView(Styles.defaultCharacterImage, "2em")
+            this += MaterialIconView(CharacterArcStyles.defaultCharacterImage, "2em")
             vbox {
                 label(nameProperty) {
                     style { fontSize = 1.25.em }
@@ -200,7 +201,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
             vbox {
                 isFillWidth = false
                 bindChildren(valuesProperty) {
-                    chip(it.label.toProperty(), onDelete = removeChip(it)) {
+                    chip(it.label, onDelete = removeChip(it)) {
                         maxWidth = Region.USE_PREF_SIZE
                     }.node
                 }

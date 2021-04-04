@@ -3,7 +3,7 @@ package com.soyle.stories.characterarc.baseStoryStructure.presenters
 import com.soyle.stories.characterarc.baseStoryStructure.BaseStoryStructureViewModel
 import com.soyle.stories.characterarc.baseStoryStructure.StoryStructureSectionViewModel
 import com.soyle.stories.gui.View
-import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.usecase.character.arc.section.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 
 class UnlinkLocationFromCharacterArcSectionPresenter(
   private val view: View.Nullable<BaseStoryStructureViewModel>

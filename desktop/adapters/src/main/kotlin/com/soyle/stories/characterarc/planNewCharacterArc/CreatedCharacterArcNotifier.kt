@@ -1,6 +1,6 @@
 package com.soyle.stories.characterarc.planNewCharacterArc
 
-import com.soyle.stories.usecase.character.planNewCharacterArc.CreatedCharacterArc
+import com.soyle.stories.usecase.character.arc.planNewCharacterArc.CreatedCharacterArc
 import com.soyle.stories.common.Notifier
 
 class CreatedCharacterArcNotifier : Notifier<CreatedCharacterArcReceiver>(), CreatedCharacterArcReceiver {

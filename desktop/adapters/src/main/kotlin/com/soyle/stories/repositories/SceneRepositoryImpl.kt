@@ -1,5 +1,6 @@
 package com.soyle.stories.repositories
 
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
@@ -33,6 +34,10 @@ class SceneRepositoryImpl : SceneRepository {
 
 	override suspend fun getScenesUsingLocation(locationId: Location.Id): List<Scene> {
 		return  scenes.values.filter { it.settings.containsEntityWithId(locationId) }
+	}
+
+	override suspend fun getScenesIncludingCharacter(characterId: Character.Id): List<Scene> {
+		return scenes.values.filter { it.includesCharacter(characterId) }
 	}
 
 	override suspend fun getSceneIdsInOrder(projectId: Project.Id): List<Scene.Id> {

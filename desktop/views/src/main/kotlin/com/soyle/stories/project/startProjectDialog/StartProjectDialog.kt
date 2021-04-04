@@ -1,6 +1,9 @@
 package com.soyle.stories.project.startProjectDialog
 
 import com.soyle.stories.common.async
+import com.soyle.stories.common.components.buttons.ButtonVariant
+import com.soyle.stories.common.components.buttons.primaryButton
+import com.soyle.stories.common.components.buttons.secondaryButton
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.projectList.ProjectListViewListener
@@ -13,6 +16,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
+import javafx.scene.layout.Region.USE_COMPUTED_SIZE
 import javafx.scene.paint.Color
 import javafx.stage.Modality
 import javafx.stage.Stage
@@ -50,12 +54,18 @@ class StartProjectDialog : View("Start New Project") {
     }
 
     override val root: Parent = form {
+        style { backgroundColor = multi(Color.WHITE) }
         fieldset {
             field("Directory") {
                 labelContainer.alignment = Pos.CENTER_RIGHT
-                hbox(5) {
+                hbox(8) {
+                    isFillHeight = true
                     textfield {
+                        maxHeight = USE_COMPUTED_SIZE
                         id = "directory-input"
+                        style {
+                            padding = box(8.px, 6.px)
+                        }
                         toggleClass(errorState, model.select { (it.failingField == "directory").toProperty() })
                         hgrow = Priority.ALWAYS
                         textProperty().bindBidirectional(selectedDirectoryFile, object : StringConverter<File?>() {
@@ -63,7 +73,7 @@ class StartProjectDialog : View("Start New Project") {
                             override fun toString(p0: File?): String = p0?.absolutePath ?: ""
                         })
                     }
-                    button("Choose Directory") {
+                    primaryButton("Choose Directory", variant = ButtonVariant.Outlined) {
                         runLater { requestFocus() }
                         action {
                             selectedDirectoryFile.set(chooseDirectory("Choose Directory", owner = currentStage))
@@ -90,15 +100,15 @@ class StartProjectDialog : View("Start New Project") {
                 textFill = Color.RED
             }
         }
-        hbox(5) {
+        hbox(8) {
             alignment = Pos.BOTTOM_RIGHT
-            button("Cancel") {
+            secondaryButton("Cancel", variant = ButtonVariant.Outlined) {
                 isCancelButton = true
                 action {
                     close()
                 }
             }
-            button("Create Project") {
+            primaryButton("Create Project") {
                 enableWhen { isValid }
                 isDefaultButton = true
                 action {

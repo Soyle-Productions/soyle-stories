@@ -25,12 +25,12 @@ object ToolModule : RegisteredToolsConfig {
         ThemeList.getRegistration(),
         SceneSymbols.getRegistration(),
         SceneSetting.getRegistration(),
+        SceneCharacters.getRegistration(),
         /**
          * Dynamic Tools
          */
         BaseStoryStructureConfig.getRegistration(),
         LocationDetailsConfig.getRegistration(),
-        SceneDetailsConfig.getRegistration(),
         ValueOppositionWebsConfig.getRegistration(),
         CharacterValueComparison.getRegistration(),
         CharacterConflict.getRegistration(),

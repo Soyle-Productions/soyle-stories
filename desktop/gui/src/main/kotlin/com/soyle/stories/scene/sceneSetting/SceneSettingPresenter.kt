@@ -2,8 +2,8 @@ package com.soyle.stories.scene.sceneSetting
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
-import com.soyle.stories.domain.scene.LocationRemovedFromScene
-import com.soyle.stories.domain.scene.LocationUsedInScene
+import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
+import com.soyle.stories.domain.scene.events.LocationUsedInScene
 import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel

@@ -9,6 +9,7 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.sceneSetting.SceneSettingView
+import javafx.event.ActionEvent
 import tornadofx.FX
 
 fun WorkBench.givenSceneSettingToolHasBeenOpened(): SceneSettingView =
@@ -58,6 +59,6 @@ fun SceneSettingView.selectAvailableLocation(location: Location)
 fun SceneSettingView.removeLocation(location: Location)
 {
     drive {
-        getRemoveLocationButton(location.id)!!.fire()
+        getLocationItem(location.id)!!.onDelete!!.handle(ActionEvent())
     }
 }

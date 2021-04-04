@@ -108,11 +108,13 @@ class DragHandleImpl : Fragment(), DragHandle {
         onMoveCancelled()
     }
     private fun startMove() {
+        println("startMove")
         isMoving = true
         root.addClass(keyboardMove)
         onMoveStart()
     }
     private fun commitMove() {
+        println("commit move")
         if (! isMoving) return
         isMoving = false
         root.removeClass(keyboardMove)

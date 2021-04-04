@@ -9,8 +9,10 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":core:usecases"))
     implementation(Libraries.kotlin.coroutines)
-
+    implementation(project(":core:usecases"))
     implementation(project(":desktop:application"))
+
+    testImplementation(Libraries.junit.api)
+    testImplementation(Libraries.junit.engine)
 }

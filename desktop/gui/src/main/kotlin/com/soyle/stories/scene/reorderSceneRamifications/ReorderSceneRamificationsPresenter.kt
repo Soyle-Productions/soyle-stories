@@ -3,23 +3,24 @@ package com.soyle.stories.scene.reorderSceneRamifications
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
+import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
 import com.soyle.stories.scene.deleteSceneRamifications.CharacterRamificationsViewModel
 import com.soyle.stories.scene.deleteSceneRamifications.SceneRamificationsViewModel
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.PotentialChangesFromReorderingScene
-import com.soyle.stories.usecase.scene.removeCharacterFromScene.RemoveCharacterFromScene
-import com.soyle.stories.usecase.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 
 class ReorderSceneRamificationsPresenter(
     private val view: View.Nullable<ReorderSceneRamificationsViewModel>,
     sceneDeleted: Notifier<DeleteScene.OutputPort>,
-    characterRemoved: Notifier<RemoveCharacterFromScene.OutputPort>,
+    characterRemoved: Notifier<RemovedCharacterFromSceneReceiver>,
     characterMotivationSet: Notifier<SetMotivationForCharacterInScene.OutputPort>
 ) :
     GetPotentialChangesFromReorderingScene.OutputPort,
     DeleteScene.OutputPort,
-    RemoveCharacterFromScene.OutputPort,
+    RemovedCharacterFromSceneReceiver,
     SetMotivationForCharacterInScene.OutputPort {
 
     init {
@@ -51,7 +52,7 @@ class ReorderSceneRamificationsPresenter(
         view.updateOrInvalidated { copy(invalid = true) }
     }
 
-    override fun characterRemovedFromScene(response: RemoveCharacterFromScene.ResponseModel) {
+    override suspend fun receiveRemovedCharacterFromScene(removedCharacterFromScene: RemoveCharacterFromScene.ResponseModel) {
         view.updateOrInvalidated { copy(invalid = true) }
     }
 
@@ -60,6 +61,5 @@ class ReorderSceneRamificationsPresenter(
     }
 
     override fun receiveDeleteSceneFailure(failure: Exception) {}
-    override fun failedToRemoveCharacterFromScene(failure: Exception) {}
     override fun failedToSetMotivationForCharacterInScene(failure: Exception) {}
 }

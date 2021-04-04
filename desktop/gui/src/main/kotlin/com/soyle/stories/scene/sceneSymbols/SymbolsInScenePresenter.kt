@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.domain.scene.*
+import com.soyle.stories.domain.scene.events.*
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.gui.View

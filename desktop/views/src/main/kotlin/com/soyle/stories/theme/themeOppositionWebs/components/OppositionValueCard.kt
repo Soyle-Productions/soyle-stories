@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.themeOppositionWebs.components
 
 import com.soyle.stories.common.components.*
+import com.soyle.stories.common.components.dataDisplay.chip.Chip.Companion.chip
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.validation.NonBlankString
@@ -82,7 +83,7 @@ internal fun GridPane.oppositionValueCard(index: Int, model: ValueOppositionWebs
                 vgap = 8.0
                 padding = Insets(8.0, 4.0, 4.0, 4.0)
                 bindChildren(symbolicItems) {
-                    chip(it.itemName.toProperty(), onDelete={ _ ->
+                    chip(it.itemName, onDelete={ _ ->
                         val oppositionValueId = oppositionValueId.value ?: return@chip
                         viewListener.removeSymbolicItem(oppositionValueId, it.itemId)
                     }).node

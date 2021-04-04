@@ -1,11 +1,12 @@
 package com.soyle.stories.characterarc.changeSectionValue
 
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterArcSectionValue
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterDesire
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
-import com.soyle.stories.usecase.scene.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterDesire
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
+import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
+import kotlinx.coroutines.Job
 import java.util.*
 
 class ChangeSectionValueControllerImpl(
@@ -62,14 +63,19 @@ class ChangeSectionValueControllerImpl(
 
     }
 
-    override fun changeValueOfArcSection(themeId: String, characterId: String, arcSectionId: String, value: String) {
+    override fun changeValueOfArcSection(
+        themeId: String,
+        characterId: String,
+        arcSectionId: String,
+        value: String
+    ): Job {
         val request = ChangeCharacterArcSectionValue.RequestModel(
             UUID.fromString(themeId),
             UUID.fromString(characterId),
             UUID.fromString(arcSectionId),
             value
         )
-        threadTransformer.async {
+        return threadTransformer.async {
             changeCharacterArcSectionValue.invoke(
                 request, changeCharacterArcSectionValueOutputPort
             )

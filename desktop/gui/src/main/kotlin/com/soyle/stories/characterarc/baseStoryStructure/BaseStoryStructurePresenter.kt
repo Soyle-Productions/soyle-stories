@@ -7,10 +7,10 @@ import com.soyle.stories.gui.View
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
-import com.soyle.stories.usecase.character.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
-import com.soyle.stories.usecase.character.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
-import com.soyle.stories.usecase.character.viewBaseStoryStructure.ViewBaseStoryStructure
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.usecase.character.arc.section.linkLocationToCharacterArcSection.LinkLocationToCharacterArcSection
+import com.soyle.stories.usecase.character.arc.section.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
+import com.soyle.stories.usecase.character.arc.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.usecase.location.listAllLocations.ListAllLocations
 import com.soyle.stories.usecase.theme.changeThematicSectionValue.ChangeThematicSectionValue
 

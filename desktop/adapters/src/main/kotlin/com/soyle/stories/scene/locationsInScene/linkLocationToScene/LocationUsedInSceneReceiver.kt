@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.locationsInScene.linkLocationToScene
 
-import com.soyle.stories.domain.scene.LocationUsedInScene
+import com.soyle.stories.domain.scene.events.LocationUsedInScene
 
 interface LocationUsedInSceneReceiver {
 

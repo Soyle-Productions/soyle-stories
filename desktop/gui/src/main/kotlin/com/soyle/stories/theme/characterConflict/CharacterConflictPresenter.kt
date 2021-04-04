@@ -12,8 +12,8 @@ import com.soyle.stories.theme.removeCharacterAsOpponent.CharacterRemovedAsOppon
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
 import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ArcSectionType
-import com.soyle.stories.usecase.character.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ArcSectionType
+import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.usecase.theme.changeCharacterChange.ChangedCharacterChange
 import com.soyle.stories.usecase.theme.changeCharacterPerspectivePropertyValue.ChangeCharacterPerspectivePropertyValue
 import com.soyle.stories.usecase.theme.changeCharacterPropertyValue.ChangeCharacterPropertyValue

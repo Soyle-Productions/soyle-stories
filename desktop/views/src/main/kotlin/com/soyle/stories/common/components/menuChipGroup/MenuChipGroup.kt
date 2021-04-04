@@ -1,13 +1,7 @@
 package com.soyle.stories.common.components.menuChipGroup
 
-import com.soyle.stories.common.components.Chip
-import com.soyle.stories.common.components.ChipNode
-import com.sun.javafx.collections.TrackableObservableList
+import com.soyle.stories.common.components.dataDisplay.chip.Chip
 import javafx.beans.property.*
-import javafx.beans.value.ObservableValue
-import javafx.collections.ListChangeListener
-import javafx.collections.ObservableList
-import javafx.collections.SetChangeListener
 import javafx.css.PseudoClass
 import javafx.event.ActionEvent
 import javafx.event.Event

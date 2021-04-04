@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.view.scene.sceneSetting
 
+import com.soyle.stories.common.components.dataDisplay.chip.Chip
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
@@ -37,20 +38,14 @@ class `Scene Setting Driver`(private val view: SceneSettingView) : FxRobot() {
     private val locationList: Parent?
         get() = locationSetter?.let { from(it.root).lookup(".location-list").queryAll<Parent>().firstOrNull() }
 
-    fun getLocationItem(locationId: Location.Id): Labeled?
+    fun getLocationItem(locationId: Location.Id): Chip?
     {
-        val locationNode = locationList?.let { from(it).lookup("#${locationId}").queryAll<Node>().firstOrNull() }
-        return locationNode?.let { from(it).lookup(".label").queryLabeled() }
+        val locationNode = locationList?.let { from(it).lookup("#${locationId}").queryAll<Chip>().firstOrNull() }
+        return locationNode
     }
 
     fun getLocationItemByName(locationName: String): Labeled? {
         return locationList?.let { from(it).lookup(locationName).queryAll<Labeled>().firstOrNull() }
-    }
-
-    fun getRemoveLocationButton(locationId: Location.Id): ButtonBase?
-    {
-        val locationNode = locationList?.let { from(it).lookup("#${locationId}").queryAll<Node>().firstOrNull() }
-        return locationNode?.let { from(it).lookup(".button").queryAll<ButtonBase>().firstOrNull() }
     }
 }
 

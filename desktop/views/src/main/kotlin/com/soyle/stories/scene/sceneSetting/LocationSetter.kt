@@ -2,7 +2,9 @@ package com.soyle.stories.scene.sceneSetting
 
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.buttons.ButtonStyles
-import com.soyle.stories.common.components.text.mainHeader
+import com.soyle.stories.common.components.buttons.primaryMenuButton
+import com.soyle.stories.common.components.layouts.emptyToolInvitation
+import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
@@ -53,15 +55,13 @@ class LocationSetter : Fragment()  {
     }
 
     private fun Parent.emptyState(): Node {
-        return vbox(spacing = 16) {
-            alignment = Pos.CENTER
-            addClass(ComponentsStyles.cardBody)
+        return emptyToolInvitation {
             imageview("com/soyle/stories/scene/Symbols-design.png") {
                 this.isPreserveRatio = true
                 this.isSmooth = true
                 fitHeight = 260.0
             }
-            mainHeader("Use Locations as Scene Setting")
+            toolTitle("Use Locations as Scene Setting")
             textflow {
                 textAlignment = TextAlignment.CENTER
                 text("When you ")
@@ -85,13 +85,13 @@ class LocationSetter : Fragment()  {
         return vbox {
             hbox {
                 alignment = Pos.CENTER_LEFT
-                mainHeader("Scene Setting")
+                toolTitle("Scene Setting")
                 spacer()
                 useLocationMenuButton {}
             }
             vbox {
                 isFillWidth = false
-                addClass("location-list")
+                addClass(SceneSettingView.Styles.locationList)
                 locations.forEach {
                     SceneSettingChip(it, onRemoveLocation = ::removeSceneLocation)
                 }
@@ -99,8 +99,7 @@ class LocationSetter : Fragment()  {
         }
     }
 
-    private fun Parent.useLocationMenuButton(op: MenuButton.() -> Unit) = menubutton("Use Location") {
-        addClass(ButtonStyles.primaryButton)
+    private fun Parent.useLocationMenuButton(op: MenuButton.() -> Unit) = primaryMenuButton("Use Location") {
         addClass("use-location-button")
         setOnShowing { loadAvailableLocationsToUse() }
         state.availableLocations.onChange { it: ObservableList<LocationItemViewModel>? ->
