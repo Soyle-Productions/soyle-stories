@@ -149,13 +149,7 @@ class Scene private constructor(
 
     fun withCharacterIncluded(character: Character): SceneUpdate<IncludedCharacterInScene> {
         if (includesCharacter(character.id)) return noUpdate()
-        val characterInScene = CharacterInScene(
-            character.id,
-            id,
-            character.name.value,
-            null,
-            listOf()
-        )
+        val characterInScene = CharacterInScene(id, character.id, character.name.value)
         return Updated(
             copy(
                 charactersInScene = charactersInScene + characterInScene
@@ -175,6 +169,21 @@ class Scene private constructor(
                     .plus(characterInScene.withName(character.name.value))
             ),
             RenamedCharacterInScene(id, IncludedCharacter(character.id, character.name.value))
+        )
+    }
+
+    fun withRoleForCharacter(characterId: Character.Id, roleInScene: RoleInScene?): SceneUpdate<*> {
+        val characterInScene = includedCharacters.getOrError(characterId)
+        if (characterInScene.roleInScene == roleInScene) return noUpdate()
+
+        val newCharacter = characterInScene.withRoleInScene(roleInScene)
+        val event = when(roleInScene) {
+            null -> CharacterRoleInSceneCleared(id)
+            else -> CharacterAssignedRoleInScene(id, roleInScene)
+        }
+        return Updated(
+            copy(charactersInScene = charactersInScene.minus(characterId).plus(newCharacter)),
+            event
         )
     }
 
@@ -287,7 +296,8 @@ class Scene private constructor(
     inner class IncludedCharacters internal constructor() : Collection<CharacterInScene> by charactersInScene {
 
         operator fun get(characterId: Character.Id) = charactersInScene.getEntityById(characterId)
-        fun getOrError(characterId: Character.Id): CharacterInScene = get(characterId) ?: throw SceneDoesNotIncludeCharacter(id, characterId)
+        fun getOrError(characterId: Character.Id): CharacterInScene =
+            get(characterId) ?: throw SceneDoesNotIncludeCharacter(id, characterId)
     }
 
     inner class TrackedSymbols private constructor(private val symbolsById: Map<Symbol.Id, TrackedSymbol>) :
