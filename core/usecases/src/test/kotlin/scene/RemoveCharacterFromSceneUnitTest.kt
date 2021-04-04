@@ -4,6 +4,7 @@ import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.*
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.validation.toEntitySet
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
@@ -68,7 +69,7 @@ class RemoveCharacterFromSceneUnitTest {
 	{
 		sceneRepository.scenes[sceneId] = makeScene(sceneId, Project.Id(), storyEventId = storyEventId, charactersInScene = listOfNotNull(
 			characterId.takeIf { includesCharacter }?.let { CharacterInScene(it, sceneId, "", null, listOf()) }
-		))
+		).toEntitySet())
 	}
 
 	private fun whenCharacterIsRemovedFromScene()

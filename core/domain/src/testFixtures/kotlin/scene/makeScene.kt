@@ -16,7 +16,7 @@ fun makeScene(
     storyEventId: StoryEvent.Id = StoryEvent.Id(),
     settings: EntitySet<SceneSettingLocation> = noEntities(),
     proseId: Prose.Id = Prose.Id(),
-    charactersInScene: List<CharacterInScene> = listOf(),
+    charactersInScene: EntitySet<CharacterInScene> = noEntities(),
     symbols: Collection<Scene.TrackedSymbol> = listOf(),
     conflict: SceneConflict = SceneConflict(""),
     resolution: SceneResolution = SceneResolution("")

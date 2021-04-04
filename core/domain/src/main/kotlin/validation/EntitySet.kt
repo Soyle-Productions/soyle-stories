@@ -53,3 +53,5 @@ fun <E : Entity<Id>, Id> entitySetOfNotNull(vararg entities: E?) = EntitySet.fro
 fun <E : Entity<Id>, Id> entitySetOf(vararg entities: E) = EntitySet.fromCollection(entities.toList())
 
 fun <Id, E : Entity<Id>> noEntities(): EntitySet<E> = EntitySet.fromMap(emptyMap<Id, E>())!!
+
+fun <E: Entity<Id>, Id> Collection<E>.toEntitySet() = EntitySet.fromCollection(this)

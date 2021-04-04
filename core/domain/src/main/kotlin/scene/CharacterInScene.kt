@@ -2,14 +2,18 @@ package com.soyle.stories.domain.scene
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArcSection
+import com.soyle.stories.domain.entities.Entity
 
-class CharacterInScene(
-    val characterId: Character.Id,
+data class CharacterInScene(
+    override val id: Character.Id,
     val sceneId: Scene.Id,
     val characterName: String,
     val motivation: String?,
     val coveredArcSections: List<CharacterArcSection.Id>
-) {
+) : Entity<Character.Id> {
+
+    val characterId
+        get() = id
 
     private fun copy(
         characterName: String = this.characterName,
@@ -17,9 +21,9 @@ class CharacterInScene(
         coveredArcSections: List<CharacterArcSection.Id> = this.coveredArcSections
     ) = CharacterInScene(characterId, sceneId, characterName, motivation, coveredArcSections)
 
-    fun withName(name: String): CharacterInScene = copy(characterName = name)
+    internal fun withName(name: String): CharacterInScene = copy(characterName = name)
 
-    fun withCoveredArcSection(characterArcSection: CharacterArcSection): CharacterInScene
+    internal fun withCoveredArcSection(characterArcSection: CharacterArcSection): CharacterInScene
     {
         if (characterArcSection.characterId != characterId) throw CharacterArcSectionIsNotPartOfCharactersArc(
             characterId.uuid,
@@ -34,7 +38,7 @@ class CharacterInScene(
         return copy(coveredArcSections = coveredArcSections + characterArcSection.id)
     }
 
-    fun withoutCoveredArcSection(characterArcSection: CharacterArcSection): CharacterInScene
+    internal fun withoutCoveredArcSection(characterArcSection: CharacterArcSection): CharacterInScene
     {
         if (characterArcSection.characterId != characterId) throw CharacterArcSectionIsNotPartOfCharactersArc(
             characterId.uuid,
@@ -43,5 +47,7 @@ class CharacterInScene(
         )
         return copy(coveredArcSections = coveredArcSections.filter { it != characterArcSection.id })
     }
+
+    internal fun withMotivation(motivation: String?) = copy(motivation = motivation)
 
 }

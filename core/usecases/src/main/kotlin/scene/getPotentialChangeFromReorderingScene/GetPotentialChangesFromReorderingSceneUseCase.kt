@@ -2,6 +2,7 @@ package com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.CharacterInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -25,8 +26,7 @@ class GetPotentialChangesFromReorderingSceneUseCase(
     private suspend fun getScene(sceneId: UUID) = (sceneRepository.getSceneById(Scene.Id(sceneId))
         ?: throw SceneDoesNotExist(sceneId))
 
-    private suspend fun getScenesAffectedByMovingSceneToIndex(scene: Scene, index: Int)
-    :  List<AffectedScene>
+    private suspend fun getScenesAffectedByMovingSceneToIndex(scene: Scene, index: Int): List<AffectedScene>
     {
         val orderedScenes = sceneRepository.getOrderedScenes(scene.projectId) // A, B, C
         if (index.isSameAsCurrentIndex(orderedScenes, scene)) return listOf() // 2 == 0, 2 == 1
@@ -85,7 +85,7 @@ class GetPotentialChangesFromReorderingSceneUseCase(
     private fun getScenesWithChangedMotivationForCharacters(
         orderedScenes: IndexedScenes,
         reorderedScenes: IndexedScenes,
-        characters: List<Scene.IncludedCharacter>
+        characters: Collection<CharacterInScene>
     ): List<AffectedScene> {
         return getAffectedScenesByCharacter(
             orderedScenes,
@@ -103,7 +103,7 @@ class GetPotentialChangesFromReorderingSceneUseCase(
     private fun getAffectedScenesByCharacter(
         orderedScenes: IndexedScenes,
         reorderedScenes: IndexedScenes,
-        characters: List<Scene.IncludedCharacter>
+        characters: Collection<CharacterInScene>
     ) = characters.asSequence()
         .map {
             getAffectedScenesForCharacter(orderedScenes, reorderedScenes, it.characterId).asSequence()

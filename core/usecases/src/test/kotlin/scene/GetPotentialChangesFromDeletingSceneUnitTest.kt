@@ -11,6 +11,7 @@ import com.soyle.stories.domain.scene.SceneLocaleDouble
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.shouldBe
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.domain.validation.toEntitySet
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.scene.common.AffectedScene
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
@@ -330,21 +331,23 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
             targetScene.projectId,
             targetScene.name,
             targetScene.storyEventId,
-            charactersInScene = targetScene.includedCharacters.map {
-                CharacterInScene(
-                    it.characterId,
-                    sceneId,
-                    it.characterName,
-                    targetScene.getMotivationForCharacter(it.characterId)!!.motivation,
-                    targetScene.getCoveredCharacterArcSectionsForCharacter(it.characterId)!!
-                )
-            })
+            charactersInScene = targetScene.duplicateCharactersForNewScene(sceneId))
         sceneRepository.sceneOrder[projectId] = sceneRepository.sceneOrder.getValue(projectId).map {
             if (it == targetScene.id) sceneId
             else it
         }
         this.targetScene = sceneRepository.scenes[sceneId]
     }
+
+    private fun Scene.duplicateCharactersForNewScene(sceneId: Scene.Id) = includedCharacters.map {
+        CharacterInScene(
+            it.characterId,
+            sceneId,
+            it.characterName,
+            getMotivationForCharacter(it.characterId)!!.motivation,
+            getCoveredCharacterArcSectionsForCharacter(it.characterId)!!
+        )
+    }.toEntitySet()
 
     private fun potentialChangesFromDeletingScene() {
         val useCase = GetPotentialChangesFromDeletingSceneUseCase(sceneRepository)

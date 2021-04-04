@@ -3,6 +3,7 @@ package com.soyle.stories.domain.scene
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -55,5 +56,15 @@ class `Characters in Scene Unit Test` {
         }
         error.sceneId.mustEqual(scene.id)
         error.characterId.mustEqual(character.id)
+    }
+
+    @Nested
+    inner class `Character Role in Scene`
+    {
+
+        @Test
+        fun `a character should not have a role initially`() {
+        }
+
     }
 }
