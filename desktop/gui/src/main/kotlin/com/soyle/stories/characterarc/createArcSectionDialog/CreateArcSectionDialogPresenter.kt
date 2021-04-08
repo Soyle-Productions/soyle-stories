@@ -3,8 +3,8 @@ package com.soyle.stories.characterarc.createArcSectionDialog
 import com.soyle.stories.domain.character.CharacterArcSection
 import com.soyle.stories.domain.character.CharacterArcTemplateSection
 import com.soyle.stories.gui.View
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 
 internal class CreateArcSectionDialogPresenter(
     private val view: View.Nullable<CreateArcSectionDialogViewModel>

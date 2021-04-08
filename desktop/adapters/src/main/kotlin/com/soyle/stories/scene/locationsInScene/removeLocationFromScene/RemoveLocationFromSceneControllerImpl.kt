@@ -3,7 +3,7 @@ package com.soyle.stories.scene.locationsInScene.removeLocationFromScene
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.usecase.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromScene
+import com.soyle.stories.usecase.scene.location.removeLocationFromScene.RemoveLocationFromScene
 import kotlinx.coroutines.Job
 
 class RemoveLocationFromSceneControllerImpl(

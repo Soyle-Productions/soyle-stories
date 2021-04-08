@@ -2,7 +2,7 @@ package com.soyle.stories.scene.charactersInScene.removeCharacterFromScene
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
 
 class RemovedCharacterFromSceneNotifier(
 	private val threadTransformer: ThreadTransformer

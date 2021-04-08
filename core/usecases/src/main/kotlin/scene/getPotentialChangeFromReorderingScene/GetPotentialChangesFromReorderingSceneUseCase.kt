@@ -8,7 +8,7 @@ import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.SceneRepository
 import com.soyle.stories.usecase.scene.common.AffectedCharacter
 import com.soyle.stories.usecase.scene.common.AffectedScene
-import com.soyle.stories.usecase.scene.common.sortedByProjectOrder
+import com.soyle.stories.usecase.scene.common.PreviousMotivations.Companion.sortedByProjectOrder
 import java.util.*
 import kotlin.collections.HashMap
 

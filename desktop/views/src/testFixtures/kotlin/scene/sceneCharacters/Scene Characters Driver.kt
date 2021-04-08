@@ -4,6 +4,7 @@ import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.buttons.ButtonStyles
 import com.soyle.stories.common.components.menuChipGroup.MenuChipGroup
 import com.soyle.stories.common.components.menuChipGroup.MenuChipGroupStyles
+import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.scene.Scene
@@ -66,6 +67,9 @@ class `Scene Characters Driver`(private val view: SceneCharactersView) : FxRobot
     val IncludedCharacterItemView.editButton: Button
         get() = from(root).lookup("Edit").queryButton()!!
 
+    val IncludedCharacterItemView.role: Labeled
+        get() = from(root).lookup(".${TextStyles.caption.name}").queryLabeled()!!
+
     fun getCharacterEditorOrError(): SelectedSceneCharacterEditor =
         getCharacterEditor() ?: error("No Character in Scene Editor is currently open in Scene Characters tool")
 
@@ -85,6 +89,15 @@ class `Scene Characters Driver`(private val view: SceneCharactersView) : FxRobot
 
     val SelectedSceneCharacterEditor.motivationInput
         get() = from(root).lookup(".motivation .text-field").queryTextInputControl()
+
+    private val SelectedSceneCharacterEditor.roleInSceneSelection
+        get() = from(root).lookup(".${SelectedSceneCharacterEditor.Styles.roleInSceneSelection.name}").queryParent()
+
+    val SelectedSceneCharacterEditor.incitingCharacterToggle
+        get() = from(roleInSceneSelection).lookup("Is Inciting Character").query<ButtonBase>()
+
+    val SelectedSceneCharacterEditor.opponentCharacterToggle
+        get() = from(roleInSceneSelection).lookup("Is Opponent to Inciting Character").query<ButtonBase>()
 
     fun MenuButton.getSectionItem(arcName: String, sectionName: String): MenuItem?
     {

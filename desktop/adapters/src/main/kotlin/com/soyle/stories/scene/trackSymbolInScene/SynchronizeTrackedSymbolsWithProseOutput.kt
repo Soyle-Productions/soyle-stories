@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.trackSymbolInScene
 
-import com.soyle.stories.usecase.scene.trackSymbolInScene.SynchronizeTrackedSymbolsWithProse
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.SynchronizeTrackedSymbolsWithProse
 
 class SynchronizeTrackedSymbolsWithProseOutput(
     private val symbolsTrackedInSceneReceiver: SymbolsTrackedInSceneReceiver,

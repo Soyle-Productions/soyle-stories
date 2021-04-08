@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.locationsInScene.linkLocationToScene
 
-import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
+import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocationToScene
 
 class LinkLocationToSceneOutput(
     private val locationLinkedToSceneReceiver: LocationUsedInSceneReceiver

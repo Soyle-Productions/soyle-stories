@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.charactersInScene.removeCharacterFromScene
 
-import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
 
 class RemoveCharacterFromSceneOutput(
     private val removedCharacterFromSceneReceiver: RemovedCharacterFromSceneReceiver

@@ -9,8 +9,8 @@ import com.soyle.stories.scene.deleteSceneRamifications.SceneRamificationsViewMo
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.PotentialChangesFromReorderingScene
-import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
-import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 
 class ReorderSceneRamificationsPresenter(
     private val view: View.Nullable<ReorderSceneRamificationsViewModel>,

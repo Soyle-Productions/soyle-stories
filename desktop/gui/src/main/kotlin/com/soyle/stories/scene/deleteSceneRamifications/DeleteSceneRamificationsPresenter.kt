@@ -9,7 +9,7 @@ import com.soyle.stories.scene.deleteSceneRamifications.presenters.DeleteScenePr
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.Invalidater
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
-import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 
 class DeleteSceneRamificationsPresenter(
   private val view: View.Nullable<DeleteSceneRamificationsViewModel>,

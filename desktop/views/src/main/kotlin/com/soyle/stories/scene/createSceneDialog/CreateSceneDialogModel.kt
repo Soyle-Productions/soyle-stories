@@ -3,6 +3,7 @@ package com.soyle.stories.scene.createSceneDialog
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.resolveLater
 import com.soyle.stories.gui.View
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialogViewModel
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogViewModel
 import javafx.beans.property.SimpleBooleanProperty
@@ -35,6 +36,17 @@ class CreateSceneDialogModel : ItemViewModel<CreateNewSceneDialogViewModel>(), V
 		threadTransformer.gui {
 			rebind { item = item?.update() }
 			executing.set(false)
+		}
+	}
+
+	override fun updateIf(
+		condition: CreateNewSceneDialogViewModel.() -> Boolean,
+		update: CreateNewSceneDialogViewModel.() -> CreateNewSceneDialogViewModel
+	) {
+		threadTransformer.gui {
+			if (item.condition()) {
+				item = item?.update()
+			}
 		}
 	}
 

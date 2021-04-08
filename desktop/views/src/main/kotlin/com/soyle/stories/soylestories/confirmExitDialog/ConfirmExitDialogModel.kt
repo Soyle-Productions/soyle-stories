@@ -1,6 +1,10 @@
 package com.soyle.stories.soylestories.confirmExitDialog
 
+import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.di.resolveLater
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialogViewModel
 import com.soyle.stories.soylestories.ApplicationModel
+import com.soyle.stories.soylestories.ApplicationScope
 import javafx.application.Platform
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.ItemViewModel
@@ -15,6 +19,8 @@ class ConfirmExitDialogModel : ConfirmExitDialogView, ItemViewModel<ConfirmExitD
 	val closingProject = find<ApplicationModel>().closingProject
 
 	val isInvalid = SimpleBooleanProperty(true)
+
+	private val threadTransformer by resolveLater<ThreadTransformer>(scope as ApplicationScope)
 
 	override val viewModel: ConfirmExitDialogViewModel? = item
 
@@ -31,5 +37,16 @@ class ConfirmExitDialogModel : ConfirmExitDialogView, ItemViewModel<ConfirmExitD
 
 	private fun invalidate() {
 		isInvalid.set(true)
+	}
+
+	override fun updateIf(
+		condition: ConfirmExitDialogViewModel.() -> Boolean,
+		update: ConfirmExitDialogViewModel.() -> ConfirmExitDialogViewModel
+	) {
+		threadTransformer.gui {
+			if (item.condition()) {
+				item = item?.update()
+			}
+		}
 	}
 }

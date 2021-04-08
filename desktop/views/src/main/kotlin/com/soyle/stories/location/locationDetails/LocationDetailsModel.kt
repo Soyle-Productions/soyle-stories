@@ -2,6 +2,7 @@ package com.soyle.stories.location.locationDetails
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialogViewModel
 import tornadofx.ItemViewModel
 
 class LocationDetailsModel : ItemViewModel<LocationDetailsViewModel>(), LocationDetailsView {
@@ -29,5 +30,16 @@ class LocationDetailsModel : ItemViewModel<LocationDetailsViewModel>(), Location
 	}
 
 	private fun invalidated() {}
+
+	override fun updateIf(
+		condition: LocationDetailsViewModel.() -> Boolean,
+		update: LocationDetailsViewModel.() -> LocationDetailsViewModel
+	) {
+		threadTransformer.gui {
+			if (item.condition()) {
+				item = item?.update()
+			}
+		}
+	}
 
 }

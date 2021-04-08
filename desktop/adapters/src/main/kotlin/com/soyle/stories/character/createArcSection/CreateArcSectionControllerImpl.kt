@@ -5,8 +5,8 @@ import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArcTemplateSection
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
 import kotlinx.coroutines.Job
 import java.util.*
 

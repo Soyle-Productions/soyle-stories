@@ -5,7 +5,7 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterDesire
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
 import kotlinx.coroutines.Job
 import java.util.*
 

@@ -3,39 +3,43 @@ package com.soyle.stories.scene.sceneCharacters
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.CharacterArcSection
+import com.soyle.stories.domain.scene.RoleInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneReceiver
+import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedReceiver
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneReceiver
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludedCharacterInSceneReceiver
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
-import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.AvailableCharactersToAddToScene
-import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
+import com.soyle.stories.usecase.scene.character.listAvailableCharacters.AvailableCharactersToAddToScene
+import com.soyle.stories.usecase.scene.character.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
+import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInScene
 import com.soyle.stories.usecase.scene.common.IncludedCharacterInScene
-import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetails
 
 class SceneCharactersPresenter(
     private val view: View.Nullable<SceneCharactersViewModel>
 ) :
-    GetSceneDetails.OutputPort,
+    ListCharactersInScene.OutputPort,
     ListAvailableCharactersToIncludeInScene.OutputPort,
     GetAvailableCharacterArcsForCharacterInScene.OutputPort,
     IncludedCharacterInSceneReceiver by SceneCharactersIncludedCharacterPresenter(view),
     RemovedCharacterFromSceneReceiver by SceneCharactersRemovedCharacterPresenter(view),
     RenamedCharacterInSceneReceiver by SceneCharactersRenamedCharacterPresenter(view),
     CharacterArcSectionsCoveredBySceneReceiver by SceneCharactersCoveredArcSectionsPresenter(view),
-    CharacterArcSectionUncoveredInSceneReceiver by SceneCharactersUncoveredArcSectionPresenter(view) {
+    CharacterArcSectionUncoveredInSceneReceiver by SceneCharactersUncoveredArcSectionPresenter(view),
+    CharacterRoleInSceneChangedReceiver by SceneCharactersRoleInSceneChangedPresenter(view)
+{
 
-    override fun sceneDetailsRetrieved(response: GetSceneDetails.ResponseModel) {
+    override suspend fun receiveCharactersInScene(response: ListCharactersInScene.ResponseModel) {
         view.update {
             SceneCharactersViewModel(
-                Scene.Id(response.sceneId),
+                response.sceneId,
                 null,
-                response.characters.map(::includedCharacterViewModel)
+                response.charactersInScene.map(::includedCharacterViewModel)
             )
         }
     }
@@ -90,17 +94,13 @@ class SceneCharactersPresenter(
         }
     }
 
-    override fun failedToGetSceneDetails(failure: Exception) {
-
-    }
-
     companion object {
         internal fun includedCharacterViewModel(includedCharacter: IncludedCharacterInScene): IncludedCharacterViewModel {
             return IncludedCharacterViewModel(
-                Character.Id(includedCharacter.characterId),
+                includedCharacter.characterId,
                 includedCharacter.characterName,
                 "",
-                null,
+                includedCharacter.roleInScene.toRoleInSceneViewModel(),
                 "",
                 includedCharacter.motivation,
                 includedCharacter.motivation != null,
@@ -126,6 +126,13 @@ class SceneCharactersPresenter(
                 null
             )
         }
+
+        internal fun RoleInScene?.toRoleInSceneViewModel(): CharacterRoleInScene? =
+            when (this) {
+                RoleInScene.IncitingCharacter -> CharacterRoleInScene.IncitingCharacter
+                RoleInScene.OpponentCharacter -> CharacterRoleInScene.OpponentToIncitingCharacter
+                null -> null
+            }
 
         private fun arcSectionListedLabel(
             arcSectionTemplateName: String,

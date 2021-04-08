@@ -9,8 +9,10 @@ import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.character.CharacterArc
+import com.soyle.stories.domain.scene.RoleInScene
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.scene.sceneCharacters.AvailableArcSectionViewModel
+import com.soyle.stories.scene.sceneCharacters.CharacterRoleInScene
 import com.soyle.stories.scene.sceneCharacters.SceneCharactersState
 import com.soyle.stories.scene.sceneCharacters.SceneCharactersViewListener
 import javafx.animation.Interpolator
@@ -18,9 +20,11 @@ import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.ActionEvent
 import javafx.scene.control.*
+import javafx.scene.effect.DropShadow
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Region.USE_COMPUTED_SIZE
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.FontWeight
 import javafx.util.Duration
@@ -103,13 +107,23 @@ class SelectedSceneCharacterEditorLogic(private val view: SelectedSceneCharacter
 
     internal fun incitingCharacterToggle(button: ButtonBase) {
         button.action {
-
+            val character = state.item ?: return@action
+            if (character.roleInScene == CharacterRoleInScene.IncitingCharacter) {
+                viewListener.clearRole(character.id)
+            } else {
+                viewListener.assignRole(character.id, RoleInScene.IncitingCharacter)
+            }
         }
     }
 
     internal fun opponentCharacterToggle(button: ButtonBase) {
         button.action {
-
+            val character = state.item ?: return@action
+            if (character.roleInScene == CharacterRoleInScene.OpponentToIncitingCharacter) {
+                viewListener.clearRole(character.id)
+            } else {
+                viewListener.assignRole(character.id, RoleInScene.OpponentCharacter)
+            }
         }
     }
 

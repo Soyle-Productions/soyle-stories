@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.view.scene.sceneCharacters
 
+import com.soyle.stories.common.exists
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.CharacterArcSection
@@ -51,6 +52,26 @@ class SceneCharactersAssertions private constructor(private val view: SceneChara
                 getCharacterEditorOrError().motivationInput
             }
             assertEquals(expectedInheritedMotivation, motivationInput.promptText)
+        }
+
+        fun doesNotHaveRole(unexpectedRole: String? = null) {
+            val characterRole = view.drive {
+                item.role
+            }
+            if (unexpectedRole == null) {
+                assert(characterRole.text.isNullOrBlank())
+                assertFalse(characterRole.exists)
+            } else {
+                assertNotEquals(unexpectedRole, characterRole.text)
+            }
+        }
+
+        fun hasRole(expectedRole: String) {
+            val characterRole = view.drive {
+                item.role
+            }
+            assertEquals(expectedRole, characterRole.text)
+            assertTrue(characterRole.exists)
         }
 
         fun isListingAvailableArcToCover(characterArcId: CharacterArc.Id, expectedName: String) {

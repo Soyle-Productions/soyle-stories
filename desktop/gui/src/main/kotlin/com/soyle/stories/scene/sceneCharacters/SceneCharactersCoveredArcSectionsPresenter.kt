@@ -4,7 +4,7 @@ import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.CharacterArcSection
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
 
 class SceneCharactersCoveredArcSectionsPresenter(
     private val view: View.Nullable<SceneCharactersViewModel>

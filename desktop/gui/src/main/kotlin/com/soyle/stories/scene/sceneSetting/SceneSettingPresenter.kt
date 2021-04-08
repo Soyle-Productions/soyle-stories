@@ -10,8 +10,8 @@ import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedReceiver
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneReceiver
-import com.soyle.stories.usecase.scene.locationsInScene.listLocationsToUse.ListAvailableLocationsToUseInScene
-import com.soyle.stories.usecase.scene.locationsInScene.listLocationsUsed.ListLocationsUsedInScene
+import com.soyle.stories.usecase.scene.location.listLocationsToUse.ListAvailableLocationsToUseInScene
+import com.soyle.stories.usecase.scene.location.listLocationsUsed.ListLocationsUsedInScene
 
 internal class SceneSettingPresenter(
     private val view: View.Nullable<SceneSettingViewModel>,

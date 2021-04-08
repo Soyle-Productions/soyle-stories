@@ -6,8 +6,8 @@ import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
-import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInScene
-import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInSceneUseCase
+import com.soyle.stories.usecase.scene.symbol.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.usecase.scene.symbol.listSymbolsInScene.ListSymbolsInSceneUseCase
 import com.soyle.stories.usecase.theme.SymbolDoesNotExist
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue

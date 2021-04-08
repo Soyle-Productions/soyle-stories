@@ -3,10 +3,9 @@ package com.soyle.stories.character.createArcSectionDialog
 import com.soyle.stories.character.createArcSection.CreateArcSectionController
 import com.soyle.stories.characterarc.changeSectionValue.ChangeSectionValueController
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
-import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.doubles.ControlledThreadTransformer
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested

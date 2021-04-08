@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
 
 class CharacterArcSectionsCoveredBySceneNotifier : Notifier<CharacterArcSectionsCoveredBySceneReceiver>(),
     CharacterArcSectionsCoveredBySceneReceiver {

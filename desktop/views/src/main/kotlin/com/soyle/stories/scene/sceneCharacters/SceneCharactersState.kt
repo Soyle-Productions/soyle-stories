@@ -53,11 +53,11 @@ class SceneCharactersState : ProjectScopedModel<SceneCharactersViewModel>() {
                     else -> "${characterItem.name} is not an Opponent to ${it.name}"
                 }
             }
-            null -> SimpleStringProperty("")
             else -> incitingCharacter.stringBinding {
+                val characterItemName = characterItem?.name ?: ""
                 when (it) {
-                    null -> "${characterItem.name} Opposes the Inciting Character"
-                    else -> "${characterItem.name} Opposes ${it.name}"
+                    null -> "$characterItemName Opposes the Inciting Character"
+                    else -> "$characterItemName Opposes ${it.name}"
                 }
             }
         }
@@ -71,6 +71,10 @@ class SceneCharactersState : ProjectScopedModel<SceneCharactersViewModel>() {
     private val characterBeingEditedUpdater = bind {
         val editingCharacterId = characterBeingEdited.value?.id ?: return@bind
         characterBeingEdited.value = it?.includedCharacters?.find { it.id == editingCharacterId }
+    }
+
+    override fun viewModel(): SceneCharactersViewModel? {
+        return super.viewModel()?.copy(targetSceneId = selectedSceneId.value)
     }
 
     init {

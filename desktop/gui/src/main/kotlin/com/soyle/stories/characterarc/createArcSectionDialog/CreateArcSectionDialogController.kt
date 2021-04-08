@@ -8,7 +8,7 @@ import com.soyle.stories.domain.character.CharacterArcSection
 import com.soyle.stories.domain.character.CharacterArcTemplateSection
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.gui.View
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 
 class CreateArcSectionDialogController private constructor(
     private val threadTransformer: ThreadTransformer,

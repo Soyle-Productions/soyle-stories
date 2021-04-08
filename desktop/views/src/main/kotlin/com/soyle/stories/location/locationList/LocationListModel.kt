@@ -3,6 +3,7 @@ package com.soyle.stories.location.locationList
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialogViewModel
 import com.soyle.stories.location.items.LocationItemViewModel
 import com.soyle.stories.project.ProjectScope
 import javafx.beans.binding.BooleanBinding
@@ -38,6 +39,17 @@ class LocationListModel : LocationListView, ItemViewModel<LocationListViewModel>
 			val selectedItem = this@LocationListModel.selectedItem.value
 			item = item?.update()
 			this@LocationListModel.selectedItem.set(selectedItem)
+		}
+	}
+
+	override fun updateIf(
+		condition: LocationListViewModel.() -> Boolean,
+		update: LocationListViewModel.() -> LocationListViewModel
+	) {
+		threadTransformer.gui {
+			if (item.condition()) {
+				item = item?.update()
+			}
 		}
 	}
 }

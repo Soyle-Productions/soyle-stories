@@ -7,10 +7,10 @@ import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
-import com.soyle.stories.usecase.scene.includedCharacter.listAvailableCharacters.AvailableCharactersToAddToScene
-import com.soyle.stories.usecase.scene.includedCharacter.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
-import com.soyle.stories.usecase.scene.includedCharacter.includeCharacterInScene.IncludeCharacterInScene
-import com.soyle.stories.usecase.scene.includedCharacter.includeCharacterInScene.IncludeCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.character.listAvailableCharacters.AvailableCharactersToAddToScene
+import com.soyle.stories.usecase.scene.character.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
+import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInSceneUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

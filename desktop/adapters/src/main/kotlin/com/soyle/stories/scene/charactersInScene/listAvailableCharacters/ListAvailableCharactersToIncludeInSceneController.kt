@@ -1,9 +1,8 @@
 package com.soyle.stories.scene.charactersInScene.listAvailableCharacters
 
-import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
+import com.soyle.stories.usecase.scene.character.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
 import kotlinx.coroutines.Job
 
 class ListAvailableCharactersToIncludeInSceneController(

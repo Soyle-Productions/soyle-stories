@@ -1,5 +1,6 @@
 package com.soyle.stories.usecase.theme.removeSymbolFromTheme
 
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneUpdate
 import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import com.soyle.stories.domain.scene.Updated
@@ -7,6 +8,9 @@ import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.usecase.scene.SceneRepository
 import com.soyle.stories.usecase.theme.SymbolDoesNotExist
 import com.soyle.stories.usecase.theme.ThemeRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import java.util.*
 
 class RemoveSymbolFromThemeUseCase(

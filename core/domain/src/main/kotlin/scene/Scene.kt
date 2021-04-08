@@ -131,6 +131,43 @@ class Scene private constructor(
         resolution,
         defaultConstructorMarker = Unit
     )
+    companion object {
+        private val equalityProps
+            get() = listOf(
+                Scene::id,
+                Scene::projectId,
+                Scene::name,
+                Scene::storyEventId,
+                Scene::settings,
+                Scene::proseId,
+                Scene::charactersInScene,
+                Scene::symbols,
+                Scene::conflict,
+                Scene::resolution
+            )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Scene
+
+        return equalityProps.all { it.get(this) == it.get(other) }
+    }
+
+    private val cachedHashCode: Int by lazy {
+        equalityProps.drop(1)
+            .fold(equalityProps.first().get(this).hashCode()) { result, prop ->
+                31 * result + prop.get(this).hashCode()
+            }
+    }
+
+    override fun hashCode(): Int = cachedHashCode
+
+    override fun toString(): String {
+        return "Scene(${equalityProps.joinToString(", ") { "${it.name}=${it.get(this)}" }})"
+    }
 
     fun withName(newName: NonBlankString) = copy(name = newName)
 
@@ -172,7 +209,7 @@ class Scene private constructor(
         )
     }
 
-    fun withRoleForCharacter(characterId: Character.Id, roleInScene: RoleInScene?): SceneUpdate<CharacterRoleInSceneChanged> {
+    fun withRoleForCharacter(characterId: Character.Id, roleInScene: RoleInScene?): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>> {
         val characterInScene = includedCharacters.getOrError(characterId)
         if (characterInScene.roleInScene == roleInScene) return noUpdate()
 
@@ -181,9 +218,15 @@ class Scene private constructor(
             null -> CharacterRoleInSceneCleared(id, characterId)
             else -> CharacterAssignedRoleInScene(id, characterId, roleInScene)
         }
+
+        if (roleInScene == RoleInScene.IncitingCharacter && includedCharacters.incitingCharacter != null) {
+            return withRoleForCharacter(includedCharacters.incitingCharacter!!.id, null)
+                .then { withRoleForCharacter(characterId, roleInScene) }
+        }
+
         return Updated(
             copy(charactersInScene = charactersInScene.minus(characterId).plus(newCharacter)),
-            event
+            CompoundEvent(listOf(event))
         )
     }
 
@@ -294,6 +337,8 @@ class Scene private constructor(
     class IncludedCharacter(val characterId: Character.Id, val characterName: String)
 
     inner class IncludedCharacters internal constructor() : Collection<CharacterInScene> by charactersInScene {
+
+        val incitingCharacter by lazy { includedCharacters.find { it.roleInScene == RoleInScene.IncitingCharacter } }
 
         operator fun get(characterId: Character.Id) = charactersInScene.getEntityById(characterId)
         fun getOrError(characterId: Character.Id): CharacterInScene =

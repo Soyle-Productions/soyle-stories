@@ -65,6 +65,15 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View<VM>, Vie
 		}
 	}
 
+	override fun updateIf(condition: VM.() -> Boolean, update: VM.() -> VM) {
+		threadTransformer.gui {
+			val viewModel = viewModel() ?: return@gui invalidatedProperty.set(false)
+			if (viewModel.condition()) {
+				item = viewModel.update()
+			}
+		}
+	}
+
 	private class BoundPropertyCannotBeUpdated(override val cause: Throwable) : Exception()
 
 	inner class BoundProperty<R>(private val prop: WritableValue<R>, private val getter: (VM) -> R) {

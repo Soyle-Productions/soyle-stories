@@ -145,11 +145,10 @@ class SceneCharactersView : View() {
 
     @ViewBuilder
     private fun StackPane.charactersIncluded() {
-        val selectedCharacter = SimpleObjectProperty<IncludedCharacterViewModel?>()
         vbox {
             existsWhen(props.hasIncludedCharacters)
-            includedCharacterListHeader(selectedCharacter)
-            includedCharacterList(selectedCharacter).apply { vgrow = Priority.ALWAYS }
+            includedCharacterListHeader(props.selectedCharacter)
+            includedCharacterList(props.selectedCharacter).apply { vgrow = Priority.ALWAYS }
         }
     }
 

@@ -12,7 +12,7 @@ import com.soyle.stories.scene.trackSymbolInScene.DetectUnusedSymbolsInSceneCont
 import com.soyle.stories.scene.trackSymbolInScene.ListAvailableSymbolsToTrackInSceneController
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
 import com.soyle.stories.scene.trackSymbolInScene.UnpinSymbolFromSceneController
-import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.DetectUnusedSymbolsInScene
 import com.soyle.stories.usecase.theme.changeThemeDetails.RenamedTheme
 import java.util.*
 

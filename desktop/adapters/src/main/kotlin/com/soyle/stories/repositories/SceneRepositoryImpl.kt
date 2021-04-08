@@ -61,10 +61,6 @@ class SceneRepositoryImpl : SceneRepository {
 		scenesByProseId[scene.proseId] = scene.id
 	}
 
-	override suspend fun updateScenes(scenes: List<Scene>) {
-		scenes.forEach { updateScene(it) }
-	}
-
 	override suspend fun removeScene(scene: Scene) {
 		scenes.remove(scene.id)
 		scenesByStoryEventId.remove(scene.storyEventId)

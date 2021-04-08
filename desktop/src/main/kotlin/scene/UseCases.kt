@@ -7,6 +7,8 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.editProse.ContentReplacedNotifier
+import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneController
+import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneOutput
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverCharacterArcSectionsInSceneOutputPort
@@ -39,7 +41,6 @@ import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLo
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneOutput
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneOutput
-import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
@@ -52,7 +53,9 @@ import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScen
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.*
+import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInScene
+import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
@@ -61,27 +64,27 @@ import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.Get
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingSceneUseCase
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingSceneUseCase
-import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetails
-import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetailsUseCase
-import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
-import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInScene
-import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneUseCase
-import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
-import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToSceneUseCase
+import com.soyle.stories.usecase.scene.character.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
+import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInScene
+import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInSceneUseCase
+import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocationToScene
+import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocationToSceneUseCase
 import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
 import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenesUseCase
 import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProseUseCase
-import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInScene
-import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInSceneUseCase
-import com.soyle.stories.usecase.scene.locationsInScene.listLocationsToUse.ListAvailableLocationsToUseInScene
-import com.soyle.stories.usecase.scene.locationsInScene.listLocationsToUse.ListAvailableLocationsToUseInSceneUseCase
-import com.soyle.stories.usecase.scene.locationsInScene.listLocationsUsed.ListLocationsUsedInScene
-import com.soyle.stories.usecase.scene.locationsInScene.listLocationsUsed.ListLocationsUsedInSceneUseCase
-import com.soyle.stories.usecase.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromScene
-import com.soyle.stories.usecase.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneUseCase
-import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
-import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
+import com.soyle.stories.usecase.scene.symbol.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.usecase.scene.symbol.listSymbolsInScene.ListSymbolsInSceneUseCase
+import com.soyle.stories.usecase.scene.location.listLocationsToUse.ListAvailableLocationsToUseInScene
+import com.soyle.stories.usecase.scene.location.listLocationsToUse.ListAvailableLocationsToUseInSceneUseCase
+import com.soyle.stories.usecase.scene.location.listLocationsUsed.ListLocationsUsedInScene
+import com.soyle.stories.usecase.scene.location.listLocationsUsed.ListLocationsUsedInSceneUseCase
+import com.soyle.stories.usecase.scene.location.removeLocationFromScene.RemoveLocationFromScene
+import com.soyle.stories.usecase.scene.location.removeLocationFromScene.RemoveLocationFromSceneUseCase
+import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.usecase.scene.renameScene.RenameScene
 import com.soyle.stories.usecase.scene.renameScene.RenameSceneUseCase
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
@@ -90,9 +93,9 @@ import com.soyle.stories.usecase.scene.sceneFrame.GetSceneFrame
 import com.soyle.stories.usecase.scene.sceneFrame.GetSceneFrameUseCase
 import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValue
 import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValueUseCase
-import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
-import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
-import com.soyle.stories.usecase.scene.trackSymbolInScene.*
+import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.*
 
 object UseCases {
 
@@ -104,11 +107,12 @@ object UseCases {
             deleteScene()
             includeCharacterInScene()
             setMotivationForCharacterInScene()
-            getSceneDetails()
+            listCharactersInScene()
             linkLocationToScene()
             removeCharacterFromScene()
             reorderScene()
             coverCharacterArcSectionsInScene()
+            assignRoleToCharacter()
             listOptionsToReplaceMention()
             synchronizeTrackedSymbolsWithProse()
             listSymbolsInScene()
@@ -235,12 +239,13 @@ object UseCases {
         }
     }
 
-    private fun InProjectScope.getSceneDetails() {
-        provide {
-            ListCharactersInSceneController(applicationScope.get(), applicationScope.get(), get())
+    private fun InProjectScope.listCharactersInScene() {
+        provide<ListCharactersInScene> {
+            ListCharactersInSceneUseCase(get())
         }
-        provide<GetSceneDetails> {
-            GetSceneDetailsUseCase(get(), get())
+
+        provide {
+            ListCharactersInSceneController(applicationScope.get(), get())
         }
     }
 
@@ -340,6 +345,19 @@ object UseCases {
             CreateCharacterArcSectionAndCoverInScene.OutputPort::class
         ) {
             CoverCharacterArcSectionsInSceneOutputPort(get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.assignRoleToCharacter() {
+        provide<AssignRoleToCharacterInScene> {
+            AssignRoleToCharacterInSceneUseCase(get())
+        }
+
+        provide {
+            AssignRoleToCharacterInSceneController(applicationScope.get(), get(), get())
+        }
+        provide<AssignRoleToCharacterInScene.OutputPort> {
+            AssignRoleToCharacterInSceneOutput(get())
         }
     }
 

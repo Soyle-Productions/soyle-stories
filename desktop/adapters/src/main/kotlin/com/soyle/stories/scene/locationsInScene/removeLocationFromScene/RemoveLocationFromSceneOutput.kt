@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.locationsInScene.removeLocationFromScene
 
-import com.soyle.stories.usecase.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromScene
+import com.soyle.stories.usecase.scene.location.removeLocationFromScene.RemoveLocationFromScene
 
 class RemoveLocationFromSceneOutput(
     private val locationRemovedFromSceneReceiver: LocationRemovedFromSceneReceiver

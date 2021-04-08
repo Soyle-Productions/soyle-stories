@@ -11,7 +11,7 @@ class SceneCharactersIncludedCharacterPresenter(
 
     override suspend fun receiveIncludedCharacterInScene(includedCharacterInScene: IncludedCharacterInScene) {
         view.updateOrInvalidated {
-            if (this.targetSceneId?.uuid != includedCharacterInScene.sceneId) return@updateOrInvalidated this
+            if (this.targetSceneId != includedCharacterInScene.sceneId) return@updateOrInvalidated this
             copy(
                 includedCharacters = includedCharacters?.plus(
                     SceneCharactersPresenter.includedCharacterViewModel(

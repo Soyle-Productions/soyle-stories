@@ -3,7 +3,7 @@ package com.soyle.stories.scene.sceneList.presenters
 import com.soyle.stories.gui.View
 import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.scene.sceneList.SceneListViewModel
-import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.DetectUnusedSymbolsInScene
 
 class DetectedInvalidMentionsPresenter(
     private val view: View.Nullable<SceneListViewModel>

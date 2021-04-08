@@ -24,7 +24,6 @@ import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.*
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneControllerImpl
-import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneOutput
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
@@ -41,7 +40,7 @@ import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScen
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.*
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
@@ -50,23 +49,21 @@ import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.Get
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingSceneUseCase
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingSceneUseCase
-import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetails
-import com.soyle.stories.usecase.scene.getSceneDetails.GetSceneDetailsUseCase
-import com.soyle.stories.usecase.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
-import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInScene
-import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneUseCase
-import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
-import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToSceneUseCase
+import com.soyle.stories.usecase.scene.character.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
+import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocationToScene
+import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocationToSceneUseCase
 import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
 import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenesUseCase
-import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
-import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
+import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.usecase.scene.renameScene.RenameScene
 import com.soyle.stories.usecase.scene.renameScene.RenameSceneUseCase
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderSceneUseCase
-import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
-import com.soyle.stories.usecase.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
+import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
 
 object SceneModule {
 
@@ -117,9 +114,6 @@ object SceneModule {
             }
             provide<GetPotentialChangesFromReorderingScene> {
                 GetPotentialChangesFromReorderingSceneUseCase(get())
-            }
-            provide<GetSceneDetails> {
-                GetSceneDetailsUseCase(get(), get())
             }
             provide<LinkLocationToScene> {
                 LinkLocationToSceneUseCase(get(), get())
