@@ -4,6 +4,7 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.resolveLater
 import com.soyle.stories.gui.View
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.soylestories.welcomeScreen.WelcomeScreenViewModel
 import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.ItemViewModel
 import tornadofx.rebind
@@ -31,6 +32,17 @@ class CreateStoryEventDialogModel : View.Nullable<CreateStoryEventDialogViewMode
 	override fun updateOrInvalidated(update: CreateStoryEventDialogViewModel.() -> CreateStoryEventDialogViewModel) {
 		threadTransformer.gui {
 			rebind { item = item?.update() }
+		}
+	}
+
+	override fun updateIf(
+		condition: CreateStoryEventDialogViewModel.() -> Boolean,
+		update: CreateStoryEventDialogViewModel.() -> CreateStoryEventDialogViewModel
+	) {
+		threadTransformer.gui {
+			if (item.condition()) {
+				item = item?.update()
+			}
 		}
 	}
 }

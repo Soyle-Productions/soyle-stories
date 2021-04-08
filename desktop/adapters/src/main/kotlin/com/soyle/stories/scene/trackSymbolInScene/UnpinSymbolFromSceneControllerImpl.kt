@@ -3,7 +3,7 @@ package com.soyle.stories.scene.trackSymbolInScene
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Symbol
-import com.soyle.stories.usecase.scene.trackSymbolInScene.UnpinSymbolFromScene
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.UnpinSymbolFromScene
 
 class UnpinSymbolFromSceneControllerImpl(
     private val threadTransformer: ThreadTransformer,

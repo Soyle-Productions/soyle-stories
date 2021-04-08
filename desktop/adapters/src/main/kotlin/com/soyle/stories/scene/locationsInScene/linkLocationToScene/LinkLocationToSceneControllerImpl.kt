@@ -4,7 +4,7 @@ import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.usecase.scene.linkLocationToScene.LinkLocationToScene
+import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocationToScene
 
 class LinkLocationToSceneControllerImpl(
     private val threadTransformer: ThreadTransformer,

@@ -11,8 +11,8 @@ import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
-import com.soyle.stories.usecase.scene.trackSymbolInScene.UnpinSymbolFromScene
-import com.soyle.stories.usecase.scene.trackSymbolInScene.UnpinSymbolFromSceneUseCase
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.UnpinSymbolFromScene
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.UnpinSymbolFromSceneUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested

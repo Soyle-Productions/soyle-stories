@@ -1,10 +1,8 @@
 package com.soyle.stories.scene.sceneCharacters
 
-import com.soyle.stories.domain.character.CharacterArc
-import com.soyle.stories.domain.character.CharacterArcSection
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneReceiver
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CharacterArcSectionUncoveredInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CharacterArcSectionUncoveredInScene
 
 class SceneCharactersUncoveredArcSectionPresenter(
     private val view: View.Nullable<SceneCharactersViewModel>

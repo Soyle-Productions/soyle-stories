@@ -3,6 +3,7 @@ package com.soyle.stories.location.deleteLocationDialog
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialogViewModel
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBenchModel
 import com.soyle.stories.project.layout.Dialog
@@ -34,6 +35,17 @@ class DeleteLocationDialogModel : DeleteLocationDialogView, ItemViewModel<Delete
 	override fun updateOrInvalidated(update: DeleteLocationDialogViewModel.() -> DeleteLocationDialogViewModel) {
 		threadTransformer.gui {
 			item = item?.update()
+		}
+	}
+
+	override fun updateIf(
+		condition: DeleteLocationDialogViewModel.() -> Boolean,
+		update: DeleteLocationDialogViewModel.() -> DeleteLocationDialogViewModel
+	) {
+		threadTransformer.gui {
+			if (item.condition()) {
+				item = item?.update()
+			}
 		}
 	}
 

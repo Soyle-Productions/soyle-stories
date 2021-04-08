@@ -9,6 +9,7 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.MentionedEntityId
 import com.soyle.stories.domain.prose.ProseContent
+import com.soyle.stories.domain.scene.RoleInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
@@ -17,6 +18,7 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.prose.editProse.EditProseController
 import com.soyle.stories.prose.proseEditor.ProseEditorScope
+import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
@@ -113,7 +115,7 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
         if (!doesSceneCoverArcSection(scene, section)) coverArcSectionInScene(scene, section) else Unit
 
     fun doesSceneCoverArcSection(scene: Scene, section: CharacterArcSection): Boolean =
-        scene.coveredArcSectionIds.contains(section.id)
+        scene.isCharacterArcSectionCovered(section.id)
 
     private fun coverArcSectionInScene(scene: Scene, section: CharacterArcSection) {
         projectScope.get<CoverArcSectionsInSceneController>().coverCharacterArcSectionInScene(
@@ -123,9 +125,31 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
         )
     }
 
+    fun givenCharacterHasRole(scene: Scene, character: Character, role: String)
+    {
+        if (!characterHasRole(scene, character, role)) assignRoleToCharacter(scene, character, role)
+    }
+
+    private fun characterHasRole(scene: Scene, character: Character, role: String): Boolean
+    {
+        val characterInScene = scene.includedCharacters.get(character.id)
+        return when (role) {
+            "Inciting Character" -> characterInScene?.roleInScene == RoleInScene.IncitingCharacter
+            else -> characterInScene?.roleInScene == RoleInScene.OpponentCharacter
+        }
+    }
+
+    private fun assignRoleToCharacter(scene: Scene, character: Character, role: String)
+    {
+        projectScope.get<AssignRoleToCharacterInSceneController>().assignRole(scene.id, character.id, when (role) {
+            "Inciting Character" -> RoleInScene.IncitingCharacter
+            else -> RoleInScene.OpponentCharacter
+        })
+    }
+
     fun givenLocationUsedInScene(scene: Scene, location: Location)
     {
-        if (! scene.settings.contains(location.id)) useLocationInScene(scene, location)
+        if (! scene.settings.containsEntityWithId(location.id)) useLocationInScene(scene, location)
     }
 
     fun useLocationInScene(scene: Scene, location: Location)

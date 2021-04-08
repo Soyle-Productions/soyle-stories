@@ -7,6 +7,9 @@ import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.Symbol
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import java.util.*
 
 interface SceneRepository {
@@ -22,7 +25,12 @@ interface SceneRepository {
     suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene?
     suspend fun getSceneThatOwnsProse(proseId: Prose.Id): Scene?
     suspend fun updateScene(scene: Scene)
-    suspend fun updateScenes(scenes: List<Scene>)
+    suspend fun updateScenes(scenes: List<Scene>) = coroutineScope {
+        scenes.map {
+            async { updateScene(it) }
+        }.awaitAll()
+    }
+
     suspend fun removeScene(scene: Scene)
     suspend fun getScenesIncludingCharacter(characterId: Character.Id): List<Scene>
     suspend fun getScenesTrackingSymbol(symbolId: Symbol.Id): List<Scene>

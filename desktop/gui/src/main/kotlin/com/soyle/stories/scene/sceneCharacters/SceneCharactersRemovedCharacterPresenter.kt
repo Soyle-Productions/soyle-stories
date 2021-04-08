@@ -2,7 +2,7 @@ package com.soyle.stories.scene.sceneCharacters
 
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
-import com.soyle.stories.usecase.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromScene
+import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
 
 class SceneCharactersRemovedCharacterPresenter(
     private val view: View.Nullable<SceneCharactersViewModel>

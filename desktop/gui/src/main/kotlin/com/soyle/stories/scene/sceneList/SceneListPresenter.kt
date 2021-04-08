@@ -11,7 +11,7 @@ import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
 import com.soyle.stories.usecase.scene.renameScene.RenameScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
-import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.DetectUnusedSymbolsInScene
 
 class SceneListPresenter(
     private val view: View.Nullable<SceneListViewModel>,

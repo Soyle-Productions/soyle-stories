@@ -3,6 +3,7 @@ package com.soyle.stories.scene.sceneCharacters
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArcTemplateSection
 import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.scene.RoleInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Theme
 
@@ -11,6 +12,9 @@ interface SceneCharactersViewListener {
     fun getAvailableCharacters()
     fun addCharacter(characterId: Character.Id)
     fun removeCharacter(characterId: Character.Id)
+
+    fun assignRole(characterId: Character.Id, role: RoleInScene)
+    fun clearRole(characterId: Character.Id)
 
     fun setMotivation(characterId: Character.Id,motivation: String)
     fun resetMotivation(characterId: Character.Id)

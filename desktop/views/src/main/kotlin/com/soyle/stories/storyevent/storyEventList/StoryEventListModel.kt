@@ -5,6 +5,7 @@ import com.soyle.stories.common.bindImmutableList
 import com.soyle.stories.di.resolveLater
 import com.soyle.stories.gui.View
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.soylestories.welcomeScreen.WelcomeScreenViewModel
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.ItemViewModel
@@ -36,6 +37,17 @@ class StoryEventListModel : ItemViewModel<StoryEventListViewModel>(), View.Nulla
 	override fun updateOrInvalidated(update: StoryEventListViewModel.() -> StoryEventListViewModel) {
 		threadTransformer.gui {
 			rebind { item = item?.update() }
+		}
+	}
+
+	override fun updateIf(
+		condition: StoryEventListViewModel.() -> Boolean,
+		update: StoryEventListViewModel.() -> StoryEventListViewModel
+	) {
+		threadTransformer.gui {
+			if (item.condition()) {
+				item = item?.update()
+			}
 		}
 	}
 }

@@ -15,8 +15,8 @@ import com.soyle.stories.usecase.prose.ProseDoesNotExist
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
-import com.soyle.stories.usecase.scene.trackSymbolInScene.SynchronizeTrackedSymbolsWithProse
-import com.soyle.stories.usecase.scene.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseUseCase
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.SynchronizeTrackedSymbolsWithProse
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue

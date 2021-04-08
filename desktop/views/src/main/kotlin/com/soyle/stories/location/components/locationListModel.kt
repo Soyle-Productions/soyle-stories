@@ -20,4 +20,16 @@ private class LocationListModel(
 	override fun updateOrInvalidated(update: List<LocationItemViewModel>.() -> List<LocationItemViewModel>) {
 		threadTransformer.gui { model.set(model.get().update().toObservable()) }
 	}
+
+	override fun updateIf(
+		condition: List<LocationItemViewModel>.() -> Boolean,
+		update: List<LocationItemViewModel>.() -> List<LocationItemViewModel>
+	) {
+		threadTransformer.gui {
+			val viewModel = model.get()
+			if (viewModel.condition()) {
+				model.set(viewModel.update().toObservable())
+			}
+		}
+	}
 }

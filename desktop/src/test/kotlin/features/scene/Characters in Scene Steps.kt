@@ -9,6 +9,7 @@ import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.scene.sceneCharacters.SceneCharactersAssertions
 import com.soyle.stories.desktop.view.scene.sceneCharacters.SceneCharactersAssertions.IncludedCharacterAssertions.Companion.andCharacter
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.scene.RoleInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.sceneList.SceneListView
 import io.cucumber.datatable.DataTable
@@ -91,6 +92,11 @@ class `Characters in Scene Steps` : En {
         ) { character: Character, motivation: String, scene: Scene ->
             sceneDriver.givenCharacterIncludedInScene(scene, character, motivation)
         }
+        Given(
+            "I have assigned the {character} the {string} role in the {scene}"
+        ) { character: Character, role: String, scene: Scene ->
+            sceneDriver.givenCharacterHasRole(scene, character, role)
+        }
     }
 
     private fun whens() {
@@ -160,6 +166,22 @@ class `Characters in Scene Steps` : En {
                 .givenFocusedOn(scene)
                 .givenEditing(character)
                 .setMotivationAs(motivation)
+        }
+        When(
+            "I assign the {character} the {string} role in the {scene}"
+        ) { character: Character, role: String, scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .givenEditing(character)
+                .assignRole(role)
+        }
+        When(
+            "I check the roles of the included characters in the {scene}"
+        ) { scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
         }
     }
 
@@ -257,7 +279,7 @@ class `Characters in Scene Steps` : En {
             SceneCharactersAssertions.assertThat(sceneCharacters) {
                 andCharacter(character.id) {
                     arcs.forEach { arc ->
-                        arc.arcSections.filterNot { scene.coveredArcSectionIds.contains(it.id) }.forEach {
+                        arc.arcSections.filterNot { scene.isCharacterArcSectionCovered(it.id) }.forEach {
                             isListingAvailableArcSectionToCover(arc.id, it.id, it.template.name)
                         }
                     }
@@ -274,7 +296,7 @@ class `Characters in Scene Steps` : En {
             SceneCharactersAssertions.assertThat(sceneCharacters) {
                 andCharacter(character.id) {
                     arcs.forEach { arc ->
-                        arc.arcSections.filter { scene.coveredArcSectionIds.contains(it.id) }.forEach {
+                        arc.arcSections.filter { scene.isCharacterArcSectionCovered(it.id) }.forEach {
                             isListingAvailableArcSectionToCover(arc.id, it.id, it.template.name)
                         }
                     }
@@ -307,14 +329,14 @@ class `Characters in Scene Steps` : En {
         ) { scene: Scene, sectionName: String, character: Character, arcName: String ->
             val arc = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterArcByNameOrError(character, arcName)
             val section = arc.arcSections.find { it.template.name == sectionName }!!
-            assertTrue(scene.coveredArcSectionIds.contains(section.id))
+            assertTrue(scene.isCharacterArcSectionCovered(section.id))
         }
         Then(
             "the {scene} should not cover the {string} section from the {character}'s {string} character arc"
         ) { scene: Scene, sectionName: String, character: Character, arcName: String ->
             val arc = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterArcByNameOrError(character, arcName)
             val section = arc.arcSections.find { it.template.name == sectionName }!!
-            Assertions.assertFalse(scene.coveredArcSectionIds.contains(section.id))
+            Assertions.assertFalse(scene.isCharacterArcSectionCovered(section.id))
         }
         Then(
             "the {character}'s motivation in the {scene} should be {string}"
@@ -338,6 +360,68 @@ class `Characters in Scene Steps` : En {
             SceneCharactersAssertions.assertThat(sceneCharacters) {
                 andCharacter(character.id) {
                     hasInheritedMotivationValue(expectedInheritedMotivation)
+                }
+            }
+        }
+        Then(
+            "the {character} should not have a role in the {scene}"
+        ) { character: Character, scene: Scene ->
+            assertNull(scene.includedCharacters[character.id]!!.roleInScene)
+
+            val sceneCharacters = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneCharactersAssertions.assertThat(sceneCharacters) {
+                andCharacter(character.id) {
+                    doesNotHaveRole()
+                }
+            }
+        }
+        Then(
+            "the {character} should have the {string} role in the {scene}"
+        ) { character: Character, role: String, scene: Scene ->
+            val currentRole = scene.includedCharacters.getOrError(character.id).roleInScene
+            when (role) {
+                "Inciting Character" -> assertEquals(RoleInScene.IncitingCharacter, currentRole)
+                else -> assertEquals(RoleInScene.OpponentCharacter, currentRole)
+            }
+
+            val sceneCharacters = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneCharactersAssertions.assertThat(sceneCharacters) {
+                andCharacter(character.id) {
+                    hasRole(when (role) {
+                        "Inciting Character" -> "Inciting Character"
+                        else -> when (val incitingCharacter = scene.includedCharacters.find { it.roleInScene == RoleInScene.IncitingCharacter }) {
+                            null -> "Opponent to Inciting Character"
+                            else -> "Opponent to ${incitingCharacter.characterName}"
+                        }
+                    })
+                }
+            }
+        }
+        Then(
+            "the {character} should not have the {string} role in the {scene}"
+        ) { character: Character, role: String, scene: Scene ->
+            val currentRole = scene.includedCharacters.getOrError(character.id).roleInScene
+            when (role) {
+                "Inciting Character" -> assertNotEquals(RoleInScene.IncitingCharacter, currentRole)
+                else -> assertNotEquals(RoleInScene.OpponentCharacter, currentRole)
+            }
+
+            val sceneCharacters = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneCharactersAssertions.assertThat(sceneCharacters) {
+                andCharacter(character.id) {
+                    doesNotHaveRole(when (role) {
+                        "Inciting Character" -> "Inciting Character"
+                        else -> when (val incitingCharacter = scene.includedCharacters.find { it.roleInScene == RoleInScene.IncitingCharacter }) {
+                            null -> "Opponent to Inciting Character"
+                            else -> "Opponent to ${incitingCharacter.characterName}"
+                        }
+                    })
                 }
             }
         }

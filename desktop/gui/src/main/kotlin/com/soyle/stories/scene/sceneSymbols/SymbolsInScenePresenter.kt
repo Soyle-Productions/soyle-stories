@@ -4,9 +4,9 @@ import com.soyle.stories.domain.scene.events.*
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.gui.View
-import com.soyle.stories.usecase.scene.listSymbolsInScene.ListSymbolsInScene
-import com.soyle.stories.usecase.scene.trackSymbolInScene.DetectUnusedSymbolsInScene
-import com.soyle.stories.usecase.scene.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
+import com.soyle.stories.usecase.scene.symbol.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.DetectUnusedSymbolsInScene
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.ListAvailableSymbolsToTrackInScene
 import com.soyle.stories.usecase.theme.changeThemeDetails.RenamedTheme
 import com.soyle.stories.usecase.theme.listSymbolsByTheme.SymbolsByTheme
 

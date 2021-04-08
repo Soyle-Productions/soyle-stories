@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene
 
 import com.soyle.stories.character.createArcSection.CreatedCharacterArcSectionReceiver
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.*
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
 
 class CoverCharacterArcSectionsInSceneOutputPort(
     private val coverCharacterArcSectionsInSceneReceiver: CharacterArcSectionsCoveredBySceneReceiver,

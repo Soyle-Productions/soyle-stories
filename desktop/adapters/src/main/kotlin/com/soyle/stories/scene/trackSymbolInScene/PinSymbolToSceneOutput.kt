@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.trackSymbolInScene
 
-import com.soyle.stories.usecase.scene.trackSymbolInScene.PinSymbolToScene
+import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.PinSymbolToScene
 
 class PinSymbolToSceneOutput(
     private val symbolsTrackedInSceneReceiver: SymbolsTrackedInSceneReceiver,

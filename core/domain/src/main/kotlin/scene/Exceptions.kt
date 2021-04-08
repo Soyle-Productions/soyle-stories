@@ -10,7 +10,7 @@ import java.util.*
 class SceneDoesNotIncludeCharacter(val sceneId: Scene.Id, val characterId: Character.Id) : EntityNotFoundException(characterId.uuid)
 {
 	override val message: String?
-		get() = "$sceneId does not track $characterId"
+		get() = "$sceneId does not include $characterId"
 }
 class SceneDoesNotTrackSymbol(val sceneId: Scene.Id, val symbolId: Symbol.Id) : EntityNotFoundException(symbolId.uuid)
 {

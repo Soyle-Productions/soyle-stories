@@ -31,4 +31,15 @@ class CreateLocationDialogModel : CreateLocationDialogView, ItemViewModel<Create
 		}
 	}
 
+	override fun updateIf(
+		condition: CreateLocationDialogViewModel.() -> Boolean,
+		update: CreateLocationDialogViewModel.() -> CreateLocationDialogViewModel
+	) {
+		threadTransformer.gui {
+			if (item.condition()) {
+				item = item?.update()
+			}
+		}
+	}
+
 }

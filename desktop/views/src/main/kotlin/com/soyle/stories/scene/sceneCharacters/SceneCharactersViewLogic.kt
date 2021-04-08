@@ -4,6 +4,7 @@ import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialo
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.scene.RoleInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.sceneCharacters.characterEditor.SelectedSceneCharacterEditor
 import com.soyle.stories.scene.sceneCharacters.includedCharacterItem.IncludedCharacterItemView
@@ -67,11 +68,24 @@ class SceneCharactersViewLogic(private val view: SceneCharactersView, private va
 
     internal fun incitingCharacterToggle(menuItem: MenuItem) {
         menuItem.action {
+            val character = state.selectedCharacter.get() ?: return@action
+            if (character.roleInScene == CharacterRoleInScene.IncitingCharacter) {
+                viewListener.clearRole(character.id)
+            } else {
+                viewListener.assignRole(character.id, RoleInScene.IncitingCharacter)
+            }
         }
     }
 
     internal fun opponentCharacterToggle(menuItem: MenuItem) {
-
+        menuItem.action {
+            val character = state.selectedCharacter.get() ?: return@action
+            if (character.roleInScene == CharacterRoleInScene.OpponentToIncitingCharacter) {
+                viewListener.clearRole(character.id)
+            } else {
+                viewListener.assignRole(character.id, RoleInScene.OpponentCharacter)
+            }
+        }
     }
 
     internal fun editCharacterOption(menuItem: MenuItem)

@@ -23,7 +23,7 @@ class Scene private constructor(
     val storyEventId: StoryEvent.Id,
     val settings: EntitySet<SceneSettingLocation>,
     val proseId: Prose.Id,
-    private val charactersInScene: List<CharacterInScene>,
+    private val charactersInScene: EntitySet<CharacterInScene>,
     private val symbols: Collection<TrackedSymbol>,
     val conflict: SceneConflict,
     val resolution: SceneResolution,
@@ -43,7 +43,7 @@ class Scene private constructor(
         storyEventId,
         entitySetOf(),
         proseId,
-        listOf(),
+        entitySetOf(),
         listOf(),
         SceneConflict(""),
         SceneResolution("")
@@ -56,7 +56,7 @@ class Scene private constructor(
         storyEventId: StoryEvent.Id,
         settings: EntitySet<SceneSettingLocation>,
         proseId: Prose.Id,
-        charactersInScene: List<CharacterInScene>,
+        charactersInScene: EntitySet<CharacterInScene>,
         symbols: Collection<TrackedSymbol>,
         conflict: SceneConflict,
         resolution: SceneResolution,
@@ -82,38 +82,29 @@ class Scene private constructor(
         }
     }
 
-    private val charactersById by lazy { charactersInScene.associateBy { it.characterId } }
-
+    val includedCharacters by lazy { IncludedCharacters() }
     val trackedSymbols: TrackedSymbols by lazy { TrackedSymbols() }
 
     fun includesCharacter(characterId: Character.Id): Boolean {
-        return charactersById.containsKey(characterId)
+        return charactersInScene.containsEntityWithId(characterId)
     }
 
     fun getMotivationForCharacter(characterId: Character.Id): CharacterMotivation? {
-        return charactersById[characterId]?.let {
+        return charactersInScene.getEntityById(characterId)?.let {
             CharacterMotivation(it.characterId, it.characterName, it.motivation)
         }
     }
 
     fun getCoveredCharacterArcSectionsForCharacter(characterId: Character.Id): List<CharacterArcSection.Id>? {
-        return charactersById[characterId]?.coveredArcSections
+        return charactersInScene.getEntityById(characterId)?.coveredArcSections
     }
 
-    private val allCharacterArcSections by lazy {
-        charactersById.values.flatMap { it.coveredArcSections }.toSet()
+    private val coveredArcSectionIds by lazy {
+        charactersInScene.flatMap { it.coveredArcSections }.toSet()
     }
 
     fun isCharacterArcSectionCovered(characterArcSectionId: CharacterArcSection.Id): Boolean {
-        return allCharacterArcSections.contains(characterArcSectionId)
-    }
-
-    val includedCharacters: List<IncludedCharacter> by lazy {
-        charactersInScene.map { IncludedCharacter(it.characterId, it.characterName) }
-    }
-
-    val coveredArcSectionIds by lazy {
-        charactersInScene.flatMap { it.coveredArcSections }
+        return coveredArcSectionIds.contains(characterArcSectionId)
     }
 
     fun hasCharacters(): Boolean = charactersInScene.isNotEmpty()
@@ -123,7 +114,7 @@ class Scene private constructor(
     private fun copy(
         name: NonBlankString = this.name,
         settings: EntitySet<SceneSettingLocation> = this.settings,
-        charactersInScene: List<CharacterInScene> = this.charactersInScene,
+        charactersInScene: EntitySet<CharacterInScene> = this.charactersInScene,
         symbols: Collection<TrackedSymbol> = this.symbols,
         conflict: SceneConflict = this.conflict,
         resolution: SceneResolution = this.resolution
@@ -140,6 +131,43 @@ class Scene private constructor(
         resolution,
         defaultConstructorMarker = Unit
     )
+    companion object {
+        private val equalityProps
+            get() = listOf(
+                Scene::id,
+                Scene::projectId,
+                Scene::name,
+                Scene::storyEventId,
+                Scene::settings,
+                Scene::proseId,
+                Scene::charactersInScene,
+                Scene::symbols,
+                Scene::conflict,
+                Scene::resolution
+            )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Scene
+
+        return equalityProps.all { it.get(this) == it.get(other) }
+    }
+
+    private val cachedHashCode: Int by lazy {
+        equalityProps.drop(1)
+            .fold(equalityProps.first().get(this).hashCode()) { result, prop ->
+                31 * result + prop.get(this).hashCode()
+            }
+    }
+
+    override fun hashCode(): Int = cachedHashCode
+
+    override fun toString(): String {
+        return "Scene(${equalityProps.joinToString(", ") { "${it.name}=${it.get(this)}" }})"
+    }
 
     fun withName(newName: NonBlankString) = copy(name = newName)
 
@@ -158,13 +186,7 @@ class Scene private constructor(
 
     fun withCharacterIncluded(character: Character): SceneUpdate<IncludedCharacterInScene> {
         if (includesCharacter(character.id)) return noUpdate()
-        val characterInScene = CharacterInScene(
-            character.id,
-            id,
-            character.name.value,
-            null,
-            listOf()
-        )
+        val characterInScene = CharacterInScene(id, character.id, character.name.value)
         return Updated(
             copy(
                 charactersInScene = charactersInScene + characterInScene
@@ -173,33 +195,48 @@ class Scene private constructor(
         )
     }
 
-    fun withCharacterRenamed(character: Character): SceneUpdate<RenamedCharacterInScene>
-    {
-        val characterInScene = charactersById[character.id] ?: throw SceneDoesNotIncludeCharacter(id, character.id)
+    fun withCharacterRenamed(character: Character): SceneUpdate<RenamedCharacterInScene> {
+        val characterInScene = includedCharacters.getOrError(character.id)
         if (characterInScene.characterName == character.name.value) return noUpdate()
+
         return Updated(
             copy(
-                charactersInScene = charactersInScene.map {
-                    if (it.characterId == character.id) {
-                        it.withName(character.name.value)
-                    } else it
-                }
+                charactersInScene = charactersInScene
+                    .minus(character.id)
+                    .plus(characterInScene.withName(character.name.value))
             ),
-            RenamedCharacterInScene(id, IncludedCharacter(character.id, character.name.value)))
+            RenamedCharacterInScene(id, IncludedCharacter(character.id, character.name.value))
+        )
+    }
+
+    fun withRoleForCharacter(characterId: Character.Id, roleInScene: RoleInScene?): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>> {
+        val characterInScene = includedCharacters.getOrError(characterId)
+        if (characterInScene.roleInScene == roleInScene) return noUpdate()
+
+        val newCharacter = characterInScene.withRoleInScene(roleInScene)
+        val event = when(roleInScene) {
+            null -> CharacterRoleInSceneCleared(id, characterId)
+            else -> CharacterAssignedRoleInScene(id, characterId, roleInScene)
+        }
+
+        if (roleInScene == RoleInScene.IncitingCharacter && includedCharacters.incitingCharacter != null) {
+            return withRoleForCharacter(includedCharacters.incitingCharacter!!.id, null)
+                .then { withRoleForCharacter(characterId, roleInScene) }
+        }
+
+        return Updated(
+            copy(charactersInScene = charactersInScene.minus(characterId).plus(newCharacter)),
+            CompoundEvent(listOf(event))
+        )
     }
 
     fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene {
-        if (!includesCharacter(characterId)) throw SceneDoesNotIncludeCharacter(id, characterId)
-        return copy(charactersInScene = charactersInScene.map {
-            if (it.characterId == characterId) CharacterInScene(
-                it.characterId,
-                id,
-                it.characterName,
-                motivation,
-                listOf()
-            )
-            else it
-        })
+        val characterInScene = includedCharacters.getOrError(characterId)
+        return copy(
+            charactersInScene = charactersInScene
+                .minus(characterId)
+                .plus(characterInScene.withMotivation(motivation))
+        )
     }
 
     fun withLocationLinked(location: Location): SceneUpdate<LocationUsedInScene> {
@@ -207,6 +244,7 @@ class Scene private constructor(
         val sceneSetting = SceneSettingLocation(location)
         return Updated(copy(settings = settings + sceneSetting), LocationUsedInScene(id, sceneSetting))
     }
+
     fun withoutLocation(locationId: Location.Id): SceneUpdate<LocationRemovedFromScene> {
         val sceneSetting = settings.getEntityById(locationId) ?: return noUpdate()
         return Updated(
@@ -214,6 +252,7 @@ class Scene private constructor(
             LocationRemovedFromScene(id, sceneSetting)
         )
     }
+
     fun withLocationRenamed(location: Location): SceneUpdate<SceneSettingLocationRenamed> {
         val sceneSetting = getSceneSettingOrError(location.id)
         if (sceneSetting.locationName == location.name.value) return noUpdate()
@@ -224,33 +263,28 @@ class Scene private constructor(
         )
     }
 
-    private fun getSceneSettingOrError(locationId: Location.Id): SceneSettingLocation
-    {
+    private fun getSceneSettingOrError(locationId: Location.Id): SceneSettingLocation {
         return settings.getEntityById(locationId) ?: throw SceneDoesNotUseLocation(id, locationId)
     }
 
     fun withoutCharacter(characterId: Character.Id) =
-        copy(charactersInScene = charactersInScene.filterNot { it.characterId == characterId })
+        copy(charactersInScene = charactersInScene.minus(characterId))
 
     fun withCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene {
-        charactersById[characterArcSection.characterId] ?: throw SceneDoesNotIncludeCharacter(
-            id,
-            characterArcSection.characterId
-        )
+        val characterInScene = includedCharacters.getOrError(characterArcSection.characterId)
         return copy(
-            charactersInScene = charactersInScene.map {
-                if (it.characterId != characterArcSection.characterId) it
-                else it.withCoveredArcSection(characterArcSection)
-            }
+            charactersInScene = charactersInScene
+                .minus(characterInScene.characterId)
+                .plus(characterInScene.withCoveredArcSection(characterArcSection))
         )
     }
 
     fun withoutCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene {
+        val characterInScene = includedCharacters.getOrError(characterArcSection.characterId)
         return copy(
-            charactersInScene = charactersInScene.map {
-                if (it.characterId != characterArcSection.characterId) it
-                else it.withoutCoveredArcSection(characterArcSection)
-            }
+            charactersInScene = charactersInScene
+                .minus(characterInScene.characterId)
+                .plus(characterInScene.withoutCoveredArcSection(characterArcSection))
         )
     }
 
@@ -301,6 +335,15 @@ class Scene private constructor(
     }
 
     class IncludedCharacter(val characterId: Character.Id, val characterName: String)
+
+    inner class IncludedCharacters internal constructor() : Collection<CharacterInScene> by charactersInScene {
+
+        val incitingCharacter by lazy { includedCharacters.find { it.roleInScene == RoleInScene.IncitingCharacter } }
+
+        operator fun get(characterId: Character.Id) = charactersInScene.getEntityById(characterId)
+        fun getOrError(characterId: Character.Id): CharacterInScene =
+            get(characterId) ?: throw SceneDoesNotIncludeCharacter(id, characterId)
+    }
 
     inner class TrackedSymbols private constructor(private val symbolsById: Map<Symbol.Id, TrackedSymbol>) :
         Collection<TrackedSymbol> by symbolsById.values {

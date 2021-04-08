@@ -14,6 +14,9 @@ import com.soyle.stories.prose.editProse.ContentReplacedNotifier
 import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
 import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneNotifier
 import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneReceiver
+import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneController
+import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedNotifier
+import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedReceiver
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.*
 import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
 import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogController
@@ -226,6 +229,8 @@ object Presentation {
                         get() = get()
                     override val setMotivationForCharacterInSceneController: SetMotivationForCharacterInSceneController
                         get() = get()
+                    override val assignRoleToCharacterInSceneController: AssignRoleToCharacterInSceneController
+                        get() = get()
 
                     override val includedCharacterInSceneNotifier: Notifier<IncludedCharacterInSceneReceiver>
                         get() = get<IncludedCharacterInSceneNotifier>()
@@ -237,6 +242,8 @@ object Presentation {
                         get() = get<CharacterArcSectionsCoveredBySceneNotifier>()
                     override val characterArcSectionUncoveredInSceneNotifier: Notifier<CharacterArcSectionUncoveredInSceneReceiver>
                         get() = get<CharacterArcSectionUncoveredInSceneNotifier>()
+                    override val characterRoleInSceneChangedNotifier: Notifier<CharacterRoleInSceneChangedReceiver>
+                        get() = get<CharacterRoleInSceneChangedNotifier>()
                 },
                 get<SceneCharactersState>()
             )

@@ -12,11 +12,11 @@ import com.soyle.stories.domain.validation.noEntities
 fun makeScene(
     sceneId: Scene.Id = Scene.Id(),
     projectId: Project.Id = Project.Id(),
-    name: NonBlankString = nonBlankStr("Scene ${str()}"),
+    name: NonBlankString = sceneName(),
     storyEventId: StoryEvent.Id = StoryEvent.Id(),
     settings: EntitySet<SceneSettingLocation> = noEntities(),
     proseId: Prose.Id = Prose.Id(),
-    charactersInScene: List<CharacterInScene> = listOf(),
+    charactersInScene: EntitySet<CharacterInScene> = noEntities(),
     symbols: Collection<Scene.TrackedSymbol> = listOf(),
     conflict: SceneConflict = SceneConflict(""),
     resolution: SceneResolution = SceneResolution("")
@@ -32,3 +32,5 @@ fun makeScene(
     conflict,
     resolution
 )
+
+fun sceneName(): NonBlankString = nonBlankStr("Scene ${str()}")

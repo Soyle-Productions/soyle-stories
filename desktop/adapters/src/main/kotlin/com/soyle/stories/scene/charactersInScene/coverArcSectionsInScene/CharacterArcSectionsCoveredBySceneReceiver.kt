@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene
 
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CharacterArcSectionCoveredByScene
 
 interface CharacterArcSectionsCoveredBySceneReceiver {
 

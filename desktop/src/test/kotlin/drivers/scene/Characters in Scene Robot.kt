@@ -12,6 +12,7 @@ import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.sceneCharacters.SceneCharactersView
+import javafx.scene.control.ButtonBase
 import tornadofx.FX
 
 
@@ -120,5 +121,16 @@ fun SceneCharactersView.setMotivationAs(motivation: String)
             text = motivation
             parent.requestFocus()
         }
+    }
+}
+
+fun SceneCharactersView.assignRole(role: String)
+{
+    drive {
+        val roleToggle: ButtonBase = when (role) {
+            "Inciting Character" -> getCharacterEditorOrError().incitingCharacterToggle
+            else -> getCharacterEditorOrError().opponentCharacterToggle
+        }
+        roleToggle.fire()
     }
 }

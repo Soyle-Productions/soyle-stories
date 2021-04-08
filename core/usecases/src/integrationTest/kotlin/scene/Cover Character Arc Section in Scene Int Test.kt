@@ -6,15 +6,14 @@ import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.character.makeCharacterArc
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.scene.makeScene
-import com.soyle.stories.domain.theme.makeTheme
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArcUseCase
 import com.soyle.stories.usecase.repositories.CharacterArcRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
-import com.soyle.stories.usecase.scene.charactersInScene.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 

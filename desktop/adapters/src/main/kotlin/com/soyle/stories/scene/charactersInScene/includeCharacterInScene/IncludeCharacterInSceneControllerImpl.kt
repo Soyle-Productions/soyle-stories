@@ -1,7 +1,7 @@
 package com.soyle.stories.scene.charactersInScene.includeCharacterInScene
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEventReceiver
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEvent

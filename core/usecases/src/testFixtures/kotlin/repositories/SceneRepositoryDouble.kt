@@ -62,10 +62,6 @@ class SceneRepositoryDouble(
 		scenes[scene.id] = scene
 	}
 
-	override suspend fun updateScenes(scenes: List<Scene>) {
-		scenes.forEach { updateScene(it) }
-	}
-
 	override suspend fun removeScene(scene: Scene) {
 		scenes.remove(scene.id)
 		onRemoveScene.invoke(scene)

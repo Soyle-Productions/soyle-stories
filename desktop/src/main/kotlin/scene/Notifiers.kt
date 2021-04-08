@@ -5,6 +5,8 @@ import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneNotifier
 import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneReceiver
+import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedNotifier
+import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedReceiver
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneNotifier
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneReceiver
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneNotifier
@@ -68,6 +70,9 @@ object Notifiers {
             }
             provide(RenamedCharacterInSceneReceiver::class) {
                 RenamedCharacterInSceneNotifier()
+            }
+            provide(CharacterRoleInSceneChangedReceiver::class) {
+                CharacterRoleInSceneChangedNotifier()
             }
         }
     }

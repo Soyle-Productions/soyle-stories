@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.charactersInScene.includeCharacterInScene
 
-import com.soyle.stories.usecase.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEventReceiver
 
 class IncludeCharacterInSceneOutput(

@@ -3,8 +3,13 @@ package com.soyle.stories.domain.scene
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import com.soyle.stories.domain.scene.events.CharacterAssignedRoleInScene
+import com.soyle.stories.domain.scene.events.CharacterRoleInSceneCleared
+import com.soyle.stories.domain.scene.events.SceneEvent
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.DynamicTest.dynamicTest
 
 class `Characters in Scene Unit Test` {
 
@@ -55,5 +60,102 @@ class `Characters in Scene Unit Test` {
         }
         error.sceneId.mustEqual(scene.id)
         error.characterId.mustEqual(character.id)
+    }
+
+    @Nested
+    inner class `Character Role in Scene` {
+
+        @Test
+        fun `a character should not have a role initially`() {
+            val defaultRole = scene.withCharacterIncluded(character)
+                .scene.includedCharacters.getOrError(character.id)
+                .roleInScene
+            assertNull(defaultRole)
+        }
+
+        @Test
+        fun `can assign a new role`() {
+            val newRole = RoleInScene.IncitingCharacter
+            val roleUpdate = scene.withCharacterIncluded(character)
+                .scene.withRoleForCharacter(character.id, newRole)
+
+            roleUpdate.scene.includedCharacters.getOrError(character.id).roleInScene.mustEqual(newRole)
+            roleUpdate as Updated
+            roleUpdate.event.events.single().mustEqual(CharacterAssignedRoleInScene(scene.id, character.id, newRole))
+        }
+
+        @Test
+        fun `can clear a character's role`() {
+            val roleUpdate = scene.withCharacterIncluded(character)
+                .scene.withRoleForCharacter(character.id, RoleInScene.IncitingCharacter)
+                .scene.withRoleForCharacter(character.id, null)
+
+            assertNull(roleUpdate.scene.includedCharacters.getOrError(character.id).roleInScene)
+            roleUpdate as Updated
+            roleUpdate.event.events.single().mustEqual(CharacterRoleInSceneCleared(scene.id, character.id))
+        }
+
+        @Test
+        fun `cannot update character's role if they aren't in the scene`() {
+            val error = assertThrows<SceneDoesNotIncludeCharacter> {
+                scene.withRoleForCharacter(character.id, RoleInScene.IncitingCharacter)
+            }
+            error.characterId.mustEqual(character.id)
+            error.sceneId.mustEqual(scene.id)
+        }
+
+        @Test
+        fun `assigning the same role should not produce an update`() {
+            listOf(
+                scene.withCharacterIncluded(character)
+                    .scene.withRoleForCharacter(character.id, null),
+
+                scene.withCharacterIncluded(character)
+                    .scene.withRoleForCharacter(character.id, RoleInScene.IncitingCharacter)
+                    .scene.withRoleForCharacter(character.id, RoleInScene.IncitingCharacter),
+
+                scene.withCharacterIncluded(character)
+                    .scene.withRoleForCharacter(character.id, RoleInScene.OpponentCharacter)
+                    .scene.withRoleForCharacter(character.id, RoleInScene.OpponentCharacter)
+            ).forEachIndexed { index, roleUpdate ->
+                if (roleUpdate !is WithoutChange) {
+                    error("Should not have received update for $index test")
+                }
+            }
+        }
+
+        @Nested
+        inner class `Assign Second Inciting Character` {
+
+            val secondCharacter = makeCharacter()
+            val initialScene = scene.withCharacterIncluded(character).scene
+                .withCharacterIncluded(secondCharacter).scene
+                .withRoleForCharacter(character.id, RoleInScene.IncitingCharacter).scene
+
+            @Test
+            fun `should clear previous inciting character's role`() {
+                val sceneUpdate = initialScene.withRoleForCharacter(secondCharacter.id, RoleInScene.IncitingCharacter)
+
+                assertNull(sceneUpdate.scene.includedCharacters.getOrError(character.id).roleInScene)
+            }
+
+            @Test
+            fun `should output role cleared event and role assignment event`() {
+                val sceneUpdate = initialScene.withRoleForCharacter(secondCharacter.id, RoleInScene.IncitingCharacter)
+
+                sceneUpdate as Updated
+                sceneUpdate.event.events.first().mustEqual(CharacterRoleInSceneCleared(scene.id, character.id))
+                sceneUpdate.event.events.component2().mustEqual(
+                    CharacterAssignedRoleInScene(
+                        scene.id,
+                        secondCharacter.id,
+                        RoleInScene.IncitingCharacter
+                    )
+                )
+                sceneUpdate.event.events.size.mustEqual(2)
+            }
+
+        }
+
     }
 }
