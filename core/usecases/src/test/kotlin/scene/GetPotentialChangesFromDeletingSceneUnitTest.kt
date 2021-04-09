@@ -345,6 +345,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
             sceneId,
             it.characterName,
             it.roleInScene,
+            it.desire,
             it.motivation,
             it.coveredArcSections
         )
