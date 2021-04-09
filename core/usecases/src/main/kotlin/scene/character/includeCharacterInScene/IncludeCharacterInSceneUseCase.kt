@@ -86,6 +86,7 @@ class IncludeCharacterInSceneUseCase(
             character.id,
             character.name.value,
             null,
+            "",
             null,
             previousMotivations.getLastSetMotivation(character.id),
             listOf()

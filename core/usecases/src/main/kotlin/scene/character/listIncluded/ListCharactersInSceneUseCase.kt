@@ -20,6 +20,7 @@ class ListCharactersInSceneUseCase(
                 it.characterId,
                 it.characterName,
                 it.roleInScene,
+                it.desire,
                 it.motivation,
                 previousMotivations.getLastSetMotivation(it.characterId),
                 listOf()

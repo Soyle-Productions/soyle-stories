@@ -103,7 +103,7 @@ class SceneCharactersPresenter(
                 includedCharacter.characterName,
                 "",
                 includedCharacter.roleInScene.toRoleInSceneViewModel(),
-                "",
+                includedCharacter.desire,
                 includedCharacter.motivation,
                 includedCharacter.motivation != null,
                 includedCharacter.inheritedMotivation?.let { inherited ->
