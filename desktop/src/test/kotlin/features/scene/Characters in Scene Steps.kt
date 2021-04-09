@@ -97,6 +97,11 @@ class `Characters in Scene Steps` : En {
         ) { character: Character, role: String, scene: Scene ->
             sceneDriver.givenCharacterHasRole(scene, character, role)
         }
+        Given(
+            "I have set the {character}'s desire to {string} in the {scene}"
+        ) { character: Character, desire: String, scene: Scene ->
+            sceneDriver.givenCharacterHasDesire(scene, character, desire)
+        }
     }
 
     private fun whens() {
@@ -182,6 +187,23 @@ class `Characters in Scene Steps` : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenSceneCharactersToolHasBeenOpened()
                 .givenFocusedOn(scene)
+        }
+        When(
+            "I check the {character}'s desire in the {scene}"
+        ) { character: Character, scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .givenEditing(character)
+        }
+        When(
+            "I set the {character}'s desire to {string} in the {scene}"
+        ) { character: Character, desire: String, scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .givenEditing(character)
+                .setDesireAs(desire)
         }
     }
 
@@ -436,6 +458,20 @@ class `Characters in Scene Steps` : En {
             SceneCharactersAssertions.assertThat(sceneCharacters) {
                 andCharacter(character.id) {
                     doesNotHaveDesire()
+                }
+            }
+        }
+        Then(
+            "the {character}'s desire in the {scene} should be {string}"
+        ) { character: Character, scene: Scene, expectedDesire: String ->
+            assertEquals(expectedDesire, scene.includedCharacters.getOrError(character.id).desire)
+
+            val sceneCharacters = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneCharactersAssertions.assertThat(sceneCharacters) {
+                andCharacter(character.id) {
+                    hasDesire(expectedDesire)
                 }
             }
         }

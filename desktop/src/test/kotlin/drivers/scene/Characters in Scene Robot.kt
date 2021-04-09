@@ -113,6 +113,17 @@ fun SceneCharactersView.givenCreateNewSectionInArcSelected(arcName: String): Cre
     else return dialog
 }
 
+fun SceneCharactersView.setDesireAs(desire: String)
+{
+    drive {
+        with(getCharacterEditorOrError().desireInput) {
+            requestFocus()
+            text = desire
+            parent.requestFocus()
+        }
+    }
+}
+
 fun SceneCharactersView.setMotivationAs(motivation: String)
 {
     drive {

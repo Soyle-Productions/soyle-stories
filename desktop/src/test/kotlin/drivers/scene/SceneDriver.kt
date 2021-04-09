@@ -22,6 +22,7 @@ import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacte
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.createNewScene.CreateNewSceneController
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
+import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
@@ -145,6 +146,22 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
             "Inciting Character" -> RoleInScene.IncitingCharacter
             else -> RoleInScene.OpponentCharacter
         })
+    }
+
+    fun givenCharacterHasDesire(scene: Scene, character: Character, desire: String)
+    {
+        if (!characterHasDesire(scene, character, desire)) setCharacterDesireInScene(scene, character, desire)
+    }
+
+    private fun characterHasDesire(scene: Scene, character: Character, desire: String): Boolean
+    {
+        val characterInScene = scene.includedCharacters.get(character.id)
+        return characterInScene?.desire == desire
+    }
+
+    private fun setCharacterDesireInScene(scene: Scene, character: Character, desire: String)
+    {
+        projectScope.get<SetCharacterDesireInSceneController>().setDesire(scene.id, character.id, desire)
     }
 
     fun givenLocationUsedInScene(scene: Scene, location: Location)

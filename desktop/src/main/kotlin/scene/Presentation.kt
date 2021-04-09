@@ -49,6 +49,9 @@ import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.Location
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneController
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
+import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedNotifier
+import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
+import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
@@ -231,6 +234,8 @@ object Presentation {
                         get() = get()
                     override val assignRoleToCharacterInSceneController: AssignRoleToCharacterInSceneController
                         get() = get()
+                    override val setCharacterDesireInSceneController: SetCharacterDesireInSceneController
+                        get() = get()
 
                     override val includedCharacterInSceneNotifier: Notifier<IncludedCharacterInSceneReceiver>
                         get() = get<IncludedCharacterInSceneNotifier>()
@@ -244,6 +249,8 @@ object Presentation {
                         get() = get<CharacterArcSectionUncoveredInSceneNotifier>()
                     override val characterRoleInSceneChangedNotifier: Notifier<CharacterRoleInSceneChangedReceiver>
                         get() = get<CharacterRoleInSceneChangedNotifier>()
+                    override val characterDesireInSceneChangedNotifier: Notifier<CharacterDesireInSceneChangedReceiver>
+                        get() = get<CharacterDesireInSceneChangedNotifier>()
                 },
                 get<SceneCharactersState>()
             )

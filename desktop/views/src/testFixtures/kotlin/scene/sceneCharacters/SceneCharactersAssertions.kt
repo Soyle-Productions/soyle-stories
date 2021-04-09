@@ -47,6 +47,13 @@ class SceneCharactersAssertions private constructor(private val view: SceneChara
             assert(desireInput.text.isNullOrEmpty())
         }
 
+        fun hasDesire(expectedDesire: String) {
+            val desireInput = view.drive {
+                getCharacterEditorOrError().desireInput
+            }
+            assertEquals(expectedDesire, desireInput.text ?: "")
+        }
+
         fun hasMotivationValue(expectedMotivation: String) {
             val motivationInput = view.drive {
                 getCharacterEditorOrError().motivationInput

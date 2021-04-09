@@ -130,10 +130,10 @@ class SelectedSceneCharacterEditorLogic(private val view: SelectedSceneCharacter
     internal fun desire(input: TextInputControl)
     {
         input.onLoseFocus {
-            val characterId = state.item?.id ?: return@onLoseFocus
+            val character = state.item ?: return@onLoseFocus
             val newDesire = input.text
-            if (newDesire != state.desire.value) {
-                // TODO("viewListener.setDesire(characterId, newDesire)")
+            if (newDesire != character.desire) {
+                viewListener.setDesire(character.id, newDesire)
             }
         }
     }

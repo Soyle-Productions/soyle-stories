@@ -13,6 +13,7 @@ import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.Charact
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludedCharacterInSceneReceiver
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
+import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionsForCharacterInScene
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
 import com.soyle.stories.usecase.scene.character.listAvailableCharacters.AvailableCharactersToAddToScene
@@ -31,7 +32,8 @@ class SceneCharactersPresenter(
     RenamedCharacterInSceneReceiver by SceneCharactersRenamedCharacterPresenter(view),
     CharacterArcSectionsCoveredBySceneReceiver by SceneCharactersCoveredArcSectionsPresenter(view),
     CharacterArcSectionUncoveredInSceneReceiver by SceneCharactersUncoveredArcSectionPresenter(view),
-    CharacterRoleInSceneChangedReceiver by SceneCharactersRoleInSceneChangedPresenter(view)
+    CharacterRoleInSceneChangedReceiver by SceneCharactersRoleInSceneChangedPresenter(view),
+    CharacterDesireInSceneChangedReceiver by SceneCharactersDesireChangedPresenter(view)
 {
 
     override suspend fun receiveCharactersInScene(response: ListCharactersInScene.ResponseModel) {
