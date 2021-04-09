@@ -87,6 +87,9 @@ class `Scene Characters Driver`(private val view: SceneCharactersView) : FxRobot
     val SelectedSceneCharacterEditor.positionOnArcSelection
         get() = from(root).lookup("#coverArcSectionButton").query<MenuButton>()
 
+    val SelectedSceneCharacterEditor.desireInput
+        get() = from(root).lookup(".desire .text-field").queryTextInputControl()
+
     val SelectedSceneCharacterEditor.motivationInput
         get() = from(root).lookup(".motivation .text-field").queryTextInputControl()
 

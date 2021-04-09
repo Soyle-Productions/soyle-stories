@@ -425,6 +425,20 @@ class `Characters in Scene Steps` : En {
                 }
             }
         }
+        Then(
+            "the {character} should not have a desire in the {scene}"
+        ) { character: Character, scene: Scene ->
+            assertTrue(scene.includedCharacters.getOrError(character.id).desire.isEmpty())
+
+            val sceneCharacters = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneCharactersToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneCharactersAssertions.assertThat(sceneCharacters) {
+                andCharacter(character.id) {
+                    doesNotHaveDesire()
+                }
+            }
+        }
     }
 
 }

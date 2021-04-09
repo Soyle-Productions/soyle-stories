@@ -9,12 +9,13 @@ class CharacterInScene(
     val sceneId: Scene.Id,
     val characterName: String,
     val roleInScene: RoleInScene?,
+    val desire: String,
     val motivation: String?,
     val coveredArcSections: List<CharacterArcSection.Id>
 ) : Entity<Character.Id> {
 
     constructor(sceneId: Scene.Id, id: Character.Id, name: String) : this(
-        id, sceneId, name, null, null, emptyList()
+        id, sceneId, name, null, "", null, emptyList()
     )
 
     val characterId
@@ -25,7 +26,7 @@ class CharacterInScene(
         roleInScene: RoleInScene? = this.roleInScene,
         motivation: String? = this.motivation,
         coveredArcSections: List<CharacterArcSection.Id> = this.coveredArcSections
-    ) = CharacterInScene(characterId, sceneId, characterName, roleInScene, motivation, coveredArcSections)
+    ) = CharacterInScene(characterId, sceneId, characterName, roleInScene, desire, motivation, coveredArcSections)
 
 
 
