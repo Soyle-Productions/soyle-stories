@@ -15,6 +15,7 @@ allprojects {
 
 application {
     mainClassName = "com.soyle.stories.desktop.config.soylestories.MainKt"
+    applicationName = "Soyle Stories"
 }
 
 
