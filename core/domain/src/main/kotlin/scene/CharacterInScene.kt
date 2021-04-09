@@ -24,6 +24,7 @@ class CharacterInScene(
     private fun copy(
         characterName: String = this.characterName,
         roleInScene: RoleInScene? = this.roleInScene,
+        desire: String = this.desire,
         motivation: String? = this.motivation,
         coveredArcSections: List<CharacterArcSection.Id> = this.coveredArcSections
     ) = CharacterInScene(characterId, sceneId, characterName, roleInScene, desire, motivation, coveredArcSections)
@@ -33,6 +34,8 @@ class CharacterInScene(
     internal fun withName(name: String): CharacterInScene = copy(characterName = name)
 
     internal fun withRoleInScene(roleInScene: RoleInScene?) = copy(roleInScene = roleInScene)
+
+    internal fun withDesire(desire: String) = copy(desire = desire)
 
     internal fun withMotivation(motivation: String?) = copy(motivation = motivation)
 

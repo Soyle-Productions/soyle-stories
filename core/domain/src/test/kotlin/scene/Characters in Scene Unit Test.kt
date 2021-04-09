@@ -4,6 +4,7 @@ import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.scene.events.CharacterAssignedRoleInScene
+import com.soyle.stories.domain.scene.events.CharacterDesireInSceneChanged
 import com.soyle.stories.domain.scene.events.CharacterRoleInSceneCleared
 import com.soyle.stories.domain.scene.events.SceneEvent
 import org.junit.jupiter.api.*
@@ -155,6 +156,45 @@ class `Characters in Scene Unit Test` {
                 sceneUpdate.event.events.size.mustEqual(2)
             }
 
+        }
+
+    }
+
+    @Nested
+    inner class `Character Desire in Scene`
+    {
+
+        @Test
+        fun `characters have no desire when first included`() {
+            scene.withCharacterIncluded(character).scene
+                .includedCharacters.getOrError(character.id)
+                .desire.mustEqual("")
+        }
+
+        @Test
+        fun `cannot update character desire if character is not included`() {
+            val error = assertThrows<SceneDoesNotIncludeCharacter> {
+                scene.withDesireForCharacter(character.id, "New Desire")
+            }
+            error.sceneId.mustEqual(scene.id)
+            error.characterId.mustEqual(character.id)
+        }
+
+        @Test
+        fun `can update included character's desire`() {
+            val update = scene.withCharacterIncluded(character).scene
+                .withDesireForCharacter(character.id, "New Desire")
+            update as Updated
+            update.event.mustEqual(CharacterDesireInSceneChanged(scene.id, character.id, "New Desire"))
+            update.scene.includedCharacters.getOrError(character.id).desire.mustEqual("New Desire")
+        }
+
+        @Test
+        fun `passing in same desire should return no update`() {
+            val update = scene.withCharacterIncluded(character).scene
+                .withDesireForCharacter(character.id, "New Desire").scene
+                .withDesireForCharacter(character.id, "New Desire")
+            update as WithoutChange
         }
 
     }
