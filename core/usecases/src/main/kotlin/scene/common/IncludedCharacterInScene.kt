@@ -11,6 +11,7 @@ data class IncludedCharacterInScene(
   val characterId: Character.Id,
   val characterName: String,
   val roleInScene: RoleInScene?,
+  val desire: String,
   val motivation: String?,
   val inheritedMotivation: InheritedMotivation?,
   val coveredArcSections: List<CoveredArcSectionInScene>

@@ -1,6 +1,5 @@
 package com.soyle.stories.domain.scene
 
-
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArcSection
 import com.soyle.stories.domain.entities.Entity
@@ -28,6 +27,7 @@ class Scene private constructor(
     val conflict: SceneConflict,
     val resolution: SceneResolution,
 
+    @Suppress("UNUSED_PARAMETER")
     defaultConstructorMarker: Unit = Unit
 ) : Entity<Scene.Id> {
 
@@ -131,7 +131,9 @@ class Scene private constructor(
         resolution,
         defaultConstructorMarker = Unit
     )
+
     companion object {
+
         private val equalityProps
             get() = listOf(
                 Scene::id,
@@ -209,12 +211,15 @@ class Scene private constructor(
         )
     }
 
-    fun withRoleForCharacter(characterId: Character.Id, roleInScene: RoleInScene?): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>> {
+    fun withRoleForCharacter(
+        characterId: Character.Id,
+        roleInScene: RoleInScene?
+    ): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>> {
         val characterInScene = includedCharacters.getOrError(characterId)
         if (characterInScene.roleInScene == roleInScene) return noUpdate()
 
         val newCharacter = characterInScene.withRoleInScene(roleInScene)
-        val event = when(roleInScene) {
+        val event = when (roleInScene) {
             null -> CharacterRoleInSceneCleared(id, characterId)
             else -> CharacterAssignedRoleInScene(id, characterId, roleInScene)
         }
@@ -227,6 +232,15 @@ class Scene private constructor(
         return Updated(
             copy(charactersInScene = charactersInScene.minus(characterId).plus(newCharacter)),
             CompoundEvent(listOf(event))
+        )
+    }
+
+    fun withDesireForCharacter(characterId: Character.Id, desire: String): SceneUpdate<CharacterDesireInSceneChanged> {
+        val includedCharacter = includedCharacters.getOrError(characterId)
+        if (includedCharacter.desire == desire) return noUpdate()
+        return Updated(
+            copy(charactersInScene = charactersInScene.minus(characterId).plus(includedCharacter.withDesire(desire))),
+            CharacterDesireInSceneChanged(id, characterId, desire)
         )
     }
 
@@ -327,10 +341,12 @@ class Scene private constructor(
     fun noUpdate() = WithoutChange(this)
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
+
         override fun toString(): String = "Scene($uuid)"
     }
 
     class CharacterMotivation(val characterId: Character.Id, val characterName: String, val motivation: String?) {
+
         fun isInherited() = motivation == null
     }
 
@@ -347,6 +363,7 @@ class Scene private constructor(
 
     inner class TrackedSymbols private constructor(private val symbolsById: Map<Symbol.Id, TrackedSymbol>) :
         Collection<TrackedSymbol> by symbolsById.values {
+
         internal constructor() : this(symbols.associateBy { it.symbolId })
 
         fun isSymbolTracked(symbolId: Symbol.Id): Boolean = symbolsById.containsKey(symbolId)

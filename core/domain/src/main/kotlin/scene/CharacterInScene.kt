@@ -9,12 +9,13 @@ class CharacterInScene(
     val sceneId: Scene.Id,
     val characterName: String,
     val roleInScene: RoleInScene?,
+    val desire: String,
     val motivation: String?,
     val coveredArcSections: List<CharacterArcSection.Id>
 ) : Entity<Character.Id> {
 
     constructor(sceneId: Scene.Id, id: Character.Id, name: String) : this(
-        id, sceneId, name, null, null, emptyList()
+        id, sceneId, name, null, "", null, emptyList()
     )
 
     val characterId
@@ -23,15 +24,18 @@ class CharacterInScene(
     private fun copy(
         characterName: String = this.characterName,
         roleInScene: RoleInScene? = this.roleInScene,
+        desire: String = this.desire,
         motivation: String? = this.motivation,
         coveredArcSections: List<CharacterArcSection.Id> = this.coveredArcSections
-    ) = CharacterInScene(characterId, sceneId, characterName, roleInScene, motivation, coveredArcSections)
+    ) = CharacterInScene(characterId, sceneId, characterName, roleInScene, desire, motivation, coveredArcSections)
 
 
 
     internal fun withName(name: String): CharacterInScene = copy(characterName = name)
 
     internal fun withRoleInScene(roleInScene: RoleInScene?) = copy(roleInScene = roleInScene)
+
+    internal fun withDesire(desire: String) = copy(desire = desire)
 
     internal fun withMotivation(motivation: String?) = copy(motivation = motivation)
 

@@ -22,6 +22,8 @@ import com.soyle.stories.scene.charactersInScene.listAvailableCharacters.ListAva
 import com.soyle.stories.scene.charactersInScene.listCharactersInScene.ListCharactersInSceneController
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
+import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
+import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 
@@ -35,6 +37,7 @@ class SceneCharactersController private constructor(
     private val removeCharacterFromStoryEventController: RemoveCharacterFromSceneController,
     private val setMotivationForCharacterInSceneController: SetMotivationForCharacterInSceneController,
     private val assignRoleToCharacterInSceneController: AssignRoleToCharacterInSceneController,
+    private val setCharacterDesireInSceneController: SetCharacterDesireInSceneController,
     private val presenter: SceneCharactersPresenter
 ) : SceneCharactersViewListener {
 
@@ -48,6 +51,7 @@ class SceneCharactersController private constructor(
         val removeCharacterFromSceneController: RemoveCharacterFromSceneController
         val setMotivationForCharacterInSceneController: SetMotivationForCharacterInSceneController
         val assignRoleToCharacterInSceneController: AssignRoleToCharacterInSceneController
+        val setCharacterDesireInSceneController: SetCharacterDesireInSceneController
 
         val includedCharacterInSceneNotifier: Notifier<IncludedCharacterInSceneReceiver>
         val removedCharacterFromSceneNotifier: Notifier<RemovedCharacterFromSceneReceiver>
@@ -55,6 +59,7 @@ class SceneCharactersController private constructor(
         val characterArcSectionsCoveredBySceneNotifier: Notifier<CharacterArcSectionsCoveredBySceneReceiver>
         val characterArcSectionUncoveredInSceneNotifier: Notifier<CharacterArcSectionUncoveredInSceneReceiver>
         val characterRoleInSceneChangedNotifier: Notifier<CharacterRoleInSceneChangedReceiver>
+        val characterDesireInSceneChangedNotifier: Notifier<CharacterDesireInSceneChangedReceiver>
     }
 
     constructor(
@@ -70,6 +75,7 @@ class SceneCharactersController private constructor(
         dependencies.removeCharacterFromSceneController,
         dependencies.setMotivationForCharacterInSceneController,
         dependencies.assignRoleToCharacterInSceneController,
+        dependencies.setCharacterDesireInSceneController,
         SceneCharactersPresenter(view).apply {
             listensTo(dependencies.includedCharacterInSceneNotifier)
             listensTo(dependencies.removedCharacterFromSceneNotifier)
@@ -77,6 +83,7 @@ class SceneCharactersController private constructor(
             listensTo(dependencies.characterArcSectionsCoveredBySceneNotifier)
             listensTo(dependencies.characterArcSectionUncoveredInSceneNotifier)
             listensTo(dependencies.characterRoleInSceneChangedNotifier)
+            listensTo(dependencies.characterDesireInSceneChangedNotifier)
         }
     )
 
@@ -149,6 +156,11 @@ class SceneCharactersController private constructor(
     override fun clearRole(characterId: Character.Id) {
         val sceneId = this.sceneId ?: return
         assignRoleToCharacterInSceneController.clearRole(sceneId, characterId)
+    }
+
+    override fun setDesire(characterId: Character.Id, desire: String) {
+        val sceneId = this.sceneId ?: return
+        setCharacterDesireInSceneController.setDesire(sceneId, characterId, desire)
     }
 
     override fun setMotivation(characterId: Character.Id, motivation: String) {

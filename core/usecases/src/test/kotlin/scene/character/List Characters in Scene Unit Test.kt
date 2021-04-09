@@ -59,6 +59,17 @@ class `List Characters in Scene Unit Test` {
         }
 
         @Test
+        fun `should output character desire`() {
+            val firstCharacter = scene.includedCharacters.getOrError(includedCharacters.first().id)
+            sceneRepository.givenScene(scene.withDesireForCharacter(firstCharacter.id, "Desire 1482").scene)
+            val result = listCharactersInScene()
+            result.charactersInScene.forEach {
+                if (it.characterId == firstCharacter.id) it.desire.mustEqual("Desire 1482")
+                else it.desire.mustEqual("")
+            }
+        }
+
+        @Test
         fun `should output character motivation`() {
             val firstCharacter = scene.includedCharacters.getOrError(includedCharacters.first().id)
             sceneRepository.givenScene(scene.withMotivationForCharacter(firstCharacter.id, "Motivation 832"))

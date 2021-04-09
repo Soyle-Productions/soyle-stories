@@ -16,6 +16,8 @@ interface SceneCharactersViewListener {
     fun assignRole(characterId: Character.Id, role: RoleInScene)
     fun clearRole(characterId: Character.Id)
 
+    fun setDesire(characterId: Character.Id, desire: String)
+
     fun setMotivation(characterId: Character.Id,motivation: String)
     fun resetMotivation(characterId: Character.Id)
 

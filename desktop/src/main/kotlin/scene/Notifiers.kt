@@ -15,6 +15,8 @@ import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.Include
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludedCharacterInSceneReceiver
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
+import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedNotifier
+import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedNotifier
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedReceiver
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
@@ -73,6 +75,9 @@ object Notifiers {
             }
             provide(CharacterRoleInSceneChangedReceiver::class) {
                 CharacterRoleInSceneChangedNotifier()
+            }
+            provide(CharacterDesireInSceneChangedReceiver::class) {
+                CharacterDesireInSceneChangedNotifier()
             }
         }
     }

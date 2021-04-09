@@ -41,6 +41,8 @@ import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLo
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneOutput
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneOutput
+import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
+import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneOutput
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
 import com.soyle.stories.scene.renameScene.RenameSceneNotifier
@@ -85,6 +87,8 @@ import com.soyle.stories.usecase.scene.location.removeLocationFromScene.RemoveLo
 import com.soyle.stories.usecase.scene.location.removeLocationFromScene.RemoveLocationFromSceneUseCase
 import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
+import com.soyle.stories.usecase.scene.character.setDesire.SetCharacterDesireInScene
+import com.soyle.stories.usecase.scene.character.setDesire.SetCharacterDesireInSceneUseCase
 import com.soyle.stories.usecase.scene.renameScene.RenameScene
 import com.soyle.stories.usecase.scene.renameScene.RenameSceneUseCase
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
@@ -113,6 +117,7 @@ object UseCases {
             reorderScene()
             coverCharacterArcSectionsInScene()
             assignRoleToCharacter()
+            setCharacterDesireInScene()
             listOptionsToReplaceMention()
             synchronizeTrackedSymbolsWithProse()
             listSymbolsInScene()
@@ -360,6 +365,21 @@ object UseCases {
             AssignRoleToCharacterInSceneOutput(get())
         }
     }
+
+    private fun InProjectScope.setCharacterDesireInScene() {
+        provide<SetCharacterDesireInScene> {
+            SetCharacterDesireInSceneUseCase(get())
+        }
+
+        provide {
+            SetCharacterDesireInSceneController(applicationScope.get(), get(), get())
+        }
+        provide<SetCharacterDesireInScene.OutputPort> {
+            SetCharacterDesireInSceneOutput(get())
+        }
+    }
+
+
 
     private fun InProjectScope.listOptionsToReplaceMention() {
         provide<ListOptionsToReplaceMentionController> {

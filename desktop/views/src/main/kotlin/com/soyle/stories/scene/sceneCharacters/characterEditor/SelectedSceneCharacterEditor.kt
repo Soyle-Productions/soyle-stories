@@ -206,6 +206,7 @@ class SelectedSceneCharacterEditor : View() {
     @ViewBuilder
     private fun VBox.desireField() {
         section("Desire in Scene") {
+            addClass("desire")
             textfield {
                 textProperty().bindBidirectional(props.desire)
                 controlledBy(logic::desire)
