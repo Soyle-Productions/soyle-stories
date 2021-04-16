@@ -15,6 +15,7 @@ allprojects {
 
 application {
     mainClassName = "com.soyle.stories.desktop.config.soylestories.MainKt"
+    applicationName = "Soyle Stories"
 }
 
 
@@ -49,9 +50,34 @@ runtime {
         )
     )
 
-    targetPlatform("linux", System.getenv("JAVA_HOME"))
-    targetPlatform("mac", System.getenv("JAVA_HOME"))
+    //targetPlatform("linux", System.getenv("JAVA_HOME"))
+    //targetPlatform("mac", System.getenv("JAVA_HOME"))
     targetPlatform("win", System.getenv("JAVA_HOME"))
+
+    jpackage {
+        resourceDir = File("$buildDir/resources")
+        imageOptions = listOf(
+            "--icon", "\"Soyle Stories.ico\""
+        )
+        imageName = application.applicationName
+        installerName = application.applicationName
+        installerOptions = listOf(
+            "--win-menu",
+            "--win-shortcut",
+            "--win-dir-chooser",
+            "--win-menu-group", "Soyle Studio",
+            "--description", "\"Manage your story with ease.\"",
+            "--vendor", "\"Soyle Productions\""
+        )
+    }
+}
+
+tasks.getByName("jpackageImage").doLast {
+    copy {
+        from("src/main/resources")
+        include("Soyle Stories.ico")
+        into("$buildDir/jpackage/${application.applicationName}")
+    }
 }
 
 tasks.withType<CreateStartScripts> {

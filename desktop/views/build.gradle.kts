@@ -45,6 +45,7 @@ configurations {
 javafx {
     version = "14"
     modules = listOf("javafx.controls", "javafx.fxml"/*, 'javafx.web', 'javafx.swing'*/)
+    configuration = "compileOnly"
 }
 
 val javaFXOptions = convention.findByType<JavaFXOptions>()
