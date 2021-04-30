@@ -3,6 +3,8 @@ package com.soyle.stories.desktop.config.character
 import com.soyle.stories.character.createArcSection.AddSectionToCharacterArcOutput
 import com.soyle.stories.character.createArcSection.CreateArcSectionController
 import com.soyle.stories.character.createArcSection.CreateArcSectionControllerImpl
+import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
+import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantOutput
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
@@ -36,6 +38,8 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentOutput
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArcUseCase
+import com.soyle.stories.usecase.character.nameVariant.AddCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.AddCharacterNameVariantUseCase
 
 object UseCases {
 
@@ -98,6 +102,8 @@ object UseCases {
             removeCharacterFromStory()
             viewBaseStoryStructure()
 
+            // name variants
+            addNameVariant()
         }
     }
 
@@ -145,6 +151,16 @@ object UseCases {
         provide<ViewBaseStoryStructure> {
             ViewBaseStoryStructureUseCase(get(), get())
         }
+    }
+
+    private fun InProjectScope.addNameVariant() {
+        provide {
+            AddCharacterNameVariantController(applicationScope.get(), get(), get())
+        }
+        provide<AddCharacterNameVariant> {
+            AddCharacterNameVariantUseCase(get())
+        }
+        provide<AddCharacterNameVariant.OutputPort> { AddCharacterNameVariantOutput() }
     }
 
 }
