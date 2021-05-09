@@ -395,7 +395,7 @@ object UseCases {
     }
 
     private fun InProjectScope.synchronizeTrackedSymbolsWithProse() {
-        provide {
+        keepInScope {
             SynchronizeTrackedSymbolsWithProseController(get(), get()).also {
                 it listensTo get<ContentReplacedNotifier>()
             }
