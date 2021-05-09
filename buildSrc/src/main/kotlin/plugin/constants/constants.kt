@@ -2,7 +2,7 @@ package plugin.constants
 
 import org.gradle.kotlin.dsl.application
 
-const val kotlinVersion = "1.4.30"
+const val kotlinVersion = "1.5.0"
 
 const val javaVersion = "14"
 
