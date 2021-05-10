@@ -1,5 +1,6 @@
 package com.soyle.stories.project.dialogs
 
+import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogView
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve

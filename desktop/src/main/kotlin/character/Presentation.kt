@@ -1,16 +1,23 @@
 package com.soyle.stories.desktop.config.character
 
+import com.soyle.stories.character.create.CreateCharacterFlow
+import com.soyle.stories.character.delete.DeleteCharacterFlow
+import com.soyle.stories.character.delete.DeleteCharacterForm
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
+import com.soyle.stories.character.list.CharacterListState
+import com.soyle.stories.character.rename.RenameCharacterFlow
+import com.soyle.stories.character.rename.RenameCharacterForm
 import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.characterarc.baseStoryStructure.*
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueNotifier
 import com.soyle.stories.characterarc.characterList.CharacterListController
-import com.soyle.stories.characterarc.characterList.CharacterListModel
 import com.soyle.stories.characterarc.characterList.CharacterListPresenter
 import com.soyle.stories.characterarc.characterList.CharacterListViewListener
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
+import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
+import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterForm
 import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogController
 import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogState
 import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogViewListener
@@ -32,8 +39,11 @@ object Presentation {
     init {
         scoped<ProjectScope> {
 
+            createCharacterFlow()
+            createCharacterDialog()
             characterList()
-            deleteCharacterDialog()
+            renameCharacterFlow()
+            deleteCharacterFlow()
 
             createCharacterArcSectionDialog()
 
@@ -42,9 +52,21 @@ object Presentation {
         baseStoryStructureTool()
     }
 
+    private fun InProjectScope.createCharacterFlow() {
+        provide<CreateCharacterFlow> {
+            com.soyle.stories.character.create.CreateCharacterForm.InDialog(this)
+        }
+    }
+
+    private fun InProjectScope.createCharacterDialog() {
+        provide<CreateCharacterDialog> {
+            CreateCharacterForm.Dialog(this)
+        }
+    }
+
     private fun InProjectScope.characterList() = provide<CharacterListViewListener> {
         val characterListPresenter = CharacterListPresenter(
-            get<CharacterListModel>(),
+            get<CharacterListState>(),
             get()
         )
 
@@ -68,6 +90,18 @@ object Presentation {
             get(),
             get()
         )
+    }
+
+    private fun InProjectScope.renameCharacterFlow() {
+        provide<RenameCharacterFlow> {
+            RenameCharacterForm.InDialog(this)
+        }
+    }
+
+    private fun InProjectScope.deleteCharacterFlow() {
+        provide<DeleteCharacterFlow> {
+            DeleteCharacterForm.InDialog(this)
+        }
     }
 
     private fun InProjectScope.deleteCharacterDialog()

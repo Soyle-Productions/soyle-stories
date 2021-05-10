@@ -10,7 +10,7 @@ Feature: Manage Characters
     Given I am creating a character
     When I create a character named "Bob"
     Then I should not be creating a character
-    And a new character named "Bob" should have been created
+    And a character named "Bob" should have been created
 
   Scenario: Rename a Character
     Given I have created a character named "Bob"

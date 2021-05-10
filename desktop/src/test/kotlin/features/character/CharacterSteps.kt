@@ -1,18 +1,22 @@
 package com.soyle.stories.desktop.config.features.character
 
+import com.soyle.stories.character.rename.RenameCharacterForm
 import com.soyle.stories.desktop.config.drivers.character.*
+import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.ScenarioContext
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.drivers.theme.givenMoralArgumentToolHasBeenOpenedForTheme
 import com.soyle.stories.desktop.config.features.soyleStories
-import com.soyle.stories.desktop.view.character.characterList.CharacterListAssertions
+import com.soyle.stories.desktop.view.character.list.CharacterListAssertions
+import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.NonBlankString
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import java.util.*
 
@@ -82,13 +86,26 @@ class CharacterSteps : En {
                 driver.givenCharacterHasAnArcNamed(character, UUID.randomUUID().toString())
             }
         }
+        Given("I am creating a character") {
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCreateCharacterDialogHasBeenOpened()
+        }
+        Given("I am creating a name variant for the {character}") { character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCreateCharacterNameDialogHasBeenOpenedFor(character)
+        }
+        Given("I have created a name variant of {string} for the {character}") { variant: String, character: Character ->
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .givenCharacterHasANameVariant(character, variant)
+        }
     }
 
     private fun whens() {
         When("I rename the {character} to {string}") { character: Character, newName: String ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCharacterListToolHasBeenOpened()
-                .renameCharacterTo(character.id, newName)
+                .givenRenameCharacterDialogHasBeenOpened(character.id)
+                .renameCharacterTo(newName)
         }
         When("I want to delete the {character}") { character: Character ->
             soyleStories.getAnyOpenWorkbenchOrError()
@@ -107,14 +124,40 @@ class CharacterSteps : En {
                 .givenDeleteCharacterDialogHasBeenOpened(character.id)
                 .confirmDelete()
         }
+        When("I create a character named {string}") { name: String ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCreateCharacterDialogHasBeenOpened()
+                .createCharacterWithName(name)
+        }
+        When("I create a character without a name") {
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCreateCharacterDialogHasBeenOpened()
+                .createCharacterWithName("")
+        }
+        When("I create a name variant of {string} for the {character}") { variant: String, character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCreateCharacterNameDialogHasBeenOpenedFor(character)
+                .createNameVariant(variant)
+        }
     }
 
     private fun thens() {
+        Then("I should still be creating a character") {
+            getCreateCharacterDialogOrError()
+        }
+        Then("I should not be creating a character") {
+            assertNull(getCreateCharacterDialog())
+        }
         Then(
             "a character named {string} should have been created"
         ) { name: String ->
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .getCharacterByNameOrError(name)
+        }
+        Then("a new character should not have been created") {
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .getCharacterCountInProject()
+                .let { assertEquals(0, it) }
         }
         Then("I should be prompted to confirm deleting the {character}") { character: Character ->
             getDeleteCharacterDialogOrError()
@@ -197,6 +240,14 @@ class CharacterSteps : En {
             CharacterListAssertions.assertThat(workbench.givenCharacterListToolHasBeenOpened()) {
                 characterHasName(character.id, expectedName)
             }
+        }
+        Then("I should still be renaming the {character}") { character: Character ->
+            assertNotNull(robot.getOpenDialog<RenameCharacterForm>())
+        }
+        Then(
+            "the {character} should still have the display name of {string}"
+        ) { character: Character, expectedName: String ->
+            assertEquals(expectedName, character.name.value)
         }
     }
 }

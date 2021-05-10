@@ -11,22 +11,37 @@ import javafx.beans.value.ObservableValue
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ToggleButton
 import tornadofx.booleanProperty
+import tornadofx.onChange
 import tornadofx.onChangeOnce
 import tornadofx.toProperty
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
 /**
+ * Listens to changes to the [source] until [this] is GC'd
+ */
+fun <Scope: Any, T : Any> Scope.scopedListener(source: ObservableValue<T?>, listener: Scope.(T?) -> Unit)
+{
+    val thisStr = this.toString()
+    val thisRef = WeakReference(this)
+    listener(source.value)
+    source.onChangeUntil({ thisRef.get() == null }) {
+        val ref = thisRef.get()
+        if (ref == null) {
+            println("$thisStr was GC'd and thus did not receive the update of $it")
+            return@onChangeUntil
+        }
+        ref.listener(it)
+    }
+}
+
+/**
  * listens to the source observable value until the receiver is GC'd.
  */
-fun <T : Any, R : Any> Any.boundProperty(source: ObservableValue<T?>, selector: T?.() -> R?): Property<R?>
+fun <T : Any, R : Any> Any.boundProperty(source: ObservableValue<T?>, selector: (T?) -> R?): Property<R?>
 {
-    val thisRef = WeakReference(this)
-    val prop = SimpleObjectProperty(source.value.selector())
-    source.onChangeUntil({ thisRef.get() == null }) {
-        if (thisRef.get() == null) return@onChangeUntil
-        prop.value = it.selector()
-    }
+    val prop = SimpleObjectProperty<R>()
+    scopedListener(source) { prop.value = selector(it) }
     return prop
 }
 
@@ -34,23 +49,22 @@ fun <T : Any, R : Any> Any.boundProperty(source: ObservableValue<T?>, selector: 
  * Allows the selection property of a selectable button to be bound to an observable boolean without causing bound
  * errors when the user clicks on the button.
  */
-fun ToggleButton.bindSelection(property: ObservableValue<Boolean>)
-{
-    isSelected = property.value
-    val thisRef = WeakReference(this)
-    property.onChangeOnce {
-        thisRef.get()?.bindSelection(property)
-    }
-}
+fun ToggleButton.bindSelection(property: ObservableValue<Boolean>) = selectedProperty().softBind(property) { it }
+
 /**
  * Allows the selection property of a selectable button to be bound to an observable boolean without causing bound
  * errors when the user clicks on the button.
  */
-fun CheckBox.bindSelection(property: ObservableValue<Boolean>)
+fun CheckBox.bindSelection(property: ObservableValue<Boolean>) = selectedProperty().softBind(property) { it }
+
+/**
+ * As long as the receiver has not been GC'd, changes to the [source] will trigger an update using the supplied [converter]
+ */
+fun <T, R> Property<T>.softBind(source: ObservableValue<R>, converter: (R?) -> T)
 {
-    isSelected = property.value
+    value = converter(source.value)
     val thisRef = WeakReference(this)
-    property.onChangeOnce {
-        thisRef.get()?.bindSelection(property)
+    source.onChangeOnce {
+        thisRef.get()?.softBind(source, converter)
     }
 }

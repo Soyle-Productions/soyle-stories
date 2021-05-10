@@ -1,0 +1,82 @@
+package com.soyle.stories.common.components.surfaces
+
+import com.soyle.stories.common.ColorStyles
+import javafx.scene.effect.DropShadow
+import javafx.scene.effect.Effect
+import javafx.scene.paint.Color
+import tornadofx.*
+import kotlin.math.pow
+import kotlin.math.round
+
+class SurfaceStyles : Stylesheet() {
+    companion object {
+
+        /**
+         * valid indices: 0-24
+         *
+         * example: ```elevation[0];  elevation[24]```
+         */
+        val elevation = List(25) { CssRule.c("elevation${it}") }
+        val relativeElevation = List(25) { CssRule.pc("relativeElevation${it}") }
+
+        val dropShadowColor = Color.web("black", 0.20)
+        fun dropShadow(elevation: Double) = DropShadow(elevation, 0.0, elevation, dropShadowColor)
+
+        fun red(elevation: Double) = round(205.0 * (elevation.pow(0.0679)))
+        fun green(elevation: Double) = round(199.0 * (elevation.pow(0.0756)))
+        fun blue(elevation: Double) = round(198.0 * (elevation.pow(0.0779)))
+
+        fun lightBackground(elevation: Double) = Color.rgb(red(elevation).toInt(), green(elevation).toInt(), blue(elevation).toInt())
+
+        init {
+            importStylesheet<SurfaceStyles>()
+        }
+    }
+
+    init {
+        elevation.withIndex().forEach { (index, elevationStyle) ->
+            if (index == 0) return@forEach
+            elevationStyle {
+                val calculatedBackgroundColor = lightBackground(index.toDouble() + 1)
+                backgroundColor = multi(calculatedBackgroundColor)
+
+                treeCell {
+                    backgroundColor = multi(Color.TRANSPARENT)
+                }
+                treeCell and hover {
+                    textFill = Color.BLACK
+                    backgroundColor = multi(ColorStyles.lightHighlightColor)
+                    effect = dropShadow(2.0)
+                    graphicContainer {
+                        fill = Color.BLACK
+                    }
+                    and(empty) {
+                        backgroundColor = multi(Color.TRANSPARENT)
+                        //unsafe("-fx-effect", raw("none"))
+                    }
+                }
+                treeCell and selected {
+                    textFill = ColorStyles.lightSelectionTextColor
+                    graphicContainer {
+                        fill = ColorStyles.lightSelectionTextColor
+                    }
+                    backgroundColor = multi(ColorStyles.lightSelectionColor)
+                }
+            }
+        }
+        elevation[0] {
+            backgroundColor = multi(Color.TRANSPARENT)
+        }
+        relativeElevation.withIndex().forEach { (index, relativeElevation) ->
+            relativeElevation {
+                if (index == 0) {
+                    borderColor = multi(box(Color.rgb(0, 0, 0, 0.12)))
+                    borderWidth = multi(box(1.px))
+                } else {
+                    effect = dropShadow(index.toDouble())
+                }
+            }
+        }
+    }
+
+}

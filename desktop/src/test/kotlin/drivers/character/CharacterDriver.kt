@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.config.drivers.character
 
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
+import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
@@ -39,6 +40,12 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
         return allCharacters.find { it.name.value == characterName }
     }
 
+    fun getCharacterCountInProject(): Int {
+        val characterRepository = projectScope.get<CharacterRepository>()
+        val projectId = Project.Id(projectScope.projectId)
+        return runBlocking { characterRepository.listCharactersInProject(projectId) }.size
+    }
+
     fun getCharacterAtOnePointNamed(formerName: String): Character? {
         val characterRepository = projectScope.get<CharacterRepository>()
         val projectId = Project.Id(projectScope.projectId)
@@ -47,10 +54,29 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
         return characterNameHistory.getValue(formerName).lastOrNull()?.let { charactersById[it] }
     }
 
-    fun createCharacterWithName(characterName: NonBlankString): Character {
+    private fun createCharacterWithName(characterName: NonBlankString): Character {
         projectScope.get<BuildNewCharacterController>()
-            .createCharacter(characterName) { throw it }
+            .createCharacter(characterName)
         return getCharacterByNameOrError(characterName.value)
+    }
+
+    fun givenCharacterHasANameVariant(character: Character, variant: String): NonBlankString {
+        return getCharacterNameVariant(character.id, variant) ?: createNameVariant(character.id, variant).run {
+            getCharacterNameVariantOrError(character.id, variant)
+        }
+    }
+
+    fun getCharacterNameVariantOrError(characterId: Character.Id, variant: String): NonBlankString =
+        getCharacterNameVariant(characterId, variant) ?: error("$characterId does not have name variant $variant")
+
+    fun getCharacterNameVariant(characterId: Character.Id, variant: String): NonBlankString? = runBlocking {
+        projectScope.get<CharacterRepository>()
+            .getCharacterById(characterId)
+            ?.otherNames?.find { it.value == variant }
+    }
+
+    fun createNameVariant(characterId: Character.Id, variant: String) {
+        projectScope.get<AddCharacterNameVariantController>().addCharacterNameVariant(characterId, NonBlankString.create(variant)!!)
     }
 
     fun givenCharacterHasAnArcNamed(character: Character, name: String): CharacterArc =

@@ -8,7 +8,11 @@ import javafx.scene.image.ImageView
 import tornadofx.*
 import kotlin.reflect.KProperty
 import com.soyle.stories.common.getValue
+import com.soyle.stories.common.onChangeWithCurrent
 import javafx.beans.value.ObservableValue
+import javafx.scene.layout.Pane
+import javafx.scene.layout.StackPane
+import javafx.scene.text.Text
 import java.lang.ref.WeakReference
 
 fun characterIcon(sourceProperty: ObservableValue<String?>): Node {
@@ -20,7 +24,7 @@ fun characterIcon(sourceProperty: ObservableValue<String?>): Node {
         } catch (e: Exception) {
             defaultIcon()
         }
-    }
+    }.let { StackPane(it) }
     node.addClass(CharacterArcStyles.characterIcon)
     val nodeRef = WeakReference(node)
     sourceProperty.onChangeOnce {

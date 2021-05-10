@@ -1,5 +1,6 @@
 package com.soyle.stories.layout.config.fixed
 
+import com.soyle.stories.character.list.CharacterListView
 import com.soyle.stories.di.get
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
@@ -23,7 +24,8 @@ object CharacterList : ToolConfig<CharacterList>, FixedTool() {
 	override fun getTabConfig(tool: ToolViewModel, type: CharacterList): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-				val list = projectScope.get<com.soyle.stories.characterarc.characterList.CharacterList>()
+				val list = projectScope.get<com.soyle.stories.character.list.CharacterListView>()
+				list.title = getViewModelConfig(type).toolName()
 				return tabPane.tab(list)
 			}
 		}
