@@ -15,7 +15,7 @@ class CharacterListAssertions private constructor(private val access: CharacterL
 
     fun characterHasName(characterId: Character.Id, expectedName: String)
     {
-        assertEquals(expectedName, access.getCharacterItemOrError(characterId).item.characterName)
+        assertEquals(expectedName, access.getCharacterItemOrError(characterId).characterName)
     }
 
     fun characterArcHasName(characterId: Character.Id, themeId: Theme.Id, arcId: CharacterArc.Id, expectedName: String)

@@ -49,14 +49,15 @@ class CharacterItemGrid : Fragment() {
     private fun Node.characterCardBehavior(characterItem: CharacterListItemViewModel) {
         userData = characterItem
 
+        val selectableCharacterItem = CharacterListState.SelectableCharacterItem(characterItem.item)
         val selectedProperty = makeSelectable(focusTraversable = true)
         surfaceRelativeElevationProperty().bind(hoverProperty().integerBinding { if (it == true) 2 else 0 })
-        selectedProperty.softBind(viewModel.selectedCharacterItem) { it.isSameCharacterAs(characterItem) }
-        selectedProperty.onChange { if (it) viewModel.selectedCharacterItem.set(characterItem) }
+        selectedProperty.softBind(viewModel.selectedCharacterItem) { it?.isSameSelectableAs(selectableCharacterItem) }
+        selectedProperty.onChange { if (it) viewModel.selectedCharacterItem.set(selectableCharacterItem) }
 
         applyContextMenu(characterContextMenu) {
-            viewModel.selectedCharacterItem.set(characterItem)
-            characterContextMenu.items.setAll(characterOptions(scope, characterItem))
+            viewModel.selectedCharacterItem.set(selectableCharacterItem)
+            characterContextMenu.items.setAll(characterOptions(scope, characterItem.item))
         }
     }
 }

@@ -154,7 +154,8 @@ class CharacterListView : View() {
 
             scopedListener(state.selectedCharacterItem) {
                 when (it) {
-                    is CharacterListItemViewModel -> items.setAll(characterOptions(scope, it))
+                    is CharacterListState.SelectableCharacterItem -> items.setAll(characterOptions(scope, it.characterItem))
+                    is CharacterListState.SelectableArcItem -> items.setAll(characterArcOptions(scope, it.arcItem))
                     else -> items.clear()
                 }
             }

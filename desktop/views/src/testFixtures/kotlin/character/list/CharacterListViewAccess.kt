@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.view.character.list
 import com.soyle.stories.character.list.CharacterListState
 import com.soyle.stories.character.list.CharacterListView
 import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.characterList.CharacterListItemViewModel
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
@@ -19,6 +20,7 @@ import tornadofx.getChildList
 class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
 
     companion object {
+
         fun CharacterListView.access() = CharacterListViewAccess(this)
         fun <T> CharacterListView.drive(access: CharacterListViewAccess.() -> T): T {
             var result: T? = null
@@ -46,6 +48,9 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
     private val MenuButton.createNewMenu: Menu?
         get() = items.find { it.id == "create_new" } as? Menu
 
+    val MenuButton.newCharacterArcOption: MenuItem?
+        get() = createNewMenu?.items?.find { it.id == "create_new_arc" }
+
     val MenuButton.createNewNameOption: MenuItem?
         get() = createNewMenu?.items?.find { it.id == "create_new_name" }
 
@@ -55,52 +60,51 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
     val characterItemLayout: Region?
         get() = from(view.root).lookup("#character_item_layout").queryAll<Region>().firstOrNull()
 
-    fun Region.selectItem(characterListItemViewModel: CharacterListItemViewModel)
-    {
-        view.scope.get<CharacterListState>().selectedCharacterItem.set(characterListItemViewModel)
-    }
-
     private val tree: TreeView<Any?>?
         get() = characterItemLayout as? TreeView<Any?>
 
     private val grid: FlowPane?
         get() = characterItemLayout as? FlowPane
 
-    fun getCharacterItemOrError(characterId: Character.Id) = getCharacterItem(characterId) ?: error("Character not listed $characterId")
-    fun getCharacterItem(characterId: Character.Id): CharacterListItemViewModel? {
+    fun getCharacterItemOrError(characterId: Character.Id) =
+        getCharacterItem(characterId) ?: error("Character not listed $characterId")
+
+    fun getCharacterItem(characterId: Character.Id): CharacterItemViewModel? {
         val tree = tree
         if (tree != null) {
             return tree.root.children.asSequence().mapNotNull {
-                it.value as? CharacterListItemViewModel
-            }.find { it.item.characterId == characterId.uuid.toString() }
+                (it.value as? CharacterListState.SelectableCharacterItem)?.characterItem
+            }.find { it.characterId == characterId.uuid.toString() }
         }
         val grid = grid
         if (grid != null) {
             return grid.children.asSequence().mapNotNull {
-                it.userData as? CharacterListItemViewModel
-            }.find { it.item.characterId == characterId.uuid.toString() }
+                (it.userData as? CharacterListState.SelectableCharacterItem)?.characterItem
+            }.find { it.characterId == characterId.uuid.toString() }
         }
         return null
     }
 
-    fun getArcItem(characterId: Character.Id, themeId: Theme.Id): CharacterArcItemViewModel?
-    {
+    fun getArcItemOrError(characterId: Character.Id, themeId: Theme.Id) =
+        getArcItem(characterId, themeId) ?: error("Character arc not listed $characterId, $themeId")
+
+    fun getArcItem(characterId: Character.Id, themeId: Theme.Id): CharacterArcItemViewModel? {
         val tree = tree
         if (tree != null) {
             return tree.root.children.asSequence().find {
-                val value = it.value as? CharacterListItemViewModel
-                value?.item?.characterId == characterId.uuid.toString()
+                val value = (it.value as? CharacterListState.SelectableCharacterItem)?.characterItem
+                value?.characterId == characterId.uuid.toString()
             }?.children?.asSequence()?.mapNotNull {
-                it.value as? CharacterArcItemViewModel
+                (it.value as? CharacterListState.SelectableArcItem)?.arcItem
             }?.find { it.themeId == themeId.uuid.toString() }
         }
         val grid = grid
         if (grid != null) {
             return grid.children.asSequence().find {
-                val value = it.userData as? CharacterListItemViewModel
-                value?.item?.characterId == characterId.uuid.toString()
+                val value = (it.userData as? CharacterListState.SelectableCharacterItem)?.characterItem
+                value?.characterId == characterId.uuid.toString()
             }?.getChildList()?.asSequence()?.mapNotNull {
-                it.userData as? CharacterArcItemViewModel
+                (it.userData as? CharacterListState.SelectableArcItem)?.arcItem
             }?.find { it.themeId == themeId.uuid.toString() }
         }
         return null

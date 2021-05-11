@@ -17,13 +17,11 @@ fun CharacterListView.givenDeleteCharacterDialogHasBeenOpened(characterId: Chara
     getDeleteCharacterDialog() ?: openDeleteCharacterDialog(characterId).let { getDeleteCharacterDialogOrError() }
 
 fun CharacterListView.openDeleteCharacterDialog(characterId: Character.Id) {
-    with (access()) {
+    drive {
         val item = getCharacterItemOrError(characterId)
-        drive {
-            characterItemLayout!!.selectItem(item)
-            optionsButton!!.show()
-            optionsButton!!.deleteOption!!.fire()
-        }
+        selectItem(item)
+        optionsButton!!.show()
+        optionsButton!!.deleteOption!!.fire()
     }
 }
 
