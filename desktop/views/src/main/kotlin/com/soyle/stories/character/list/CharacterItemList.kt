@@ -1,56 +1,69 @@
 package com.soyle.stories.character.list
 
-import com.soyle.stories.characterarc.characterList.CharacterListItemViewModel
 import com.soyle.stories.characterarc.components.characterIcon
-import com.soyle.stories.common.boundProperty
-import com.soyle.stories.common.components.surfaces.Surface
 import com.soyle.stories.common.components.surfaces.surface
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.scopedListener
-import com.soyle.stories.common.softBind
 import com.soyle.stories.di.get
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleListProperty
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import javafx.scene.Parent
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import tornadofx.*
-import java.lang.ref.WeakReference
 
 class CharacterItemList : Fragment() {
 
     private val viewModel = scope.get<CharacterListState>()
 
     override val root: Parent = surface(
-        component = TreeView<CharacterListState.SelectableCharacterListItem?>(TreeItem(null)),
+        component = TreeView<CharacterListState.CharacterListItem?>(TreeItem(null)),
         elevation = 8
     ) {
         applyCharacterListBehavior()
         isShowRoot = false
         cellFormat {
-            text = it?.name
-            graphic = cache { characterIcon(itemProperty().stringBinding { it?.name }) }
-            if (viewModel.selectedCharacterItem.value?.isSameSelectableAs(it) == true) {
-                if (selectionModel.selectedItem != treeItem) selectionModel.select(treeItem)
-            }
-        }
-    }
-
-    private fun TreeView<CharacterListState.SelectableCharacterListItem?>.applyCharacterListBehavior() {
-        bindSelected(viewModel.selectedCharacterItem)
-        bindItems(viewModel.characters)
-        contextmenu {
-            scopedListener(viewModel.selectedCharacterItem) {
-                when (it) {
-                    is CharacterListState.SelectableCharacterItem -> items.setAll(characterOptions(scope, it.characterItem))
-                    is CharacterListState.SelectableArcItem -> items.setAll(characterArcOptions(scope, it.arcItem))
-                    null -> items.clear()
+            when (it) {
+                is CharacterListState.CharacterListItem.CharacterItem -> {
+                    textProperty().cleanBind(it.character.stringBinding { it?.characterName })
+                    graphic = characterIcon(it.character.select { it.imageResource.toProperty() })
+                    disclosureNode.style { padding = box(7.px, 5.px, 0.px, 5.px) }
+                }
+                is CharacterListState.CharacterListItem.ArcItem -> {
+                    text = it.arc.value.name
+                    graphic = null
                 }
             }
         }
     }
+
+    private fun TreeView<CharacterListState.CharacterListItem?>.applyCharacterListBehavior() {
+        root.children.bind(viewModel.characters) { characterItem ->
+            TreeItem<CharacterListState.CharacterListItem?>(characterItem).apply {
+                scopedListener(characterItem.hasNew) { if (it == true) isExpanded = true }
+                expandedProperty().onChangeUntil({ value != characterItem }) {
+                    if (value == characterItem && it != true) characterItem.hasNew.value = false
+                }
+                children.bind(characterItem.arcs) { TreeItem(it) }
+            }
+        }
+        bindSelected(viewModel.selectedCharacterListItem)
+        scopedListener(selectionModel.selectedItemProperty()) {
+            viewModel.selectedCharacterListItem.value = it?.value
+        }
+        contextmenu {
+            scopedListener(viewModel.selectedCharacterListItem) {
+                when (it) {
+                    is CharacterListState.CharacterListItem.CharacterItem -> items.setAll(
+                        characterOptions(
+                            scope,
+                            it.character.value
+                        )
+                    )
+                    is CharacterListState.CharacterListItem.ArcItem -> items.setAll(characterArcOptions(scope, it.arc.value))
+                    null -> items.clear()
+                }
+            }
+        }
+    }/*
 
     private fun TreeView<CharacterListState.SelectableCharacterListItem?>.bindItems(characters: SimpleListProperty<CharacterListItemViewModel>) {
         val treeItemsById = mutableMapOf<String, TreeItem<CharacterListState.SelectableCharacterListItem?>>()
@@ -75,6 +88,6 @@ class CharacterItemList : Fragment() {
                 }
             }
         }
-    }
+    }*/
 
 }

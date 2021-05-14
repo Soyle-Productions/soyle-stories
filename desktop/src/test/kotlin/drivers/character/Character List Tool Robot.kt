@@ -5,24 +5,17 @@ import com.soyle.stories.character.list.CharacterListView
 import com.soyle.stories.character.rename.RenameCharacterForm
 import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.characterList.CharacterListItemViewModel
-import com.soyle.stories.characterarc.characterList.CharacterTreeItemViewModel
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
-import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess
 import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.access
 import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.drive
 import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.theme.Theme
-import com.soyle.stories.layout.config.fixed.CharacterList
 import com.soyle.stories.project.WorkBench
-import javafx.scene.control.TextField
-import javafx.scene.control.TreeItem
-import javafx.scene.layout.Region
 import tornadofx.FX
+import tornadofx.toProperty
 
 fun WorkBench.givenCharacterListToolHasBeenOpened(): CharacterListView =
     getCharacterListTool() ?: openCharacterListTool().let { getCharacterListToolOrError() }
@@ -67,10 +60,19 @@ fun CharacterListView.openCreateCharacterArcDialogFor(characterId: Character.Id)
 }
 
 fun CharacterListView.selectItem(characterItemViewModel: CharacterItemViewModel) {
-    scope.get<CharacterListState>().selectedCharacterItem.set(CharacterListState.SelectableCharacterItem(characterItemViewModel))
+    val state = scope.get<CharacterListState>()
+    state.selectedCharacterListItem.set(
+        state.characters.find { it.character.value.characterId == characterItemViewModel.characterId }
+    )
 }
+
 fun CharacterListView.selectItem(characterArcItemViewModel: CharacterArcItemViewModel) {
-    scope.get<CharacterListState>().selectedCharacterItem.set(CharacterListState.SelectableArcItem(characterArcItemViewModel))
+    val state = scope.get<CharacterListState>()
+    state.selectedCharacterListItem.set(
+        state.characters.asSequence().flatMap { it.arcs.asSequence() }.find {
+            it.arc.value.characterId == characterArcItemViewModel.characterId && it.arc.value.themeId == characterArcItemViewModel.themeId
+        }
+    )
 }
 
 fun CharacterListView.deleteCharacterArc(characterId: Character.Id, themeId: Theme.Id) {

@@ -1,18 +1,19 @@
 package com.soyle.stories.desktop.config.character
 
+import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.create.CreateCharacterFlow
 import com.soyle.stories.character.delete.DeleteCharacterFlow
 import com.soyle.stories.character.delete.DeleteCharacterForm
 import com.soyle.stories.character.deleteCharacterArc.DeleteCharacterArcNotifier
+import com.soyle.stories.character.list.CharacterListController
 import com.soyle.stories.character.list.CharacterListState
 import com.soyle.stories.character.rename.RenameCharacterFlow
 import com.soyle.stories.character.rename.RenameCharacterForm
 import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.characterarc.baseStoryStructure.*
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueNotifier
-import com.soyle.stories.characterarc.characterList.CharacterListController
-import com.soyle.stories.characterarc.characterList.CharacterListPresenter
-import com.soyle.stories.characterarc.characterList.CharacterListViewListener
+import com.soyle.stories.character.list.CharacterListPresenter
+import com.soyle.stories.character.list.CharacterListViewListener
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
@@ -65,11 +66,10 @@ object Presentation {
     }
 
     private fun InProjectScope.characterList() = provide<CharacterListViewListener> {
-        val characterListPresenter = CharacterListPresenter(
-            get<CharacterListState>(),
-            get()
-        )
+        val characterListPresenter = CharacterListPresenter()
 
+        characterListPresenter listensTo get<CreatedCharacterNotifier>()
+        characterListPresenter listensTo get<CharacterRenamedNotifier>()
         characterListPresenter listensTo get<CreatedCharacterArcNotifier>()
         characterListPresenter listensTo get<CharacterIncludedInThemeNotifier>()
         characterListPresenter listensTo get<DeleteCharacterArcNotifier>()

@@ -20,7 +20,7 @@ import kotlin.reflect.KProperty
 /**
  * Listens to changes to the [source] until [this] is GC'd
  */
-fun <Scope: Any, T : Any> Scope.scopedListener(source: ObservableValue<T?>, listener: Scope.(T?) -> Unit)
+fun <Scope: Any, T> Scope.scopedListener(source: ObservableValue<T>, listener: Scope.(T?) -> Unit)
 {
     val thisStr = this.toString()
     val thisRef = WeakReference(this)

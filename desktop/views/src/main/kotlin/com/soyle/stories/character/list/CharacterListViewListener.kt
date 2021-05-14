@@ -1,4 +1,4 @@
-package com.soyle.stories.characterarc.characterList
+package com.soyle.stories.character.list
 
 import com.soyle.stories.domain.validation.NonBlankString
 

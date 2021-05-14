@@ -2,7 +2,6 @@ package com.soyle.stories.common.components.surfaces
 
 import com.soyle.stories.common.ColorStyles
 import javafx.scene.effect.DropShadow
-import javafx.scene.effect.Effect
 import javafx.scene.paint.Color
 import tornadofx.*
 import kotlin.math.pow
@@ -16,7 +15,7 @@ class SurfaceStyles : Stylesheet() {
          *
          * example: ```elevation[0];  elevation[24]```
          */
-        val elevation = List(25) { CssRule.c("elevation${it}") }
+        val elevated = List(25) { CssRule.c("elevation${it}") }
         val relativeElevation = List(25) { CssRule.pc("relativeElevation${it}") }
 
         val dropShadowColor = Color.web("black", 0.20)
@@ -34,7 +33,7 @@ class SurfaceStyles : Stylesheet() {
     }
 
     init {
-        elevation.withIndex().forEach { (index, elevationStyle) ->
+        elevated.withIndex().forEach { (index, elevationStyle) ->
             if (index == 0) return@forEach
             elevationStyle {
                 val calculatedBackgroundColor = lightBackground(index.toDouble() + 1)
@@ -47,9 +46,6 @@ class SurfaceStyles : Stylesheet() {
                     textFill = Color.BLACK
                     backgroundColor = multi(ColorStyles.lightHighlightColor)
                     effect = dropShadow(2.0)
-                    graphicContainer {
-                        fill = Color.BLACK
-                    }
                     and(empty) {
                         backgroundColor = multi(Color.TRANSPARENT)
                         //unsafe("-fx-effect", raw("none"))
@@ -57,14 +53,16 @@ class SurfaceStyles : Stylesheet() {
                 }
                 treeCell and selected {
                     textFill = ColorStyles.lightSelectionTextColor
-                    graphicContainer {
-                        fill = ColorStyles.lightSelectionTextColor
+                    treeDisclosureNode {
+                        arrow {
+                            backgroundColor = multi(ColorStyles.lightSelectionTextColor)
+                        }
                     }
                     backgroundColor = multi(ColorStyles.lightSelectionColor)
                 }
             }
         }
-        elevation[0] {
+        elevated[0] {
             backgroundColor = multi(Color.TRANSPARENT)
         }
         relativeElevation.withIndex().forEach { (index, relativeElevation) ->

@@ -4,7 +4,6 @@ import com.soyle.stories.character.list.CharacterListState
 import com.soyle.stories.character.list.CharacterListView
 import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.characterList.CharacterListItemViewModel
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.theme.Theme
@@ -73,13 +72,13 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
         val tree = tree
         if (tree != null) {
             return tree.root.children.asSequence().mapNotNull {
-                (it.value as? CharacterListState.SelectableCharacterItem)?.characterItem
+                (it.value as? CharacterListState.CharacterListItem.CharacterItem)?.character?.value
             }.find { it.characterId == characterId.uuid.toString() }
         }
         val grid = grid
         if (grid != null) {
             return grid.children.asSequence().mapNotNull {
-                (it.userData as? CharacterListState.SelectableCharacterItem)?.characterItem
+                (it.userData as? CharacterListState.CharacterListItem.CharacterItem)?.character?.value
             }.find { it.characterId == characterId.uuid.toString() }
         }
         return null
@@ -92,19 +91,19 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
         val tree = tree
         if (tree != null) {
             return tree.root.children.asSequence().find {
-                val value = (it.value as? CharacterListState.SelectableCharacterItem)?.characterItem
+                val value = (it.value as? CharacterListState.CharacterListItem.CharacterItem)?.character?.value
                 value?.characterId == characterId.uuid.toString()
             }?.children?.asSequence()?.mapNotNull {
-                (it.value as? CharacterListState.SelectableArcItem)?.arcItem
+                (it.value as? CharacterListState.CharacterListItem.ArcItem)?.arc?.value
             }?.find { it.themeId == themeId.uuid.toString() }
         }
         val grid = grid
         if (grid != null) {
             return grid.children.asSequence().find {
-                val value = (it.userData as? CharacterListState.SelectableCharacterItem)?.characterItem
+                val value = (it.userData as? CharacterListState.CharacterListItem.CharacterItem)?.character?.value
                 value?.characterId == characterId.uuid.toString()
             }?.getChildList()?.asSequence()?.mapNotNull {
-                (it.userData as? CharacterListState.SelectableArcItem)?.arcItem
+                (it.userData as? CharacterListState.CharacterListItem.ArcItem)?.arc?.value
             }?.find { it.themeId == themeId.uuid.toString() }
         }
         return null

@@ -13,7 +13,6 @@ import javafx.geometry.Side
 import javafx.scene.Parent
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
-import javafx.scene.paint.Color
 import tornadofx.*
 
 class ToolGroup : WindowChild() {
@@ -54,7 +53,7 @@ class ToolGroup : WindowChild() {
                                 }
                                 it.consume()
                             }
-                            toggleClass(SurfaceStyles.elevation[8], tab.selectedProperty())
+                            toggleClass(SurfaceStyles.elevated[8], tab.selectedProperty())
                             receivingUpdate = true
                             selectionModel.select(tab)
                             receivingUpdate = false

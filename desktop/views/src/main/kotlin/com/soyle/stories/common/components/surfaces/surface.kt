@@ -5,12 +5,9 @@ import javafx.beans.property.IntegerProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.event.EventTarget
 import javafx.scene.Node
-import javafx.scene.Parent
 import javafx.scene.layout.VBox
 import tornadofx.*
-import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
-import kotlin.reflect.jvm.javaConstructor
 
 @ViewBuilder
 inline fun EventTarget.surface(
@@ -56,18 +53,20 @@ fun <N : Node> Surface(
     component: N,
     elevation: Int = 1
 ): N {
-    component.apply {
-        properties[SURFACE_ELEVATION_PROPERTY] = elevation
-        if (elevation >= 0 && elevation <= 24) {
-            addClass(SurfaceStyles.elevation[elevation])
-            surfaceRelativeElevationProperty().onChange { relativeElevation ->
-                (0..24).forEach {
-                    togglePseudoClass(SurfaceStyles.relativeElevation[it].name, relativeElevation == it)
-                }
+    return component.asSurface(elevation)
+}
+
+fun <N : Node> N.asSurface(elevation: Int = 1): N {
+    properties[SURFACE_ELEVATION_PROPERTY] = elevation
+    if (elevation >= 0 && elevation <= 24) {
+        addClass(SurfaceStyles.elevated[elevation])
+        surfaceRelativeElevationProperty().onChange { relativeElevation ->
+            (0..24).forEach {
+                togglePseudoClass(SurfaceStyles.relativeElevation[it].name, relativeElevation == it)
             }
-            surfaceRelativeElevationProperty().set(elevation)
-            viewOrder = 25.0 - elevation
         }
+        surfaceRelativeElevationProperty().set(elevation)
+        viewOrder = 25.0 - elevation
     }
-    return component
+    return this
 }

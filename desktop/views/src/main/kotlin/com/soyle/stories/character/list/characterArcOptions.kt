@@ -4,7 +4,7 @@ import com.soyle.stories.character.delete.DeleteCharacterFlow
 import com.soyle.stories.character.rename.RenameCharacterFlow
 import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.characterList.CharacterListViewListener
+import com.soyle.stories.character.list.CharacterListViewListener
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
