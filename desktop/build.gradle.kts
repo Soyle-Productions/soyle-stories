@@ -1,3 +1,5 @@
+import plugin.constants.kotlinVersion
+
 plugins {
     java
     kotlin("jvm")
@@ -34,6 +36,16 @@ dependencies {
             exclude(group = "com.soyle.stories")
         }
     }
+}
+
+// in kotlin 1.5+, lambdas provided as SAM interfaces are compiled without a backing class
+// This causes the cucumber-java8 framework to fail because it can't handle lambdas without a backing class
+// by adding Xsam-conversions = class as a compiler argument for the test code compilation,
+// we increase the resulting code size, but it only affects the test code, and we can continue to use
+// lambdas and cucumber-java8 instead of changing EVERY step definition to an annotated function with cucumber-java
+val compileTestKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    freeCompilerArgs += "-Xsam-conversions=class"
 }
 
 runtime {

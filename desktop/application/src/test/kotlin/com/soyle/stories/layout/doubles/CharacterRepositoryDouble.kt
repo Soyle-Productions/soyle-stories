@@ -1,6 +1,6 @@
 package com.soyle.stories.layout.doubles
 
-import com.soyle.stories.character.repositories.CharacterRepository
+import com.soyle.stories.usecase.character.CharacterRepository
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.project.Project
 
@@ -21,6 +21,10 @@ class CharacterRepositoryDouble(
 	override suspend fun deleteCharacterWithId(characterId: Character.Id) {
 		onDeleteCharacterWithId.invoke(characterId)
 		characters.remove(characterId)
+	}
+
+	override suspend fun getCharacterIdsThatDoNotExist(characterIdsToTest: Set<Character.Id>): Set<Character.Id> {
+		return characterIdsToTest.filterNot { it in characters }.toSet()
 	}
 
 	override suspend fun getCharacterById(characterId: Character.Id): Character? = characters[characterId]

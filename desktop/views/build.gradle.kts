@@ -12,33 +12,10 @@ plugins {
 }
 
 sourceSets {
-    val integration by creating {
-        java {
-            srcDir("src/integration/kotlin")
-            srcDir("src/integration/java")
-        }
-        compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
-        runtimeClasspath += output + compileClasspath
-    }
     testFixtures {
         java {
             srcDir("src/testFixtures/kotlin")
         }
-    }
-}
-
-
-
-configurations {
-
-    val integrationRuntime by getting {
-        extendsFrom(configurations["testImplementation"])
-    }
-    val integrationCompile by getting {
-        extendsFrom(configurations["testCompile"])
-    }
-    val integrationImplementation by getting {
-        extendsFrom(configurations["testImplementation"])
     }
 }
 
@@ -122,12 +99,9 @@ idea {
     module {
         testSourceDirs.add(file("src/integration/java"))
         testSourceDirs.add(file("src/integration/kotlin"))
-        scopes["TEST"]?.get("plus")?.add(configurations.getByName("integrationCompile"))
-
 
         (this as ExtensionAware).configure<org.jetbrains.gradle.ext.ModuleSettings> {
             (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = "com.soyle.stories.desktop.view"
-            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/integration/kotlin"] = "com.soyle.stories.desktop.view"
             (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/testFixtures/kotlin"] = "com.soyle.stories.desktop.view"
         }
     }

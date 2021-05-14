@@ -3,6 +3,7 @@ package com.soyle.stories.characterarc.baseStoryStructure
 import com.soyle.stories.characterarc.baseStoryStructure.presenters.*
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.items.LocationItemViewModel
@@ -60,7 +61,7 @@ class BaseStoryStructurePresenter(
                                 SubSectionViewModel(it.templateName, it.arcSectionId.toString(), subSectionName, value)
                             },
                             it.linkedLocation?.let {
-                                locationMap[it.toString()]
+                                locationMap[Location.Id(it)]
                             }
                         )
                     }

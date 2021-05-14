@@ -1,5 +1,6 @@
 package com.soyle.stories.common.components.text
 
+import com.soyle.stories.common.ColorStyles
 import com.soyle.stories.soylestories.Styles
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
@@ -32,7 +33,7 @@ class TextStyles : Stylesheet() {
         val title = mixin {
             fontFamily = "Corbel"
             fontSmoothingType = FontSmoothingType.LCD
-            textFill = Color.gray(0.15)
+            textFill = ColorStyles.lightTitleTextColor
         }
         applicationLevelTitle {
             +title
@@ -61,7 +62,7 @@ class TextStyles : Stylesheet() {
         }
         val body = mixin {
             fontFamily = "Segoe UI"
-            textFill = Color.gray(0.35)
+            textFill = ColorStyles.lightTextColor
         }
         fieldLabel {
             +body
@@ -79,7 +80,7 @@ class TextStyles : Stylesheet() {
             +body
             fontWeight = FontWeight.NORMAL
             fontSize = 12.px
-            textFill = Color.gray(0.55)
+            textFill = ColorStyles.lightCaptionTextColor
         }
         warning {
             textFill = Styles.Orange

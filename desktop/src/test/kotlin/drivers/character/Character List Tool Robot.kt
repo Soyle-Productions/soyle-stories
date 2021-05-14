@@ -1,47 +1,88 @@
 package com.soyle.stories.desktop.config.drivers.character
 
-import com.soyle.stories.characterarc.characterList.CharacterList
-import com.soyle.stories.common.editingCell
+import com.soyle.stories.character.list.CharacterListState
+import com.soyle.stories.character.list.CharacterListView
+import com.soyle.stories.character.rename.RenameCharacterForm
+import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
-import com.soyle.stories.desktop.view.character.characterList.drive
-import com.soyle.stories.desktop.view.character.characterList.driver
+import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.access
+import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.drive
+import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
+import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.WorkBench
-import javafx.event.ActionEvent
-import javafx.scene.control.TextField
-import javafx.scene.control.TreeItem
 import tornadofx.FX
+import tornadofx.toProperty
 
-fun WorkBench.givenCharacterListToolHasBeenOpened(): CharacterList =
+fun WorkBench.givenCharacterListToolHasBeenOpened(): CharacterListView =
     getCharacterListTool() ?: openCharacterListTool().let { getCharacterListToolOrError() }
 
-fun WorkBench.getCharacterListToolOrError(): CharacterList =
+fun WorkBench.getCharacterListToolOrError(): CharacterListView =
     getCharacterListTool() ?: throw NoSuchElementException("Theme List has not been opened")
 
-fun WorkBench.getCharacterListTool(): CharacterList?
-{
-    return (FX.getComponents(scope)[CharacterList::class] as? CharacterList)?.takeIf { it.currentStage?.isShowing == true }
+fun WorkBench.getCharacterListTool(): CharacterListView? {
+    return (FX.getComponents(scope)[CharacterListView::class] as? CharacterListView)?.takeIf { it.currentStage?.isShowing == true }
 }
 
-fun WorkBench.openCharacterListTool()
-{
+fun WorkBench.openCharacterListTool() {
     findMenuItemById("tools_characterlist")!!
         .apply { robot.interact { fire() } }
 }
 
-fun CharacterList.renameCharacterTo(characterId: Character.Id, newName: String)
-{
-    with (driver()) {
+fun CharacterListView.renameCharacter(characterId: Character.Id): RenameCharacterForm? {
+    return with(access()) {
         val item = getCharacterItemOrError(characterId)
         drive {
-            tree.selectionModel.select(item as TreeItem<Any?>)
-            val renameOptionItem = characterItemContextMenu!!.getRenameOption()
-            renameOptionItem.fire()
-            (tree.editingCell!!.graphic as TextField).run {
-                text = newName
-                fireEvent(ActionEvent())
+            selectItem(item)
+            val renameOptionItem = with(optionsButton!!) {
+                show()
+                renameOption!!
             }
+            renameOptionItem.fire()
         }
+        getOpenDialog<RenameCharacterForm>()
+    }
+}
+
+fun CharacterListView.openCreateCharacterArcDialogFor(characterId: Character.Id) {
+    drive {
+        val item = getCharacterItemOrError(characterId)
+        selectItem(item)
+        val newCharacterArcOption = with(optionsButton!!) {
+            show()
+            newCharacterArcOption!!
+        }
+        newCharacterArcOption.fire()
+    }
+}
+
+fun CharacterListView.selectItem(characterItemViewModel: CharacterItemViewModel) {
+    val state = scope.get<CharacterListState>()
+    state.selectedCharacterListItem.set(
+        state.characters.find { it.character.value.characterId == characterItemViewModel.characterId }
+    )
+}
+
+fun CharacterListView.selectItem(characterArcItemViewModel: CharacterArcItemViewModel) {
+    val state = scope.get<CharacterListState>()
+    state.selectedCharacterListItem.set(
+        state.characters.asSequence().flatMap { it.arcs.asSequence() }.find {
+            it.arc.value.characterId == characterArcItemViewModel.characterId && it.arc.value.themeId == characterArcItemViewModel.themeId
+        }
+    )
+}
+
+fun CharacterListView.deleteCharacterArc(characterId: Character.Id, themeId: Theme.Id) {
+    drive {
+        val item = getArcItemOrError(characterId, themeId)
+        selectItem(item)
+        val deleteOptionItem = with(optionsButton!!) {
+            show()
+            deleteOption!!
+        }
+        deleteOptionItem.fire()
     }
 }

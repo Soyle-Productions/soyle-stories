@@ -72,6 +72,7 @@ private fun MenuButton.majorCharacters(list: List<AvailablePerspectiveCharacterV
     }
     list.filter { it.isMajorCharacter }.forEach {
         item(it.characterName) {
+            id = it.characterId
             addClass(ComponentsStyles.contextMenuSectionedItem)
             action {
                 onPerspectiveCharacterSelected?.invoke(it)
@@ -87,6 +88,7 @@ private fun MenuButton.minorCharacters(list: List<AvailablePerspectiveCharacterV
     }
     list.filterNot { it.isMajorCharacter }.forEach {
         customitem {
+            id = it.characterId
             addClass(ComponentsStyles.contextMenuSectionedItem)
             addClass(ComponentsStyles.discouragedSelection)
             content = label(it.characterName) {
