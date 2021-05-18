@@ -1,4 +1,4 @@
-package com.soyle.stories.usecase.character.nameVariant
+package com.soyle.stories.usecase.character.nameVariant.create
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
@@ -11,7 +11,7 @@ interface AddCharacterNameVariant {
         val characterNameVariantAdded: CharacterNameVariantAdded
     )
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun addedCharacterNameVariant(response: ResponseModel)
     }
 }

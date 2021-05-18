@@ -1,11 +1,9 @@
-package com.soyle.stories.usecase.character.nameVariant
+package com.soyle.stories.usecase.character.nameVariant.create
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterUpdate
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.usecase.character.CharacterDoesNotExist
 import com.soyle.stories.usecase.character.CharacterRepository
-import java.util.*
 
 class AddCharacterNameVariantUseCase(
     private val characterRepository: CharacterRepository

@@ -1,16 +1,16 @@
 package com.soyle.stories.usecase.character.nameVariant
 
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.character.CharacterDoesNotExist
+import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariantUseCase
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
