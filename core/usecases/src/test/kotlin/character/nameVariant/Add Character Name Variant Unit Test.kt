@@ -1,7 +1,6 @@
 package com.soyle.stories.usecase.character.nameVariant
 
-import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.character.makeCharacter
+import com.soyle.stories.domain.character.*
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.validation.NonBlankString
@@ -50,7 +49,9 @@ class `Add Character Name Variant Unit Test` {
 
         @Test
         fun `name variant is same as display name`() {
-            addCharacterNameVariant(character.name)
+            assertThrows<CharacterNameVariantCannotEqualDisplayName> {
+                addCharacterNameVariant(character.name)
+            }
             assertNull(updatedCharacter)
             assertNull(result)
         }
@@ -59,7 +60,9 @@ class `Add Character Name Variant Unit Test` {
         fun `duplicate name variant`() {
             val input = nonBlankStr("Frank")
             characterRepository.givenCharacter(character.withNameVariant(input).character)
-            addCharacterNameVariant(input)
+            assertThrows<CharacterNameVariantCannotEqualOtherVariant> {
+                addCharacterNameVariant(input)
+            }
             assertNull(updatedCharacter)
             assertNull(result)
         }

@@ -15,6 +15,9 @@ class AddCharacterNameVariantUseCase(
         if (characterUpdate is CharacterUpdate.Updated) {
             characterRepository.updateCharacter(characterUpdate.character)
             output.addedCharacterNameVariant(AddCharacterNameVariant.ResponseModel(characterUpdate.event))
+        } else if (characterUpdate is CharacterUpdate.WithoutChange) {
+            val reasonForFailure = characterUpdate.reason
+            if (reasonForFailure is Throwable) throw reasonForFailure
         }
     }
 }
