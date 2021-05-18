@@ -35,11 +35,17 @@ inline fun <reified N : Node> Surface(
     elevation: Int = 1
 ): N = Surface(component = N::class.createInstance(), elevation = elevation)
 
-const val SURFACE_ELEVATION_PROPERTY = "surface_elevation"
-val Node.surfaceElevation: Int?
-    get() = properties[SURFACE_ELEVATION_PROPERTY] as? Int
+private const val SURFACE_ELEVATION_PROPERTY = "surface_elevation"
+var Node.surfaceElevation: Int
+    get() = surfaceElevationProperty().get()
+    set(value) = surfaceElevationProperty().set(value)
 
-const val SURFACE_RELATIVE_ELEVATION_PROPERTY = "surface_relative_elevation"
+fun Node.surfaceElevationProperty(): IntegerProperty =
+    properties.getOrPut(SURFACE_ELEVATION_PROPERTY) {
+        SimpleIntegerProperty(0)
+    } as IntegerProperty
+
+private const val SURFACE_RELATIVE_ELEVATION_PROPERTY = "surface_relative_elevation"
 var Node.surfaceRelativeElevation: Int?
     get() = surfaceRelativeElevationProperty().get()
     set(value) = surfaceRelativeElevationProperty().set(value ?: 0)
@@ -57,16 +63,20 @@ fun <N : Node> Surface(
 }
 
 fun <N : Node> N.asSurface(elevation: Int = 1): N {
-    properties[SURFACE_ELEVATION_PROPERTY] = elevation
-    if (elevation >= 0 && elevation <= 24) {
-        addClass(SurfaceStyles.elevated[elevation])
-        surfaceRelativeElevationProperty().onChange { relativeElevation ->
-            (0..24).forEach {
-                togglePseudoClass(SurfaceStyles.relativeElevation[it].name, relativeElevation == it)
-            }
+    surfaceElevationProperty().onChange { absoluteElevation ->
+        (0..24).forEach {
+            toggleClass(SurfaceStyles.elevated[it], absoluteElevation == it)
         }
-        surfaceRelativeElevationProperty().set(elevation)
-        viewOrder = 25.0 - elevation
+    }
+    surfaceRelativeElevationProperty().onChange { relativeElevation ->
+        (0..24).forEach {
+            togglePseudoClass(SurfaceStyles.relativeElevation[it].name, relativeElevation == it)
+        }
+    }
+    if (elevation >= 0 && elevation <= 24) {
+        viewOrderProperty().bind(surfaceElevationProperty().doubleBinding { (25.0 - elevation).coerceAtLeast(0.0) })
+        surfaceElevation = elevation
+        surfaceRelativeElevation = elevation
     }
     return this
 }

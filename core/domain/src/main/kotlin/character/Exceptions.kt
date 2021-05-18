@@ -2,15 +2,16 @@ package com.soyle.stories.domain.character
 
 import com.soyle.stories.domain.validation.DuplicateOperationException
 import com.soyle.stories.domain.validation.EntityNotFoundException
+import com.soyle.stories.domain.validation.SoyleStoriesException
 import com.soyle.stories.domain.validation.ValidationException
 import java.util.*
 
 sealed interface CharacterNamesMustBeUnique
 data class CharacterNameVariantCannotEqualDisplayName(val characterId: Character.Id, val name: String) :
-    CharacterNamesMustBeUnique, Throwable()
+    CharacterNamesMustBeUnique, ValidationException()
 
 data class CharacterNameVariantCannotEqualOtherVariant(val characterId: Character.Id, val name: String) :
-    CharacterNamesMustBeUnique, Throwable()
+    CharacterNamesMustBeUnique, ValidationException()
 
 class CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
     val arcId: UUID,

@@ -4,11 +4,14 @@ import com.soyle.stories.character.rename.RenameCharacterForm
 import com.soyle.stories.desktop.config.drivers.character.*
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.ScenarioContext
+import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbench
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.drivers.theme.givenMoralArgumentToolHasBeenOpenedForTheme
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.character.list.CharacterListAssertions
+import com.soyle.stories.desktop.view.character.profile.`Character Profile Assertions`.Companion.assertThat
+import com.soyle.stories.desktop.view.character.profile.`Character Profile View Access`.Companion.access
 import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
 import com.soyle.stories.domain.character.Character
@@ -19,6 +22,7 @@ import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import java.util.*
+import kotlin.math.exp
 
 class CharacterSteps : En {
 
@@ -92,11 +96,19 @@ class CharacterSteps : En {
         }
         Given("I am creating a name variant for the {character}") { character: Character ->
             soyleStories.getAnyOpenWorkbenchOrError()
-                .givenCreateCharacterNameDialogHasBeenOpenedFor(character)
+                .givenCharacterListToolHasBeenOpened()
+                .givenCharacterProfileOpenedFor(character)
+                .givenCreatingCharacterNameVariant()
         }
         Given("I have created a name variant of {string} for the {character}") { variant: String, character: Character ->
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenCharacterHasANameVariant(character, variant)
+        }
+        Given("I am renaming the {string} name variant for the {character}") { variant: String, character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .givenCharacterProfileOpenedFor(character)
+                .givenRenamingCharacterNameVariant(variant)
         }
     }
 
@@ -136,8 +148,19 @@ class CharacterSteps : En {
         }
         When("I create a name variant of {string} for the {character}") { variant: String, character: Character ->
             soyleStories.getAnyOpenWorkbenchOrError()
-                .givenCreateCharacterNameDialogHasBeenOpenedFor(character)
+                .givenCharacterListToolHasBeenOpened()
+                .givenCharacterProfileOpenedFor(character)
+                .givenCreatingCharacterNameVariant()
                 .createNameVariant(variant)
+        }
+        When(
+            "I rename the name variant of {string} for the {character} to {string}"
+        ) { originalVariant: String, character: Character, newVariant: String ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .givenCharacterProfileOpenedFor(character)
+                .givenRenamingCharacterNameVariant(originalVariant)
+                .renameVariantTo(originalVariant, newVariant)
         }
     }
 
@@ -248,6 +271,71 @@ class CharacterSteps : En {
             "the {character} should still have the display name of {string}"
         ) { character: Character, expectedName: String ->
             assertEquals(expectedName, character.name.value)
+        }
+        Then(
+            "I should not be creating a name variant for the {character}"
+        ) { character: Character ->
+            val characterProfile = soyleStories.getAnyOpenWorkbench()
+                ?.getCharacterListTool()
+                ?.getCharacterProfileFor(character)
+
+            if (characterProfile == null) return@Then
+
+            assertThat(characterProfile) {
+                isNotCreatingNameVariant()
+            }
+        }
+        Then(
+            "the {character} should have a name variant of {string}"
+        ) { character: Character, expectedVariant: String ->
+            assertTrue(character.otherNames.contains(NonBlankString.create(expectedVariant)!!))
+
+            val characterProfile = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .givenCharacterProfileOpenedFor(character)
+
+            assertThat(characterProfile) {
+                hasNameVariant(expectedVariant)
+            }
+        }
+        Then("I should still be creating a name variant for the {character}") { character: Character ->
+            val characterProfile = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .getCharacterProfileFor(character)!!
+
+            assertThat(characterProfile) {
+                isCreatingNameVariant()
+            }
+        }
+        Then(
+            "I should still be renaming the name variant {string} for the {character}"
+        ) { variant: String, character: Character ->
+            val characterProfile = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .getCharacterProfileFor(character)!!
+
+            assertThat(characterProfile) {
+                isRenamingNameVariant(variant)
+            }
+        }
+        Then("I should not be renaming a name variant for the {character}") { character: Character ->
+            val characterProfile = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .getCharacterProfileFor(character) ?: return@Then
+
+            assertThat(characterProfile) {
+                isNotRenamingNameVariantFor(character)
+            }
+        }
+        Then(
+            "the {character} should not have a name variant of {string}"
+        ) { character: Character, variant: String ->
+            assertNull(character.otherNames.find { it.value == variant })
+        }
+        Then(
+            "the {character} should have only one name variant of {string}"
+        ) { character: Character, variant: String ->
+            character.otherNames.filter { it.value == variant }.single()
         }
     }
 }

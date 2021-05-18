@@ -1,6 +1,7 @@
 package com.soyle.stories.character.list
 
 import com.soyle.stories.character.delete.DeleteCharacterFlow
+import com.soyle.stories.character.nameVariant.create.CreateCharacterNameVariantFlow
 import com.soyle.stories.character.rename.RenameCharacterFlow
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.planCharacterArcDialog.planCharacterArcDialog
@@ -29,7 +30,11 @@ internal fun characterOptions(scope: Scope, characterItem: CharacterItemViewMode
                 )
             }
         },
-        Menu("Additional Names").apply {
+        Menu("View Profile").apply {
+            id = "profile"
+            action {
+                scope.get<CharacterListState>().profileBeingViewed.set(characterItem)
+            }
         },
         SeparatorMenuItem(),
         Menu("Create New...").apply {
@@ -42,6 +47,11 @@ internal fun characterOptions(scope: Scope, characterItem: CharacterItemViewMode
             }
             item("Name Variant") {
                 id = "create_new_name"
+                action {
+                    scope.get<CreateCharacterNameVariantFlow>().start(
+                        characterItem.characterId.let(UUID::fromString).let(Character::Id),
+                    )
+                }
             }
         },
         MenuItem("Delete").apply {

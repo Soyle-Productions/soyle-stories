@@ -14,6 +14,8 @@ import com.soyle.stories.characterarc.baseStoryStructure.*
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueNotifier
 import com.soyle.stories.character.list.CharacterListPresenter
 import com.soyle.stories.character.list.CharacterListViewListener
+import com.soyle.stories.character.nameVariant.create.CreateCharacterNameFormView
+import com.soyle.stories.character.nameVariant.create.CreateCharacterNameVariantFlow
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogState
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewListener
@@ -44,6 +46,7 @@ object Presentation {
             createCharacterDialog()
             characterList()
             renameCharacterFlow()
+            createCharacterNameVariantFlow()
             deleteCharacterFlow()
 
             createCharacterArcSectionDialog()
@@ -62,6 +65,12 @@ object Presentation {
     private fun InProjectScope.createCharacterDialog() {
         provide<CreateCharacterDialog> {
             CreateCharacterForm.Dialog(this)
+        }
+    }
+
+    private fun InProjectScope.createCharacterNameVariantFlow() {
+        provide<CreateCharacterNameVariantFlow> {
+            CreateCharacterNameFormView.InDialog(this)
         }
     }
 

@@ -86,3 +86,15 @@ fun CharacterListView.deleteCharacterArc(characterId: Character.Id, themeId: The
         deleteOptionItem.fire()
     }
 }
+
+fun CharacterListView.openCharacterProfileFor(character: Character) {
+    drive {
+        val item = getCharacterItem(character.id)!!
+        selectItem(item)
+        val profileOptionItem = with(optionsButton!!) {
+            show()
+            profileOption!!
+        }
+        profileOptionItem.fire()
+    }
+}

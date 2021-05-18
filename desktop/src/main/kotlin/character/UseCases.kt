@@ -5,6 +5,7 @@ import com.soyle.stories.character.createArcSection.CreateArcSectionController
 import com.soyle.stories.character.createArcSection.CreateArcSectionControllerImpl
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantOutput
+import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
@@ -38,8 +39,10 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentOutput
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArcUseCase
-import com.soyle.stories.usecase.character.nameVariant.AddCharacterNameVariant
-import com.soyle.stories.usecase.character.nameVariant.AddCharacterNameVariantUseCase
+import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariantUseCase
+import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariants
+import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariantsUseCase
 
 object UseCases {
 
@@ -104,6 +107,7 @@ object UseCases {
 
             // name variants
             addNameVariant()
+            listCharacterNameVariants()
         }
     }
 
@@ -160,7 +164,16 @@ object UseCases {
         provide<AddCharacterNameVariant> {
             AddCharacterNameVariantUseCase(get())
         }
-        provide<AddCharacterNameVariant.OutputPort> { AddCharacterNameVariantOutput() }
+        provide<AddCharacterNameVariant.OutputPort> { AddCharacterNameVariantOutput(get()) }
+    }
+
+    private fun InProjectScope.listCharacterNameVariants() {
+        provide {
+            ListCharacterNameVariantsController(applicationScope.get(), get())
+        }
+        provide<ListCharacterNameVariants> {
+            ListCharacterNameVariantsUseCase(get())
+        }
     }
 
 }

@@ -1,11 +1,13 @@
 package com.soyle.stories.character.list
 
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.components.characterIcon
 import com.soyle.stories.common.components.surfaces.surface
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.scopedListener
 import com.soyle.stories.di.get
 import javafx.scene.Parent
+import javafx.scene.control.TreeCell
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import tornadofx.*
@@ -13,6 +15,12 @@ import tornadofx.*
 class CharacterItemList : Fragment() {
 
     private val viewModel = scope.get<CharacterListState>()
+
+    private fun viewCharacterProfile(characterItem: CharacterItemViewModel, originatingCell: TreeCell<*>?)
+    {
+        viewModel.profileCharacterListNode.set(originatingCell)
+        viewModel.profileBeingViewed.set(characterItem)
+    }
 
     override val root: Parent = surface(
         component = TreeView<CharacterListState.CharacterListItem?>(TreeItem(null)),
@@ -33,6 +41,18 @@ class CharacterItemList : Fragment() {
                 }
             }
         }
+        setOnMouseClicked {
+            if (it.clickCount == 2) {
+                val item = selectionModel.selectedItem ?: return@setOnMouseClicked
+                val characterItem = item.value as? CharacterListState.CharacterListItem.CharacterItem
+                if (characterItem != null) {
+                    val treeCell = lookupAll(".tree-cell").asSequence()
+                        .filterIsInstance<TreeCell<*>>()
+                        .find { it.treeItem == item }
+                    viewCharacterProfile(characterItem.character.value, treeCell)
+                }
+            }
+        }
     }
 
     private fun TreeView<CharacterListState.CharacterListItem?>.applyCharacterListBehavior() {
@@ -42,13 +62,12 @@ class CharacterItemList : Fragment() {
                 expandedProperty().onChangeUntil({ value != characterItem }) {
                     if (value == characterItem && it != true) characterItem.hasNew.value = false
                 }
-                children.bind(characterItem.arcs) { TreeItem(it) }
+                children.bind(characterItem.arcs) {
+                    TreeItem(it)
+                }
             }
         }
         bindSelected(viewModel.selectedCharacterListItem)
-        scopedListener(selectionModel.selectedItemProperty()) {
-            viewModel.selectedCharacterListItem.value = it?.value
-        }
         contextmenu {
             scopedListener(viewModel.selectedCharacterListItem) {
                 when (it) {

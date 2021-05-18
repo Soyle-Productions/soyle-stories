@@ -3,7 +3,7 @@ package com.soyle.stories.character.nameVariant.addNameVariant
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.usecase.character.nameVariant.AddCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariant
 import kotlinx.coroutines.Job
 
 class AddCharacterNameVariantController(

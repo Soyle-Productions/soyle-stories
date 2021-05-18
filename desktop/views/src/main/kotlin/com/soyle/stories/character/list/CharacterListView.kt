@@ -1,6 +1,11 @@
 package com.soyle.stories.character.list
 
 import com.soyle.stories.character.create.CreateCharacterFlow
+import com.soyle.stories.character.profile.CharacterProfileProps
+import com.soyle.stories.character.profile.CharacterProfileScope
+import com.soyle.stories.character.profile.CharacterProfileState
+import com.soyle.stories.character.profile.CharacterProfileView
+import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
 import com.soyle.stories.common.*
 import com.soyle.stories.common.components.ComponentsStyles
@@ -11,31 +16,147 @@ import com.soyle.stories.common.components.surfaces.*
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.project.ProjectScope
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
+import javafx.animation.Animation
+import javafx.animation.Interpolator
+import javafx.animation.Timeline
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
+import javafx.event.EventTarget
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.layout.*
+import javafx.scene.paint.Color
+import javafx.scene.shape.Rectangle
 import javafx.scene.text.TextAlignment
 import tornadofx.*
 import java.lang.ref.WeakReference
+import java.util.*
+import java.util.UUID.fromString
 
 class CharacterListView : View() {
 
+    override val scope = super.scope as ProjectScope
     private val viewListener = resolve<CharacterListViewListener>()
     private val state = resolve<CharacterListState>()
 
     private val layoutStyle: SimpleObjectProperty<LayoutStyle> = SimpleObjectProperty(LayoutStyle.List)
 
-    override val root: Parent = vbox(alignment = Pos.CENTER, spacing = 16.0) {
-        parentProperty().onChangeWithCurrent { if (it != null) fitToParentSize() }
-        vgrow = Priority.ALWAYS
-        hgrow = Priority.SOMETIMES
+    override val root: Parent = stackpane {
+        characterProfile().asSurface(10)
+        vbox(alignment = Pos.CENTER, spacing = 16.0) {
+            asSurface(8)
+            parentProperty().onChangeWithCurrent { if (it != null) fitToParentSize() }
+            vgrow = Priority.ALWAYS
+            hgrow = Priority.SOMETIMES
 
-        content()
+            content()
+        }
+    }
+
+    private fun EventTarget.characterProfile(): Node {
+
+        val profileBeingViewed = SimpleObjectProperty<CharacterProfileProps?>(null)
+
+        val profileScope = CharacterProfileScope(scope)
+        val backdrop = pane {
+            existsWhen(profileBeingViewed.isNotNull)
+            style { backgroundColor = multi(Color.rgb(0, 0, 0, 0.4)) }
+        }
+        backdrop.fitToParentSize()
+        val profileContainer = backdrop.anchorpane {
+            primaryButton("DONE") {
+                anchorpaneConstraints {
+                    topAnchor = 16.0
+                    rightAnchor = 16
+                }
+                action {
+                    state.profileBeingViewed.set(null)
+                }
+            }
+            add(profileScope.get<CharacterProfileView>().apply {
+                props.bind(profileBeingViewed)
+                root.asSurface(10)
+                root.anchorpaneConstraints {
+                    topAnchor = 0
+                    bottomAnchor = 0
+                    leftAnchor = 0
+                    rightAnchor = 0
+                }
+            })
+            minHeight = 0.0
+            clip = Rectangle().apply {
+                heightProperty().bind(this@anchorpane.heightProperty())
+                widthProperty().bind(this@anchorpane.widthProperty())
+            }
+        }
+        profileContainer.fitToParentWidth()
+
+        fun openingAnimation(top: Double, height: Double) = timeline(play = false) {
+            keyframe(0.seconds) {
+                keyvalue(profileContainer.layoutYProperty(), top, null)
+                keyvalue(profileContainer.prefHeightProperty(), height, null)
+                keyvalue(profileContainer.maxHeightProperty(), height, null)
+            }
+            keyframe(0.3.seconds) {
+                keyvalue(profileContainer.layoutYProperty(), 0.0, Interpolator.EASE_IN)
+                keyvalue(profileContainer.prefHeightProperty(), backdrop.prefHeight, Interpolator.EASE_IN)
+                keyvalue(profileContainer.maxHeightProperty(), backdrop.prefHeight, Interpolator.EASE_IN)
+            }
+        }
+
+        fun closingAnimation(top: Double, height: Double) = timeline(play = false) {
+            keyframe(0.seconds) {
+                keyvalue(profileContainer.layoutYProperty(), 0.0, null)
+                keyvalue(profileContainer.prefHeightProperty(), backdrop.prefHeight, null)
+                keyvalue(profileContainer.maxHeightProperty(), backdrop.prefHeight, null)
+            }
+            keyframe(0.3.seconds) {
+                keyvalue(profileContainer.layoutYProperty(), top, Interpolator.EASE_IN)
+                keyvalue(profileContainer.prefHeightProperty(), height, Interpolator.EASE_IN)
+                keyvalue(profileContainer.maxHeightProperty(), height, Interpolator.EASE_IN)
+            }
+            setOnFinished {
+                profileBeingViewed.set(null)
+            }
+        }
+        backdrop.scopedListener(state.profileBeingViewed) {
+            if (it == null) {
+                val profileCharacterListNode = state.profileCharacterListNode.value
+                if (profileCharacterListNode == null) {
+                    closingAnimation(backdrop.prefHeight / 2, 0.0).playFromStart()
+                } else {
+                    val startTop = backdrop.screenToLocal(profileCharacterListNode.localToScreen(profileCharacterListNode.boundsInLocal)).minY
+                    closingAnimation(startTop, profileCharacterListNode.height).playFromStart()
+                }
+            }
+            else {
+                profileBeingViewed.set(object : CharacterProfileProps {
+                    override val characterId: Character.Id = it.characterId.let(::fromString).let(Character::Id)
+                    override val name: String = it.characterName
+                    override val imageResource: String = it.imageResource
+                })
+                val profileCharacterListNode = state.profileCharacterListNode.value
+                if (profileCharacterListNode == null) {
+                    runLater {
+                        openingAnimation(backdrop.prefHeight / 2, 0.0).playFromStart()
+                    }
+                } else {
+                    val startTop = backdrop.screenToLocal(profileCharacterListNode.localToScreen(profileCharacterListNode.boundsInLocal)).minY
+                    runLater {
+                        openingAnimation(startTop, profileCharacterListNode.height).playFromStart()
+                    }
+                }
+            }
+        }
+
+        return backdrop
     }
 
     @ViewBuilder
@@ -45,7 +166,9 @@ class CharacterListView : View() {
         when {
             characters == null -> {
                 loader()
-                state.characters.isNull.onChangeOnce { content() }
+                state.characters.onChangeUntil({ it != null }) {
+                    if (it != null) content()
+                }
             }
             characters.isEmpty() -> {
                 spacing = 16.0
@@ -105,7 +228,7 @@ class CharacterListView : View() {
         val characterItemsProperty = characterItems()
 
         // should only show drop shadow based on elevation distance
-        header.surfaceRelativeElevation = header.surfaceElevation!! - characterItemsProperty.value.surfaceElevation!!
+        header.surfaceRelativeElevation = header.surfaceElevation - characterItemsProperty.value.surfaceElevation
     }
 
     @ViewBuilder

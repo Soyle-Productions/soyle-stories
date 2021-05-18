@@ -1,5 +1,7 @@
 package com.soyle.stories.desktop.config.character
 
+import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedNotifier
+import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterConfirmationNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterConfirmationReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
@@ -41,6 +43,7 @@ object Notifiers {
                     get<RemoveSymbolicItemControllerImpl>() listensTo it
                 }
             }
+            provide(CharacterNameVariantAddedReceiver::class) { CharacterNameVariantAddedNotifier() }
 
         }
     }

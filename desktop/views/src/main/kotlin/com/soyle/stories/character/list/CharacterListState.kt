@@ -6,7 +6,9 @@ import com.soyle.stories.common.scopedListener
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
+import javafx.scene.Node
 import javafx.scene.control.TreeItem
+import javafx.scene.layout.Region
 import tornadofx.*
 
 class CharacterListState : ViewModel() {
@@ -14,6 +16,9 @@ class CharacterListState : ViewModel() {
     val loading = SimpleBooleanProperty(true)
     val characters = SimpleListProperty<CharacterListItem.CharacterItem>(null)
     val selectedCharacterListItem: ObjectProperty<CharacterListItem?> = SimpleObjectProperty(null)
+
+    val profileCharacterListNode = SimpleObjectProperty<Region?>(null)
+    val profileBeingViewed = SimpleObjectProperty<CharacterItemViewModel?>(null)
 
     sealed class CharacterListItem {
         class CharacterItem(

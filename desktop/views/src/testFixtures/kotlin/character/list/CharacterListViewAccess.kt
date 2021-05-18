@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.view.character.list
 
 import com.soyle.stories.character.list.CharacterListState
 import com.soyle.stories.character.list.CharacterListView
+import com.soyle.stories.character.profile.CharacterProfileView
 import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.di.get
@@ -9,12 +10,14 @@ import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.CharacterId
 import javafx.event.EventTarget
+import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.image.ImageView
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.Region
 import org.testfx.api.FxRobot
 import tornadofx.getChildList
+import tornadofx.uiComponent
 
 class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
 
@@ -55,6 +58,9 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
 
     val MenuButton.deleteOption: MenuItem?
         get() = items.find { it.id == "delete" }
+
+    val MenuButton.profileOption: MenuItem?
+        get() = items.find { it.id == "profile" }
 
     val characterItemLayout: Region?
         get() = from(view.root).lookup("#character_item_layout").queryAll<Region>().firstOrNull()
@@ -108,5 +114,10 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
         }
         return null
     }
+
+    val characterProfile: CharacterProfileView?
+        get() = from(view.root).lookup(".character-profile").queryAll<Node>().asSequence()
+            .mapNotNull { it.uiComponent<CharacterProfileView>() }
+            .firstOrNull()
 
 }

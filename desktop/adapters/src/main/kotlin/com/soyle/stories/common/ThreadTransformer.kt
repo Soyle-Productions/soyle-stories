@@ -1,8 +1,3 @@
-/**
- * Created by Brendan
- * Date: 3/14/2020
- * Time: 7:05 PM
- */
 package com.soyle.stories.common
 
 import kotlinx.coroutines.CoroutineScope
