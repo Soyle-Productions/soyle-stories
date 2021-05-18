@@ -31,15 +31,15 @@ class Character(
 	 */
 	fun withNameVariant(variant: NonBlankString): CharacterUpdate<CharacterNameVariantAdded>
 	{
-		if (variant == name) return noUpdate()
-		if (variant in otherNames) return noUpdate()
+		if (variant == name) return noUpdate(reason = CharacterNameVariantCannotEqualDisplayName(id, variant.value))
+		if (variant in otherNames) return noUpdate(reason = CharacterNameVariantCannotEqualOtherVariant(id, variant.value))
 		return CharacterUpdate.Updated(
 			character = copy(otherNames = otherNames + variant),
 			event = CharacterNameVariantAdded(id, variant.value)
 		)
 	}
 
-	fun noUpdate() = CharacterUpdate.WithoutChange(this)
+	fun noUpdate(reason: Any? = null) = CharacterUpdate.WithoutChange(this, reason)
 
 	data class Id(val uuid: UUID = UUID.randomUUID()) {
 		override fun toString(): String = "Character($uuid)"

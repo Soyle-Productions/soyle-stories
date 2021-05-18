@@ -5,6 +5,10 @@ import com.soyle.stories.domain.validation.EntityNotFoundException
 import com.soyle.stories.domain.validation.ValidationException
 import java.util.*
 
+sealed interface CharacterNamesMustBeUnique
+data class CharacterNameVariantCannotEqualDisplayName(val characterId: Character.Id, val name: String) : CharacterNamesMustBeUnique
+data class CharacterNameVariantCannotEqualOtherVariant(val characterId: Character.Id, val name: String) : CharacterNamesMustBeUnique
+
 class CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(
     val arcId: UUID,
     val characterId: UUID,

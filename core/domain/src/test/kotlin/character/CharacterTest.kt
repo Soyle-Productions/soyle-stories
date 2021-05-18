@@ -46,6 +46,7 @@ class CharacterTest {
 		val character = makeCharacter(name = NonBlankString.create("Frank")!!)
 		val update = character.withNameVariant(NonBlankString.create("Frank")!!)
 		update as CharacterUpdate.WithoutChange
+		update.reason.mustEqual(CharacterNameVariantCannotEqualDisplayName(character.id, "Frank"))
 	}
 
 	@Test
@@ -54,5 +55,6 @@ class CharacterTest {
 		val update = character.withNameVariant(NonBlankString.create("Frank")!!)
 			.character.withNameVariant(NonBlankString.create("Frank")!!)
 		update as CharacterUpdate.WithoutChange
+		update.reason.mustEqual(CharacterNameVariantCannotEqualOtherVariant(character.id, "Frank"))
 	}
 }
