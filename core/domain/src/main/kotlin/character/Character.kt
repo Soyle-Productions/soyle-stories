@@ -55,6 +55,7 @@ class Character(
         replacement: NonBlankString
     ): CharacterUpdate<CharacterNameVariantRenamed> {
         if (currentVariant == replacement) return noUpdate()
+        if (currentVariant !in otherNames) return noUpdate(CharacterDoesNotHaveNameVariant(id, currentVariant.value))
         if (replacement == name) return noUpdate(reason = CharacterNameVariantCannotEqualDisplayName(id, replacement.value))
         if (replacement in otherNames) return noUpdate(
             reason = CharacterNameVariantCannotEqualOtherVariant(
@@ -69,7 +70,7 @@ class Character(
         )
     }
 
-    fun noUpdate(reason: Any? = null) = CharacterUpdate.WithoutChange(this, reason)
+    fun noUpdate(reason: CharacterException? = null) = CharacterUpdate.WithoutChange(this, reason)
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
 

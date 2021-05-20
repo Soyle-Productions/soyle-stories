@@ -2,12 +2,15 @@ package com.soyle.stories.usecase.character.nameVariant
 
 import com.soyle.stories.domain.character.characterName
 import com.soyle.stories.domain.character.makeCharacter
+import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariant
 import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariantUseCase
 import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariants
 import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariantsUseCase
+import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariantUseCase
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -24,6 +27,19 @@ class `Name Variant Management Int Test` {
         val creationResponse = addCharacterNameVariant(variant)
         val variants = listCharacterNameVariants()
         assertTrue(variants.contains(creationResponse.characterNameVariantAdded.newVariant))
+    }
+
+    @Test
+    fun `can rename created variants`() {
+        val variant = characterName()
+        val creationResponse = addCharacterNameVariant(variant)
+        val rename = characterName()
+        val renameResponse = renameCharacterNameVariant(
+            NonBlankString.create(creationResponse.characterNameVariantAdded.newVariant)!!,
+            rename
+        )
+        renameResponse.characterNameVariantRenamed.originalVariant.mustEqual(variant)
+        renameResponse.characterNameVariantRenamed.newVariant.mustEqual(rename)
     }
 
     private fun addCharacterNameVariant(variant: NonBlankString): AddCharacterNameVariant.ResponseModel = runBlocking {
@@ -43,6 +59,20 @@ class `Name Variant Management Int Test` {
             result = it
         }
         result
+    }
+
+    private fun renameCharacterNameVariant(
+        originalVariant: NonBlankString,
+        nextVariant: NonBlankString
+    ): RenameCharacterNameVariant.ResponseModel {
+        lateinit var result: RenameCharacterNameVariant.ResponseModel
+        val request = RenameCharacterNameVariant.RequestModel(character.id, originalVariant, nextVariant)
+        runBlocking {
+            RenameCharacterNameVariantUseCase(characterRepository).invoke(request) {
+                result = it
+            }
+        }
+        return result
     }
 
 }

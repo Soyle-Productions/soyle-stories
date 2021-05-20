@@ -72,6 +72,17 @@ class CharacterTest {
         assertFalse(update.character.otherNames.contains(originalVariant))
     }
 
+    @Test
+    fun `cannot modify a name variant that does not exist`() {
+        val originalVariant = NonBlankString.create("Frank")!!
+        val newVariant = NonBlankString.create("George")!!
+        val character = makeCharacter()
+        val update = character.withNameVariantModified(originalVariant, newVariant)
+
+        update as CharacterUpdate.WithoutChange
+        update.reason.mustEqual(CharacterDoesNotHaveNameVariant(character.id, originalVariant.value))
+    }
+
 	@Test
 	fun `cannot modify name variant to be same as display name`() {
 		val originalVariant = NonBlankString.create("Frank")!!

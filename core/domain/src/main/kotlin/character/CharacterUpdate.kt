@@ -8,7 +8,7 @@ sealed class CharacterUpdate<out Event>(val character: Character) : EntityUpdate
 
     override fun component1(): Character = character
 
-    class WithoutChange(character: Character, val reason: Any? = null) : CharacterUpdate<Nothing>(character)
+    class WithoutChange(character: Character, val reason: CharacterException? = null) : CharacterUpdate<Nothing>(character)
     class Updated<Event>(character: Character, val event: Event) : CharacterUpdate<Event>(character) {
 
         operator fun component2(): Event = event
