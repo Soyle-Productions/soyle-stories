@@ -3,6 +3,7 @@ package com.soyle.stories.character.profile
 import com.soyle.stories.character.create.characterNameInput
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
+import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
 import com.soyle.stories.characterarc.components.characterIcon
 import com.soyle.stories.common.components.buttons.ButtonVariant
@@ -85,6 +86,26 @@ class CharacterProfileView : View() {
         }
     }
 
+    private fun removeAlternativeName(altName: NonBlankString) {
+        state.executingNameChange.set(true)
+        val controller = scope.projectScope.get<RemoveCharacterNameVariantController>()
+        try {
+            val eventualResult = controller.removeCharacterNameVariant(state.characterId.value, altName)
+            eventualResult.invokeOnCompletion {
+                runLater {
+                    state.executingNameChange.set(false)
+                    /*if (failure is SoyleStoriesException) state.creationFailure.set(failure.localizedMessage)
+                    else state.isCreatingName.set(false)*/
+                }
+            }
+        } catch (failure: ValidationException) {
+            runLater {
+                state.executingNameChange.set(false)
+                //state.creationFailure.set(failure.localizedMessage)
+            }
+        }
+    }
+
     override val root: Parent = vbox {
         addClass("character-profile")
         val rootSurfaceElevationProperty = surfaceElevationProperty()
@@ -147,7 +168,7 @@ class CharacterProfileView : View() {
                     }
 
                     fun deleteAlternativeName() {
-
+                        removeAlternativeName(NonBlankString.create(altName)!!)
                     }
 
                     /*

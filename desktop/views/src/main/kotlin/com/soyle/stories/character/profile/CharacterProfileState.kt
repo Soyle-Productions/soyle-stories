@@ -3,18 +3,21 @@ package com.soyle.stories.character.profile
 import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedNotifier
 import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedReceiver
 import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
+import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedNotifier
+import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedReceiver
 import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedNotifier
 import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedReceiver
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
+import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import javafx.beans.property.*
 import tornadofx.*
 
 class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterNameVariantAddedReceiver,
-    CharacterNameVariantRenamedReceiver {
+    CharacterNameVariantRenamedReceiver, CharacterNameVariantRemovedReceiver {
 
     val characterId: ReadOnlyProperty<Character.Id> = bind(CharacterProfileProps::characterId)
     val characterImageResource: ReadOnlyStringProperty = bind(CharacterProfileProps::imageResource)
@@ -42,6 +45,7 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
         (scope as CharacterProfileScope).projectScope.run {
             this@CharacterProfileState listensTo get<CharacterNameVariantAddedNotifier>()
             this@CharacterProfileState listensTo get<CharacterNameVariantRenamedNotifier>()
+            this@CharacterProfileState listensTo get<CharacterNameVariantRemovedNotifier>()
         }
     }
 
@@ -63,6 +67,16 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
                         if (it == event.originalVariant.value) event.newVariant.value
                         else it
                     }
+                }
+            }
+        }
+    }
+
+    override suspend fun receiveCharacterNameVariantRemoved(event: CharacterNameVariantRemoved) {
+        if (event.characterId == item?.characterId) {
+            runLater {
+                if (alternativeNames.value != null) {
+                    alternativeNames.removeIf { it == event.variant.value }
                 }
             }
         }

@@ -6,6 +6,8 @@ import com.soyle.stories.character.createArcSection.CreateArcSectionControllerIm
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantOutput
 import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
+import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
+import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantOutput
 import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantOutput
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
@@ -45,6 +47,8 @@ import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVa
 import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariantUseCase
 import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariants
 import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariantsUseCase
+import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariantUseCase
 import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariant
 import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariantUseCase
 
@@ -113,6 +117,7 @@ object UseCases {
             addNameVariant()
             listCharacterNameVariants()
             renameCharacterNameVariant()
+            removeCharacterNameVariant()
         }
     }
 
@@ -190,6 +195,18 @@ object UseCases {
         }
         provide<RenameCharacterNameVariant.OutputPort> {
             RenameCharacterNameVariantOutput(get())
+        }
+    }
+
+    private fun InProjectScope.removeCharacterNameVariant() {
+        provide {
+            RemoveCharacterNameVariantController(applicationScope.get(), get(), get())
+        }
+        provide<RemoveCharacterNameVariant> {
+            RemoveCharacterNameVariantUseCase(get())
+        }
+        provide<RemoveCharacterNameVariant.OutputPort> {
+            RemoveCharacterNameVariantOutput(get())
         }
     }
 }
