@@ -1,6 +1,7 @@
 package com.soyle.stories.domain.character
 
 import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
+import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.entities.EntityUpdate
@@ -50,13 +51,26 @@ class Character(
         )
     }
 
+    fun withoutNameVariant(variant: NonBlankString): CharacterUpdate<CharacterNameVariantRemoved> {
+        if (variant !in otherNames) return noUpdate(CharacterDoesNotHaveNameVariant(id, variant.value))
+        return CharacterUpdate.Updated(
+            character = copy(otherNames = otherNames - variant),
+            event = CharacterNameVariantRemoved(id, variant)
+        )
+    }
+
     fun withNameVariantModified(
         currentVariant: NonBlankString,
         replacement: NonBlankString
     ): CharacterUpdate<CharacterNameVariantRenamed> {
         if (currentVariant == replacement) return noUpdate()
         if (currentVariant !in otherNames) return noUpdate(CharacterDoesNotHaveNameVariant(id, currentVariant.value))
-        if (replacement == name) return noUpdate(reason = CharacterNameVariantCannotEqualDisplayName(id, replacement.value))
+        if (replacement == name) return noUpdate(
+            reason = CharacterNameVariantCannotEqualDisplayName(
+                id,
+                replacement.value
+            )
+        )
         if (replacement in otherNames) return noUpdate(
             reason = CharacterNameVariantCannotEqualOtherVariant(
                 id,

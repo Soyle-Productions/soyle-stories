@@ -1,5 +1,6 @@
 package com.soyle.stories.domain.character
 
+import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
@@ -115,4 +116,27 @@ class CharacterTest {
 		update as CharacterUpdate.WithoutChange
 		assertNull(update.reason)
 	}
+
+    @Test
+    fun `can remove name variant`() {
+        val nameVariant = characterName()
+        val character = makeCharacter().withNameVariant(nameVariant).character
+        val update = character.withoutNameVariant(nameVariant)
+
+        update as CharacterUpdate.Updated
+        update.event.mustEqual(CharacterNameVariantRemoved(character.id, nameVariant))
+        update.character.otherNames.contains(nameVariant).mustEqual(false)
+    }
+
+    @Test
+    fun `cannot remove name variant that doesn't exist`() {
+        val nameVariant = characterName()
+        val character = makeCharacter()
+        val update = character.withoutNameVariant(nameVariant)
+
+        update as CharacterUpdate.WithoutChange
+        update.reason.mustEqual(CharacterDoesNotHaveNameVariant(character.id, nameVariant.value))
+    }
+
+
 }
