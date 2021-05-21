@@ -9,6 +9,8 @@ import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVa
 import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariantUseCase
 import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariants
 import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariantsUseCase
+import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariantUseCase
 import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariant
 import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariantUseCase
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
@@ -42,6 +44,17 @@ class `Name Variant Management Int Test` {
         renameResponse.characterNameVariantRenamed.newVariant.mustEqual(rename)
     }
 
+    @Test
+    fun `can delete listed variants`() {
+        val variant = characterName()
+        addCharacterNameVariant(variant)
+        val variants = listCharacterNameVariants()
+        val listedVariant = variants.find { it == variant.value }!!
+        val removalResponse = removeCharacterNameVariant(nonBlankStr(listedVariant))
+        removalResponse.characterNameVariantRemoved.characterId.mustEqual(character.id)
+        removalResponse.characterNameVariantRemoved.variant.value.mustEqual(listedVariant)
+    }
+
     private fun addCharacterNameVariant(variant: NonBlankString): AddCharacterNameVariant.ResponseModel = runBlocking {
         val output = object : AddCharacterNameVariant.OutputPort {
             lateinit var result: AddCharacterNameVariant.ResponseModel
@@ -69,6 +82,18 @@ class `Name Variant Management Int Test` {
         val request = RenameCharacterNameVariant.RequestModel(character.id, originalVariant, nextVariant)
         runBlocking {
             RenameCharacterNameVariantUseCase(characterRepository).invoke(request) {
+                result = it
+            }
+        }
+        return result
+    }
+
+    private fun removeCharacterNameVariant(
+        variant: NonBlankString
+    ): RemoveCharacterNameVariant.ResponseModel {
+        lateinit var result: RemoveCharacterNameVariant.ResponseModel
+        runBlocking {
+            RemoveCharacterNameVariantUseCase(characterRepository).invoke(character.id, variant) {
                 result = it
             }
         }
