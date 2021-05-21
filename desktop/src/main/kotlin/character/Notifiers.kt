@@ -2,6 +2,8 @@ package com.soyle.stories.desktop.config.character
 
 import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedNotifier
 import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedReceiver
+import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedNotifier
+import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterConfirmationNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterConfirmationReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
@@ -15,6 +17,7 @@ import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
@@ -44,7 +47,7 @@ object Notifiers {
                 }
             }
             provide(CharacterNameVariantAddedReceiver::class) { CharacterNameVariantAddedNotifier() }
-
+            provide(CharacterNameVariantRenamedReceiver::class) { CharacterNameVariantRenamedNotifier() }
         }
     }
 

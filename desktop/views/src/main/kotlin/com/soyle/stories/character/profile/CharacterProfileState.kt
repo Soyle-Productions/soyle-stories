@@ -3,14 +3,18 @@ package com.soyle.stories.character.profile
 import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedNotifier
 import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedReceiver
 import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
+import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedNotifier
+import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedReceiver
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
+import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import javafx.beans.property.*
 import tornadofx.*
 
-class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterNameVariantAddedReceiver {
+class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterNameVariantAddedReceiver,
+    CharacterNameVariantRenamedReceiver {
 
     val characterId: ReadOnlyProperty<Character.Id> = bind(CharacterProfileProps::characterId)
     val characterImageResource: ReadOnlyStringProperty = bind(CharacterProfileProps::imageResource)
@@ -37,7 +41,7 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
     init {
         (scope as CharacterProfileScope).projectScope.run {
             this@CharacterProfileState listensTo get<CharacterNameVariantAddedNotifier>()
-
+            this@CharacterProfileState listensTo get<CharacterNameVariantRenamedNotifier>()
         }
     }
 
@@ -46,6 +50,19 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
             runLater {
                 if (alternativeNames.value != null) {
                     alternativeNames.add(event.newVariant)
+                }
+            }
+        }
+    }
+
+    override suspend fun receiveCharacterNameVariantRenamed(event: CharacterNameVariantRenamed) {
+        if (event.characterId == item?.characterId) {
+            runLater {
+                if (alternativeNames.value != null) {
+                    alternativeNames.replaceAll {
+                        if (it == event.originalVariant.value) event.newVariant.value
+                        else it
+                    }
                 }
             }
         }

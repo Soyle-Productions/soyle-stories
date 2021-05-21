@@ -32,7 +32,7 @@ Feature: Manage Name Variants
       Given I have created a name variant of "Bobby" for the "Bob" character
       And I am renaming the "Bobby" name variant for the "Bob" character
       When I rename the name variant of "Bobby" for the "Bob" character to "Bob"
-      Then I should still be renaming the "Bobby" name variant for the "Bob" character
+      Then I should still be renaming the name variant "Bobby" for the "Bob" character
       And the "Bob" character should not have a name variant of "Bob"
       And the "Bob" character should have a name variant of "Bobby"
 
@@ -50,6 +50,6 @@ Feature: Manage Name Variants
       And I have created a name variant of "Robert" for the "Bob" character
       And I am renaming the "Robert" name variant for the "Bob" character
       When I rename the name variant of "Robert" for the "Bob" character to "Bobby"
-      Then I should still be renaming the "Robert" name variant for the "Bob" character
+      Then I should still be renaming the name variant "Robert" for the "Bob" character
       And the "Bob" character should have only one name variant of "Bobby"
       And the "Bob" character should have a name variant of "Robert"

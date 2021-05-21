@@ -6,6 +6,8 @@ import com.soyle.stories.character.createArcSection.CreateArcSectionControllerIm
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantOutput
 import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
+import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
+import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantOutput
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
@@ -43,6 +45,8 @@ import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVa
 import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariantUseCase
 import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariants
 import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariantsUseCase
+import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariantUseCase
 
 object UseCases {
 
@@ -108,6 +112,7 @@ object UseCases {
             // name variants
             addNameVariant()
             listCharacterNameVariants()
+            renameCharacterNameVariant()
         }
     }
 
@@ -176,4 +181,15 @@ object UseCases {
         }
     }
 
+    private fun InProjectScope.renameCharacterNameVariant() {
+        provide {
+            RenameCharacterNameVariantController(applicationScope.get(), get(), get())
+        }
+        provide<RenameCharacterNameVariant> {
+            RenameCharacterNameVariantUseCase(get())
+        }
+        provide<RenameCharacterNameVariant.OutputPort> {
+            RenameCharacterNameVariantOutput(get())
+        }
+    }
 }

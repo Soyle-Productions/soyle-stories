@@ -3,6 +3,7 @@ package com.soyle.stories.character.profile
 import com.soyle.stories.character.create.characterNameInput
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
+import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
 import com.soyle.stories.characterarc.components.characterIcon
 import com.soyle.stories.common.components.buttons.ButtonVariant
 import com.soyle.stories.common.components.buttons.secondaryButton
@@ -62,8 +63,26 @@ class CharacterProfileView : View() {
                 state.creationFailure.set(failure.localizedMessage)
             }
         }
+    }
 
-
+    private fun renameAlternativeName(currentName: NonBlankString, newName: NonBlankString) {
+        state.executingNameChange.set(true)
+        val controller = scope.projectScope.get<RenameCharacterNameVariantController>()
+        try {
+            controller.renameCharacterNameVariant(state.characterId.value, currentName, newName)
+                .invokeOnCompletion { failure ->
+                    runLater {
+                        state.executingNameChange.set(false)
+                        /*if (failure is SoyleStoriesException) state.creationFailure.set(failure.localizedMessage)
+                        else state.isCreatingName.set(false)*/
+                    }
+                }
+        } catch (failure: ValidationException) {
+            runLater {
+                state.executingNameChange.set(false)
+                //state.creationFailure.set(failure.localizedMessage)
+            }
+        }
     }
 
     override val root: Parent = vbox {
@@ -124,7 +143,7 @@ class CharacterProfileView : View() {
                     fun cancelEdit() = isEditing.set(false)
 
                     fun commitAltNameRename(newName: NonBlankString) {
-
+                        renameAlternativeName(NonBlankString.create(altName)!!, newName)
                     }
 
                     fun deleteAlternativeName() {
