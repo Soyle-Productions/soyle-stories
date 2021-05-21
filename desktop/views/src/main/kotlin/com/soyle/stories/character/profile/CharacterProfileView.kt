@@ -174,6 +174,7 @@ class CharacterProfileView : View() {
                         }
                         label(altName ?: "") { existsWhen(isEditing.not()) }
                         secondaryButton(graphic = MaterialIconView(MaterialIcon.DELETE, "1.5em"), variant = null) {
+                            addClass("delete-button")
                             action { deleteAlternativeName() }
                         }
                     }

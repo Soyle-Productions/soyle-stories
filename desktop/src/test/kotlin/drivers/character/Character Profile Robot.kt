@@ -59,3 +59,10 @@ fun CharacterProfileView.renameVariantTo(originalVariant: String, newVariant: St
         renameField.fireEvent(ActionEvent())
     }
 }
+
+fun CharacterProfileView.removeVariant(variant: String)
+{
+    drive {
+        altNameDeleteButton(variant)!!.fire()
+    }
+}

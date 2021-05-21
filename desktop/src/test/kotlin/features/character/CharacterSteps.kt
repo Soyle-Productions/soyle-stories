@@ -162,6 +162,14 @@ class CharacterSteps : En {
                 .givenRenamingCharacterNameVariant(originalVariant)
                 .renameVariantTo(originalVariant, newVariant)
         }
+        When(
+            "I remove the {string} name variant for the {character}"
+        ) { variant: String, character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenCharacterListToolHasBeenOpened()
+                .givenCharacterProfileOpenedFor(character)
+                .removeVariant(variant)
+        }
     }
 
     private fun thens() {

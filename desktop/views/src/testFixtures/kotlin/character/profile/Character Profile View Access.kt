@@ -43,6 +43,10 @@ class `Character Profile View Access`(val view: CharacterProfileView) : FxRobot(
         from(this).lookup(".edit-button").queryAll<Button>().firstOrNull()
     }
 
+    fun altNameDeleteButton(altName: String): Button? = getCharacterAltNameItem(altName)?.run {
+        from(this).lookup(".delete-button").queryAll<Button>().firstOrNull()
+    }
+
     fun altNameRenameField(altName: String): TextInputControl? = getCharacterAltNameItem(altName)?.run {
         from(this).lookup(".character-name-input").queryAll<TextInputControl>().firstOrNull()
     }

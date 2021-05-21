@@ -20,6 +20,11 @@ Feature: Manage Name Variants
     And the "Bob" character should not have a name variant of "Bobby"
     And the "Bob" character should have a name variant of "Robert"
 
+  Scenario: Delete Variant
+    Given I have created a name variant of "Bobby" for the "Bob" character
+    When I remove the "Bobby" name variant for the "Bob" character
+    Then the "Bob" character should not have a name variant of "Bobby"
+
   Rule: A character name variant cannot be the same as the character Display Name
 
     Scenario: Create Name Variant with Same Name as Display Name
