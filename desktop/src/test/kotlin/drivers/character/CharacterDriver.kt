@@ -2,6 +2,8 @@ package com.soyle.stories.desktop.config.drivers.character
 
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
+import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
+import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
@@ -134,6 +136,29 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
     fun givenCharacterRemoved(character: Character) {
         projectScope.get<RemoveCharacterFromStoryController>()
             .confirmRemoveCharacter(character.id)
+    }
+
+    fun givenCharacterNameVariantRemoved(characterId: Character.Id, variant: String) {
+        val nonBlankVariant = getCharacterNameVariant(characterId, variant) ?: return
+        removeNameVariant(characterId, nonBlankVariant)
+    }
+
+    private fun removeNameVariant(characterId: Character.Id, variant: NonBlankString)
+    {
+        projectScope.get<RemoveCharacterNameVariantController>()
+            .removeCharacterNameVariant(characterId, variant)
+    }
+
+    fun givenCharacterNameVariantRenamedTo(characterId: Character.Id, original: String, rename: String)
+    {
+        val originalVariant = getCharacterNameVariant(characterId, original) ?: return
+        renameNameVariant(characterId, originalVariant, NonBlankString.create(rename)!!)
+    }
+
+    private fun renameNameVariant(characterId: Character.Id, original: NonBlankString, newName: NonBlankString)
+    {
+        projectScope.get<RenameCharacterNameVariantController>()
+            .renameCharacterNameVariant(characterId, original, newName)
     }
 
     companion object {

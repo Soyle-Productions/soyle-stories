@@ -52,7 +52,7 @@ class CharacterSteps : En {
             val characterDriver = CharacterDriver(workbench)
             characterDriver.givenCharacterNamed(NonBlankString.create(characterName)!!)
         }
-        Given("I have created a character named {string}")  { characterName: String ->
+        Given("I have created a character named {string}") { characterName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val characterDriver = CharacterDriver(workbench)
             characterDriver.givenCharacterNamed(NonBlankString.create(characterName)!!)
@@ -104,11 +104,27 @@ class CharacterSteps : En {
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenCharacterHasANameVariant(character, variant)
         }
+        Given("I have created the following name variants for the {character}") { character: Character, data: DataTable ->
+            val characterDriver = CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+            data.asList().forEach {
+                characterDriver.givenCharacterHasANameVariant(character, it)
+            }
+        }
         Given("I am renaming the {string} name variant for the {character}") { variant: String, character: Character ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCharacterListToolHasBeenOpened()
                 .givenCharacterProfileOpenedFor(character)
                 .givenRenamingCharacterNameVariant(variant)
+        }
+        Given("I have removed the {string} name variant for the {character}") { variant: String, character: Character ->
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .givenCharacterNameVariantRemoved(character.id, variant)
+        }
+        Given(
+            "I have renamed the name variant of {string} for the {character} to {string}"
+        ) { originalVariant: String, character: Character, newVariant: String ->
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .givenCharacterNameVariantRenamedTo(character.id, originalVariant, newVariant)
         }
     }
 
