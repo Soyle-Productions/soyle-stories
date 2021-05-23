@@ -61,7 +61,7 @@ class RenameSymbolUseCase(
         val entityId = symbol.id.mentioned(themeId)
         val updates = proseRepository.getProseThatMentionEntity(entityId)
             .map {
-                it.withMentionTextReplaced(entityId, name)
+                it.withMentionTextReplaced(entityId, symbol.name to name)
             }
         proseRepository.replaceProse(updates.map { it.prose })
         return updates.mapNotNull { it.event }

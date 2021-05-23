@@ -43,7 +43,7 @@ class RenameLocationUseCase(
 	{
 		val locationEntityId = location.id.mentioned()
 		val updatedProse = proseRepository.getProseThatMentionEntity(locationEntityId).map {
-			it.withMentionTextReplaced(locationEntityId, newName.value)
+			it.withMentionTextReplaced(locationEntityId, location.name.value to newName.value)
 		}
 		proseRepository.replaceProse(updatedProse.map { it.prose })
 		return updatedProse.mapNotNull { it.event }

@@ -1,6 +1,7 @@
 package com.soyle.stories.usecase.character
 
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.characterName
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
@@ -140,19 +141,20 @@ class RenameCharacterUnitTest {
     @Nested
     inner class `Rule - All Prose that mention the character should update the mention of that character` {
 
-        private val prose = makeProse(
+        private val proseId = Prose.Id()
+        private val prose = makeProse(id = proseId,
             content = character.name.value, mentions = listOf(
                 ProseMention(character.id.mentioned(), ProseMentionRange(0, character.name.length))
             )
         )
 
         init {
+            proseRepository.givenProse(prose)
             characterRepository.givenCharacter(character)
         }
 
         @Test
         fun `should update prose`() {
-            proseRepository.givenProse(prose)
             renameCharacter()
             updatedProse!!.let {
                 it.content.mustEqual(inputName.value) { "prose with only mention should have entire content replaced" }
@@ -166,7 +168,6 @@ class RenameCharacterUnitTest {
 
         @Test
         fun `should output prose mention text replaced events`() {
-            proseRepository.givenProse(prose)
             renameCharacter()
             result!!.mentionTextReplaced.single().let {
                 it.deletedText.mustEqual(character.name.value)
@@ -175,6 +176,35 @@ class RenameCharacterUnitTest {
                 it.newContent.mustEqual(updatedProse!!.content)
                 it.newMentions.mustEqual(updatedProse!!.mentions)
             }
+        }
+
+        @Nested
+        inner class `Should not modify mentioned name variants`
+        {
+
+            private val variant = characterName()
+
+            private val prose = makeProse(id = proseId)
+                .withTextInserted(variant.value).prose
+                .withEntityMentioned(character.id.mentioned(), 0, variant.length).prose
+
+            init {
+                proseRepository.givenProse(prose)
+                characterRepository.givenCharacter(character.withNameVariant(variant).character)
+            }
+
+            @Test
+            fun `Prose should not be updated`() {
+                renameCharacter()
+                assertNull(updatedProse)
+            }
+
+            @Test
+            fun `should not output prose updated events`() {
+                renameCharacter()
+                result!!.mentionTextReplaced.mustEqual(emptyList<MentionTextReplaced>())
+            }
+
         }
 
     }
