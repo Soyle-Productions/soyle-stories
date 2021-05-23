@@ -14,6 +14,7 @@ import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNam
 import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariant
 import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariantUseCase
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
+import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -81,7 +82,7 @@ class `Name Variant Management Int Test` {
         lateinit var result: RenameCharacterNameVariant.ResponseModel
         val request = RenameCharacterNameVariant.RequestModel(character.id, originalVariant, nextVariant)
         runBlocking {
-            RenameCharacterNameVariantUseCase(characterRepository).invoke(request) {
+            RenameCharacterNameVariantUseCase(characterRepository, ProseRepositoryDouble()).invoke(request) {
                 result = it
             }
         }

@@ -3,11 +3,16 @@ package com.soyle.stories.usecase.character.nameVariant
 import com.soyle.stories.domain.character.*
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import com.soyle.stories.domain.mustEqual
+import com.soyle.stories.domain.prose.MentionTextReplaced
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.prose.makeProse
+import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.character.CharacterDoesNotExist
 import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariant
 import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariantUseCase
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
+import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertNull
@@ -19,9 +24,11 @@ class `Rename Character Name Variant Unit Test` {
     private val replacementVariant = characterName()
 
     private var updatedCharacter: Character? = null
+    private val updatedProse = mutableListOf<Prose>()
     private var result: RenameCharacterNameVariant.ResponseModel? = null
 
     private val characterRepository = CharacterRepositoryDouble(onUpdateCharacter = ::updatedCharacter::set)
+    private val proseRepository = ProseRepositoryDouble(onReplaceProse = updatedProse::add)
 
     @Test
     fun `character doesn't exist - should throw error`() {
@@ -45,6 +52,10 @@ class `Rename Character Name Variant Unit Test` {
 
         init {
             characterRepository.givenCharacter(character.withNameVariant(originalVariant).character)
+            makeProse()
+                .withTextInserted(character.name.value, 0).prose
+                .withEntityMentioned(character.id.mentioned(), 0, character.name.length).prose
+                .also(proseRepository::givenProse)
         }
 
         @Test
@@ -67,11 +78,49 @@ class `Rename Character Name Variant Unit Test` {
             assertNull(failure)
         }
 
+        @Test
+        fun `should not update prose`() {
+            renameCharacterNameVariant()
+            updatedProse.mustEqual(emptyList<Prose>())
+        }
+
+        @Nested
+        inner class `Given Name Variant Mentioned in Prose` {
+
+            private val prose = List(5) {
+                makeProse()
+                    .withTextInserted(originalVariant.value).prose
+                    .withEntityMentioned(character.id.mentioned(), 0, originalVariant.length).prose
+                    .also(proseRepository::givenProse)
+            }
+
+            @Test
+            fun `should update all prose with mention`() {
+                renameCharacterNameVariant()
+
+                updatedProse.size.mustEqual(5)
+                updatedProse.map { it.id }.toSet().mustEqual(prose.map { it.id }.toSet())
+            }
+
+            @Test
+            fun `should output prose events`() {
+                renameCharacterNameVariant()
+
+                result!!.mentionTextReplaced.size.mustEqual(5)
+                result!!.mentionTextReplaced.forEach {
+                    it.deletedText.mustEqual(originalVariant.value)
+                    it.entityId.mustEqual(character.id.mentioned())
+                    it.insertedText.mustEqual(replacementVariant.value)
+                    it.newContent.mustEqual(replacementVariant.value)
+                }
+            }
+
+        }
+
     }
 
     @Nested
-    inner class `Given Rename is Unsuccessful`
-    {
+    inner class `Given Rename is Unsuccessful` {
 
         init {
             characterRepository.givenCharacter(character.withNameVariant(originalVariant).character)
@@ -98,7 +147,8 @@ class `Rename Character Name Variant Unit Test` {
         fun `replacement already exists as other name`() {
             characterRepository.givenCharacter(
                 character.withNameVariant(originalVariant)
-                    .character.withNameVariant(replacementVariant).character)
+                    .character.withNameVariant(replacementVariant).character
+            )
 
             val failure = renameCharacterNameVariant(replacementVariant)
             failure.mustEqual(CharacterNameVariantCannotEqualOtherVariant(character.id, replacementVariant.value))
@@ -113,7 +163,7 @@ class `Rename Character Name Variant Unit Test` {
     }
 
     private fun renameCharacterNameVariant(replacement: NonBlankString = replacementVariant) = runBlocking {
-        val useCase: RenameCharacterNameVariant = RenameCharacterNameVariantUseCase(characterRepository)
+        val useCase: RenameCharacterNameVariant = RenameCharacterNameVariantUseCase(characterRepository, proseRepository)
         val request = RenameCharacterNameVariant.RequestModel(character.id, originalVariant, replacement)
         useCase.invoke(request) {
             result = it
