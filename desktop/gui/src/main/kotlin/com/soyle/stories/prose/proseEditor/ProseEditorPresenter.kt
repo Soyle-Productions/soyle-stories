@@ -59,6 +59,9 @@ class ProseEditorPresenter internal constructor(
                         it.name.substring(index - 1, index) == " " -> 1
                         else -> 2
                     }
+                },
+                {
+                    it.name.length.toDouble() / query.length
                 }
             )).map {
                 MatchingStoryElementViewModel(

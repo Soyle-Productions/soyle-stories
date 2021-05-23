@@ -50,16 +50,17 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
         assertEquals(characterIndex, driver.mentionMenuCharacterAlignment())
     }
 
-    fun isListingStoryElement(index: Int, expectedLabel: String, expectedType: String)
+    fun isListingStoryElement(index: Int, expectedLabel: String, expectedType: String, expectedAddendum: String? = null)
     {
         val storyElement = driver.listedStoryElementAt(index)
-        assertEquals(expectedLabel, storyElement!!.name.toString())
-        assertEquals(expectedType, storyElement.type)
+        assertEquals(expectedLabel, storyElement!!.name.toString()) { "Item $index does not match expected label" }
+        assertEquals(expectedAddendum, storyElement.addendum?.toString()) { "Item $index does not match expected addendum" }
+        assertEquals(expectedType, storyElement.type) { "Item $index does not match expected type" }
     }
 
-    fun isListingAllStoryElementsInOrder(elements: List<Pair<String, String>>)
+    fun isListingAllStoryElementsInOrder(elements: List<Triple<String, String, String?>>)
     {
-        elements.forEachIndexed { index, pair -> isListingStoryElement(index, pair.first, pair.second) }
+        elements.forEachIndexed { index, pair -> isListingStoryElement(index, pair.first, pair.second, pair.third) }
     }
 
     fun isDisabled()

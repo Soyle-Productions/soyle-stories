@@ -536,7 +536,9 @@ class SceneSteps : En {
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
                     suggestedMentionListIsVisible()
-                    isListingAllStoryElementsInOrder(dataTable.asLists().drop(1).map { it.component1() to it.component2() })
+                    isListingAllStoryElementsInOrder(dataTable.asLists().drop(1).map {
+                        Triple(it.component1(), it.component2(), it.component3())
+                    })
                 }
             }
         }

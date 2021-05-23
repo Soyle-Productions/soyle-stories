@@ -29,12 +29,12 @@ Feature: Mention a Story Element
     And I am editing the "Big Battle" scene's prose
     When I request story elements that match "Bo" for the "Big Battle" scene
     Then I should see the following matching story elements for the "Big Battle" scene in this order
-      | Element Name | Element Type |
-      | Bob          | character    |
-      | Bomb Shelter | location     |
-      | Billy Bob    | character    |
-      | A Border     | symbol       |
-      | Hobo Den     | location     |
+      | Element Name | Element Type | Addendum          |
+      | Bob          | character    |                   |
+      | Bomb Shelter | location     |                   |
+      | A Border     | symbol       | Becoming a Leader |
+      | Billy Bob    | character    |                   |
+      | Hobo Den     | location     |                   |
 
   Scenario Outline: Mention a Story Element
     Given I have created the following characters
@@ -156,3 +156,13 @@ Feature: Mention a Story Element
       And I am editing the "Big Battle" scene's prose
       When I rename the name variant of "Bobby" for the "Bob" character to "Robert"
       Then the "Bobby" mention in the "Big Battle" scene's prose should read "Robert"
+
+  Rule: Renaming a Character should not modify the Alternative name mentions
+
+    Scenario: Rename a Character Mentioned via an Alternative Name
+      Given I have created a character named "Bob"
+      And I have created a name variant of "Bobby" for the "Bob" character
+      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
+      And I am editing the "Big Battle" scene's prose
+      When I rename the "Bob" character to "Frank"
+      Then I should see "Bobby" mentioned in the "Big Battle" scene's prose

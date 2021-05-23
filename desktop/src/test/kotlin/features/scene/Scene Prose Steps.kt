@@ -111,8 +111,8 @@ class `Scene Prose Steps` : En {
                     suggestedMentionListIsVisible()
                     isListingAllStoryElementsInOrder(rows.map {
                         val (nameVariant, fullName) = it
-                        if (fullName.isNullOrBlank()) nameVariant to "Character"
-                        else "$nameVariant ($fullName)" to "Character"
+                        if (fullName.isNullOrBlank()) Triple(nameVariant, "character", null)
+                        else Triple(nameVariant, "character", fullName)
                     })
                 }
             }

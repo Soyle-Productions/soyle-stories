@@ -191,10 +191,10 @@ object UseCases {
             RenameCharacterNameVariantController(applicationScope.get(), get(), get())
         }
         provide<RenameCharacterNameVariant> {
-            RenameCharacterNameVariantUseCase(get())
+            RenameCharacterNameVariantUseCase(get(), get())
         }
         provide<RenameCharacterNameVariant.OutputPort> {
-            RenameCharacterNameVariantOutput(get())
+            RenameCharacterNameVariantOutput(get(), get())
         }
     }
 
