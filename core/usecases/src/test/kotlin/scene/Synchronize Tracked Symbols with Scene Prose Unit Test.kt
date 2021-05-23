@@ -1,14 +1,12 @@
 package com.soyle.stories.usecase.scene
 
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.prose.ProseMention
-import com.soyle.stories.domain.prose.ProseMentionRange
-import com.soyle.stories.domain.prose.makeProse
-import com.soyle.stories.domain.prose.mentioned
+import com.soyle.stories.domain.prose.*
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SymbolTrackedInScene
 import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.singleLine
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
 import com.soyle.stories.usecase.prose.ProseDoesNotExist
@@ -31,8 +29,7 @@ class `Synchronize Tracked Symbols with Scene Prose Unit Test` {
     private val theme = makeTheme(symbols = listOf(symbol))
     private val prose = makeProse(
         id = scene.proseId,
-        content = symbol.name,
-        mentions = listOf(ProseMention(symbol.id.mentioned(theme.id), ProseMentionRange(0, symbol.name.length)))
+        content = listOf(ProseContent("", symbol.id.mentioned(theme.id) to singleLine(symbol.name)))
     )
 
     private var updatedScene: Scene? = null

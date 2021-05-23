@@ -6,6 +6,7 @@ import com.soyle.stories.domain.prose.*
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.shouldBe
+import com.soyle.stories.domain.singleLine
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.makeSymbol
@@ -77,8 +78,8 @@ class RenameSymbolUnitTest {
     inner class `Rule - All Prose that mention the symbol should update the mention of that symbol` {
 
         private val prose = makeProse(
-            content = symbol.name, mentions = listOf(
-                ProseMention(symbol.id.mentioned(themeId), ProseMentionRange(0, symbol.name.length))
+            content = listOf(
+                ProseContent("", symbol.id.mentioned(themeId) to singleLine(symbol.name))
             )
         )
 

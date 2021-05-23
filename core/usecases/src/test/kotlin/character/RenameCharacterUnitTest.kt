@@ -9,6 +9,7 @@ import com.soyle.stories.domain.prose.*
 import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.singleLine
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.makeCharacterInTheme
 import com.soyle.stories.domain.theme.makeTheme
@@ -144,8 +145,8 @@ class RenameCharacterUnitTest {
 
         private val proseId = Prose.Id()
         private val prose = makeProse(id = proseId,
-            content = character.name.value, mentions = listOf(
-                ProseMention(character.id.mentioned(), ProseMentionRange(0, character.name.length))
+            content = listOf(
+                ProseContent("", character.id.mentioned() to singleLine(character.name.value))
             )
         )
 

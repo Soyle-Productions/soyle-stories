@@ -33,7 +33,7 @@ class ProseUnitTest {
     inner class `Insert Text` {
 
         val characterId = Character.Id().mentioned()
-        val prose = makeProse(proseId, content = "banana")
+        val prose = makeProse(proseId, content = listOf(ProseContent("banana", null)))
 
         @Test
         fun `should update version id`() {
@@ -110,7 +110,7 @@ class ProseUnitTest {
     inner class `Mention Entity` {
 
         val characterId = Character.Id().mentioned()
-        private val prose = makeProse(proseId, content = "banana")
+        private val prose = makeProse(proseId, content = listOf(ProseContent("banana", null)))
 
         @Test
         fun `mentions must be in range`() {
@@ -182,9 +182,8 @@ class ProseUnitTest {
         @Test
         fun `produced event should communicate text changes`() {
             val prose = makeProse(
-                content = "I mention Bob",
-                mentions = listOf(
-                    ProseMention(entityId, ProseMentionRange(10, 3))
+                content = listOf(
+                    ProseContent("I mention ", entityId to singleLine("Bob"))
                 )
             )
             val update = prose.withMentionTextReplaced(entityId, "Bob" to "Frank")
@@ -201,10 +200,9 @@ class ProseUnitTest {
         inner class `When Sections in Content Match Mention Text but don't Mention Entity` {
 
             val prose = makeProse(
-                content = "I mention Bob, the character and I just talk about Bob, the idea.  I mention a different Bob",
-                mentions = listOf(
-                    ProseMention(entityId, ProseMentionRange(10, 3)),
-                    ProseMention(Character.Id().mentioned(), ProseMentionRange(89, 3))
+                content = listOf(
+                    ProseContent("I mention ", entityId to singleLine("Bob")),
+                    ProseContent(", the character and I just talk about Bob, the idea.  I mention a different ", Character.Id().mentioned() to singleLine("Bob"))
                 )
             )
 
@@ -223,11 +221,11 @@ class ProseUnitTest {
         inner class `When Multiple Mentions Match` {
 
             val prose = makeProse(
-                content = "I mention Bob, the character and then I mention Bob again.  Let's say Bob a third time.",
-                mentions = listOf(
-                    ProseMention(entityId, ProseMentionRange(10, 3)),
-                    ProseMention(entityId, ProseMentionRange(48, 3)),
-                    ProseMention(entityId, ProseMentionRange(70, 3))
+                content = listOf(
+                    ProseContent("I mention ", entityId to singleLine("Bob")),
+                    ProseContent(", the character and then I mention ", entityId to singleLine("Bob")),
+                    ProseContent(" again.  Let's say ", entityId to singleLine("Bob")),
+                    ProseContent(" a third time.", null)
                 )
             )
 
@@ -270,12 +268,12 @@ class ProseUnitTest {
         fun `other mentions should be shifted, but not modified`() {
             val aliceId = Character.Id().mentioned()
             val prose = makeProse(
-                content = "I mention Bob, the character and then I mention Alice.  Let's say Bob and Alice again.",
-                mentions = listOf(
-                    ProseMention(entityId, ProseMentionRange(10, 3)),
-                    ProseMention(aliceId, ProseMentionRange(48, 5)),
-                    ProseMention(entityId, ProseMentionRange(66, 3)),
-                    ProseMention(aliceId, ProseMentionRange(74, 5))
+                content = listOf(
+                    ProseContent("I mention ", entityId to singleLine("Bob")),
+                    ProseContent(", the character and then I mention ", aliceId to singleLine("Alice")),
+                    ProseContent(".  Let's say ", entityId to singleLine("Bob")),
+                    ProseContent(" and ", aliceId to singleLine("Alice")),
+                    ProseContent(" again.", null)
                 )
             )
             val update = prose.withMentionTextReplaced(entityId, "Bob" to "Frank")
@@ -294,11 +292,11 @@ class ProseUnitTest {
         inner class `When multiple mentions with different text match entity` {
 
             val prose = makeProse(
-                content = "I mention Bob, the character and then I mention him as Robert.  Another name for him is Bobby.",
-                mentions = listOf(
-                    ProseMention(entityId, ProseMentionRange(10, 3)),
-                    ProseMention(entityId, ProseMentionRange(55, 6)),
-                    ProseMention(entityId, ProseMentionRange(88, 5))
+                content = listOf(
+                    ProseContent("I mention ", entityId to singleLine("Bob")),
+                    ProseContent(", the character and then I mention him as ", entityId to singleLine("Robert")),
+                    ProseContent(".  Another name for him is ", entityId to singleLine("Bobby")),
+                    ProseContent(".", null)
                 )
             )
 
@@ -319,7 +317,7 @@ class ProseUnitTest {
 
         @Test
         fun `range out of bounds should throw error`() {
-            val prose = makeProse(content = "abcde")
+            val prose = makeProse(content = listOf(ProseContent("abcde", null)))
             assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-4..0) }
             assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-1..2) }
             assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(2..6) }
@@ -330,8 +328,10 @@ class ProseUnitTest {
         @Test
         fun `cannot bisect a mention`() {
             val prose = makeProse(
-                content = "Talking about Bob can be fun.",
-                mentions = listOf(ProseMention(entityId(), ProseMentionRange(14, 3)))
+                content = listOf(
+                    ProseContent("Talking about ", entityId() to singleLine("Bob")),
+                    ProseContent(" can be fun.", null)
+                )
             )
             assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(12..14) }
             assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(14..15) }
@@ -348,7 +348,7 @@ class ProseUnitTest {
 
             @Test
             fun `should remove text in range`() {
-                val prose = makeProse(content = "I'm content that will have a portion deleted.")
+                val prose = makeProse(content = listOf(ProseContent("I'm content that will have a portion deleted.", null)))
                 val update = prose.withTextRemoved(1..15 /* == 1 until 16 */)
                 update.prose.content.mustEqual(
                     "I will have a portion deleted."
@@ -362,10 +362,9 @@ class ProseUnitTest {
                 val bobId = entityId()
                 val frankId = entityId()
                 val prose = makeProse(
-                    content = "Mention Bob, then remove text, then mention Frank",
-                    mentions = listOf(
-                        ProseMention(bobId, ProseMentionRange(8, 3)),
-                        ProseMention(frankId, ProseMentionRange(44, 5))
+                    content = listOf(
+                        ProseContent("Mention ", bobId to singleLine("Bob")),
+                        ProseContent(", then remove text, then mention ", frankId to singleLine("Frank"))
                     )
                 )
                 val update = prose.withTextRemoved(11..28)
@@ -383,11 +382,10 @@ class ProseUnitTest {
                 val bobId = entityId()
                 val frankId = entityId()
                 val prose = makeProse(
-                    content = "Mention Bob, then mention Frank and remove text, then mention Frank",
-                    mentions = listOf(
-                        ProseMention(bobId, ProseMentionRange(8, 3)),
-                        ProseMention(frankId, ProseMentionRange(26, 5)),
-                        ProseMention(frankId, ProseMentionRange(62, 5))
+                    content = listOf(
+                        ProseContent("Mention ", bobId to singleLine("Bob")),
+                        ProseContent(", then mention ", frankId to singleLine("Frank")),
+                        ProseContent(" and remove text, then mention ", frankId to singleLine("Frank"))
                     )
                 )
                 val update = prose.withTextRemoved(11 until 62)
@@ -410,14 +408,16 @@ class ProseUnitTest {
         @Test
         fun `when mention does not exist, should throw error`() {
             val mention = ProseMention(entityId(), ProseMentionRange(10, 3))
-            val prose = makeProse(content = "I mention Bob, the character", mentions = emptyList())
+            val prose = makeProse(content = listOf(ProseContent("I mention Bob, the character", null)))
             assertThrows<MentionDoesNotExistInProse> { prose.withoutMention(mention) }
         }
 
         @Test
         fun `should remove mention`() {
             val mention = ProseMention(entityId(), ProseMentionRange(10, 3))
-            val prose = makeProse(content = "I mention Bob, the character", mentions = listOf(mention))
+            val prose = makeProse(content = listOf(
+                ProseContent("I mention ", mention.entityId to singleLine("Bob")), ProseContent(", the character", null)
+            ))
             val update = prose.withoutMention(mention)
             update.prose.mentions.contains(mention).mustEqual(false)
             update.event.entityId.mustEqual(mention.entityId)
@@ -427,7 +427,9 @@ class ProseUnitTest {
         @Test
         fun `should not remove text`() {
             val mention = ProseMention(entityId(), ProseMentionRange(10, 3))
-            val prose = makeProse(content = "I mention Bob, the character", mentions = listOf(mention))
+            val prose = makeProse(content = listOf(
+                ProseContent("I mention ", mention.entityId to singleLine("Bob")), ProseContent(", the character", null)
+            ))
             val update = prose.withoutMention(mention)
             update.prose.content.mustEqual("I mention Bob, the character")
         }

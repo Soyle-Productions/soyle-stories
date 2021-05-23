@@ -38,22 +38,27 @@ class Prose private constructor(
         fun build(
             id: Id,
             projectId: Project.Id,
-            content: String,
-            mentions: List<ProseMention<*>>,
+            content: List<ProseContent>,
             revision: Long
         ): Prose {
             if (revision < 0L) error("Revision number must be at least 0.  Got $revision")
-            val sortedMentions = mentions.sortedBy { it.position.index }
-            sortedMentions.forEachIndexed { index, proseMention ->
-                sortedMentions.subList(index + 1, sortedMentions.size).forEach {
-                    if (it.position.isIntersecting(proseMention.position)) error("No two mentions can intersect.  $it, $proseMention")
+
+            var offset = 0
+            val newMentions = content.mapNotNull { (leadingText, mention) ->
+                if (mention == null) return@mapNotNull null
+                offset += leadingText.length
+                ProseMention(mention.first, ProseMentionRange(offset, mention.second.length)).also {
+                    offset += mention.second.length
                 }
             }
+
             return Prose(
                 id,
                 projectId,
-                content,
-                sortedMentions,
+                content.joinToString("") {  proseContent ->
+                    proseContent.text + (proseContent.mention?.second ?: "")
+                },
+                newMentions,
                 revision,
 
                 defaultConstructorMarker = Unit
