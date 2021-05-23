@@ -6,6 +6,7 @@ import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.theme.Theme

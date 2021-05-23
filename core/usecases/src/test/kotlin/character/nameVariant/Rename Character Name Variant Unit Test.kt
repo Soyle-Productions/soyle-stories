@@ -3,7 +3,6 @@ package com.soyle.stories.usecase.character.nameVariant
 import com.soyle.stories.domain.character.*
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.prose.MentionTextReplaced
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.prose.makeProse
 import com.soyle.stories.domain.prose.mentioned

@@ -1,7 +1,7 @@
 package com.soyle.stories.usecase.prose.bulkUpdateProse
 
 import com.soyle.stories.domain.prose.*
-
+import com.soyle.stories.domain.prose.events.*
 
 sealed class Operation {
     abstract fun transform(event: ProseEvent): Operation?

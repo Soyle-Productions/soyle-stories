@@ -1,8 +1,8 @@
 package com.soyle.stories.usecase.prose.updateProse
 
-import com.soyle.stories.domain.prose.ContentReplaced
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.prose.ProseContent
+import com.soyle.stories.domain.prose.events.ContentReplaced
 
 interface UpdateProse {
 

@@ -38,6 +38,10 @@ class CharacterRepositoryDouble(
 
 	override suspend fun getCharacterById(characterId: Character.Id): Character? = characters[characterId]
 
+	override suspend fun getCharacters(characterIds: Set<Character.Id>): List<Character> {
+		return characterIds.mapNotNull(characters::get)
+	}
+
 	override suspend fun updateCharacter(character: Character) {
 		onUpdateCharacter.invoke(character)
 		_updatedCharacters += character

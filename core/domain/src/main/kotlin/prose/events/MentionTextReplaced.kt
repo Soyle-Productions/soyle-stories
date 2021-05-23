@@ -1,36 +1,7 @@
-package com.soyle.stories.domain.prose
+package com.soyle.stories.domain.prose.events
 
-sealed class ProseEvent(prose: Prose) {
-    val proseId: Prose.Id = prose.id
-    val revision: Long = prose.revision
-}
-
-class ProseCreated(prose: Prose) : ProseEvent(prose)
-class TextInsertedIntoProse(
-    prose: Prose,
-    val insertedText: String,
-    val index: Int
-) : ProseEvent(prose)
-
-class TextRemovedFromProse(
-    prose: Prose,
-    val deletedText: String,
-    val index: Int
-) : ProseEvent(prose) {
-    val newMentions = prose.mentions
-}
-
-class EntityMentionedInProse(
-    prose: Prose,
-    val entityId: MentionedEntityId<*>,
-    val position: ProseMentionRange
-) : ProseEvent(prose)
-
-class MentionRemovedFromProse(
-    prose: Prose,
-    val entityId: MentionedEntityId<*>,
-    val position: ProseMentionRange
-) : ProseEvent(prose)
+import com.soyle.stories.domain.prose.MentionedEntityId
+import com.soyle.stories.domain.prose.Prose
 
 class MentionTextReplaced(
     prose: Prose,
@@ -72,12 +43,4 @@ class MentionTextReplaced(
     override fun hashCode(): Int = _hashCode
 
 
-}
-
-class ContentReplaced(
-    prose: Prose
-) : ProseEvent(prose)
-{
-    val newContent = prose.content
-    val newMentions = prose.mentions
 }

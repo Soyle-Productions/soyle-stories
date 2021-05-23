@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.theme.renameSymbol
 
-import com.soyle.stories.domain.prose.MentionTextReplaced
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.events.SceneEvent
 import com.soyle.stories.domain.scene.SceneUpdate

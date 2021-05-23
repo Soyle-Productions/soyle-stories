@@ -3,8 +3,8 @@ package com.soyle.stories.usecase.character.renameCharacter
 import arrow.core.identity
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterRenamed
-import com.soyle.stories.domain.prose.MentionTextReplaced
 import com.soyle.stories.domain.prose.ProseUpdate
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.SceneUpdate
 import com.soyle.stories.domain.scene.Updated

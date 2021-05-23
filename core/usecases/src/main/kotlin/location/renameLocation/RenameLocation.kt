@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.location.renameLocation
 
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.LocationRenamed
-import com.soyle.stories.domain.prose.MentionTextReplaced
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
 import com.soyle.stories.domain.validation.SingleNonBlankLine
 

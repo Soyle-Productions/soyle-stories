@@ -1,6 +1,7 @@
 package com.soyle.stories.usecase.prose
 
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.characterName
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.location.Location
@@ -9,13 +10,14 @@ import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import com.soyle.stories.usecase.repositories.ThemeRepositoryDouble
-import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.location.makeLocation
-import com.soyle.stories.domain.prose.makeProse
+import com.soyle.stories.domain.nonBlankStr
+import com.soyle.stories.domain.prose.*
 import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentionsUseCase
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.repositories.LocationRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DynamicTest.dynamicTest
@@ -35,8 +37,7 @@ class `Detect Invalidated Mentions Unit Test` {
     private val themeRepository = ThemeRepositoryDouble()
     private val proseRepository = ProseRepositoryDouble()
 
-    private fun resetTest()
-    {
+    private fun resetTest() {
         result = null
     }
 
@@ -60,24 +61,33 @@ class `Detect Invalidated Mentions Unit Test` {
         @Nested
         inner class `When Mentioned Entity Exists` {
 
+            private fun givenMentionedCharacter(
+                displayName: NonBlankString = characterName(),
+                nameVariants: List<NonBlankString> = listOf()
+            ): MentionedCharacterId {
+                val character = makeCharacter(name = displayName, otherNames = nameVariants.toSet())
+                characterRepository.givenCharacter(character)
+                return character.id.mentioned()
+            }
+
+            private fun givenMentionedLocation(): MentionedLocationId {
+                val location = makeLocation()
+                locationRepository.givenLocation(location)
+                return location.id.mentioned()
+            }
+
+            private fun givenMentionedSymbol(): MentionedSymbolId {
+                val symbol = makeSymbol()
+                val theme = makeTheme(symbols = listOf(symbol))
+                themeRepository.givenTheme(theme)
+                return symbol.id.mentioned(theme.id)
+            }
+
             @TestFactory
             fun `should not output entity id`() = listOf(
-                {
-                    val character = makeCharacter()
-                    characterRepository.givenCharacter(character)
-                    character.id.mentioned()
-                },
-                {
-                    val location = makeLocation()
-                    locationRepository.givenLocation(location)
-                    location.id.mentioned()
-                },
-                {
-                    val symbol = makeSymbol()
-                    val theme = makeTheme(symbols = listOf(symbol))
-                    themeRepository.givenTheme(theme)
-                    symbol.id.mentioned(theme.id)
-                }
+                { givenMentionedCharacter() },
+                ::givenMentionedLocation,
+                ::givenMentionedSymbol
             ).map {
                 val mentionedEntityId = it()
                 dynamicTest("should not output ${mentionedEntityId.id}") {
@@ -92,6 +102,24 @@ class `Detect Invalidated Mentions Unit Test` {
                     resetTest()
                 }
             }
+
+            @Nested
+            inner class `When Mentioned Character No Longer has Used Name Variant` {
+/*
+                @Test
+                fun `should output character id`() {
+                    val mentionedCharacterId = givenMentionedCharacter(displayName = nonBlankStr("Bob"))
+                    proseRepository.givenProse(
+                        prose.withTextInserted("Robert").prose.withEntityMentioned(
+                            mentionedCharacterId, 0, 6
+                        ).prose
+                    )
+                    detectInvalidatedMentions()
+                    result!!.invalidEntityIds.single().mustEqual(mentionedCharacterId)
+                }
+*/
+            }
+
         }
 
         @Nested

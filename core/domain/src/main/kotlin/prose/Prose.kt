@@ -4,6 +4,7 @@ import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.prose.events.*
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.SingleLine
@@ -241,10 +242,6 @@ data class ProseMentionRange(val index: Int, val length: Int) {
     fun withLength(length: Int) = copy(length = length)
 }
 
-class ProseUpdate<E : ProseEvent?>(val prose: Prose, val event: E) {
-    operator fun component2() = event
-    operator fun component1() = prose
-}
 
 fun <E : ProseEvent?> Prose.updatedBy(event: E) = ProseUpdate(this, event)
 

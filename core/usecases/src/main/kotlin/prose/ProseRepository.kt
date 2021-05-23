@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.prose
 
 import com.soyle.stories.domain.prose.MentionedEntityId
 import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.domain.prose.ProseEvent
+import com.soyle.stories.domain.prose.events.ProseEvent
 
 interface ProseRepository {
     suspend fun getProseById(proseId: Prose.Id): Prose?

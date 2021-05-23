@@ -5,6 +5,8 @@ import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.prose.events.ContentReplaced
+import com.soyle.stories.domain.prose.events.ProseEvent
 import com.soyle.stories.domain.singleLine
 import com.soyle.stories.domain.validation.SingleLine
 import com.soyle.stories.usecase.prose.updateProse.UpdateProse

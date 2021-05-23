@@ -6,8 +6,8 @@ import com.soyle.stories.domain.character.CharacterDoesNotHaveNameVariant
 import com.soyle.stories.domain.character.CharacterException
 import com.soyle.stories.domain.character.CharacterUpdate
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
-import com.soyle.stories.domain.prose.MentionTextReplaced
 import com.soyle.stories.domain.prose.ProseUpdate
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.usecase.character.CharacterDoesNotExist
 import com.soyle.stories.usecase.character.CharacterRepository

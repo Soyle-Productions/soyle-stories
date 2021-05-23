@@ -3,6 +3,9 @@ package com.soyle.stories.usecase.prose
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.prose.events.EntityMentionedInProse
+import com.soyle.stories.domain.prose.events.ProseEvent
+import com.soyle.stories.domain.prose.events.TextInsertedIntoProse
 import com.soyle.stories.usecase.prose.bulkUpdateProse.*
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import kotlinx.coroutines.runBlocking

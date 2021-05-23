@@ -40,7 +40,12 @@ class DetectInvalidatedMentionsUseCase(
 
     private suspend fun getNonExistingCharacterIds(mentions: List<ProseMention<*>>): List<MentionedCharacterId>
     {
-        return characterRepository.getCharacterIdsThatDoNotExist(mentions.map { it.entityId.id as Character.Id }.toSet()).map {
+        val mentionedCharacterIdSet = mentions.map { it.entityId.id as Character.Id }.toSet()
+        val nonExistingIds = characterRepository.getCharacterIdsThatDoNotExist(mentionedCharacterIdSet)
+        val remainingIds = mentionedCharacterIdSet.filterNot { it in nonExistingIds }
+        val charactersToInspect = characterRepository.getCharacters(remainingIds.toSet())
+        assert(charactersToInspect.size == remainingIds.size)
+        return characterRepository.getCharacterIdsThatDoNotExist(mentionedCharacterIdSet).map {
             it.mentioned()
         }
     }
