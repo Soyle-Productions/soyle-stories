@@ -156,25 +156,24 @@ class ProseUnitTest {
     }
 
     @Nested
-    inner class `With Mention Text Replaced`
-    {
+    inner class `With Mention Text Replaced` {
 
         private val entityId = Character.Id().mentioned()
 
         @Nested
-        inner class `When No Mentions Match Entity Id`
-        {
+        inner class `When No Mentions Match Entity Id` {
+
             private val prose = makeProse()
 
             @Test
             fun `prose should not be modified`() {
-                val update = prose.withMentionTextReplaced(entityId, "I should not appear")
+                val update = prose.withMentionTextReplaced(entityId, "" to "I should not appear")
                 assertEquals(prose, update.prose)
             }
 
             @Test
             fun `event should not be produced`() {
-                val update = prose.withMentionTextReplaced(entityId, "I should not appear")
+                val update = prose.withMentionTextReplaced(entityId, "" to "I should not appear")
                 assertNull(update.event)
             }
 
@@ -188,7 +187,7 @@ class ProseUnitTest {
                     ProseMention(entityId, ProseMentionRange(10, 3))
                 )
             )
-            val update = prose.withMentionTextReplaced(entityId, "Frank")
+            val update = prose.withMentionTextReplaced(entityId, "Bob" to "Frank")
             update.event!!.let {
                 it.proseId.mustEqual(prose.id)
                 it.newContent.mustEqual(update.prose.content)
@@ -199,8 +198,8 @@ class ProseUnitTest {
         }
 
         @Nested
-        inner class `When Sections in Content Match Mention Text but don't Mention Entity`
-        {
+        inner class `When Sections in Content Match Mention Text but don't Mention Entity` {
+
             val prose = makeProse(
                 content = "I mention Bob, the character and I just talk about Bob, the idea.  I mention a different Bob",
                 mentions = listOf(
@@ -211,7 +210,7 @@ class ProseUnitTest {
 
             @Test
             fun `prose content should not modify those areas`() {
-                val update = prose.withMentionTextReplaced(entityId, "Frank")
+                val update = prose.withMentionTextReplaced(entityId, "Bob" to "Frank")
                 assertEquals(
                     "I mention Frank, the character and I just talk about Bob, the idea.  I mention a different Bob",
                     update.prose.content
@@ -221,19 +220,20 @@ class ProseUnitTest {
         }
 
         @Nested
-        inner class `When Multiple Mentions Match`
-        {
+        inner class `When Multiple Mentions Match` {
 
-            val prose = makeProse(content = "I mention Bob, the character and then I mention Bob again.  Let's say Bob a third time.",
+            val prose = makeProse(
+                content = "I mention Bob, the character and then I mention Bob again.  Let's say Bob a third time.",
                 mentions = listOf(
                     ProseMention(entityId, ProseMentionRange(10, 3)),
                     ProseMention(entityId, ProseMentionRange(48, 3)),
                     ProseMention(entityId, ProseMentionRange(70, 3))
-                ))
+                )
+            )
 
             @Test
             fun `should modify content areas with matched mentions`() {
-                val update = prose.withMentionTextReplaced(entityId, "Frank")
+                val update = prose.withMentionTextReplaced(entityId, "Bob" to "Frank")
                 update.prose.content.mustEqual(
                     "I mention Frank, the character and then I mention Frank again.  Let's say Frank a third time."
                 )
@@ -241,7 +241,7 @@ class ProseUnitTest {
 
             @Test
             fun `should update mention positions and lengths`() {
-                val update = prose.withMentionTextReplaced(entityId, "Frank")
+                val update = prose.withMentionTextReplaced(entityId, "Bob" to "Frank")
                 assertEquals(
                     listOf(
                         ProseMention(entityId, ProseMentionRange(10, 5)),
@@ -254,12 +254,14 @@ class ProseUnitTest {
 
             @Test
             fun `produced event should communicate mention positioning changes`() {
-                val update = prose.withMentionTextReplaced(entityId, "Frank")
-                update.event!!.newMentions.mustEqual(listOf(
-                    ProseMention(entityId, ProseMentionRange(10, 5)),
-                    ProseMention(entityId, ProseMentionRange(50, 5)),
-                    ProseMention(entityId, ProseMentionRange(74, 5))
-                ))
+                val update = prose.withMentionTextReplaced(entityId, "Bob" to "Frank")
+                update.event!!.newMentions.mustEqual(
+                    listOf(
+                        ProseMention(entityId, ProseMentionRange(10, 5)),
+                        ProseMention(entityId, ProseMentionRange(50, 5)),
+                        ProseMention(entityId, ProseMentionRange(74, 5))
+                    )
+                )
             }
 
         }
@@ -267,14 +269,16 @@ class ProseUnitTest {
         @Test
         fun `other mentions should be shifted, but not modified`() {
             val aliceId = Character.Id().mentioned()
-            val prose = makeProse(content = "I mention Bob, the character and then I mention Alice.  Let's say Bob and Alice again.",
+            val prose = makeProse(
+                content = "I mention Bob, the character and then I mention Alice.  Let's say Bob and Alice again.",
                 mentions = listOf(
                     ProseMention(entityId, ProseMentionRange(10, 3)),
                     ProseMention(aliceId, ProseMentionRange(48, 5)),
                     ProseMention(entityId, ProseMentionRange(66, 3)),
                     ProseMention(aliceId, ProseMentionRange(74, 5))
-                ))
-            val update = prose.withMentionTextReplaced(entityId, "Frank")
+                )
+            )
+            val update = prose.withMentionTextReplaced(entityId, "Bob" to "Frank")
             assertEquals(
                 listOf(
                     ProseMention(entityId, ProseMentionRange(10, 5)),
@@ -286,20 +290,41 @@ class ProseUnitTest {
             )
         }
 
+        @Nested
+        inner class `When multiple mentions with different text match entity` {
+
+            val prose = makeProse(
+                content = "I mention Bob, the character and then I mention him as Robert.  Another name for him is Bobby.",
+                mentions = listOf(
+                    ProseMention(entityId, ProseMentionRange(10, 3)),
+                    ProseMention(entityId, ProseMentionRange(55, 6)),
+                    ProseMention(entityId, ProseMentionRange(88, 5))
+                )
+            )
+
+            @Test
+            fun `only mentions that match entity and text should be replaced`() {
+                val update = prose.withMentionTextReplaced(entityId, "Robert" to "Frank")
+                update.prose.content.mustEqual(
+                    "I mention Bob, the character and then I mention him as Frank.  Another name for him is Bobby."
+                )
+            }
+
+        }
+
     }
 
     @Nested
-    inner class `With Text Removed`
-    {
+    inner class `With Text Removed` {
 
         @Test
         fun `range out of bounds should throw error`() {
             val prose = makeProse(content = "abcde")
-            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-4 .. 0) }
-            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-1 .. 2) }
-            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(2 .. 6) }
-            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-1 .. 6) }
-            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(6 .. 9) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-4..0) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-1..2) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(2..6) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(-1..6) }
+            assertThrows<IndexOutOfBoundsException> { prose.withTextRemoved(6..9) }
         }
 
         @Test
@@ -308,24 +333,23 @@ class ProseUnitTest {
                 content = "Talking about Bob can be fun.",
                 mentions = listOf(ProseMention(entityId(), ProseMentionRange(14, 3)))
             )
-            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(12 .. 14) }
-            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(14 .. 15) }
-            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(15 .. 19) }
+            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(12..14) }
+            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(14..15) }
+            assertThrows<ProseMentionCannotBeBisected> { prose.withTextRemoved(15..19) }
 
             // should be fine
             prose.withTextRemoved(12 until 14 /* == 12 .. 13 */)
-            prose.withTextRemoved(17 .. 19)
+            prose.withTextRemoved(17..19)
             prose.withTextRemoved(14 until 17 /* == 14 .. 16 */)
         }
 
         @Nested
-        inner class `When Range is Valid`
-        {
+        inner class `When Range is Valid` {
 
             @Test
             fun `should remove text in range`() {
                 val prose = makeProse(content = "I'm content that will have a portion deleted.")
-                val update = prose.withTextRemoved(1 .. 15 /* == 1 until 16 */)
+                val update = prose.withTextRemoved(1..15 /* == 1 until 16 */)
                 update.prose.content.mustEqual(
                     "I will have a portion deleted."
                 )
@@ -344,11 +368,13 @@ class ProseUnitTest {
                         ProseMention(frankId, ProseMentionRange(44, 5))
                     )
                 )
-                val update = prose.withTextRemoved(11 .. 28)
-                update.prose.mentions.mustEqual(listOf(
-                    ProseMention(bobId, ProseMentionRange(8, 3)),
-                    ProseMention(frankId, ProseMentionRange(26, 5))
-                ))
+                val update = prose.withTextRemoved(11..28)
+                update.prose.mentions.mustEqual(
+                    listOf(
+                        ProseMention(bobId, ProseMentionRange(8, 3)),
+                        ProseMention(frankId, ProseMentionRange(26, 5))
+                    )
+                )
                 update.event.newMentions.mustEqual(update.prose.mentions)
             }
 
@@ -365,10 +391,12 @@ class ProseUnitTest {
                     )
                 )
                 val update = prose.withTextRemoved(11 until 62)
-                update.prose.mentions.mustEqual(listOf(
-                    ProseMention(bobId, ProseMentionRange(8, 3)),
-                    ProseMention(frankId, ProseMentionRange(11, 5))
-                ))
+                update.prose.mentions.mustEqual(
+                    listOf(
+                        ProseMention(bobId, ProseMentionRange(8, 3)),
+                        ProseMention(frankId, ProseMentionRange(11, 5))
+                    )
+                )
                 update.event.newMentions.mustEqual(update.prose.mentions)
             }
 
@@ -377,8 +405,7 @@ class ProseUnitTest {
     }
 
     @Nested
-    inner class `Without Mention`
-    {
+    inner class `Without Mention` {
 
         @Test
         fun `when mention does not exist, should throw error`() {
@@ -408,8 +435,7 @@ class ProseUnitTest {
     }
 
     @Nested
-    inner class `Replace Content`
-    {
+    inner class `Replace Content` {
 
         private val prose = makeProse()
         private val bob = makeCharacter()
@@ -439,11 +465,13 @@ class ProseUnitTest {
                     ProseContent(" is worse.", null)
                 )
             )
-            newProse.mentions.mustEqual(listOf(
-                ProseMention(bob.id.mentioned(), ProseMentionRange(0, 3)),
-                ProseMention(frank.id.mentioned(), ProseMentionRange(36, 5)),
-                ProseMention(alexis.id.mentioned(), ProseMentionRange(66, 6))
-            ))
+            newProse.mentions.mustEqual(
+                listOf(
+                    ProseMention(bob.id.mentioned(), ProseMentionRange(0, 3)),
+                    ProseMention(frank.id.mentioned(), ProseMentionRange(36, 5)),
+                    ProseMention(alexis.id.mentioned(), ProseMentionRange(66, 6))
+                )
+            )
         }
 
         @Test

@@ -52,7 +52,7 @@ class Prose private constructor(
                 id,
                 projectId,
                 content,
-                mentions,
+                sortedMentions,
                 revision,
 
                 defaultConstructorMarker = Unit
@@ -61,10 +61,10 @@ class Prose private constructor(
     }
 
     private val sortedMentionSet: Set<ProseMention<*>> by lazy { sortedSetOf(compareBy { it.start() }, *mentions.toTypedArray()) }
-    private val mentionsByEntityId: Map<Any, ProseMention<*>> by lazy { mentions.associateBy { it.entityId.id } }
+    private val mentionsByEntityId: Map<MentionedEntityId<*>, List<ProseMention<*>>> by lazy { mentions.groupBy { it.entityId } }
 
     // reads
-    fun containsMentionOf(entityId: Any): Boolean = mentionsByEntityId.containsKey(entityId)
+    fun containsMentionOf(entityId: MentionedEntityId<*>): Boolean = mentionsByEntityId.containsKey(entityId)
 
     // updates
     private fun copy(
@@ -105,14 +105,16 @@ class Prose private constructor(
         return newProse.updatedBy(TextInsertedIntoProse(newProse, text, insertIndex))
     }
 
-    fun withMentionTextReplaced(entityId: MentionedEntityId<*>, newText: String): ProseUpdate<MentionTextReplaced?> {
-        val (mentionsOfEntity, mentionsOfOtherEntities) = mentions.partition { it.entityId == entityId }
-        if (mentionsOfEntity.isEmpty()) return this.updatedBy(null)
+    fun withMentionTextReplaced(entityId: MentionedEntityId<*>, replacement: Pair<String, String>): ProseUpdate<MentionTextReplaced?> {
+        val mentionsOfEntityWithMatch = mentionsByEntityId[entityId].orEmpty().filter {
+            content.substring(it.start(), it.end()) == replacement.first
+        }
+        if (mentionsOfEntityWithMatch.isEmpty()) return this.updatedBy(null)
 
-        val lengthDifference = newText.length - mentionsOfEntity.first().position.length
+        val lengthDifference = replacement.second.length - replacement.first.length
         val contentBuilder = StringBuilder(content)
-        mentionsOfEntity.fold(0) { adjustment, mention ->
-            contentBuilder.replace(mention.start() + adjustment, mention.end() + adjustment, newText)
+        mentionsOfEntityWithMatch.fold(0) { adjustment, mention ->
+            contentBuilder.replace(mention.start() + adjustment, mention.end() + adjustment, replacement.second)
             adjustment + lengthDifference
         }
 
@@ -121,7 +123,7 @@ class Prose private constructor(
             val shiftedMention = mention.shiftedRight(adjustment)
             if (shiftedMention.entityId == entityId) {
                 adjustment += lengthDifference
-                shiftedMention.withLength(newText.length)
+                shiftedMention.withLength(replacement.second.length)
             } else {
                 shiftedMention
             }
@@ -133,8 +135,8 @@ class Prose private constructor(
             MentionTextReplaced(
                 newProse,
                 entityId,
-                content.substring(mentionsOfEntity.first().start(), mentionsOfEntity.first().end()),
-                newText
+                content.substring(mentionsOfEntityWithMatch.first().start(), mentionsOfEntityWithMatch.first().end()),
+                replacement.second
             )
         )
 
@@ -162,7 +164,7 @@ class Prose private constructor(
     fun withoutMention(
         mention: ProseMention<*>
     ): ProseUpdate<MentionRemovedFromProse> {
-        if (!sortedMentionSet.contains(mention)) throw MentionDoesNotExistInProse(id, mention)
+        if (! containsMentionOf(mention.entityId)) throw MentionDoesNotExistInProse(id, mention)
         val newProse = copy(
             mentions = mentions.minus(mention)
         )
@@ -190,6 +192,7 @@ class Prose private constructor(
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "Prose($uuid)"
     }
+
 }
 
 data class ProseContent(val text: String, val mention: Pair<MentionedEntityId<*>, SingleLine>?)
