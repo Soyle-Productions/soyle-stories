@@ -62,9 +62,9 @@ Feature: Track Symbols in Scene
       And I am editing the "Big Battle" scene's prose
       When I request story elements that match "B" for the "Big Battle" scene
       Then I should see the following matching story elements for the "Big Battle" scene in this order
-        | Element Name | Element Type |
-        | Butterfly    | symbol       |
-        | A Border     | symbol       |
+        | Element Name | Element Type | Addendum          |
+        | Butterfly    | symbol       | Transformation    |
+        | A Border     | symbol       | Becoming a Leader |
 
     Scenario: Request Symbols to Mention After Being Used
       Given I have created the following themes and symbols
@@ -74,9 +74,9 @@ Feature: Track Symbols in Scene
       And I am editing the "Big Battle" scene's prose
       When I request story elements that match "B" for the "Big Battle" scene
       Then I should see the following matching story elements for the "Big Battle" scene in this order
-        | Element Name | Element Type |
-        | A Border     | symbol       |
-        | Butterfly    | symbol       |
+        | Element Name | Element Type | Addendum          |
+        | A Border     | symbol       | Becoming a Leader |
+        | Butterfly    | symbol       | Transformation    |
 
   Rule: Tracked Symbols should be renamed when the symbol is renamed
 
