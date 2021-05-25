@@ -69,12 +69,9 @@ class `Read Prose Unit Test` {
             )
             readProse()
             val result = result!!
-            result.mentions.mustEqual(
-                listOf(
-                    ProseMention(characterId.mentioned(), ProseMentionRange(12, 6)),
-                    ProseMention(locationId.mentioned(), ProseMentionRange(24, 10))
-                )
-            )
+            result.mentions.map { it.entityId }.mustEqual(listOf(characterId.mentioned(), locationId.mentioned()))
+            result.mentions.map { it.startIndex }.mustEqual(listOf(12, 24))
+            result.mentions.map { it.endIndex }.mustEqual(listOf(18, 34))
         }
 
     }

@@ -64,7 +64,7 @@ class `Bulk Update Prose Unit Test` {
             bulkUpdate(operations)
             val updatedProse = updatedProse!!
             updatedProse.id.mustEqual(prose.id)
-            updatedProse.content.mustEqual("I like George because he's a cool guy.  Unlike Frank who thinks he owns the place.")
+            updatedProse.text.mustEqual("I like George because he's a cool guy.  Unlike Frank who thinks he owns the place.")
             updatedProse.revision.mustEqual(prose.revision + 5L)
         }
 
@@ -73,12 +73,9 @@ class `Bulk Update Prose Unit Test` {
             bulkUpdate(operations)
             val updatedProse = updatedProse!!
             updatedProse.id.mustEqual(prose.id)
-            updatedProse.mentions.mustEqual(
-                listOf(
-                    ProseMention(georgeId, ProseMentionRange(7, 6)),
-                    ProseMention(frankId, ProseMentionRange(47, 5))
-                )
-            )
+            updatedProse.mentions.map { it.entityId }.mustEqual(listOf(georgeId, frankId))
+            updatedProse.mentions.map { it.startIndex }.mustEqual(listOf(7, 47))
+            updatedProse.mentions.map { it.endIndex }.mustEqual(listOf(13, 52))
         }
 
         @Test
@@ -147,7 +144,7 @@ class `Bulk Update Prose Unit Test` {
             bulkUpdate(operations)
             val updatedProse = updatedProse!!
             updatedProse.id.mustEqual(prose.id)
-            updatedProse.content.mustEqual("I like George because he's a cool guy.  Unlike Frank who thinks he owns the place.I am a fan of George because he is a cool guy.  However, Frank thinks he owns the place and isn't very cool.")
+            updatedProse.text.mustEqual("I like George because he's a cool guy.  Unlike Frank who thinks he owns the place.I am a fan of George because he is a cool guy.  However, Frank thinks he owns the place and isn't very cool.")
             updatedProse.revision.mustEqual(prose.revision + 10L)
         }
 
@@ -156,14 +153,9 @@ class `Bulk Update Prose Unit Test` {
             bulkUpdate(operations)
             val updatedProse = updatedProse!!
             updatedProse.id.mustEqual(prose.id)
-            updatedProse.mentions.mustEqual(
-                listOf(
-                    ProseMention(georgeId, ProseMentionRange(7, 6)),
-                    ProseMention(frankId, ProseMentionRange(47, 5)),
-                    ProseMention(georgeId, ProseMentionRange(96, 6)),
-                    ProseMention(frankId, ProseMentionRange(139, 5))
-                )
-            )
+            updatedProse.mentions.map { it.entityId }.mustEqual(listOf(georgeId, frankId, georgeId, frankId))
+            updatedProse.mentions.map { it.startIndex }.mustEqual(listOf(7, 47, 96, 139))
+            updatedProse.mentions.map { it.endIndex }.mustEqual(listOf(13, 52, 102, 144))
         }
 
         @Test

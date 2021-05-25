@@ -93,10 +93,12 @@ class RenameSymbolUnitTest {
             val newName = nonBlankStr("Valid New Name")
             renameSymbol(newName)
             updatedProse!!.let {
-                it.content.mustEqual(newName) { "prose with only mention should have entire content replaced" }
-                it.mentions.mustEqual(listOf(
-                    ProseMention(symbol.id.mentioned(themeId), ProseMentionRange(0, "Valid New Name".length))
-                ))
+                it.text.mustEqual(newName) { "prose with only mention should have entire content replaced" }
+                it.mentions.single().run {
+                    entityId.mustEqual(symbol.id.mentioned(themeId))
+                    startIndex.mustEqual(0)
+                    endIndex.mustEqual("Valid New Name".length)
+                }
             }
         }
 
@@ -108,7 +110,7 @@ class RenameSymbolUnitTest {
                 it.deletedText.mustEqual(symbol.name)
                 it.entityId.mustEqual(symbol.id.mentioned(themeId))
                 it.insertedText.mustEqual(newName)
-                it.newContent.mustEqual(updatedProse!!.content)
+                it.newContent.mustEqual(updatedProse!!.text)
                 it.newMentions.mustEqual(updatedProse!!.mentions)
             }
         }

@@ -1,6 +1,6 @@
 package com.soyle.stories.prose.editProse
 
-import com.soyle.stories.domain.prose.ContentReplaced
+import com.soyle.stories.domain.prose.events.ContentReplaced
 
 interface ContentReplacedReceiver {
 

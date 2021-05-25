@@ -159,12 +159,12 @@ class RenameCharacterUnitTest {
         fun `should update prose`() {
             renameCharacter()
             updatedProse!!.let {
-                it.content.mustEqual(inputName.value) { "prose with only mention should have entire content replaced" }
-                it.mentions.mustEqual(
-                    listOf(
-                        ProseMention(character.id.mentioned(), ProseMentionRange(0, inputName.length))
-                    )
-                )
+                it.text.mustEqual(inputName.value) { "prose with only mention should have entire content replaced" }
+                it.mentions.single().run{
+                    entityId.mustEqual(character.id.mentioned())
+                    startIndex.mustEqual(0)
+                    endIndex.mustEqual(inputName.length)
+                }
             }
         }
 
@@ -175,7 +175,7 @@ class RenameCharacterUnitTest {
                 it.deletedText.mustEqual(character.name.value)
                 it.entityId.mustEqual(character.id.mentioned())
                 it.insertedText.mustEqual(inputName.value)
-                it.newContent.mustEqual(updatedProse!!.content)
+                it.newContent.mustEqual(updatedProse!!.text)
                 it.newMentions.mustEqual(updatedProse!!.mentions)
             }
         }

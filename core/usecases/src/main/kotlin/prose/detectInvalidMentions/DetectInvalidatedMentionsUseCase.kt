@@ -1,8 +1,10 @@
 package com.soyle.stories.usecase.prose.detectInvalidMentions
 
+import arrow.core.valid
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.prose.content.ProseContent
 import com.soyle.stories.usecase.character.CharacterRepository
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.usecase.location.LocationRepository
@@ -38,26 +40,29 @@ class DetectInvalidatedMentionsUseCase(
             }
     }
 
-    private suspend fun getNonExistingCharacterIds(mentions: List<ProseMention<*>>): List<MentionedCharacterId>
+    private suspend fun getNonExistingCharacterIds(mentions: List<ProseContent.Mention<*>>): List<MentionedCharacterId>
     {
-        val mentionedCharacterIdSet = mentions.map { it.entityId.id as Character.Id }.toSet()
-        val nonExistingIds = characterRepository.getCharacterIdsThatDoNotExist(mentionedCharacterIdSet)
-        val remainingIds = mentionedCharacterIdSet.filterNot { it in nonExistingIds }
+        val mentionsByCharacterId = mentions.groupBy { it.entityId.id as Character.Id }
+        val nonExistingIds = characterRepository.getCharacterIdsThatDoNotExist(mentionsByCharacterId.keys)
+
+        val remainingIds = mentionsByCharacterId.keys.filterNot { it in nonExistingIds }
         val charactersToInspect = characterRepository.getCharacters(remainingIds.toSet())
         assert(charactersToInspect.size == remainingIds.size)
-        return characterRepository.getCharacterIdsThatDoNotExist(mentionedCharacterIdSet).map {
-            it.mentioned()
-        }
+
+        return nonExistingIds.map { it.mentioned() } + charactersToInspect.filter {
+            val otherNameSet = it.otherNames.map { it.value }.toSet() + it.name.value
+            mentionsByCharacterId[it.id].orEmpty().any { it.text.toString() !in otherNameSet }
+        }.map { it.id.mentioned() }
     }
 
-    private suspend fun getNonExistingLocationIds(mentions: List<ProseMention<*>>): List<MentionedLocationId>
+    private suspend fun getNonExistingLocationIds(mentions: List<ProseContent.Mention<*>>): List<MentionedLocationId>
     {
         return locationRepository.getLocationIdsThatDoNotExist(mentions.map { it.entityId.id as Location.Id }.toSet()).map {
             it.mentioned()
         }
     }
 
-    private suspend fun getNonExistingSymbolIds(mentions: List<ProseMention<*>>): List<MentionedSymbolId>
+    private suspend fun getNonExistingSymbolIds(mentions: List<ProseContent.Mention<*>>): List<MentionedSymbolId>
     {
         val mentionedSymbolIds = mentions.associateBy { it.entityId.id as Symbol.Id }
         return themeRepository.getSymbolIdsThatDoNotExist(mentionedSymbolIds.keys).map {

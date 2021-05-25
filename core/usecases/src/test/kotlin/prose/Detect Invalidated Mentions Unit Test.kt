@@ -70,13 +70,13 @@ class `Detect Invalidated Mentions Unit Test` {
                 return character.id.mentioned()
             }
 
-            private fun givenMentionedLocation(): MentionedLocationId {
+            private fun givenMentionedLocation(name: NonBlankString): MentionedLocationId {
                 val location = makeLocation()
                 locationRepository.givenLocation(location)
                 return location.id.mentioned()
             }
 
-            private fun givenMentionedSymbol(): MentionedSymbolId {
+            private fun givenMentionedSymbol(name: NonBlankString): MentionedSymbolId {
                 val symbol = makeSymbol()
                 val theme = makeTheme(symbols = listOf(symbol))
                 themeRepository.givenTheme(theme)
@@ -85,16 +85,16 @@ class `Detect Invalidated Mentions Unit Test` {
 
             @TestFactory
             fun `should not output entity id`() = listOf(
-                { givenMentionedCharacter() },
+                { givenMentionedCharacter(it) },
                 ::givenMentionedLocation,
                 ::givenMentionedSymbol
             ).map {
-                val mentionedEntityId = it()
+                val displayName = nonBlankStr("Entity Name")
+                val mentionedEntityId = it(displayName)
                 dynamicTest("should not output ${mentionedEntityId.id}") {
                     proseRepository.givenProse(
-                        prose.withTextInserted("Mentioned entity").prose.withEntityMentioned(
-                            mentionedEntityId, 0, 16
-                        ).prose
+                        prose.withTextInserted("$displayName Mentioned").prose
+                            .withEntityMentioned(mentionedEntityId, 0, displayName.length).prose
                     )
                     detectInvalidatedMentions()
                     result!!.invalidEntityIds.isEmpty().mustEqual(true)
@@ -105,7 +105,7 @@ class `Detect Invalidated Mentions Unit Test` {
 
             @Nested
             inner class `When Mentioned Character No Longer has Used Name Variant` {
-/*
+
                 @Test
                 fun `should output character id`() {
                     val mentionedCharacterId = givenMentionedCharacter(displayName = nonBlankStr("Bob"))
@@ -117,7 +117,7 @@ class `Detect Invalidated Mentions Unit Test` {
                     detectInvalidatedMentions()
                     result!!.invalidEntityIds.single().mustEqual(mentionedCharacterId)
                 }
-*/
+
             }
 
         }

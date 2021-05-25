@@ -1,7 +1,7 @@
 package com.soyle.stories.usecase.prose.readProse
 
 import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.domain.prose.ProseMention
+import com.soyle.stories.domain.prose.content.ProseContent
 
 interface ReadProse {
 
@@ -11,7 +11,7 @@ interface ReadProse {
         val proseId: Prose.Id,
         val revision: Long,
         val body: String,
-        val mentions: List<ProseMention<*>>
+        val mentions: List<ProseContent.Mention<*>>
     )
 
     interface OutputPort {

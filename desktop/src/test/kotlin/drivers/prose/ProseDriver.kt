@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.config.drivers.prose
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.prose.content.ProseContent
 import com.soyle.stories.domain.validation.SingleLine
 import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.project.ProjectScope
@@ -30,14 +31,20 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
         }
         val controller = scope.get<EditProseController>()
         var lastMentionEnd = 0
-        val content = (prose.mentions + ProseMention(entityId, ProseMentionRange(index, length))).map { mention ->
+        val newMention = object : ProseContent.Mention<Any> {
+            override val entityId: MentionedEntityId<Any> = entityId as MentionedEntityId<Any>
+            override val startIndex: Int = index
+            override val endIndex: Int = index + length
+            override val text: SingleLine = countLines(prose.text.substring(startIndex, endIndex)) as SingleLine
+        }
+        val content = (prose.mentions + newMention).map { mention ->
             ProseContent(
-                prose.content.substring(lastMentionEnd, mention.start()),
-                mention.entityId to (countLines(prose.content.substring(mention.start(), mention.end())) as SingleLine)
+                prose.text.substring(lastMentionEnd, mention.startIndex),
+                mention.entityId to (countLines(prose.text.substring(mention.startIndex, mention.endIndex)) as SingleLine)
             ).also {
-                lastMentionEnd = mention.end()
+                lastMentionEnd = mention.endIndex
             }
-        } + ProseContent(prose.content.substring(lastMentionEnd), null)
+        } + ProseContent(prose.text.substring(lastMentionEnd), null)
         controller.updateProse(prose.id, content)
     }
     fun givenProseMentionsEntity(prose: Prose, entityId: MentionedEntityId<*>, name: String) {
@@ -45,14 +52,21 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
             get<ProseEditorState>().versionNumber.set(prose.revision)
         }
         val controller = scope.get<EditProseController>()
-        val appendedText = prose.content + name
+        val appendedText = prose.text + name
+
+        val newMention = object : ProseContent.Mention<Any> {
+            override val entityId: MentionedEntityId<Any> = entityId as MentionedEntityId<Any>
+            override val startIndex: Int = prose.text.length
+            override val endIndex: Int = prose.text.length + name.length
+            override val text: SingleLine = countLines(name) as SingleLine
+        }
         var lastMentionEnd = 0
-        val content = (prose.mentions + ProseMention(entityId, ProseMentionRange(prose.content.length, name.length))).map { mention ->
+        val content = (prose.mentions + newMention).map { mention ->
             ProseContent(
-                appendedText.substring(lastMentionEnd, mention.start()),
-                mention.entityId to (countLines(appendedText.substring(mention.start(), mention.end())) as SingleLine)
+                appendedText.substring(lastMentionEnd, mention.startIndex),
+                mention.entityId to (countLines(appendedText.substring(mention.startIndex, mention.endIndex)) as SingleLine)
             ).also {
-                lastMentionEnd = mention.end()
+                lastMentionEnd = mention.endIndex
             }
         } + ProseContent(appendedText.substring(lastMentionEnd), null)
         controller.updateProse(prose.id, content)
@@ -60,7 +74,7 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
 
     fun givenProseDoesNotMention(prose: Prose, mentionText: String)
     {
-        if (prose.mentions.any { prose.content.substring(it.start(), it.end()) == mentionText}) {
+        if (prose.mentions.any { prose.text.substring(it.startIndex, it.endIndex) == mentionText}) {
             val scope = ProseEditorScope(projectScope, prose.id, { _, _ -> }, {}) { _, _ -> }.apply {
                 get<ProseEditorState>().versionNumber.set(prose.revision)
             }
@@ -79,15 +93,15 @@ class ProseDriver private constructor(private val projectScope: ProjectScope) {
 
 }
 
-fun <ID : Any> Prose.getMentionByEntityIdOrError(id: ID): ProseMention<ID>
+fun <ID : Any> Prose.getMentionByEntityIdOrError(id: ID): ProseContent.Mention<ID>
 {
     val mention =  mentions
         .find { it.entityId.id == id }
         ?: throw AssertionError("No mention in prose with id $id")
-    return mention as ProseMention<ID>
+    return mention as ProseContent.Mention<ID>
 }
 
-fun Prose.getMentionByText(text: String): ProseMention<*>?
+fun Prose.getMentionByText(text: String): ProseContent.Mention<*>?
 {
-    return mentions.find { content.substring(it.start(), it.end()) == text }
+    return mentions.find { this.text.substring(it.startIndex, it.endIndex) == text }
 }

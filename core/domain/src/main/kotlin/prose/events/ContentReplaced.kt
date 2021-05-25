@@ -6,6 +6,6 @@ class ContentReplaced(
     prose: Prose
 ) : ProseEvent(prose)
 {
-    val newContent = prose.content
+    val newContent = prose.text
     val newMentions = prose.mentions
 }

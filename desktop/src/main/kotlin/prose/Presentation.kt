@@ -1,5 +1,7 @@
 package com.soyle.stories.desktop.config.prose
 
+import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedNotifier
+import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
@@ -37,6 +39,7 @@ object Presentation {
                     it listensTo projectScope.get<DeletedLocationNotifier>()
                     it listensTo projectScope.get<ThemeDeletedNotifier>()
                     it listensTo projectScope.get<SymbolRemovedFromThemeNotifier>()
+                    it listensTo projectScope.get<CharacterNameVariantRemovedNotifier>()
                 }
             }
         }

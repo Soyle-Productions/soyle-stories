@@ -117,8 +117,8 @@ class RenameLocationUnitTest {
                     updatedProse.mapTo(HashSet(3)) { it.id }
                         .mustEqual(prose.mapTo(HashSet(3)) { it.id })
                     updatedProse.forEach {
-                        it.content.contains(location.name.value).mustEqual(false)
-                        it.content.contains(inputName.value).mustEqual(true)
+                        it.text.contains(location.name.value).mustEqual(false)
+                        it.text.contains(inputName.value).mustEqual(true)
                     }
                 }
 

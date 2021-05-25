@@ -27,15 +27,15 @@ class ProseEditorAssertions private constructor(private val driver: ProseEditorD
         assertFalse(driver.getContent().contains(unexpectedContent)) { "Prose editor content contains \"$unexpectedContent\"" }
     }
 
-    fun hasMention(entityId: MentionedEntityId<*>, position: ProseMentionRange)
+    fun hasMention(entityId: MentionedEntityId<*>, startIndex: Int, endIndex: Int)
     {
-        val mention = driver.getMentionAt(position.index, position.index + position.length)!!
+        val mention = driver.getMentionAt(startIndex, endIndex)!!
         assertEquals(entityId, mention.entityId)
     }
 
-    fun hasIssueWithMention(entityId: MentionedEntityId<*>, position: ProseMentionRange)
+    fun hasIssueWithMention(entityId: MentionedEntityId<*>, startIndex: Int, endIndex: Int)
     {
-        val mention = driver.getMentionAt(position.index, position.index + position.length)!!
+        val mention = driver.getMentionAt(startIndex, endIndex)!!
         assertEquals(entityId, mention.entityId)
         assertNotNull(mention.issue) { "Mention does not have an issue" }
     }

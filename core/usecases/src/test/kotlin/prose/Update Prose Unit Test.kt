@@ -53,14 +53,10 @@ class `Update Prose Unit Test` {
         with(updatedProse!!) {
             id.mustEqual(prose.id)
             revision.mustEqual(prose.revision + 1)
-            content.mustEqual("Bob can be annoying.  But listen to Frank and he'll tell you that Alexis is worse.")
-            mentions.mustEqual(
-                listOf(
-                    ProseMention(bob.id.mentioned(), ProseMentionRange(0, 3)),
-                    ProseMention(frank.id.mentioned(), ProseMentionRange(36, 5)),
-                    ProseMention(alexis.id.mentioned(), ProseMentionRange(66, 6))
-                )
-            )
+            text.mustEqual("Bob can be annoying.  But listen to Frank and he'll tell you that Alexis is worse.")
+            mentions.map { it.entityId }.mustEqual(listOf(bob.id.mentioned(), frank.id.mentioned(), alexis.id.mentioned()))
+            mentions.map { it.startIndex }.mustEqual(listOf(0, 36, 66))
+            mentions.map { it.endIndex }.mustEqual(listOf(3, 41, 72))
         }
     }
 
@@ -73,7 +69,7 @@ class `Update Prose Unit Test` {
             val event = single() as ContentReplaced
             event.proseId.mustEqual(prose.id)
             event.revision.mustEqual(prose.revision + 1)
-            event.newContent.mustEqual(updatedProse!!.content)
+            event.newContent.mustEqual(updatedProse!!.text)
             event.newMentions.mustEqual(updatedProse!!.mentions)
         }
     }
@@ -94,7 +90,7 @@ class `Update Prose Unit Test` {
         with(result!!.contentReplaced) {
             proseId.mustEqual(prose.id)
             revision.mustEqual(prose.revision + 1)
-            newContent.mustEqual(updatedProse!!.content)
+            newContent.mustEqual(updatedProse!!.text)
             newMentions.mustEqual(updatedProse!!.mentions)
         }
 

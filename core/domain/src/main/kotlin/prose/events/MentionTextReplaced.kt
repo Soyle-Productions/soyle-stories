@@ -9,7 +9,7 @@ class MentionTextReplaced(
     val deletedText: String,
     val insertedText: String
 ) : ProseEvent(prose) {
-    val newContent = prose.content
+    val newContent = prose.text
     val newMentions = prose.mentions
 
     override fun toString(): String {

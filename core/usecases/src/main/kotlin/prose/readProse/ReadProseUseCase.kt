@@ -10,7 +10,7 @@ class ReadProseUseCase(private val proseRepository: ProseRepository) : ReadProse
         output.receiveProse(ReadProse.ResponseModel(
             prose.id,
             prose.revision,
-            prose.content,
+            prose.text,
             prose.mentions
         ))
 
