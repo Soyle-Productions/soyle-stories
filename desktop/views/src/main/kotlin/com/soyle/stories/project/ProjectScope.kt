@@ -48,7 +48,6 @@ class ProjectScope(val applicationScope: ApplicationScope, val projectViewModel:
         }
         FX.getComponents(this)
         DI.getRegisteredTypes(this)
-        get<SynchronizeTrackedSymbolsWithProseController>()
     }
 
     fun addScope(toolId: String, scope: Scope) {

@@ -238,7 +238,7 @@ abstract class Model<S : Scope, VM : Any>(scopeClass: KClass<S>) : View<VM>, Vie
 		}
 	}
 
-	protected fun <R> bind(get: (VM?) -> R): ObservableValue<R> {
+	protected fun <R> bind(get: (VM?) -> R): SimpleObjectProperty<R> {
 		return SimpleObjectProperty<R>().also {
 			props.add(BoundProperty(it, get))
 		}

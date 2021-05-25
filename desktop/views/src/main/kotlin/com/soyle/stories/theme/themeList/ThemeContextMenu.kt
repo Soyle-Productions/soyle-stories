@@ -24,6 +24,7 @@ internal fun ThemeList.themeItemContextMenu(model: ThemeListModel, viewListener:
         }
     }
     item("Examine Central Conflict") {
+        id = "examine_conflict"
         actionForSelectedThemeItem {
             viewListener.openCentralConflict(it.themeId)
         }

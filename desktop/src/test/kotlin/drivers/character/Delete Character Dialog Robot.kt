@@ -1,40 +1,38 @@
 package com.soyle.stories.desktop.config.drivers.character
 
-import com.soyle.stories.characterarc.characterList.CharacterList
+import com.soyle.stories.character.delete.DeleteCharacterForm
+import com.soyle.stories.character.list.CharacterListView
 import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogView
 import com.soyle.stories.desktop.config.drivers.robot
-import com.soyle.stories.desktop.view.character.characterList.drive
-import com.soyle.stories.desktop.view.character.characterList.driver
-import com.soyle.stories.desktop.view.character.deleteCharacterDialog.DeleteCharacterDialogDriver
+import com.soyle.stories.desktop.view.character.deleteCharacterDialog.DeleteCharacterFormAccess.Companion.drive
+import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.access
+import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.drive
+import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.layout.config.fixed.CharacterList
 import javafx.scene.control.TreeItem
 import tornadofx.uiComponent
 
-fun CharacterList.givenDeleteCharacterDialogHasBeenOpened(characterId: Character.Id): DeleteCharacterDialogView =
+fun CharacterListView.givenDeleteCharacterDialogHasBeenOpened(characterId: Character.Id): DeleteCharacterForm =
     getDeleteCharacterDialog() ?: openDeleteCharacterDialog(characterId).let { getDeleteCharacterDialogOrError() }
 
-fun CharacterList.openDeleteCharacterDialog(characterId: Character.Id) {
-    with (driver()) {
+fun CharacterListView.openDeleteCharacterDialog(characterId: Character.Id) {
+    drive {
         val item = getCharacterItemOrError(characterId)
-        drive {
-            tree.selectionModel.select(item as TreeItem<Any?>)
-            clickOn(deleteButton)
-        }
+        selectItem(item)
+        optionsButton!!.show()
+        optionsButton!!.deleteOption!!.fire()
     }
 }
 
-fun getDeleteCharacterDialogOrError(): DeleteCharacterDialogView =
+fun getDeleteCharacterDialogOrError(): DeleteCharacterForm =
     getDeleteCharacterDialog() ?: throw NoSuchElementException("Delete Character Dialog is not open in project")
 
-fun getDeleteCharacterDialog(): DeleteCharacterDialogView? =
-    robot.listWindows().asSequence()
-        .mapNotNull { it.scene.root.uiComponent<DeleteCharacterDialogView>() }
-        .firstOrNull { it.currentStage?.isShowing == true }
+fun getDeleteCharacterDialog(): DeleteCharacterForm? = robot.getOpenDialog()
 
-fun DeleteCharacterDialogView.confirmDelete()
+fun DeleteCharacterForm.confirmDelete()
 {
-    val driver = DeleteCharacterDialogDriver(this)
-    driver.interact {
-        driver.confirmButton.fire()
+    drive {
+        confirmButton.fire()
     }
 }

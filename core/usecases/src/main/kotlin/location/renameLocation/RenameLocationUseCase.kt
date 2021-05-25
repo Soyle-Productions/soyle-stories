@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.location.renameLocation
 
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.LocationRenamed
-import com.soyle.stories.domain.prose.MentionTextReplaced
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.Updated
 import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
@@ -43,7 +43,7 @@ class RenameLocationUseCase(
 	{
 		val locationEntityId = location.id.mentioned()
 		val updatedProse = proseRepository.getProseThatMentionEntity(locationEntityId).map {
-			it.withMentionTextReplaced(locationEntityId, newName.value)
+			it.withMentionTextReplaced(locationEntityId, location.name.value to newName.value)
 		}
 		proseRepository.replaceProse(updatedProse.map { it.prose })
 		return updatedProse.mapNotNull { it.event }

@@ -8,6 +8,7 @@ interface CharacterRepository {
     suspend fun addNewCharacter(character: Character)
     suspend fun listCharactersInProject(projectId: Project.Id): List<Character>
     suspend fun getCharacterById(characterId: Character.Id): Character?
+    suspend fun getCharacters(characterIds: Set<Character.Id>): List<Character>
 
     suspend fun getCharacterOrError(characterId: UUID) = getCharacterById(Character.Id(characterId))
         ?: throw CharacterDoesNotExist(characterId)

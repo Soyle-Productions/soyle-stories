@@ -2,7 +2,6 @@ package com.soyle.stories.desktop.config.features.scene
 
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.character.createCharacterWithName
-import com.soyle.stories.desktop.config.drivers.character.createSectionForTemplate
 import com.soyle.stories.desktop.config.drivers.location.LocationDriver
 import com.soyle.stories.desktop.config.drivers.location.createLocationWithName
 import com.soyle.stories.desktop.config.drivers.prose.*
@@ -395,7 +394,7 @@ class SceneSteps : En {
             val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
                 .givenSceneEditorToolHasBeenOpened(scene)
 
-            val proseContent = ProseDriver(workbench).getProseByIdOrError(scene.proseId).content
+            val proseContent = ProseDriver(workbench).getProseByIdOrError(scene.proseId).text
             assertEquals(paragraphCount, proseContent.split(anyNewLineCharacter).size)
 
             SceneEditorAssertions.assertThat(sceneEditor) {
@@ -417,7 +416,7 @@ class SceneSteps : En {
 
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
-                    hasMention(mention.entityId, mention.position)
+                    hasMention(mention.entityId, mention.startIndex, mention.endIndex)
                 }
             }
         }
@@ -434,7 +433,7 @@ class SceneSteps : En {
 
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
-                    hasMention(mention.entityId, mention.position)
+                    hasMention(mention.entityId, mention.startIndex, mention.endIndex)
                 }
             }
         }
@@ -451,7 +450,7 @@ class SceneSteps : En {
 
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
-                    hasMention(locationMention.entityId, locationMention.position)
+                    hasMention(locationMention.entityId, locationMention.startIndex, locationMention.endIndex)
                 }
             }
         }
@@ -536,7 +535,9 @@ class SceneSteps : En {
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
                     suggestedMentionListIsVisible()
-                    isListingAllStoryElementsInOrder(dataTable.asLists().drop(1).map { it.component1() to it.component2() })
+                    isListingAllStoryElementsInOrder(dataTable.asLists().drop(1).map {
+                        Triple(it.component1(), it.component2(), it.component3())
+                    })
                 }
             }
         }
@@ -563,9 +564,9 @@ class SceneSteps : En {
                 .givenSceneEditorToolHasBeenOpened(scene)
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
-                    hasContent(prose.content)
+                    hasContent(prose.text)
                     prose.mentions.forEach {
-                        hasMention(it.entityId, it.position)
+                        hasMention(it.entityId, it.startIndex, it.endIndex)
                     }
                 }
             }
@@ -597,7 +598,7 @@ class SceneSteps : En {
                 .givenSceneEditorToolHasBeenOpened(scene)
             SceneEditorAssertions.assertThat(sceneEditor) {
                 andProseEditor {
-                    hasIssueWithMention(mention.entityId, mention.position)
+                    hasIssueWithMention(mention.entityId, mention.startIndex, mention.endIndex)
                 }
             }
         }
@@ -633,7 +634,7 @@ class SceneSteps : En {
             "the {scene}'s prose should still contain text for {string}"
         ) { scene: Scene, expectedText: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            assertTrue(ProseDriver(workbench).getProseByIdOrError(scene.proseId).content.contains(expectedText))
+            assertTrue(ProseDriver(workbench).getProseByIdOrError(scene.proseId).text.contains(expectedText))
             val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
                 .givenSceneEditorToolHasBeenOpened(scene)
             SceneEditorAssertions.assertThat(sceneEditor) {
@@ -646,7 +647,7 @@ class SceneSteps : En {
             "the {scene}'s prose should not contain text for {string}"
         ) { scene: Scene, expectedText: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            assertFalse(ProseDriver(workbench).getProseByIdOrError(scene.proseId).content.contains(expectedText))
+            assertFalse(ProseDriver(workbench).getProseByIdOrError(scene.proseId).text.contains(expectedText))
             val sceneEditor = workbench.givenSceneListToolHasBeenOpened()
                 .givenSceneEditorToolHasBeenOpened(scene)
             SceneEditorAssertions.assertThat(sceneEditor) {
@@ -671,7 +672,7 @@ class SceneSteps : En {
             "the {string} mention in the {scene}'s prose should have been replaced with {string}"
         ) { previousMentionText: String, scene: Scene, expectedMentionText: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val proseContent = ProseDriver(workbench).getProseByIdOrError(scene.proseId).content
+            val proseContent = ProseDriver(workbench).getProseByIdOrError(scene.proseId).text
             assertFalse(proseContent.contains(previousMentionText)) { "Prose content contains $previousMentionText" }
             assertTrue(proseContent.contains(expectedMentionText)) { "Prose content does not contain $expectedMentionText" }
             val sceneEditor = workbench.givenSceneListToolHasBeenOpened()

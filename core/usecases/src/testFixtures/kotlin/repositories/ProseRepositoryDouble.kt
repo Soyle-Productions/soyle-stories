@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.repositories
 
 import com.soyle.stories.domain.prose.MentionedEntityId
 import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.domain.prose.ProseEvent
+import com.soyle.stories.domain.prose.events.ProseEvent
 import com.soyle.stories.usecase.prose.ProseRepository
 
 class ProseRepositoryDouble(

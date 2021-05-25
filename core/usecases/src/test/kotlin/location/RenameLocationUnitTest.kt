@@ -8,6 +8,7 @@ import com.soyle.stories.domain.prose.*
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneSettingLocation
 import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.singleLine
 import com.soyle.stories.domain.validation.SingleNonBlankLine
 import com.soyle.stories.domain.validation.entitySetOf
 import com.soyle.stories.usecase.location.renameLocation.RenameLocation
@@ -98,11 +99,9 @@ class RenameLocationUnitTest {
 
                 private val prose = List(3) {
                     makeProse(
-                        content = location.name.value,
-                        mentions = listOf(
-                            ProseMention(
-                                location.id.mentioned(),
-                                ProseMentionRange(0, location.name.length)
+                        content = listOf(
+                            ProseContent("",
+                                location.id.mentioned() to singleLine(location.name.value)
                             )
                         )
                     )
@@ -118,8 +117,8 @@ class RenameLocationUnitTest {
                     updatedProse.mapTo(HashSet(3)) { it.id }
                         .mustEqual(prose.mapTo(HashSet(3)) { it.id })
                     updatedProse.forEach {
-                        it.content.contains(location.name.value).mustEqual(false)
-                        it.content.contains(inputName.value).mustEqual(true)
+                        it.text.contains(location.name.value).mustEqual(false)
+                        it.text.contains(inputName.value).mustEqual(true)
                     }
                 }
 

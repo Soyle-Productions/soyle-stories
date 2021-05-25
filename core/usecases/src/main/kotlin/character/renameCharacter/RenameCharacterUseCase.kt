@@ -3,7 +3,8 @@ package com.soyle.stories.usecase.character.renameCharacter
 import arrow.core.identity
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterRenamed
-import com.soyle.stories.domain.prose.MentionTextReplaced
+import com.soyle.stories.domain.prose.ProseUpdate
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.SceneUpdate
 import com.soyle.stories.domain.scene.Updated
@@ -39,7 +40,7 @@ class RenameCharacterUseCase(
             renamedCharacterEvent,
             renameCharacterInThemes(renamedCharacter),
             renameCharacterInScenes(renamedCharacter),
-            replaceProseMentionText(renamedCharacter)
+            replaceProseMentionText(character.name, renamedCharacter)
         )
     }
 
@@ -79,13 +80,12 @@ class RenameCharacterUseCase(
         return sceneUpdates.mapNotNull { (it as? Updated)?.event }
     }
 
-    private suspend fun replaceProseMentionText(character: Character): List<MentionTextReplaced> {
+    private suspend fun replaceProseMentionText(originalName: NonBlankString, character: Character): List<MentionTextReplaced> {
         val entityId = character.id.mentioned()
         val updates = proseRepository.getProseThatMentionEntity(entityId)
-            .map {
-                it.withMentionTextReplaced(entityId, character.name.value)
-            }
+            .map { it.withMentionTextReplaced(entityId, originalName.value to character.name.value) }
+            .filter { it.event != null }
         proseRepository.replaceProse(updates.map { it.prose })
-        return updates.mapNotNull { it.event }
+        return updates.map { it.event!! }
     }
 }

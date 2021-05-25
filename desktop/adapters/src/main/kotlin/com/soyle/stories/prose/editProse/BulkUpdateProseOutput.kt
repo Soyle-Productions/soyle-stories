@@ -1,8 +1,8 @@
 package com.soyle.stories.prose.editProse
 
-import com.soyle.stories.domain.prose.EntityMentionedInProse
-import com.soyle.stories.domain.prose.ProseCreated
-import com.soyle.stories.domain.prose.TextInsertedIntoProse
+import com.soyle.stories.domain.prose.events.EntityMentionedInProse
+import com.soyle.stories.domain.prose.events.ProseCreated
+import com.soyle.stories.domain.prose.events.TextInsertedIntoProse
 import com.soyle.stories.prose.entityMentionedInProse.EntityMentionedInProseReceiver
 import com.soyle.stories.prose.proseCreated.ProseCreatedReceiver
 import com.soyle.stories.prose.textInsertedIntoProse.TextInsertedIntoProseReceiver

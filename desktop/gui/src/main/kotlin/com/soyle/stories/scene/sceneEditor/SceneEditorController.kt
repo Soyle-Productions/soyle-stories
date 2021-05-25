@@ -3,7 +3,7 @@ package com.soyle.stories.scene.sceneEditor
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.prose.MentionedEntityId
-import com.soyle.stories.domain.prose.ProseMention
+import com.soyle.stories.domain.prose.content.ProseContent
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.gui.View
@@ -73,7 +73,7 @@ class SceneEditorController private constructor(
         })
     }
 
-    override fun useProseMentionInScene(mention: ProseMention<*>) {
+    override fun useProseMentionInScene(mention: ProseContent.Mention<*>) {
         when (val id = mention.entityId.id) {
             is Character.Id -> includeCharacterInSceneController.includeCharacterInScene(sceneId.uuid.toString(), id.uuid.toString())
             is Location.Id -> linkLocationToSceneController.linkLocationToScene(sceneId, id)

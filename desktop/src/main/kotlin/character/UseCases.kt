@@ -3,6 +3,13 @@ package com.soyle.stories.desktop.config.character
 import com.soyle.stories.character.createArcSection.AddSectionToCharacterArcOutput
 import com.soyle.stories.character.createArcSection.CreateArcSectionController
 import com.soyle.stories.character.createArcSection.CreateArcSectionControllerImpl
+import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
+import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantOutput
+import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
+import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
+import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantOutput
+import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
+import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantOutput
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
@@ -36,6 +43,14 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentOutput
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArcUseCase
+import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariantUseCase
+import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariants
+import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariantsUseCase
+import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariantUseCase
+import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariant
+import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariantUseCase
 
 object UseCases {
 
@@ -98,6 +113,11 @@ object UseCases {
             removeCharacterFromStory()
             viewBaseStoryStructure()
 
+            // name variants
+            addNameVariant()
+            listCharacterNameVariants()
+            renameCharacterNameVariant()
+            removeCharacterNameVariant()
         }
     }
 
@@ -147,4 +167,46 @@ object UseCases {
         }
     }
 
+    private fun InProjectScope.addNameVariant() {
+        provide {
+            AddCharacterNameVariantController(applicationScope.get(), get(), get())
+        }
+        provide<AddCharacterNameVariant> {
+            AddCharacterNameVariantUseCase(get())
+        }
+        provide<AddCharacterNameVariant.OutputPort> { AddCharacterNameVariantOutput(get()) }
+    }
+
+    private fun InProjectScope.listCharacterNameVariants() {
+        provide {
+            ListCharacterNameVariantsController(applicationScope.get(), get())
+        }
+        provide<ListCharacterNameVariants> {
+            ListCharacterNameVariantsUseCase(get())
+        }
+    }
+
+    private fun InProjectScope.renameCharacterNameVariant() {
+        provide {
+            RenameCharacterNameVariantController(applicationScope.get(), get(), get())
+        }
+        provide<RenameCharacterNameVariant> {
+            RenameCharacterNameVariantUseCase(get(), get())
+        }
+        provide<RenameCharacterNameVariant.OutputPort> {
+            RenameCharacterNameVariantOutput(get(), get())
+        }
+    }
+
+    private fun InProjectScope.removeCharacterNameVariant() {
+        provide {
+            RemoveCharacterNameVariantController(applicationScope.get(), get(), get())
+        }
+        provide<RemoveCharacterNameVariant> {
+            RemoveCharacterNameVariantUseCase(get())
+        }
+        provide<RemoveCharacterNameVariant.OutputPort> {
+            RemoveCharacterNameVariantOutput(get())
+        }
+    }
 }

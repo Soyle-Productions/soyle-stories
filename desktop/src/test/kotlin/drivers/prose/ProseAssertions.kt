@@ -12,14 +12,14 @@ object ProseAssertions {
     {
         val prose = ProseDriver(soyleStories.getAnyOpenWorkbenchOrError())
             .getProseByIdOrError(proseId)
-        assertEquals(expectedText, prose.content)
+        assertEquals(expectedText, prose.text)
     }
 
     fun proseDoesContainMention(proseId: Prose.Id, mentionName: String)
     {
         val prose = ProseDriver(soyleStories.getAnyOpenWorkbenchOrError())
             .getProseByIdOrError(proseId)
-        val mention = prose.mentions.find { prose.content.substring(it.start(), it.end()) == mentionName }
+        val mention = prose.mentions.find { prose.text.substring(it.startIndex, it.endIndex) == mentionName }
         Assertions.assertNotNull(mention) { "Prose doesn't contain mention with text $mentionName" }
     }
 
@@ -27,7 +27,7 @@ object ProseAssertions {
     {
         val prose = ProseDriver(soyleStories.getAnyOpenWorkbenchOrError())
             .getProseByIdOrError(proseId)
-        val mention = prose.mentions.find { prose.content.substring(it.start(), it.end()) == mentionName }
+        val mention = prose.mentions.find { prose.text.substring(it.startIndex, it.endIndex) == mentionName }
         Assertions.assertNull(mention) { "Prose still contains mention with text $mentionName" }
     }
 
@@ -35,7 +35,7 @@ object ProseAssertions {
     {
         val prose = ProseDriver(soyleStories.getAnyOpenWorkbenchOrError())
             .getProseByIdOrError(proseId)
-        Assertions.assertFalse(prose.content.contains(text))
+        Assertions.assertFalse(prose.text.contains(text))
     }
 
 }

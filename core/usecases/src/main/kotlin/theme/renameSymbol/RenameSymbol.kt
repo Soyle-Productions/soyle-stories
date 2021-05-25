@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.theme.renameSymbol
 
-import com.soyle.stories.domain.prose.MentionTextReplaced
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.scene.events.TrackedSymbolRenamed
 import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*

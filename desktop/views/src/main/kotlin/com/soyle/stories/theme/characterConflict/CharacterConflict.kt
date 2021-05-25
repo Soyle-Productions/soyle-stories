@@ -83,6 +83,7 @@ class CharacterConflict : View() {
 
     private fun Parent.perspectiveCharacterSelection(): MenuButton {
         return menubutton {
+            id = "perspective_character_selection"
             textProperty().bind(model.selectedPerspectiveCharacter.select { it?.characterName.toProperty() })
             setOnShowing { viewListener.getAvailableCharacters() }
             setOnHidden { model.availablePerspectiveCharacters.value = null }

@@ -1,11 +1,15 @@
 package com.soyle.stories.common.components
 
+import com.soyle.stories.common.ColorStyles
 import com.soyle.stories.common.components.buttons.ButtonStyles
+import com.soyle.stories.common.components.inputs.InputStyles
+import com.soyle.stories.common.components.surfaces.SurfaceStyles
 import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.soylestories.Styles
 import javafx.scene.effect.BlurType
 import javafx.scene.effect.DropShadow
 import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
 import tornadofx.*
 
 class ComponentsStyles : Stylesheet() {
@@ -46,8 +50,9 @@ class ComponentsStyles : Stylesheet() {
         init {
             importStylesheet<ComponentsStyles>()
 
-            ButtonStyles // reference to initilize
-            TextStyles // reference to initilize
+            ButtonStyles // reference to initialize
+            TextStyles // reference to initialize
+            InputStyles // reference to initialize
         }
     }
 
@@ -161,16 +166,17 @@ class ComponentsStyles : Stylesheet() {
         }
         popup {
             backgroundColor += Color.WHITE
-            borderColor += box(Styles.Purple)
+            borderColor += box(ColorStyles.primaryColor)
             borderWidth += box(1.px)
             borderInsets = multi(box((-1).px))
         }
         hasProblem {
             borderWidth += box(0.px, 0.px, 2.px, 0.px)
-            borderColor += box(Color.TRANSPARENT, Color.TRANSPARENT, Styles.Orange, Color.TRANSPARENT)
+            borderColor += box(Color.TRANSPARENT, Color.TRANSPARENT, ColorStyles.Orange, Color.TRANSPARENT)
         }
 
         radioButton {
+            baseColor = Color.WHITE
             radio {
                 borderColor = multi(box(Color.GREY))
                 borderRadius = multi(box(100.percent))
@@ -178,6 +184,7 @@ class ComponentsStyles : Stylesheet() {
             }
         }
         checkBox {
+            baseColor = Color.WHITE
             box {
                 borderColor = multi(box(Color.GREY))
                 borderWidth = multi(box(2.px))
@@ -199,6 +206,37 @@ class ComponentsStyles : Stylesheet() {
             }
             mark {
                 backgroundColor = multi(Styles.Purple)
+            }
+        }
+
+        tabPane {
+            tab {
+                backgroundRadius = multi(box(0.px))
+                backgroundColor = multi(SurfaceStyles.lightBackground(4.0))
+                labelPadding = box(4.px)
+                tabLabel {
+                    textFill = ColorStyles.primaryColor
+                }
+                tabCloseButton {
+                    backgroundColor = multi(ColorStyles.primaryColor)
+                }
+                and(selected) {
+                    backgroundColor = multi(ColorStyles.primaryColor)
+                    tabLabel {
+                        fontWeight = FontWeight.BOLD
+                        textFill = Color.WHITE
+                    }
+                    tabCloseButton {
+                        backgroundColor = multi(Color.WHITE)
+                    }
+                }
+            }
+            tabHeaderArea {
+                padding = box(0.px)
+            }
+            tabHeaderBackground {
+                padding = box(0.px)
+                backgroundColor = multi(SurfaceStyles.lightBackground(1.0))
             }
         }
     }
