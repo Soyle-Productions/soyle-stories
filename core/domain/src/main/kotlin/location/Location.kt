@@ -1,13 +1,13 @@
 package com.soyle.stories.domain.location
 
 import com.soyle.stories.domain.entities.Entity
+import com.soyle.stories.domain.location.events.LocationRenamed
 import com.soyle.stories.domain.location.events.SceneHostedAtLocation
 import com.soyle.stories.domain.location.exceptions.LocationAlreadyHostsScene
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.SingleNonBlankLine
-import com.soyle.stories.domain.validation.entitySetOf
 import java.util.*
 
 class Location(
@@ -24,7 +24,7 @@ class Location(
         hostedScenes: EntitySet<HostedScene> = this.hostedScenes
     ) = Location(id, projectId, name, description, hostedScenes)
 
-    fun withName(name: SingleNonBlankLine) = copy(name = name)
+    fun withName(name: SingleNonBlankLine): LocationUpdate<LocationRenamed> = Updated(copy(name = name), LocationRenamed(id, name.value))
     fun withDescription(description: String) = copy(description = description)
 
     fun withSceneHosted(sceneId: Scene.Id, sceneName: String): LocationUpdate<SceneHostedAtLocation> {
@@ -44,4 +44,3 @@ class Location(
 
 }
 
-class LocationRenamed(val locationId: Location.Id, val newName: String)

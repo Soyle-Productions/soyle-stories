@@ -269,15 +269,17 @@ class Scene private constructor(
         )
     }
 
-    fun withLocationRenamed(location: Location): SceneUpdate<SceneSettingLocationRenamed> {
-        val sceneSetting = getSceneSettingOrError(location.id)
-        if (sceneSetting.locationName == location.name.value) return noUpdate()
-        val newSceneSetting = sceneSetting.copy(locationName = location.name.value)
+    fun withLocationRenamed(locationId: Location.Id, locationName: String): SceneUpdate<SceneSettingLocationRenamed> {
+        val sceneSetting = getSceneSettingOrError(locationId)
+        if (sceneSetting.locationName == locationName) return noUpdate()
+        val newSceneSetting = sceneSetting.copy(locationName = locationName)
         return Updated(
             copy(settings = settings.minus(sceneSetting).plus(newSceneSetting)),
             SceneSettingLocationRenamed(id, newSceneSetting)
         )
     }
+    fun withLocationRenamed(location: Location): SceneUpdate<SceneSettingLocationRenamed> =
+        withLocationRenamed(location.id, location.name.value)
 
     private fun getSceneSettingOrError(locationId: Location.Id): SceneSettingLocation {
         return settings.getEntityById(locationId) ?: throw SceneDoesNotUseLocation(id, locationId)
