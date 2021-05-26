@@ -33,7 +33,7 @@ class RenameSceneUseCase(
 	private suspend fun updateSceneIfNeeded(scene: Scene, newName: NonBlankString)
 	{
 		if (scene.name != newName) {
-			sceneRepository.updateScene(scene.withName(newName))
+			sceneRepository.updateScene(scene.withName(newName).scene)
 		}
 	}
 }

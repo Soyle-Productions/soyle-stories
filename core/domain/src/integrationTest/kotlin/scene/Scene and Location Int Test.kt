@@ -17,4 +17,14 @@ class `Scene and Location Int Test` {
         updatedLocation.hostedScenes.containsEntityWithId(scene.id).mustEqual(true)
     }
 
+    @Test
+    fun `Scene Renamed Event can be used to Rename Hosted Scene`() {
+        val newName = sceneName()
+        val (_, sceneRenamed) = scene.withName(newName) as Updated
+        val (updatedLocation) = location.withSceneHosted(scene.id, scene.name.value).location
+            .withHostedScene(sceneRenamed.sceneId).renamed(to = sceneRenamed.sceneName)
+
+        updatedLocation.hostedScenes.getEntityById(scene.id)!!.sceneName.mustEqual(newName.value)
+    }
+
 }

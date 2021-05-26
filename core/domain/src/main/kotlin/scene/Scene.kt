@@ -171,7 +171,7 @@ class Scene private constructor(
         return "Scene(${equalityProps.joinToString(", ") { "${it.name}=${it.get(this)}" }})"
     }
 
-    fun withName(newName: NonBlankString) = copy(name = newName)
+    fun withName(newName: NonBlankString): SceneUpdate<SceneRenamed> = Updated(copy(name = newName), SceneRenamed(id, newName.value))
 
     fun withSceneFrameValue(value: SceneFrameValue): SceneUpdate<SceneFrameValueChanged> {
         when (value) {
