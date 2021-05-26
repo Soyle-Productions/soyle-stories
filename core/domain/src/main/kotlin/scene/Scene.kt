@@ -253,11 +253,13 @@ class Scene private constructor(
         )
     }
 
-    fun withLocationLinked(location: Location): SceneUpdate<LocationUsedInScene> {
-        if (settings.containsEntityWithId(location.id)) return noUpdate()
-        val sceneSetting = SceneSettingLocation(location)
+    fun withLocationLinked(locationId: Location.Id, locationName: String): SceneUpdate<LocationUsedInScene> {
+        if (settings.containsEntityWithId(locationId)) return noUpdate()
+        val sceneSetting = SceneSettingLocation(locationId, locationName)
         return Updated(copy(settings = settings + sceneSetting), LocationUsedInScene(id, sceneSetting))
     }
+    fun withLocationLinked(location: Location): SceneUpdate<LocationUsedInScene> =
+        withLocationLinked(location.id, location.name.value)
 
     fun withoutLocation(locationId: Location.Id): SceneUpdate<LocationRemovedFromScene> {
         val sceneSetting = settings.getEntityById(locationId) ?: return noUpdate()

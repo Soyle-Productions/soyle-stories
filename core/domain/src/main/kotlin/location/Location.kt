@@ -1,8 +1,12 @@
 package com.soyle.stories.domain.location
 
 import com.soyle.stories.domain.entities.Entity
+import com.soyle.stories.domain.location.events.SceneHostedAtLocation
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.SingleNonBlankLine
+import com.soyle.stories.domain.validation.entitySetOf
 import java.util.*
 
 class Location(
@@ -12,6 +16,8 @@ class Location(
 	val description: String = ""
 ) : Entity<Location.Id> {
 
+	val hostedScenes: EntitySet<Scene> = entitySetOf()
+
 	private fun copy(
 	  name: SingleNonBlankLine = this.name,
 	  description: String = this.description
@@ -19,6 +25,8 @@ class Location(
 
 	fun withName(name: SingleNonBlankLine) = copy(name = name)
 	fun withDescription(description: String) = copy(description = description)
+
+	fun withSceneHosted(sceneId: Scene.Id, sceneName: String): LocationUpdate<SceneHostedAtLocation> = Updated(this, SceneHostedAtLocation(id))
 
 	data class Id(val uuid: UUID = UUID.randomUUID()) {
 		override fun toString(): String = "Location($uuid)"
