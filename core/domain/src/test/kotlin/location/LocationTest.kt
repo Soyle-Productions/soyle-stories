@@ -1,6 +1,7 @@
 package com.soyle.stories.domain.location
 
 import com.soyle.stories.domain.location.events.SceneHostedAtLocation
+import com.soyle.stories.domain.location.exceptions.LocationAlreadyHostsScene
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.makeScene
@@ -53,6 +54,18 @@ class LocationTest {
 			val (location, hostedScene) = initialLocation.withSceneHosted(scene.id, scene.name.value) as Updated
 
 			hostedScene.mustEqual(SceneHostedAtLocation(initialLocation.id, scene.id, scene.name.value))
+
+			location.hostedScenes.containsEntityWithId(scene.id).mustEqual(true)
+			location.hostedScenes.single().sceneName.mustEqual(scene.name.value)
+		}
+
+		@Test
+		fun `cannot host the same scene more than once`() {
+			val (initialLocation) = makeLocation().withSceneHosted(scene.id, scene.name.value)
+
+			val (location, failure) = initialLocation.withSceneHosted(scene.id, scene.name.value) as NoUpdate
+
+			failure.mustEqual(LocationAlreadyHostsScene(initialLocation.id, scene.id))
 
 			location.hostedScenes.containsEntityWithId(scene.id).mustEqual(true)
 			location.hostedScenes.single().sceneName.mustEqual(scene.name.value)
