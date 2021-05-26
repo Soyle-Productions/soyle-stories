@@ -1,8 +1,11 @@
 package com.soyle.stories.usecase.location.createNewLocation
 
+import com.soyle.stories.domain.location.HostedScene
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.validation.SingleNonBlankLine
+import com.soyle.stories.domain.validation.entitySetOf
 import com.soyle.stories.usecase.location.LocationRepository
 import java.util.*
 
@@ -30,7 +33,7 @@ class CreateNewLocationUseCase(
 
 	private fun createLocation(name: SingleNonBlankLine, description: String?): Location {
 		val id = Location.Id()
-		return Location(id, projectId, name, description ?: "")
+		return Location(id, projectId, name, description ?: "", entitySetOf())
 	}
 
 	private suspend fun addNewLocation(location: Location) {
