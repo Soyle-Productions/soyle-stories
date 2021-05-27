@@ -1,6 +1,7 @@
 package com.soyle.stories.domain.location
 
 import com.soyle.stories.domain.entities.Entity
+import com.soyle.stories.domain.location.events.HostedSceneRemoved
 import com.soyle.stories.domain.location.events.HostedSceneRenamed
 import com.soyle.stories.domain.location.events.LocationRenamed
 import com.soyle.stories.domain.location.events.SceneHostedAtLocation
@@ -50,6 +51,13 @@ class Location(
                     event = HostedSceneRenamed(id, sceneId, to)
                 )
             }
+
+            override fun removed(): LocationUpdate<HostedSceneRemoved> {
+                return Updated(
+                    location = copy(hostedScenes = hostedScenes.minus(sceneId)),
+                    event = HostedSceneRemoved(id, sceneId)
+                )
+            }
             
         }
     }
@@ -64,6 +72,7 @@ class Location(
     interface HostedSceneModifications {
 
         fun renamed(to: String): LocationUpdate<HostedSceneRenamed>
+        fun removed(): LocationUpdate<HostedSceneRemoved>
     }
 
 }

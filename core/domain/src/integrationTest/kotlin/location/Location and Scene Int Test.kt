@@ -30,4 +30,14 @@ class `Location and Scene Int Test` {
         updatedScene.settings.getEntityById(location.id)!!.locationName.mustEqual(newName.value)
     }
 
+    @Test
+    fun `Hosted Scene Removed Event can be used to Remove Location from Scene`() {
+        val (_, hostedSceneRemoved) = location.withSceneHosted(scene.id, scene.name.value)
+            .location.withHostedScene(scene.id)!!.removed() as Updated
+        val (updatedScene) = scene.withLocationLinked(location.id, location.name.value)
+            .scene.withoutLocation(hostedSceneRemoved.locationId)
+
+        updatedScene.settings.containsEntityWithId(location.id).mustEqual(false)
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.soyle.stories.domain.location
 
+import com.soyle.stories.domain.location.events.HostedSceneRemoved
 import com.soyle.stories.domain.location.events.HostedSceneRenamed
 import com.soyle.stories.domain.location.events.SceneHostedAtLocation
 import com.soyle.stories.domain.location.exceptions.HostedSceneAlreadyHasName
@@ -98,6 +99,16 @@ class LocationTest {
                 .withHostedScene(scene.id)!!.renamed(to = scene.name.value) as NoUpdate
             failure.mustEqual(HostedSceneAlreadyHasName(location.id, scene.id, scene.name.value))
         }
+
+		@Test
+		fun `can remove hosted scenes`() {
+			val (initialLocation) = makeLocation().withSceneHosted(scene.id, scene.name.value)
+			val (location, hostedSceneRemoved) = initialLocation
+				.withHostedScene(scene.id)!!.removed() as Updated
+
+			hostedSceneRemoved.mustEqual(HostedSceneRemoved(initialLocation.id, scene.id))
+			location.hostedScenes.containsEntityWithId(scene.id).mustEqual(false)
+		}
 
 	}
 }
