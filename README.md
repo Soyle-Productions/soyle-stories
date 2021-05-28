@@ -7,11 +7,11 @@ Soyle Stories is a working title for an application to help writers organize and
 3. No input field should be included just for the sake of input.  If it's just a box, it can be put into the description of the thing.
 
 ## Architecture
-At the very core of the project, we use Domain-Driven Design and functional programming.  Charaters are distinct from Locations or Scenes.
-Surrounding the core domain, we use Clean Architecture Use Cases to describe what users or external actors can do with the system.  Many use cases map directly to a method on an entity.
-In the Adapters layer of the system, we include the implementations of the outputs of use cases which typically distribute the domain events to receivers/notifiers that broadcast a change to interested parties (usually some GUI component).  We also implement the persistence code, but currently, it only resides in memory and does not actually save to the file system.
-In the View layer, we usually have tornadofx components and the dependency injection interface.
-In the src folder for the desktop module, we have all the definitions for the dependency injection (some DI definitions are still waiting to be migrated from Views into this folder).
+- At the very core of the project, we use Domain-Driven Design and functional programming.  Charaters are distinct from Locations or Scenes.
+- Surrounding the core domain, we use Clean Architecture Use Cases to describe what users or external actors can do with the system.  Many use cases map directly to a method on an entity.
+- In the Adapters layer of the system, we include the implementations of the outputs of use cases which typically distribute the domain events to receivers/notifiers that broadcast a change to interested parties (usually some GUI component).  We also implement the persistence code, but currently, it only resides in memory and does not actually save to the file system.
+- In the View layer, we usually have tornadofx components and the dependency injection interface.
+- In the src folder for the desktop module, we have all the definitions for the dependency injection (some DI definitions are still waiting to be migrated from Views into this folder).
 
 ## Current Focuses
 1. World Building features
