@@ -3,6 +3,8 @@ package com.soyle.stories.domain.scene
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.character.makeCharacterArcSection
 import com.soyle.stories.domain.mustEqual
+import com.soyle.stories.domain.nonBlankStr
+import com.soyle.stories.domain.scene.events.SceneRenamed
 import com.soyle.stories.domain.scene.events.SymbolTrackedInScene
 import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import com.soyle.stories.domain.theme.makeSymbol
@@ -14,6 +16,35 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class SceneTest {
+
+    @Nested
+    inner class `With Scene Renamed` {
+
+        private val scene = makeScene()
+        private val newName = sceneName()
+
+        @Test
+        fun `should update scene`() {
+            val (newScene, _) = scene.withName(newName) as Updated
+            newScene.name.mustEqual(newName)
+        }
+
+        @Test
+        fun `should produce scene renamed event`() {
+            val (_, event) = scene.withName(newName) as Updated
+            event.mustEqual(SceneRenamed(scene.id, newName.value))
+        }
+
+        @Nested
+        inner class `When Same Name Provided` {
+
+            @Test
+            fun `should not produce event`() {
+                scene.withName(scene.name) as WithoutChange
+            }
+
+        }
+    }
 
     @Test
     fun `scene covers character arc section`() {
