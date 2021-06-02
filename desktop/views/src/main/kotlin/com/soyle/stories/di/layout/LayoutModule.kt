@@ -28,7 +28,7 @@ import com.soyle.stories.project.eventbus.ToggleToolOpenedNotifier
 import com.soyle.stories.project.layout.LayoutController
 import com.soyle.stories.project.layout.LayoutPresenter
 import com.soyle.stories.project.layout.LayoutViewListener
-import com.soyle.stories.scene.deleteScene.DeleteSceneNotifier
+import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedNotifier
 
 object LayoutModule {
@@ -80,7 +80,7 @@ object LayoutModule {
             }
             provide {
                 RemoveToolsWithIdController(applicationScope.get(), get(), get()).also {
-                    get<DeleteSceneNotifier>().addListener(it)
+                    get<DeleteSceneOutput>().addListener(it)
                     get<ThemeDeletedNotifier>().addListener(it)
                 }
             }

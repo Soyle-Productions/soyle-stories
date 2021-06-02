@@ -18,7 +18,7 @@ import com.soyle.stories.scene.createNewScene.CreateNewSceneControllerImpl
 import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneControllerImpl
-import com.soyle.stories.scene.deleteScene.DeleteSceneNotifier
+import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneOutput
@@ -45,7 +45,7 @@ import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInS
 import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneOutput
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
-import com.soyle.stories.scene.renameScene.RenameSceneNotifier
+import com.soyle.stories.scene.renameScene.RenameSceneOutput
 import com.soyle.stories.scene.reorderScene.ReorderSceneController
 import com.soyle.stories.scene.reorderScene.ReorderSceneControllerImpl
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
@@ -174,7 +174,7 @@ object UseCases {
         }
 
         provide(RenameScene.OutputPort::class) {
-            RenameSceneNotifier(applicationScope.get())
+            RenameSceneOutput(applicationScope.get())
         }
     }
 
@@ -196,7 +196,7 @@ object UseCases {
         }
 
         provide(DeleteScene.OutputPort::class) {
-            DeleteSceneNotifier(applicationScope.get())
+            DeleteSceneOutput(applicationScope.get())
         }
     }
 

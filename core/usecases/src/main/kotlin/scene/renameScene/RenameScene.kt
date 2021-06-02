@@ -21,8 +21,8 @@ interface RenameScene {
 	)
 
 	interface OutputPort {
-		fun receiveRenameSceneFailure(failure: Exception)
-		fun receiveRenameSceneResponse(response: ResponseModel)
+		suspend fun receiveRenameSceneFailure(failure: Exception)
+		suspend fun receiveRenameSceneResponse(response: ResponseModel)
 	}
 
 }

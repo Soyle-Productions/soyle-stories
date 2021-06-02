@@ -23,7 +23,7 @@ import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogControll
 import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogPresenter
 import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogViewListener
 import com.soyle.stories.scene.createSceneDialog.CreateSceneDialogModel
-import com.soyle.stories.scene.deleteScene.DeleteSceneNotifier
+import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogController
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogModel
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogPresenter
@@ -53,7 +53,7 @@ import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInScen
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
 import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
-import com.soyle.stories.scene.renameScene.RenameSceneNotifier
+import com.soyle.stories.scene.renameScene.RenameSceneOutput
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogController
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogModel
@@ -109,7 +109,7 @@ object Presentation {
                     projectScope.get(),
                     DeleteSceneRamificationsPresenter(
                         get<DeleteSceneRamificationsModel>(),
-                        projectScope.get<DeleteSceneNotifier>(),
+                        projectScope.get<DeleteSceneOutput>(),
                         projectScope.get<RemovedCharacterNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),
@@ -130,7 +130,7 @@ object Presentation {
                     projectScope.get(),
                     ReorderSceneRamificationsPresenter(
                         get<ReorderSceneRamificationsModel>(),
-                        projectScope.get<DeleteSceneNotifier>(),
+                        projectScope.get<DeleteSceneOutput>(),
                         projectScope.get<RemovedCharacterFromSceneNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),
@@ -150,8 +150,8 @@ object Presentation {
                 SceneListPresenter(
                     get<SceneListModel>(),
                     get<CreateNewSceneNotifier>(),
-                    get<RenameSceneNotifier>(),
-                    get<DeleteSceneNotifier>(),
+                    get<RenameSceneOutput>(),
+                    get<DeleteSceneOutput>(),
                     get<ReorderSceneNotifier>(),
                     get<DetectInvalidatedMentionsOutput>(),
                     get<DetectUnusedSymbolsOutput>()

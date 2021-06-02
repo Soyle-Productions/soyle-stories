@@ -10,9 +10,7 @@ class DeleteLocationOutput(
 
     override suspend fun receiveDeleteLocationResponse(response: DeleteLocation.ResponseModel) {
         deletedLocationReceiver.receiveDeletedLocation(response.deletedLocation)
-        response.locationRemovedFromScenes.forEach {
-            locationRemovedFromSceneReceiver.receiveLocationRemovedFromScene(it)
-        }
+        locationRemovedFromSceneReceiver.receiveLocationRemovedFromScenes(response.locationRemovedFromScenes)
     }
 
 }
