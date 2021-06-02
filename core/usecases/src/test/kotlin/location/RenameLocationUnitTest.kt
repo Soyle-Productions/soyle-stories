@@ -47,8 +47,30 @@ class RenameLocationUnitTest {
 
     @Nested
     inner class `When Location Exists` {
+
         init {
             locationRepository.givenLocation(location)
+        }
+
+        @Test
+        fun `should update location`() {
+            renameLocation()
+            updatedLocation!!.name.mustEqual(inputName)
+        }
+
+        @Test
+        fun `should output event`() {
+            renameLocation()
+            result!!.locationRenamed.let {
+                it.locationId.mustEqual(location.id)
+                it.newName.mustEqual(inputName.value)
+            }
+        }
+
+        @Test
+        fun `should not update prose`() {
+            renameLocation()
+            updatedProse.isEmpty().mustEqual(true)
         }
 
         @Nested
@@ -71,88 +93,66 @@ class RenameLocationUnitTest {
         }
 
         @Nested
-        inner class `When Input Name is Different` {
+        inner class `When Mentioned in Prose` {
 
-            @Test
-            fun `should update location`() {
-                renameLocation()
-                updatedLocation!!.name.mustEqual(inputName)
-            }
-
-            @Test
-            fun `should event`() {
-                renameLocation()
-                result!!.locationRenamed.let {
-                    it.locationId.mustEqual(location.id)
-                    it.newName.mustEqual(inputName.value)
-                }
-            }
-
-            @Test
-            fun `should not update prose`() {
-                renameLocation()
-                updatedProse.isEmpty().mustEqual(true)
-            }
-
-            @Nested
-            inner class `When Mentioned in Prose` {
-
-                private val prose = List(3) {
-                    makeProse(
-                        content = listOf(
-                            ProseContent("",
-                                location.id.mentioned() to singleLine(location.name.value)
-                            )
+            private val prose = List(3) {
+                makeProse(
+                    content = listOf(
+                        ProseContent("",
+                            location.id.mentioned() to singleLine(location.name.value)
                         )
                     )
-                }
-
-                init {
-                    prose.onEach(proseRepository::givenProse)
-                }
-
-                @Test
-                fun `should update prose`() {
-                    renameLocation()
-                    updatedProse.mapTo(HashSet(3)) { it.id }
-                        .mustEqual(prose.mapTo(HashSet(3)) { it.id })
-                    updatedProse.forEach {
-                        it.text.contains(location.name.value).mustEqual(false)
-                        it.text.contains(inputName.value).mustEqual(true)
-                    }
-                }
-
-                @Test
-                fun `should output prose mention text replaced events`() {
-                    renameLocation()
-                    result!!.mentionTextReplaced.mapTo(HashSet(3)) { it.proseId }
-                        .mustEqual(prose.mapTo(HashSet(3)) { it.id })
-                }
-
+                )
             }
 
-            @Nested
-            inner class `When Used in Scenes`
-            {
-                private val scenes = List(5) { makeScene(settings = entitySetOf(SceneSettingLocation(location))) }
-                init {
-                    scenes.forEach(sceneRepository::givenScene)
-                }
+            init {
+                prose.onEach(proseRepository::givenProse)
+            }
 
-                @Test
-                fun `should update scenes`() {
-                    renameLocation()
-                    updatedScenes.map { it.id }.toSet().mustEqual(scenes.map { it.id }.toSet())
-                    updatedScenes.forEach { it.settings.getEntityById(location.id)!!.locationName.mustEqual(inputName.value) }
+            @Test
+            fun `should update prose`() {
+                renameLocation()
+                updatedProse.mapTo(HashSet(3)) { it.id }
+                    .mustEqual(prose.mapTo(HashSet(3)) { it.id })
+                updatedProse.forEach {
+                    it.text.contains(location.name.value).mustEqual(false)
+                    it.text.contains(inputName.value).mustEqual(true)
                 }
+            }
 
-                @Test
-                fun `should output scene setting location renamed events`() {
-                    renameLocation()
-                    result!!.sceneSettingLocationsRenamed.map { it.sceneId }.toSet().mustEqual(scenes.map { it.id }.toSet())
-                    result!!.sceneSettingLocationsRenamed.onEach { it.sceneSettingLocation.locationName.mustEqual(inputName.value) }
+            @Test
+            fun `should output prose mention text replaced events`() {
+                renameLocation()
+                result!!.mentionTextReplaced.mapTo(HashSet(3)) { it.proseId }
+                    .mustEqual(prose.mapTo(HashSet(3)) { it.id })
+            }
+
+        }
+
+        @Nested
+        inner class `When Used in Scenes`
+        {
+            private val scenes = List(5) { makeScene(settings = entitySetOf(SceneSettingLocation(location))) }
+            init {
+                scenes.forEach(sceneRepository::givenScene)
+            }
+
+            @Test
+            fun `should update scenes`() {
+                renameLocation()
+                updatedScenes.map { it.id }.toSet().mustEqual(scenes.map { it.id }.toSet())
+                updatedScenes.forEach {
+                    it.settings.getEntityById(location.id)!!.locationName.mustEqual(inputName.value)
                 }
+            }
 
+            @Test
+            fun `should output scene setting location renamed events`() {
+                renameLocation()
+                result!!.sceneSettingLocationsRenamed.map { it.sceneId }.toSet().mustEqual(scenes.map { it.id }.toSet())
+                result!!.sceneSettingLocationsRenamed.onEach {
+                    it.sceneSettingLocation.locationName.mustEqual(inputName.value)
+                }
             }
 
         }

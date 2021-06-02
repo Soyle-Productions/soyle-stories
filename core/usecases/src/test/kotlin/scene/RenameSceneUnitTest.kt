@@ -1,116 +1,151 @@
 package com.soyle.stories.usecase.scene
 
+import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.location.events.HostedSceneRenamed
+import com.soyle.stories.domain.location.makeLocation
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.SceneLocale
-import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.scene.*
+import com.soyle.stories.domain.scene.events.SceneRenamed
+import com.soyle.stories.domain.shouldBe
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.repositories.LocationRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.scene.renameScene.RenameScene
 import com.soyle.stories.usecase.scene.renameScene.RenameSceneUseCase
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.*
 
 class RenameSceneUnitTest {
 
-	private val projectId = Project.Id(UUID.randomUUID())
-	private val sceneId: UUID = UUID.randomUUID()
-	private val originalName: NonBlankString = NonBlankString.create("First Scene Name")!!
-	private val inputName: NonBlankString = NonBlankString.create("Scene Name")!!
-	private val sceneDoesNotExistMessage = "Scene does not exist"
-	private val sceneNameCannotBeBlankMessage = "Scene name cannot be blank"
-
-	private lateinit var sceneRepository: SceneRepository
+    private val scene = makeScene()
+    private val inputName = sceneName()
 
 	private var updatedScene: Scene? = null
-	private var result: Any? = null
+	private val updatedLocations: List<Location>
+    private var result: Result<RenameScene.ResponseModel>? = null
 
-	@BeforeEach
-	fun clear() {
-		sceneRepository = SceneRepositoryDouble()
-		updatedScene = null
-		result = null
+    private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::updatedScene::set)
+	private val locationRepository: LocationRepositoryDouble
+	init {
+		val mutableUpdatedLocations = mutableListOf<Location>()
+		locationRepository = LocationRepositoryDouble(onUpdateLocation = mutableUpdatedLocations::add)
+		updatedLocations = mutableUpdatedLocations
 	}
 
-	@Test
-	fun `scene does not exist`() {
-		givenNoScenes()
-		whenUseCaseIsExecuted()
-		val result = result as SceneDoesNotExist
-		result.sceneId.mustEqual(sceneId)
-		assertEquals(sceneDoesNotExistMessage, result.localizedMessage)
-	}
+	private val renameScene: RenameScene = RenameSceneUseCase(sceneRepository, locationRepository)
 
-	@Test
-	fun `valid name is output`() {
-		given(sceneWithId = sceneId)
-		whenUseCaseIsExecuted()
-		assertResultIsValidResponseModel()
-	}
+    @Test
+    fun `scene does not exist`() = runBlocking {
+		renameScene(requestModel(), output())
+        val result = result!!.exceptionOrNull() as SceneDoesNotExist
+        result.sceneId.mustEqual(scene.id.uuid)
+    }
 
-	@Test
-	fun `same name is not persisted`() {
-		given(sceneWithId = sceneId, andName = inputName)
-		whenUseCaseIsExecuted()
-		assertResultIsValidResponseModel()
-		assertLocationNotUpdated()
-	}
+	@Nested
+	inner class `Given Scene Exists` {
 
-	@Test
-	fun `modified valid name is persisted`() {
-		given(sceneWithId = sceneId)
-		whenUseCaseIsExecuted()
-		assertResultIsValidResponseModel()
-		assertOnlyLocationNameUpdated()
-	}
-
-	private fun givenNoScenes() = given()
-	private fun given(sceneWithId: UUID? = null, andName: NonBlankString? = null) {
-		sceneRepository = SceneRepositoryDouble(
-		  initialScenes = listOfNotNull(
-			sceneWithId?.let { makeScene(Scene.Id(it), projectId, andName ?: originalName) }
-		  ),
-		  onUpdateScene = { updatedScene = it }
-		)
-	}
-
-	private fun whenUseCaseIsExecuted(withName: NonBlankString = inputName) {
-		val useCase: RenameScene = RenameSceneUseCase(sceneRepository)
-		val request = RenameScene.RequestModel(sceneId, withName, object : SceneLocale {
-			override val sceneNameCannotBeBlank: String = sceneNameCannotBeBlankMessage
-			override val sceneDoesNotExist: String = sceneDoesNotExistMessage
-		})
-		runBlocking {
-			useCase.invoke(request, object : RenameScene.OutputPort {
-				override fun receiveRenameSceneFailure(failure: Exception) {
-					result = failure
-				}
-
-				override fun receiveRenameSceneResponse(response: RenameScene.ResponseModel) {
-					result = response
-				}
-			})
+		init {
+			sceneRepository.givenScene(scene)
 		}
+
+		@Test
+		fun `should output scene renamed`() = runBlocking {
+			renameScene(requestModel(), output())
+			result!!.getOrNull().shouldBe(responseModel())
+		}
+
+		@Test
+		fun `should update scene with new name`() = runBlocking {
+			renameScene(requestModel(), output())
+			updatedScene!!.name.mustEqual(inputName)
+		}
+
+		@Nested
+		inner class `Given Locations Host the Scene` {
+
+			private val locations = List(5) { makeLocation().withSceneHosted(scene.id, scene.name.value).location }
+
+			init {
+			    locations.forEach(locationRepository::givenLocation)
+				sceneRepository.givenScene(locations.fold(scene) { a, b -> a.withLocationLinked(b).scene })
+			}
+
+			@Test
+			fun `should update locations`() = runBlocking {
+				renameScene(requestModel(), output())
+				updatedLocations.size.mustEqual(locations.size)
+				updatedLocations.map { it.id }.toSet().mustEqual(locations.map { it.id }.toSet())
+				updatedLocations.forEach { it.hostedScenes.getEntityById(scene.id)!!.sceneName.mustEqual(inputName.value) }
+			}
+
+			@Test
+			fun `should output updated location events`() = runBlocking {
+				renameScene(requestModel(), output())
+				result!!.getOrNull().shouldBe(responseModel(
+					expectedLocationEvents = locations.map { HostedSceneRenamed(it.id, scene.id, inputName.value) }
+				))
+			}
+
+			@Nested
+			inner class `Given Scene Already has Name` {
+
+				@Test
+				fun `should not update scene`() = runBlocking {
+					renameScene(requestModel(withName = scene.name), output())
+					result!!.getOrNull().shouldBe(responseModel(
+						expectedName = scene.name.value,
+						expectedSceneRenamedEvent = null
+					))
+					assertNull(updatedScene)
+				}
+
+				@Test
+				fun `should not update locations`() = runBlocking {
+					renameScene(requestModel(withName = scene.name), output())
+					updatedLocations.mustEqual(emptyList<Location>())
+				}
+
+				@Test
+				fun `should output scene id and requested name`() = runBlocking {
+					renameScene(requestModel(withName = scene.name), output())
+					result!!.getOrNull().shouldBe(responseModel(
+						expectedName = scene.name.value,
+						expectedSceneRenamedEvent = null,
+						expectedLocationEvents = emptyList()
+					))
+				}
+
+			}
+
+		}
+
 	}
 
-	private fun assertResultIsValidResponseModel() {
-		val result = result as RenameScene.ResponseModel
-		result.sceneId.mustEqual(sceneId)
-		result.newName.mustEqual(inputName.value)
-	}
+    private fun requestModel(withName: NonBlankString = inputName) =
+        RenameScene.RequestModel(scene.id.uuid, withName, SceneLocaleDouble())
 
-	private fun assertLocationNotUpdated() {
-		val updatedScene = updatedScene
-		updatedScene.mustEqual(null) { "Scene should not have been updated" }
-	}
+    private fun output() = object : RenameScene.OutputPort {
+        override fun receiveRenameSceneFailure(failure: Exception) {
+            result = Result.failure(failure)
+        }
 
-	private fun assertOnlyLocationNameUpdated() {
-		val updatedScene = updatedScene!!
-		updatedScene.name.mustEqual(inputName)
+        override fun receiveRenameSceneResponse(response: RenameScene.ResponseModel) {
+            result = Result.success(response)
+        }
+    }
+
+	private fun responseModel(
+		expectedName: String = inputName.value,
+		expectedSceneRenamedEvent: SceneRenamed? = SceneRenamed(scene.id, inputName.value),
+		expectedLocationEvents: List<HostedSceneRenamed> = emptyList()
+	) = fun(actual: Any?) {
+		actual as RenameScene.ResponseModel
+		actual.sceneId.mustEqual(scene.id)
+		actual.requestedName.mustEqual(expectedName)
+		actual.sceneRenamed.mustEqual(expectedSceneRenamedEvent)
+		actual.hostedScenesRenamed.mustEqual(expectedLocationEvents)
 	}
 
 }

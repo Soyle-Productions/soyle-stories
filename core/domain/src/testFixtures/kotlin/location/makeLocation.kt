@@ -23,4 +23,5 @@ fun makeLocation(
         hostedScenes
     )
 
-fun locationName(value: String = "Location ${str()}"): SingleNonBlankLine = SingleNonBlankLine.create(singleLine(value))!!
+fun locationName(value: String = "Location ${str()}"): SingleNonBlankLine =
+    SingleNonBlankLine.create(singleLine(value))!!

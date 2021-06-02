@@ -23,7 +23,10 @@ class RenameLocationUseCase(
 		output.receiveRenameLocationResponse(responseModel)
 	}
 
-	private suspend fun updateIfNamesAreDifferent(name: SingleNonBlankLine, location: Location): RenameLocation.ResponseModel? {
+	private suspend fun updateIfNamesAreDifferent(
+		name: SingleNonBlankLine,
+		location: Location
+	): RenameLocation.ResponseModel? {
 		return if (name != location.name) {
 			RenameLocation.ResponseModel(
 				updateLocationName(location, name),
@@ -39,8 +42,10 @@ class RenameLocationUseCase(
 		return LocationRenamed(location.id, name.value)
 	}
 
-	private suspend fun updateProseThatMentionLocation(location: Location, newName: SingleNonBlankLine): List<MentionTextReplaced>
-	{
+	private suspend fun updateProseThatMentionLocation(
+		location: Location,
+		newName: SingleNonBlankLine
+	): List<MentionTextReplaced> {
 		val locationEntityId = location.id.mentioned()
 		val updatedProse = proseRepository.getProseThatMentionEntity(locationEntityId).map {
 			it.withMentionTextReplaced(locationEntityId, location.name.value to newName.value)
@@ -49,8 +54,10 @@ class RenameLocationUseCase(
 		return updatedProse.mapNotNull { it.event }
 	}
 
-	private suspend fun updateScenesThatUseLocation(location: Location, newName: SingleNonBlankLine): List<SceneSettingLocationRenamed>
-	{
+	private suspend fun updateScenesThatUseLocation(
+		location: Location,
+		newName: SingleNonBlankLine
+	): List<SceneSettingLocationRenamed> {
 		val (renamedLocation) = location.withName(newName)
 		val sceneUpdates = sceneRepository.getScenesUsingLocation(location.id).mapNotNull {
 			it.withLocationRenamed(renamedLocation) as? Updated

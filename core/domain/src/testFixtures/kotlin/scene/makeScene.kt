@@ -9,6 +9,7 @@ import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.noEntities
 
+@Suppress("LongParameterList")
 fun makeScene(
     sceneId: Scene.Id = Scene.Id(),
     projectId: Project.Id = Project.Id(),

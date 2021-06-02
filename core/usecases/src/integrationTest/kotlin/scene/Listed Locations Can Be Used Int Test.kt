@@ -44,8 +44,7 @@ class `Listed Locations Can Be Used Int Test` {
     }
 
     @Test
-    fun `used location should not be listed`()
-    {
+    fun `used location should not be listed`() {
         linkLocationToScene(location.id)
         val availableLocations = listAvailableLocationsToUseInScene()
         assertNull(availableLocations.find {
@@ -58,7 +57,8 @@ class `Listed Locations Can Be Used Int Test` {
         linkLocationToScene(location.id)
         val availableLocations = listAvailableLocationsToUseInScene()
         linkLocationToScene(availableLocations.first().id)
-        sceneRepository.scenes.getValue(scene.id).settings.map { it.id }.toSet().mustEqual(setOf(location.id, availableLocations.first().id))
+        sceneRepository.scenes.getValue(scene.id).settings.map { it.id }.toSet()
+            .mustEqual(setOf(location.id, availableLocations.first().id))
     }
 
     @Test
@@ -77,7 +77,8 @@ class `Listed Locations Can Be Used Int Test` {
         linkLocationToScene(availableLocations.first().id)
         val usedLocations = listLocationsUsedInScene()
         removeLocationFromScene(usedLocations.first().id)
-        sceneRepository.scenes.getValue(scene.id).settings.map { it.id }.toSet().mustEqual(usedLocations.drop(1).map { it.id }.toSet())
+        sceneRepository.scenes.getValue(scene.id).settings.map { it.id }.toSet()
+            .mustEqual(usedLocations.drop(1).map { it.id }.toSet())
     }
 
     @Test
@@ -103,9 +104,9 @@ class `Listed Locations Can Be Used Int Test` {
         return result!!
     }
 
-    private fun listAvailableLocationsToUseInScene(): ListAvailableLocationsToUseInScene.ResponseModel
-    {
-        val useCase: ListAvailableLocationsToUseInScene = ListAvailableLocationsToUseInSceneUseCase(sceneRepository, locationRepository)
+    private fun listAvailableLocationsToUseInScene(): ListAvailableLocationsToUseInScene.ResponseModel {
+        val useCase: ListAvailableLocationsToUseInScene =
+            ListAvailableLocationsToUseInSceneUseCase(sceneRepository, locationRepository)
         var result: ListAvailableLocationsToUseInScene.ResponseModel? = null
         val output = object : ListAvailableLocationsToUseInScene.OutputPort {
             override suspend fun receiveAvailableLocationsToUseInScene(response: ListAvailableLocationsToUseInScene.ResponseModel) {
@@ -118,8 +119,7 @@ class `Listed Locations Can Be Used Int Test` {
         return result!!
     }
 
-    private fun listLocationsUsedInScene(): List<LocationItem>
-    {
+    private fun listLocationsUsedInScene(): List<LocationItem> {
         val useCase: ListLocationsUsedInScene = ListLocationsUsedInSceneUseCase(sceneRepository)
         var result: ListLocationsUsedInScene.ResponseModel? = null
         val output = object : ListLocationsUsedInScene.OutputPort {
@@ -134,7 +134,7 @@ class `Listed Locations Can Be Used Int Test` {
     }
 
     private fun removeLocationFromScene(locationId: Location.Id) {
-        val useCase: RemoveLocationFromScene = RemoveLocationFromSceneUseCase(sceneRepository)
+        val useCase: RemoveLocationFromScene = RemoveLocationFromSceneUseCase(sceneRepository, locationRepository)
         val output = object : RemoveLocationFromScene.OutputPort {
             override suspend fun locationRemovedFromScene(response: RemoveLocationFromScene.ResponseModel) {}
         }
