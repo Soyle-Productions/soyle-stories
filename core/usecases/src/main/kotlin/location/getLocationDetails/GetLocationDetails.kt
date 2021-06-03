@@ -1,16 +1,20 @@
 package com.soyle.stories.usecase.location.getLocationDetails
 
-import java.util.*
+import com.soyle.stories.usecase.location.HostedSceneItem
+import java.util.UUID
 
 interface GetLocationDetails {
 
 	suspend operator fun invoke(locationId: UUID, output: OutputPort)
 
-	class ResponseModel(val locationId: UUID, val locationName: String, val locationDescription: String)
+	class ResponseModel(
+		val locationId: UUID,
+		val locationName: String,
+		val locationDescription: String,
+		val hostedScenes: List<HostedSceneItem>
+	)
 
-	interface OutputPort {
-		fun receiveGetLocationDetailsFailure(failure: Exception)
-		fun receiveGetLocationDetailsResponse(response: ResponseModel)
+	fun interface OutputPort {
+		suspend fun receiveGetLocationDetailsResponse(response: ResponseModel)
 	}
-
 }
