@@ -15,6 +15,9 @@ const val javaFxVersion = "0.0.9"
 const val shadow = "com.github.johnrengelman.shadow"
 const val shadowVersion = "6.1.0"
 
+const val detekt = "io.gitlab.arturbosch.detekt"
+const val detektVersion = "1.17.1"
+
 /**
  * implicitly applies the [application] plugin
  */

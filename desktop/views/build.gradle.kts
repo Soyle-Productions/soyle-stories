@@ -6,6 +6,7 @@ import org.openjfx.gradle.JavaFXPlatform
 
 plugins {
     kotlin("jvm")
+    id(plugin.constants.detekt)
     id(plugin.constants.javafx) version plugin.constants.javaFxVersion
     id(plugin.constants.ideaExt)
     id("java-test-fixtures")

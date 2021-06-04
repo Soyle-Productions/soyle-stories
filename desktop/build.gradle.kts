@@ -3,6 +3,7 @@ import plugin.constants.kotlinVersion
 plugins {
     java
     kotlin("jvm")
+    id(plugin.constants.detekt)
     id(plugin.constants.ideaExt) version plugin.constants.ideaExtVersion
     id(plugin.constants.shadow) version plugin.constants.shadowVersion
     id(plugin.constants.badassRuntime) version plugin.constants.badassRuntimeVersion
