@@ -50,8 +50,6 @@ object Presentation {
                     projectScope.get()
                 )
             }
-
         }
     }
-
 }

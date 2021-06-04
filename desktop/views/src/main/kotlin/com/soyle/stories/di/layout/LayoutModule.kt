@@ -29,6 +29,7 @@ import com.soyle.stories.project.layout.LayoutController
 import com.soyle.stories.project.layout.LayoutPresenter
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
+import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedNotifier
 
 object LayoutModule {
@@ -79,8 +80,8 @@ object LayoutModule {
                 CloseToolControllerImpl(applicationScope.get(), get(), get())
             }
             provide {
-                RemoveToolsWithIdController(applicationScope.get(), get(), get()).also {
-                    get<DeleteSceneOutput>().addListener(it)
+                RemoveToolsWithIdController(get(), get()).also {
+                    get<SceneDeletedNotifier>().addListener(it)
                     get<ThemeDeletedNotifier>().addListener(it)
                 }
             }

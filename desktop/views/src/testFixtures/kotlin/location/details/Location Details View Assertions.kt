@@ -12,7 +12,8 @@ class `Location Details View Assertions`(private val access: `Location Details V
         fun assertThat(view: LocationDetails, assertions: `Location Details View Assertions`.() -> Unit) {
             `Location Details View Assertions`(view.access()).assertions()
         }
-        fun LocationDetails.assertThis(assertions: `Location Details View Assertions`.() -> Unit) = assertThat(this, assertions)
+        fun LocationDetails.assertThis(assertions: `Location Details View Assertions`.() -> Unit) =
+            assertThat(this, assertions)
     }
 
     fun doesNotHaveSceneNamed(sceneName: String) {
@@ -20,21 +21,21 @@ class `Location Details View Assertions`(private val access: `Location Details V
     }
 
     fun hasScene(sceneId: Scene.Id, expectedName: String) {
-        assertEquals(expectedName, access.getHostedScene(sceneId)!!.text)
+        val hostedScene = access.getHostedScene(sceneId) ?: throw AssertionError("Hosted Scene not listed $sceneId")
+        assertEquals(expectedName, hostedScene.text)
     }
 
     fun hasAvailableSceneItem(sceneId: Scene.Id, expectedName: String) {
-        val sceneItem =with (access) {
+        val sceneItem = with(access) {
             availableScenesToHost!!.getSceneItem(sceneId)!!
         }
         assertEquals(expectedName, sceneItem.text)
     }
 
     fun doesNotHaveAvailableSceneItem(sceneId: Scene.Id) {
-        val sceneItem = with (access) {
+        val sceneItem = with(access) {
             availableScenesToHost?.getSceneItem(sceneId)
         }
         assertNull(sceneItem)
     }
-
 }

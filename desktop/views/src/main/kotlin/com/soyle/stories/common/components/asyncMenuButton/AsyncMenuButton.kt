@@ -1,5 +1,6 @@
 package com.soyle.stories.common.components.asyncMenuButton
 
+import com.soyle.stories.common.scopedListener
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
@@ -57,7 +58,7 @@ class AsyncMenuButton<T> : Fragment() {
     }
 
     private fun MenuButton.addItemsWhenLoaded() {
-        sourceProperty.onChange { list: List<T>? ->
+        scopedListener(sourceProperty) { list: List<T>? ->
             items.clear()
             when (list) {
                 null -> addLoadingItem()
@@ -65,5 +66,4 @@ class AsyncMenuButton<T> : Fragment() {
             }
         }
     }
-
 }

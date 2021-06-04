@@ -12,5 +12,4 @@ class LinkLocationToSceneOutput(
         locationLinkedToSceneReceiver.receiveLocationUsedInScene(response.locationUsedInScene)
         sceneHostedReceiver.receiveSceneHostedAtLocation(response.sceneHostedAtLocation)
     }
-
 }

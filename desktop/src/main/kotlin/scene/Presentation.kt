@@ -79,6 +79,9 @@ import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneController
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneViewListener
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
+import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
+import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.sceneCharacters.SceneCharactersState
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
@@ -109,7 +112,7 @@ object Presentation {
                     projectScope.get(),
                     DeleteSceneRamificationsPresenter(
                         get<DeleteSceneRamificationsModel>(),
-                        projectScope.get<DeleteSceneOutput>(),
+                        projectScope.get<SceneDeletedNotifier>(),
                         projectScope.get<RemovedCharacterNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),
@@ -130,7 +133,7 @@ object Presentation {
                     projectScope.get(),
                     ReorderSceneRamificationsPresenter(
                         get<ReorderSceneRamificationsModel>(),
-                        projectScope.get<DeleteSceneOutput>(),
+                        projectScope.get<SceneDeletedNotifier>(),
                         projectScope.get<RemovedCharacterFromSceneNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),
@@ -150,8 +153,8 @@ object Presentation {
                 SceneListPresenter(
                     get<SceneListModel>(),
                     get<CreateNewSceneNotifier>(),
-                    get<RenameSceneOutput>(),
-                    get<DeleteSceneOutput>(),
+                    get<SceneRenamedNotifier>(),
+                    get<SceneDeletedNotifier>(),
                     get<ReorderSceneNotifier>(),
                     get<DetectInvalidatedMentionsOutput>(),
                     get<DetectUnusedSymbolsOutput>()

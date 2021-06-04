@@ -39,6 +39,7 @@ import com.soyle.stories.scene.reorderSceneRamifications.*
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
@@ -88,11 +89,13 @@ object SceneModule {
             }
             provide<RenameScene> {
                 RenameSceneUseCase(
+                    get(),
                     get()
                 )
             }
             provide<DeleteScene> {
                 DeleteSceneUseCase(
+                    get(),
                     get()
                 )
             }
@@ -149,10 +152,10 @@ object SceneModule {
                 CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventNotifier>())
             }
             provide(RenameScene.OutputPort::class) {
-                RenameSceneOutput(applicationScope.get())
+                RenameSceneOutput(get(), get())
             }
             provide(DeleteScene.OutputPort::class) {
-                DeleteSceneOutput(applicationScope.get())
+                DeleteSceneOutput(applicationScope.get(), get(), get())
             }
             provide(SetMotivationForCharacterInScene.OutputPort::class) {
                 SetMotivationForCharacterInSceneNotifier(applicationScope.get())
@@ -295,7 +298,7 @@ object SceneModule {
                     projectScope.get(),
                     DeleteSceneRamificationsPresenter(
                         get<DeleteSceneRamificationsModel>(),
-                        projectScope.get<DeleteSceneOutput>(),
+                        projectScope.get<SceneDeletedNotifier>(),
                         projectScope.get<RemovedCharacterNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),
@@ -316,7 +319,7 @@ object SceneModule {
                     projectScope.get(),
                     ReorderSceneRamificationsPresenter(
                         get<ReorderSceneRamificationsModel>(),
-                        projectScope.get<DeleteSceneOutput>(),
+                        projectScope.get<SceneDeletedNotifier>(),
                         projectScope.get<RemovedCharacterFromSceneNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),

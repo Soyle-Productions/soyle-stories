@@ -4,5 +4,5 @@ interface LocationDetailsViewListener {
 
 	fun getValidState()
 	fun reDescribeLocation(newDescription: String)
-
+	fun getAvailableScenesToHost()
 }

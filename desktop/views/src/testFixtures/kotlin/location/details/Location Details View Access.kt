@@ -29,10 +29,16 @@ class `Location Details View Access`(private val view: LocationDetails) : FxRobo
             items.takeIf { isShowing }
         }
 
-    fun ObservableList<MenuItem>.getSceneItem(sceneId: Scene.Id): MenuItem? = find { it.id == sceneId.toString() }
-    fun getHostedSceneByName(sceneName: String): Labeled? = from(view.root).lookup(".hosted-scene-item").queryAll<Labeled>()
-        .find { it.text == sceneName }
-    fun getHostedScene(sceneId: Scene.Id): Labeled? = from(view.root).lookup(".hosted-scene-item").queryAll<Labeled>()
-        .find { it.id == sceneId.toString() }
-
+    fun ObservableList<MenuItem>.getSceneItem(sceneId: Scene.Id): MenuItem? =
+        find { it.id == sceneId.toString() }
+    fun getHostedSceneByName(sceneName: String): Labeled? =
+        from(view.root)
+            .lookup(".hosted-scene-item")
+            .queryAll<Labeled>()
+            .find { it.text == sceneName }
+    fun getHostedScene(sceneId: Scene.Id): Labeled? =
+        from(view.root)
+            .lookup(".hosted-scene-item")
+            .queryAll<Labeled>()
+            .find { it.id == sceneId.toString() }
 }

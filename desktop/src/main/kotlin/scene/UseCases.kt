@@ -161,7 +161,7 @@ object UseCases {
 
     private fun InProjectScope.renameScene() {
         provide<RenameScene> {
-            RenameSceneUseCase(get())
+            RenameSceneUseCase(get(), get())
         }
 
         provide<RenameSceneController> {
@@ -174,7 +174,7 @@ object UseCases {
         }
 
         provide(RenameScene.OutputPort::class) {
-            RenameSceneOutput(applicationScope.get())
+            RenameSceneOutput(get(), get())
         }
     }
 
@@ -183,7 +183,7 @@ object UseCases {
             GetPotentialChangesFromDeletingSceneUseCase(get())
         }
         provide<DeleteScene> {
-            DeleteSceneUseCase(get())
+            DeleteSceneUseCase(get(), get())
         }
 
         provide<DeleteSceneController> {
@@ -196,7 +196,7 @@ object UseCases {
         }
 
         provide(DeleteScene.OutputPort::class) {
-            DeleteSceneOutput(applicationScope.get())
+            DeleteSceneOutput(applicationScope.get(), get(), get())
         }
     }
 
@@ -269,7 +269,7 @@ object UseCases {
         }
 
         provide(LinkLocationToScene.OutputPort::class) {
-            LinkLocationToSceneOutput(get())
+            LinkLocationToSceneOutput(get(), get())
         }
     }
 
@@ -378,8 +378,6 @@ object UseCases {
             SetCharacterDesireInSceneOutput(get())
         }
     }
-
-
 
     private fun InProjectScope.listOptionsToReplaceMention() {
         provide<ListOptionsToReplaceMentionController> {
@@ -509,14 +507,13 @@ object UseCases {
 
     private fun InProjectScope.removeLocationFromScene() {
         provide<RemoveLocationFromScene> {
-            RemoveLocationFromSceneUseCase(get())
+            RemoveLocationFromSceneUseCase(get(), get())
         }
         provide<RemoveLocationFromScene.OutputPort> {
-            RemoveLocationFromSceneOutput(get())
+            RemoveLocationFromSceneOutput(get(), get())
         }
         provide<RemoveLocationFromSceneController> {
             RemoveLocationFromSceneControllerImpl(applicationScope.get(), get(), get())
         }
     }
-
 }

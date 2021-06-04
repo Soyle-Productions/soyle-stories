@@ -5,6 +5,6 @@ import com.soyle.stories.domain.location.events.HostedSceneRemoved
 interface HostedSceneRemovedReceiver {
 
     suspend fun receiveHostedScenesRemoved(events: List<HostedSceneRemoved>)
-    suspend fun receiveHostedSceneRemoved(event: HostedSceneRemoved)
-
+    suspend fun receiveHostedSceneRemoved(event: HostedSceneRemoved) =
+        receiveHostedScenesRemoved(listOf(event))
 }

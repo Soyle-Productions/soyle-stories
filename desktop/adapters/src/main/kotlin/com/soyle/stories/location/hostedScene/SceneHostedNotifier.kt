@@ -8,5 +8,4 @@ class SceneHostedNotifier : Notifier<SceneHostedReceiver>(), SceneHostedReceiver
     override suspend fun receiveSceneHostedAtLocation(event: SceneHostedAtLocation) {
         notifyAll { it.receiveSceneHostedAtLocation(event) }
     }
-
 }
