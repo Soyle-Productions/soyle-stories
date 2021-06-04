@@ -106,10 +106,17 @@ class LocationDetails : View() {
 				if (!secondary) addClass(ButtonStyles.inviteButton)
 			}
 			sourceProperty.bind(model.availableScenesToHostProperty)
-			itemsWhenLoaded {
-				it.map { MenuItem(it.sceneName).apply { id = it.sceneId.toString() } }
+			itemsWhenLoaded { availableScenesToHost ->
+				availableScenesToHost.map {
+					MenuItem(it.sceneName).apply {
+						id = it.sceneId.toString()
+						action { viewListener.hostScene(it.sceneId) }
+					}
+				}
 			}
-			onLoad = { viewListener.getAvailableScenesToHost() }
+			onLoad = {
+				model.availableScenesToHostProperty.set(null)
+				viewListener.getAvailableScenesToHost() }
 		}
 	}
 	@ViewBuilder

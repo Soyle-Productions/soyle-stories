@@ -6,11 +6,14 @@ import com.soyle.stories.di.scoped
 import com.soyle.stories.location.deleteLocation.DeleteLocationController
 import com.soyle.stories.location.deleteLocation.DeleteLocationControllerImpl
 import com.soyle.stories.location.deleteLocation.DeleteLocationOutput
+import com.soyle.stories.location.hostedScene.listAvailableScenes.ListScenesToHostInLocationController
 import com.soyle.stories.location.renameLocation.RenameLocationOutput
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.repositories.CharacterArcRepositoryImpl
 import com.soyle.stories.usecase.location.deleteLocation.DeleteLocation
 import com.soyle.stories.usecase.location.deleteLocation.DeleteLocationUseCase
+import com.soyle.stories.usecase.location.hostedScene.listAvailableScenes.ListScenesToHostInLocation
+import com.soyle.stories.usecase.location.hostedScene.listAvailableScenes.ListScenesToHostInLocationUseCase
 import com.soyle.stories.usecase.location.renameLocation.RenameLocation
 import com.soyle.stories.usecase.location.renameLocation.RenameLocationUseCase
 
@@ -20,6 +23,7 @@ object UseCases {
         scoped<ProjectScope> {
             deleteLocation()
             renameLocation()
+            listScenesToHostInLocation()
         }
     }
 
@@ -44,6 +48,14 @@ object UseCases {
         provide<RenameLocation.OutputPort> {
             RenameLocationOutput(get(), get(), get())
         }
+    }
+
+    private fun InProjectScope.listScenesToHostInLocation()
+    {
+        provide<ListScenesToHostInLocation> {
+            ListScenesToHostInLocationUseCase(get(), get())
+        }
+        provide { ListScenesToHostInLocationController(applicationScope.get(), get()) }
     }
 
 }

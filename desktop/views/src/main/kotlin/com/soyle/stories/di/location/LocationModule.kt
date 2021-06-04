@@ -61,7 +61,7 @@ object LocationModule {
 			object : LocationEvents {
 				override val createNewLocation: Notifier<CreateNewLocation.OutputPort> by DI.resolveLater<CreateNewLocationNotifier>(this@provide)
 				override val deleteLocation: Notifier<DeletedLocationReceiver> by lazy { this@provide.get<DeletedLocationNotifier>() }
-				override val renameLocation: Notifier<RenameLocation.OutputPort> by lazy { this@provide.get() }
+				override val locationRenamed: Notifier<LocationRenamedReceiver> by lazy { this@provide.get<LocationRenamedNotifier>() }
 				override val reDescribeLocation: Notifier<ReDescribeLocation.OutputPort> by DI.resolveLater<ReDescribeLocationNotifier>(this@provide)
 				override val sceneHosted: Notifier<SceneHostedReceiver> by lazy { this@provide.get<SceneHostedNotifier>() }
 				override val hostedSceneRenamed: Notifier<HostedSceneRenamedReceiver> by DI.resolveLater<HostedSceneRenamedNotifier>(this@provide)

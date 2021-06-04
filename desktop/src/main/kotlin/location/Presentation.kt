@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.config.location
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogController
 import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogModel
 import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogPresenter
@@ -10,6 +11,7 @@ import com.soyle.stories.location.deleteLocationDialog.DeleteLocationDialogViewL
 import com.soyle.stories.location.locationDetails.*
 import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.project.ProjectScope
+import java.util.*
 
 object Presentation {
 
@@ -38,16 +40,14 @@ object Presentation {
 
             provide<LocationDetailsViewListener> {
                 LocationDetailsController(
+                    Location.Id(UUID.fromString(locationId)),
                     projectScope.applicationScope.get(),
-                    locationId,
                     projectScope.get(),
-                    LocationDetailsPresenter(
-                        locationId,
-                        get<LocationDetailsModel>(),
-                        projectScope.get(),
-                        projectScope.get<LocationRenamedNotifier>()
-                    ),
-                    projectScope.get()
+                    projectScope.get(),
+                    projectScope.get(),
+                    projectScope.get(),
+                    get<LocationDetailsModel>(),
+                    projectScope.get(),
                 )
             }
         }

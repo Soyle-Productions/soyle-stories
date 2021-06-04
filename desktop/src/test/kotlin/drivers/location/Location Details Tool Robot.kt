@@ -36,7 +36,9 @@ fun LocationDetails.requestScenesToHost()
 fun LocationDetails.addScene(scene: Scene)
 {
     drive {
-        val sceneItem = availableScenesToHost!!.getSceneItem(scene.id)!!
+        addSceneButton.fire()
+        val availableScenes = availableScenesToHost!!
+        val sceneItem = availableScenes.getSceneItem(scene.id)!!
         sceneItem.fire()
     }
 }

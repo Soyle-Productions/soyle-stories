@@ -15,10 +15,11 @@ import tornadofx.*
 class AsyncMenuButton<T> : Fragment() {
 
     companion object {
-        fun <T> EventTarget.asyncMenuButton(op: AsyncMenuButton<T>.() -> Unit = {}): AsyncMenuButton<T> = FX.find<AsyncMenuButton<T>>(FX.defaultScope).also {
-            add(it.root)
-            it.op()
-        }
+        fun <T> EventTarget.asyncMenuButton(op: AsyncMenuButton<T>.() -> Unit = {}): AsyncMenuButton<T> =
+            FX.find<AsyncMenuButton<T>>(FX.defaultScope).also {
+                add(it.root)
+                it.op()
+            }
     }
 
     val textProperty = titleProperty
@@ -40,28 +41,20 @@ class AsyncMenuButton<T> : Fragment() {
 
     override val root: Region = menubutton {
         textProperty().bind(titleProperty)
-        addLoadingItem()
         loadItemsWhenShown()
         addItemsWhenLoaded()
     }
 
-    private fun MenuButton.addLoadingItem() {
-        item("") { textProperty().bind(loadingLabelProperty) }
-    }
+    private fun loadingItem() = MenuItem("").apply { textProperty().bind(loadingLabelProperty) }
 
     private fun MenuButton.loadItemsWhenShown() {
-        setOnShowing {
-            items.clear()
-            addLoadingItem()
-            onLoad()
-        }
+        setOnShowing { onLoad() }
     }
 
     private fun MenuButton.addItemsWhenLoaded() {
         scopedListener(sourceProperty) { list: List<T>? ->
-            items.clear()
             when (list) {
-                null -> addLoadingItem()
+                null -> items.setAll(loadingItem())
                 else -> items.setAll(mapToItems(list))
             }
         }

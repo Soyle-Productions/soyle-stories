@@ -7,21 +7,21 @@ import com.soyle.stories.location.events.LocationEvents
 import com.soyle.stories.location.locationDetails.presenters.*
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.usecase.location.getLocationDetails.GetLocationDetails
+import com.soyle.stories.usecase.location.hostedScene.listAvailableScenes.ListScenesToHostInLocation
 import java.util.*
 
 class LocationDetailsPresenter(
-    locationId: String,
+    private val locationId: Location.Id,
     private val view: LocationDetailsViewModel,
     locationEvents: LocationEvents,
-    locationRenamedNotifier: Notifier<LocationRenamedReceiver>
-) : GetLocationDetails.OutputPort {
+) : GetLocationDetails.OutputPort, ListScenesToHostInLocation.OutputPort {
 
     private val subPresenters = listOf(
-        LocationRenamedPresenter(locationId, view) listensTo locationRenamedNotifier,
+        LocationRenamedPresenter(locationId, view) listensTo locationEvents.locationRenamed,
         ReDescribeLocationPresenter(locationId, view) listensTo locationEvents.reDescribeLocation,
-        SceneHostedPresenter(Location.Id(UUID.fromString(locationId)), view) listensTo locationEvents.sceneHosted,
-        HostedSceneRenamedPresenter(Location.Id(UUID.fromString(locationId)), view) listensTo locationEvents.hostedSceneRenamed,
-        HostedSceneRemovedPresenter(Location.Id(UUID.fromString(locationId)), view) listensTo locationEvents.hostedSceneRemoved,
+        SceneHostedPresenter(locationId, view) listensTo locationEvents.sceneHosted,
+        HostedSceneRenamedPresenter(locationId, view) listensTo locationEvents.hostedSceneRenamed,
+        HostedSceneRemovedPresenter(locationId, view) listensTo locationEvents.hostedSceneRemoved,
     )
 
     override suspend fun receiveGetLocationDetailsResponse(response: GetLocationDetails.ResponseModel) {
@@ -31,6 +31,17 @@ class LocationDetailsPresenter(
                 descriptionLabel = "Description"
                 description = response.locationDescription
                 hostedScenes = response.hostedScenes.map { hostedSceneItemViewModel(it.sceneId, it.sceneName) }
+            }
+        }
+    }
+
+    override suspend fun receiveScenesAvailableToHostInLocation(response: ListScenesToHostInLocation.ResponseModel) {
+        if (locationId != response.locationId) return
+        with(view) {
+            update {
+                availableScenesToHost = response.availableScenesToHost.map {
+                    AvailableSceneToHostViewModel(it.sceneId, it.sceneName)
+                }
             }
         }
     }
