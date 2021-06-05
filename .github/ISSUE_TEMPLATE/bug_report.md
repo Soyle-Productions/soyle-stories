@@ -8,28 +8,12 @@ assignees: b-camphart
 ---
 
 ### Title
-The title should be only as long as is needed to describe what's wrong.  If you think about the bug in terms of a UAT, which of the 'Then's are failing?  The title should be the inverse of that 'Then' statement.
-
-**Example:** 
-Given ....
-When the button is clicked on
-Then the dialog should be opened
-
-Thus the title is: The dialog is not open after clicking on the button.
+The title should be only as long as is needed to describe what's wrong.  It should describe what did not happen correctly.  Instead of "The dialog should have opened when I clicked the button," the title should say "The dialog does not open after clicking the button."  Try not to include the details that led to the bug occuring in the title, that information should be in the ticket itself.
 
 ### Description
-The description should contain the steps to reproduce the issue.  Think of this like writing a new UAT.  The difference is in how the steps are described and how many.  The steps should be all the 'Given' statements and a final 'When' statement with the expected result being the failing 'Then' statement.  However, do not use the 'Given' 'When' and 'Then' words.
+The description should contain the steps to reproduce the issue.  Think of this like telling an idiot how to make a sandwich.  Try to include every click or bits of input you provided the program that led to the bug
 
 **Example:**
-If the UAT would be written like this:
-
-    Given a project has been opened
-    And a Location has been created
-    And the Location List Tool has been opened
-    When a Location is right-clicked
-    Then the Location right-click menu should be open
-
-Then the steps for filing the bug should look like this:
 
     1. Open a project
     2. Create a Location
