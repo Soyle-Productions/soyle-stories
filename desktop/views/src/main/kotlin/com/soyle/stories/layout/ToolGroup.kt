@@ -1,6 +1,10 @@
 package com.soyle.stories.layout
 
 import com.soyle.stories.common.async
+import com.soyle.stories.common.components.surfaces.Elevation
+import com.soyle.stories.common.components.surfaces.Surface
+import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
 import com.soyle.stories.common.components.surfaces.SurfaceStyles
 import com.soyle.stories.di.layout.ToolModule
 import com.soyle.stories.di.resolve
@@ -13,6 +17,7 @@ import javafx.geometry.Side
 import javafx.scene.Parent
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import javafx.scene.layout.StackPane
 import tornadofx.*
 
 class ToolGroup : WindowChild() {
@@ -53,7 +58,6 @@ class ToolGroup : WindowChild() {
                                 }
                                 it.consume()
                             }
-                            toggleClass(SurfaceStyles.elevated[8], tab.selectedProperty())
                             receivingUpdate = true
                             selectionModel.select(tab)
                             receivingUpdate = false

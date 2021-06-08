@@ -212,7 +212,7 @@ class ComponentsStyles : Stylesheet() {
         tabPane {
             tab {
                 backgroundRadius = multi(box(0.px))
-                backgroundColor = multi(SurfaceStyles.lightBackground(4.0))
+                backgroundColor = multi(SurfaceStyles.lightBackground(5.0))
                 labelPadding = box(4.px)
                 tabLabel {
                     textFill = ColorStyles.primaryColor

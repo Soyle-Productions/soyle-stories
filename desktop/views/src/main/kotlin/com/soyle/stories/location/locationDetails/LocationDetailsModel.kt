@@ -43,9 +43,9 @@ class LocationDetailsModel : ViewModel(), LocationDetailsViewModel {
 	//
 	val hostedScenesProperty = SimpleListProperty<HostedSceneItemModel>(observableListOf())
 	override var GUIUpdate.hostedScenes: List<HostedSceneItemViewModel>
-		get() = hostedScenesProperty
+		get() = hostedScenesProperty.value
 		set(value) {
-			hostedScenesProperty.setAll(value.filterIsInstance<HostedSceneItemModel>())
+			hostedScenesProperty.value.setAll(value.filterIsInstance<HostedSceneItemModel>())
 		}
 
 	override fun hostedSceneItemViewModel(sceneId: Scene.Id, name: String): HostedSceneItemViewModel =

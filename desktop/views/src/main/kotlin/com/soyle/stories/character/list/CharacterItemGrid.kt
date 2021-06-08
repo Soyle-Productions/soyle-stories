@@ -8,6 +8,7 @@ import com.soyle.stories.common.components.cardBody
 import com.soyle.stories.common.components.cardHeader
 import com.soyle.stories.common.components.layouts.WaterfallPane
 import com.soyle.stories.common.components.surfaces.*
+import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
 import com.soyle.stories.common.components.text.ResizableLabel
 import com.soyle.stories.common.components.text.SectionTitle.Companion.sectionTitle
 import com.soyle.stories.di.get
@@ -32,7 +33,7 @@ class CharacterItemGrid : Fragment() {
 
     private val characterContextMenu = ContextMenu().apply { item("") }
 
-    override val root: Parent = surface<WaterfallPane>(elevation = 8) {
+    override val root: Parent = surface<WaterfallPane>(elevation = Elevation.getValue(8), classes = {}) {
         hgap = 8.0
         vgap = 8.0
     //    rowValignment = VPos.TOP

@@ -8,10 +8,9 @@ import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariant
 import com.soyle.stories.characterarc.components.characterIcon
 import com.soyle.stories.common.components.buttons.ButtonVariant
 import com.soyle.stories.common.components.buttons.secondaryButton
-import com.soyle.stories.common.components.surfaces.surface
-import com.soyle.stories.common.components.surfaces.surfaceElevationProperty
-import com.soyle.stories.common.components.surfaces.surfaceRelativeElevation
-import com.soyle.stories.common.components.surfaces.surfaceRelativeElevationProperty
+import com.soyle.stories.common.components.surfaces.Elevation
+import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onLoseFocus
@@ -108,14 +107,15 @@ class CharacterProfileView : View() {
 
     override val root: Parent = vbox {
         addClass("character-profile")
-        val rootSurfaceElevationProperty = surfaceElevationProperty()
         surface {
             isFillWidth = false
             alignment = Pos.CENTER
             spacing = 16.0
             padding = Insets(64.0, 32.0, 32.0, 32.0)
-            surfaceElevationProperty().bind(rootSurfaceElevationProperty.plus(4))
-            surfaceRelativeElevation = 4
+            asSurface {
+                inheritedElevationProperty().bind(this@vbox.asSurface().absoluteElevationProperty())
+                relativeElevation = Elevation.getValue(4)
+            }
 
             add(characterIcon(state.characterImageResource).apply {
                 prefHeight = 64.0

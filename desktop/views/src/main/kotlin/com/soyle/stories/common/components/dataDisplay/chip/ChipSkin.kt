@@ -1,18 +1,20 @@
 package com.soyle.stories.common.components.dataDisplay.chip
 
 import com.soyle.stories.common.components.ComponentsStyles
+import com.soyle.stories.common.components.surfaces.Elevation
+import com.soyle.stories.common.components.surfaces.Surface
+import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.SurfaceStyles
 import com.soyle.stories.common.existsWhen
 import javafx.event.ActionEvent
 import javafx.scene.control.Label
 import javafx.scene.control.SkinBase
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.HBox
-import javafx.scene.layout.Region.USE_COMPUTED_SIZE
 import javafx.scene.layout.Region.USE_PREF_SIZE
 import javafx.scene.layout.StackPane
 import tornadofx.addClass
 import tornadofx.toggleClass
-import tornadofx.usePrefWidth
 
 class ChipSkin(chip: Chip) : SkinBase<Chip>(chip) {
 
@@ -46,19 +48,23 @@ class ChipSkin(chip: Chip) : SkinBase<Chip>(chip) {
 
     private fun toggleColorClasses() {
         val chip = skinnable ?: return
-        chip.toggleClass(ComponentsStyles.primary, chip.color == Chip.Color.Primary)
-        chip.toggleClass(ComponentsStyles.secondary, chip.color == Chip.Color.Secondary)
+        chip.toggleClass(ComponentsStyles.primary, chip.color == Chip.Color.primary)
+        chip.toggleClass(ComponentsStyles.secondary, chip.color == Chip.Color.secondary)
     }
 
     private fun toggleVariantClasses() {
         val chip = skinnable ?: return
-        chip.toggleClass(ComponentsStyles.filled, chip.variant == Chip.Variant.Default)
-        chip.toggleClass(ComponentsStyles.outlined, chip.variant == Chip.Variant.Outlined)
+        chip.toggleClass(ComponentsStyles.filled, chip.variant == Chip.Variant.default)
+        chip.toggleClass(ComponentsStyles.outlined, chip.variant == Chip.Variant.outlined)
     }
 
     init {
         children.clear()
         children.add(container)
+        skinnable.asSurface {
+            relativeElevation = Elevation.getValue(4)
+            liftedStyle = SurfaceStyles.relativeElevation[0]
+        }
         registerChangeListener(chip.colorProperty()) {
             toggleColorClasses()
         }

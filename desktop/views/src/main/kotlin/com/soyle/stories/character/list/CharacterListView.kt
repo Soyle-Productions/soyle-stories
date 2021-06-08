@@ -13,6 +13,8 @@ import com.soyle.stories.common.components.buttons.hasArrow
 import com.soyle.stories.common.components.buttons.inviteButton
 import com.soyle.stories.common.components.buttons.primaryButton
 import com.soyle.stories.common.components.surfaces.*
+import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
@@ -48,10 +50,17 @@ class CharacterListView : View() {
 
     private val layoutStyle: SimpleObjectProperty<LayoutStyle> = SimpleObjectProperty(LayoutStyle.List)
 
+    private val baseElevation
+        get() = Elevation.getValue(4)
+
     override val root: Parent = stackpane {
-        characterProfile().asSurface(10)
-        vbox(alignment = Pos.CENTER, spacing = 16.0) {
-            asSurface(8)
+        characterProfile().asSurface {
+            inheritedElevation = baseElevation
+            relativeElevation = Elevation.getValue(12)
+        }
+        surface {
+            alignment = Pos.CENTER
+            spacing = 16.0
             parentProperty().onChangeWithCurrent { if (it != null) fitToParentSize() }
             vgrow = Priority.ALWAYS
             hgrow = Priority.SOMETIMES
@@ -82,7 +91,10 @@ class CharacterListView : View() {
             }
             add(profileScope.get<CharacterProfileView>().apply {
                 props.bind(profileBeingViewed)
-                root.asSurface(10)
+                root.asSurface {
+                    inheritedElevation = Elevation.getValue(16)
+                    relativeElevation = Elevation.getValue(0)
+                }
                 root.anchorpaneConstraints {
                     topAnchor = 0
                     bottomAnchor = 0
@@ -227,12 +239,19 @@ class CharacterListView : View() {
         val header = header()
         val characterItemsProperty = characterItems()
 
-        // should only show drop shadow based on elevation distance
-        header.surfaceRelativeElevation = header.surfaceElevation - characterItemsProperty.value.surfaceElevation
+        header.asSurface {
+            inheritedElevation = baseElevation
+        }
+        header.scopedListener(characterItemsProperty) {
+            it?.asSurface {
+                inheritedElevation = baseElevation
+                relativeElevation = Elevation.getValue(4)
+            }
+        }
     }
 
     @ViewBuilder
-    private fun Parent.header() = surface<HBox>(elevation = 16) {
+    private fun Parent.header() = surface<HBox>(elevation = Elevation.getValue(8), classes = {}) {
         alignment = Pos.CENTER_LEFT
         spacing = 8.0
         paddingAll = 8.0
