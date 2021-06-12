@@ -2,8 +2,7 @@ package com.soyle.stories.desktop.view.scene.sceneSetting
 
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.scene.sceneSetting.SceneSettingView
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.fail
 
 class SceneSettingAssertions private constructor(private val driver: `Scene Setting Driver`) {
@@ -27,5 +26,10 @@ class SceneSettingAssertions private constructor(private val driver: `Scene Sett
     fun doesNotHaveLocationNamed(locationName: String)
     {
         assertNull(driver.getLocationItemByName(locationName)) { "Location item found for ${locationName}, but should not have." }
+    }
+
+    fun hasLocationNamed(locationName: String)
+    {
+        assertNotNull(driver.getLocationItemByName(locationName)) { "Could not find location item for ${locationName}." }
     }
 }

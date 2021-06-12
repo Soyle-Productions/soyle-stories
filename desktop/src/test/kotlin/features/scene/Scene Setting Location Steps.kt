@@ -76,6 +76,16 @@ class `Scene Setting Location Steps` : En {
                 doesNotHaveLocationNamed(settingName)
             }
         }
+        Then("the {scene} should still have a setting named {string}") { scene: Scene, settingName: String ->
+            assertTrue(scene.settings.any { it.locationName == settingName })
+
+            val sceneSettingView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneSettingAssertions.assertThat(sceneSettingView) {
+                hasLocationNamed(settingName)
+            }
+        }
     }
 
 }
