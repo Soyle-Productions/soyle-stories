@@ -52,11 +52,19 @@ internal class SceneSettingPresenter(
         }
     }
 
-    override suspend fun receiveLocationRemovedFromScene(locationRemovedFromScene: LocationRemovedFromScene) {
+    override suspend fun receiveLocationRemovedFromScene(locationRemovedFromScene: LocationRemovedFromScene) =
+        receiveLocationRemovedFromScenes(listOf(locationRemovedFromScene))
+
+    override suspend fun receiveLocationRemovedFromScenes(events: List<LocationRemovedFromScene>) {
         view.updateOrInvalidated {
-            if (targetSceneId != locationRemovedFromScene.sceneId) return@updateOrInvalidated this
+            val removedLocationIds = events
+                .asSequence()
+                .filter { it.sceneId == targetSceneId }
+                .map { it.sceneSetting.id }
+                .toSet()
+            if (removedLocationIds.isEmpty()) return@updateOrInvalidated this
             copy(
-                usedLocations = usedLocations.filterNot { it.id == locationRemovedFromScene.sceneSetting.id }
+                usedLocations = usedLocations.filterNot { it.id in removedLocationIds }
             )
         }
     }
@@ -73,19 +81,22 @@ internal class SceneSettingPresenter(
         }
     }
 
-    override suspend fun receiveSceneSettingLocationRenamed(sceneSettingLocationRenamed: SceneSettingLocationRenamed) {
+    override suspend fun receiveSceneSettingLocationRenamed(sceneSettingLocationRenamed: SceneSettingLocationRenamed) =
+        receiveSceneSettingLocaitonsRenamed(listOf(sceneSettingLocationRenamed))
+
+    override suspend fun receiveSceneSettingLocaitonsRenamed(events: List<SceneSettingLocationRenamed>) {
         view.updateOrInvalidated {
-            if (targetSceneId != sceneSettingLocationRenamed.sceneId) return@updateOrInvalidated this
+            val newLocationNamesById = events
+                .asSequence()
+                .filter { it.sceneId == targetSceneId }
+                .associate { it.sceneSettingLocation.id to it.sceneSettingLocation.locationName }
+            if (newLocationNamesById.isEmpty()) return@updateOrInvalidated this
             copy(
                 usedLocations = usedLocations.map { item ->
-                    if (item.id == sceneSettingLocationRenamed.sceneSettingLocation.id) {
-                        item.copy(name = sceneSettingLocationRenamed.sceneSettingLocation.locationName)
-                    } else {
-                        item
-                    }
+                    val newName = newLocationNamesById[item.id] ?: return@map item
+                    item.copy(name = newName)
                 }
             )
         }
     }
-
 }

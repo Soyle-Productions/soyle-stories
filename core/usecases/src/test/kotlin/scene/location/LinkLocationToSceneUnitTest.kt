@@ -1,10 +1,13 @@
 package com.soyle.stories.usecase.scene.location
 
 import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.location.events.SceneHostedAtLocation
 import com.soyle.stories.domain.location.makeLocation
+import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocaleDouble
 import com.soyle.stories.domain.scene.SceneSettingLocation
+import com.soyle.stories.domain.scene.events.LocationUsedInScene
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.shouldBe
 import com.soyle.stories.domain.validation.entitySetOfNotNull
@@ -18,94 +21,112 @@ import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocation
 import com.soyle.stories.usecase.scene.sceneDoesNotExist
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class LinkLocationToSceneUnitTest {
 
-    private val sceneId = Scene.Id()
+    private val scene = makeScene()
     private val location = makeLocation()
-    private val locationId = location.id
 
+    private var updatedLocation: Location? = null
     private var updatedScene: Scene? = null
-    private var result: Any? = null
+    private var result: LinkLocationToScene.ResponseModel? = null
 
     private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::updatedScene::set)
-    private val locationRepository = LocationRepositoryDouble()
+    private val locationRepository = LocationRepositoryDouble(onUpdateLocation = ::updatedLocation::set)
 
     @Test
     fun `scene does not exist`() {
         val error = assertThrows<SceneDoesNotExist> {
-            whenLocationIsLinkedToScene()
+            linkLocationToScene()
         }
-        error shouldBe sceneDoesNotExist(sceneId.uuid)
+        error shouldBe sceneDoesNotExist(scene.id.uuid)
+        assertNull(updatedLocation)
         assertNull(updatedScene)
         assertNull(result)
     }
 
     @Test
     fun `location does not exist`() {
-        givenSceneExists()
+        sceneRepository.givenScene(scene)
         val error = assertThrows<LocationDoesNotExist> {
-            whenLocationIsLinkedToScene()
+            linkLocationToScene()
         }
-        error shouldBe locationDoesNotExist(locationId.uuid)
+        error shouldBe locationDoesNotExist(location.id.uuid)
+        assertNull(updatedLocation)
         assertNull(updatedScene)
         assertNull(result)
     }
 
-    @Test
-    fun `happy path`() {
-        givenSceneExists()
-        givenLocationExists()
-        whenLocationIsLinkedToScene()
-        with (updatedScene as Scene) {
-            assertEquals(sceneId, id)
-            assertEquals(locationId, settings.firstOrNull()?.id)
+    @Nested
+    inner class `Given Scene and Location Exist`
+    {
+
+        init {
+            sceneRepository.givenScene(scene)
+            locationRepository.givenLocation(location)
         }
-        responseModel().invoke(result)
-    }
 
-    @Test
-    fun `link second location`() {
-        givenSceneExists(hasLinkedLocation = true)
-        givenLocationExists()
-        val secondLocation = makeLocation()
-        locationRepository.givenLocation(secondLocation)
-        whenLocationIsLinkedToScene(secondLocation)
-        with (updatedScene as Scene) {
-            assertEquals(sceneId, id)
-            assertTrue(settings.containsEntityWithId(location.id))
-            assertTrue(settings.containsEntityWithId(secondLocation.id))
+        @Test
+        fun `should update scene`() {
+            linkLocationToScene()
+            updatedScene!!.run {
+                assertEquals(scene.id, id)
+                assertEquals(location.id, settings.firstOrNull()?.id)
+            }
         }
-        responseModel(secondLocation.id).invoke(result)
+
+        @Test
+        fun `should update location`() {
+            linkLocationToScene()
+            updatedLocation!!.id.mustEqual(location.id)
+            updatedLocation!!.hostedScenes.containsEntityWithId(scene.id).mustEqual(true)
+            updatedLocation!!.hostedScenes.getEntityById(scene.id)!!.sceneName.mustEqual(scene.name.value)
+        }
+
+        @Test
+        fun `should output response`() {
+            linkLocationToScene()
+            result!!.run {
+                locationUsedInScene.mustEqual(LocationUsedInScene(scene.id, SceneSettingLocation(location.id, location.name.value)))
+                sceneHostedAtLocation.mustEqual(SceneHostedAtLocation(location.id, scene.id, scene.name.value))
+            }
+        }
+
+        @Nested
+        inner class `Given Location Already Linked`
+        {
+
+            init {
+                sceneRepository.givenScene(scene.withLocationLinked(location).scene)
+            }
+
+            @Test
+            fun `should not update scene`() {
+                linkLocationToScene()
+                assertNull(updatedScene)
+            }
+
+            @Test
+            fun `should not update location`() {
+                linkLocationToScene()
+                assertNull(updatedLocation)
+            }
+
+            @Test
+            fun `should not output result`() {
+                linkLocationToScene()
+                assertNull(result)
+            }
+
+        }
+
     }
 
-    @Test
-    fun `linking the same location should not update scene`() {
-        givenSceneExists(hasLinkedLocation = true)
-        givenLocationExists()
-        whenLocationIsLinkedToScene()
-        assertNull(updatedScene)
-        assertNull(result)
-    }
-
-    private fun givenSceneExists(hasLinkedLocation: Boolean = false) {
-        sceneRepository.scenes[sceneId] = makeScene(
-            sceneId,
-            settings = entitySetOfNotNull(SceneSettingLocation(location).takeIf { hasLinkedLocation })
-        )
-    }
-
-    private fun givenLocationExists() {
-        locationRepository.locations[locationId] = makeLocation(id = locationId)
-    }
-
-    private fun whenLocationIsLinkedToScene(location: Location = this.location) {
-        whenUseCaseIsExecuted(LinkLocationToScene.RequestModel(sceneId, location.id, SceneLocaleDouble()))
-    }
-
-    private fun whenUseCaseIsExecuted(requestModel: LinkLocationToScene.RequestModel) {
+    private fun linkLocationToScene() {
+        val requestModel = LinkLocationToScene.RequestModel(scene.id, location.id, SceneLocaleDouble())
         val useCase: LinkLocationToScene = LinkLocationToSceneUseCase(sceneRepository, locationRepository)
         val output = object : LinkLocationToScene.OutputPort {
             override suspend fun locationLinkedToScene(response: LinkLocationToScene.ResponseModel) {
@@ -115,13 +136,6 @@ class LinkLocationToSceneUnitTest {
         runBlocking {
             useCase.invoke(requestModel, output)
         }
-    }
-
-    private fun responseModel(locationId: Location.Id = this.locationId): (Any?) -> Unit = { actual ->
-        actual as LinkLocationToScene.ResponseModel
-        assertEquals(sceneId, actual.locationUsedInScene.sceneId)
-
-        assertEquals(locationId, actual.locationUsedInScene.sceneSetting.id)
     }
 
 }

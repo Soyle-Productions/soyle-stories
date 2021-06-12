@@ -32,7 +32,7 @@ class `Locations in Scene Unit Test` {
     @Test
     fun `can rename location`() {
         val newName = SingleNonBlankLine.create(singleLine("New Name"))!!
-        val update = scene.withLocationLinked(location).scene.withLocationRenamed(location.withName(newName))
+        val update = scene.withLocationLinked(location).scene.withLocationRenamed(location.withName(newName).location)
         update as Updated
         update.event.sceneId.mustEqual(scene.id)
         update.event.sceneSettingLocation.id.mustEqual(location.id)

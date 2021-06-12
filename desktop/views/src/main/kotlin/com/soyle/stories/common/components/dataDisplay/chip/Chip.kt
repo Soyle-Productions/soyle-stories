@@ -1,14 +1,15 @@
 package com.soyle.stories.common.components.dataDisplay.chip
 
+import com.soyle.stories.common.ColorStyles
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.ComponentsStyles
-import com.soyle.stories.common.components.ComponentsStyles.Companion.outlined
-import com.soyle.stories.common.components.layouts.LayoutStyles.Companion.primary
-import com.soyle.stories.soylestories.Styles
+import com.soyle.stories.common.components.surfaces.*
+import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ObjectPropertyBase
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
+import javafx.css.*
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.event.EventTarget
@@ -16,10 +17,10 @@ import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.Node
 import javafx.scene.control.*
-import javafx.scene.paint.Color
 import javafx.scene.shape.SVGPath
 import javafx.scene.text.FontWeight
 import tornadofx.*
+import tornadofx.Stylesheet
 
 class Chip : ButtonBase() {
 
@@ -32,11 +33,22 @@ class Chip : ButtonBase() {
         }
     }
 
-    private val colorProperty = SimpleObjectProperty<Color>(Color.Default)
+    private val colorProperty: ObjectProperty<Color> = object : StyleableObjectProperty<Color>(Color.default) {
+        override fun getCssMetaData(): CssMetaData<out Styleable, Color> = COLOR
+        override fun getBean(): Any = this@Chip
+        override fun getName(): String = "color"
+    }
     fun colorProperty(): ObjectProperty<Color> = colorProperty
     var color: Color by colorProperty()
 
-    private val variantProperty = SimpleObjectProperty<Variant>(Variant.Default)
+    private val variantProperty: ObjectProperty<Variant> = object : StyleableObjectProperty<Variant>(Variant.default) {
+        override fun getCssMetaData(): CssMetaData<out Styleable, Variant> = VARIANT
+        override fun getBean(): Any = this@Chip
+        override fun getName(): String = "variant"
+        override fun invalidated() {
+            super.invalidated()
+        }
+    }
     fun variantProperty(): ObjectProperty<Variant> = variantProperty
     var variant: Variant by variantProperty()
 
@@ -70,7 +82,8 @@ class Chip : ButtonBase() {
     }
 
     override fun getInitialFocusTraversable(): Boolean = false
-    override fun getUserAgentStylesheet(): String = Styles().externalForm
+    override fun getUserAgentStylesheet(): String = Styles().base64URL.toExternalForm()
+    override fun getControlCssMetaData(): MutableList<CssMetaData<out Styleable, *>> = Chip.Companion.cssMetaData
     override fun createDefaultSkin(): Skin<*> = ChipSkin(this)
     override fun fire() {
         if (!isDisabled) {
@@ -89,6 +102,18 @@ class Chip : ButtonBase() {
             val chipRoot by cssclass()
             val clickable by cssclass()
             val chipDeleteIcon by cssclass()
+
+            var PropertyHolder.chipColor: Chip.Color
+                get() = properties[Chip.COLOR.property]?.first as Chip.Color
+                set(value) {
+                    properties[Chip.COLOR.property] = value as Any to properties[Chip.COLOR.property]?.second
+                }
+
+            var PropertyHolder.chipVariant: Chip.Variant
+                get() = properties[Chip.VARIANT.property]?.first as Chip.Variant
+                set(value) {
+                    properties[Chip.VARIANT.property] = value as Any to properties[Chip.VARIANT.property]?.second
+                }
 
             init {
                 importStylesheet<Styles>()
@@ -114,12 +139,6 @@ class Chip : ButtonBase() {
 
                 and(ComponentsStyles.filled) {
                     borderWidth = multi(box(0.px))
-                    backgroundColor = multi(javafx.scene.paint.Color.web("#e0e0e0"))
-                    and(clickable) {
-                        and(hover) {
-                            backgroundColor = multi(javafx.scene.paint.Color.grayRgb(206))
-                        }
-                    }
 
                     label {
                         +nonDefaultLabelMixin
@@ -134,10 +153,10 @@ class Chip : ButtonBase() {
                     }
 
                     and(ComponentsStyles.primary) {
-                        backgroundColor = multi(com.soyle.stories.soylestories.Styles.Purple)
+                        backgroundColor = multi(ColorStyles.Purple)
                         and(clickable) {
                             and(hover) {
-                                backgroundColor = multi(com.soyle.stories.soylestories.Styles.Purple.brighter())
+                                backgroundColor = multi(ColorStyles.Purple.brighter())
                             }
                         }
 
@@ -146,10 +165,10 @@ class Chip : ButtonBase() {
                         }
                     }
                     and(ComponentsStyles.secondary) {
-                        backgroundColor = multi(com.soyle.stories.soylestories.Styles.Blue)
+                        backgroundColor = multi(ColorStyles.Blue)
                         and(clickable) {
                             and(hover) {
-                                backgroundColor = multi(com.soyle.stories.soylestories.Styles.Blue.brighter())
+                                backgroundColor = multi(ColorStyles.Blue.brighter())
                             }
                         }
 
@@ -162,14 +181,12 @@ class Chip : ButtonBase() {
                 and(ComponentsStyles.outlined) {
                     borderWidth = multi(box(1.px))
                     borderColor = multi(box(javafx.scene.paint.Color.web("#e0e0e0")))
-                    backgroundColor = multi(javafx.scene.paint.Color.TRANSPARENT)
                     and(clickable) {
                         and(hover) {
-                            backgroundColor = multi(javafx.scene.paint.Color.web("#000000", 0.1))
                         }
                     }
                     and(ComponentsStyles.primary) {
-                        borderColor = multi(box(com.soyle.stories.soylestories.Styles.Purple))
+                        borderColor = multi(box(ColorStyles.Purple))
                         and(clickable) {
                             and(hover) {
                                 backgroundColor =
@@ -236,14 +253,43 @@ class Chip : ButtonBase() {
     }
 
     enum class Color {
-        Default, Primary, Secondary
+        default, primary, secondary
     }
 
     enum class Variant {
-        Default, Outlined
+        default, outlined
     }
 
     companion object {
+
+        private val COLOR: CssMetaData<Chip, Color> = object : CssMetaData<Chip, Color>("-fx-chip-color", StyleConverter.getEnumConverter(Chip.Color::class.java)) {
+            override fun isSettable(styleable: Chip?): Boolean {
+                return styleable?.color == Color.default || styleable?.colorProperty?.isBound == true
+            }
+
+            override fun getStyleableProperty(styleable: Chip?): StyleableProperty<Color> {
+                return styleable!!.colorProperty as StyleableProperty<Color>
+            }
+        }
+
+        private val VARIANT: CssMetaData<Chip, Variant> = object : CssMetaData<Chip, Variant>("-fx-chip-variant", StyleConverter.getEnumConverter(Chip.Variant::class.java)) {
+            override fun isSettable(styleable: Chip?): Boolean {
+                return styleable?.color == Color.default || styleable?.colorProperty?.isBound == true
+            }
+
+            override fun getStyleableProperty(styleable: Chip?): StyleableProperty<Variant> {
+                return styleable!!.variantProperty as StyleableProperty<Variant>
+            }
+        }
+
+        private val cssMetaData: MutableList<CssMetaData<out Styleable, *>> = mutableListOf<CssMetaData<out Styleable, *>>().apply {
+            addAll(ButtonBase.getClassCssMetaData())
+            addAll(listOf(
+                COLOR,
+                VARIANT
+            ))
+        }
+
         @ViewBuilder
         fun EventTarget.chip(
             text: String = "",

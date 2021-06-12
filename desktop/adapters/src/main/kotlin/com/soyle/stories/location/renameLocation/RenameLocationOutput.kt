@@ -15,9 +15,6 @@ class RenameLocationOutput(
         response.mentionTextReplaced.forEach {
             mentionTextReplacedReceiver.receiveMentionTextReplaced(it)
         }
-        response.sceneSettingLocationsRenamed.forEach {
-            sceneSettingLocationRenamedReceiver.receiveSceneSettingLocationRenamed(it)
-        }
+        sceneSettingLocationRenamedReceiver.receiveSceneSettingLocaitonsRenamed(response.sceneSettingLocationsRenamed)
     }
-
 }

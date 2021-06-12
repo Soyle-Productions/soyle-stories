@@ -25,8 +25,8 @@ class SceneRepositoryImpl : SceneRepository {
 		sceneOrder[scene.projectId] = idOrder
 	}
 
-	override suspend fun listAllScenesInProject(projectId: Project.Id): List<Scene> =
-	  scenes.values.toList()
+	override suspend fun listAllScenesInProject(projectId: Project.Id, exclude: Set<Scene.Id>): List<Scene> =
+		scenes.values.filterNot { it.id in exclude }
 
 	override suspend fun getScenesTrackingSymbol(symbolId: Symbol.Id): List<Scene> {
 		return scenes.values.filter { it.trackedSymbols.isSymbolTracked(symbolId) }

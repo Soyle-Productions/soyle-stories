@@ -2,8 +2,10 @@ package com.soyle.stories.scene.reorderSceneRamifications
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
+import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
 import com.soyle.stories.scene.deleteSceneRamifications.CharacterRamificationsViewModel
 import com.soyle.stories.scene.deleteSceneRamifications.SceneRamificationsViewModel
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
@@ -14,12 +16,12 @@ import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScen
 
 class ReorderSceneRamificationsPresenter(
     private val view: View.Nullable<ReorderSceneRamificationsViewModel>,
-    sceneDeleted: Notifier<DeleteScene.OutputPort>,
+    sceneDeleted: Notifier<SceneDeletedReceiver>,
     characterRemoved: Notifier<RemovedCharacterFromSceneReceiver>,
     characterMotivationSet: Notifier<SetMotivationForCharacterInScene.OutputPort>
 ) :
     GetPotentialChangesFromReorderingScene.OutputPort,
-    DeleteScene.OutputPort,
+    SceneDeletedReceiver,
     RemovedCharacterFromSceneReceiver,
     SetMotivationForCharacterInScene.OutputPort {
 
@@ -48,11 +50,13 @@ class ReorderSceneRamificationsPresenter(
         }
     }
 
-    override fun receiveDeleteSceneResponse(responseModel: DeleteScene.ResponseModel) {
+    override suspend fun receiveSceneDeleted(event: Scene.Id) {
         view.updateOrInvalidated { copy(invalid = true) }
     }
 
-    override suspend fun receiveRemovedCharacterFromScene(removedCharacterFromScene: RemoveCharacterFromScene.ResponseModel) {
+    override suspend fun receiveRemovedCharacterFromScene(
+        removedCharacterFromScene: RemoveCharacterFromScene.ResponseModel
+    ) {
         view.updateOrInvalidated { copy(invalid = true) }
     }
 
@@ -60,6 +64,5 @@ class ReorderSceneRamificationsPresenter(
         view.updateOrInvalidated { copy(invalid = true) }
     }
 
-    override fun receiveDeleteSceneFailure(failure: Exception) {}
     override fun failedToSetMotivationForCharacterInScene(failure: Exception) {}
 }

@@ -1,9 +1,12 @@
 package com.soyle.stories.desktop.config.features.location
 
 import com.soyle.stories.desktop.config.drivers.location.*
+import com.soyle.stories.desktop.config.drivers.scene.SceneDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.features.soyleStories
+import com.soyle.stories.desktop.view.location.details.`Location Details View Assertions`.Companion.assertThis
 import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.scene.Scene
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 
@@ -48,6 +51,17 @@ class `Location Steps` : En {
             LocationDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenLocationDeleted(location)
         }
+        Given(
+            "I am looking at the {location}'s details"
+        ) { location: Location ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenLocationListToolHasBeenOpened()
+                .givenLocationDetailsToolHasBeenOpenedFor(location)
+        }
+        Given("I have added the {scene} to the {location}") { scene: Scene, location: Location ->
+            SceneDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .givenLocationUsedInScene(scene, location)
+        }
     }
 
     private fun whens() {
@@ -62,11 +76,55 @@ class `Location Steps` : En {
                 .givenDeleteLocationDialogHasBeenOpened(location.id)
                 .confirmDelete()
         }
+        When("I request a list of scenes to host in the {location}") { location: Location ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenLocationListToolHasBeenOpened()
+                .givenLocationDetailsToolHasBeenOpenedFor(location)
+                .requestScenesToHost()
+        }
+        When("I add the {scene} to the {location}") { scene: Scene, location: Location ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenLocationListToolHasBeenOpened()
+                .givenLocationDetailsToolHasBeenOpenedFor(location)
+                .addScene(scene)
+        }
     }
 
     private fun thens() {
         Then("a location named {string} should have been created") { expectedName: String ->
             LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByNameOrError(expectedName)
+        }
+        Then("the {location} should not host a scene named {string}") { location: Location, sceneName: String ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenLocationListToolHasBeenOpened()
+                .givenLocationDetailsToolHasBeenOpenedFor(location)
+                .assertThis {
+                    doesNotHaveSceneNamed(sceneName)
+                }
+        }
+        Then("the {scene} should take place at the {location}") { scene: Scene, location: Location ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenLocationListToolHasBeenOpened()
+                .givenLocationDetailsToolHasBeenOpenedFor(location)
+                .assertThis {
+                    hasScene(scene.id, scene.name.value)
+                }
+        }
+        Then("the {scene} should be listed to be hosted in the {location}") { scene: Scene, location: Location ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenLocationListToolHasBeenOpened()
+                .givenLocationDetailsToolHasBeenOpenedFor(location)
+                .assertThis {
+                    hasAvailableSceneItem(scene.id, scene.name.value)
+                }
+        }
+        Then("the {scene} should not be listed to be hosted in the {location}") { scene: Scene, location: Location ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenLocationListToolHasBeenOpened()
+                .givenLocationDetailsToolHasBeenOpenedFor(location)
+                .assertThis {
+                    doesNotHaveAvailableSceneItem(scene.id)
+                }
         }
     }
 

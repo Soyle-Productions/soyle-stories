@@ -45,3 +45,12 @@ fun LocationList.renameLocationTo(locationId: Location.Id, newName: String)
         }
     }
 }
+
+fun LocationList.openLocationDetails(locationId: Location.Id) {
+    drive {
+        val item = getLocationItemOrError(locationId)
+        tree.selectionModel.select(item)
+        val openDetailsOption = locationItemContextMenu!!.openDetailsOption
+        openDetailsOption.fire()
+    }
+}

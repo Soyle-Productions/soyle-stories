@@ -4,18 +4,18 @@ import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterRece
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
+import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.DeleteCharacterPresenter
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.DeleteScenePresenter
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.Invalidater
-import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 
 class DeleteSceneRamificationsPresenter(
-  private val view: View.Nullable<DeleteSceneRamificationsViewModel>,
-  sceneDeleted: Notifier<DeleteScene.OutputPort>,
-  characterDeleted: Notifier<RemovedCharacterReceiver>,
-  characterMotivationSet: Notifier<SetMotivationForCharacterInScene.OutputPort>
+	private val view: View.Nullable<DeleteSceneRamificationsViewModel>,
+  	sceneDeleted: Notifier<SceneDeletedReceiver>,
+  	characterDeleted: Notifier<RemovedCharacterReceiver>,
+	characterMotivationSet: Notifier<SetMotivationForCharacterInScene.OutputPort>
 ) : GetPotentialChangesFromDeletingScene.OutputPort {
 
 	private val subListeners = listOf(
@@ -31,15 +31,17 @@ class DeleteSceneRamificationsPresenter(
 			  "Ok",
 			  response.affectedScenes.map {
 				  SceneRamificationsViewModel(it.sceneName, it.sceneId.toString(), it.characters.map {
-					  CharacterRamificationsViewModel(it.characterName, it.characterId.toString(), it.currentMotivation, it.potentialMotivation)
+					  CharacterRamificationsViewModel(
+						  it.characterName,
+						  it.characterId.toString(),
+						  it.currentMotivation,
+						  it.potentialMotivation
+					  )
 				  })
 			  }
 			)
 		}
 	}
 
-	override fun failedToGetPotentialChangesFromDeletingScene(failure: Exception) {
-
-	}
-
+	override fun failedToGetPotentialChangesFromDeletingScene(failure: Exception) = Unit
 }

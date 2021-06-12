@@ -14,7 +14,7 @@ import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogViewList
 import com.soyle.stories.scene.createSceneDialog.CreateSceneDialogModel
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneControllerImpl
-import com.soyle.stories.scene.deleteScene.DeleteSceneNotifier
+import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogController
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogModel
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogPresenter
@@ -27,7 +27,7 @@ import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.Remove
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
-import com.soyle.stories.scene.renameScene.RenameSceneNotifier
+import com.soyle.stories.scene.renameScene.RenameSceneOutput
 import com.soyle.stories.scene.reorderScene.ReorderSceneController
 import com.soyle.stories.scene.reorderScene.ReorderSceneControllerImpl
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
@@ -39,6 +39,7 @@ import com.soyle.stories.scene.reorderSceneRamifications.*
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
@@ -88,11 +89,13 @@ object SceneModule {
             }
             provide<RenameScene> {
                 RenameSceneUseCase(
+                    get(),
                     get()
                 )
             }
             provide<DeleteScene> {
                 DeleteSceneUseCase(
+                    get(),
                     get()
                 )
             }
@@ -149,10 +152,10 @@ object SceneModule {
                 CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventNotifier>())
             }
             provide(RenameScene.OutputPort::class) {
-                RenameSceneNotifier(applicationScope.get())
+                RenameSceneOutput(get(), get())
             }
             provide(DeleteScene.OutputPort::class) {
-                DeleteSceneNotifier(applicationScope.get())
+                DeleteSceneOutput(applicationScope.get(), get(), get())
             }
             provide(SetMotivationForCharacterInScene.OutputPort::class) {
                 SetMotivationForCharacterInSceneNotifier(applicationScope.get())
@@ -295,7 +298,7 @@ object SceneModule {
                     projectScope.get(),
                     DeleteSceneRamificationsPresenter(
                         get<DeleteSceneRamificationsModel>(),
-                        projectScope.get<DeleteSceneNotifier>(),
+                        projectScope.get<SceneDeletedNotifier>(),
                         projectScope.get<RemovedCharacterNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),
@@ -316,7 +319,7 @@ object SceneModule {
                     projectScope.get(),
                     ReorderSceneRamificationsPresenter(
                         get<ReorderSceneRamificationsModel>(),
-                        projectScope.get<DeleteSceneNotifier>(),
+                        projectScope.get<SceneDeletedNotifier>(),
                         projectScope.get<RemovedCharacterFromSceneNotifier>(),
                         projectScope.get<SetMotivationForCharacterInSceneNotifier>()
                     ),

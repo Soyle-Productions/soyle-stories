@@ -1,4 +1,4 @@
-package com.soyle.stories.location.locationDetails
+package com.soyle.stories.location.details
 
 import com.soyle.stories.di.DI
 import com.soyle.stories.layout.config.dynamic.LocationDetails

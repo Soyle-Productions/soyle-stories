@@ -3,6 +3,7 @@ import plugin.constants.kotlinVersion
 plugins {
     java
     kotlin("jvm")
+    id(plugin.constants.detekt)
     id(plugin.constants.ideaExt) version plugin.constants.ideaExtVersion
     id(plugin.constants.shadow) version plugin.constants.shadowVersion
     id(plugin.constants.badassRuntime) version plugin.constants.badassRuntimeVersion
@@ -22,6 +23,7 @@ application {
 
 
 dependencies {
+    implementation(project(":desktop:locale"))
     implementation(project(":desktop:views"))
 
     testImplementation("io.cucumber:cucumber-java8:6.1.1")

@@ -171,7 +171,10 @@ class Scene private constructor(
         return "Scene(${equalityProps.joinToString(", ") { "${it.name}=${it.get(this)}" }})"
     }
 
-    fun withName(newName: NonBlankString) = copy(name = newName)
+    fun withName(newName: NonBlankString): SceneUpdate<SceneRenamed> {
+        if (newName == name) return noUpdate()
+        return Updated(copy(name = newName), SceneRenamed(id, newName.value))
+    }
 
     fun withSceneFrameValue(value: SceneFrameValue): SceneUpdate<SceneFrameValueChanged> {
         when (value) {
@@ -253,11 +256,13 @@ class Scene private constructor(
         )
     }
 
-    fun withLocationLinked(location: Location): SceneUpdate<LocationUsedInScene> {
-        if (settings.containsEntityWithId(location.id)) return noUpdate()
-        val sceneSetting = SceneSettingLocation(location)
+    fun withLocationLinked(locationId: Location.Id, locationName: String): SceneUpdate<LocationUsedInScene> {
+        if (settings.containsEntityWithId(locationId)) return noUpdate()
+        val sceneSetting = SceneSettingLocation(locationId, locationName)
         return Updated(copy(settings = settings + sceneSetting), LocationUsedInScene(id, sceneSetting))
     }
+    fun withLocationLinked(location: Location): SceneUpdate<LocationUsedInScene> =
+        withLocationLinked(location.id, location.name.value)
 
     fun withoutLocation(locationId: Location.Id): SceneUpdate<LocationRemovedFromScene> {
         val sceneSetting = settings.getEntityById(locationId) ?: return noUpdate()
@@ -267,15 +272,17 @@ class Scene private constructor(
         )
     }
 
-    fun withLocationRenamed(location: Location): SceneUpdate<SceneSettingLocationRenamed> {
-        val sceneSetting = getSceneSettingOrError(location.id)
-        if (sceneSetting.locationName == location.name.value) return noUpdate()
-        val newSceneSetting = sceneSetting.copy(locationName = location.name.value)
+    fun withLocationRenamed(locationId: Location.Id, locationName: String): SceneUpdate<SceneSettingLocationRenamed> {
+        val sceneSetting = getSceneSettingOrError(locationId)
+        if (sceneSetting.locationName == locationName) return noUpdate()
+        val newSceneSetting = sceneSetting.copy(locationName = locationName)
         return Updated(
             copy(settings = settings.minus(sceneSetting).plus(newSceneSetting)),
             SceneSettingLocationRenamed(id, newSceneSetting)
         )
     }
+    fun withLocationRenamed(location: Location): SceneUpdate<SceneSettingLocationRenamed> =
+        withLocationRenamed(location.id, location.name.value)
 
     private fun getSceneSettingOrError(locationId: Location.Id): SceneSettingLocation {
         return settings.getEntityById(locationId) ?: throw SceneDoesNotUseLocation(id, locationId)

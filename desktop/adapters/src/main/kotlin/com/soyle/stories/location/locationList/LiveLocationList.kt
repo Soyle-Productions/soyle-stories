@@ -3,7 +3,7 @@ package com.soyle.stories.location.locationList
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.location.Location
-import com.soyle.stories.domain.location.LocationRenamed
+import com.soyle.stories.domain.location.events.LocationRenamed
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation

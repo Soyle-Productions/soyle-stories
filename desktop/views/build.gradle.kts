@@ -6,6 +6,7 @@ import org.openjfx.gradle.JavaFXPlatform
 
 plugins {
     kotlin("jvm")
+    id(plugin.constants.detekt)
     id(plugin.constants.javafx) version plugin.constants.javaFxVersion
     id(plugin.constants.ideaExt)
     id("java-test-fixtures")
@@ -52,6 +53,8 @@ dependencies {
     implementation( "de.jensd:fontawesomefx-emojione:2.2.7-11")
 
     testImplementation( Libraries.kotlin.reflection)
+    testImplementation( Libraries.junit.api)
+    testImplementation( Libraries.junit.engine)
 
     testFixturesApi( Libraries.junit.api)
     testFixturesApi( Libraries.junit.engine)

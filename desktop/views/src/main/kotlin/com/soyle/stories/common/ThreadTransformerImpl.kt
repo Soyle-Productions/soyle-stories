@@ -17,7 +17,9 @@ class AsyncThreadTransformer(val applicationScope: ApplicationScope) : ThreadTra
     override fun gui(update: suspend CoroutineScope.() -> Unit) {
         FX.runAndWait {
             runBlocking {
-                update()
+                withTimeout(10000) {
+                    update()
+                }
             }
         }
     }

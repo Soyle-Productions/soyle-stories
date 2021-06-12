@@ -3,8 +3,6 @@ package com.soyle.stories.common
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
-import java.util.logging.Level
-import java.util.logging.Logger
 
 /**
  * Created by Brendan
@@ -13,15 +11,17 @@ import java.util.logging.Logger
  */
 abstract class Notifier<Listener : Any> {
 
-    private val listeners = mutableListOf<WeakReference<Listener>>()
+    private val _listeners = mutableListOf<WeakReference<Listener>>()
+    protected val listeners: List<Listener>
+        get() = _listeners.mapNotNull { it.get() }
 
-    private fun findWeakReference(listener: Listener): WeakReference<Listener>? = listeners.find { it.get() == listener }
+    private fun findWeakReference(listener: Listener): WeakReference<Listener>? = _listeners.find { it.get() == listener }
 
     @Synchronized
     open fun addListener(listener: Listener) {
         val ref = findWeakReference(listener)
         if (ref == null) {
-            listeners.add(WeakReference(listener))
+            _listeners.add(WeakReference(listener))
         }
     }
 
@@ -29,7 +29,7 @@ abstract class Notifier<Listener : Any> {
     fun removeListener(listener: Listener) {
         val ref = findWeakReference(listener)
         if (ref != null) {
-            listeners.remove(ref)
+            _listeners.remove(ref)
         }
     }
 
@@ -37,8 +37,8 @@ abstract class Notifier<Listener : Any> {
 
     protected suspend fun notifyAll(block: suspend (Listener) -> Unit) {
         val listeners = synchronized(this) {
-            val listeners = this.listeners.toList()
-            this.listeners.removeAll(listeners.filter { it.get() == null })
+            val listeners = this._listeners.toList()
+            this._listeners.removeAll(listeners.filter { it.get() == null })
             listeners
         }
         listeners.forEach {

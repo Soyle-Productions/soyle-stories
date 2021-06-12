@@ -33,8 +33,8 @@ class SceneRepositoryDouble(
 		sceneOrder[scene.projectId] = idOrder
 	}
 
-	override suspend fun listAllScenesInProject(projectId: Project.Id): List<Scene> {
-		return scenes.values.filter { it.projectId == projectId }
+	override suspend fun listAllScenesInProject(projectId: Project.Id, exclude: Set<Scene.Id>): List<Scene> {
+		return scenes.values.filter { it.projectId == projectId && it.id !in exclude }
 	}
 
 	override suspend fun getSceneIdsInOrder(projectId: Project.Id): List<Scene.Id> {

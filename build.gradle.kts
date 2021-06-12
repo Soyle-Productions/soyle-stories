@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     java
     kotlin("jvm") version plugin.constants.kotlinVersion
+    id(plugin.constants.detekt) version plugin.constants.detektVersion
 }
 
 java {
@@ -17,7 +18,6 @@ repositories {
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = plugin.constants.javaVersion
 }
-
 
 allprojects {
 
@@ -36,5 +36,4 @@ allprojects {
     tasks.withType<Test> {
         useJUnitPlatform()
     }
-
 }

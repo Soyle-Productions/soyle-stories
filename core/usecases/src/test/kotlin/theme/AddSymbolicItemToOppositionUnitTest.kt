@@ -5,6 +5,7 @@ import com.soyle.stories.domain.character.characterName
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.locationName
+import com.soyle.stories.domain.location.makeLocation
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.shouldBe
 import com.soyle.stories.domain.theme.*
@@ -153,7 +154,7 @@ class AddSymbolicItemToOppositionUnitTest {
         @Test
         fun `opposition and location exist`() {
             givenOppositionValue()
-            givenLocation(locationId, locationName)
+            locationRepository.givenLocation(makeLocation(locationId, name = locationName))
             addLocationToOpposition()
             updatedTheme shouldBe ::themeWithLocationAsSymbol
             result shouldBe ::locationAddedToOpposition
@@ -265,10 +266,6 @@ class AddSymbolicItemToOppositionUnitTest {
                     themeRepository.themes[themeId] = it
                 }
         }
-    }
-
-    private fun givenLocation(locationId: Location.Id, name: SingleNonBlankLine) {
-        locationRepository.locations[locationId] = Location(locationId, Project.Id(), name)
     }
 
     private fun givenSymbol(symbolId: Symbol.Id, name: String, inSameTheme: Boolean = false) {

@@ -9,6 +9,7 @@ class ColorStyles : Stylesheet() {
 
         val primaryColor = Color.web("#60408B")
         val secondaryColor = Color.web("#3F7B88")
+        val tertiaryColor = Color.web("#FF4800")
 
         val lightHighlightColor = Color.web("#9A7CC2")
         val lightSelectionColor = Color.web("#4C326D")

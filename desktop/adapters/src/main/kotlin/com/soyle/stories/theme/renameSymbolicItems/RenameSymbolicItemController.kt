@@ -3,7 +3,7 @@ package com.soyle.stories.theme.renameSymbolicItems
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.character.CharacterRenamed
-import com.soyle.stories.domain.location.LocationRenamed
+import com.soyle.stories.domain.location.events.LocationRenamed
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.theme.renameSymbol.RenamedSymbolReceiver
 import com.soyle.stories.usecase.theme.renameSymbol.RenamedSymbol

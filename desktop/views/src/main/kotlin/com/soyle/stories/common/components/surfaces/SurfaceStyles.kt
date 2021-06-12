@@ -10,6 +10,9 @@ import kotlin.math.round
 class SurfaceStyles : Stylesheet() {
     companion object {
 
+        val surface by cssclass()
+
+
         /**
          * valid indices: 0-24
          *

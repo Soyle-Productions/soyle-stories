@@ -1,22 +1,23 @@
 package com.soyle.stories.location.locationDetails.presenters
 
+import com.soyle.stories.domain.location.Location
 import com.soyle.stories.location.locationDetails.LocationDetailsView
+import com.soyle.stories.location.locationDetails.LocationDetailsViewModel
 import com.soyle.stories.usecase.location.redescribeLocation.ReDescribeLocation
 
 class ReDescribeLocationPresenter(
-  private val locationId: String,
-  private val view: LocationDetailsView
+	private val locationId: Location.Id,
+	private val view: LocationDetailsViewModel
 ) : ReDescribeLocation.OutputPort {
 
-	override fun receiveReDescribeLocationFailure(failure: Exception) {
-	}
+	override fun receiveReDescribeLocationFailure(failure: Exception) = Unit
 
 	override fun receiveReDescribeLocationResponse(response: ReDescribeLocation.ResponseModel) {
-		if (response.locationId.toString() != locationId) return
-		view.updateOrInvalidated {
-			copy(
-			  description = response.updatedDescription
-			)
+		with(view) {
+			update {
+				if (response.locationId != locationId.uuid) return@update
+				description = response.updatedDescription
+			}
 		}
 	}
 }

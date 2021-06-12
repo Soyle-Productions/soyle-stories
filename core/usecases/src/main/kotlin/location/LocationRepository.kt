@@ -10,7 +10,9 @@ interface LocationRepository {
 	suspend fun getLocationById(locationId: Location.Id): Location?
 	suspend fun getLocationOrError(locationId: Location.Id) =
 		getLocationById(locationId) ?: throw LocationDoesNotExist(locationId.uuid)
+	suspend fun getLocationsById(locationIds: Set<Location.Id>): List<Location>
 	suspend fun updateLocation(location: Location)
+	suspend fun updateLocations(locations: Set<Location>)
 	suspend fun removeLocation(location: Location)
 
 	suspend fun getLocationIdsThatDoNotExist(locationIdsToTest: Set<Location.Id>): Set<Location.Id>

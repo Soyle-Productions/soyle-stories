@@ -2,6 +2,7 @@ import librarires.Libraries
 
 plugins {
     kotlin("jvm")
+    id(plugin.constants.detekt)
     id(plugin.constants.ideaExt) version plugin.constants.ideaExtVersion
     `java-test-fixtures`
 }
