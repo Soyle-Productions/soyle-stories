@@ -82,7 +82,7 @@ class Chip : ButtonBase() {
     }
 
     override fun getInitialFocusTraversable(): Boolean = false
-    override fun getUserAgentStylesheet(): String = Styles().externalForm
+    override fun getUserAgentStylesheet(): String = Styles().base64URL.toExternalForm()
     override fun getControlCssMetaData(): MutableList<CssMetaData<out Styleable, *>> = Chip.Companion.cssMetaData
     override fun createDefaultSkin(): Skin<*> = ChipSkin(this)
     override fun fire() {

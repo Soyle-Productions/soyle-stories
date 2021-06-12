@@ -38,9 +38,6 @@ object LocationModule {
 		provide<CreateNewLocation> {
 			CreateNewLocationUseCase(projectId, get())
 		}
-		provide<GetLocationDetails> {
-			GetLocationDetailsUseCase(get())
-		}
 		provide<ReDescribeLocation> {
 			ReDescribeLocationUseCase(get())
 		}

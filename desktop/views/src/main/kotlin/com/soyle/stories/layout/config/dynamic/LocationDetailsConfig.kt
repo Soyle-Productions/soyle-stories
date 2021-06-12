@@ -6,7 +6,8 @@ import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.repositories.OpenToolContext
 import com.soyle.stories.layout.tools.DynamicTool
 import com.soyle.stories.layout.tools.FixedTool
-import com.soyle.stories.location.locationDetails.LocationDetailsScope
+import com.soyle.stories.location.details.LocationDetailsScope
+import com.soyle.stories.location.details.LocationDetailsView
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
@@ -37,7 +38,7 @@ object LocationDetailsConfig : ToolConfig<LocationDetails> {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
 				val scope = LocationDetailsScope(projectScope, type)
-				val structure = find<com.soyle.stories.location.locationDetails.LocationDetails>(scope = scope)
+				val structure = find<LocationDetailsView>(scope = scope)
 				val tab = tabPane.tab(structure)
 				tab.tabPaneProperty().onChange {
 					if (it == null) {

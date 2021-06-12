@@ -1,9 +1,11 @@
-package com.soyle.stories.location.locationDetails
+package com.soyle.stories.location.details
 
+import com.soyle.stories.common.components.ComponentsStyles.Companion.loaded
+import com.soyle.stories.common.components.ComponentsStyles.Companion.loading
 import com.soyle.stories.common.components.dataDisplay.chip.Chip
-import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chipColor
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chipVariant
 import com.soyle.stories.common.components.text.TextStyles.Companion.fieldLabel
+import com.soyle.stories.common.components.text.TextStyles.Companion.sectionTitle
 import javafx.geometry.Pos
 import javafx.scene.control.ScrollPane
 import javafx.scene.text.TextAlignment
@@ -20,6 +22,9 @@ class LocationDetailsStyles : Stylesheet() {
 
         val addScene by cssid()
 
+        val smallWidth by csspseudoclass()
+        val hasScenes by csspseudoclass()
+
         init {
             importStylesheet<LocationDetailsStyles>()
         }
@@ -35,14 +40,31 @@ class LocationDetailsStyles : Stylesheet() {
             content {
                 fillWidth = true
                 padding = box(16.px)
+                spacing = 16.px
+
+                and(loading) {
+                    alignment = Pos.CENTER
+                }
+                and(loaded) {
+                    alignment = Pos.TOP_LEFT
+                }
             }
         }
 
         description {
             fillWidth = true
 
-            textField {
+            textArea {
                 wrapText = true
+                prefRowCount = 5
+            }
+        }
+
+        smallWidth {
+            description {
+                textArea {
+                    prefRowCount = 10
+                }
             }
         }
 
@@ -51,6 +73,11 @@ class LocationDetailsStyles : Stylesheet() {
 
             header {
                 alignment = Pos.CENTER_LEFT
+
+                sectionTitle {
+
+                    maxWidth = Double.MAX_VALUE.px
+                }
             }
 
             invitation {
@@ -59,12 +86,16 @@ class LocationDetailsStyles : Stylesheet() {
                 fieldLabel {
                     textAlignment = TextAlignment.CENTER
                     wrapText = true
+                    padding = box(16.px)
                 }
             }
 
             itemList {
                 fillWidth = false
                 padding = box(8.px)
+                hgap = 8.px
+                vgap = 8.px
+
                 hostedSceneItem {
                     chipVariant = Chip.Variant.outlined
                 }

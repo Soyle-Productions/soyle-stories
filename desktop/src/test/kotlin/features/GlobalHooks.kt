@@ -7,7 +7,9 @@ import com.soyle.stories.desktop.config.drivers.scene.SceneDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransformer
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
+import com.soyle.stories.desktop.config.locale.LocaleHolder
 import com.soyle.stories.desktop.config.soylestories.configureModules
+import com.soyle.stories.desktop.locale.SoyleMessages
 import com.soyle.stories.desktop.view.runHeadless
 import com.soyle.stories.di.DI
 import com.soyle.stories.domain.character.Character
@@ -20,6 +22,7 @@ import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
 import org.testfx.api.FxToolkit
+import java.util.*
 import kotlin.concurrent.thread
 
 lateinit var soyleStories: SoyleStories
@@ -33,6 +36,16 @@ class GlobalHooks : En {
         }
     }
 
+    private fun loadLocale() {
+        DI.register(
+            LocaleHolder::class,
+            ApplicationScope::class,
+            { LocaleHolder(SoyleMessages.getLocale(Locale.getDefault())) },
+            true,
+            true
+        )
+    }
+
     private fun synchronizeBackgroundTasks() {
         DI.register(ThreadTransformer::class, ApplicationScope::class, { SyncThreadTransformer() })
     }
@@ -43,6 +56,7 @@ class GlobalHooks : En {
                 runHeadless()
                 Runtime.getRuntime().addShutdownHook(closeThread)
                 SoyleStories.initialization = {
+                    loadLocale()
                     configureModules()
                     synchronizeBackgroundTasks()
                 }

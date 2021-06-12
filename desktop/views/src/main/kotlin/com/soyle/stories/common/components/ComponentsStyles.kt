@@ -41,6 +41,9 @@ class ComponentsStyles : Stylesheet() {
 
         val hasProblem by cssclass()
 
+        val loading by csspseudoclass()
+        val loaded by csspseudoclass()
+
         val primary by csspseudoclass()
         val secondary by csspseudoclass()
 

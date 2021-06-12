@@ -17,6 +17,12 @@ Feature: Scenes in Location
     Then the "Big Battle" scene should take place at the "Work" location
     And the "Work" location should be a setting for the "Big Battle" scene
 
+  Scenario: Create Scene and Host in Location
+    Given I am looking at the "Work" location's details
+    When I create a scene named "Small Conflict" to host in the "Work" location
+    Then the "Small Conflict" scene should take place at the "Work" location
+    And the "Work" location should be a setting for the "Small Conflict" scene
+
   Scenario: Rename a Scene that Takes Place in Location
     Given I am looking at the "Work" location's details
     And I have added the "Big Battle" scene to the "Work" location
@@ -24,6 +30,13 @@ Feature: Scenes in Location
     Then the "Work" location should not host a scene named "Big Battle"
     And the "Small Conflict" scene should take place at the "Work" location
     And the "Work" location should be a setting for the "Small Conflict" scene
+
+  Scenario: Remove a Scene from a Location
+    Given I am looking at the "Work" location's details
+    And I have added the "Big Battle" scene to the "Work" location
+    When I remove the "Big Battle" scene from the "Work" location
+    Then the "Work" location should not host a scene named "Big Battle"
+    And the "Work" location should not be a setting for the "Big Battle" scene
 
   Scenario: Delete a Scene that Take Place in Location
     Given I am looking at the "Work" location's details

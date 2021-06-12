@@ -57,7 +57,7 @@ sealed interface Elevated {
     var relativeElevation: Elevation
 }
 
-private fun Node.elevated(): Elevated =
+fun Node.elevated(): Elevated =
     properties.getOrPut(ELEVATION_PROP) { SurfaceGraph(this) } as Elevated
 
 
@@ -100,9 +100,9 @@ private class SurfaceGraph(private val node: Node, private val calculator: Eleva
         override fun invalidated() {
             // if (DEBUG_SURFACE) println("inherited elevation of $node set to ${get()}")
             if (prefRelativeProperty) {
-                absoluteElevationProperty.set(calculator.calculateAbsoluteElevation(inheritedElevation, relativeElevation))
+                absoluteElevationProperty.set(calculator.calculateAbsoluteElevation(get(), relativeElevation))
             } else if (!relativeElevationProperty.isBound) {
-                relativeElevationProperty.set(calculator.calculateRelativeElevation(inheritedElevation, absoluteElevation))
+                relativeElevationProperty.set(calculator.calculateRelativeElevation(get(), absoluteElevation))
             }
         }
     }
@@ -120,7 +120,7 @@ private class SurfaceGraph(private val node: Node, private val calculator: Eleva
             override fun invalidated() {
                 // if (DEBUG_SURFACE) println("absolute elevation of $node set to ${get()}")
                 if (! prefRelativeProperty && ! relativeElevationProperty.isBound) {
-                    relativeElevationProperty.set(calculator.calculateRelativeElevation(inheritedElevation, absoluteElevation))
+                    relativeElevationProperty.set(calculator.calculateRelativeElevation(inheritedElevation, get()))
                 }
             }
         }
@@ -142,7 +142,7 @@ private class SurfaceGraph(private val node: Node, private val calculator: Eleva
             override fun invalidated() {
                 // if (DEBUG_SURFACE) println("relative elevation of $node set to ${get()}")
                 if (prefRelativeProperty && !absoluteElevationProperty.isBound)
-                    absoluteElevationProperty.set(calculator.calculateAbsoluteElevation(inheritedElevation, relativeElevation))
+                    absoluteElevationProperty.set(calculator.calculateAbsoluteElevation(inheritedElevation, get()))
             }
         }
 
@@ -252,14 +252,12 @@ class Surface<N : Node>(val node: N) : ElevatedSurface, Elevated by SurfaceGraph
             .bind(relativeElevationProperty().doubleBinding { (25.0 - (it?.value ?: 1)).coerceAtLeast(0.0) })
 
         lightLevelRuleProperty.addListener { _, oldValue, newValue ->
-            println("removing ${oldValue?.name} and adding ${newValue?.name}")
             oldValue?.let { node.removeClass(it) }
             newValue?.let { node.addClass(it) }
         }
         lightLevelRuleProperty.value?.let { node.addClass(it) }
 
         liftedRuleProperty.addListener { _, oldValue, newValue ->
-            println("removing ${oldValue?.name} and adding ${newValue?.name}")
             oldValue?.let { node.removeClass(it) }
             newValue?.let { node.addClass(it) }
         }

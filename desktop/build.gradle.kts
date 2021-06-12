@@ -23,6 +23,7 @@ application {
 
 
 dependencies {
+    implementation(project(":desktop:locale"))
     implementation(project(":desktop:views"))
 
     testImplementation("io.cucumber:cucumber-java8:6.1.1")
