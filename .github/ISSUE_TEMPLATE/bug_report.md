@@ -33,6 +33,8 @@ ___
 
 **Actual Result**
 
+**Affected Version**
+
 **Additional Information**
 
 ___
