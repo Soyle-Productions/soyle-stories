@@ -5,9 +5,11 @@ import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNoti
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.desktop.config.InProjectScope
+import com.soyle.stories.desktop.config.locale.LocaleHolder
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.editProse.ContentReplacedNotifier
@@ -23,7 +25,6 @@ import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogControll
 import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogPresenter
 import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogViewListener
 import com.soyle.stories.scene.createSceneDialog.CreateSceneDialogModel
-import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogController
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogModel
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogPresenter
@@ -53,7 +54,6 @@ import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInScen
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
 import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
-import com.soyle.stories.scene.renameScene.RenameSceneOutput
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogController
 import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogModel
@@ -72,17 +72,21 @@ import com.soyle.stories.scene.sceneList.SceneListController
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneList.SceneListPresenter
 import com.soyle.stories.scene.sceneList.SceneListViewListener
-import com.soyle.stories.scene.sceneSetting.SceneSettingController
-import com.soyle.stories.scene.sceneSetting.SceneSettingState
-import com.soyle.stories.scene.sceneSetting.SceneSettingViewListener
+import com.soyle.stories.scene.setting.SceneSettingController
+import com.soyle.stories.scene.setting.SceneSettingViewListener
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneController
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneViewListener
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
 import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
-import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.sceneCharacters.SceneCharactersState
+import com.soyle.stories.scene.setting.SceneSettingToolRoot
+import com.soyle.stories.scene.setting.list.SceneSettingItemList
+import com.soyle.stories.scene.setting.list.item.SceneSettingItemModel
+import com.soyle.stories.scene.setting.list.item.SceneSettingItemView
+import com.soyle.stories.scene.setting.list.useLocationButton.UseLocationButton
+import com.soyle.stories.scene.target.SceneTargetedNotifier
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
 
@@ -95,8 +99,8 @@ object Presentation {
             reorderSceneDialog()
 
             sceneList()
-            symbolsInScene()
             sceneSetting()
+            symbolsInScene()
             charactersInScene()
         }
         sceneEditor()
@@ -166,6 +170,54 @@ object Presentation {
         }
     }
 
+    private fun InProjectScope.sceneSetting() {
+        provide<SceneSettingToolRoot.Factory> {
+            object : SceneSettingToolRoot.Factory {
+                override fun invoke(): SceneSettingToolRoot = SceneSettingToolRoot(
+                    applicationScope.get<LocaleHolder>(),
+                    get<SceneRenamedNotifier>(),
+                    get<SceneDeletedNotifier>(),
+                    get<SceneTargetedNotifier>(),
+                    get()
+                )
+            }
+        }
+        provide<SceneSettingItemList.Factory> {
+            object :  SceneSettingItemList.Factory {
+                override fun invoke(sceneId: Scene.Id): SceneSettingItemList = SceneSettingItemList(
+                    sceneId,
+                    applicationScope.get<LocaleHolder>(),
+                    get(),
+                    get<LocationRemovedFromSceneNotifier>(),
+                    get<LocationUsedInSceneNotifier>(),
+                    get(),
+                    get()
+                )
+            }
+        }
+        provide<SceneSettingItemView.Factory> {
+            object : SceneSettingItemView.Factory {
+                override fun invoke(model: SceneSettingItemModel): SceneSettingItemView = SceneSettingItemView(
+                    model,
+                    applicationScope.get<LocaleHolder>(),
+                    get(),
+                    get<SceneSettingLocationRenamedNotifier>()
+                )
+            }
+        }
+        provide<UseLocationButton.Factory> {
+            object : UseLocationButton.Factory {
+                override fun invoke(sceneId: Scene.Id): UseLocationButton = UseLocationButton(
+                    sceneId,
+                    applicationScope.get<LocaleHolder>(),
+                    get(),
+                    get(),
+                    get()
+                )
+            }
+        }
+    }
+
     private fun InProjectScope.symbolsInScene() {
         provide<SymbolsInSceneViewListener> {
             SymbolsInSceneController(
@@ -186,32 +238,6 @@ object Presentation {
                 it listensTo get<ContentReplacedNotifier>()
                 it listensTo get<DetectUnusedSymbolsOutput>()
             }
-        }
-    }
-
-    private fun InProjectScope.sceneSetting() {
-        provide<SceneSettingViewListener> {
-            SceneSettingController(
-                object : SceneSettingController.Dependencies {
-                    override val openToolController: OpenToolController
-                        get() = get()
-                    override val listLocationsInSceneController: ListLocationsInSceneController
-                        get() = get()
-                    override val linkLocationToSceneController: LinkLocationToSceneController
-                        get() = get()
-                    override val listLocationsToUseInSceneController: ListLocationsToUseInSceneController
-                        get() = get()
-                    override val removeLocationFromSceneController: RemoveLocationFromSceneController
-                        get() = get()
-                    override val locationRemovedFromSceneNotifier: Notifier<LocationRemovedFromSceneReceiver>
-                        get() = get<LocationRemovedFromSceneNotifier>()
-                    override val locationUsedInSceneNotifier: Notifier<LocationUsedInSceneReceiver>
-                        get() = get<LocationUsedInSceneNotifier>()
-                    override val sceneSettingLocationRenamedNotifier: Notifier<SceneSettingLocationRenamedReceiver>
-                        get() = get<SceneSettingLocationRenamedNotifier>()
-                },
-                get<SceneSettingState>(),
-            )
         }
     }
 

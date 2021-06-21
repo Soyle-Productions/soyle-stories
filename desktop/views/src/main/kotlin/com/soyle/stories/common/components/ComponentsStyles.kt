@@ -6,10 +6,12 @@ import com.soyle.stories.common.components.inputs.InputStyles
 import com.soyle.stories.common.components.surfaces.SurfaceStyles
 import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.soylestories.Styles
+import javafx.geometry.Pos
 import javafx.scene.effect.BlurType
 import javafx.scene.effect.DropShadow
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
+import javafx.scene.text.TextAlignment
 import tornadofx.*
 
 class ComponentsStyles : Stylesheet() {
@@ -26,6 +28,8 @@ class ComponentsStyles : Stylesheet() {
         val cardBody by cssclass()
         val firstChild by csspseudoclass("first-child")
         val notFirstChild by csspseudoclass("not-first-child")
+
+        val invitation by cssclass()
 
         val arrowIconButton by cssclass()
         val iconButton by cssclass()
@@ -81,6 +85,16 @@ class ComponentsStyles : Stylesheet() {
             padding = box(16.px)
             and(notFirstChild) {
                 padding = box(0.px, 16.px, 16.px, 16.px)
+            }
+        }
+
+        invitation {
+            alignment = Pos.CENTER
+            spacing = 16.px
+            s(TextStyles.fieldLabel) {
+                textAlignment = TextAlignment.CENTER
+                wrapText = true
+                padding = box(16.px)
             }
         }
 

@@ -53,6 +53,7 @@ import com.soyle.stories.scene.sceneFrame.*
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.target.TargetScene
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInScene
@@ -109,6 +110,7 @@ object UseCases {
             listAllScenes()
             renameScene()
             deleteScene()
+            targetScene()
             includeCharacterInScene()
             setMotivationForCharacterInScene()
             listCharactersInScene()
@@ -198,6 +200,10 @@ object UseCases {
         provide(DeleteScene.OutputPort::class) {
             DeleteSceneOutput(applicationScope.get(), get(), get())
         }
+    }
+
+    private fun InProjectScope.targetScene() {
+        provide<TargetScene> { TargetScene(applicationScope.get(), get()) }
     }
 
     private fun InProjectScope.includeCharacterInScene() {

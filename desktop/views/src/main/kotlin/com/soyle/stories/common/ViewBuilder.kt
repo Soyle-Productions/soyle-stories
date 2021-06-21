@@ -5,5 +5,5 @@ package com.soyle.stories.common
  * Designates that this function is intended to be used to build views.  It modifies the children structure of the
  * receiver
  */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.TYPE)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.TYPE, AnnotationTarget.CLASS)
 annotation class ViewBuilder

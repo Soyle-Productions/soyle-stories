@@ -1,6 +1,7 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.di.get
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.location.deleteLocationDialog.deleteLocationDialog
 import com.soyle.stories.project.ProjectScope
 import javafx.geometry.Insets
@@ -25,7 +26,7 @@ internal class ActionBar : View() {
             id = "actionBar_createLocation"
             isDisable = false
             action {
-                createLocationDialog(scope)
+                scope.get<CreateLocationDialog.Factory>().invoke()
             }
             isMnemonicParsing = false
         }

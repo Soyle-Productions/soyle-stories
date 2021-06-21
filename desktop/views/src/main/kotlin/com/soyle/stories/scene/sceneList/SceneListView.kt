@@ -3,11 +3,15 @@ package com.soyle.stories.scene.sceneList
 import com.soyle.stories.common.components.buttons.inviteButton
 import com.soyle.stories.common.components.buttons.primaryButton
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
+import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.createSceneDialog.createSceneDialog
 import com.soyle.stories.scene.items.SceneItemViewModel
+import com.soyle.stories.scene.target.SceneTargeted
+import com.soyle.stories.scene.target.SceneTargetedReceiver
+import com.soyle.stories.scene.target.TargetScene
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
 import javafx.scene.Parent
@@ -20,7 +24,10 @@ import javafx.scene.effect.InnerShadow
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
+import kotlinx.coroutines.*
+import kotlinx.coroutines.javafx.JavaFx
 import tornadofx.*
+import java.util.*
 
 class SceneListView : View() {
 
@@ -109,7 +116,11 @@ class SceneListView : View() {
                 val selectedItem = it?.value
                 model.selectedItem.value = selectedItem
                 if (selectedItem != null) {
-                    FX.eventbus.fire(SceneTargeted(selectedItem))
+                    scope.get<TargetScene>().invoke(
+                        Scene.Id(UUID.fromString(selectedItem.id)),
+                        selectedItem.proseId,
+                        selectedItem.name
+                    )
                 }
             }
             model.selectedItem.onChange { newSelection ->

@@ -8,6 +8,7 @@ import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransform
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.locale.LocaleHolder
+import com.soyle.stories.desktop.config.soylestories.configureLocalization
 import com.soyle.stories.desktop.config.soylestories.configureModules
 import com.soyle.stories.desktop.locale.SoyleMessages
 import com.soyle.stories.desktop.view.runHeadless
@@ -36,16 +37,6 @@ class GlobalHooks : En {
         }
     }
 
-    private fun loadLocale() {
-        DI.register(
-            LocaleHolder::class,
-            ApplicationScope::class,
-            { LocaleHolder(SoyleMessages.getLocale(Locale.getDefault())) },
-            true,
-            true
-        )
-    }
-
     private fun synchronizeBackgroundTasks() {
         DI.register(ThreadTransformer::class, ApplicationScope::class, { SyncThreadTransformer() })
     }
@@ -56,7 +47,7 @@ class GlobalHooks : En {
                 runHeadless()
                 Runtime.getRuntime().addShutdownHook(closeThread)
                 SoyleStories.initialization = {
-                    loadLocale()
+                    configureLocalization()
                     configureModules()
                     synchronizeBackgroundTasks()
                 }

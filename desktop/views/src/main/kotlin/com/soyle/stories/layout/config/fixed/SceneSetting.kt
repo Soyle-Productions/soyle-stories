@@ -7,9 +7,11 @@ import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
-import com.soyle.stories.scene.sceneSetting.SceneSettingView
+import com.soyle.stories.scene.setting.SceneSettingToolRoot
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import javafx.scene.layout.Pane
+import tornadofx.add
 import tornadofx.tab
 import kotlin.reflect.KClass
 
@@ -27,9 +29,12 @@ object SceneSetting : ToolConfig<SceneSetting>, FixedTool() {
 
     override fun getTabConfig(tool: ToolViewModel, type: SceneSetting): ToolTabConfig = object : ToolTabConfig {
         override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-            val view = projectScope.get<SceneSettingView>()
-            view.title = getViewModelConfig(type).toolName()
-            return tabPane.tab(view)
+            val factory = projectScope.get<SceneSettingToolRoot.Factory>()
+            val tab = Tab().apply {
+                content = factory.invoke()
+            }
+            tabPane.tabs.add(tab)
+            return tab
         }
     }
 

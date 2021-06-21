@@ -3,8 +3,7 @@ package com.soyle.stories.desktop.view.character.profile
 import com.soyle.stories.character.profile.CharacterProfileView
 import com.soyle.stories.desktop.view.character.profile.`Character Profile View Access`.Companion.access
 import com.soyle.stories.domain.character.Character
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 
 class `Character Profile Assertions` private constructor(private val access: `Character Profile View Access`) {
     companion object {
@@ -15,7 +14,9 @@ class `Character Profile Assertions` private constructor(private val access: `Ch
 
     fun isNotCreatingNameVariant()
     {
-        assertTrue(access.createCharacterNameVariantForm?.isVisible != true)
+        val nameVariantFormVisibility = access.createCharacterNameVariantForm?.isVisible
+        if (nameVariantFormVisibility == null) return
+        assertFalse(nameVariantFormVisibility) { "Create character name variant form should not be visible" }
     }
 
     fun isCreatingNameVariant()

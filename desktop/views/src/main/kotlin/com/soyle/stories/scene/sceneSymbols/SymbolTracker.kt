@@ -117,9 +117,9 @@ class SymbolTracker : Fragment() {
 
     private fun loadAvailableSymbolsToTrack() {
         state.availableSymbols.value = null
-        val sceneId = state.targetScene.value?.id
+        val sceneId = state.targetScene.value?.first
             ?: throw IllegalStateException("This should have been an impossible state to get to.  You tried to select a symbol to pin to a scene, but the code doesn't think there is an active scene.  Please report this and EXACTLY how you got here.")
-        viewListener.listAvailableSymbolsToTrack(Scene.Id(UUID.fromString(sceneId)))
+        viewListener.listAvailableSymbolsToTrack(sceneId)
     }
 
     private fun availableSymbolOptions(availableSymbols: List<SymbolsInSceneViewModel.AvailableTheme>?): List<MenuItem> {
@@ -186,15 +186,15 @@ class SymbolTracker : Fragment() {
     }
 
     private fun pinSymbol(symbolId: Symbol.Id) {
-        val sceneId = state.targetScene.value?.id
+        val sceneId = state.targetScene.value?.first
             ?: throw IllegalStateException("This should have been an impossible state to get to.  You tried to pin a symbol to a scene, but the code doesn't think there is an active scene.  Please report this and EXACTLY how you got here.")
-        viewListener.pinSymbol(Scene.Id(UUID.fromString(sceneId)), symbolId)
+        viewListener.pinSymbol(sceneId, symbolId)
     }
 
     private fun unpinSymbol(symbolId: Symbol.Id) {
-        val sceneId = state.targetScene.value?.id
+        val sceneId = state.targetScene.value?.first
             ?: throw IllegalStateException("This should have been an impossible state to get to.  You tried to pin a symbol to a scene, but the code doesn't think there is an active scene.  Please report this and EXACTLY how you got here.")
-        viewListener.unpinSymbol(Scene.Id(UUID.fromString(sceneId)), symbolId)
+        viewListener.unpinSymbol(sceneId, symbolId)
     }
 
 

@@ -1,9 +1,9 @@
 package com.soyle.stories.desktop.view.location.details.hostSceneButton
 
+import com.soyle.stories.desktop.view.common.NodeTest
 import com.soyle.stories.desktop.view.location.details.LocaleMock
 import com.soyle.stories.desktop.view.location.details.UserActionsMock
 import com.soyle.stories.desktop.view.location.details.`Host Scene Button Access`.Companion.access
-import com.soyle.stories.desktop.view.testconfig.verifyDesign
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.location.details.components.HostSceneButton
 import com.soyle.stories.location.details.models.AvailableSceneToHostModel
@@ -20,22 +20,17 @@ import org.testfx.api.FxToolkit
 import org.testfx.matcher.control.MenuItemMatchers
 import tornadofx.observableListOf
 
-class `Host Scene Button Presentation Test` : FxRobot() {
-
-    private val primaryStage = FxToolkit.registerPrimaryStage()
+class `Host Scene Button Presentation Test` : NodeTest<HostSceneButton>() {
 
     private val availableScenesToHost = ReadOnlyListWrapper<AvailableSceneToHostModel>(null)
     private val locale = LocaleMock()
-    private val view = HostSceneButton(availableScenesToHost.readOnlyProperty, UserActionsMock(), locale)
+    override val view = HostSceneButton(availableScenesToHost.readOnlyProperty, UserActionsMock(), locale)
 
     @Test
     fun `loading item should display text from locale`() {
         locale.loading.set("Hold up, we're loading here")
         FxAssert.verifyThat(view) { it.items.single().text == "Hold up, we're loading here" }
     }
-
-    @Test
-    fun design() = verifyDesign(primaryStage, view)
 
     @Nested
     inner class `Given Available Scenes are Loaded`
@@ -81,9 +76,6 @@ class `Host Scene Button Presentation Test` : FxRobot() {
             assertEquals("I have a fancy new name", displayedItem.text)
         }
 
-        @Test
-        fun design() = verifyDesign(primaryStage, view)
-
         @Nested
         inner class `Given No Available Scenes`
         {
@@ -99,9 +91,6 @@ class `Host Scene Button Presentation Test` : FxRobot() {
 
                 `should display create scene button`()
             }
-
-            @Test
-            fun design() = verifyDesign(primaryStage, view)
 
         }
 

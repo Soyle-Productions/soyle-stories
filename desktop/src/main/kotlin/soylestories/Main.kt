@@ -21,6 +21,13 @@ import java.util.prefs.Preferences
 fun main(args: Array<String>) {
     SoyleStories.initialization = ::configureModules
 
+    configureLocalization()
+
+    LauncherImpl.launchApplication(SoyleStories::class.java, SoyleStoriesPreLoader::class.java, args)
+}
+
+fun configureLocalization() {
+
     DI.register(
         LocaleHolder::class,
         ApplicationScope::class,
@@ -28,8 +35,6 @@ fun main(args: Array<String>) {
         true,
         true
     )
-
-    LauncherImpl.launchApplication(SoyleStories::class.java, SoyleStoriesPreLoader::class.java, args)
 }
 
 fun configureModules() {

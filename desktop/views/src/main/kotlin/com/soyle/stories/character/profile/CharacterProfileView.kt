@@ -6,6 +6,7 @@ import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsCon
 import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
 import com.soyle.stories.characterarc.components.characterIcon
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.components.buttons.ButtonVariant
 import com.soyle.stories.common.components.buttons.secondaryButton
 import com.soyle.stories.common.components.surfaces.Elevation
@@ -32,6 +33,11 @@ import javafx.scene.Parent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
 import tornadofx.*
 
 class CharacterProfileView : View() {
@@ -48,60 +54,34 @@ class CharacterProfileView : View() {
     private fun createNewAlternativeName(altName: NonBlankString) {
         state.executingNameChange.set(true)
         val controller = scope.projectScope.get<AddCharacterNameVariantController>()
-        try {
-            controller.addCharacterNameVariant(state.characterId.value, altName)
-                .invokeOnCompletion { failure ->
-                    runLater {
-                        state.executingNameChange.set(false)
-                        if (failure is SoyleStoriesException) state.creationFailure.set(failure.localizedMessage)
-                        else state.isCreatingName.set(false)
-                    }
-                }
-        } catch (failure: ValidationException) {
-            runLater {
-                state.executingNameChange.set(false)
-                state.creationFailure.set(failure.localizedMessage)
+        scope.projectScope.applicationScope.get<ThreadTransformer>().gui {
+            try {
+                controller.addCharacterNameVariant(state.characterId.value, altName).join()
+                state.isCreatingName.set(false)
+            } catch (exception: ValidationException) {
+                state.creationFailure.set(exception.localizedMessage)
             }
+            state.executingNameChange.set(false)
         }
     }
 
     private fun renameAlternativeName(currentName: NonBlankString, newName: NonBlankString) {
         state.executingNameChange.set(true)
         val controller = scope.projectScope.get<RenameCharacterNameVariantController>()
-        try {
+        scope.projectScope.applicationScope.get<ThreadTransformer>().gui {
             controller.renameCharacterNameVariant(state.characterId.value, currentName, newName)
-                .invokeOnCompletion { failure ->
-                    runLater {
-                        state.executingNameChange.set(false)
-                        /*if (failure is SoyleStoriesException) state.creationFailure.set(failure.localizedMessage)
-                        else state.isCreatingName.set(false)*/
-                    }
-                }
-        } catch (failure: ValidationException) {
-            runLater {
-                state.executingNameChange.set(false)
-                //state.creationFailure.set(failure.localizedMessage)
-            }
+                .join()
+            state.executingNameChange.set(false)
         }
     }
 
     private fun removeAlternativeName(altName: NonBlankString) {
         state.executingNameChange.set(true)
         val controller = scope.projectScope.get<RemoveCharacterNameVariantController>()
-        try {
-            val eventualResult = controller.removeCharacterNameVariant(state.characterId.value, altName)
-            eventualResult.invokeOnCompletion {
-                runLater {
-                    state.executingNameChange.set(false)
-                    /*if (failure is SoyleStoriesException) state.creationFailure.set(failure.localizedMessage)
-                    else state.isCreatingName.set(false)*/
-                }
-            }
-        } catch (failure: ValidationException) {
-            runLater {
-                state.executingNameChange.set(false)
-                //state.creationFailure.set(failure.localizedMessage)
-            }
+        scope.projectScope.applicationScope.get<ThreadTransformer>().gui {
+            controller.removeCharacterNameVariant(state.characterId.value, altName)
+                .join()
+            state.executingNameChange.set(false)
         }
     }
 

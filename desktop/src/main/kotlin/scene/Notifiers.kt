@@ -29,6 +29,8 @@ import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedNotifier
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedReceiver
+import com.soyle.stories.scene.target.SceneTargetedNotifier
+import com.soyle.stories.scene.target.SceneTargetedReceiver
 import com.soyle.stories.scene.trackSymbolInScene.*
 
 object Notifiers {
@@ -88,6 +90,9 @@ object Notifiers {
             }
             provide(SceneRenamedReceiver::class) {
                 SceneRenamedNotifier()
+            }
+            provide(SceneTargetedReceiver::class) {
+                SceneTargetedNotifier()
             }
         }
     }

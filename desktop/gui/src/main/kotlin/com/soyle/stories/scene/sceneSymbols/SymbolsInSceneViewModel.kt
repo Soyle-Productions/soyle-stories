@@ -1,11 +1,13 @@
 package com.soyle.stories.scene.sceneSymbols
 
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.scene.items.SceneItemViewModel
 
 data class SymbolsInSceneViewModel(
-    val targetScene: SceneItemViewModel?,
+    val targetScene: Triple<Scene.Id, Prose.Id, String>?,
     val themesInScene: List<ThemeInScene>,
     val availableThemesToTrack: List<AvailableTheme>
 ) {

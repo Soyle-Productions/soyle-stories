@@ -17,12 +17,13 @@ import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.paint.Color
 import javafx.scene.shape.SVGPath
 import javafx.scene.text.FontWeight
 import tornadofx.*
 import tornadofx.Stylesheet
 
-class Chip : ButtonBase() {
+open class Chip : ButtonBase() {
 
     val node: Node = this
 
@@ -153,10 +154,10 @@ class Chip : ButtonBase() {
                     }
 
                     and(ComponentsStyles.primary) {
-                        backgroundColor = multi(ColorStyles.Purple)
+                        backgroundColor = multi(ColorStyles.secondaryColor)
                         and(clickable) {
                             and(hover) {
-                                backgroundColor = multi(ColorStyles.Purple.brighter())
+                                backgroundColor = multi(ColorStyles.secondaryColor.brighter())
                             }
                         }
 
@@ -165,10 +166,10 @@ class Chip : ButtonBase() {
                         }
                     }
                     and(ComponentsStyles.secondary) {
-                        backgroundColor = multi(ColorStyles.Blue)
+                        backgroundColor = multi(ColorStyles.primaryColor)
                         and(clickable) {
                             and(hover) {
-                                backgroundColor = multi(ColorStyles.Blue.brighter())
+                                backgroundColor = multi(ColorStyles.primaryColor.brighter())
                             }
                         }
 
@@ -179,14 +180,15 @@ class Chip : ButtonBase() {
                 }
 
                 and(ComponentsStyles.outlined) {
+                    backgroundColor = multi(javafx.scene.paint.Color.TRANSPARENT)
                     borderWidth = multi(box(1.px))
-                    borderColor = multi(box(javafx.scene.paint.Color.web("#e0e0e0")))
+                    borderColor = multi(box(ColorStyles.lightHighlightColor))
                     and(clickable) {
                         and(hover) {
                         }
                     }
                     and(ComponentsStyles.primary) {
-                        borderColor = multi(box(ColorStyles.Purple))
+                        borderColor = multi(box(ColorStyles.secondaryColor))
                         and(clickable) {
                             and(hover) {
                                 backgroundColor =
@@ -196,33 +198,33 @@ class Chip : ButtonBase() {
 
                         label {
                             +nonDefaultLabelMixin
-                            textFill = com.soyle.stories.soylestories.Styles.Purple
+                            textFill = ColorStyles.secondaryColor
                         }
 
                         chipDeleteIcon {
-                            fill = com.soyle.stories.soylestories.Styles.Purple.deriveColor(1.0, 1.0, 1.0, 0.7)
+                            fill = ColorStyles.secondaryColor.deriveColor(1.0, 1.0, 1.0, 0.7)
                             and(hover) {
-                                fill = com.soyle.stories.soylestories.Styles.Purple
+                                fill = ColorStyles.secondaryColor
                             }
                         }
                     }
                     and(ComponentsStyles.secondary) {
-                        borderColor = multi(box(com.soyle.stories.soylestories.Styles.Blue))
+                        borderColor = multi(box(ColorStyles.primaryColor))
                         and(clickable) {
                             and(hover) {
                                 backgroundColor =
-                                    multi(com.soyle.stories.soylestories.Styles.Blue.deriveColor(1.0, 1.0, 1.0, 0.1))
+                                    multi(ColorStyles.primaryColor.deriveColor(1.0, 1.0, 1.0, 0.1))
                             }
                         }
 
                         label {
                             +nonDefaultLabelMixin
-                            textFill = com.soyle.stories.soylestories.Styles.Blue
+                            textFill = ColorStyles.primaryColor
                         }
                         chipDeleteIcon {
-                            fill = com.soyle.stories.soylestories.Styles.Blue.deriveColor(1.0, 1.0, 1.0, 0.7)
+                            fill = ColorStyles.primaryColor.deriveColor(1.0, 1.0, 1.0, 0.7)
                             and(hover) {
-                                fill = com.soyle.stories.soylestories.Styles.Blue
+                                fill = ColorStyles.primaryColor
                             }
                         }
                     }
@@ -264,7 +266,7 @@ class Chip : ButtonBase() {
 
         private val COLOR: CssMetaData<Chip, Color> = object : CssMetaData<Chip, Color>("-fx-chip-color", StyleConverter.getEnumConverter(Chip.Color::class.java)) {
             override fun isSettable(styleable: Chip?): Boolean {
-                return styleable?.color == Color.default || styleable?.colorProperty?.isBound == true
+                return styleable?.color == Color.default || styleable?.colorProperty?.isBound != true
             }
 
             override fun getStyleableProperty(styleable: Chip?): StyleableProperty<Color> {
@@ -274,7 +276,7 @@ class Chip : ButtonBase() {
 
         private val VARIANT: CssMetaData<Chip, Variant> = object : CssMetaData<Chip, Variant>("-fx-chip-variant", StyleConverter.getEnumConverter(Chip.Variant::class.java)) {
             override fun isSettable(styleable: Chip?): Boolean {
-                return styleable?.color == Color.default || styleable?.colorProperty?.isBound == true
+                return styleable?.variantProperty?.isBound != true
             }
 
             override fun getStyleableProperty(styleable: Chip?): StyleableProperty<Variant> {

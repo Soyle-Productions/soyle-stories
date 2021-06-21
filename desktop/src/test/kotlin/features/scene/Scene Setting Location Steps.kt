@@ -30,6 +30,11 @@ class `Scene Setting Location Steps` : En {
     }
 
     private fun whens() {
+        When("I map the {scene}'s setting locations") { scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .focusOn(scene)
+        }
         When("I use the {location} as a setting for the {scene}") { location: Location, scene: Scene ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenSceneSettingToolHasBeenOpened()
@@ -84,6 +89,19 @@ class `Scene Setting Location Steps` : En {
                 .givenFocusedOn(scene)
             SceneSettingAssertions.assertThat(sceneSettingView) {
                 hasLocationNamed(settingName)
+            }
+        }
+        Then(
+            "the {scene}'s {string} setting should indicate that it was removed"
+        ) { scene: Scene, settingName: String ->
+            val sceneSetting = scene.settings.find { it.locationName == settingName }!!
+
+            val sceneSettingView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneSettingAssertions.assertThat(sceneSettingView) {
+                hasLocationNamed(settingName)
+                locationIndicatesIssue(settingName)
             }
         }
     }

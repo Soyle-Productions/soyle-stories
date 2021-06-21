@@ -9,11 +9,13 @@ import javafx.scene.control.TextField
 fun getCreateLocationDialogOrError() =
     getCreateLocationDialog() ?: error("Create Location Dialog is not open")
 
-fun getCreateLocationDialog(): CreateLocationDialog? = robot.getOpenDialog()
+fun getCreateLocationDialog(): CreateLocationDialog.View? = robot
+    .listWindows().asSequence()
+    .mapNotNull { it.scene.root as? CreateLocationDialog.View }
+    .firstOrNull { it.scene.window?.isShowing == true }
 
-fun CreateLocationDialog.createLocationWithName(locationName: String)
-{
-    val nameInput = robot.from(this.root).lookup(".text-field").query<TextField>()
+fun CreateLocationDialog.View.createLocationWithName(locationName: String) {
+    val nameInput = robot.from(this).lookup(".text-field").query<TextField>()
     robot.interact {
         nameInput.text = locationName
         nameInput.fireEvent(ActionEvent())

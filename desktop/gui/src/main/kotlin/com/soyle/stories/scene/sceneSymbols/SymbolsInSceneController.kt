@@ -32,28 +32,28 @@ class SymbolsInSceneController(
     private val presenter = SymbolsInScenePresenter(view)
 
     override suspend fun receiveSymbolsTrackedInScene(symbolsTrackedInScene: List<SymbolTrackedInScene>) {
-        val sceneId = presenter.view.viewModel?.targetScene?.id ?: return
-        val relevantEvents = symbolsTrackedInScene.filter { it.sceneId.uuid.toString() == sceneId }
+        val sceneId = presenter.view.viewModel?.targetScene?.first ?: return
+        val relevantEvents = symbolsTrackedInScene.filter { it.sceneId == sceneId }
         if (relevantEvents.isNotEmpty()) {
             presenter.receiveSymbolsTrackedInScene(relevantEvents)
-            detectUnusedSymbolsController.detectUnusedSymbols(Scene.Id(UUID.fromString(sceneId)))
+            detectUnusedSymbolsController.detectUnusedSymbols(sceneId)
         }
     }
 
     override suspend fun receiveTrackedSymbolsRenamed(trackedSymbolsRenamed: List<TrackedSymbolRenamed>) {
-        val sceneId = presenter.view.viewModel?.targetScene?.id ?: return
-        val relevantEvents = trackedSymbolsRenamed.filter { it.sceneId.uuid.toString() == sceneId }
+        val sceneId = presenter.view.viewModel?.targetScene?.first ?: return
+        val relevantEvents = trackedSymbolsRenamed.filter { it.sceneId == sceneId }
         if (relevantEvents.isNotEmpty()) {
             presenter.receiveTrackedSymbolsRenamed(relevantEvents)
         }
     }
 
     override suspend fun receiveTrackedSymbolsRemoved(trackedSymbolsRemoved: List<TrackedSymbolRemoved>) {
-        val sceneId = presenter.view.viewModel?.targetScene?.id ?: return
-        val relevantEvents = trackedSymbolsRemoved.filter { it.sceneId.uuid.toString() == sceneId }
+        val sceneId = presenter.view.viewModel?.targetScene?.first ?: return
+        val relevantEvents = trackedSymbolsRemoved.filter { it.sceneId == sceneId }
         if (relevantEvents.isNotEmpty()) {
             presenter.receiveTrackedSymbolsRemoved(relevantEvents)
-            detectUnusedSymbolsController.detectUnusedSymbols(Scene.Id(UUID.fromString(sceneId)))
+            detectUnusedSymbolsController.detectUnusedSymbols(sceneId)
         }
     }
 
@@ -64,30 +64,30 @@ class SymbolsInSceneController(
     }
 
     override suspend fun receiveSymbolPinnedToScene(symbolPinnedToScene: SymbolPinnedToScene) {
-        val sceneId = presenter.view.viewModel?.targetScene?.id ?: return
-        if (sceneId == symbolPinnedToScene.sceneId.uuid.toString()) {
+        val sceneId = presenter.view.viewModel?.targetScene?.first ?: return
+        if (sceneId == symbolPinnedToScene.sceneId) {
             presenter.receiveSymbolPinnedToScene(symbolPinnedToScene)
-            detectUnusedSymbolsController.detectUnusedSymbols(Scene.Id(UUID.fromString(sceneId)))
+            detectUnusedSymbolsController.detectUnusedSymbols(sceneId)
         }
     }
 
     override suspend fun receiveSymbolUnpinnedFromScene(symbolUnpinnedFromScene: SymbolUnpinnedFromScene) {
-        val sceneId = presenter.view.viewModel?.targetScene?.id ?: return
-        if (sceneId == symbolUnpinnedFromScene.sceneId.uuid.toString()) {
+        val sceneId = presenter.view.viewModel?.targetScene?.first ?: return
+        if (sceneId == symbolUnpinnedFromScene.sceneId) {
             presenter.receiveSymbolUnpinnedFromScene(symbolUnpinnedFromScene)
-            detectUnusedSymbolsController.detectUnusedSymbols(Scene.Id(UUID.fromString(sceneId)))
+            detectUnusedSymbolsController.detectUnusedSymbols(sceneId)
         }
     }
 
     override suspend fun receiveContentReplacedEvent(contentReplaced: ContentReplaced) {
         val targetScene = presenter.view.viewModel?.targetScene ?: return
-        if (targetScene.proseId == contentReplaced.proseId) {
-            detectUnusedSymbolsController.detectUnusedSymbols(Scene.Id(UUID.fromString(targetScene.id)))
+        if (targetScene.second == contentReplaced.proseId) {
+            detectUnusedSymbolsController.detectUnusedSymbols(targetScene.first)
         }
     }
 
     override suspend fun receiveDetectedUnusedSymbols(response: DetectUnusedSymbolsInScene.ResponseModel) {
-        if (presenter.view.viewModel?.targetScene?.id == response.sceneId.uuid.toString()) {
+        if (presenter.view.viewModel?.targetScene?.first == response.sceneId) {
             presenter.receiveDetectedUnusedSymbols(response)
         }
     }
