@@ -14,6 +14,8 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
 import com.soyle.stories.domain.scene.events.LocationUsedInScene
+import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
+import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
 import com.soyle.stories.scene.locationsInScene.listLocationsInScene.ListLocationsInSceneController
 import com.soyle.stories.scene.locationsInScene.listLocationsToUse.ListLocationsToUseInSceneController
@@ -24,6 +26,8 @@ import com.soyle.stories.scene.setting.list.SceneSettingItemList.Styles.Companio
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemModel
 import com.soyle.stories.scene.setting.list.useLocationButton.AvailableSceneSettingModel
 import com.soyle.stories.scene.setting.list.useLocationButton.UseLocationButton
+import com.soyle.stories.usecase.location.deleteLocation.DeletedLocation
+import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettings
 import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ObjectPropertyBase
@@ -43,9 +47,11 @@ class SceneSettingItemList(
     private val locale: SceneSettingItemListLocale,
 
     private val listLocationsInSceneController: ListLocationsInSceneController,
+    private val detectInconsistenciesInSceneSettings: DetectInconsistenciesInSceneSettingsController,
 
     private val sceneSettingRemoved: Notifier<LocationRemovedFromSceneReceiver>,
     private val sceneSettingAdded: Notifier<LocationUsedInSceneReceiver>,
+    private val locationDeleted: Notifier<DeletedLocationReceiver>,
 
     private val makeSceneSettingItem: SceneSettingItemView.Factory,
     private val makeUseLocationButton: UseLocationButton.Factory
@@ -97,7 +103,9 @@ class SceneSettingItemList(
 
     private val domainEventListener = object :
         LocationRemovedFromSceneReceiver,
-        LocationUsedInSceneReceiver {
+        LocationUsedInSceneReceiver,
+        DeletedLocationReceiver
+    {
         override suspend fun receiveLocationRemovedFromScenes(events: List<LocationRemovedFromScene>) {
             val removedLocationIds = events.asSequence()
                 .filter { it.sceneId == sceneId }
@@ -108,6 +116,7 @@ class SceneSettingItemList(
                 val currentModel = model.value
                 if (currentModel is SceneSettingItemListModel.Loaded) {
                     currentModel.sceneSettings.removeIf { it.locationId in removedLocationIds }
+                    detectInconsistenciesInSceneSettings.detectInconsistencies(sceneId)
                 }
             }
         }
@@ -125,14 +134,22 @@ class SceneSettingItemList(
                             booleanProperty(false)
                         )
                     )
+                    detectInconsistenciesInSceneSettings.detectInconsistencies(sceneId)
                 }
             }
+        }
+
+        override suspend fun receiveDeletedLocation(deletedLocation: DeletedLocation) {
+            (model.value as? SceneSettingItemListModel.Loaded)?.sceneSettings
+                ?.find { it.locationId == deletedLocation.location } ?: return
+            detectInconsistenciesInSceneSettings.detectInconsistencies(sceneId)
         }
     }
 
     init {
         sceneSettingRemoved.addListener(domainEventListener)
         sceneSettingAdded.addListener(domainEventListener)
+        locationDeleted.addListener(domainEventListener)
     }
 
     private val isLoading = booleanBinding(model) { model.value == SceneSettingItemListModel.Loading }
@@ -149,7 +166,10 @@ class SceneSettingItemList(
         when (val state = model.value) {
             is SceneSettingItemListModel.Loading -> progressindicator()
             is SceneSettingItemListModel.Error -> error()
-            is SceneSettingItemListModel.Loaded -> loaded(state)
+            is SceneSettingItemListModel.Loaded -> {
+                loaded(state)
+                detectInconsistenciesInSceneSettings.detectInconsistencies(sceneId)
+            }
         }
     }
 

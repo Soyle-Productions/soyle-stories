@@ -4,6 +4,7 @@ import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.buttons.ButtonStyles
 import com.soyle.stories.desktop.view.common.NodeTest
 import com.soyle.stories.desktop.view.common.hasPseudoClass
+import com.soyle.stories.desktop.view.scene.sceneSetting.doubles.DetectInconsistenciesInSceneSettingsControllerDouble
 import com.soyle.stories.desktop.view.scene.sceneSetting.doubles.ListLocationsInSceneControllerDouble
 import com.soyle.stories.desktop.view.scene.sceneSetting.item.SceneSettingItemFactory
 import com.soyle.stories.desktop.view.scene.sceneSetting.list.SceneSettingItemListLocaleMock
@@ -16,11 +17,14 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneSettingLocation
 import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
 import com.soyle.stories.domain.scene.events.LocationUsedInScene
+import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
+import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneNotifier
 import com.soyle.stories.scene.setting.list.SceneSettingItemList
 import com.soyle.stories.scene.setting.list.SceneSettingItemListLocale
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemView
+import com.soyle.stories.usecase.location.deleteLocation.DeletedLocation
 import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 import com.soyle.stories.usecase.scene.location.listLocationsUsed.ListLocationsUsedInScene
 import javafx.scene.layout.Pane
@@ -54,15 +58,23 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
         }
     )
 
+    private var detectInconsistenciesRequest: Scene.Id? = null
+    private val detectInconsistenciesInSceneSettingsController = DetectInconsistenciesInSceneSettingsControllerDouble(
+        onInvoke = ::detectInconsistenciesRequest::set
+    )
+
     private val sceneSettingRemovedNotifier = LocationRemovedFromSceneNotifier()
     private val sceneSettingAddedNotifier = LocationUsedInSceneNotifier()
+    private val deletedLocationNotifier = DeletedLocationNotifier()
 
     override val view: SceneSettingItemList = SceneSettingItemList(
         sceneId,
         locale,
         listLocationsInSceneController,
+        detectInconsistenciesInSceneSettingsController,
         sceneSettingRemovedNotifier,
         sceneSettingAddedNotifier,
+        deletedLocationNotifier,
         SceneSettingItemFactory { assertEquals(sceneId, it.sceneId) },
         UseLocationButtonFactory { assertEquals(sceneId, it) }
     )
@@ -205,6 +217,11 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
                 }
             }
 
+            @Test
+            fun `should detect inconsistencies`() {
+                assertEquals(sceneId, detectInconsistenciesRequest)
+            }
+
             @Nested
             inner class `When Scene Setting is Removed`
             {
@@ -231,6 +248,15 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
                         locationItems.minus(locationToRemove).map { it.id.toString() }.toSet(),
                         view.access().sceneSettingItems.map { it.id }.toSet()
                     )
+                }
+
+                @Test
+                fun `should detect inconsistencies again`() {
+                    detectInconsistenciesRequest = null
+
+                    locationRemoved(sceneId, locationToRemove.id)
+
+                    assertEquals(sceneId, detectInconsistenciesRequest)
                 }
 
                 private fun locationRemoved(sceneId: Scene.Id, locationId: Location.Id) {
@@ -265,6 +291,15 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
                     }
                 }
 
+                @Test
+                fun `should detect inconsistencies again`() {
+                    detectInconsistenciesRequest = null
+
+                    sceneSettingAdded(sceneId, Location.Id(), "Some Location Name")
+
+                    assertEquals(sceneId, detectInconsistenciesRequest)
+                }
+
                 private fun sceneSettingAdded(sceneId: Scene.Id, locationId: Location.Id, name: String) {
                     runBlocking {
                         sceneSettingAddedNotifier.receiveLocationUsedInScene(
@@ -272,6 +307,37 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
                         )
                     }
                     interact{}
+                }
+
+            }
+
+            @Nested
+            inner class `When Location is Removed from Story`
+            {
+
+                @Test
+                fun `should not detect inconsistencies given removed location is not scene setting`() {
+                    detectInconsistenciesRequest = null
+
+                    sendDeletedLocation(Location.Id())
+
+                    assertNull(detectInconsistenciesRequest)
+                }
+
+                @Test
+                fun `should detect inconsistencies again given removed location is scene setting`() {
+                    detectInconsistenciesRequest = null
+
+                    sendDeletedLocation(locationItems.random().id)
+
+                    assertEquals(sceneId, detectInconsistenciesRequest)
+                }
+
+                private fun sendDeletedLocation(locationId: Location.Id)
+                {
+                    runBlocking {
+                        deletedLocationNotifier.receiveDeletedLocation(DeletedLocation(locationId))
+                    }
                 }
 
             }
@@ -297,6 +363,15 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
                     assertEquals(locationId.toString(), it.id)
                     assertEquals(locationName, it.text)
                 }
+            }
+
+            @Test
+            fun `should detect inconsistencies again`() {
+                detectInconsistenciesRequest = null
+
+                sceneSettingAdded(sceneId, Location.Id(), "Some Location Name")
+
+                assertEquals(sceneId, detectInconsistenciesRequest)
             }
 
             private fun sceneSettingAdded(sceneId: Scene.Id, locationId: Location.Id, name: String) {

@@ -8,9 +8,12 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneSettingLocation
 import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedNotifier
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemModel
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemView
+import com.soyle.stories.usecase.scene.inconsistencies.SceneInconsistencies
+import com.soyle.stories.usecase.scene.inconsistencies.SceneSettingLocationInconsistencies
 import javafx.scene.layout.Pane
 import javafx.stage.Stage
 import javafx.stage.StageStyle
@@ -29,6 +32,7 @@ class `Scene Setting Item Unit Test` : NodeTest<SceneSettingItemView>() {
     private val removed = booleanProperty(false)
     private val locale = SceneSettingItemLocaleMock()
     private val sceneSettingRenamed = SceneSettingLocationRenamedNotifier()
+    private val sceneInconsistentNotifier = SceneInconsistenciesNotifier()
 
     private var removeLocationRequest: Pair<Scene.Id, Location.Id>? = null
 
@@ -38,7 +42,8 @@ class `Scene Setting Item Unit Test` : NodeTest<SceneSettingItemView>() {
         RemoveLocationFromSceneControllerDouble(
             onRemoveLocation = { sceneId, locationId -> removeLocationRequest = sceneId to locationId}
         ),
-        sceneSettingRenamed
+        sceneSettingRenamed,
+        sceneInconsistentNotifier
     )
 
     init {
@@ -102,22 +107,136 @@ class `Scene Setting Item Unit Test` : NodeTest<SceneSettingItemView>() {
     }
 
     @Nested
-    inner class `Given Scene Setting backing Location has been Removed` {
+    inner class `When scene inconsistency is received`
+    {
 
-        init {
-            removed.set(true)
+        @Nested
+        inner class `Given No Inconsistency`
+        {
+
+            @Test
+            fun `should not show warning when scene does not have scene setting location inconsistency`() {
+                sendInconsistency(sceneId, isSceneSetting = false)
+
+                // then
+                assertFalse(view.hasClass(hasProblem))
+            }
+
+            @Test
+            fun `should not show warning when scene setting location has inconsistency for different scene`() {
+                sendInconsistency(Scene.Id(), locationId)
+
+                // then
+                assertFalse(view.hasClass(hasProblem))
+            }
+
+            @Test
+            fun `should not show warning when scene setting location has inconsistency for different location`() {
+                sendInconsistency(sceneId, Location.Id())
+
+                // then
+                assertFalse(view.hasClass(hasProblem))
+            }
+
+            @Test
+            fun `should not show warning when scene setting location has no inconsistency for same scene and location`() {
+                sendInconsistency(sceneId, locationId, hasInconsistency = false)
+
+                // then
+                assertFalse(view.hasClass(hasProblem))
+            }
+
+            @Test
+            fun `should show warning when scene setting location has inconsistency for same scene and location`() {
+                sendInconsistency(sceneId, locationId, hasInconsistency = true)
+
+                // then
+                assertTrue(view.hasClass(hasProblem))
+            }
+
         }
 
-        @Test
-        fun `should show warning state`() {
-            assertTrue(view.hasClass(hasProblem))
+        @Nested
+        inner class `Given Inconsistency` {
+
+            init {
+                sendInconsistency(sceneId, locationId)
+            }
+
+            @Test
+            fun `removed tooltip should display text from locale`() {
+                locale.locationHasBeenRemovedFromStory.set("This location was removed a while ago, dude.")
+                assertEquals("This location was removed a while ago, dude.", view.tooltip!!.text)
+            }
+
+            @Test
+            fun `should still show warning when scene does not have scene setting location inconsistency`() {
+                sendInconsistency(sceneId, isSceneSetting = false)
+
+                // then
+                assertTrue(view.hasClass(hasProblem))
+            }
+
+            @Test
+            fun `should still show warning when scene setting location has inconsistency for different scene`() {
+                sendInconsistency(Scene.Id(), locationId)
+
+                // then
+                assertTrue(view.hasClass(hasProblem))
+            }
+
+            @Test
+            fun `should still show warning when scene setting location has inconsistency for different location`() {
+                sendInconsistency(sceneId, Location.Id())
+
+                // then
+                assertTrue(view.hasClass(hasProblem))
+            }
+
+            @Test
+            fun `should still show warning when scene setting location has inconsistency for same scene and location`() {
+                sendInconsistency(sceneId, locationId, hasInconsistency = true)
+
+                // then
+                assertTrue(view.hasClass(hasProblem))
+            }
+
+            @Test
+            fun `should not show warning when scene setting location has no inconsistency for same scene and location`() {
+                sendInconsistency(sceneId, locationId, hasInconsistency = false)
+
+                // then
+                assertFalse(view.hasClass(hasProblem))
+            }
+
         }
 
-        @Test
-        fun `removed tooltip should display text from locale`() {
-            locale.locationHasBeenRemovedFromStory.set("This location was removed a while ago, dude.")
-            assertEquals("This location was removed a while ago, dude.", view.tooltip!!.text)
+        private fun sendInconsistency(sceneId: Scene.Id, isSceneSetting: Boolean, locationId: Location.Id, hasInconsistency: Boolean) {
+            runBlocking {
+                sceneInconsistentNotifier.receiveSceneInconsistencies(SceneInconsistencies(sceneId, setOfNotNull(
+                    if (isSceneSetting) SceneInconsistencies.SceneInconsistency.SceneSettingInconsistency(
+                        setOf(
+                            SceneSettingLocationInconsistencies(sceneId, locationId, setOfNotNull(
+                                if (hasInconsistency) SceneSettingLocationInconsistencies.SceneSettingLocationInconsistency.LocationRemovedFromStory
+                                else null
+                            )
+                            )
+                        )
+                    )
+                    else null
+                )
+                ))
+            }
         }
+
+        private fun sendInconsistency(sceneId: Scene.Id) =
+            sendInconsistency(sceneId, false, Location.Id(), false)
+
+        private fun sendInconsistency(sceneId: Scene.Id, isSceneSetting: Boolean) =
+            sendInconsistency(sceneId, isSceneSetting, Location.Id(), false)
+
+        private fun sendInconsistency(sceneId: Scene.Id, locationId: Location.Id, hasInconsistency: Boolean = true) =
+            sendInconsistency(sceneId, true, locationId, hasInconsistency)
 
     }
 

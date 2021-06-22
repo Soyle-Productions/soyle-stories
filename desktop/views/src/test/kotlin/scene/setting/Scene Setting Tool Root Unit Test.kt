@@ -10,6 +10,7 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SceneRenamed
 import com.soyle.stories.scene.target.SceneTargeted
 import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.setting.SceneSettingToolRoot

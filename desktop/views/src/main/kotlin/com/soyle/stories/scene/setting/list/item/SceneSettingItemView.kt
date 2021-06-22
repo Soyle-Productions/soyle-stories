@@ -6,11 +6,14 @@ import com.soyle.stories.common.components.ComponentsStyles.Companion.hasProblem
 import com.soyle.stories.common.components.dataDisplay.chip.Chip
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chipColor
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chipVariant
+import com.soyle.stories.common.guiUpdate
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesReceiver
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedReceiver
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneController
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemView.Styles.Companion.sceneSettingItem
+import com.soyle.stories.usecase.scene.inconsistencies.SceneInconsistencies
 import javafx.application.Platform
 import javafx.scene.control.Tooltip
 import javafx.util.Duration
@@ -24,20 +27,22 @@ class SceneSettingItemView(
     private val model: SceneSettingItemModel,
     private val locale: SceneSettingItemLocale,
     private val removeLocationFromSceneController: RemoveLocationFromSceneController,
-    sceneSettingRenamed: Notifier<SceneSettingLocationRenamedReceiver>
-) : Chip(), SceneSettingLocationRenamedReceiver
-{
+    sceneSettingRenamed: Notifier<SceneSettingLocationRenamedReceiver>,
+    sceneSettingInconsistency: Notifier<SceneInconsistenciesReceiver>
+) : Chip() {
 
     fun interface Factory {
+
         operator fun invoke(model: SceneSettingItemModel): SceneSettingItemView
     }
 
     private val name = stringProperty(model.locationName)
+    private val inconsistency = booleanProperty(false)
 
     init {
         id = model.locationId.toString()
         addClass(sceneSettingItem)
-        toggleClass(hasProblem, model.removed)
+        toggleClass(hasProblem, inconsistency)
     }
 
     init {
@@ -46,7 +51,7 @@ class SceneSettingItemView(
 
     init {
         onDelete { removeLocationFromSceneController.removeLocation(model.sceneId, model.locationId) }
-        tooltipProperty().bind(model.removed.objectBinding {
+        tooltipProperty().bind(inconsistency.objectBinding {
             if (it != true) return@objectBinding null
             else removedTooltip()
         })
@@ -60,20 +65,37 @@ class SceneSettingItemView(
         return tooltip
     }
 
-    override suspend fun receiveSceneSettingLocaitonsRenamed(events: List<SceneSettingLocationRenamed>) {
-        val lastRelevantEvent = events.lastOrNull { it.sceneId == model.sceneId && it.sceneSettingLocation.id == model.locationId }
-            ?: return
-        if (!Platform.isFxApplicationThread()) {
-            withContext(Dispatchers.JavaFx) {
+    private val domainEventReceiver = object :
+        SceneSettingLocationRenamedReceiver,
+        SceneInconsistenciesReceiver
+    {
+
+        override suspend fun receiveSceneSettingLocaitonsRenamed(events: List<SceneSettingLocationRenamed>) {
+            val lastRelevantEvent = events.lastOrNull {
+                it.sceneId == model.sceneId && it.sceneSettingLocation.id == model.locationId
+            } ?: return
+            guiUpdate {
                 name.set(lastRelevantEvent.sceneSettingLocation.locationName)
             }
-        } else {
-            name.set(lastRelevantEvent.sceneSettingLocation.locationName)
         }
+
+        override suspend fun receiveSceneInconsistencies(sceneInconsistencies: SceneInconsistencies) {
+            if (sceneInconsistencies.sceneId != model.sceneId) return
+            val sceneSettingInconsistencies = sceneInconsistencies
+                .filterIsInstance<SceneInconsistencies.SceneInconsistency.SceneSettingInconsistency>()
+                .firstOrNull() ?: return
+            val sceneSettingLocationInconsistencies = sceneSettingInconsistencies
+                .find { it.locationId == model.locationId } ?: return
+            guiUpdate {
+                inconsistency.set(sceneSettingLocationInconsistencies.isNotEmpty())
+            }
+        }
+
     }
 
     init {
-        sceneSettingRenamed.addListener(this)
+        sceneSettingRenamed.addListener(domainEventReceiver)
+        sceneSettingInconsistency.addListener(domainEventReceiver)
     }
 
     override fun getUserAgentStylesheet(): String = Styles().externalForm

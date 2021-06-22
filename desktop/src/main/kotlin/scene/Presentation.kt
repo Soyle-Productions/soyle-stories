@@ -11,6 +11,7 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.openTool.OpenToolController
+import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.editProse.ContentReplacedNotifier
 import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
@@ -79,6 +80,7 @@ import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneViewListener
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
 import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.sceneCharacters.SceneCharactersState
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
@@ -161,7 +163,8 @@ object Presentation {
                     get<SceneDeletedNotifier>(),
                     get<ReorderSceneNotifier>(),
                     get<DetectInvalidatedMentionsOutput>(),
-                    get<DetectUnusedSymbolsOutput>()
+                    get<DetectUnusedSymbolsOutput>(),
+                    get<SceneInconsistenciesNotifier>()
                 ),
                 get(),
                 get(),
@@ -188,8 +191,10 @@ object Presentation {
                     sceneId,
                     applicationScope.get<LocaleHolder>(),
                     get(),
+                    get(),
                     get<LocationRemovedFromSceneNotifier>(),
                     get<LocationUsedInSceneNotifier>(),
+                    get<DeletedLocationNotifier>(),
                     get(),
                     get()
                 )
@@ -201,7 +206,8 @@ object Presentation {
                     model,
                     applicationScope.get<LocaleHolder>(),
                     get(),
-                    get<SceneSettingLocationRenamedNotifier>()
+                    get<SceneSettingLocationRenamedNotifier>(),
+                    get<SceneInconsistenciesNotifier>()
                 )
             }
         }

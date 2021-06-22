@@ -19,6 +19,8 @@ import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInScen
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
 import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
 import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesReceiver
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedNotifier
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedReceiver
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
@@ -93,6 +95,9 @@ object Notifiers {
             }
             provide(SceneTargetedReceiver::class) {
                 SceneTargetedNotifier()
+            }
+            provide(SceneInconsistenciesReceiver::class) {
+                SceneInconsistenciesNotifier()
             }
         }
     }

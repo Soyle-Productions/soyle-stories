@@ -12,6 +12,7 @@ import com.soyle.stories.common.scopedListener
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SceneRenamed
 import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesReceiver
 import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
 import com.soyle.stories.scene.setting.list.SceneSettingInviteImage.Companion.sceneSettingInviteImage
 import com.soyle.stories.scene.setting.list.SceneSettingItemList
@@ -42,14 +43,7 @@ class SceneSettingToolRoot(
         operator fun invoke(): SceneSettingToolRoot
     }
 
-    private val model = objectProperty<SceneSettingToolModel>(SceneSettingToolModel.NoSceneSelected)/* {
-        override fun getBean(): Any = this@SceneSettingToolRoot
-        override fun getName(): String = "model"
-        override fun set(newValue: SceneSettingToolModel?) {
-            if (Platform.isFxApplicationThread()) super.set(newValue)
-            else runLater { super.set(newValue) }
-        }
-    }*/
+    private val model = objectProperty<SceneSettingToolModel>(SceneSettingToolModel.NoSceneSelected)
 
     val selectedScene: Scene.Id?
         get() = (model.get() as? SceneSettingToolModel.SceneSelected)?.sceneId
