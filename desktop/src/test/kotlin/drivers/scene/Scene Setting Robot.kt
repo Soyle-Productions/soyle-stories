@@ -12,6 +12,7 @@ import com.soyle.stories.desktop.view.scene.sceneSetting.useLocationButton.`Use 
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.SceneSettingLocation
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
 import com.soyle.stories.scene.setting.SceneSettingToolRoot.Styles.Companion.sceneSettingToolRoot
@@ -54,6 +55,24 @@ fun SceneSettingToolRoot.givenAvailableLocationsLoaded(): SceneSettingToolRoot {
     return this
 }
 
+fun SceneSettingToolRoot.givenReplacementOptionsLoadedFor(sceneSetting: SceneSettingLocation): SceneSettingToolRoot
+{
+    if (false) loadReplacementOptionsFor(sceneSetting)
+    return this
+}
+
+fun SceneSettingToolRoot.givenSettingRemoved(sceneSetting: SceneSettingLocation): SceneSettingToolRoot
+{
+    if (access().list?.access()?.getSceneSettingItem(sceneSetting.id) != null) removeLocation(sceneSetting.locationName)
+    return this
+}
+
+fun SceneSettingToolRoot.givenSettingReplacedWith(sceneSetting: SceneSettingLocation, replacement: Location): SceneSettingToolRoot
+{
+    if (access().list?.access()?.getSceneSettingItem(sceneSetting.id) != null) replaceSettingWith(sceneSetting, replacement)
+    return this
+}
+
 fun SceneSettingToolRoot.selectAvailableLocation(location: Location) {
     access {
         val item = list?.access()?.useLocationButton?.access()?.availableLocationItem(location.id)
@@ -71,5 +90,19 @@ fun SceneSettingToolRoot.removeLocation(settingName: String) {
     access {
         val button = list?.access()?.getSceneSettingItemByName(settingName)?.access()?.deleteButton
         interact { clickOn(button) }
+    }
+}
+
+fun SceneSettingToolRoot.loadReplacementOptionsFor(sceneSetting: SceneSettingLocation)
+{
+    access {
+
+    }
+}
+
+fun SceneSettingToolRoot.replaceSettingWith(sceneSetting: SceneSettingLocation, location: Location)
+{
+    access {
+
     }
 }

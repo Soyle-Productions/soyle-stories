@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.view.scene.sceneSetting
 
 import com.soyle.stories.common.components.ComponentsStyles.Companion.hasProblem
+import com.soyle.stories.desktop.view.common.components.dataDisplay.`Chip Access`.Companion.access
 import com.soyle.stories.desktop.view.scene.sceneSetting.`Scene Setting Tool Root Access`.Companion.access
 import com.soyle.stories.desktop.view.scene.sceneSetting.list.`Scene Setting Item List Access`.Companion.access
 import com.soyle.stories.domain.location.Location
@@ -51,5 +52,19 @@ class SceneSettingAssertions private constructor(private val access: `Scene Sett
         val locationItem = locationList.access().sceneSettingItems.find { it.text == locationName }
             ?: fail("Could not find location item for ${locationName}.")
         assertTrue(locationItem.hasClass(hasProblem))
+    }
+
+    fun sceneSettingItemHasReplacementOption(sceneSettingId: Location.Id, expectedReplacementOption: String)
+    {
+        val locationList = access.list ?: fail("Scene Setting List is not visible in Scene Setting tool")
+        val locationItem = locationList.access().getSceneSettingItem(sceneSettingId) ?: fail("Scene setting item $sceneSettingId is not in list")
+        TODO()
+    }
+
+    fun sceneSettingItemHasNoReplacementOptions(sceneSettingId: Location.Id)
+    {
+        val locationList = access.list ?: fail("Scene Setting List is not visible in Scene Setting tool")
+        val locationItem = locationList.access().getSceneSettingItem(sceneSettingId) ?: fail("Scene setting item $sceneSettingId is not in list")
+        TODO()
     }
 }
