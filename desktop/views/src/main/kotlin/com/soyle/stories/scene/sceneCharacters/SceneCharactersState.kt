@@ -2,15 +2,22 @@ package com.soyle.stories.scene.sceneCharacters
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.ProjectScopedModel
+import com.soyle.stories.di.get
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListModel
+import com.soyle.stories.scene.target.SceneTargeted
+import com.soyle.stories.scene.target.SceneTargetedNotifier
+import com.soyle.stories.scene.target.SceneTargetedReceiver
+import javafx.application.Platform
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.binding.StringBinding
 import javafx.beans.property.*
 import javafx.beans.value.ObservableStringValue
 import javafx.beans.value.ObservableValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.withContext
 import tornadofx.*
 import java.util.*
 
@@ -77,13 +84,22 @@ class SceneCharactersState : ProjectScopedModel<SceneCharactersViewModel>() {
         return super.viewModel()?.copy(targetSceneId = selectedSceneId.value)
     }
 
-    init {
-        subscribe<SceneTargeted> {
-            selectScene(
-                it.sceneItem.id.let(UUID::fromString).let(Scene::Id),
-                it.sceneItem.name
-            )
+    private val guiEventListener = object :
+        SceneTargetedReceiver
+    {
+        override suspend fun receiveSceneTargeted(event: SceneTargeted) {
+            if (! Platform.isFxApplicationThread()) {
+                withContext(Dispatchers.JavaFx) {
+                    selectScene(event.sceneId, event.sceneName)
+                }
+            } else {
+                selectScene(event.sceneId, event.sceneName)
+            }
         }
+    }
+
+    init {
+        scope.get<SceneTargetedNotifier>().addListener(guiEventListener)
         (FX.getComponents(scope)[SceneListModel::class] as? SceneListModel)?.selectedItem?.value?.let {
             selectScene(
                 it.id.let(UUID::fromString).let(Scene::Id),

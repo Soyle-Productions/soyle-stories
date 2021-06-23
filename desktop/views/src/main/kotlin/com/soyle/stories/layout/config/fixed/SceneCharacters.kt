@@ -8,7 +8,6 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import com.soyle.stories.scene.sceneCharacters.SceneCharactersView
-import com.soyle.stories.scene.sceneSetting.SceneSettingView
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import tornadofx.tab

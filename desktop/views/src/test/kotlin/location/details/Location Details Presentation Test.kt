@@ -2,10 +2,10 @@ package com.soyle.stories.desktop.view.location.details
 
 import com.soyle.stories.common.components.surfaces.Elevation
 import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.desktop.view.common.NodeTest
 import com.soyle.stories.desktop.view.common.`Node Assertions`.Companion.assertThat
 import com.soyle.stories.desktop.view.location.details.`Location Details Access`.Companion.access
 import com.soyle.stories.desktop.view.testconfig.DESIGN
-import com.soyle.stories.desktop.view.testconfig.verifyDesign
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.location.details.models.LocationDetailsModel
 import com.soyle.stories.location.details.components.LocationDetailsRoot
@@ -25,18 +25,11 @@ import org.testfx.matcher.control.LabeledMatchers.hasText
 import tornadofx.objectProperty
 import tornadofx.observableListOf
 
-class `Location Details Presentation Test` : ApplicationTest() {
-
-    private val primaryStage = FxToolkit.registerPrimaryStage()
-
-    @AfterEach
-    fun `cleanup stage`() {
-        interact { primaryStage.close() }
-    }
+class `Location Details Presentation Test` : NodeTest<LocationDetailsRoot>() {
 
     private val state = objectProperty<LocationDetailsModel>(LocationDetailsModel.Loading)
     private val locale = LocaleMock()
-    private val view = LocationDetailsRoot(state, UserActionsMock(), locale).apply {
+    override val view = LocationDetailsRoot(state, UserActionsMock(), locale).apply {
         if (DESIGN) asSurface { absoluteElevation = Elevation.getValue(5) }
     }
 
@@ -54,9 +47,6 @@ class `Location Details Presentation Test` : ApplicationTest() {
             assertThat(hostedScenesList).isNotVisible()
         }
     }
-
-    @Test
-    fun design() = verifyDesign(primaryStage, view)
 
     @Nested
     inner class `Given data has loaded` {
@@ -96,9 +86,6 @@ class `Location Details Presentation Test` : ApplicationTest() {
                 verifyThat(from(hostedScenesList!!.invitation!!).lookup(".label").query<Labeled>(), hasText("You should host some scenes"))
             }
         }
-
-        @Test
-        fun design() = verifyDesign(primaryStage, view)
 
         @Nested
         inner class `Description Field`
@@ -187,9 +174,6 @@ class `Location Details Presentation Test` : ApplicationTest() {
                             }
                     }
                 }
-
-                @Test
-                fun design() = verifyDesign(primaryStage, view)
 
             }
 

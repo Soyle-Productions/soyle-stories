@@ -21,11 +21,14 @@ class RemoveLocationFromSceneUseCase(
         val scene = sceneRepository.getSceneOrError(sceneId.uuid)
         val updatedScene = scene.withoutLocation(locationId)
         if (updatedScene is Updated) {
-            val locationUpdate = locationRepository.getLocationOrError(locationId).withHostedScene(scene.id)!!.removed()
-                    as com.soyle.stories.domain.location.Updated
+            val location = locationRepository.getLocationById(locationId)
+            val locationUpdate = if (location != null) {
+                location.withHostedScene(scene.id)!!.removed()
+                        as com.soyle.stories.domain.location.Updated
+            } else null
             sceneRepository.updateScene(updatedScene.scene)
-            locationRepository.updateLocation(locationUpdate.location)
-            val response = RemoveLocationFromScene.ResponseModel(updatedScene.event, locationUpdate.event)
+            if (locationUpdate != null) locationRepository.updateLocation(locationUpdate.location)
+            val response = RemoveLocationFromScene.ResponseModel(updatedScene.event, locationUpdate?.event)
             output.locationRemovedFromScene(response)
         } else throw SceneDoesNotUseLocation(scene.id, locationId)
     }

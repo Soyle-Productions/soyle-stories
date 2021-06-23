@@ -53,6 +53,9 @@ import com.soyle.stories.scene.sceneFrame.*
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsController
+import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsOutput
+import com.soyle.stories.scene.target.TargetScene
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInScene
@@ -99,6 +102,8 @@ import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValue
 import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValueUseCase
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettings
+import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettingsUseCase
 import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.*
 
 object UseCases {
@@ -109,6 +114,7 @@ object UseCases {
             listAllScenes()
             renameScene()
             deleteScene()
+            targetScene()
             includeCharacterInScene()
             setMotivationForCharacterInScene()
             listCharactersInScene()
@@ -130,6 +136,7 @@ object UseCases {
             listLocationsInScene()
             listLocationsToUse()
             removeLocationFromScene()
+            detectInconsistenciesInScene()
         }
     }
 
@@ -198,6 +205,10 @@ object UseCases {
         provide(DeleteScene.OutputPort::class) {
             DeleteSceneOutput(applicationScope.get(), get(), get())
         }
+    }
+
+    private fun InProjectScope.targetScene() {
+        provide<TargetScene> { TargetScene(applicationScope.get(), get()) }
     }
 
     private fun InProjectScope.includeCharacterInScene() {
@@ -514,6 +525,18 @@ object UseCases {
         }
         provide<RemoveLocationFromSceneController> {
             RemoveLocationFromSceneControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.detectInconsistenciesInScene() {
+        provide<DetectInconsistenciesInSceneSettings> {
+            DetectInconsistenciesInSceneSettingsUseCase(get(), get())
+        }
+        provide<DetectInconsistenciesInSceneSettingsController> {
+            DetectInconsistenciesInSceneSettingsController.invoke(applicationScope.get(), get(), get())
+        }
+        provide(DetectInconsistenciesInSceneSettings.OutputPort::class) {
+            DetectInconsistenciesInSceneSettingsOutput(get())
         }
     }
 }

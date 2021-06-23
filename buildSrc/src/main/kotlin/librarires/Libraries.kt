@@ -11,7 +11,7 @@ object Libraries {
         override val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     }
     val junit: JUnitLibraries = object : JUnitLibraries {
-        private val version = "5.6.0"
+        private val version = "5.7.0"
 
         override val api = "org.junit.jupiter:junit-jupiter-api:$version"
         override val engine = "org.junit.jupiter:junit-jupiter-engine:$version"

@@ -30,6 +30,11 @@ class `Scene Setting Location Steps` : En {
     }
 
     private fun whens() {
+        When("I map the {scene}'s setting locations") { scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .focusOn(scene)
+        }
         When("I use the {location} as a setting for the {scene}") { location: Location, scene: Scene ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenSceneSettingToolHasBeenOpened()
@@ -42,6 +47,12 @@ class `Scene Setting Location Steps` : En {
                 .givenSceneSettingToolHasBeenOpened()
                 .givenFocusedOn(scene)
                 .removeLocation(location)
+        }
+        When("I stop using {string} as a setting for the {scene}") { settingName: String, scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .removeLocation(settingName)
         }
     }
 
@@ -74,6 +85,29 @@ class `Scene Setting Location Steps` : En {
                 .givenFocusedOn(scene)
             SceneSettingAssertions.assertThat(sceneSettingView) {
                 doesNotHaveLocationNamed(settingName)
+            }
+        }
+        Then("the {scene} should still have a setting named {string}") { scene: Scene, settingName: String ->
+            assertTrue(scene.settings.any { it.locationName == settingName })
+
+            val sceneSettingView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneSettingAssertions.assertThat(sceneSettingView) {
+                hasLocationNamed(settingName)
+            }
+        }
+        Then(
+            "the {scene}'s {string} setting should indicate that it was removed"
+        ) { scene: Scene, settingName: String ->
+            val sceneSetting = scene.settings.find { it.locationName == settingName }!!
+
+            val sceneSettingView = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+            SceneSettingAssertions.assertThat(sceneSettingView) {
+                hasLocationNamed(settingName)
+                locationIndicatesIssue(settingName)
             }
         }
     }

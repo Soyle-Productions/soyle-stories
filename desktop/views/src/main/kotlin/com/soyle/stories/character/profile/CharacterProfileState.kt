@@ -7,12 +7,14 @@ import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemove
 import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedReceiver
 import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedNotifier
 import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedReceiver
+import com.soyle.stories.common.guiUpdate
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
 import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
+import javafx.application.Platform
 import javafx.beans.property.*
 import tornadofx.*
 
@@ -29,7 +31,7 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
             if (it != null) {
                 (scope as CharacterProfileScope).projectScope.get<ListCharacterNameVariantsController>()
                     .listCharacterNameVariants(it) {
-                        runLater {
+                        guiUpdate {
                             set(it.toObservable())
                         }
                     }
@@ -51,7 +53,7 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
 
     override suspend fun receiveCharacterNameVariantAdded(event: CharacterNameVariantAdded) {
         if (event.characterId == item?.characterId) {
-            runLater {
+            guiUpdate {
                 if (alternativeNames.value != null) {
                     alternativeNames.add(event.newVariant)
                 }
@@ -61,7 +63,7 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
 
     override suspend fun receiveCharacterNameVariantRenamed(event: CharacterNameVariantRenamed) {
         if (event.characterId == item?.characterId) {
-            runLater {
+            guiUpdate {
                 if (alternativeNames.value != null) {
                     alternativeNames.replaceAll {
                         if (it == event.originalVariant.value) event.newVariant.value
@@ -74,7 +76,7 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
 
     override suspend fun receiveCharacterNameVariantRemoved(event: CharacterNameVariantRemoved) {
         if (event.characterId == item?.characterId) {
-            runLater {
+            guiUpdate {
                 if (alternativeNames.value != null) {
                     alternativeNames.removeIf { it == event.variant.value }
                 }

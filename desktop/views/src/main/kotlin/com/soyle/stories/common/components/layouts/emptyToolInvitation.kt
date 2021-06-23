@@ -6,8 +6,10 @@ import javafx.geometry.Orientation
 import javafx.scene.Parent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import javafx.scene.text.TextFlow
 import tornadofx.add
 import tornadofx.addClass
+import tornadofx.textflow
 
 @ViewBuilder
 fun EventTarget.emptyToolInvitation(
@@ -32,3 +34,8 @@ fun EventTarget.emptyPrimaryToolInvitation(
     addClass(LayoutStyles.primary)
     op()
 }
+
+@ViewBuilder
+fun EventTarget.inviteMessage(
+    op: TextFlow.() -> Unit = {}
+): TextFlow = textflow { addClass(LayoutStyles.inviteMessage) }.apply(op)

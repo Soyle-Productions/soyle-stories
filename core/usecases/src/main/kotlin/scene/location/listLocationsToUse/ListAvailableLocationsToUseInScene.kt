@@ -10,7 +10,7 @@ interface ListAvailableLocationsToUseInScene {
     class ResponseModel(items: List<LocationItem>) : List<LocationItem> by items
 
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun receiveAvailableLocationsToUseInScene(response: ResponseModel)
     }
 

@@ -1,6 +1,7 @@
 package com.soyle.stories.location.locationList
 
-import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.di.get
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.project.ProjectScope
 import javafx.geometry.HPos
 import javafx.geometry.Insets
@@ -13,11 +14,6 @@ import javafx.scene.layout.RowConstraints
 import javafx.scene.text.TextAlignment
 import tornadofx.*
 
-/**
- * Created by Brendan
- * Date: 2/10/2020
- * Time: 9:54 AM
- */
 internal class EmptyDisplay : View() {
 
     override val scope: ProjectScope = super.scope as ProjectScope
@@ -55,7 +51,7 @@ internal class EmptyDisplay : View() {
             GridPane.setRowIndex(this, 1)
             GridPane.setMargin(this, Insets(5.0, 0.0, 0.0, 0.0))
             action {
-                createLocationDialog(scope)
+                scope.get<CreateLocationDialog.Factory>().invoke().show()
             }
         }
     }

@@ -10,18 +10,20 @@ data class SceneItemViewModel(
     val index: Int,
     val invalidEntitiesMentioned: Boolean,
     val unusedSymbols: Boolean,
+    val inconsistentSettings: Boolean
 ) {
-    constructor(sceneItem: SceneItem, invalidEntitiesMentioned: Boolean = false, unusedSymbols: Boolean = false) : this(
+    constructor(sceneItem: SceneItem, invalidEntitiesMentioned: Boolean = false, unusedSymbols: Boolean = false, inconsistentSettings: Boolean = false) : this(
         sceneItem.id.toString(),
         sceneItem.proseId,
         sceneItem.sceneName,
         sceneItem.index,
         invalidEntitiesMentioned,
-        unusedSymbols
+        unusedSymbols,
+        inconsistentSettings
     )
 
     val hasProblem: Boolean
-        get() = invalidEntitiesMentioned || unusedSymbols
+        get() = invalidEntitiesMentioned || unusedSymbols || inconsistentSettings
 
     override fun toString(): String {
         return "SceneItemViewModel(id=$id, name=$name)"

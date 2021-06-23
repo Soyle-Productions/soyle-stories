@@ -89,17 +89,15 @@ class DeleteLocationUnitTest {
         }
 
         @Test
-        fun `should remove location setting from scene`() {
+        fun `should not remove location setting from scene`() {
             deleteLocation()
-            updatedScenes.map { it.id }.toSet().mustEqual(scenes.map { it.id }.toSet())
-            assertTrue(updatedScenes.none { it.settings.containsEntityWithId(location.id) })
+            assertTrue(updatedScenes.isEmpty())
         }
 
         @Test
-        fun `should output location setting removed from scene event`() {
+        fun `should not output location setting removed from scene event`() {
             deleteLocation()
-            result!!.locationRemovedFromScenes.map { it.sceneId }.toSet().mustEqual(scenes.map { it.id }.toSet())
-            result!!.locationRemovedFromScenes.onEach { it.sceneSetting.id.mustEqual(location.id) }
+            assertTrue(result!!.locationRemovedFromScenes.isEmpty())
         }
 
     }

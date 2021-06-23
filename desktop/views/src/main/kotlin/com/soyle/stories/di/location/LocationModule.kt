@@ -69,7 +69,7 @@ object LocationModule {
 
 	private fun InScope<ProjectScope>.controllers() {
 		provide {
-			CreateNewLocationController(get(), get())
+			CreateNewLocationController(applicationScope.get(), get(), get())
 		}
 		provide {
 			RenameLocationController(get(), get())

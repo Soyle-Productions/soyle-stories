@@ -18,7 +18,7 @@ import tornadofx.hasPseudoClass
 class SymbolsInSceneDriver (private val symbolsInSceneView: SymbolsInSceneView) : FxRobot() {
 
     fun isFocusedOn(scene: Scene): Boolean {
-        return symbolsInSceneView.scope.get<SymbolsInSceneState>().targetScene.value?.id == scene.id.uuid.toString()
+        return symbolsInSceneView.scope.get<SymbolsInSceneState>().targetScene.value?.first == scene.id
     }
 
     val symbolList: Parent?

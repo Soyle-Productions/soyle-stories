@@ -6,20 +6,26 @@ import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import org.junit.jupiter.api.Test
 import org.testfx.api.FxRobot
 import tornadofx.FX
+import java.lang.annotation.ElementType
+import java.lang.annotation.RetentionPolicy
+import org.junit.jupiter.api.condition.EnabledIf
 
-const val DESIGN = false
+const val DESIGN = true
+const val ROOT_DESIGN = true
+fun designEnabled() = DESIGN && !ROOT_DESIGN
+fun rootOnlyDesignEnabled() = DESIGN
 
-fun FxRobot.verifyDesign(primaryStage: Stage, view: Parent) {
-    if (DESIGN) {
-        interact {
-            ComponentsStyles
-            Styles
-            val stage =  Stage(StageStyle.DECORATED).apply { initOwner(primaryStage) }
-            stage.scene = javafx.scene.Scene(view)
-            FX.applyStylesheetsTo(stage.scene)
-            stage.showAndWait()
-        }
-    }
-}
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@EnabledIf("com.soyle.stories.desktop.view.testconfig.DesignKt#designEnabled", disabledReason = "Design tests are not enabled or root-only design tests are enabled")
+@Test
+annotation class DesignTest
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@EnabledIf("com.soyle.stories.desktop.view.testconfig.DesignKt#rootOnlyDesignEnabled", disabledReason = "No design tests are not enabled")
+@Test
+annotation class RootDesignTest

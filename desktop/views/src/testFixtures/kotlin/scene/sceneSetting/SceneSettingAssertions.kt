@@ -1,31 +1,55 @@
 package com.soyle.stories.desktop.view.scene.sceneSetting
 
+import com.soyle.stories.common.components.ComponentsStyles.Companion.hasProblem
+import com.soyle.stories.desktop.view.scene.sceneSetting.`Scene Setting Tool Root Access`.Companion.access
+import com.soyle.stories.desktop.view.scene.sceneSetting.list.`Scene Setting Item List Access`.Companion.access
 import com.soyle.stories.domain.location.Location
-import com.soyle.stories.scene.sceneSetting.SceneSettingView
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import com.soyle.stories.scene.setting.SceneSettingToolRoot
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.fail
+import tornadofx.hasClass
 
-class SceneSettingAssertions private constructor(private val driver: `Scene Setting Driver`) {
+class SceneSettingAssertions private constructor(private val access: `Scene Setting Tool Root Access`) {
     companion object {
-        fun assertThat(view: SceneSettingView, assertions: SceneSettingAssertions.() -> Unit) {
-            SceneSettingAssertions(view.driver()).assertions()
+
+        @JvmName("thenAssertThat")
+        fun SceneSettingToolRoot.assertThat(assertions: SceneSettingAssertions.() -> Unit) {
+            SceneSettingAssertions(access()).assertions()
+        }
+
+        fun assertThat(view: SceneSettingToolRoot, assertions: SceneSettingAssertions.() -> Unit) {
+            SceneSettingAssertions(view.access()).assertions()
         }
     }
 
-    fun hasLocation(location: Location)
-    {
-        val locationItem = driver.getLocationItem(location.id) ?: fail("location item does not exist for ${location.name}")
+    fun hasLocation(location: Location) {
+        val locationList = access.list ?: fail("Scene Setting List is not visible in Scene Setting tool")
+        val locationItem = locationList.access().getSceneSettingItem(location.id)
+            ?: fail("location item does not exist for ${location.name}")
         assertEquals(location.name.value, locationItem.text) { "Location item does not match expected name." }
     }
 
-    fun doesNotHaveLocation(location: Location)
-    {
-        assertNull(driver.getLocationItem(location.id)) { "Location item found for ${location.name}, but should not have." }
+    fun doesNotHaveLocation(location: Location) {
+        val locationList = access.list ?: return
+        assertNull(
+            locationList.access().getSceneSettingItem(location.id)
+        ) { "Location item found for ${location.name}, but should not have." }
     }
 
-    fun doesNotHaveLocationNamed(locationName: String)
-    {
-        assertNull(driver.getLocationItemByName(locationName)) { "Location item found for ${locationName}, but should not have." }
+    fun doesNotHaveLocationNamed(locationName: String) {
+        val locationList = access.list ?: return
+        assertNull(locationList.access().sceneSettingItems.find { it.text == locationName }) { "Location item found for ${locationName}, but should not have." }
+    }
+
+    fun hasLocationNamed(locationName: String) {
+        val locationList = access.list ?: fail("Scene Setting List is not visible in Scene Setting tool")
+        assertNotNull(locationList.access().sceneSettingItems.find { it.text == locationName }) { "Could not find location item for ${locationName}." }
+    }
+
+    fun locationIndicatesIssue(locationName: String) {
+        val locationList = access.list ?: fail("Scene Setting List is not visible in Scene Setting tool")
+        val locationItem = locationList.access().sceneSettingItems.find { it.text == locationName }
+            ?: fail("Could not find location item for ${locationName}.")
+        assertTrue(locationItem.hasClass(hasProblem))
     }
 }

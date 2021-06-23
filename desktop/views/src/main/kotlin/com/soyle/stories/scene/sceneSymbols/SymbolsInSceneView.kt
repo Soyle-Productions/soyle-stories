@@ -7,13 +7,18 @@ import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.SceneStyles
-import com.soyle.stories.scene.SceneTargeted
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.symbolsInScene
+import com.soyle.stories.scene.target.SceneTargeted
+import com.soyle.stories.scene.target.SceneTargetedNotifier
+import com.soyle.stories.scene.target.SceneTargetedReceiver
 import com.soyle.stories.soylestories.Styles.Companion.Orange
+import javafx.application.Platform
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
@@ -24,6 +29,9 @@ import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.scene.text.TextAlignment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.withContext
 import tornadofx.*
 import java.util.*
 
@@ -48,7 +56,7 @@ class SymbolsInSceneView : View() {
         return hbox {
             addClass(SceneStyles.selectedSceneHeader)
             label("Scene: ")
-            label(state.targetScene.stringBinding { it?.name ?: "No Scene Targeted" }) {
+            label(state.targetScene.stringBinding { it?.third ?: "No Scene Targeted" }) {
                 toggleClass(TextStyles.warning, state.targetScene.isNull)
             }
         }
@@ -57,14 +65,14 @@ class SymbolsInSceneView : View() {
     private fun Parent.body(): Node {
         return stackpane {
             dynamicContent(state.targetScene) {
-                determineBodyContent(it).apply {
+                determineBodyContent(it?.first).apply {
                     vgrow = Priority.ALWAYS
                 }
             }
         }
     }
 
-    private fun Parent.determineBodyContent(targetScene: SceneItemViewModel?): Node
+    private fun Parent.determineBodyContent(targetScene: Scene.Id?): Node
     {
         return when (targetScene) {
             null -> emptyBody()
@@ -95,19 +103,31 @@ class SymbolsInSceneView : View() {
             }
         }
     }
-    private fun targetSceneItem(sceneItem: SceneItemViewModel) {
-        if (state.targetScene.value?.id != sceneItem.id) {
-            viewListener.getSymbolsInScene(Scene.Id(UUID.fromString(sceneItem.id)))
+    private fun targetSceneItem(sceneId: Scene.Id, proseId: Prose.Id, sceneName: String) {
+        if (state.targetScene.value?.first != sceneId) {
+            viewListener.getSymbolsInScene(sceneId)
         }
-        state.targetScene.value = sceneItem
+        state.targetScene.value = Triple(sceneId, proseId, sceneName)
+    }
+
+    private val guiEventListener = object :
+        SceneTargetedReceiver
+    {
+        override suspend fun receiveSceneTargeted(event: SceneTargeted) {
+            if (! Platform.isFxApplicationThread()) {
+                withContext(Dispatchers.JavaFx) {
+                    targetSceneItem(event.sceneId, event.proseId, event.sceneName)
+                }
+            } else {
+                targetSceneItem(event.sceneId, event.proseId, event.sceneName)
+            }
+        }
     }
 
     init {
-        subscribe<SceneTargeted> {
-            targetSceneItem(it.sceneItem)
-        }
+        (scope as ProjectScope).get<SceneTargetedNotifier>().addListener(guiEventListener)
         (FX.getComponents(scope)[SceneListModel::class] as? SceneListModel)?.let {
-            it.selectedItem.value?.let(this::targetSceneItem)
+            it.selectedItem.value?.let { targetSceneItem(Scene.Id(UUID.fromString(it.id)), it.proseId, it.name) }
         }
     }
 

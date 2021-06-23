@@ -4,6 +4,7 @@ import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesReceiver
 import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
@@ -21,7 +22,8 @@ class SceneListPresenter(
     deleteSceneNotifier: Notifier<SceneDeletedReceiver>,
     sceneReordered: Notifier<ReorderScene.OutputPort>,
     invalidMentionsNotifier: Notifier<DetectInvalidatedMentions.OutputPort>,
-    unusedSymbolsDetectedNotifier: Notifier<DetectUnusedSymbolsInScene.OutputPort>
+    unusedSymbolsDetectedNotifier: Notifier<DetectUnusedSymbolsInScene.OutputPort>,
+    sceneInconsistenciesNotifier: Notifier<SceneInconsistenciesReceiver>
 ) : ListAllScenes.OutputPort {
 
     private val subPresenters = listOf(
@@ -32,7 +34,8 @@ class SceneListPresenter(
         DetectedInvalidMentionsPresenter(view).apply {
             listensTo(unusedSymbolsDetectedNotifier)
             listensTo(invalidMentionsNotifier)
-        }
+        },
+        SceneInconsistenciesPresenter(view) listensTo sceneInconsistenciesNotifier
     )
 
     override fun receiveListAllScenesResponse(response: ListAllScenes.ResponseModel) {
