@@ -54,7 +54,7 @@ class WorkBench : View() {
                     }
                     item("Location") {
                         id = "file_new_location"
-                        action { scope.get<CreateLocationDialog.Factory>().invoke() }
+                        action { scope.get<CreateLocationDialog.Factory>().invoke().show() }
                     }
                     item("Scene") {
                         id = "file_new_scene"

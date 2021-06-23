@@ -51,4 +51,6 @@ class `Scene Setting Item List Access`(val list: SceneSettingItemList) : NodeAcc
     fun getSceneSettingItem(locationId: Location.Id): SceneSettingItemView? =
         sceneSettingItems.find { it.id == locationId.toString() }
 
+    fun getSceneSettingItemByName(settingName: String): SceneSettingItemView? =
+        sceneSettingItems.find { it.text == settingName }
 }

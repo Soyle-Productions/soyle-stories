@@ -49,3 +49,10 @@ Feature: Use Locations as Scene Setting
       When I remove the "Home" location from the story
       Then the "Big Battle" scene's "Home" setting should indicate that it was removed
       And the "Big Battle" scene should indicate that it has an issue
+
+    Scenario: Remove Deleted Location used in Scene
+      Given I have used the "Home" location as a setting for the "Big Battle" scene
+      And I am mapping the "Big Battle" scene's setting locations
+      And I have removed the "Home" location from the story
+      When I stop using "Home" as a setting for the "Big Battle" scene
+      Then the "Big Battle" scene should not indicate that it has an issue

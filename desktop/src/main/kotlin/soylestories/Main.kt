@@ -10,6 +10,9 @@ import com.soyle.stories.desktop.config.theme.Themes
 import com.soyle.stories.desktop.locale.SoyleMessages
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
+import com.soyle.stories.di.get
+import com.soyle.stories.di.scoped
+import com.soyle.stories.scene.setting.SceneSettingToolLocale
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import com.sun.javafx.application.LauncherImpl
@@ -27,14 +30,12 @@ fun main(args: Array<String>) {
 }
 
 fun configureLocalization() {
-
-    DI.register(
-        LocaleHolder::class,
-        ApplicationScope::class,
-        { LocaleHolder(SoyleMessages.getLocale(Locale.getDefault())) },
-        true,
-        true
-    )
+    scoped<ApplicationScope> {
+        keepInScope {
+            LocaleHolder(SoyleMessages.getLocale(Locale.getDefault()))
+        }
+        keepInScope<SceneSettingToolLocale> { get<LocaleHolder>() }
+    }
 }
 
 fun configureModules() {

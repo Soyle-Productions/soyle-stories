@@ -26,6 +26,11 @@ interface SoyleMessageBundle {
     val allExistingLocationsInProjectHaveBeenUsed: String
     val createLocation: String
     val locationHasBeenRemovedFromStory: String
+    val name: String
+    val create: String
+    val cancel: String
+    val newLocation: String
+    val pleaseProvideALocationName: String
 
     sealed class MessageSegment {
         abstract val message: String

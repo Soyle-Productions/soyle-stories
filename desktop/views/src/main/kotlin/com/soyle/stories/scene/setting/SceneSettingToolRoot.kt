@@ -30,6 +30,7 @@ import tornadofx.*
 import java.util.*
 
 class SceneSettingToolRoot(
+    initialScene: Pair<Scene.Id, String>?,
     private val locale: SceneSettingToolLocale,
 
     sceneRenamed: Notifier<SceneRenamedReceiver>,
@@ -40,7 +41,7 @@ class SceneSettingToolRoot(
 ) : VBox() {
 
     interface Factory {
-        operator fun invoke(): SceneSettingToolRoot
+        operator fun invoke(initialScene: Pair<Scene.Id, String>?): SceneSettingToolRoot
     }
 
     private val model = objectProperty<SceneSettingToolModel>(SceneSettingToolModel.NoSceneSelected)
@@ -148,6 +149,9 @@ class SceneSettingToolRoot(
 
     init {
         sceneTargeted.addListener(guiEventListener)
+        if (initialScene != null) {
+            model.set(SceneSettingToolModel.SceneSelected(initialScene.first, stringProperty(initialScene.second)))
+        }
     }
 
     override fun getUserAgentStylesheet(): String = Styles().externalForm

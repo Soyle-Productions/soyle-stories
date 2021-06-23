@@ -176,7 +176,8 @@ object Presentation {
     private fun InProjectScope.sceneSetting() {
         provide<SceneSettingToolRoot.Factory> {
             object : SceneSettingToolRoot.Factory {
-                override fun invoke(): SceneSettingToolRoot = SceneSettingToolRoot(
+                override fun invoke(initialScene: Pair<Scene.Id, String>?): SceneSettingToolRoot = SceneSettingToolRoot(
+                    initialScene,
                     applicationScope.get<LocaleHolder>(),
                     get<SceneRenamedNotifier>(),
                     get<SceneDeletedNotifier>(),

@@ -48,6 +48,12 @@ class `Scene Setting Location Steps` : En {
                 .givenFocusedOn(scene)
                 .removeLocation(location)
         }
+        When("I stop using {string} as a setting for the {scene}") { settingName: String, scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .removeLocation(settingName)
+        }
     }
 
     private fun thens() {

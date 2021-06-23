@@ -11,7 +11,7 @@ class RemoveLocationFromSceneOutput(
 
     override suspend fun locationRemovedFromScene(response: RemoveLocationFromScene.ResponseModel) {
         locationRemovedFromSceneReceiver.receiveLocationRemovedFromScene(response.locationRemovedFromScene)
-        hostedSceneRemovedReceiver.receiveHostedSceneRemoved(response.hostedSceneRemoved)
+        response.hostedSceneRemoved?.let { hostedSceneRemovedReceiver.receiveHostedSceneRemoved(it) }
     }
 
 }

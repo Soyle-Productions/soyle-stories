@@ -11,7 +11,7 @@ interface RemoveLocationFromScene {
 
     class ResponseModel(
         val locationRemovedFromScene: LocationRemovedFromScene,
-        val hostedSceneRemoved: HostedSceneRemoved
+        val hostedSceneRemoved: HostedSceneRemoved?
     )
 
     interface OutputPort {

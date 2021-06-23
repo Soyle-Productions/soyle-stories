@@ -281,7 +281,7 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
                 }
 
                 @Test
-                fun `same location removed from the scene should remove the scene setting item`() {
+                fun `location added to the scene should add a scene setting item`() {
                     val locationId = Location.Id()
                     val locationName = "Brand new location!"
                     sceneSettingAdded(sceneId, locationId, locationName)
@@ -355,7 +355,7 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
             }
 
             @Test
-            fun `same location removed from the scene should remove the scene setting item`() {
+            fun `location added to the scene should add a scene setting item`() {
                 val locationId = Location.Id()
                 val locationName = "Brand new location!"
                 sceneSettingAdded(sceneId, locationId, locationName)

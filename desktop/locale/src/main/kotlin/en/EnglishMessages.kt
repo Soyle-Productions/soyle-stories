@@ -25,7 +25,7 @@ object EnglishMessages : SoyleMessageBundle {
     override val sceneSettings: String = "Scene Settings"
     override val sceneSettingToolTitle: String
         get() = sceneSettings
-    override val selectedScene: String = "Selected Scene"
+    override val selectedScene: String = "Selected Scene: %s"
     override val useLocation: String = "Use Location"
     override val useLocationsAsSceneSetting: String = "Use locations as a scene setting"
     override val noSceneSelectedInviteMessage: List<SoyleMessageBundle.MessageSegment> = listOf(
@@ -40,5 +40,9 @@ object EnglishMessages : SoyleMessageBundle {
         SoyleMessageBundle.MessageSegment.Mention("@mention"),
         SoyleMessageBundle.MessageSegment.Text(" a location in the scene, you can choose to use the location as a setting in the scene.  However, you can also choose to use a location as a setting in this scene by clicking the button below."),
     )
-
+    override val cancel: String = "Cancel"
+    override val create: String = "Create"
+    override val name: String = "Name"
+    override val newLocation: String = "New Location"
+    override val pleaseProvideALocationName: String = "Please provide a location name."
 }

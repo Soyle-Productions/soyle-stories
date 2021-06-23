@@ -67,3 +67,9 @@ fun SceneSettingToolRoot.removeLocation(location: Location) {
         interact { clickOn(button) }
     }
 }
+fun SceneSettingToolRoot.removeLocation(settingName: String) {
+    access {
+        val button = list?.access()?.getSceneSettingItemByName(settingName)?.access()?.deleteButton
+        interact { clickOn(button) }
+    }
+}

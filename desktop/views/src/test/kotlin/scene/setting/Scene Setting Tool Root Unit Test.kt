@@ -36,6 +36,7 @@ class `Scene Setting Tool Root Unit Test` : NodeTest<SceneSettingToolRoot>() {
     private val makeSceneSettingItemList = SceneSettingItemListFactory()
 
     override val view: SceneSettingToolRoot = SceneSettingToolRoot(
+        null,
         locale,
         sceneRenamedNotifier,
         sceneRemovedNotifier,

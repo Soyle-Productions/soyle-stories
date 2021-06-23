@@ -14,7 +14,7 @@ import kotlin.reflect.KProperty
 
 abstract class DesignTest : FxRobot() {
 
-    private val primaryStage by lazy { FxToolkit.registerPrimaryStage() }
+    protected val primaryStage by lazy { FxToolkit.registerPrimaryStage() }
 
     abstract val node: Node
 
@@ -33,7 +33,7 @@ abstract class DesignTest : FxRobot() {
                     scene = javafx.scene.Scene(if (view is Parent) view else Pane(view))
                 }
             } else view.scene!!.window!! as Stage
-            stage.title = "Verify Design"
+            if (! stage.titleProperty().isBound) stage.title = "Verify Design"
             stage.initStage()
 
             FX.applyStylesheetsTo(stage.scene)

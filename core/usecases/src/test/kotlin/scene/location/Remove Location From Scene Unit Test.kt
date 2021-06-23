@@ -45,23 +45,37 @@ class `Remove Location From Scene Unit Test` {
     inner class `Given scene exists` {
 
         init {
-            sceneRepository.givenScene(scene)
+            sceneRepository.givenScene(scene.withLocationLinked(location).scene)
         }
 
         @Test
-        fun `should throw location not used error`() {
-            val error = assertThrows<SceneDoesNotUseLocation> {
-                removeLocationFromScene()
+        fun `should remove location from scene`() {
+            removeLocationFromScene()
+            assertFalse(updatedScene!!.contains(location.id))
+        }
+
+        @Test
+        fun `should output location removed from scene event`() {
+            removeLocationFromScene()
+            with(result ?: throw AssertionError("No response received")) {
+                locationRemovedFromScene.mustEqual(
+                    LocationRemovedFromScene(scene.id, SceneSettingLocation(location))
+                )
             }
-            error.sceneId.mustEqual(scene.id)
-            error.locationId.mustEqual(location.id)
+        }
+
+        @Test
+        fun `should not output hosted scene removed event`() {
+            removeLocationFromScene()
+            with(result ?: throw AssertionError("No response received")) {
+                assertNull(hostedSceneRemoved)
+            }
         }
 
         @Nested
         inner class `Given scene uses location` {
 
             init {
-                sceneRepository.givenScene(scene.withLocationLinked(location).scene)
                 locationRepository.givenLocation(location.withSceneHosted(scene.id, scene.name.value).location)
             }
 

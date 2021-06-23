@@ -19,8 +19,6 @@ class `Scene Setting Tool Root Access`(val root: SceneSettingToolRoot) : NodeAcc
             op: `Scene Setting Tool Root Access`.() -> Unit = {}
         ): `Scene Setting Tool Root Access` =
             `Scene Setting Tool Root Access`(this).apply(op)
-
-
     }
 
     fun isFocusedOn(scene: com.soyle.stories.domain.scene.Scene): Boolean

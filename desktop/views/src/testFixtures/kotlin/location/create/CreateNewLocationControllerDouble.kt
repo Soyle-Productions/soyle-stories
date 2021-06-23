@@ -8,8 +8,8 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 
 class CreateNewLocationControllerDouble(
-    private val onCreateNewLocation: (SingleNonBlankLine, String) -> Unit = { _, _ -> },
-    private val deferred: Deferred<CreateNewLocation.ResponseModel> = CompletableDeferred()
+    var onCreateNewLocation: (SingleNonBlankLine, String) -> Unit = { _, _ -> },
+    var deferred: CompletableDeferred<CreateNewLocation.ResponseModel> = CompletableDeferred()
 ) : CreateNewLocationController {
 
     override fun createNewLocation(name: SingleNonBlankLine, description: String): Deferred<CreateNewLocation.ResponseModel> {

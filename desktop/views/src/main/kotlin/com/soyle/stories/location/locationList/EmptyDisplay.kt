@@ -51,7 +51,7 @@ internal class EmptyDisplay : View() {
             GridPane.setRowIndex(this, 1)
             GridPane.setMargin(this, Insets(5.0, 0.0, 0.0, 0.0))
             action {
-                scope.get<CreateLocationDialog.Factory>().invoke()
+                scope.get<CreateLocationDialog.Factory>().invoke().show()
             }
         }
     }

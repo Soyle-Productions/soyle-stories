@@ -27,7 +27,7 @@ class `Use Location Button Unit Test` : NodeTest<UseLocationButton>() {
     private val sceneId = Scene.Id()
     private val locale = UseLocationButtonLocaleMock()
 
-    private var createNewLocationDialogRequest: ((CreateNewLocation.ResponseModel) -> Unit)? = null
+    private var createNewLocationDialogRequest: (suspend (CreateNewLocation.ResponseModel) -> Unit)? = null
     private val createLocationDialogFactory = CreateLocationDialogFactory(onInvoke = {
         createNewLocationDialogRequest = it
     })
@@ -128,7 +128,9 @@ class `Use Location Button Unit Test` : NodeTest<UseLocationButton>() {
                     private val newLocation = CreateNewLocation.ResponseModel(UUID.randomUUID(), "Some location")
 
                     init {
-                        createNewLocationDialogRequest!!.invoke(newLocation)
+                        runBlocking {
+                            createNewLocationDialogRequest!!.invoke(newLocation)
+                        }
                     }
 
                     @Test

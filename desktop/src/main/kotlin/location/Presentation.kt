@@ -34,10 +34,12 @@ object Presentation {
     private fun InProjectScope.createLocationDialog() {
         provide<CreateLocationDialog.Factory> {
             object : CreateLocationDialog.Factory {
-                override fun invoke(onCreateLocation: (CreateNewLocation.ResponseModel) -> Unit): CreateLocationDialog =
+                override fun invoke(onCreateLocation: suspend (CreateNewLocation.ResponseModel) -> Unit): CreateLocationDialog =
                     CreateLocationDialog(
+                        applicationScope.get(),
                         onCreateLocation,
-                        get()
+                        get(),
+                        applicationScope.get<LocaleHolder>()
                     )
             }
         }

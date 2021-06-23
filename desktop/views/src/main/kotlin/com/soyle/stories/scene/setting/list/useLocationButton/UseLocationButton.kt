@@ -56,8 +56,7 @@ class UseLocationButton(
 
     init {
         textProperty().bind(locale.useLocation)
-        scopedListener(availableLocations.isNull) { populateItems(availableLocations.value) }
-        scopedListener(availableLocations.emptyProperty()) { populateItems(availableLocations.value) }
+        scopedListener(availableLocations) { populateItems(availableLocations.value) }
     }
 
     init {

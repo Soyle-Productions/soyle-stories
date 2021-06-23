@@ -14,16 +14,18 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.config.fixed.SceneSetting
-import com.soyle.stories.scene.SceneTargeted
+import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
+import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.setting.SceneSettingToolModel
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
-import com.soyle.stories.scene.setting.SceneSettingToolView
 import com.soyle.stories.scene.setting.list.SceneSettingItemList
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemModel
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemView
 import com.soyle.stories.scene.setting.list.useLocationButton.UseLocationButton
+import com.soyle.stories.scene.target.SceneTargeted
+import com.soyle.stories.scene.target.SceneTargetedNotifier
 import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 import com.soyle.stories.usecase.scene.location.listLocationsToUse.ListAvailableLocationsToUseInScene
@@ -41,7 +43,7 @@ import kotlin.properties.Delegates
 
 class `Scene Setting Tool Design` : DesignTest() {
 
-    private val sceneSettingToolModel = objectProperty<SceneSettingToolModel>(SceneSettingToolModel.NoSceneSelected)
+    private val sceneTargetedNotifier = SceneTargetedNotifier()
 
     @State
     fun `no scene targeted`() = verifyDesign {
@@ -54,20 +56,19 @@ class `Scene Setting Tool Design` : DesignTest() {
         verifyDesign {
             width = 400.0
             height = 600.0
-            FX.eventbus.fire(
-                SceneTargeted(
-                    SceneItemViewModel(
-                        SceneItem(Scene.Id().uuid, Prose.Id(), "Scene Name", 0)
-                    )
-                )
-            )
+            runBlocking {
+                sceneTargetedNotifier.receiveSceneTargeted(SceneTargeted(Scene.Id(), Prose.Id(), "Scene Name"))
+            }
         }
     }
 
     override val node: Node
         get() = SceneSettingToolRoot(
+            null,
             SceneSettingToolMockLocale(),
             SceneRenamedNotifier(),
+            SceneDeletedNotifier(),
+            sceneTargetedNotifier,
             SceneSettingItemListFactory()
         )
 
