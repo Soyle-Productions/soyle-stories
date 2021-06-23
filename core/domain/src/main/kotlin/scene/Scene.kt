@@ -261,6 +261,7 @@ class Scene private constructor(
         val sceneSetting = SceneSettingLocation(locationId, locationName)
         return Updated(copy(settings = settings + sceneSetting), LocationUsedInScene(id, sceneSetting))
     }
+
     fun withLocationLinked(location: Location): SceneUpdate<LocationUsedInScene> =
         withLocationLinked(location.id, location.name.value)
 
@@ -281,8 +282,32 @@ class Scene private constructor(
             SceneSettingLocationRenamed(id, newSceneSetting)
         )
     }
+
     fun withLocationRenamed(location: Location): SceneUpdate<SceneSettingLocationRenamed> =
         withLocationRenamed(location.id, location.name.value)
+
+    fun withSetting(settingId: Location.Id): SceneSettingLocationOperations? {
+        val sceneSetting = settings.getEntityById(settingId) ?: return null
+        return object : SceneSettingLocationOperations {
+            override fun replacedWith(location: Location): SceneUpdate<*> {
+                if (location.id == sceneSetting.id) return noUpdate(
+                    reason = SceneSettingCannotBeReplacedBySameLocation(id, location.id)
+                )
+                return Updated(
+                    copy(
+                        settings = settings
+                            .minus(sceneSetting)
+                            .plus(SceneSettingLocation(location.id, location.name.value))
+                    ),
+                    LocationRemovedFromScene(
+                        id,
+                        sceneSetting.id,
+                        replacedBy = LocationUsedInScene(id, location.id, location.name.value)
+                    )
+                )
+            }
+        }
+    }
 
     private fun getSceneSettingOrError(locationId: Location.Id): SceneSettingLocation {
         return settings.getEntityById(locationId) ?: throw SceneDoesNotUseLocation(id, locationId)
@@ -345,7 +370,7 @@ class Scene private constructor(
         return Updated(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
     }
 
-    fun noUpdate() = WithoutChange(this)
+    fun noUpdate(reason: Any? = null) = WithoutChange(this, reason)
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
 
@@ -379,6 +404,11 @@ class Scene private constructor(
             symbolsById.getOrElse(symbolId) { throw SceneDoesNotTrackSymbol(id, symbolId) }
 
         internal fun withoutSymbol(symbolId: Symbol.Id): Collection<TrackedSymbol> = symbolsById.minus(symbolId).values
+    }
+
+    interface SceneSettingLocationOperations {
+
+        fun replacedWith(location: Location): SceneUpdate<*>
     }
 
     data class TrackedSymbol(

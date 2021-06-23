@@ -28,3 +28,5 @@ class SceneAlreadyContainsCharacter(val sceneId: UUID, val characterId: UUID) : 
 class SceneAlreadyCoversCharacterArcSection(val sceneId: UUID, val characterId: UUID, val characterArcSectionId: UUID) : DuplicateOperationException()
 
 class CharacterArcSectionIsNotPartOfCharactersArc(val characterId: UUID, val characterArcSectionId: UUID, val expectedCharacterId: UUID) : ValidationException()
+
+data class SceneSettingCannotBeReplacedBySameLocation(val sceneId: Scene.Id, val locationId: Location.Id) : ValidationException()

@@ -1,7 +1,10 @@
 package com.soyle.stories.domain.scene
 
+import com.soyle.stories.domain.location.NoUpdate
 import com.soyle.stories.domain.location.makeLocation
 import com.soyle.stories.domain.mustEqual
+import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
+import com.soyle.stories.domain.scene.events.LocationUsedInScene
 import com.soyle.stories.domain.singleLine
 import com.soyle.stories.domain.validation.SingleNonBlankLine
 import org.junit.jupiter.api.Test
@@ -17,8 +20,8 @@ class `Locations in Scene Unit Test` {
         val update = scene.withLocationLinked(location)
         update as Updated
         update.event.sceneId.mustEqual(scene.id)
-        update.event.sceneSetting.id.mustEqual(location.id)
-        update.event.sceneSetting.locationName.mustEqual(location.name.value)
+        update.event.locationId.mustEqual(location.id)
+        update.event.locationName.mustEqual(location.name.value)
         update.scene.settings.containsEntityWithId(location.id).mustEqual(true)
     }
 
@@ -55,6 +58,33 @@ class `Locations in Scene Unit Test` {
         }
         error.sceneId.mustEqual(scene.id)
         error.locationId.mustEqual(location.id)
+    }
+
+    @Test
+    fun `can replace setting with another location`() {
+        val replacement = makeLocation()
+        val update = scene.withLocationLinked(location)
+            .scene.withSetting(location.id)!!.replacedWith(replacement)
+
+        update as Updated
+        update.scene.contains(location.id).mustEqual(false)
+        update.scene.settings.getEntityById(replacement.id)!!.locationName.mustEqual(replacement.name.value)
+        update.event.mustEqual(
+            LocationRemovedFromScene(
+                scene.id,
+                location.id,
+                replacedBy = LocationUsedInScene(scene.id, replacement.id, replacement.name.value)
+            )
+        )
+    }
+
+    @Test
+    fun `cannot replace setting with same location`() {
+        val update = scene.withLocationLinked(location)
+            .scene.withSetting(location.id)!!.replacedWith(location)
+
+        update as WithoutChange
+        update.reason.mustEqual(SceneSettingCannotBeReplacedBySameLocation(scene.id, location.id))
     }
 
 }
