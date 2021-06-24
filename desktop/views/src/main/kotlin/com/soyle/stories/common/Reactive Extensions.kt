@@ -8,6 +8,7 @@ import javafx.beans.property.ReadOnlyProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
+import javafx.collections.ObservableList
 import javafx.scene.control.CheckBox
 import javafx.scene.control.ToggleButton
 import tornadofx.booleanProperty
@@ -25,6 +26,23 @@ fun <Scope: Any, T> Scope.scopedListener(source: ObservableValue<T>, listener: S
     val thisStr = this.toString()
     val thisRef = WeakReference(this)
     listener(source.value)
+    source.onChangeUntil({ thisRef.get() == null }) {
+        val ref = thisRef.get()
+        if (ref == null) {
+            println("$thisStr was GC'd and thus did not receive the update of $it")
+            return@onChangeUntil
+        }
+        ref.listener(it)
+    }
+}
+/**
+ * Listens to changes to the [source] until [this] is GC'd
+ */
+fun <Scope: Any, T> Scope.scopedListener(source: ObservableList<T>, listener: Scope.(List<T>?) -> Unit)
+{
+    val thisStr = this.toString()
+    val thisRef = WeakReference(this)
+    listener(source)
     source.onChangeUntil({ thisRef.get() == null }) {
         val ref = thisRef.get()
         if (ref == null) {

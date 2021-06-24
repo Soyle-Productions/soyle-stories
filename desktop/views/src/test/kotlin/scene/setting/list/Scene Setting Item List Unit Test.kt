@@ -226,7 +226,8 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
             inner class `When Scene Setting is Removed`
             {
 
-                private val locationToRemove = locationItems.random()
+                private val locationToRemoveIndex = listOf(0, 1).random()
+                private val locationToRemove = locationItems[locationToRemoveIndex]
 
                 @Test
                 fun `same location removed from different scene should have no affect`() {
@@ -259,10 +260,26 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
                     assertEquals(sceneId, detectInconsistenciesRequest)
                 }
 
-                private fun locationRemoved(sceneId: Scene.Id, locationId: Location.Id) {
+                @Test
+                fun `should add scene setting in place of removed item given it was replaced`() {
+                    val replacementId = Location.Id()
+                    val replacementName = "Some scene name that replaced the last"
+                    locationRemoved(sceneId, locationToRemove.id, replacementId to replacementName)
+                    assertEquals(3, view.access().sceneSettingItems.size) { "Should not reduce in size because the removed item should have been replaced" }
+                    assertNull(view.access().getSceneSettingItem(locationToRemove.id)) { "Should have removed the item" }
+                    view.access().sceneSettingItems.single { it.id == replacementId.toString() }.let {
+                        assertEquals(replacementName, it.text)
+                    }
+                    assertEquals(
+                        locationToRemoveIndex,
+                        view.access().sceneSettingItems.indexOfFirst { it.id == replacementId.toString() }
+                    )
+                }
+
+                private fun locationRemoved(sceneId: Scene.Id, locationId: Location.Id, replacedBy: Pair<Location.Id, String>? = null) {
                     runBlocking {
                         sceneSettingRemovedNotifier.receiveLocationRemovedFromScene(
-                            LocationRemovedFromScene(sceneId, SceneSettingLocation(locationId, ""))
+                            LocationRemovedFromScene(sceneId, locationId, replacedBy?.let { LocationUsedInScene(sceneId, it.first, it.second) })
                         )
                     }
                     interact{}
@@ -307,6 +324,18 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
                         )
                     }
                     interact{}
+                }
+
+                @Test
+                fun `should ignore added setting if item already exists`() {
+                    val locationId = Location.Id()
+                    val locationName = "Brand new location!"
+                    sceneSettingAdded(sceneId, locationId, locationName)
+                    sceneSettingAdded(sceneId, locationId, locationName)
+                    assertEquals(4, view.access().sceneSettingItems.size) { "should have added the location only once" }
+                    view.access().sceneSettingItems.single { it.id == locationId.toString() }.let {
+                        assertEquals(locationName, it.text)
+                    }
                 }
 
             }

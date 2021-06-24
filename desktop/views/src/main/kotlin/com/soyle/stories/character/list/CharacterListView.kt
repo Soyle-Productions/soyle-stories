@@ -29,6 +29,7 @@ import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
+import javafx.collections.ObservableList
 import javafx.event.EventTarget
 import javafx.geometry.Pos
 import javafx.scene.Node
@@ -178,21 +179,21 @@ class CharacterListView : View() {
         when {
             characters == null -> {
                 loader()
-                state.characters.onChangeUntil({ it != null }) {
+                (state.characters as ObservableValue<*>).onChangeUntil({ it != null }) {
                     if (it != null) content()
                 }
             }
             characters.isEmpty() -> {
                 spacing = 16.0
                 emptyCharacterList()
-                state.characters.onChangeUntil({ it?.isEmpty() != true }) {
+                (state.characters as ObservableValue<ObservableList<*>>).onChangeUntil({ it?.isEmpty() != true }) {
                     if (it?.isEmpty() != true) { content() }
                 }
             }
             else -> {
                 spacing = 0.0
                 populatedCharacterList()
-                state.characters.onChangeUntil({ it.isNullOrEmpty() }) {
+                (state.characters as ObservableValue<ObservableList<*>>).onChangeUntil({ it.isNullOrEmpty() }) {
                     if (it.isNullOrEmpty()) { content() }
                 }
             }
