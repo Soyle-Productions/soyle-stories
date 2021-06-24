@@ -289,7 +289,7 @@ class Scene private constructor(
     fun withSetting(settingId: Location.Id): SceneSettingLocationOperations? {
         val sceneSetting = settings.getEntityById(settingId) ?: return null
         return object : SceneSettingLocationOperations {
-            override fun replacedWith(location: Location): SceneUpdate<*> {
+            override fun replacedWith(location: Location): SceneUpdate<LocationRemovedFromScene> {
                 if (location.id == sceneSetting.id) return noUpdate(
                     reason = SceneSettingCannotBeReplacedBySameLocation(id, location.id)
                 )
@@ -408,7 +408,7 @@ class Scene private constructor(
 
     interface SceneSettingLocationOperations {
 
-        fun replacedWith(location: Location): SceneUpdate<*>
+        fun replacedWith(location: Location): SceneUpdate<LocationRemovedFromScene>
     }
 
     data class TrackedSymbol(
