@@ -7,11 +7,14 @@ import com.soyle.stories.desktop.config.drivers.soylestories.getWorkbenchForProj
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.common.components.dataDisplay.`Chip Access`.Companion.access
 import com.soyle.stories.desktop.view.scene.sceneSetting.`Scene Setting Tool Root Access`.Companion.access
+import com.soyle.stories.desktop.view.scene.sceneSetting.item.`Scene Setting Item Access`.Companion.access
+import com.soyle.stories.desktop.view.scene.sceneSetting.item.`Scene Setting Item Access`.Companion.drive
 import com.soyle.stories.desktop.view.scene.sceneSetting.list.`Scene Setting Item List Access`.Companion.access
 import com.soyle.stories.desktop.view.scene.sceneSetting.useLocationButton.`Use Location Button Access`.Companion.access
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.SceneSettingLocation
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
 import com.soyle.stories.scene.setting.SceneSettingToolRoot.Styles.Companion.sceneSettingToolRoot
@@ -54,6 +57,24 @@ fun SceneSettingToolRoot.givenAvailableLocationsLoaded(): SceneSettingToolRoot {
     return this
 }
 
+fun SceneSettingToolRoot.givenReplacementOptionsLoadedFor(sceneSetting: SceneSettingLocation): SceneSettingToolRoot
+{
+    if (access().list?.access()?.getSceneSettingItem(sceneSetting.id)?.access()?.replaceOption?.isShowing == false) loadReplacementOptionsFor(sceneSetting)
+    return this
+}
+
+fun SceneSettingToolRoot.givenSettingRemoved(sceneSetting: SceneSettingLocation): SceneSettingToolRoot
+{
+    if (access().list?.access()?.getSceneSettingItem(sceneSetting.id) != null) removeLocation(sceneSetting.locationName)
+    return this
+}
+
+fun SceneSettingToolRoot.givenSettingReplacedWith(sceneSetting: SceneSettingLocation, replacement: Location): SceneSettingToolRoot
+{
+    if (access().list?.access()?.getSceneSettingItem(sceneSetting.id) != null) replaceSettingWith(sceneSetting, replacement)
+    return this
+}
+
 fun SceneSettingToolRoot.selectAvailableLocation(location: Location) {
     access {
         val item = list?.access()?.useLocationButton?.access()?.availableLocationItem(location.id)
@@ -63,13 +84,33 @@ fun SceneSettingToolRoot.selectAvailableLocation(location: Location) {
 
 fun SceneSettingToolRoot.removeLocation(location: Location) {
     access {
-        val button = list?.access()?.getSceneSettingItem(location.id)?.access()?.deleteButton
-        interact { clickOn(button) }
+        val sceneSettingItem = list?.access()?.getSceneSettingItem(location.id)!!
+        interact { sceneSettingItem.access().deleteButton.show() }
+        val button = sceneSettingItem.access().removeOption!!
+        interact { button.fire() }
     }
 }
 fun SceneSettingToolRoot.removeLocation(settingName: String) {
     access {
-        val button = list?.access()?.getSceneSettingItemByName(settingName)?.access()?.deleteButton
-        interact { clickOn(button) }
+        val sceneSettingItem = list?.access()?.getSceneSettingItemByName(settingName)!!
+        interact { sceneSettingItem.access().deleteButton.show() }
+        val button = sceneSettingItem.access().removeOption!!
+        interact { button.fire() }
+    }
+}
+
+fun SceneSettingToolRoot.loadReplacementOptionsFor(sceneSetting: SceneSettingLocation)
+{
+    access().list!!.access().getSceneSettingItem(sceneSetting.id)!!.drive {
+        deleteButton.show()
+        replaceOption!!.show()
+    }
+}
+
+fun SceneSettingToolRoot.replaceSettingWith(sceneSetting: SceneSettingLocation, location: Location)
+{
+    access().list!!.access().getSceneSettingItem(sceneSetting.id)!!.drive {
+        deleteButton.show()
+        replaceOption!!.availableLocationItems.find { it.id == location.id.toString() }!!.fire()
     }
 }

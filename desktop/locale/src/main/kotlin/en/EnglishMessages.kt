@@ -45,4 +45,6 @@ object EnglishMessages : SoyleMessageBundle {
     override val name: String = "Name"
     override val newLocation: String = "New Location"
     override val pleaseProvideALocationName: String = "Please provide a location name."
+    override val removeFromScene: String = "Remove From Scene"
+    override val replaceWith: String = "Replace With..."
 }

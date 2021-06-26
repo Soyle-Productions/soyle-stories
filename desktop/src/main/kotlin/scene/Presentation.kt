@@ -207,6 +207,8 @@ object Presentation {
                     model,
                     applicationScope.get<LocaleHolder>(),
                     get(),
+                    get(),
+                    get(),
                     get<SceneSettingLocationRenamedNotifier>(),
                     get<SceneInconsistenciesNotifier>()
                 )

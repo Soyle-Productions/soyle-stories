@@ -9,6 +9,7 @@ import com.soyle.stories.location.details.LocationDetailsLocale
 import com.soyle.stories.location.details.models.AvailableSceneToHostModel
 import com.soyle.stories.location.details.LocationDetailsStyles
 import javafx.beans.property.ReadOnlyListProperty
+import javafx.beans.value.ObservableValue
 import javafx.scene.Parent
 import javafx.scene.control.MenuButton
 import javafx.scene.control.MenuItem
@@ -40,16 +41,17 @@ class HostSceneButton(
 
     init {
         textProperty().bind(locale.hostScene)
-        scopedListener(availableScenesToHost) {
+        scopedListener(availableScenesToHost as ObservableValue<*>) {
+            val availableScenesToHost = availableScenesToHost.value
             when {
-                it == null -> items.setAll(loadingItem())
-                it.isEmpty() -> items.setAll(
+                availableScenesToHost == null -> items.setAll(loadingItem())
+                availableScenesToHost.isEmpty() -> items.setAll(
                     createSceneItem(),
                     SeparatorMenuItem(),
                     noAvailableScenesItem()
                 )
                 else -> items.setAll(
-                    listOf(createSceneItem(), SeparatorMenuItem()) + it.map(::availableSceneItem)
+                    listOf(createSceneItem(), SeparatorMenuItem()) + availableScenesToHost.map(::availableSceneItem)
                 )
             }
         }

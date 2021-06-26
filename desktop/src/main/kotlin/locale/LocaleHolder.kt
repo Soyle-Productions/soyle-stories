@@ -79,6 +79,8 @@ class LocaleHolder(bundle: SoyleMessageBundle) : LocationDetailsLocale, SceneSet
     override val name: ObservableValue<String> = currentLocale.stringBinding { it!!.name }
     override val newLocation: ObservableValue<String> = currentLocale.stringBinding { it!!.newLocation }
     override val pleaseProvideALocationName: ObservableValue<String> = currentLocale.stringBinding { it!!.pleaseProvideALocationName }
+    override val removeFromScene: ObservableValue<String> = currentLocale.stringBinding { it!!.removeFromScene }
+    override val replaceWith: ObservableValue<String> = currentLocale.stringBinding { it!!.replaceWith }
 
     private fun createDynamicMessage(parent: Parent, segment: SoyleMessageBundle.MessageSegment) {
         when (segment) {

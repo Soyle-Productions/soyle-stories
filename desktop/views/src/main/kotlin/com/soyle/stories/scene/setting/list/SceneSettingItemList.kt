@@ -34,8 +34,10 @@ import javafx.beans.property.ObjectPropertyBase
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
 import javafx.event.EventTarget
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import tornadofx.*
@@ -107,15 +109,25 @@ class SceneSettingItemList(
         DeletedLocationReceiver
     {
         override suspend fun receiveLocationRemovedFromScenes(events: List<LocationRemovedFromScene>) {
-            val removedLocationIds = events.asSequence()
-                .filter { it.sceneId == sceneId }
-                .map { it.sceneSetting.id }
-                .toSet()
-            if (removedLocationIds.isEmpty()) return
+            val relevantEvents = events.filter { it.sceneId == sceneId }
+            if (relevantEvents.isEmpty()) return
+            val removedLocationIds = relevantEvents.mapTo(LinkedHashSet(relevantEvents.size)) { it.locationId }
+            val addedLocations = relevantEvents.mapNotNull {
+                val replacement = it.replacedBy
+                if (replacement != null) it.locationId to replacement
+                else null
+            }.toMap()
             guiUpdate {
                 val currentModel = model.value
                 if (currentModel is SceneSettingItemListModel.Loaded) {
-                    currentModel.sceneSettings.removeIf { it.locationId in removedLocationIds }
+                    currentModel.sceneSettings.setAll(
+                        currentModel.sceneSettings.mapNotNull { itemModel ->
+                            if (itemModel.locationId in removedLocationIds) {
+                                val replacement = addedLocations[itemModel.locationId] ?: return@mapNotNull null
+                                SceneSettingItemModel(replacement.sceneId, replacement.locationId, replacement.locationName, booleanProperty(false))
+                            } else itemModel
+                        }
+                    )
                     detectInconsistenciesInSceneSettings.detectInconsistencies(sceneId)
                 }
             }
@@ -126,11 +138,12 @@ class SceneSettingItemList(
             guiUpdate {
                 val currentModel = model.value
                 if (currentModel is SceneSettingItemListModel.Loaded) {
+                    if (currentModel.sceneSettings.any { it.locationId == locationUsedInScene.locationId }) return@guiUpdate
                     currentModel.sceneSettings.add(
                         SceneSettingItemModel(
                             sceneId,
-                            locationUsedInScene.sceneSetting.id,
-                            locationUsedInScene.sceneSetting.locationName,
+                            locationUsedInScene.locationId,
+                            locationUsedInScene.locationName,
                             booleanProperty(false)
                         )
                     )
@@ -237,8 +250,14 @@ class SceneSettingItemList(
         }
         vbox {
             addClass(Styles.itemList)
+            val itemCache = mutableMapOf<Location.Id, Node>()
             bindChildren(model.sceneSettings) {
-                makeSceneSettingItem(it)
+                itemCache.getOrPut(it.locationId) { makeSceneSettingItem(it) }
+            }
+            scopedListener(model.sceneSettings) {
+                val list = it.orEmpty()
+                val includedIds = list.mapTo(LinkedHashSet(list.size)) { it.locationId }
+                itemCache.keys.removeIf { it !in includedIds }
             }
         }
     }

@@ -55,6 +55,8 @@ import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScen
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
 import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsController
 import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsOutput
+import com.soyle.stories.scene.locationsInScene.replace.ReplaceSettingInSceneController
+import com.soyle.stories.scene.locationsInScene.replace.ReplaceSettingInSceneOutput
 import com.soyle.stories.scene.target.TargetScene
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
@@ -104,6 +106,8 @@ import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScen
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
 import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettings
 import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettingsUseCase
+import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInScene
+import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInSceneUseCase
 import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.*
 
 object UseCases {
@@ -137,6 +141,7 @@ object UseCases {
             listLocationsToUse()
             removeLocationFromScene()
             detectInconsistenciesInScene()
+            replaceSettingInScene()
         }
     }
 
@@ -538,5 +543,15 @@ object UseCases {
         provide(DetectInconsistenciesInSceneSettings.OutputPort::class) {
             DetectInconsistenciesInSceneSettingsOutput(get())
         }
+    }
+
+    private fun InProjectScope.replaceSettingInScene() {
+        provide<ReplaceSettingInScene> {
+            ReplaceSettingInSceneUseCase(get(), get())
+        }
+        provide<ReplaceSettingInScene.OutputPort> {
+            ReplaceSettingInSceneOutput(get(), get(), get(), get())
+        }
+        provide<ReplaceSettingInSceneController> { ReplaceSettingInSceneController(applicationScope.get(), get(), get()) }
     }
 }

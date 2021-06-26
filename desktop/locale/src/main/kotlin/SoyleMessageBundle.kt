@@ -31,6 +31,8 @@ interface SoyleMessageBundle {
     val cancel: String
     val newLocation: String
     val pleaseProvideALocationName: String
+    val replaceWith: String
+    val removeFromScene: String
 
     sealed class MessageSegment {
         abstract val message: String

@@ -8,6 +8,8 @@ import javafx.beans.binding.IntegerBinding
 import javafx.beans.property.*
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
+import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
 import javafx.geometry.Bounds
 import javafx.scene.Node
 import javafx.scene.control.*
@@ -48,6 +50,22 @@ fun <T> ObservableValue<T>.onChangeUntil(until: (T?) -> Boolean, op: (T?) -> Uni
 				removeListener(this)
 			}
 			op(newValue)
+		}
+	}
+	addListener(listener)
+}
+
+/**
+ * Listen for changes to this observable. Optionally only listen until the predicate returns true.
+ * The lambda receives the changed value when the change occurs, which may be null,
+ */
+fun <T> ObservableList<T>.onChangeUntil(until: (List<T>?) -> Boolean, op: (List<T>?) -> Unit) {
+	val listener = object : ListChangeListener<T> {
+		override fun onChanged(c: ListChangeListener.Change<out T>?) {
+			if (until(c?.list)) {
+				removeListener(this)
+			}
+			op(c?.list)
 		}
 	}
 	addListener(listener)

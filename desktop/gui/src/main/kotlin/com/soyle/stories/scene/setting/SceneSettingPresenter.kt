@@ -60,7 +60,7 @@ internal class SceneSettingPresenter(
             val removedLocationIds = events
                 .asSequence()
                 .filter { it.sceneId == targetSceneId }
-                .map { it.sceneSetting.id }
+                .map { it.locationId }
                 .toSet()
             if (removedLocationIds.isEmpty()) return@updateOrInvalidated this
             copy(
@@ -74,8 +74,8 @@ internal class SceneSettingPresenter(
             if (targetSceneId != locationUsedInScene.sceneId) return@updateOrInvalidated this
             copy(
                 usedLocations = usedLocations + LocationItemViewModel(
-                    locationUsedInScene.sceneSetting.id,
-                    locationUsedInScene.sceneSetting.locationName
+                    locationUsedInScene.locationId,
+                    locationUsedInScene.locationName
                 )
             )
         }
