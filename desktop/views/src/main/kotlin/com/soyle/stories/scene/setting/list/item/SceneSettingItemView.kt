@@ -35,6 +35,7 @@ import javafx.scene.effect.BlendMode
 import javafx.scene.layout.Region
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Path
 import javafx.scene.shape.SVGPath
@@ -187,6 +188,7 @@ class SceneSettingItemView(
             val sceneSettingItem by cssclass()
             val options by cssclass()
             val availableLocation by cssclass()
+            val glyphIcon by cssclass("glyph-icon")
 
             init {
                 importStylesheet<Styles>()
@@ -211,8 +213,15 @@ class SceneSettingItemView(
                         label {
                             padding = box(0.px)
                         }
-                        s("*") {
+                        glyphIcon {
                             fill = javafx.scene.paint.Color.WHITE
+                        }
+                        contextMenu {
+                            menuItem {
+                                label {
+                                    textFill = ColorStyles.lightTextColor
+                                }
+                            }
                         }
                     }
                 }
