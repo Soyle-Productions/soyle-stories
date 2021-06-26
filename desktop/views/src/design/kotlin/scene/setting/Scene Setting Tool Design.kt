@@ -16,6 +16,7 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.config.fixed.SceneSetting
 import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.setting.SceneSettingToolModel
@@ -27,10 +28,15 @@ import com.soyle.stories.scene.setting.list.useLocationButton.UseLocationButton
 import com.soyle.stories.scene.target.SceneTargeted
 import com.soyle.stories.scene.target.SceneTargetedNotifier
 import com.soyle.stories.usecase.location.listAllLocations.LocationItem
+import com.soyle.stories.usecase.scene.inconsistencies.SceneInconsistencies
+import com.soyle.stories.usecase.scene.inconsistencies.SceneSettingLocationInconsistencies
 import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 import com.soyle.stories.usecase.scene.location.listLocationsToUse.ListAvailableLocationsToUseInScene
 import com.soyle.stories.usecase.scene.location.listLocationsUsed.ListLocationsUsedInScene
 import javafx.scene.Node
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -127,6 +133,8 @@ class `Scene Setting Tool Design` : DesignTest() {
         @SubComponent
         inner class `Scene Setting Item` : Design() {
 
+            private val sceneInconsistentNotifier = SceneInconsistenciesNotifier()
+
             private var model =
                 SceneSettingItemModel(Scene.Id(), Location.Id(), "Scene Setting Item", booleanProperty(false))
 
@@ -135,12 +143,26 @@ class `Scene Setting Tool Design` : DesignTest() {
 
             @State
             fun `has problem`() {
-                model = SceneSettingItemModel(Scene.Id(), Location.Id(), "Scene Setting Item", booleanProperty(true))
+                val sceneId = Scene.Id()
+                val locationId = Location.Id()
+                model = SceneSettingItemModel(sceneId, locationId, "Scene Setting Item", booleanProperty(true))
+                GlobalScope.launch {
+                    delay(2000)
+                    sceneInconsistentNotifier.receiveSceneInconsistencies(SceneInconsistencies(sceneId, setOf(
+                        SceneInconsistencies.SceneInconsistency.SceneSettingInconsistency(setOf(
+                            SceneSettingLocationInconsistencies(sceneId, locationId, setOf(
+                                SceneSettingLocationInconsistencies.SceneSettingLocationInconsistency.LocationRemovedFromStory
+                            ))
+                        ))
+                    )))
+                }
                 verifyDesign()
             }
 
             override val node: Node
-                get() = SceneSettingItemFactory().invoke(model)
+                get() = SceneSettingItemFactory(
+                    sceneInconsistenciesNotifier = sceneInconsistentNotifier
+                ).invoke(model)
 
         }
 

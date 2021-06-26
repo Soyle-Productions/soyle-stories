@@ -66,10 +66,6 @@ open class Chip : ButtonBase() {
                 "M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"
         }
     ) {
-        override fun invalidated() {
-            get()?.styleClass?.add(Styles.chipDeleteIcon.name)
-        }
-
         override fun getBean(): Any = this@Chip
 
         override fun getName(): String = "deleteGraphic"
@@ -124,8 +120,8 @@ open class Chip : ButtonBase() {
         init {
             chip {
                 prefHeight = 32.px
-                backgroundRadius += box(16.px)
-                borderRadius = multi(box(16.px))
+                backgroundRadius += box(100.percent)
+                borderRadius = multi(box(100.percent))
 
                 chipDeleteIcon {
                     fill = javafx.scene.paint.Color.grayRgb(0, 0.26)

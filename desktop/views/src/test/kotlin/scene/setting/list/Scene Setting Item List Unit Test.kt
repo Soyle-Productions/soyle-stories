@@ -75,7 +75,7 @@ class `Scene Setting Item List Unit Test` : NodeTest<SceneSettingItemList>() {
         sceneSettingRemovedNotifier,
         sceneSettingAddedNotifier,
         deletedLocationNotifier,
-        SceneSettingItemFactory { assertEquals(sceneId, it.sceneId) },
+        SceneSettingItemFactory({ assertEquals(sceneId, it.sceneId) }),
         UseLocationButtonFactory { assertEquals(sceneId, it) }
     )
 
