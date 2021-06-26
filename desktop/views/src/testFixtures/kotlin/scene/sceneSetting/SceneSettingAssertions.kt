@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.view.scene.sceneSetting
 import com.soyle.stories.common.components.ComponentsStyles.Companion.hasProblem
 import com.soyle.stories.desktop.view.common.components.dataDisplay.`Chip Access`.Companion.access
 import com.soyle.stories.desktop.view.scene.sceneSetting.`Scene Setting Tool Root Access`.Companion.access
+import com.soyle.stories.desktop.view.scene.sceneSetting.item.`Scene Setting Item Access`.Companion.access
 import com.soyle.stories.desktop.view.scene.sceneSetting.list.`Scene Setting Item List Access`.Companion.access
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
@@ -54,17 +55,19 @@ class SceneSettingAssertions private constructor(private val access: `Scene Sett
         assertTrue(locationItem.hasClass(hasProblem))
     }
 
-    fun sceneSettingItemHasReplacementOption(sceneSettingId: Location.Id, expectedReplacementOption: String)
-    {
+    fun sceneSettingItemHasReplacementOption(sceneSettingId: Location.Id, expectedReplacementOption: String) {
         val locationList = access.list ?: fail("Scene Setting List is not visible in Scene Setting tool")
-        val locationItem = locationList.access().getSceneSettingItem(sceneSettingId) ?: fail("Scene setting item $sceneSettingId is not in list")
-        TODO()
+        val locationItem = locationList.access().getSceneSettingItem(sceneSettingId)
+            ?: fail("Scene setting item $sceneSettingId is not in list")
+        assertNotNull(locationItem.access().replaceOption?.items?.find { it.text == expectedReplacementOption })
     }
 
-    fun sceneSettingItemHasNoReplacementOptions(sceneSettingId: Location.Id)
-    {
+    fun sceneSettingItemHasNoReplacementOptions(sceneSettingId: Location.Id) {
         val locationList = access.list ?: fail("Scene Setting List is not visible in Scene Setting tool")
-        val locationItem = locationList.access().getSceneSettingItem(sceneSettingId) ?: fail("Scene setting item $sceneSettingId is not in list")
-        TODO()
+        val locationItem = locationList.access().getSceneSettingItem(sceneSettingId)
+            ?: fail("Scene setting item $sceneSettingId is not in list")
+        locationItem.access {
+            assertTrue(replaceOption!!.availableLocationItems.isEmpty())
+        }
     }
 }

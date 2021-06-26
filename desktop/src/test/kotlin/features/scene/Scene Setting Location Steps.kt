@@ -57,6 +57,16 @@ class `Scene Setting Location Steps` : En {
                 .givenFocusedOn(scene)
                 .givenSettingReplacedWith(sceneSetting, replacement)
         }
+        Given(
+            "I wanted to replace the {string} setting in the {scene}"
+        ) { settingName: String, scene: Scene ->
+            val sceneSetting = scene.settings.find { it.locationName == settingName } ?: return@Given
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .givenReplacementOptionsLoadedFor(sceneSetting)
+        }
     }
 
     private fun whens() {
@@ -101,6 +111,17 @@ class `Scene Setting Location Steps` : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenSceneSettingToolHasBeenOpened()
                 .givenFocusedOn(scene)
+                .replaceSettingWith(sceneSetting, replacement)
+        }
+        When(
+            "I select the {location} to replace the {string} setting in the {scene}"
+        ) { replacement: Location, settingName: String, scene: Scene  ->
+            val sceneSetting = scene.settings.find { it.locationName == settingName }!!
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneSettingToolHasBeenOpened()
+                .givenFocusedOn(scene)
+                .givenReplacementOptionsLoadedFor(sceneSetting)
                 .replaceSettingWith(sceneSetting, replacement)
         }
     }

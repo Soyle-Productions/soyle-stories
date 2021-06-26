@@ -4,6 +4,7 @@ import com.soyle.stories.common.components.dataDisplay.chip.Chip
 import com.soyle.stories.common.exists
 import com.soyle.stories.desktop.view.common.NodeAccess
 import com.soyle.stories.desktop.view.common.components.dataDisplay.`Chip Access`.Companion.access
+import com.soyle.stories.desktop.view.scene.sceneSetting.item.`Scene Setting Item Access`.Companion.access
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemView
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuButton
@@ -14,6 +15,13 @@ class `Scene Setting Item Access`(val item: SceneSettingItemView) : NodeAccess<S
     companion object {
         fun SceneSettingItemView.access() = `Scene Setting Item Access`(this)
         fun SceneSettingItemView.access(op: `Scene Setting Item Access`.() -> Unit) = `Scene Setting Item Access`(this).op()
+        fun <T> SceneSettingItemView.drive(op: `Scene Setting Item Access`.() -> T): T = `Scene Setting Item Access`(this).run {
+            var t: T? = null
+            interact {
+                t = op()
+            }
+            return t as T
+        }
     }
 
     val deleteButton: MenuButton by mandatoryChild(SceneSettingItemView.Styles.options)
