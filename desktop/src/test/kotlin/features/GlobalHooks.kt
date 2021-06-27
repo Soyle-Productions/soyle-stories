@@ -22,6 +22,7 @@ import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
+import kotlinx.coroutines.CoroutineScope
 import org.testfx.api.FxToolkit
 import java.util.*
 import kotlin.concurrent.thread
@@ -40,6 +41,8 @@ class GlobalHooks : En {
     private fun synchronizeBackgroundTasks() {
         DI.register(ThreadTransformer::class, ApplicationScope::class, { SyncThreadTransformer() })
     }
+
+    private val primaryTestThread = Thread.getAllStackTraces().keys.find { it.name == "main" }!!
 
     init {
         Before { scenario: Scenario ->
@@ -60,6 +63,11 @@ class GlobalHooks : En {
                             e.printStackTrace()
                         } else {
                             currentHandler?.uncaughtException(t, e)
+
+                            // sometimes, the gui thread just passed the error directly to the uncaught
+                            // exception handler and continues on it's merry way.  Throw again to ensure
+                            // that the test thread gets the error too
+                            throw e
                         }
                     }
                 }

@@ -316,7 +316,7 @@ object ThemeModule {
             ChangeCharacterMoralWeakness.OutputPort::class,
             ChangeCharacterArcSectionValue.OutputPort::class
         ) {
-            ChangeCharacterArcSectionValueOutput(get())
+            ChangeCharacterArcSectionValueOutput(get(), get())
         }
         provide(ChangeCharacterChange.OutputPort::class) {
             ChangeCharacterChangeOutput(get())

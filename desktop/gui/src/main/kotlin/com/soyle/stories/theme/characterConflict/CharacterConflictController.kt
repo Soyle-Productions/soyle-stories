@@ -16,6 +16,8 @@ import com.soyle.stories.usecase.theme.examineCentralConflictOfTheme.ExamineCent
 import com.soyle.stories.usecase.theme.includeCharacterInComparison.CharacterIncludedInTheme
 import com.soyle.stories.usecase.theme.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
 import com.soyle.stories.usecase.theme.useCharacterAsOpponent.ListAvailableCharactersToUseAsOpponents
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.util.*
 
 class CharacterConflictController(
