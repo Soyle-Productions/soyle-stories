@@ -27,12 +27,9 @@ import com.soyle.stories.project.eventbus.GetSavedLayoutNotifier
 import com.soyle.stories.project.eventbus.ToggleToolOpenedNotifier
 import com.soyle.stories.project.layout.LayoutController
 import com.soyle.stories.project.layout.LayoutPresenter
-import com.soyle.stories.project.layout.LayoutView
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.scene.deleteScene.DeleteSceneNotifier
-import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
-import com.soyle.stories.theme.deleteTheme.DeleteThemeNotifier
-import tornadofx.find
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedNotifier
 
 object LayoutModule {
 
@@ -84,7 +81,7 @@ object LayoutModule {
             provide {
                 RemoveToolsWithIdController(applicationScope.get(), get(), get()).also {
                     get<DeleteSceneNotifier>().addListener(it)
-                    get<DeleteThemeNotifier>().addListener(it)
+                    get<ThemeDeletedNotifier>().addListener(it)
                 }
             }
 

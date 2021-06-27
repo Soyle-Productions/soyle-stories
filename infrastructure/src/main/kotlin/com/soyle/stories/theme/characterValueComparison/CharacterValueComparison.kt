@@ -1,13 +1,8 @@
 package com.soyle.stories.theme.characterValueComparison
 
-import com.soyle.stories.characterarc.Styles.Companion.defaultCharacterImage
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
-import com.soyle.stories.common.components.*
-import com.soyle.stories.common.components.ComponentsStyles.Companion.notFirstChild
-import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.characterValueComparison.components.CharacterCard
-import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.geometry.Insets
@@ -15,10 +10,6 @@ import javafx.geometry.VPos
 import javafx.scene.Parent
 import javafx.scene.control.ContentDisplay
 import javafx.scene.control.MenuItem
-import javafx.scene.control.TreeItem
-import javafx.scene.layout.Region
-import javafx.scene.paint.Color
-import javafx.util.Duration
 import tornadofx.*
 
 class CharacterValueComparison : View() {
@@ -38,7 +29,7 @@ class CharacterValueComparison : View() {
                 action { viewListener.openValueWebTool(scope.type.themeId.toString()) }
             }
             spacer()
-            buttonCombo {
+            menubutton {
                 textProperty().bind(model.addCharacterButtonLabel)
                 val loadingItem = item("Loading...") {
                     isDisable = true

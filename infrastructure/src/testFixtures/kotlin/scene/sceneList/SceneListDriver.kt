@@ -1,13 +1,13 @@
 package com.soyle.stories.desktop.view.scene.sceneList
 
 import com.soyle.stories.scene.items.SceneItemViewModel
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import org.testfx.api.FxRobot
 
-class SceneListDriver(private val sceneList: SceneList) : FxRobot() {
+class SceneListDriver(private val sceneList: SceneListView) : FxRobot() {
 
     val tree: TreeView<SceneItemViewModel?>
         get() = from(sceneList.root).lookup(".tree-view").query<TreeView<SceneItemViewModel?>>()
@@ -31,8 +31,8 @@ class SceneListDriver(private val sceneList: SceneList) : FxRobot() {
 
 }
 
-fun SceneList.driver() = SceneListDriver(this)
-inline fun SceneList.drive(crossinline road: SceneListDriver.() -> Unit) {
+fun SceneListView.driver() = SceneListDriver(this)
+inline fun SceneListView.drive(crossinline road: SceneListDriver.() -> Unit) {
     val driver = SceneListDriver(this)
     driver.interact { driver.road() }
 }

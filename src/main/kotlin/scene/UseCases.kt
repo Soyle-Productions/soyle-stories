@@ -1,10 +1,12 @@
 package com.soyle.stories.desktop.config.scene
 
+import com.soyle.stories.common.listensTo
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.prose.editProse.ContentReplacedNotifier
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverArcSectionsInSceneControllerImpl
 import com.soyle.stories.scene.coverArcSectionsInScene.CoverCharacterArcSectionsInSceneOutputPort
@@ -22,6 +24,8 @@ import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.linkLocationToScene.LinkLocationToSceneNotifier
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
 import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionControllerImpl
+import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneController
+import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneControllerImpl
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.scene.removeCharacterFromScene.RemoveCharacterFromSceneNotifier
 import com.soyle.stories.scene.renameScene.RenameSceneController
@@ -33,6 +37,7 @@ import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.scene.usecases.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewScene
 import com.soyle.stories.scene.usecases.createNewScene.CreateNewSceneUseCase
@@ -53,6 +58,8 @@ import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenesUseCase
 import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 import com.soyle.stories.scene.usecases.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProseUseCase
+import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInScene
+import com.soyle.stories.scene.usecases.listSymbolsInScene.ListSymbolsInSceneUseCase
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.scene.usecases.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
@@ -61,6 +68,7 @@ import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
 import com.soyle.stories.scene.usecases.reorderScene.ReorderSceneUseCase
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.scene.usecases.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
+import com.soyle.stories.scene.usecases.trackSymbolInScene.*
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 
 object UseCases {
@@ -79,6 +87,12 @@ object UseCases {
             reorderScene()
             coverCharacterArcSectionsInScene()
             listOptionsToReplaceMention()
+            synchronizeTrackedSymbolsWithProse()
+            listSymbolsInScene()
+            listAvailableSymbolsToTrackInScene()
+            pinSymbolToScene()
+            unpinSymbolFromScene()
+            detectUnusedSymbols()
         }
     }
 
@@ -300,7 +314,81 @@ object UseCases {
         }
 
         provide<ListOptionsToReplaceMentionInSceneProse> {
-            ListOptionsToReplaceMentionInSceneProseUseCase(get(), get(), get())
+            ListOptionsToReplaceMentionInSceneProseUseCase(get(), get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.synchronizeTrackedSymbolsWithProse() {
+        provide {
+            SynchronizeTrackedSymbolsWithProseController(get(), get()).also {
+                it listensTo get<ContentReplacedNotifier>()
+            }
+        }
+        provide<SynchronizeTrackedSymbolsWithProse> {
+            SynchronizeTrackedSymbolsWithProseUseCase(get(), get(), get())
+        }
+        provide<SynchronizeTrackedSymbolsWithProse.OutputPort> {
+            SynchronizeTrackedSymbolsWithProseOutput(get(), get())
+        }
+    }
+
+    private fun InProjectScope.listSymbolsInScene()
+    {
+        provide<ListSymbolsInScene> {
+            ListSymbolsInSceneUseCase(get(), get())
+        }
+        provide<ListSymbolsInSceneController> {
+            ListSymbolsInSceneControllerImpl(applicationScope.get(), get())
+        }
+    }
+
+    private fun InProjectScope.listAvailableSymbolsToTrackInScene()
+    {
+        provide<ListAvailableSymbolsToTrackInSceneController> {
+            ListAvailableSymbolsToTrackInSceneControllerImpl(applicationScope.get(), get())
+        }
+
+        provide<ListAvailableSymbolsToTrackInScene> {
+            ListAvailableSymbolsToTrackInSceneUseCase(get(), get())
+        }
+    }
+
+    private fun InProjectScope.pinSymbolToScene()
+    {
+        provide<PinSymbolToScene> {
+            PinSymbolToSceneUseCase(get(), get())
+        }
+        provide(PinSymbolToScene.OutputPort::class) {
+            PinSymbolToSceneOutput(get(), get())
+        }
+        provide<PinSymbolToSceneController> {
+            PinSymbolToSceneControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.unpinSymbolFromScene()
+    {
+        provide<UnpinSymbolFromScene> {
+            UnpinSymbolFromSceneUseCase(get(), get())
+        }
+        provide(UnpinSymbolFromScene.OutputPort::class) {
+            UnpinSymbolFromSceneOutput(get(), get())
+        }
+        provide<UnpinSymbolFromSceneController> {
+            UnpinSymbolFromSceneControllerImpl(applicationScope.get(), get(), get())
+        }
+    }
+
+    private fun InProjectScope.detectUnusedSymbols()
+    {
+        provide<DetectUnusedSymbolsInScene> {
+            DetectUnusedSymbolsInSceneUseCase(get(), get())
+        }
+        provide(DetectUnusedSymbolsInScene.OutputPort::class) {
+            DetectUnusedSymbolsOutput()
+        }
+        provide<DetectUnusedSymbolsInSceneController> {
+            DetectUnusedSymbolsInSceneControllerImpl(applicationScope.get(), get(), get())
         }
     }
 

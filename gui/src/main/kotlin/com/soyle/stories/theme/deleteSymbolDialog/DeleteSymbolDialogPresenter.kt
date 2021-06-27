@@ -1,19 +1,16 @@
 package com.soyle.stories.theme.deleteSymbolDialog
 
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialogViewModel
-import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
-import com.soyle.stories.theme.usecases.removeSymbolFromTheme.RemoveSymbolFromTheme
+import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
 import com.soyle.stories.theme.usecases.removeSymbolFromTheme.SymbolRemovedFromTheme
 import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
-import java.util.*
 
 class DeleteSymbolDialogPresenter(
     private val symbolId: String,
     private val symbolName: String,
     private val view: View.Nullable<DeleteSymbolDialogViewModel>
-) : GetDialogPreferences.OutputPort, RemoveSymbolFromTheme.OutputPort {
+) : GetDialogPreferences.OutputPort, SymbolRemovedFromThemeReceiver {
 
     override fun gotDialogPreferences(response: DialogPreference) {
         view.update {
@@ -29,8 +26,8 @@ class DeleteSymbolDialogPresenter(
         }
     }
 
-    override suspend fun removedSymbolFromTheme(response: SymbolRemovedFromTheme) {
-        if (response.symbolId.toString() != symbolId) return
+    override suspend fun receiveSymbolRemovedFromTheme(symbolRemovedFromTheme: SymbolRemovedFromTheme) {
+        if (symbolRemovedFromTheme.symbolId.toString() != symbolId) return
         view.updateOrInvalidated {
             this
         }

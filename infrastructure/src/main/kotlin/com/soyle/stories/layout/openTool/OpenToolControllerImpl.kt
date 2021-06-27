@@ -5,9 +5,12 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.entities.Prose
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.layout.config.dynamic.*
+import com.soyle.stories.layout.config.fixed.SceneList
+import com.soyle.stories.layout.config.fixed.SceneSymbols
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications
 import com.soyle.stories.layout.usecases.openTool.OpenTool
+import com.soyle.stories.scene.usecases.listAllScenes.SceneItem
 import java.util.*
 
 class OpenToolControllerImpl(
@@ -16,6 +19,12 @@ class OpenToolControllerImpl(
   private val openTool: OpenTool,
   private val openToolOutputPort: OpenTool.OutputPort
 ) : OpenToolController {
+
+	override fun openSceneList() {
+		threadTransformer.async {
+			openTool.invoke(SceneList, openToolOutputPort)
+		}
+	}
 
 	override fun openLocationDetailsTool(locationId: String) {
 		threadTransformer.async {
@@ -132,6 +141,12 @@ class OpenToolControllerImpl(
 		)
 		threadTransformer.async {
 			openTool.invoke(request, openToolOutputPort)
+		}
+	}
+
+	override fun openSymbolsInScene(sceneItem: SceneItem?) {
+		threadTransformer.async {
+			openTool.invoke(SceneSymbols, openToolOutputPort)
 		}
 	}
 }

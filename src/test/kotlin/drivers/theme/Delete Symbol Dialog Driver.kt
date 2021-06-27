@@ -1,16 +1,13 @@
 package com.soyle.stories.desktop.config.drivers.theme
 
-import com.soyle.stories.common.editingCell
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
+import com.soyle.stories.entities.Theme
 import com.soyle.stories.theme.deleteSymbolDialog.DeleteSymbolDialog
-import com.soyle.stories.theme.deleteThemeDialog.DeleteThemeDialog
 import com.soyle.stories.theme.themeList.ThemeList
 import com.sun.javafx.tk.Toolkit
-import javafx.event.ActionEvent
 import javafx.scene.control.Button
 import javafx.scene.control.SplitPane
-import javafx.scene.control.TextField
 import tornadofx.uiComponent
 
 /**
@@ -44,6 +41,9 @@ fun ThemeList.openDeleteSymbolDialogForSymbolInThemeNamed(themeName: String, sym
     }
     return getDeleteSymbolDialog()
 }
+
+fun ThemeList.openDeleteSymbolDialogForSymbolInTheme(theme: Theme, symbolName: String): DeleteSymbolDialog? =
+    openDeleteSymbolDialogForSymbolInThemeNamed(theme.name, symbolName)
 
 fun getDeleteSymbolDialog(): DeleteSymbolDialog? =
     robot.listWindows().asSequence()

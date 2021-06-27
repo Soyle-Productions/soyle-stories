@@ -8,7 +8,7 @@ import com.soyle.stories.desktop.view.scene.sceneList.driver
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialog
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
 
 fun WorkBench.givenDeleteSceneDialogHasBeenOpened(scene: Scene): DeleteSceneDialog =
     getOpenDeleteSceneDialog(scene) ?: givenSceneListToolHasBeenOpened().openDeleteSceneDialog(scene)
@@ -21,7 +21,7 @@ fun WorkBench.getOpenDeleteSceneDialog(scene: Scene): DeleteSceneDialog? =
     robot.getOpenDialog<DeleteSceneDialog>()?.takeIf { it.sceneId == scene.id.uuid.toString() }
 
 
-fun SceneList.openDeleteSceneDialog(scene: Scene) {
+fun SceneListView.openDeleteSceneDialog(scene: Scene) {
     val sceneItem = driver().getSceneItemOrError(scene.name.value)
     drive {
         tree.selectionModel.select(sceneItem)

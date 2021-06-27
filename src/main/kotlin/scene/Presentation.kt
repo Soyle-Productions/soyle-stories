@@ -4,10 +4,12 @@ import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.prose.editProse.ContentReplacedNotifier
 import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneNotifier
 import com.soyle.stories.scene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneNotifier
@@ -45,7 +47,12 @@ import com.soyle.stories.scene.sceneList.SceneListController
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneList.SceneListPresenter
 import com.soyle.stories.scene.sceneList.SceneListViewListener
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneController
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
+import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneViewListener
 import com.soyle.stories.scene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.trackSymbolInScene.*
+import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
 
 object Presentation {
 
@@ -56,7 +63,7 @@ object Presentation {
             reorderSceneDialog()
 
             sceneList()
-
+            symbolsInScene()
         }
         sceneEditor()
 
@@ -183,12 +190,36 @@ object Presentation {
                     get<RenameSceneNotifier>(),
                     get<DeleteSceneNotifier>(),
                     get<ReorderSceneNotifier>(),
-                    get<DetectInvalidatedMentionsOutput>()
+                    get<DetectInvalidatedMentionsOutput>(),
+                    get<DetectUnusedSymbolsOutput>()
                 ),
                 get(),
                 get(),
                 get()
             )
+        }
+    }
+
+    private fun InProjectScope.symbolsInScene() {
+        provide<SymbolsInSceneViewListener> {
+            SymbolsInSceneController(
+                get<SymbolsInSceneState>(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            ).also {
+                it listensTo get<SymbolsTrackedInSceneNotifier>()
+                it listensTo get<TrackedSymbolsRenamedNotifier>()
+                it listensTo get<TrackedSymbolsRemovedNotifier>()
+                it listensTo get<RenamedThemeNotifier>()
+                it listensTo get<SymbolPinnedToSceneNotifier>()
+                it listensTo get<SymbolUnpinnedFromSceneNotifier>()
+                it listensTo get<ContentReplacedNotifier>()
+                it listensTo get<DetectUnusedSymbolsOutput>()
+            }
         }
     }
 

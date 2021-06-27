@@ -2,7 +2,9 @@ package com.soyle.stories.project
 
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.DI
+import com.soyle.stories.di.get
 import com.soyle.stories.project.projectList.ProjectFileViewModel
+import com.soyle.stories.scene.trackSymbolInScene.SynchronizeTrackedSymbolsWithProseController
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.ReadOnlySetProperty
@@ -46,6 +48,7 @@ class ProjectScope(val applicationScope: ApplicationScope, val projectViewModel:
         }
         FX.getComponents(this)
         DI.getRegisteredTypes(this)
+        get<SynchronizeTrackedSymbolsWithProseController>()
     }
 
     fun addScope(toolId: String, scope: Scope) {

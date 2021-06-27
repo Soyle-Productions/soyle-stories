@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.config.drivers.scene
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
 import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialogOrError
 import com.soyle.stories.desktop.config.drivers.location.getCreateLocationDialogOrError
+import com.soyle.stories.desktop.config.drivers.theme.getCreateSymbolDialogOrError
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.drive
 import com.soyle.stories.desktop.view.prose.proseEditor.ProseEditorDriver.Companion.driver
@@ -13,9 +14,11 @@ import com.soyle.stories.entities.Scene
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.proseEditor.ContentElement
+import com.soyle.stories.prose.proseEditor.MentionIssueMenu
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
 import com.soyle.stories.scene.sceneEditor.SceneEditorView
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
+import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.scene.input.ContextMenuEvent
 import javafx.scene.input.KeyCode
 import javafx.scene.input.PickResult
@@ -23,7 +26,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import tornadofx.FX
 
-fun SceneList.givenSceneEditorToolHasBeenOpened(scene: Scene): SceneEditorView =
+fun SceneListView.givenSceneEditorToolHasBeenOpened(scene: Scene): SceneEditorView =
     scope.getSceneEditorTool(scene) ?: openSceneEditorTool(scene).let { scope.getSceneEditorToolOrError(scene) }
 
 fun ProjectScope.getSceneEditorToolOrError(scene: Scene): SceneEditorView =
@@ -36,7 +39,7 @@ fun ProjectScope.getSceneEditorTool(scene: Scene): SceneEditorView? {
         ?.let { FX.getComponents(it)[SceneEditorView::class] as? SceneEditorView }
 }
 
-fun SceneList.openSceneEditorTool(scene: Scene) {
+fun SceneListView.openSceneEditorTool(scene: Scene) {
     val driver = SceneListDriver(this)
     val item = driver.getSceneItemOrError(scene.name.value)
     driver.interact {
@@ -178,8 +181,8 @@ fun SceneEditorView.isMentionBeingInvestigated(mentionName: String): Boolean = d
     isShowingMentionIssueMenu() && mentionIssueMenuIsRelatedToMention(mentionName)
 }
 
-fun SceneEditorView.investigateMention(mentionName: String) {
-    driver().getProseEditor()
+fun SceneEditorView.investigateMention(mentionName: String): MentionIssueMenu? {
+    return driver().getProseEditor()
         .drive {
             textArea.requestFocus()
             textArea.moveTo(textArea.text.indexOf(mentionName) + 1)
@@ -194,7 +197,7 @@ fun SceneEditorView.investigateMention(mentionName: String) {
                     PickResult(textArea, 0.0, 0.0)
                 )
             )
-        }
+        }.mentionIssueMenu?.takeIf { it.isShowing }
 }
 
 fun SceneEditorView.clearAllMentionsOfEntity() {
@@ -206,22 +209,14 @@ fun SceneEditorView.clearAllMentionsOfEntity() {
     }
 }
 
-fun SceneEditorView.removeMention() {
-    val removeMentionOption = with(driver().getProseEditor().driver()) {
-        mentionIssueMenu!!.removeMentionOption()!!
-    }
-    driver().interact {
-        removeMentionOption.fire()
-    }
-}
-
 fun SceneEditorView.selectReplacementSuggestion(suggestionText: String)
 {
     val replacementOption = with(driver().getProseEditor().driver()) {
         mentionIssueMenu!!.replacementOption()!!
     }
+    val replacementSuggestion = replacementOption.items.find { it.text == suggestionText } ?: error("No replacement suggestion available named $suggestionText")
     driver().interact {
-        replacementOption.items.find { it.text == suggestionText }!!.fire()
+        replacementSuggestion.fire()
     }
 }
 
@@ -245,4 +240,15 @@ fun SceneEditorView.givenReplacingInvestigatedMentionWithNewLocation(): CreateLo
         replacementOption.items.first().fire()
     }
     return getCreateLocationDialogOrError()
+}
+
+fun SceneEditorView.givenReplacingInvestigatedMentionWithNewSymbol(): CreateSymbolDialog
+{
+    val replacementOption = with(driver().getProseEditor().driver()) {
+        mentionIssueMenu!!.replacementOption()!!
+    }
+    driver().interact {
+        replacementOption.items.first().fire()
+    }
+    return getCreateSymbolDialogOrError()
 }

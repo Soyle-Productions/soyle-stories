@@ -8,9 +8,8 @@ import com.soyle.stories.di.get
 import com.soyle.stories.entities.Scene
 import com.soyle.stories.project.ProjectSteps
 import com.soyle.stories.project.layout.LayoutViewListener
-import com.soyle.stories.scene.SceneListDriver.interact
 import com.soyle.stories.scene.items.SceneItemViewModel
-import com.soyle.stories.scene.sceneList.SceneList
+import com.soyle.stories.scene.sceneList.SceneListView
 import com.soyle.stories.soylestories.SoyleStoriesTestDouble
 import com.soyle.stories.testutils.findComponentsInScope
 import javafx.geometry.Side
@@ -39,10 +38,10 @@ object SceneListDriver : ApplicationTest() {
 		whenOpened(double)
 	}
 
-	fun getIfOpen(double: SoyleStoriesTestDouble): SceneList?
+	fun getIfOpen(double: SoyleStoriesTestDouble): SceneListView?
 	{
 		val projectScope = ProjectSteps.getProjectScope(double) ?: return null
-		return findComponentsInScope<SceneList>(projectScope).singleOrNull()?.takeIf {
+		return findComponentsInScope<SceneListView>(projectScope).singleOrNull()?.takeIf {
 			it.currentStage?.isShowing == true
 		}
 	}
@@ -93,7 +92,7 @@ object SceneListDriver : ApplicationTest() {
 		}
 	}
 
-	fun getIfVisible(double: SoyleStoriesTestDouble): SceneList? =
+	fun getIfVisible(double: SoyleStoriesTestDouble): SceneListView? =
 	  getIfOpen(double)?.takeIf { it.owningTab?.isSelected == true }
 
 	fun isVisible(double: SoyleStoriesTestDouble): Boolean =
@@ -175,7 +174,7 @@ object SceneListDriver : ApplicationTest() {
 		if (items.isEmpty()) return (false).also { UATLogger.log("no items in scene list") }
 		return items.find {
 			val idsMatch = it.value?.id == scene.id.uuid.toString()
-			val namesMatch = it.value?.name == scene.name
+			val namesMatch = it.value?.name == scene.name.value
 			if (idsMatch && !namesMatch) UATLogger.log("Matching id but mismatched name")
 			idsMatch && namesMatch
 		} != null

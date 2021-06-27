@@ -37,6 +37,6 @@ class MentionQueryLoaded(
     val prioritizedMatches: List<MatchingStoryElementViewModel>
 ) : MentionQueryState(), TriggeredQuery
 
-data class MatchingStoryElementViewModel(val name: SingleLine, val matchingRange: IntRange, val type: String, val id: MentionedEntityId<*>)
+data class MatchingStoryElementViewModel(val name: SingleLine, val addendum: SingleLine?, val matchingRange: IntRange, val type: String, val id: MentionedEntityId<*>)
 
 data class ReplacementElementViewModel(val name: String, val id: MentionedEntityId<*>)

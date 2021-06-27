@@ -11,6 +11,7 @@ import com.soyle.stories.scene.usecases.deleteScene.DeleteScene
 import com.soyle.stories.scene.usecases.listAllScenes.ListAllScenes
 import com.soyle.stories.scene.usecases.renameScene.RenameScene
 import com.soyle.stories.scene.usecases.reorderScene.ReorderScene
+import com.soyle.stories.scene.usecases.trackSymbolInScene.DetectUnusedSymbolsInScene
 
 class SceneListPresenter(
     private val view: View.Nullable<SceneListViewModel>,
@@ -18,7 +19,8 @@ class SceneListPresenter(
     renameSceneNotifier: Notifier<RenameScene.OutputPort>,
     deleteSceneNotifier: Notifier<DeleteScene.OutputPort>,
     sceneReordered: Notifier<ReorderScene.OutputPort>,
-    invalidMentionsNotifier: Notifier<DetectInvalidatedMentions.OutputPort>
+    invalidMentionsNotifier: Notifier<DetectInvalidatedMentions.OutputPort>,
+    unusedSymbolsDetectedNotifier: Notifier<DetectUnusedSymbolsInScene.OutputPort>
 ) : ListAllScenes.OutputPort {
 
     private val subPresenters = listOf(
@@ -26,7 +28,10 @@ class SceneListPresenter(
         RenameScenePresenter(view) listensTo renameSceneNotifier,
         DeleteScenePresenter(view) listensTo deleteSceneNotifier,
         ReorderScenePresenter(view) listensTo sceneReordered,
-        DetectedInvalidMentionsPresenter(view) listensTo invalidMentionsNotifier
+        DetectedInvalidMentionsPresenter(view).apply {
+            listensTo(unusedSymbolsDetectedNotifier)
+            listensTo(invalidMentionsNotifier)
+        }
     )
 
     override fun receiveListAllScenesResponse(response: ListAllScenes.ResponseModel) {

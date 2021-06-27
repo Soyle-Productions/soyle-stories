@@ -1,8 +1,7 @@
 package com.soyle.stories.theme.deleteThemeDialog
 
-import com.soyle.stories.characterarc.usecases.deleteCharacterArc.DeletedCharacterArc
 import com.soyle.stories.gui.View
-import com.soyle.stories.theme.usecases.deleteTheme.DeleteTheme
+import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
 import com.soyle.stories.theme.usecases.deleteTheme.DeletedTheme
 import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
@@ -11,7 +10,7 @@ class DeleteThemeDialogPresenter(
     private val themeId: String,
     private val themeName: String,
     private val view: View.Nullable<DeleteThemeDialogViewModel>
-) : GetDialogPreferences.OutputPort, DeleteTheme.OutputPort {
+) : GetDialogPreferences.OutputPort, ThemeDeletedReceiver {
 
     override fun gotDialogPreferences(response: DialogPreference) {
         view.update {
@@ -27,8 +26,8 @@ class DeleteThemeDialogPresenter(
         }
     }
 
-    override fun themeDeleted(response: DeletedTheme) {
-        if (response.themeId.toString() != themeId) return
+    override suspend fun receiveDeletedTheme(deletedTheme: DeletedTheme) {
+        if (deletedTheme.themeId.toString() != themeId) return
         view.updateOrInvalidated {
             this
         }
@@ -46,10 +45,6 @@ class DeleteThemeDialogPresenter(
                 errorMessage = failure.localizedMessage?.takeUnless { it.isBlank() } ?: "Failed to retrieve dialog preferences: ${failure::class.simpleName ?: failure::class}"
             )
         }
-    }
-
-    override suspend fun characterArcsDeleted(response: List<DeletedCharacterArc>) {
-        // do nothing
     }
 
 }

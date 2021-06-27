@@ -7,6 +7,7 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.editProse.*
 import com.soyle.stories.prose.entityMentionedInProse.EntityMentionedInProseNotifier
 import com.soyle.stories.prose.entityMentionedInProse.EntityMentionedInProseReceiver
+import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
 import com.soyle.stories.prose.invalidateRemovedMentions.InvalidateRemovedMentionsController
 import com.soyle.stories.prose.invalidateRemovedMentions.InvalidateRemovedMentionsControllerImpl
 import com.soyle.stories.prose.proseCreated.ProseCreatedNotifier
@@ -91,6 +92,7 @@ object UseCases {
             GetStoryElementsToMentionInSceneUseCase(
                 get(),
                 get(),
+                get(),
                 get()
             )
         }
@@ -110,9 +112,12 @@ object UseCases {
                 get()
             )
         }
+        provide(DetectInvalidatedMentions.OutputPort::class) {
+            DetectInvalidatedMentionsOutput()
+        }
 
         provide<DetectInvalidatedMentions> {
-            DetectInvalidatedMentionsUseCase(get(), get(), get())
+            DetectInvalidatedMentionsUseCase(get(), get(), get(), get())
         }
     }
 
