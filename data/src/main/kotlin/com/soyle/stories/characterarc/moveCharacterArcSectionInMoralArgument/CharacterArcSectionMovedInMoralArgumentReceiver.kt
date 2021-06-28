@@ -1,9 +1,0 @@
-package com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument
-
-import com.soyle.stories.characterarc.usecases.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgument
-
-interface CharacterArcSectionMovedInMoralArgumentReceiver {
-
-    suspend fun receiveCharacterArcSectionsMovedInMoralArgument(events: List<CharacterArcSectionMovedInMoralArgument>)
-
-}

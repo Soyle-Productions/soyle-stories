@@ -1,7 +1,0 @@
-rootProject.name = 'soyle-stories-desktop'
-include ":application"
-include ":data"
-include ":gui"
-include ":infrastructure"
-
-includeBuild("../soyle-stories-core")

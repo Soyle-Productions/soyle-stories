@@ -18,7 +18,3 @@ gradle-app.setting
 /gradlew
 /gradlew.bat
 /gradle/
-
-# Ignore updates to local variables
-local-repositories.gradle
-local-properties.properties
