@@ -68,3 +68,11 @@ fun CharacterConflict.changeMoralWeaknessTo(weakness: String)
         psychologicalWeaknessInput!!.requestFocus()
     }
 }
+
+fun CharacterConflict.addOpponentCharacter(character: Character)
+{
+    drive {
+        addOpponentSelection.show()
+        addOpponentSelection.items.single { it.id == character.id.uuid.toString() }.fire()
+    }
+}

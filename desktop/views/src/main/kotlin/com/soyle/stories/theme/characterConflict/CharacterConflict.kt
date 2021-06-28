@@ -261,6 +261,7 @@ class CharacterConflict : View() {
 
     private fun Parent.addOpponentSelection() {
         menubutton("Add Opponent") {
+            id = "add-opponent-selection"
             existsWhen {
                 model.isLarge.or(
                     selectedContentTab.isEqualTo(

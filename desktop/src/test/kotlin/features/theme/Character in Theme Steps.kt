@@ -35,6 +35,16 @@ class `Character in Theme Steps` : En {
                 .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
                 .givenFocusedOnPerspectiveCharacter(character.id)
         }
+        Given(
+            "I have added the {character} as an opponent to {string} in the {theme}"
+        ) { toBeOpponent: Character, perspectiveCharacterName: String, theme: Theme ->
+            val perspectiveCharacterId = theme.characters.single { it.name == perspectiveCharacterName }.id
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
+                .givenFocusedOnPerspectiveCharacter(perspectiveCharacterId)
+                .addOpponentCharacter(toBeOpponent)
+        }
     }
 
     private fun whens() {
@@ -70,6 +80,14 @@ class `Character in Theme Steps` : En {
                 .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
                 .givenFocusedOnPerspectiveCharacter(character.id)
                 .changeMoralWeaknessTo(weakness)
+        }
+        When(
+            "I examine the {theme}'s central conflict for the {character}"
+        ) { theme: Theme, character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
+                .focusOnPerspectiveCharacter(character.id)
         }
     }
 

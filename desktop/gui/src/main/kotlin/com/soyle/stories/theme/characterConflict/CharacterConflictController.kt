@@ -49,7 +49,7 @@ class CharacterConflictController(
                 examineCentralConflict.invoke(themeId, preparedCharacterId, examineCentralConflictOutputPort)
             } catch(e: CharacterIsNotMajorCharacterInTheme) {
                 if (preparedCharacterId != null && e.characterId == preparedCharacterId) {
-                    promoteMinorCharacterController.promoteCharacter(themeId.toString(), preparedCharacterId.toString())
+                    promoteMinorCharacterController.promoteCharacter(themeId.toString(), preparedCharacterId.toString()).join()
                     examineCentralConflict.invoke(themeId, preparedCharacterId, examineCentralConflictOutputPort)
                 } else throw e
             }

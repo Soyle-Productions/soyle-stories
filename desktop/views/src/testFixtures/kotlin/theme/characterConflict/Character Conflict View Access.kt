@@ -46,4 +46,7 @@ class `Character Conflict View Access`(val view: CharacterConflict) : NodeAccess
 
     private val moralWeaknessField: Field? by temporaryChild<Field>(CssRule.id("moral-weakness-field"))
     val moralWeaknessInput: TextInputControl? by moralWeaknessField.temporaryChild(Stylesheet.textInput)
+
+    val addOpponentSelection: MenuButton by mandatoryChild(CssRule.id("add-opponent-selection"))
+
 }
