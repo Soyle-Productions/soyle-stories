@@ -8,7 +8,7 @@ class CreateCharacterDialogController(
 ) : CreateCharacterDialogViewListener {
 
     override fun createCharacter(name: NonBlankString) {
-        buildNewCharacterController.createCharacter(name) { throw it }
+        buildNewCharacterController.createCharacter(name)
     }
 
     override fun createCharacterAndIncludeInTheme(name: NonBlankString, includeInTheme: String) {

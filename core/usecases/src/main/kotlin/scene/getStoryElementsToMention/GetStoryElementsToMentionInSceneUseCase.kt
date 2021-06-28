@@ -43,7 +43,7 @@ class GetStoryElementsToMentionInSceneUseCase(
     private suspend fun getMatchingCharacterElements(
         scene: Scene,
         query: String
-    ) = getCharactersInProjectWithMatchingName(scene.projectId, query).map(::characterAsMatchingStoryElement)
+    ) = getCharactersInProjectWithMatchingName(scene.projectId, query).map(::characterNameAsMatchingStoryElement)
 
     private suspend fun getMatchingSymbolElements(
         scene: Scene,
@@ -52,7 +52,12 @@ class GetStoryElementsToMentionInSceneUseCase(
 
     private suspend fun getCharactersInProjectWithMatchingName(projectId: Project.Id, query: String) =
         characterRepository.listCharactersInProject(projectId).asSequence()
-            .filter { it.name.value.matchesQuery(query) }
+            .flatMap { character ->
+                sequenceOf(character.name to character) +
+                character.otherNames.asSequence()
+                    .map { it to character }
+            }
+            .filter { it.first.value.matchesQuery(query) }
 
     private suspend fun getLocationsInProjectWithMatchingName(projectId: Project.Id, query: String) =
         locationRepository.getAllLocationsInProject(projectId).asSequence()
@@ -69,8 +74,9 @@ class GetStoryElementsToMentionInSceneUseCase(
 
     private fun String.matchesQuery(query: String) = contains(query, ignoreCase = true)
 
-    private fun characterAsMatchingStoryElement(character: Character) =
-        MatchingStoryElement(character.id.mentioned(), character.name.value, null)
+    private fun characterNameAsMatchingStoryElement(characterName: Pair<NonBlankString, Character>) =
+        MatchingStoryElement(characterName.second.id.mentioned(), characterName.first.value,
+            if (characterName.first == characterName.second.name) null else characterName.second.name.value)
 
     private fun locationAsMatchingStoryElement(location: Location) =
         MatchingStoryElement(location.id.mentioned(), location.name.value, null)

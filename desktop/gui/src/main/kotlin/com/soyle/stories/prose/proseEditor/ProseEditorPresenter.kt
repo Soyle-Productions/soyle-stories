@@ -1,6 +1,10 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.prose.content.ProseContent
+import com.soyle.stories.domain.prose.MentionedCharacterId
+import com.soyle.stories.domain.prose.MentionedLocationId
+import com.soyle.stories.domain.prose.MentionedSymbolId
+import com.soyle.stories.domain.prose.events.*
 import com.soyle.stories.domain.validation.SingleLine
 import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.gui.View
@@ -59,6 +63,9 @@ class ProseEditorPresenter internal constructor(
                         it.name.substring(index - 1, index) == " " -> 1
                         else -> 2
                     }
+                },
+                {
+                    it.name.length.toDouble() / query.length
                 }
             )).map {
                 MatchingStoryElementViewModel(
@@ -129,13 +136,13 @@ class ProseEditorPresenter internal constructor(
         }
     }
 
-    private fun breakBodyIntoContentElements(body: String, mentions: List<ProseMention<*>>): List<ContentElement> {
+    private fun breakBodyIntoContentElements(body: String, mentions: List<ProseContent.Mention<*>>): List<ContentElement> {
         var lastMentionEnd = 0
         return mentions.flatMap { mention ->
-            val mentionText = body.substring(mention.start(), mention.end())
-            body.splitIntoBasicTextLines(lastMentionEnd, mention.start())
+            val mentionText = body.substring(mention.startIndex, mention.endIndex)
+            body.splitIntoBasicTextLines(lastMentionEnd, mention.startIndex)
                 .plus(Mention(mentionText, mention.entityId))
-                .also { lastMentionEnd = mention.end() }
+                .also { lastMentionEnd = mention.endIndex }
         } + if (lastMentionEnd < body.length) body.splitIntoBasicTextLines(lastMentionEnd, body.length) else listOf()
     }
 
@@ -159,7 +166,7 @@ class ProseEditorPresenter internal constructor(
         }
     }
 
-    internal fun replaceRangeWithMention(range: IntRange, mention: ProseMention<*>, mentionedText: SingleLine) {
+    internal fun replaceRangeWithMention(range: IntRange, mention: com.soyle.stories.domain.prose.content.ProseContent.Mention<*>, mentionedText: SingleLine) {
         val newElement = Mention(mentionedText.toString(), mention.entityId)
         view.updateOrInvalidated {
             var offset = 0

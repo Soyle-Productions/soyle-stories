@@ -72,17 +72,24 @@ class `Detect Unused Symbols Unit Test` {
 
                 private val symbolsNotMentioned = List(3) { makeSymbol() }
                 private val symbolMentioned = makeSymbol()
+                private val mentionedSymbolThemeId = Theme.Id()
 
                 init {
                     prose.withTextInserted(symbolMentioned.name)
                         .prose.withEntityMentioned(
-                            symbolMentioned.id.mentioned(Theme.Id()),
+                            symbolMentioned.id.mentioned(mentionedSymbolThemeId),
                             0,
                             symbolMentioned.name.length
                         )
                         .prose.let { proseRepository.givenProse(it) }
                     (symbolsNotMentioned + symbolMentioned).fold(scene) { nextScene, symbol ->
-                        nextScene.withSymbolTracked(makeTheme(symbols = listOf(symbol)), symbol, true).scene
+                        val themeId = if (symbol isSameEntityAs symbolMentioned) mentionedSymbolThemeId else Theme.Id()
+
+                        nextScene.withSymbolTracked(
+                            makeTheme(id = themeId, symbols = listOf(symbol)),
+                            symbol,
+                            true
+                        ).scene
                     }.let { sceneRepository.givenScene(it) }
                 }
 

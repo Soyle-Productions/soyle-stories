@@ -1,7 +1,12 @@
 package com.soyle.stories.prose.proseEditor
 
+import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
+import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
 import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.prose.content.ProseContent
+import com.soyle.stories.domain.prose.events.ContentReplaced
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.SingleLine
@@ -25,6 +30,7 @@ import com.soyle.stories.usecase.theme.removeSymbolFromTheme.SymbolRemovedFromTh
 
 fun interface OnLoadMentionQueryOutput : (List<GetStoryElementsToMentionInScene.MatchingStoryElement>) -> Unit
 fun interface OnLoadMentionReplacementsOutput {
+
     fun loadedReplacements(replacements: List<ListOptionsToReplaceMentionInSceneProse.MentionOption<*>>)
 }
 
@@ -35,11 +41,12 @@ class ProseEditorController private constructor(
     private val invalidateRemovedMentionsController: InvalidateRemovedMentionsController,
     private val editProseController: EditProseController,
     private val onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit,
-    private val onUseStoryElement: (ProseMention<*>) -> Unit,
+    private val onUseStoryElement: (com.soyle.stories.domain.prose.content.ProseContent.Mention<*>) -> Unit,
     private val onLoadMentionReplacements: (MentionedEntityId<*>, OnLoadMentionReplacementsOutput) -> Unit,
     private val presenter: ProseEditorPresenter
 ) : ReadProse.OutputPort, ProseEditorViewListener, ContentReplacedReceiver, MentionTextReplacedReceiver,
-    DetectInvalidatedMentions.OutputPort, RemovedCharacterReceiver, DeletedLocationReceiver, ThemeDeletedReceiver, SymbolRemovedFromThemeReceiver {
+    DetectInvalidatedMentions.OutputPort, RemovedCharacterReceiver, DeletedLocationReceiver, ThemeDeletedReceiver,
+    SymbolRemovedFromThemeReceiver, CharacterNameVariantRemovedReceiver {
 
     constructor(
         proseId: Prose.Id,
@@ -48,7 +55,7 @@ class ProseEditorController private constructor(
         invalidateRemovedMentionsController: InvalidateRemovedMentionsController,
         editProseController: EditProseController,
         onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit,
-        onUseStoryElement: (ProseMention<*>) -> Unit,
+        onUseStoryElement: (com.soyle.stories.domain.prose.content.ProseContent.Mention<*>) -> Unit,
         onLoadMentionReplacements: (MentionedEntityId<*>, OnLoadMentionReplacementsOutput) -> Unit,
     ) : this(
         proseId,
@@ -71,7 +78,6 @@ class ProseEditorController private constructor(
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
-
     override fun getMentionReplacementOptions(mention: Mention) {
         onLoadMentionReplacements.invoke(mention.entityId, presenter)
     }
@@ -90,7 +96,12 @@ class ProseEditorController private constructor(
         val queryState = view.viewModel?.mentionQueryState ?: return
         if (queryState is MentionQueryLoaded) {
             val match = queryState.prioritizedMatches[filteredListIndex]
-            val newMention = ProseMention(match.id, ProseMentionRange(queryState.primedIndex, match.name.length))
+            val newMention = object : ProseContent.Mention<Any> {
+                override val entityId: MentionedEntityId<Any> = match.id as MentionedEntityId<Any>
+                override val startIndex: Int = queryState.primedIndex
+                override val endIndex: Int = queryState.primedIndex + match.name.length
+                override val text: SingleLine = match.name
+            }
             presenter.replaceRangeWithMention(
                 queryState.primedIndex..queryState.primedIndex + queryState.query.length + 1,
                 newMention,
@@ -166,6 +177,10 @@ class ProseEditorController private constructor(
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
+    override suspend fun receiveCharacterNameVariantRemoved(event: CharacterNameVariantRemoved) {
+        invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
+    }
+
     override fun save() {
         val viewModel = view.viewModel ?: return
         if (viewModel.isLocked) return
@@ -173,8 +188,7 @@ class ProseEditorController private constructor(
         updateProse(content)
     }
 
-    private fun List<ContentElement>.collapseAdjacentBasicTexts(): List<ContentElement>
-    {
+    private fun List<ContentElement>.collapseAdjacentBasicTexts(): List<ContentElement> {
         return fold(ArrayList<ContentElement>(this.size)) { collapsedList, element ->
             val previousElement = collapsedList.lastOrNull()
             if (element is BasicText && previousElement is BasicText) {
@@ -187,36 +201,36 @@ class ProseEditorController private constructor(
         }
     }
 
-    private fun updateProse(content: List<ContentElement>)
-    {
+    private fun updateProse(content: List<ContentElement>) {
         presenter.replaceContentAndLockInput(content)
-        val proseContent = content.fold(mutableListOf<ProseContent>()) { resultList, element ->
-            val previousElement = resultList.lastOrNull()
-            val previousMention = previousElement?.mention
-            when (element) {
-                is BasicText -> when {
-                    previousMention == null && previousElement != null -> {
+        val proseContent =
+            content.fold(mutableListOf<com.soyle.stories.domain.prose.ProseContent>()) { resultList, element ->
+                val previousElement = resultList.lastOrNull()
+                val previousMention = previousElement?.mention
+                when (element) {
+                    is BasicText -> when {
+                        previousMention == null && previousElement != null -> {
+                            resultList.removeLast()
+                            resultList.add(ProseContent(previousElement.text + element.text, null))
+                        }
+                        else -> {
+                            resultList.add(ProseContent(element.text, null))
+                        }
+                    }
+                    is Mention -> if (previousElement != null && previousMention == null) {
                         resultList.removeLast()
-                        resultList.add(ProseContent(previousElement.text + element.text, null))
-                    }
-                    else -> {
-                        resultList.add(ProseContent(element.text, null))
-                    }
-                }
-                is Mention -> if (previousElement != null && previousMention == null) {
-                    resultList.removeLast()
-                    resultList.add(
-                        ProseContent(
-                            previousElement.text,
-                            element.entityId to countLines(element.text) as SingleLine
+                        resultList.add(
+                            ProseContent(
+                                previousElement.text,
+                                element.entityId to countLines(element.text) as SingleLine
+                            )
                         )
-                    )
-                } else {
-                    resultList.add(ProseContent("", element.entityId to countLines(element.text) as SingleLine))
+                    } else {
+                        resultList.add(ProseContent("", element.entityId to countLines(element.text) as SingleLine))
+                    }
                 }
-            }
-            resultList
-        }.toList()
+                resultList
+            }.toList()
 
         editProseController.updateProse(proseId, proseContent).invokeOnCompletion { failure ->
             if (failure != null) presenter.unlockInput()

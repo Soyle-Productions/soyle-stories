@@ -1,3 +1,5 @@
+import plugin.constants.kotlinVersion
+
 plugins {
     java
     kotlin("jvm")
@@ -36,6 +38,16 @@ dependencies {
     }
 }
 
+// in kotlin 1.5+, lambdas provided as SAM interfaces are compiled without a backing class
+// This causes the cucumber-java8 framework to fail because it can't handle lambdas without a backing class
+// by adding Xsam-conversions = class as a compiler argument for the test code compilation,
+// we increase the resulting code size, but it only affects the test code, and we can continue to use
+// lambdas and cucumber-java8 instead of changing EVERY step definition to an annotated function with cucumber-java
+val compileTestKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    freeCompilerArgs += "-Xsam-conversions=class"
+}
+
 runtime {
     options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
     modules.set(
@@ -50,9 +62,34 @@ runtime {
         )
     )
 
-    targetPlatform("linux", System.getenv("JAVA_HOME"))
-    targetPlatform("mac", System.getenv("JAVA_HOME"))
+    //targetPlatform("linux", System.getenv("JAVA_HOME"))
+    //targetPlatform("mac", System.getenv("JAVA_HOME"))
     targetPlatform("win", System.getenv("JAVA_HOME"))
+
+    jpackage {
+        resourceDir = File("$buildDir/resources")
+        imageOptions = listOf(
+            "--icon", "\"Soyle Stories.ico\""
+        )
+        imageName = application.applicationName
+        installerName = application.applicationName
+        installerOptions = listOf(
+            "--win-menu",
+            "--win-shortcut",
+            "--win-dir-chooser",
+            "--win-menu-group", "Soyle Studio",
+            "--description", "\"Manage your story with ease.\"",
+            "--vendor", "\"Soyle Productions\""
+        )
+    }
+}
+
+tasks.getByName("jpackageImage").doLast {
+    copy {
+        from("src/main/resources")
+        include("Soyle Stories.ico")
+        into("$buildDir/jpackage/${application.applicationName}")
+    }
 }
 
 tasks.withType<CreateStartScripts> {

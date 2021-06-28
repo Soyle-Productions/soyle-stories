@@ -1,6 +1,8 @@
 package com.soyle.stories.soylestories
 
+import com.soyle.stories.common.ColorStyles
 import com.soyle.stories.common.components.ComponentsStyles
+import com.soyle.stories.common.components.surfaces.SurfaceStyles
 import javafx.scene.image.Image
 import javafx.scene.paint.Color
 import javafx.scene.paint.CycleMethod
@@ -269,9 +271,20 @@ class Styles : Stylesheet() {
 
     companion object {
 
-        val Purple = Color.web("#862F89")
-        val Orange = Color.web("#D38147")
-        val Blue = Color.web("#3A518E")
+        @Deprecated("Moved", ReplaceWith("com.soyle.stories.common.ColorStyles.primaryColor"))
+        val primaryColor = ColorStyles.primaryColor
+
+        @Deprecated("Moved", ReplaceWith("com.soyle.stories.common.ColorStyles.secondaryColor"))
+        val secondaryColor = ColorStyles.secondaryColor
+
+        @Deprecated("Moved", ReplaceWith("com.soyle.stories.common.ColorStyles.Purple"))
+        val Purple = ColorStyles.Purple
+
+        @Deprecated("Moved", ReplaceWith("com.soyle.stories.common.ColorStyles.Orange"))
+        val Orange = ColorStyles.Orange
+
+        @Deprecated("Moved", ReplaceWith("com.soyle.stories.common.ColorStyles.Blue"))
+        val Blue = ColorStyles.Blue
 
         val appIcon = Image("com/soyle/stories/soylestories/icon.png")
         val logo = Image("com/soyle/stories/soylestories/bronze logo.png")
@@ -289,6 +302,7 @@ class Styles : Stylesheet() {
 
     init {
         root {
+            baseColor = SurfaceStyles.lightBackground(1.0)
             accentColor = Blue
             focusColor = Purple
         }

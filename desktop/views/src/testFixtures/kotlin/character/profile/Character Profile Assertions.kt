@@ -1,0 +1,37 @@
+package com.soyle.stories.desktop.view.character.profile
+
+import com.soyle.stories.character.profile.CharacterProfileView
+import com.soyle.stories.desktop.view.character.profile.`Character Profile View Access`.Companion.access
+import com.soyle.stories.domain.character.Character
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+
+class `Character Profile Assertions` private constructor(private val access: `Character Profile View Access`) {
+    companion object {
+        fun assertThat(view: CharacterProfileView, assertions: `Character Profile Assertions`.() -> Unit) {
+            `Character Profile Assertions`(view.access()).assertions()
+        }
+    }
+
+    fun isNotCreatingNameVariant()
+    {
+        assertTrue(access.createCharacterNameVariantForm?.isVisible != true)
+    }
+
+    fun isCreatingNameVariant()
+    {
+        assertTrue(access.createCharacterNameVariantForm?.isVisible == true)
+    }
+
+    fun hasNameVariant(expectedVariant: String) {
+        assertNotNull(access.getCharacterAltNameItem(expectedVariant))
+    }
+
+    fun isRenamingNameVariant(variant: String) {
+        assertTrue(access.altNameRenameField(variant)?.isVisible == true)
+    }
+
+    fun isNotRenamingNameVariantFor(character: Character) = character.otherNames.none {
+        access.altNameRenameField(it.value)?.isVisible == true
+    }
+}

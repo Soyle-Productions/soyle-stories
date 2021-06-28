@@ -7,6 +7,8 @@ import com.soyle.stories.desktop.config.drivers.theme.createSymbolAndThemeNamed
 import com.soyle.stories.desktop.config.drivers.theme.createSymbolWithName
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.prose.MentionedCharacterId
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Theme
@@ -44,6 +46,12 @@ class `Scene Prose Steps` : En {
         ) { mentionName: String, scene: Scene ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenSceneProseDoesNotMention(scene, mentionName)
+        }
+        Given(
+            "I have mentioned the {string} name variant for the {character} in the {scene}'s prose"
+        ) { nameVariant: String, character: Character, scene: Scene ->
+            SceneDriver(soyleStories.getAnyOpenWorkbenchOrError())
+                .givenSceneProseMentionsEntity(scene, MentionedCharacterId(character.id), nameVariant)
         }
 
 
@@ -86,6 +94,26 @@ class `Scene Prose Steps` : En {
                 andProseEditor {
                     isShowingMentionIssueMenuForMention(mentionText)
                     mentionIssueReplacementMenuHasOption("Create New Symbol")
+                }
+            }
+        }
+        Then(
+            "I should see the following matching characters for the {scene} in this order"
+        ) { scene: Scene, data: DataTable ->
+            val rows = data.asLists().drop(1) // first row is header
+
+            val sceneEditor = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenSceneListToolHasBeenOpened()
+                .givenSceneEditorToolHasBeenOpened(scene)
+
+            SceneEditorAssertions.assertThat(sceneEditor) {
+                andProseEditor {
+                    suggestedMentionListIsVisible()
+                    isListingAllStoryElementsInOrder(rows.map {
+                        val (nameVariant, fullName) = it
+                        if (fullName.isNullOrBlank()) Triple(nameVariant, "character", null)
+                        else Triple(nameVariant, "character", fullName)
+                    })
                 }
             }
         }

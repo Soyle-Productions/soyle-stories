@@ -1,7 +1,7 @@
 package com.soyle.stories.prose.editProse
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.domain.prose.ContentReplaced
+import com.soyle.stories.domain.prose.events.ContentReplaced
 
 class ContentReplacedNotifier : Notifier<ContentReplacedReceiver>(), ContentReplacedReceiver {
 

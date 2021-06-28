@@ -1,6 +1,6 @@
 package com.soyle.stories.usecase.theme.renameSymbol
 
-import com.soyle.stories.domain.prose.MentionTextReplaced
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.events.SceneEvent
 import com.soyle.stories.domain.scene.SceneUpdate
@@ -61,7 +61,7 @@ class RenameSymbolUseCase(
         val entityId = symbol.id.mentioned(themeId)
         val updates = proseRepository.getProseThatMentionEntity(entityId)
             .map {
-                it.withMentionTextReplaced(entityId, name)
+                it.withMentionTextReplaced(entityId, symbol.name to name)
             }
         proseRepository.replaceProse(updates.map { it.prose })
         return updates.mapNotNull { it.event }

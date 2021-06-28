@@ -12,5 +12,6 @@ fun makeCharacter(
     id: Character.Id = Character.Id(),
     projectId: Project.Id = Project.Id(),
     name: NonBlankString = characterName(),
+    otherNames: Set<NonBlankString> = setOf(),
     media: Media.Id? = null
-) = Character(id, projectId, name, media)
+) = Character(id, projectId, name, otherNames, media)

@@ -1,6 +1,7 @@
 package com.soyle.stories.layout
 
 import com.soyle.stories.common.async
+import com.soyle.stories.common.components.surfaces.SurfaceStyles
 import com.soyle.stories.di.layout.ToolModule
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
@@ -12,14 +13,8 @@ import javafx.geometry.Side
 import javafx.scene.Parent
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
-import javafx.scene.paint.Color
 import tornadofx.*
 
-/**
- * Created by Brendan
- * Date: 2/15/2020
- * Time: 4:08 PM
- */
 class ToolGroup : WindowChild() {
 
     override val scope = super.scope as ProjectScope
@@ -58,6 +53,7 @@ class ToolGroup : WindowChild() {
                                 }
                                 it.consume()
                             }
+                            toggleClass(SurfaceStyles.elevated[8], tab.selectedProperty())
                             receivingUpdate = true
                             selectionModel.select(tab)
                             receivingUpdate = false
@@ -81,9 +77,6 @@ class ToolGroup : WindowChild() {
             visibleWhen { isEmpty }
             alignment = Pos.CENTER
             fitToParentSize()
-            style {
-                backgroundColor += Color.LIGHTGRAY
-            }
         }
     }
 }

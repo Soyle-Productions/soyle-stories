@@ -9,8 +9,8 @@ import tornadofx.*
 
 class CharacterEditorModel : ProjectScopedModel<IncludedCharacterViewModel>() {
 
-    val isIncitingCharacter = bind { (it?.roleInScene == CharacterRoleInScene.IncitingCharacter) } as Property
-    val isOpponentCharacter = bind { (it?.roleInScene == CharacterRoleInScene.OpponentToIncitingCharacter) } as Property
+    val isIncitingCharacter = bind { (it?.roleInScene == CharacterRoleInScene.IncitingCharacter) }
+    val isOpponentCharacter = bind { (it?.roleInScene == CharacterRoleInScene.OpponentToIncitingCharacter) }
     val desire = bind(IncludedCharacterViewModel::desire)
     val motivation = bind(IncludedCharacterViewModel::motivation)
     val previousMotivation = bind(IncludedCharacterViewModel::previousMotivation)

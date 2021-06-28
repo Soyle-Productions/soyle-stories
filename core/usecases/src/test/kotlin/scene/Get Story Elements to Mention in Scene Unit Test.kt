@@ -58,28 +58,53 @@ class `Get Story Elements to Mention in Scene Unit Test` {
     @Nested
     inner class `Characters with string matching` {
 
-        private val charactersByName: Map<String, Character>
-
         init {
             sceneRepository.givenScene(scene)
-            charactersByName = listOf(
-                makeCharacter(projectId = scene.projectId, name = nonBlankStr("Billy")),
-                makeCharacter(projectId = scene.projectId, name = nonBlankStr("John Boy")),
-                makeCharacter(projectId = scene.projectId, name = nonBlankStr("Hallboid")),
-                makeCharacter(projectId = scene.projectId, name = nonBlankStr("Katherine")),
-                makeCharacter(name = nonBlankStr("Benjamin"))
-            ).onEach(characterRepository::givenCharacter)
-                .associateBy { it.name.value }
         }
 
         @Test
-        fun `should list characters with matching string in same project`() {
+        fun `should only match against characters in the same project as the scene`() {
+            characterRepository.givenCharacter(makeCharacter(name = nonBlankStr("Billy")))
+
+            getStoryElementsToMentionInScene("B")
+
+            result!!.isEmpty().mustEqual(true)
+        }
+
+        @Test
+        fun `matching should be case-insensitive`() {
+            val character = makeCharacter(projectId = scene.projectId, name = nonBlankStr("Billy"))
+                .also(characterRepository::givenCharacter)
+
             getStoryElementsToMentionInScene("b")
+
             result!!.toList().mustEqual(
                 listOf(
-                    MatchingStoryElement(charactersByName.getValue("Billy").id.mentioned(), "Billy", null),
-                    MatchingStoryElement(charactersByName.getValue("John Boy").id.mentioned(), "John Boy", null),
-                    MatchingStoryElement(charactersByName.getValue("Hallboid").id.mentioned(), "Hallboid", null),
+                    MatchingStoryElement(character.id.mentioned(), "Billy", null)
+                )
+            )
+        }
+
+        @Test
+        fun `can match against alternative names`() {
+            val frank = makeCharacter(projectId = scene.projectId, name = nonBlankStr("Frank"),
+                otherNames = setOf(
+                    nonBlankStr("Billy")
+                )
+            ).also(characterRepository::givenCharacter)
+            val bob = makeCharacter(projectId = scene.projectId, name = nonBlankStr("Bob"),
+                otherNames = setOf(
+                    nonBlankStr("Robert")
+                )
+            ).also(characterRepository::givenCharacter)
+
+            getStoryElementsToMentionInScene("b")
+
+            result!!.toList().mustEqual(
+                listOf(
+                    MatchingStoryElement(frank.id.mentioned(), "Billy", "Frank"),
+                    MatchingStoryElement(bob.id.mentioned(), "Bob", null),
+                    MatchingStoryElement(bob.id.mentioned(), "Robert", "Bob")
                 )
             )
         }

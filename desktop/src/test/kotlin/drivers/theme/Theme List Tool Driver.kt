@@ -79,3 +79,15 @@ fun ThemeList.renameSymbolInThemeTo(originalSymbolName: String, themeName: Strin
         }
     }
 }
+
+fun ThemeList.openCharacterConflict(themeId: Theme.Id)
+{
+    val driver = ThemeListDriver(this)
+    val tree = driver.getTree()
+    val themeItem = driver.getThemeItemOrError(themeId)
+    val examineConflictItem = themeItemContextMenu.items.find { it.id == "examine_conflict" }!!
+    driver.interact {
+        tree.selectionModel.select(themeItem)
+        examineConflictItem.fire()
+    }
+}

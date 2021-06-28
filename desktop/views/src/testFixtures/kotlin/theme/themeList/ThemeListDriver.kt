@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.view.theme.themeList
 
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.theme.themeList.SymbolListItemViewModel
 import com.soyle.stories.theme.themeList.ThemeList
 import com.soyle.stories.theme.themeList.ThemeListItemViewModel
@@ -10,6 +11,18 @@ import org.testfx.api.FxRobot
 class ThemeListDriver(private val themeList: ThemeList) : FxRobot() {
 
     fun getTree(): TreeView<Any?> = from(themeList.root).lookup(".tree-view").query<TreeView<Any?>>()
+
+    fun getThemeItemOrError(themeId: Theme.Id): TreeItem<Any?> =
+        getThemeItem(themeId) ?: error("No item in theme list with id $themeId")
+
+    fun getThemeItem(themeId: Theme.Id): TreeItem<Any?>?
+    {
+        return getTree().root.children.asSequence().mapNotNull {
+            val value = it.value as? ThemeListItemViewModel
+            if (value != null && value.themeId == themeId.uuid.toString()) it as TreeItem<Any?>
+            else null
+        }.firstOrNull()
+    }
 
     fun getThemeItemOrError(themeName: String): TreeItem<Any?> =
         getThemeItem(themeName) ?: error("No item in theme list with name $themeName")

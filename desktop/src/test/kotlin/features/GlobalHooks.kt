@@ -34,7 +34,7 @@ class GlobalHooks : En {
     }
 
     private fun synchronizeBackgroundTasks() {
-        DI.registerTypeFactory(ThreadTransformer::class, ApplicationScope::class) { SyncThreadTransformer() }
+        DI.register(ThreadTransformer::class, ApplicationScope::class, { SyncThreadTransformer() })
     }
 
     init {
@@ -73,7 +73,7 @@ class GlobalHooks : En {
         }
 
         ParameterType<Character?>("character", "character \"(.*?)\"|\"(.*?)\" character") { name: String ->
-            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByName(name)
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByNameOrError(name)
         }
         ParameterType<Location?>("location", "location \"(.*?)\"|\"(.*?)\" location") { name: String ->
             LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByName(name)

@@ -4,6 +4,7 @@ import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.prose.*
+import com.soyle.stories.domain.singleLine
 import com.soyle.stories.usecase.prose.readProse.ReadProse
 import com.soyle.stories.usecase.prose.readProse.ReadProseUseCase
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
@@ -43,7 +44,7 @@ class `Read Prose Unit Test` {
 
         @Test
         fun `should output prose content`() {
-            proseRepository.givenProse(makeProse(id = prose.id, content = "I'm a funky monkey\nfrom funky town."))
+            proseRepository.givenProse(makeProse(id = prose.id, content = listOf(ProseContent("I'm a funky monkey\nfrom funky town.", null))))
             readProse()
             val result = result!!
             result.body.mustEqual(
@@ -59,21 +60,18 @@ class `Read Prose Unit Test` {
             proseRepository.givenProse(
                 makeProse(
                     id = prose.id,
-                    content = "I'm a funky monkey\nfrom funky town.",
-                    mentions = listOf(
-                        ProseMention(characterId.mentioned(), ProseMentionRange(12, 6)),
-                        ProseMention(locationId.mentioned(), ProseMentionRange(24, 10))
+                    content = listOf(
+                        ProseContent("I'm a funky ", characterId.mentioned() to singleLine("monkey")),
+                        ProseContent("\nfrom ", locationId.mentioned() to singleLine("funky town")),
+                        ProseContent(".",null)
                     )
                 )
             )
             readProse()
             val result = result!!
-            result.mentions.mustEqual(
-                listOf(
-                    ProseMention(characterId.mentioned(), ProseMentionRange(12, 6)),
-                    ProseMention(locationId.mentioned(), ProseMentionRange(24, 10))
-                )
-            )
+            result.mentions.map { it.entityId }.mustEqual(listOf(characterId.mentioned(), locationId.mentioned()))
+            result.mentions.map { it.startIndex }.mustEqual(listOf(12, 24))
+            result.mentions.map { it.endIndex }.mustEqual(listOf(18, 34))
         }
 
     }

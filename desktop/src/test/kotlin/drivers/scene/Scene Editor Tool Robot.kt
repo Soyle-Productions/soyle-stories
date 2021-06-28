@@ -1,6 +1,6 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
-import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterDialog
+import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterForm
 import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialogOrError
 import com.soyle.stories.desktop.config.drivers.location.getCreateLocationDialogOrError
 import com.soyle.stories.desktop.config.drivers.theme.getCreateSymbolDialogOrError
@@ -20,8 +20,10 @@ import com.soyle.stories.scene.sceneEditor.SceneEditorScope
 import com.soyle.stories.scene.sceneEditor.SceneEditorView
 import com.soyle.stories.scene.sceneList.SceneListView
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
+import javafx.event.EventType
 import javafx.scene.input.ContextMenuEvent
 import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.input.PickResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -236,7 +238,7 @@ fun SceneEditorView.selectReplacementSuggestion(suggestionText: String)
     }
 }
 
-fun SceneEditorView.givenReplacingInvestigatedMentionWithNewCharacter(): CreateCharacterDialog
+fun SceneEditorView.givenReplacingInvestigatedMentionWithNewCharacter(): CreateCharacterForm
 {
     val replacementOption = with(driver().getProseEditor().driver()) {
         mentionIssueMenu!!.replacementOption()!!

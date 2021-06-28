@@ -1,6 +1,6 @@
 package com.soyle.stories.scene.trackSymbolInScene
 
-import com.soyle.stories.domain.prose.ContentReplaced
+import com.soyle.stories.domain.prose.events.ContentReplaced
 import com.soyle.stories.prose.editProse.ContentReplacedReceiver
 import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.SynchronizeTrackedSymbolsWithProse
 

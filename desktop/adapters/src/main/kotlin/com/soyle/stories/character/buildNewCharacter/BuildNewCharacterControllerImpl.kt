@@ -4,6 +4,7 @@ import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacter
 import com.soyle.stories.usecase.character.createPerspectiveCharacter.CreatePerspectiveCharacter
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.validation.NonBlankString
+import kotlinx.coroutines.Job
 import java.util.*
 
 class BuildNewCharacterControllerImpl(
@@ -17,11 +18,9 @@ class BuildNewCharacterControllerImpl(
 
     private val projectId = UUID.fromString(projectId)
 
-    override fun createCharacter(name: NonBlankString, onError: (Throwable) -> Unit) {
-        threadTransformer.async {
-            try {
-                buildNewCharacter.invoke(projectId, name, buildNewCharacterOutputPort)
-            } catch (t: Throwable) { onError(t) }
+    override fun createCharacter(name: NonBlankString): Job {
+        return threadTransformer.async {
+            buildNewCharacter.invoke(projectId, name, buildNewCharacterOutputPort)
         }
     }
 

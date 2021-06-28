@@ -5,9 +5,7 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.soylestories.ApplicationScope
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.binding.IntegerBinding
-import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleMapProperty
-import javafx.beans.property.SimpleSetProperty
+import javafx.beans.property.*
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Bounds
@@ -15,14 +13,22 @@ import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.skin.TextAreaSkin
 import javafx.scene.control.skin.VirtualFlow
+import javafx.scene.image.ImageView
+import javafx.scene.input.ContextMenuEvent
 import javafx.scene.text.Text
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import tornadofx.*
+import tornadofx.Stylesheet.Companion.selected
 import java.util.*
 import kotlin.collections.LinkedHashSet
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
+import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.full.memberProperties
 
 /**
  * Created by Brendan
@@ -222,14 +228,71 @@ fun <T> ListView<T>.sizeToFitItems(maximumVisibleItems: Double = 11.5)
 operator fun CssClassDelegate.getValue(nothing: Nothing?, property: KProperty<*>): CssRule = getValue(fileObj, property)
 private val fileObj = Any()
 
-fun Node.applyContextMenu(contextMenu: ContextMenu)
+fun Node.applyContextMenu(contextMenu: ContextMenu, onRequested: (ContextMenuEvent?) -> Unit = {})
 {
 	if (this is Control) {
 		this.contextMenu = contextMenu
 	} else {
 		setOnContextMenuRequested {
 			contextMenu.show(this, it.screenX, it.screenY)
+			onRequested(it)
 			it.consume()
 		}
 	}
+}
+
+/**
+ * if the image is finished loading, the listener is called immediately.  Otherwise, when the image finishes loading or
+ * fails to load, the listener will be called.  If the image fails to load, [error] will be true.
+ */
+@OptIn(ExperimentalContracts::class)
+fun ImageView.onImageLoadingDone(listener: (error: Boolean) -> Unit) {
+	contract {
+		callsInPlace(listener, InvocationKind.EXACTLY_ONCE)
+	}
+	var wasCalled = false
+	val exactlyOneCallListener = { error: Boolean ->
+		if (! wasCalled) {
+			wasCalled = true
+			listener(error)
+		}
+	}
+	onImageLoadingDoneExactlyOnce(exactlyOneCallListener)
+}
+
+private fun ImageView.onImageLoadingDoneExactlyOnce(listener: (error: Boolean) -> Unit) {
+	if (image.isError) listener(true)
+	else if (image.progress == 1.0) listener(false)
+	else {
+		image.progressProperty().onChangeOnce {
+			onImageLoadingDone(listener)
+		}
+		image.errorProperty().onChangeOnce {
+			onImageLoadingDone(listener)
+		}
+	}
+}
+
+fun Node.makeSelectable(focusTraversable: Boolean = this.isFocusTraversable, selectionClass: CssRule? = null): BooleanProperty {
+	val selectedProperty = try {
+		this::class.memberFunctions.find { it.name == "selectedProperty" }?.call() as? BooleanProperty ?: SimpleBooleanProperty(false)
+	} catch (t: Throwable) {
+		SimpleBooleanProperty(false)
+	}
+
+	properties["selectedProperty"] = selectedProperty
+
+	isFocusTraversable = focusTraversable
+	if (focusTraversable) {
+		focusedProperty().onChange {
+			if (it) {
+
+			}
+		}
+	}
+	onLeftClick { selectedProperty.set(true) }
+	if (selectionClass != null) toggleClass(selectionClass, selectedProperty)
+	toggleClass(selected, selectedProperty)
+
+	return selectedProperty
 }

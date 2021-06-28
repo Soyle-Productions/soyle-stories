@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.config.drivers.character
 
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
+import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -22,6 +23,24 @@ class CharacterArcDriver private constructor(private val projectScope: ProjectSc
         if (previousVersions.lastOrNull() != arc) {
             timeMachine[arc.id] = previousVersions.apply { add(arc) }
         }
+    }
+
+    fun givenCharacterArcNamed(characterId: Character.Id, name: String): CharacterArc =
+        getCharacterArcNamed(characterId, name) ?: createCharacterArcNamed(characterId, name).run {
+            getCharacterArcNamed(characterId, name) ?: error("Character arc named $name was not created for $characterId")
+        }
+
+    fun getCharacterArcNamed(characterId: Character.Id, name: String): CharacterArc?
+    {
+        val repo = projectScope.get<CharacterArcRepository>()
+        return runBlocking {
+            repo.listCharacterArcsForCharacter(characterId).find { it.name == name }
+        }
+    }
+
+    private fun createCharacterArcNamed(characterId: Character.Id, name: String)
+    {
+        projectScope.get<PlanNewCharacterArcController>().planCharacterArc(characterId.uuid.toString(), name)
     }
 
     fun getPreviousVersions(arc: CharacterArc): List<CharacterArc> = timeMachine[arc.id]?.toList() ?: listOf()
