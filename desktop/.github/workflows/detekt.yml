@@ -1,0 +1,21 @@
+name: detekt
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+   detekt:
+     runs-on: ubuntu-latest
+
+     steps:
+       - name: "checkout"
+         uses: actions/checkout@v2
+
+       - name: "detekt"
+         uses: natiginfo/action-detekt-all@1.17.1
