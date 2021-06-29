@@ -38,4 +38,18 @@ open class NodeAccess<N : Node>(protected val node: N) : FxRobot() {
         }
     }
 
+    abstract class Factory<Target, N : Node, Accessor : NodeAccess<N>>(private val make: (Target) -> Accessor) {
+        fun Target.access(): Accessor = make(this)
+        fun Target.access(op: Accessor.() -> Unit) = access().op()
+        fun <T> Target.drive(op: Accessor.() -> T): T
+        {
+            val accessor = access()
+            var result: Result<T>? = null
+            accessor.interact {
+                result = kotlin.runCatching { accessor.op() }
+            }
+            return result!!.getOrThrow()
+        }
+    }
+
 }

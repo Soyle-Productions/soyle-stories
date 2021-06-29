@@ -91,3 +91,15 @@ fun ThemeList.openCharacterConflict(themeId: Theme.Id)
         examineConflictItem.fire()
     }
 }
+
+fun ThemeList.openCharacterComparison(themeId: Theme.Id)
+{
+    val driver = ThemeListDriver(this)
+    val tree = driver.getTree()
+    val themeItem = driver.getThemeItemOrError(themeId)
+    val compareCharactersItem = themeItemContextMenu.items.find { it.id == "compare-characters" }!!
+    driver.interact {
+        tree.selectionModel.select(themeItem)
+        compareCharactersItem.fire()
+    }
+}

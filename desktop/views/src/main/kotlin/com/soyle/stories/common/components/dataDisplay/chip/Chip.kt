@@ -5,6 +5,7 @@ import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.surfaces.*
 import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ObjectPropertyBase
 import javafx.beans.property.SimpleObjectProperty
@@ -113,7 +114,8 @@ open class Chip : ButtonBase() {
                 }
 
             init {
-                importStylesheet<Styles>()
+                if (Platform.isFxApplicationThread()) importStylesheet<Styles>()
+                else runLater { importStylesheet<Styles>() }
             }
         }
 

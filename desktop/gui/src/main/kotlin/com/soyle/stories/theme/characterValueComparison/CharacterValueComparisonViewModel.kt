@@ -30,7 +30,7 @@ class ArchetypeLabel(
     val isEmptyValue: Boolean = label.isEmpty()
 }
 
-class CharacterValueViewModel(val oppositionId: String, val label: String)
+class CharacterValueViewModel(val oppositionId: String, internal val valueWebName: String, val label: String)
 
 class AvailableValueWebViewModel(val valueWebId: String, val label: String, val preSelectedOppositionValue: AvailableOppositionValue?, val availableOppositions: List<AvailableOppositionValue>)
 class AvailableOppositionValue(val oppositionId: String, val label: String)

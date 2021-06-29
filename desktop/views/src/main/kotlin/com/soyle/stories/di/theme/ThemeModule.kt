@@ -573,6 +573,7 @@ object ThemeModule {
                 presenter listensTo projectScope.get<CharacterIncludedInThemeNotifier>()
                 presenter listensTo projectScope.get<RemovedCharacterFromThemeNotifier>()
                 presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()
+                presenter listensTo projectScope.get<RenameOppositionValueNotifier>()
 
                 CharacterValueComparisonController(
                     type.themeId.toString(),

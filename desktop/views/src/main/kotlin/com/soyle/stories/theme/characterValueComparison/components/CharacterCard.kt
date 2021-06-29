@@ -52,6 +52,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
     private val valuesProperty = viewModel.bindImmutableList(CharacterComparedWithValuesViewModel::values)
 
     override val root: Parent = card {
+        idProperty().bind(itemProperty.stringBinding { it?.characterId })
         cardHeader {
             this += MaterialIconView(CharacterArcStyles.defaultCharacterImage, "2em")
             vbox {
@@ -107,11 +108,13 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
                 }
                 spacer()
                 menubutton {
+                    id = "add-value-button"
                     this.textProperty().bind(addValueButtonLabelProperty)
                     val loadingItem = item("Loading...") {
                         isDisable = true
                     }
                     val createValueWebItem = MenuItem("[Create New Value Web]").apply {
+                        id = "create-value-web"
                         action {
                             val characterId = itemProperty.get()?.characterId ?: return@action
                             model.scope.projectScope.get<CreateValueWebDialog>().showToAutoLinkCharacter(
@@ -154,6 +157,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
                                             }
                                         }
                                     customitem {
+                                        id = "create-opposition-value-${availableValueWeb.valueWebId}"
                                         addClass(contextMenuSectionedItem)
                                         availableValueWeb.preSelectedOppositionValue?.let {
                                             addClass(discouragedSelection)
@@ -172,6 +176,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
                                     }
                                     availableValueWeb.availableOppositions.forEach {
                                         customitem {
+                                            id = it.oppositionId
                                             addClass(contextMenuSectionedItem)
                                             availableValueWeb.preSelectedOppositionValue?.let {
                                                 addClass(discouragedSelection)
@@ -202,6 +207,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
                 isFillWidth = false
                 bindChildren(valuesProperty) {
                     chip(it.label, onDelete = removeChip(it)) {
+                        id = it.oppositionId
                         maxWidth = Region.USE_PREF_SIZE
                     }.node
                 }

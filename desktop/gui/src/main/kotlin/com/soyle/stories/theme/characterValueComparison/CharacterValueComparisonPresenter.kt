@@ -2,6 +2,7 @@ package com.soyle.stories.theme.characterValueComparison
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.domain.theme.oppositionValue.CharacterAddedToOpposition
+import com.soyle.stories.domain.theme.oppositionValue.RenamedOppositionValue
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeReceiver
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
@@ -17,6 +18,7 @@ import com.soyle.stories.usecase.theme.listAvailableOppositionValuesForCharacter
 import com.soyle.stories.usecase.theme.removeCharacterFromComparison.RemovedCharacterFromTheme
 import com.soyle.stories.usecase.theme.removeSymbolicItem.RemoveSymbolicItem
 import com.soyle.stories.usecase.theme.removeSymbolicItem.RemovedSymbolicItem
+import com.soyle.stories.usecase.theme.renameOppositionValue.RenameOppositionValue
 import java.util.*
 
 class CharacterValueComparisonPresenter(
@@ -25,7 +27,8 @@ class CharacterValueComparisonPresenter(
 ) : CompareCharacterValues.OutputPort, ListCharactersAvailableToIncludeInTheme.OutputPort,
     RemoveSymbolicItem.OutputPort, AddSymbolicItemToOpposition.OutputPort,
     RemovedCharacterFromThemeReceiver, CharacterIncludedInThemeReceiver,
-    ChangeCharacterPropertyValue.OutputPort, ListAvailableOppositionValuesForCharacterInTheme.OutputPort {
+    ChangeCharacterPropertyValue.OutputPort, ListAvailableOppositionValuesForCharacterInTheme.OutputPort,
+    RenameOppositionValue.OutputPort {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -61,6 +64,7 @@ class CharacterValueComparisonPresenter(
                         values = it.characterValues.map {
                             CharacterValueViewModel(
                                 it.oppositionId.toString(),
+                                it.valueWebName,
                                 "(${it.valueWebName}) ${it.oppositionName}"
                             )
                         }
@@ -96,6 +100,7 @@ class CharacterValueComparisonPresenter(
                     else it.copy(
                         values = it.values + CharacterValueViewModel(
                             addedItem.oppositionId.toString(),
+                            addedItem.valueWebName,
                             "(${addedItem.valueWebName}) ${addedItem.oppositionName}"
                         )
                     )
@@ -114,7 +119,8 @@ class CharacterValueComparisonPresenter(
                 characters = characters.map {
                     if (it.characterId !in removedSymbolicIds) it
                     else {
-                        val removedOppositionIds = removedSymbolicIds.getValue(it.characterId).map { it.oppositionValueId.toString() }.toSet()
+                        val removedOppositionIds =
+                            removedSymbolicIds.getValue(it.characterId).map { it.oppositionValueId.toString() }.toSet()
                         it.copy(
                             values = it.values.filterNot {
                                 it.oppositionId in removedOppositionIds
@@ -185,6 +191,30 @@ class CharacterValueComparisonPresenter(
                             AvailableOppositionValue(it.oppositionValueId.toString(), it.oppositionValueName)
                         }
                     )
+                }
+            )
+        }
+    }
+
+    override suspend fun oppositionValueRenamed(response: RenamedOppositionValue) {
+        if (response.themeId != themeId) return
+        view.updateOrInvalidated {
+
+            copy(
+                characters = characters.map { comparedCharacterVM ->
+                    if (comparedCharacterVM.values.any { it.oppositionId == response.oppositionValueId.toString() }) {
+                        comparedCharacterVM.copy(
+                            values = comparedCharacterVM.values.map { characterValueVM ->
+                                if (characterValueVM.oppositionId == response.oppositionValueId.toString()) {
+                                    CharacterValueViewModel(
+                                        characterValueVM.oppositionId,
+                                        characterValueVM.valueWebName,
+                                        "(${characterValueVM.valueWebName}) ${response.oppositionValueName}"
+                                    )
+                                } else characterValueVM
+                            }
+                        )
+                    } else comparedCharacterVM
                 }
             )
         }

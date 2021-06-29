@@ -33,8 +33,12 @@ lateinit var soyleStories: SoyleStories
 class GlobalHooks : En {
 
     companion object {
-        private val closeThread = thread(start = false) {
-            Thread.currentThread().interrupt()
+        private val closeThread by lazy {
+            val close = thread(start = false) {
+                Thread.currentThread().interrupt()
+            }
+            Runtime.getRuntime().addShutdownHook(close)
+            close
         }
     }
 
@@ -48,7 +52,7 @@ class GlobalHooks : En {
         Before { scenario: Scenario ->
             if (! FxToolkit.isFXApplicationThreadRunning()) {
                 runHeadless()
-                Runtime.getRuntime().addShutdownHook(closeThread)
+                closeThread
                 SoyleStories.initialization = {
                     configureLocalization()
                     configureModules()

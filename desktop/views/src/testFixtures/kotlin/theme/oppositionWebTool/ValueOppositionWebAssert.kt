@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Assertions.*
 class ValueOppositionWebAssert private constructor(private val valueOppositionWebTool: ValueOppositionWebs) {
 
     companion object {
+        fun ValueOppositionWebs.assertThis(assertions: ValueOppositionWebAssert.() -> Unit) {
+            ValueOppositionWebAssert(this).assertions()
+        }
         fun assertThat(valueOppositionWebTool: ValueOppositionWebs, assertions: ValueOppositionWebAssert.() -> Unit) {
             ValueOppositionWebAssert(valueOppositionWebTool).assertions()
         }

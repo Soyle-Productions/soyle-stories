@@ -19,8 +19,15 @@ internal fun ThemeList.themeItemContextMenu(model: ThemeListModel, viewListener:
         }
     }
     item("Compare Values") {
+        id = "compare-values"
         actionForSelectedThemeItem {
             viewListener.openValueWeb(it.themeId)
+        }
+    }
+    item("Compare Character Values") {
+        id = "compare-characters"
+        actionForSelectedThemeItem {
+            viewListener.openCharacterComparison(it.themeId)
         }
     }
     item("Examine Central Conflict") {

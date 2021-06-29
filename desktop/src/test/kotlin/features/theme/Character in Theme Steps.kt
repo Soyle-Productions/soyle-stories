@@ -1,12 +1,18 @@
 package com.soyle.stories.desktop.config.features.theme
 
+import com.soyle.stories.desktop.config.drivers.character.createCharacterWithName
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
+import com.soyle.stories.desktop.view.theme.characterComparison.`Character Comparison Assertions`.Companion.assertThat
+import com.soyle.stories.desktop.view.theme.characterComparison.`Character Comparison Assertions`.`Included Character Assertions`.Companion.includedCharacter
 import com.soyle.stories.desktop.view.theme.characterConflict.`Character Conflict Assertions`.Companion.assertThat
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.theme.Theme
 import io.cucumber.java8.En
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.fail
 
 class `Character in Theme Steps` : En {
 
@@ -44,6 +50,41 @@ class `Character in Theme Steps` : En {
                 .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
                 .givenFocusedOnPerspectiveCharacter(perspectiveCharacterId)
                 .addOpponentCharacter(toBeOpponent)
+        }
+        Given(
+            "I am comparing the character values of the {theme}"
+        ) { theme: Theme ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+        }
+        Given(
+            "I have included the {character} in the {theme}'s character value comparison"
+        ) { character: Character, theme: Theme ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .givenCharacterHasBeenAdded(character)
+        }
+        Given(
+            "I am selecting a value to add to the {character} in the {theme}'s character value comparison"
+        ) { character: Character, theme: Theme ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .givenCharacterHasBeenAdded(character)
+                .givenAvailableValuesHaveBeenLoadedFor(character.id)
+        }
+        Given(
+            "I have used the {theme}'s {string} value web's {string} opposition value for the {character}"
+        ) { theme: Theme, valueWebName: String, oppositionName: String, character: Character ->
+            val valueWeb = theme.valueWebs.single { it.name.value == valueWebName }
+            val oppositionValue = valueWeb.oppositions.single { it.name.value == oppositionName }
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .givenOppositionValueUsedForCharacter(character.id, oppositionValue)
         }
     }
 
@@ -89,6 +130,57 @@ class `Character in Theme Steps` : En {
                 .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
                 .focusOnPerspectiveCharacter(character.id)
         }
+        When(
+            "I include the {character} in the {theme}'s character value comparison"
+        ) { character: Character, theme: Theme ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .addCharacter(character)
+        }
+        When(
+            "I create a character named {string} to include in the {theme}'s character value comparison"
+        ) { characterName: String, theme: Theme ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .givenCreateCharacterDialogHasBeenOpened()
+                .createCharacterWithName(characterName)
+        }
+        When(
+            "I select the {theme}'s {string} value web's {string} opposition value to add to the {character}"
+        ) { theme: Theme, valueWebName: String, oppositionName: String, character: Character ->
+            val valueWeb = theme.valueWebs.single { it.name.value == valueWebName }
+            val oppositionValue = valueWeb.oppositions.single { it.name.value == oppositionName }
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .givenAvailableValuesHaveBeenLoadedFor(character.id)
+                .selectOppositionValue(oppositionValue)
+        }
+        When(
+            "I create an opposition value named {string} in the {theme}'s {string} value web to add to the {character}"
+        ) { newOppositionName: String, theme: Theme, valueWebName: String, character: Character ->
+            val valueWeb = theme.valueWebs.single { it.name.value == valueWebName }
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .givenAvailableValuesHaveBeenLoadedFor(character.id)
+                .givenCreateOppositionValueDialogHasBeenOpenedFor(valueWeb.id)
+                .createOppositionValueNamed(newOppositionName)
+        }
+        When(
+            "I create a value web named {string} in the {theme} to add to the {character}"
+        ) { newValueWebName: String, theme: Theme, character: Character ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .givenAvailableValuesHaveBeenLoadedFor(character.id)
+                .givenCreateValueWebDialogHasBeenOpened()
+                .createValueWebNamed(newValueWebName)
+        }
     }
 
     private fun thens() {
@@ -101,6 +193,20 @@ class `Character in Theme Steps` : En {
             "the {character} should be a major character in the {theme}"
         ) { character: Character, theme: Theme ->
             theme.getMajorCharacterByIdOrError(character.id)
+        }
+        Then(
+            "the {character} should be included in the {theme}'s character value comparison"
+        ) { character: Character, theme: Theme ->
+            theme.getIncludedCharacterById(character.id)
+                ?: fail("Character ${character.name} was not included in the ${theme.name} theme")
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .assertThat {
+                    hasIncludedCharacter(character.id)
+                }
+
         }
         Then(
             "the {character}'s psychological weakness in the {theme} should be {string}"
@@ -122,6 +228,50 @@ class `Character in Theme Steps` : En {
                 .givenFocusedOnPerspectiveCharacter(character.id)
                 .assertThat {
                     moralWeaknessHasValue(expectedWeakness)
+                }
+        }
+        Then(
+            "the {character} should have no values in the {theme}"
+        ) { character: Character, theme: Theme ->
+            theme.valueWebs.flatMap { it.oppositions }.forEach {
+                assertFalse(it.hasEntityAsRepresentation(character.id.uuid))
+            }
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .assertThat {
+                    includedCharacter(character.id)!!.hasNoValues()
+                }
+        }
+        Then(
+            "the {character} in the {theme} should have the {string} value web's {string} opposition value"
+        ) { character: Character, theme: Theme, valueWebName: String, oppositionName: String ->
+            val valueWeb = theme.valueWebs.single { it.name.value == valueWebName }
+            val oppositionValue = valueWeb.oppositions.single { it.name.value == oppositionName }
+            assertTrue(oppositionValue.hasEntityAsRepresentation(character.id.uuid))
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .assertThat {
+                    includedCharacter(character.id)!!.hasValue(valueWeb, oppositionValue)
+                }
+        }
+        Then(
+            "the {character} in the {theme} should not have the {string} value web's {string} opposition value"
+        ) { character: Character, theme: Theme, valueWebName: String, oppositionName: String ->
+            val valueWeb = theme.valueWebs.single { it.name.value == valueWebName }
+            val oppositionValue = valueWeb.oppositions.singleOrNull() { it.name.value == oppositionName }
+            if (oppositionValue != null) {
+                assertFalse(oppositionValue.hasEntityAsRepresentation(character.id.uuid))
+            }
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenThemeListToolHasBeenOpened()
+                .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
+                .assertThat {
+                    includedCharacter(character.id)!!.doesNotHaveValue(valueWebName, oppositionName)
                 }
         }
     }
