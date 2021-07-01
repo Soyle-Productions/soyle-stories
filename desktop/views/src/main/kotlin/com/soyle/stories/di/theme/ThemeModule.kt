@@ -224,11 +224,6 @@ object ThemeModule {
                 get()
             )
         }
-        provide<ListAvailableOppositionValuesForCharacterInTheme> {
-            ListAvailableOppositionValuesForCharacterInThemeUseCase(
-                get()
-            )
-        }
         provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get(), get()) }
         provide<ListAvailablePerspectiveCharacters> { ListAvailablePerspectiveCharactersUseCase(get()) }
         provide(

@@ -9,12 +9,16 @@ import com.soyle.stories.scene.setting.SceneSettingToolLocale
 import com.soyle.stories.scene.setting.list.SceneSettingItemListLocale
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemLocale
 import com.soyle.stories.scene.setting.list.useLocationButton.UseLocationButtonLocale
+import com.soyle.stories.theme.characterValueComparison.components.addValueButton.AddValueButtonLocale
+import com.soyle.stories.theme.valueWeb.create.CreateValueWebFormLocale
+import com.soyle.stories.theme.valueWeb.opposition.create.CreateOppositionValueFormLocale
 import javafx.beans.value.ObservableValue
 import javafx.scene.Parent
 import tornadofx.*
 
 class LocaleHolder(bundle: SoyleMessageBundle) : LocationDetailsLocale, SceneSettingToolLocale,
-    SceneSettingItemListLocale, SceneSettingItemLocale, UseLocationButtonLocale, CreateLocationDialogLocale {
+    SceneSettingItemListLocale, SceneSettingItemLocale, UseLocationButtonLocale, CreateLocationDialogLocale, AddValueButtonLocale,
+    CreateOppositionValueFormLocale, CreateValueWebFormLocale {
 
     private val currentLocale = objectProperty<SoyleMessageBundle>(bundle)
 
@@ -81,6 +85,11 @@ class LocaleHolder(bundle: SoyleMessageBundle) : LocationDetailsLocale, SceneSet
     override val pleaseProvideALocationName: ObservableValue<String> = currentLocale.stringBinding { it!!.pleaseProvideALocationName }
     override val removeFromScene: ObservableValue<String> = currentLocale.stringBinding { it!!.removeFromScene }
     override val replaceWith: ObservableValue<String> = currentLocale.stringBinding { it!!.replaceWith }
+    override val addValue: ObservableValue<String> = currentLocale.stringBinding { it!!.addValue }
+    override val createNewValueWeb: ObservableValue<String> = currentLocale.stringBinding { it!!.createNewValueWeb }
+    override val createOppositionValue: ObservableValue<String> = currentLocale.stringBinding { it!!.createOppositionValue }
+    override val themeHasNoValueWebs: ObservableValue<String> = currentLocale.stringBinding { it!!.themeHasNoValueWebs }
+    override val nameCannotBeBlank: ObservableValue<String> = currentLocale.stringBinding { it!!.nameCannotBeBlank }
 
     private fun createDynamicMessage(parent: Parent, segment: SoyleMessageBundle.MessageSegment) {
         when (segment) {

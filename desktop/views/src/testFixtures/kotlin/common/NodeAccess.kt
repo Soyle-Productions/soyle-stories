@@ -17,8 +17,10 @@ open class NodeAccess<N : Node>(protected val node: N) : FxRobot() {
     protected fun <Child : Node> Node.mandatoryChild(rule: Rendered, secondaryMatch: (Child) -> Boolean = { true }): ReadOnlyProperty<NodeAccess<N>, Child> = object : ReadOnlyProperty<NodeAccess<N>, Child> {
         override fun getValue(thisRef: NodeAccess<N>, property: KProperty<*>): Child {
             val matches = from(this@mandatoryChild).lookup(rule.render()).queryAll<Child>()
-            return matches.filter(secondaryMatch).singleOrNull() ?:
-                error("Multiple children matching [${rule.render()} $secondaryMatch] query: $matches")
+            val secondaryMatches = matches.filter(secondaryMatch)
+            if (secondaryMatches.size > 1) error("Multiple children matching [${rule.render()} $secondaryMatch] query: $secondaryMatches")
+            else if (secondaryMatches.isEmpty()) error("No children matching [${rule.render()} $secondaryMatch]")
+            return secondaryMatches.single()
         }
     }
 

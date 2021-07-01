@@ -84,7 +84,7 @@ class `Character in Theme Steps` : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenThemeListToolHasBeenOpened()
                 .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
-                .givenOppositionValueUsedForCharacter(character.id, oppositionValue)
+                .givenOppositionValueUsedForCharacter(character.id, valueWeb, oppositionValue)
         }
     }
 
@@ -157,7 +157,7 @@ class `Character in Theme Steps` : En {
                 .givenThemeListToolHasBeenOpened()
                 .givenCharacterComparisonToolHasBeenOpenedFor(theme.id)
                 .givenAvailableValuesHaveBeenLoadedFor(character.id)
-                .selectOppositionValue(oppositionValue)
+                .selectOppositionValue(valueWeb, oppositionValue)
         }
         When(
             "I create an opposition value named {string} in the {theme}'s {string} value web to add to the {character}"

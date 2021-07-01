@@ -12,7 +12,10 @@ import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.Chang
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineController
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineControllerImpl
 import com.soyle.stories.theme.removeSymbolFromTheme.RemoveSymbolFromThemeOutput
+import com.soyle.stories.theme.valueWeb.opposition.list.ListAvailableOppositionValuesForCharacterInThemeController
 import com.soyle.stories.usecase.theme.changeThemeDetails.*
+import com.soyle.stories.usecase.theme.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
+import com.soyle.stories.usecase.theme.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInThemeUseCase
 import com.soyle.stories.usecase.theme.outlineMoralArgument.GetMoralArgumentFrame
 import com.soyle.stories.usecase.theme.outlineMoralArgument.OutlineMoralArgument
 import com.soyle.stories.usecase.theme.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
@@ -68,8 +71,20 @@ object UseCases {
                     applicationScope.get(), get(), get()
                 )
             }
-
+            listAvailableOppositionValuesForCharacterInTheme()
             removeSymbolFromTheme()
+        }
+    }
+
+    private fun InProjectScope.listAvailableOppositionValuesForCharacterInTheme()
+    {
+        provide<ListAvailableOppositionValuesForCharacterInTheme> {
+            ListAvailableOppositionValuesForCharacterInThemeUseCase(
+                get()
+            )
+        }
+        provide<ListAvailableOppositionValuesForCharacterInThemeController> {
+            ListAvailableOppositionValuesForCharacterInThemeController(applicationScope.get(), get())
         }
     }
 

@@ -2,9 +2,12 @@ package com.soyle.stories.desktop.config.drivers.theme
 
 import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterForm
 import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialogOrError
+import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.view.theme.characterComparison.`Character Card View Access`.Companion.access
+import com.soyle.stories.desktop.view.theme.characterComparison.addValueButton.`Add Value Button Access`.Companion.access
 import com.soyle.stories.desktop.view.theme.characterComparison.`Character Comparison View Access`.Companion.access
 import com.soyle.stories.desktop.view.theme.characterComparison.`Character Comparison View Access`.Companion.drive
+import com.soyle.stories.desktop.view.theme.valueWeb.create.getOpenCreateValueWebDialog
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.oppositionValue.OppositionValue
@@ -16,6 +19,8 @@ import com.soyle.stories.theme.characterValueComparison.CharacterValueComparison
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialog
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import com.soyle.stories.theme.themeList.ThemeList
+import com.soyle.stories.theme.valueWeb.create.CreateValueWebForm
+import com.soyle.stories.theme.valueWeb.opposition.create.CreateOppositionValueForm
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.fail
@@ -77,43 +82,41 @@ fun CharacterValueComparison.givenCreateCharacterDialogHasBeenOpened(): CreateCh
     return getCreateCharacterDialogOrError()
 }
 
-fun CharacterValueComparison.givenCreateOppositionValueDialogHasBeenOpenedFor(valueWebId: ValueWeb.Id): CreateOppositionValueDialog
+fun CharacterValueComparison.givenCreateOppositionValueDialogHasBeenOpenedFor(valueWebId: ValueWeb.Id): CreateOppositionValueForm
 {
     drive {
         characterCards.single { it.access().addValueButton.isShowing }
-            .access {
-                addValueButton.getCreateOppositionValueItem(valueWebId)!!.fire()
+            .access().addValueButton.access {
+                getValueWebItem(valueWebId)!!.createOppositionValueItem.fire()
             }
     }
     return getCreateOppositionValueDialogOrError()
 }
 
-fun CharacterValueComparison.givenCreateValueWebDialogHasBeenOpened(): CreateValueWebDialog
+fun CharacterValueComparison.givenCreateValueWebDialogHasBeenOpened(): CreateValueWebForm
 {
     drive {
         characterCards.single { it.access().addValueButton.isShowing }
-            .access {
-                addValueButton.getCreateValueWebItem()!!.fire()
-            }
+            .access().addValueButton.access().createValueWebItem!!.fire()
     }
-    return getCreateValueWebDialog() ?: fail("Create Value Web Dialog was not opened")
+    return robot.getOpenCreateValueWebDialog() ?: fail("Create Value Web Dialog was not opened")
 }
 
-fun CharacterValueComparison.givenOppositionValueUsedForCharacter(characterId: Character.Id, oppositionValue: OppositionValue): CharacterValueComparison
+fun CharacterValueComparison.givenOppositionValueUsedForCharacter(characterId: Character.Id, valueWeb: ValueWeb, oppositionValue: OppositionValue): CharacterValueComparison
 {
     if (access().getCharacterCard(characterId)!!.access().getValue(oppositionValue.id) == null) {
         loadAvailableValuesFor(characterId)
-        selectOppositionValue(oppositionValue)
+        selectOppositionValue(valueWeb, oppositionValue)
     }
     return this
 }
 
-fun CharacterValueComparison.selectOppositionValue(oppositionValue: OppositionValue)
+fun CharacterValueComparison.selectOppositionValue(valueWeb: ValueWeb, oppositionValue: OppositionValue)
 {
     drive {
         characterCards.single { it.access().addValueButton.isShowing }
-            .access {
-                addValueButton.getOppositionValueItem(oppositionValue.id)!!.fire()
+            .access().addValueButton.access {
+                getValueWebItem(valueWeb.id)!!.getOppositionValueItem(oppositionValue.id)!!.fire()
             }
     }
 }

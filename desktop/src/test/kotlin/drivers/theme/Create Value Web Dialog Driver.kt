@@ -5,15 +5,16 @@ import com.soyle.stories.desktop.view.theme.createValueWebDialog.CreateValueWebD
 import com.soyle.stories.desktop.view.theme.oppositionWebTool.ValueOppositionWebDriver
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebs
+import com.soyle.stories.theme.valueWeb.create.CreateValueWebForm
+import com.soyle.stories.desktop.view.theme.valueWeb.create.`Create Value Web Form Access`.Companion.drive
+import com.soyle.stories.desktop.view.theme.valueWeb.create.getOpenCreateValueWebDialog
 import javafx.event.ActionEvent
 import tornadofx.uiComponent
 
-fun getCreateValueWebDialog(): CreateValueWebDialog? =
-    robot.listWindows().asSequence()
-        .mapNotNull { it.scene.root.uiComponent<CreateValueWebDialog>() }
-        .firstOrNull { it.currentStage?.isShowing == true }
+fun getCreateValueWebDialog(): CreateValueWebForm? =
+    robot.getOpenCreateValueWebDialog()
 
-fun ValueOppositionWebs.openCreateValueWebDialog(): CreateValueWebDialog
+fun ValueOppositionWebs.openCreateValueWebDialog(): CreateValueWebForm
 {
     val driver = ValueOppositionWebDriver(this)
     val createButton = driver.getCreateValueWebButton()
@@ -21,11 +22,9 @@ fun ValueOppositionWebs.openCreateValueWebDialog(): CreateValueWebDialog
     return getCreateValueWebDialog() ?: error("Value Opposition Web tool did not properly open Create Value Web Dialog")
 }
 
-fun CreateValueWebDialog.createValueWebNamed(valueWebName: String)
+fun CreateValueWebForm.createValueWebNamed(valueWebName: String)
 {
-    val driver = CreateValueWebDialogDriver(this)
-    val nameInput = driver.getNameInput()
-    driver.interact {
+    drive {
         nameInput.text = valueWebName
         nameInput.fireEvent(ActionEvent())
     }
