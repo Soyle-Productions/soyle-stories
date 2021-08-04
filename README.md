@@ -1,21 +1,34 @@
-# Soyle Stories
-Soyle Stories is a working title for an application to help writers organize and think through their stories.
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Soyle-Productions/soyle-stories-desktop/main/desktop/views/src/main/resources/com/soyle/stories/soylestories/icon.png" alt="Soyle Stories Logo" width="150">
+  <h1>Soyle Stories </h1>
+  <strong>Soyle Stories is a working title for an application to help writers organize and think through their stories.</strong>
+</div>
+<br>
 
-## Designing Principles
-1. Enable writers to finish their stories without worrying about how to keep track of everything.
-2. Writers have many different ways of thinking about their stories, we can't enforce one way of thinking and instead have to allow for as many different workflows as possible.
-3. No input field should be included just for the sake of input.  If it's just a box, it can be put into the description of the thing.
+<p align="center">
+  <a href="https://twitter.com/official_soyle" target="_blank">
+    <img src="https://img.shields.io/twitter/follow/official_soyle?color=26A0ED&label=Follow&logo=twitter&logoColor=white&style=flat" alt="Twitter">
+  </a>
 
-## Architecture
-- At the very core of the project, we use Domain-Driven Design and functional programming.  Charaters are distinct from Locations or Scenes.
-- Surrounding the core domain, we use Clean Architecture Use Cases to describe what users or external actors can do with the system.  Many use cases map directly to a method on an entity.
-- In the Adapters layer of the system, we include the implementations of the outputs of use cases which typically distribute the domain events to receivers/notifiers that broadcast a change to interested parties (usually some GUI component).  We also implement the persistence code, but currently, it only resides in memory and does not actually save to the file system.
-- In the View layer, we usually have tornadofx components and the dependency injection interface.
-- In the src folder for the desktop module, we have all the definitions for the dependency injection (some DI definitions are still waiting to be migrated from Views into this folder).
+  <a href="https://github.com/Soyle-Productions/soyle-stories-desktop/issues" target="_blank">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs Welcome">
+  </a>
+</p>
 
-## Current Focuses
-1. World Building features
-2. Scene Formatting and additional mentions
-3. Migrating old, core API's to return events in Update objects
-4. Migrating old use case API's to output events and throw errors (instead of outputting the errors)
-5. Persistence to file system
+## Soyle Stories Desktop
+> A [TornadoFX](https://tornadofx.io/) application that helps write your story.
+
+## Features
+1. Keep track of your characters, locations, and scenes
+2. Write your story without worrying about typos or missed name changes
+3. See the potential changes that will be made to your story if you modify or delete something. (in progress)
+4. See illogical configurations of parts of your story due to something happening before it should (in progress)
+5. Quickly take notes about what should happen and let the program organize them for you (in progress)
+6. Take your story on the go!  Pick up your phone and keep working on your story.  When you come back home, all of your changes will appear on your computer.  (future)
+
+## Download
+The application is available for Mac, Windows, and Linux platforms.  However, it is currently in development and only the windows installer has been created and tested thus far.  Other installers can be made available on request.  Download from here - https://github.com/Soyle-Productions/soyle-stories-desktop/releases
+
+## Issues
+If you face any problems while using the application, please open an issue here - https://github.com/Soyle-Productions/soyle-stories-desktop/issues
+
