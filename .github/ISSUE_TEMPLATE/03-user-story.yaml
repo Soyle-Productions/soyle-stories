@@ -1,0 +1,11 @@
+name: "\U0001F4D7 User Story"
+description: Document a new User Story
+title: ""
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      label: Description
+      placeholder: Add a description...
+    validations:
+      required: false
