@@ -73,6 +73,13 @@ runtime {
         imageOptions = listOf(
             "--icon", "\"Soyle Stories.ico\""
         )
+        /*
+        Windows limits us to only three dots in the appVersion.  In order for incremental builds to take advantage of
+        windows' automatic updating, it must always be a higher version number, even if it's just another build of the
+        same release candidate.  So, we'll use the build date here and the actual, branded version number in the rest
+        of gradle.
+         */
+        appVersion = "2021.08.07"
         imageName = application.applicationName
         installerName = application.applicationName
         installerOptions = listOf(
