@@ -6,6 +6,7 @@ import com.soyle.stories.desktop.view.theme.themeList.ThemeListDriver
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.oppositionValue.OppositionValue
+import com.soyle.stories.domain.theme.valueWeb.ValueWeb
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import com.soyle.stories.theme.themeList.ThemeList
@@ -77,6 +78,7 @@ fun ValueOppositionWebs.renameValueWebTo(valueWebName: String, newName: String)
         valueWebInput.commit()
     }
 }
+
 
 fun ValueOppositionWebs.givenValueWebHasBeenCreatedNamed(valueWebName: String): ValueOppositionWebs
 {

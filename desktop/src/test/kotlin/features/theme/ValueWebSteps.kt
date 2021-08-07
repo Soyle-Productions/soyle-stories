@@ -46,6 +46,14 @@ class ValueWebSteps : En {
                 .createValueWebNamed(valueWebName)
         }
         When(
+            "I rename the {theme}'s {string} value web to {string}"
+        ) { theme: Theme, valueWebName: String, newName: String ->
+            val valueWeb = theme.valueWebs.single { it.name.value == valueWebName }
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenValueWebToolHasBeenOpenedFor(theme.id)
+                .renameValueWebTo(valueWeb.name.value, newName)
+        }
+        When(
             "the {string} value web in the {string} theme is renamed to {string}"
         ) { valueWebName: String, themeName: String, newName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
