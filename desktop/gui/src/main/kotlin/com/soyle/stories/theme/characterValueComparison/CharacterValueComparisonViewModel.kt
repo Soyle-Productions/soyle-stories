@@ -1,7 +1,7 @@
 package com.soyle.stories.theme.characterValueComparison
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-
+import com.soyle.stories.domain.theme.valueWeb.ValueWeb
 
 data class CharacterValueComparisonViewModel(
     val openValueWebToolButtonLabel: String,
@@ -30,7 +30,19 @@ class ArchetypeLabel(
     val isEmptyValue: Boolean = label.isEmpty()
 }
 
-class CharacterValueViewModel(val oppositionId: String, internal val valueWebName: String, val label: String)
+class CharacterValueViewModel(
+    val valueWebId: ValueWeb.Id,
+    val oppositionId: String,
+    internal val valueWebName: String,
+    internal val oppositionValueName: String,
+    val label: String
+)
 
-class AvailableValueWebViewModel(val valueWebId: String, val label: String, val preSelectedOppositionValue: AvailableOppositionValue?, val availableOppositions: List<AvailableOppositionValue>)
+class AvailableValueWebViewModel(
+    val valueWebId: String,
+    val label: String,
+    val preSelectedOppositionValue: AvailableOppositionValue?,
+    val availableOppositions: List<AvailableOppositionValue>
+)
+
 class AvailableOppositionValue(val oppositionId: String, val label: String)
