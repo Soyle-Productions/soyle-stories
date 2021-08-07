@@ -105,22 +105,14 @@ class `Character in Theme Steps` : En {
                 .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
         }
         When(
-            "I change the {character}'s psychological weakness in the {theme} to {string}"
-        ) { character: Character, theme: Theme, weakness: String ->
+            "I change the {character}'s {} in the {theme} to {string}"
+        ) { character: Character, arcSection: String, theme: Theme, newValue: String ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenThemeListToolHasBeenOpened()
                 .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
                 .givenFocusedOnPerspectiveCharacter(character.id)
-                .changePsychologicalWeaknessTo(weakness)
-        }
-        When(
-            "I change the {character}'s moral weakness in the {theme} to {string}"
-        ) { character: Character, theme: Theme, weakness: String ->
-            soyleStories.getAnyOpenWorkbenchOrError()
-                .givenThemeListToolHasBeenOpened()
-                .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
-                .givenFocusedOnPerspectiveCharacter(character.id)
-                .changeMoralWeaknessTo(weakness)
+                .changeFieldValueTo(arcSection, newValue)
+
         }
         When(
             "I examine the {theme}'s central conflict for the {character}"
@@ -209,25 +201,14 @@ class `Character in Theme Steps` : En {
 
         }
         Then(
-            "the {character}'s psychological weakness in the {theme} should be {string}"
-        ) { character: Character, theme: Theme, expectedWeakness: String ->
+            "the {character}'s {} in the {theme} should be {string}"
+        ) { character: Character, arcSectionName: String, theme: Theme, expectedValue: String ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenThemeListToolHasBeenOpened()
                 .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
                 .givenFocusedOnPerspectiveCharacter(character.id)
                 .assertThat {
-                    psychologicalWeaknessHasValue(expectedWeakness)
-                }
-        }
-        Then(
-            "the {character}'s moral weakness in the {theme} should be {string}"
-        ) { character: Character, theme: Theme, expectedWeakness: String ->
-            soyleStories.getAnyOpenWorkbenchOrError()
-                .givenThemeListToolHasBeenOpened()
-                .givenCharacterConflictToolHasBeenOpenedFor(theme.id)
-                .givenFocusedOnPerspectiveCharacter(character.id)
-                .assertThat {
-                    moralWeaknessHasValue(expectedWeakness)
+                    access.characterChangeInput(arcSectionName)!!.hasValue(expectedValue)
                 }
         }
         Then(
