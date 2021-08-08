@@ -4,6 +4,8 @@ import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbench
 import com.soyle.stories.desktop.config.drivers.theme.*
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.theme.oppositionWebTool.ValueOppositionWebAssert.Companion.assertThat
+import com.soyle.stories.desktop.view.theme.oppositionWebTool.ValueOppositionWebAssert.Companion.assertThis
+import com.soyle.stories.domain.theme.Theme
 import io.cucumber.java8.En
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -32,13 +34,26 @@ class OppositionValueSteps : En {
                 }
         }
         When(
-            "the first opposition value in the {string} value web in the {string} theme is renamed to {string}"
-        ) { valueWebName: String, themeName: String, newOppositionValueName: String ->
+            "I rename the first opposition value of the {string} value web in the {theme} to {string}"
+        ) { valueWebName: String, theme: Theme, newOppositionValueName: String ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            workbench.givenValueWebToolHasBeenOpenedForThemeNamed(themeName)
+            workbench.givenValueWebToolHasBeenOpenedForThemeNamed(theme.name)
                 .run {
                     givenValueWebHasBeenSelectedNamed(valueWebName)
                     renameOppositionValueTo(0, newOppositionValueName)
+                }
+        }
+        When(
+            "I rename the {theme}'s {string} value web's {string} opposition value to {string}"
+        ) { theme: Theme, valueWebName: String, oppositionName: String, newOppositionName: String ->
+            val valueWeb = theme.valueWebs.single { it.name.value == valueWebName }
+            val oppositionValue = valueWeb.oppositions.single { it.name.value == oppositionName }
+
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenValueWebToolHasBeenOpenedForThemeNamed(theme.name)
+                .run {
+                    givenValueWebHasBeenSelectedNamed(valueWebName)
+                    renameOppositionValueTo(oppositionValue.id, newOppositionName)
                 }
         }
         When(
@@ -73,23 +88,20 @@ class OppositionValueSteps : En {
             }
         }
         Then(
-            "the first opposition value in the {string} value web in the {string} theme should have been renamed to {string}"
-        ) { valueWebName: String, themeName: String, expectedOppositionValueName: String ->
-            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            val themeDriver = ThemeDriver(workbench)
-            val theme = themeDriver.getThemeByNameOrError(themeName)
-            val valueWeb = themeDriver.getValueWebInThemeNamedOrError(theme.id, valueWebName)
+            "the first opposition value of the {string} value web in the {theme} should be named {string}"
+        ) { valueWebName: String, theme: Theme, expectedOppositionValueName: String ->
+            val valueWeb = theme.valueWebs.single { it.name.value == valueWebName }
+            val oppositionValue = valueWeb.oppositions.first()
+            assertEquals(expectedOppositionValueName, oppositionValue.name.value)
 
-            assertEquals(expectedOppositionValueName, valueWeb.oppositions.first().name.value) { "First opposition value in value web $valueWebName was not renamed" }
-
-            val valueWebTool = workbench.givenValueWebToolHasBeenOpenedForThemeNamed(themeName)
-            valueWebTool.givenValueWebHasBeenSelectedNamed(valueWebName)
-            assertThat(valueWebTool) {
-                andValueWebContent {
-                    hasOppositionValueNamed(expectedOppositionValueName)
-                    doesNotHaveOppositionValueNamed(valueWeb.name.value)
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenValueWebToolHasBeenOpenedFor(theme.id)
+                .givenValueWebHasBeenSelectedNamed(valueWebName)
+                .assertThis {
+                    andValueWebContent {
+                        hasOppositionValueNamed(expectedOppositionValueName)
+                    }
                 }
-            }
         }
         Then(
             "the {string} value web in the {string} theme should have no opposition values"

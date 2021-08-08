@@ -18,7 +18,7 @@ import com.soyle.stories.scene.createNewScene.CreateNewSceneControllerImpl
 import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
 import com.soyle.stories.scene.deleteScene.DeleteSceneController
 import com.soyle.stories.scene.deleteScene.DeleteSceneControllerImpl
-import com.soyle.stories.scene.deleteScene.DeleteSceneNotifier
+import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneOutput
@@ -45,7 +45,7 @@ import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInS
 import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneOutput
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
-import com.soyle.stories.scene.renameScene.RenameSceneNotifier
+import com.soyle.stories.scene.renameScene.RenameSceneOutput
 import com.soyle.stories.scene.reorderScene.ReorderSceneController
 import com.soyle.stories.scene.reorderScene.ReorderSceneControllerImpl
 import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
@@ -53,6 +53,11 @@ import com.soyle.stories.scene.sceneFrame.*
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsController
+import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsOutput
+import com.soyle.stories.scene.locationsInScene.replace.ReplaceSettingInSceneController
+import com.soyle.stories.scene.locationsInScene.replace.ReplaceSettingInSceneOutput
+import com.soyle.stories.scene.target.TargetScene
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInScene
@@ -99,6 +104,10 @@ import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValue
 import com.soyle.stories.usecase.scene.sceneFrame.SetSceneFrameValueUseCase
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettings
+import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettingsUseCase
+import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInScene
+import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInSceneUseCase
 import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.*
 
 object UseCases {
@@ -109,6 +118,7 @@ object UseCases {
             listAllScenes()
             renameScene()
             deleteScene()
+            targetScene()
             includeCharacterInScene()
             setMotivationForCharacterInScene()
             listCharactersInScene()
@@ -130,6 +140,8 @@ object UseCases {
             listLocationsInScene()
             listLocationsToUse()
             removeLocationFromScene()
+            detectInconsistenciesInScene()
+            replaceSettingInScene()
         }
     }
 
@@ -161,7 +173,7 @@ object UseCases {
 
     private fun InProjectScope.renameScene() {
         provide<RenameScene> {
-            RenameSceneUseCase(get())
+            RenameSceneUseCase(get(), get())
         }
 
         provide<RenameSceneController> {
@@ -174,7 +186,7 @@ object UseCases {
         }
 
         provide(RenameScene.OutputPort::class) {
-            RenameSceneNotifier(applicationScope.get())
+            RenameSceneOutput(get(), get())
         }
     }
 
@@ -183,7 +195,7 @@ object UseCases {
             GetPotentialChangesFromDeletingSceneUseCase(get())
         }
         provide<DeleteScene> {
-            DeleteSceneUseCase(get())
+            DeleteSceneUseCase(get(), get())
         }
 
         provide<DeleteSceneController> {
@@ -196,8 +208,12 @@ object UseCases {
         }
 
         provide(DeleteScene.OutputPort::class) {
-            DeleteSceneNotifier(applicationScope.get())
+            DeleteSceneOutput(applicationScope.get(), get(), get())
         }
+    }
+
+    private fun InProjectScope.targetScene() {
+        provide<TargetScene> { TargetScene(applicationScope.get(), get()) }
     }
 
     private fun InProjectScope.includeCharacterInScene() {
@@ -269,7 +285,7 @@ object UseCases {
         }
 
         provide(LinkLocationToScene.OutputPort::class) {
-            LinkLocationToSceneOutput(get())
+            LinkLocationToSceneOutput(get(), get())
         }
     }
 
@@ -378,8 +394,6 @@ object UseCases {
             SetCharacterDesireInSceneOutput(get())
         }
     }
-
-
 
     private fun InProjectScope.listOptionsToReplaceMention() {
         provide<ListOptionsToReplaceMentionController> {
@@ -509,14 +523,35 @@ object UseCases {
 
     private fun InProjectScope.removeLocationFromScene() {
         provide<RemoveLocationFromScene> {
-            RemoveLocationFromSceneUseCase(get())
+            RemoveLocationFromSceneUseCase(get(), get())
         }
         provide<RemoveLocationFromScene.OutputPort> {
-            RemoveLocationFromSceneOutput(get())
+            RemoveLocationFromSceneOutput(get(), get())
         }
         provide<RemoveLocationFromSceneController> {
             RemoveLocationFromSceneControllerImpl(applicationScope.get(), get(), get())
         }
     }
 
+    private fun InProjectScope.detectInconsistenciesInScene() {
+        provide<DetectInconsistenciesInSceneSettings> {
+            DetectInconsistenciesInSceneSettingsUseCase(get(), get())
+        }
+        provide<DetectInconsistenciesInSceneSettingsController> {
+            DetectInconsistenciesInSceneSettingsController.invoke(applicationScope.get(), get(), get())
+        }
+        provide(DetectInconsistenciesInSceneSettings.OutputPort::class) {
+            DetectInconsistenciesInSceneSettingsOutput(get())
+        }
+    }
+
+    private fun InProjectScope.replaceSettingInScene() {
+        provide<ReplaceSettingInScene> {
+            ReplaceSettingInSceneUseCase(get(), get())
+        }
+        provide<ReplaceSettingInScene.OutputPort> {
+            ReplaceSettingInSceneOutput(get(), get(), get(), get())
+        }
+        provide<ReplaceSettingInSceneController> { ReplaceSettingInSceneController(applicationScope.get(), get(), get()) }
+    }
 }

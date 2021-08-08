@@ -2,7 +2,10 @@ package com.soyle.stories.character.list
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.components.characterIcon
-import com.soyle.stories.common.components.surfaces.surface
+import com.soyle.stories.common.components.surfaces.Elevation
+import com.soyle.stories.common.components.surfaces.Surface
+import com.soyle.stories.common.components.surfaces.Surface.Companion.noOverrides
+import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.scopedListener
 import com.soyle.stories.di.get
@@ -22,10 +25,11 @@ class CharacterItemList : Fragment() {
         viewModel.profileBeingViewed.set(characterItem)
     }
 
-    override val root: Parent = surface(
-        component = TreeView<CharacterListState.CharacterListItem?>(TreeItem(null)),
-        elevation = 8
+    override val root: Parent = surface<TreeView<CharacterListState.CharacterListItem?>>(
+        elevation = Elevation.getValue(8),
+        classes = noOverrides
     ) {
+        root = TreeItem(null)
         applyCharacterListBehavior()
         isShowRoot = false
         cellFormat {

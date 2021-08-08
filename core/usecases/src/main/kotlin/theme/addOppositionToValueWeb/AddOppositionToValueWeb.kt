@@ -33,7 +33,7 @@ interface AddOppositionToValueWeb {
         val characterIncludedInTheme: CharacterIncludedInTheme?
     )
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun addedOppositionToValueWeb(response: ResponseModel)
     }
 

@@ -4,7 +4,11 @@ import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.domain.character.CharacterRenamed
+import com.soyle.stories.domain.character.Desire
+import com.soyle.stories.domain.character.MoralWeakness
+import com.soyle.stories.domain.character.PsychologicalWeakness
 import com.soyle.stories.gui.View
+import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArcReceiver
 import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeReceiver
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedReceiver
 import com.soyle.stories.theme.changeThemeDetails.changeCentralConflict.CentralConflictChangedReceiver
@@ -12,6 +16,7 @@ import com.soyle.stories.theme.removeCharacterAsOpponent.CharacterRemovedAsOppon
 import com.soyle.stories.theme.removeCharacterFromComparison.RemovedCharacterFromThemeReceiver
 import com.soyle.stories.theme.useCharacterAsMainOpponent.CharacterUsedAsMainOpponentReceiver
 import com.soyle.stories.theme.useCharacterAsOpponent.CharacterUsedAsOpponentReceiver
+import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ArcSectionType
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangedCharacterArcSectionValue
 import com.soyle.stories.usecase.theme.changeCharacterChange.ChangedCharacterChange
@@ -38,7 +43,8 @@ class CharacterConflictPresenter(
     CharacterUsedAsMainOpponentReceiver,
     CentralConflictChangedReceiver, ChangedCharacterArcSectionValueReceiver, ChangedCharacterChangeReceiver,
     ChangeCharacterPropertyValue.OutputPort, CharacterPerspectivePropertyChangedReceiver, CharacterRenamedReceiver,
-    CharacterRemovedAsOpponentReceiver, RemovedCharacterFromThemeReceiver {
+    CharacterRemovedAsOpponentReceiver, RemovedCharacterFromThemeReceiver,
+    ArcSectionAddedToCharacterArcReceiver {
 
     private val themeId = UUID.fromString(themeId)
 
@@ -279,6 +285,27 @@ class CharacterConflictPresenter(
                     else it
                 }
             )
+        }
+    }
+
+    override suspend fun receiveArcSectionAddedToCharacterArc(event: ArcSectionAddedToCharacterArc) {
+        if (event.themeId != themeId) return
+        if (event.templateSectionId !in setOf(
+                Desire.id.uuid,
+                PsychologicalWeakness.id.uuid,
+                MoralWeakness.id.uuid
+            )
+        ) return
+        view.updateOrInvalidated {
+            if (selectedPerspectiveCharacter?.characterId != event.characterId.toString())
+                return@updateOrInvalidated this
+
+            when (event.templateSectionId) {
+                Desire.id.uuid -> copy(desire = event.value)
+                PsychologicalWeakness.id.uuid -> copy(psychologicalWeakness = event.value)
+                MoralWeakness.id.uuid -> copy(moralWeakness = event.value)
+                else -> this // due to the type !in setOf call above, will never actually reach this line.
+            }
         }
     }
 

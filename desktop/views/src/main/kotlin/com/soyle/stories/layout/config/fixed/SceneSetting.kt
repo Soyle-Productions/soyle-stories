@@ -1,16 +1,24 @@
 package com.soyle.stories.layout.config.fixed
 
 import com.soyle.stories.di.get
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
-import com.soyle.stories.scene.sceneSetting.SceneSettingView
+import com.soyle.stories.scene.sceneList.SceneListModel
+import com.soyle.stories.scene.sceneList.SceneListView
+import com.soyle.stories.scene.sceneList.SceneListViewModel
+import com.soyle.stories.scene.setting.SceneSettingToolLocale
+import com.soyle.stories.scene.setting.SceneSettingToolRoot
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import javafx.scene.layout.Pane
+import tornadofx.add
 import tornadofx.tab
+import java.util.*
 import kotlin.reflect.KClass
 
 object SceneSetting : ToolConfig<SceneSetting>, FixedTool() {
@@ -27,9 +35,18 @@ object SceneSetting : ToolConfig<SceneSetting>, FixedTool() {
 
     override fun getTabConfig(tool: ToolViewModel, type: SceneSetting): ToolTabConfig = object : ToolTabConfig {
         override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-            val view = projectScope.get<SceneSettingView>()
-            view.title = getViewModelConfig(type).toolName()
-            return tabPane.tab(view)
+            val factory = projectScope.get<SceneSettingToolRoot.Factory>()
+            val locale = projectScope.applicationScope.get<SceneSettingToolLocale>()
+            val tab = Tab().apply {
+                val selectedScene = projectScope.get<SceneListModel>().selectedItem.value?.let {
+                    Scene.Id(UUID.fromString(it.id)) to it.name
+                }
+                val sceneSettingRoot = factory.invoke(selectedScene)
+                content = sceneSettingRoot
+                textProperty().bind(locale.sceneSettingToolTitle)
+            }
+            tabPane.tabs.add(tab)
+            return tab
         }
     }
 

@@ -3,12 +3,13 @@ package com.soyle.stories.prose.proseEditor
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.onLoseFocus
+import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.prose.*
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
-import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import javafx.collections.ObservableList
 import javafx.scene.control.Menu
@@ -280,9 +281,9 @@ class ProseEditorView : Fragment() {
             }
             is MentionedLocationId -> MenuItem("Create New Location").apply {
                 action {
-                    createLocationDialog(scope.projectScope, onCreateLocation = {
+                    scope.projectScope.get<CreateLocationDialog.Factory>().invoke {
                         onNewMentionedEntity(Mention(it.locationName, Location.Id(it.locationId).mentioned()))
-                    })
+                    }.show(currentWindow)
                 }
             }
             is MentionedSymbolId -> MenuItem("Create New Symbol").apply {

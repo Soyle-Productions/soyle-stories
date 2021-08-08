@@ -164,10 +164,18 @@ class CharacterConflict : View() {
     private fun Parent.characterChangeFields(): Node {
         return responsiveBox(model.isSmall, hSpacing = 8.0, vSpacing = 8.0) {
             listOf(
-                characterChangeField(model.desireLabel, model.desire, ::setDesire),
-                characterChangeField(model.psychologicalWeaknessLabel, model.psychologicalWeakness, ::setPsychologicalWeakness),
-                characterChangeField(model.moralWeaknessLabel, model.moralWeakness, ::setMoralWeakness),
-                characterChangeField(model.characterChangeLabel, model.characterChange, ::setCharacterChange)
+                characterChangeField(model.desireLabel, model.desire, ::setDesire).apply {
+                    id = "desire-field"
+                },
+                characterChangeField(model.psychologicalWeaknessLabel, model.psychologicalWeakness, ::setPsychologicalWeakness).apply {
+                    id = "psychological-weakness-field"
+                },
+                characterChangeField(model.moralWeaknessLabel, model.moralWeakness, ::setMoralWeakness).apply {
+                    id = "moral-weakness-field"
+                },
+                characterChangeField(model.characterChangeLabel, model.characterChange, ::setCharacterChange).apply {
+                    id = "character-change-field"
+                }
             ).onEach {
                 it.hgrow = Priority.ALWAYS
             }
@@ -208,7 +216,9 @@ class CharacterConflict : View() {
             characterChangeInput(valueProperty).apply {
                 hgrow = Priority.ALWAYS
                 onLoseFocus {
-                    setCharacterChangeField(text)
+                    if (text != valueProperty.value) {
+                        setCharacterChangeField(text)
+                    }
                 }
             }
         }
@@ -253,6 +263,7 @@ class CharacterConflict : View() {
 
     private fun Parent.addOpponentSelection() {
         menubutton("Add Opponent") {
+            id = "add-opponent-selection"
             existsWhen {
                 model.isLarge.or(
                     selectedContentTab.isEqualTo(

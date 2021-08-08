@@ -6,7 +6,7 @@ interface ListAvailableOppositionValuesForCharacterInTheme {
 
     suspend operator fun invoke(themeId: UUID, characterId: UUID, output: OutputPort)
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun availableOppositionValuesListedForCharacterInTheme(response: OppositionValuesAvailableForCharacterInTheme)
     }
 

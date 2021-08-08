@@ -22,11 +22,13 @@ class LocationListDriver(private val locationList: LocationList) : FxRobot() {
 
     fun ContextMenu.getRenameOption() = items.find { it.text == "Rename" }!!
 
+    val ContextMenu.openDetailsOption
+        get() = items.find { it.id == "open" }!!
+
     fun getLocationItemOrError(locationId: Location.Id): TreeItem<Any?> =
         getLocationItem(locationId) ?: error("No item in location list with id $locationId")
 
-    fun getLocationItem(locationId: Location.Id): TreeItem<Any?>?
-    {
+    fun getLocationItem(locationId: Location.Id): TreeItem<Any?>? {
         return tree.root.children.asSequence().mapNotNull {
             val value = it.value as? LocationItemViewModel
             if (value?.id == locationId) it as TreeItem<Any?>

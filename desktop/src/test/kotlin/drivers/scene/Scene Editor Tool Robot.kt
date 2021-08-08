@@ -249,7 +249,7 @@ fun SceneEditorView.givenReplacingInvestigatedMentionWithNewCharacter(): CreateC
     return getCreateCharacterDialogOrError()
 }
 
-fun SceneEditorView.givenReplacingInvestigatedMentionWithNewLocation(): CreateLocationDialog
+fun SceneEditorView.givenReplacingInvestigatedMentionWithNewLocation(): CreateLocationDialog.View
 {
     val replacementOption = with(driver().getProseEditor().driver()) {
         mentionIssueMenu!!.replacementOption()!!

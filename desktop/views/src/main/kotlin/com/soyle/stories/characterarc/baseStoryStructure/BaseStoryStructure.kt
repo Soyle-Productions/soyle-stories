@@ -3,7 +3,8 @@ package com.soyle.stories.characterarc.baseStoryStructure
 import com.soyle.stories.common.ToolView
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.resolve
-import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.di.resolveLater
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Orientation
@@ -20,6 +21,8 @@ class BaseStoryStructure : ToolView() {
 
     val model = find<BaseStoryStructureModel>()
     private val baseStoryStructureViewListener = resolve<BaseStoryStructureViewListener>()
+
+    private val makeCreateLocationDialog by resolveLater<CreateLocationDialog.Factory>(scope.projectScope)
 
     override val root: Parent = scrollpane {
         hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
@@ -49,7 +52,7 @@ class BaseStoryStructure : ToolView() {
         return listOf(
             MenuItem("Create Location").apply {
                 action {
-                    createLocationDialog(scope.projectScope) {
+                    makeCreateLocationDialog {
                         baseStoryStructureViewListener.linkLocation(section.sectionId, it.locationId.toString())
                     }
                 }

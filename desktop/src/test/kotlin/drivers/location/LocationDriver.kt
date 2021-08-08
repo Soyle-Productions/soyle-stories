@@ -4,6 +4,7 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.validation.SingleLine
 import com.soyle.stories.domain.validation.SingleNonBlankLine
 import com.soyle.stories.domain.validation.countLines

@@ -17,14 +17,22 @@ import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.Remove
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedNotifier
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
+import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
+import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesReceiver
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedNotifier
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedReceiver
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneNotifier
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneReceiver
+import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
+import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedNotifier
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedReceiver
+import com.soyle.stories.scene.target.SceneTargetedNotifier
+import com.soyle.stories.scene.target.SceneTargetedReceiver
 import com.soyle.stories.scene.trackSymbolInScene.*
 
 object Notifiers {
@@ -79,7 +87,18 @@ object Notifiers {
             provide(CharacterDesireInSceneChangedReceiver::class) {
                 CharacterDesireInSceneChangedNotifier()
             }
+            provide(SceneDeletedReceiver::class) {
+                SceneDeletedNotifier()
+            }
+            provide(SceneRenamedReceiver::class) {
+                SceneRenamedNotifier()
+            }
+            provide(SceneTargetedReceiver::class) {
+                SceneTargetedNotifier()
+            }
+            provide(SceneInconsistenciesReceiver::class) {
+                SceneInconsistenciesNotifier()
+            }
         }
     }
-
 }

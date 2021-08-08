@@ -6,7 +6,7 @@ import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.domain.character.CharacterRenamed
 import com.soyle.stories.domain.location.Location
-import com.soyle.stories.domain.location.LocationRenamed
+import com.soyle.stories.domain.location.events.LocationRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.items.LocationItemViewModel

@@ -3,6 +3,7 @@ package com.soyle.stories.scene.createSceneDialog
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
@@ -18,6 +19,7 @@ class CreateSceneDialog : Fragment() {
 
 	private val sceneId: String? by params
 	private val relativeDirection: Boolean by params
+	private val onSceneCreated: (Scene.Id) -> Unit by params
 
 	private val viewListener by resolveLater<CreateNewSceneDialogViewListener>()
 	private val model = resolve<CreateSceneDialogModel>()
@@ -34,20 +36,27 @@ class CreateSceneDialog : Fragment() {
 			}
 			onAction = EventHandler {
 				it.consume()
-				model.executing.set(true)
 				val name = NonBlankString.create(text)
 				if (name == null) {
 					model.errorMessage.value = "Name cannot be blank"
 					return@EventHandler
 				}
-				when {
-					sceneId != null -> when (relativeDirection) {
-						true -> viewListener.createSceneBefore(name, sceneId!!)
-						false -> viewListener.createSceneAfter(name, sceneId!!)
-					}
-					else -> viewListener.createScene(name)
-				}
+				model.executing.set(true)
+				createScene(name)
 			}
+		}
+	}
+
+	private fun createScene(name: NonBlankString) {
+		val deferredSceneId = when {
+			sceneId != null -> when (relativeDirection) {
+				true -> viewListener.createSceneBefore(name, sceneId!!)
+				false -> viewListener.createSceneAfter(name, sceneId!!)
+			}
+			else -> viewListener.createScene(name)
+		}
+		deferredSceneId.invokeOnCompletion {
+			if (it == null) onSceneCreated(deferredSceneId.getCompleted())
 		}
 	}
 
@@ -60,11 +69,28 @@ class CreateSceneDialog : Fragment() {
 	}
 
 }
-fun createSceneDialog(scope: ProjectScope, relativeSceneId: String? = null, direction: Boolean = true): CreateSceneDialog = find<CreateSceneDialog>(scope, mapOf("sceneId" to relativeSceneId, "relativeDirection" to direction)).apply {
-	openModal(StageStyle.UTILITY, Modality.NONE, escapeClosesWindow = true, owner = scope.get<WorkBench>().currentWindow)?.apply {
-		centerOnScreen()
-		focusedProperty().onChange {
-			if (! it) close()
+fun createSceneDialog(
+	scope: ProjectScope,
+	relativeSceneId: String? = null,
+	direction: Boolean = true,
+	onSceneCreated: (Scene.Id) -> Unit = {}
+): CreateSceneDialog {
+	val params = mapOf(
+		"sceneId" to relativeSceneId,
+		"relativeDirection" to direction,
+		"onSceneCreated" to onSceneCreated
+	)
+	return find<CreateSceneDialog>(scope, params).apply {
+		openModal(
+			StageStyle.UTILITY,
+			Modality.NONE,
+			escapeClosesWindow = true,
+			owner = scope.get<WorkBench>().currentWindow
+		)?.apply {
+			centerOnScreen()
+			focusedProperty().onChange {
+				if (!it) close()
+			}
 		}
 	}
 }

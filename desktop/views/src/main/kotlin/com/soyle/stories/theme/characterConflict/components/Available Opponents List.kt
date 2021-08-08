@@ -39,6 +39,7 @@ private fun MenuButton.charactersInTheme(list: List<AvailableOpponentViewModel>)
     }
     list.filter { it.isInTheme }.forEach {
         item(it.characterName) {
+            id = it.characterId
             addClass(ComponentsStyles.contextMenuSectionedItem)
             action {
                 onOpponentCharacterSelected?.invoke(it)
@@ -56,6 +57,7 @@ private fun MenuButton.otherCharactersInStory(list: List<AvailableOpponentViewMo
     items.add(createCharacterItem())
     list.filterNot { it.isInTheme }.forEach {
         customitem {
+            id = it.characterId
             addClass(ComponentsStyles.contextMenuSectionedItem)
             addClass(ComponentsStyles.discouragedSelection)
             content = label(it.characterName) {

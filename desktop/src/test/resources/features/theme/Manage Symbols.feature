@@ -16,7 +16,7 @@ Feature: Manage Symbols
 
   Scenario: Rename Symbol Used as Symbolic Item for Opposition Value
     Given a symbol named "Ring" has been created in the "Growing Up" theme
-    And a value web named "Love" has been created in the "Growing Up" theme
+    And I have created a value web named "Love" in the "Growing Up" theme
     And the "Ring" symbol in the "Growing Up" theme has been added as a symbolic item to the opposition value in the "Love" value web
     When the "Ring" symbol in the "Growing Up" theme is renamed with the name "Cube"
     Then the symbol originally named "Ring" in the "Growing Up" theme should have been renamed to "Cube"
@@ -29,7 +29,7 @@ Feature: Manage Symbols
 
   Scenario: Delete Symbol Used as Symbolic Item for Opposition Value
     Given a symbol named "Ring" has been created in the "Growing Up" theme
-    And a value web named "Love" has been created in the "Growing Up" theme
+    And I have created a value web named "Love" in the "Growing Up" theme
     And the "Ring" symbol in the "Growing Up" theme has been added as a symbolic item to the opposition value in the "Love" value web
     When the "Ring" symbol in the "Growing Up" theme is deleted
     Then the "Ring" symbol in the "Growing Up" theme should have been deleted

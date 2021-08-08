@@ -11,6 +11,7 @@ import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.location.deleteLocation.DeletedLocationReceiver
 import com.soyle.stories.location.events.CreateNewLocationNotifier
 import com.soyle.stories.location.events.LocationEvents
+import com.soyle.stories.location.hostedScene.*
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationControllerImpl
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationNotifier
@@ -37,9 +38,6 @@ object LocationModule {
 		provide<CreateNewLocation> {
 			CreateNewLocationUseCase(projectId, get())
 		}
-		provide<GetLocationDetails> {
-			GetLocationDetailsUseCase(get())
-		}
 		provide<ReDescribeLocation> {
 			ReDescribeLocationUseCase(get())
 		}
@@ -60,15 +58,18 @@ object LocationModule {
 			object : LocationEvents {
 				override val createNewLocation: Notifier<CreateNewLocation.OutputPort> by DI.resolveLater<CreateNewLocationNotifier>(this@provide)
 				override val deleteLocation: Notifier<DeletedLocationReceiver> by lazy { this@provide.get<DeletedLocationNotifier>() }
-				override val renameLocation: Notifier<RenameLocation.OutputPort> by lazy { this@provide.get() }
+				override val locationRenamed: Notifier<LocationRenamedReceiver> by lazy { this@provide.get<LocationRenamedNotifier>() }
 				override val reDescribeLocation: Notifier<ReDescribeLocation.OutputPort> by DI.resolveLater<ReDescribeLocationNotifier>(this@provide)
+				override val sceneHosted: Notifier<SceneHostedReceiver> by lazy { this@provide.get<SceneHostedNotifier>() }
+				override val hostedSceneRenamed: Notifier<HostedSceneRenamedReceiver> by DI.resolveLater<HostedSceneRenamedNotifier>(this@provide)
+				override val hostedSceneRemoved: Notifier<HostedSceneRemovedReceiver> by DI.resolveLater<HostedSceneRemovedNotifier>(this@provide)
 			}
 		}
 	}
 
 	private fun InScope<ProjectScope>.controllers() {
 		provide {
-			CreateNewLocationController(get(), get())
+			CreateNewLocationController(applicationScope.get(), get(), get())
 		}
 		provide {
 			RenameLocationController(get(), get())

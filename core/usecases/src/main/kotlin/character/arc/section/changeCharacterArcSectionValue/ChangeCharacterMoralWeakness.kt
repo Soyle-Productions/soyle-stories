@@ -1,5 +1,6 @@
 package com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue
 
+import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import java.util.*
 
 interface ChangeCharacterMoralWeakness {
@@ -13,10 +14,11 @@ interface ChangeCharacterMoralWeakness {
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
     class ResponseModel(
-        val changedCharacterMoralWeakness: ChangedCharacterArcSectionValue
+        val characterArcSectionAddedToArc: ArcSectionAddedToCharacterArc?,
+        val changedCharacterMoralWeakness: ChangedCharacterArcSectionValue?
     )
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun characterMoralWeaknessChanged(response: ResponseModel)
     }
 

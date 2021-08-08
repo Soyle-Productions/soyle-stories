@@ -3,7 +3,10 @@ package com.soyle.stories.scene.createNewScene
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import java.util.*
 
 class CreateNewSceneControllerImpl(
@@ -16,17 +19,31 @@ class CreateNewSceneControllerImpl(
 
 	private val projectId = UUID.fromString(projectId)
 
-	override fun createNewScene(name: NonBlankString) {
+	private fun output() = object : CreateNewScene.OutputPort by createNewSceneOutputPort {
+		var response: CreateNewScene.ResponseModel? = null
+		override fun receiveCreateNewSceneResponse(response: CreateNewScene.ResponseModel) {
+			createNewSceneOutputPort.receiveCreateNewSceneResponse(response)
+			this.response = response
+		}
+	}
+
+	override fun createNewScene(name: NonBlankString): Deferred<Scene.Id> {
+		val output = output()
+		val deferred = CompletableDeferred<Scene.Id>()
 		threadTransformer.async {
 			val request = CreateNewScene.RequestModel(
 			  name,
 			  localeManager.getCurrentLocale()
 			)
-			createNewScene.invoke(request, createNewSceneOutputPort)
+			createNewScene.invoke(request, output)
+			if (output.response != null) deferred.complete(Scene.Id(output.response!!.sceneId))
 		}
+		return deferred
 	}
 
-	override fun createNewSceneBefore(name: NonBlankString, sceneId: String) {
+	override fun createNewSceneBefore(name: NonBlankString, sceneId: String): Deferred<Scene.Id> {
+		val output = output()
+		val deferred = CompletableDeferred<Scene.Id>()
 		threadTransformer.async {
 			createNewScene.invoke(
 			  CreateNewScene.RequestModel(
@@ -35,12 +52,16 @@ class CreateNewSceneControllerImpl(
 				true,
 				localeManager.getCurrentLocale()
 			  ),
-			  createNewSceneOutputPort
+				output
 			)
+			if (output.response != null) deferred.complete(Scene.Id(output.response!!.sceneId))
 		}
+		return deferred
 	}
 
-	override fun createNewSceneAfter(name: NonBlankString, sceneId: String) {
+	override fun createNewSceneAfter(name: NonBlankString, sceneId: String): Deferred<Scene.Id> {
+		val output = output()
+		val deferred = CompletableDeferred<Scene.Id>()
 		threadTransformer.async {
 			createNewScene.invoke(
 			  CreateNewScene.RequestModel(
@@ -49,8 +70,10 @@ class CreateNewSceneControllerImpl(
 				false,
 				localeManager.getCurrentLocale()
 			  ),
-			  createNewSceneOutputPort
+				output
 			)
+			if (output.response != null) deferred.complete(Scene.Id(output.response!!.sceneId))
 		}
+		return deferred
 	}
 }

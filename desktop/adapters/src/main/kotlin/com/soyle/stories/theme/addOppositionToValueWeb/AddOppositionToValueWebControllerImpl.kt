@@ -4,7 +4,11 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.theme.addOppositionToValueWeb.AddOppositionToValueWeb
 import com.soyle.stories.usecase.theme.addOppositionToValueWeb.AddOppositionToValueWeb.RequestModel
+import com.soyle.stories.usecase.theme.addOppositionToValueWeb.OppositionAddedToValueWeb
 import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.CharacterId
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 import java.util.*
 
 class AddOppositionToValueWebControllerImpl(
@@ -13,29 +17,41 @@ class AddOppositionToValueWebControllerImpl(
     private val addOppositionToValueWebOutputPort: AddOppositionToValueWeb.OutputPort
 ) : AddOppositionToValueWebController {
 
-    override fun addOpposition(valueWebId: String) {
+    override fun addOpposition(valueWebId: String): Deferred<OppositionAddedToValueWeb> {
         val request = RequestModel(
             UUID.fromString(valueWebId)
         )
-        addOppositionToValueWeb(request)
+        return addOppositionToValueWeb(request)
     }
 
-    override fun addOppositionWithCharacter(valueWebId: String, name: NonBlankString, characterId: String) {
+    override fun addOpposition(valueWebId: String, name: NonBlankString): Deferred<OppositionAddedToValueWeb> {
+        val request = RequestModel(
+            UUID.fromString(valueWebId),
+            name,
+            null
+        )
+        return addOppositionToValueWeb(request)
+    }
+
+    override fun addOppositionWithCharacter(valueWebId: String, name: NonBlankString, characterId: String): Deferred<OppositionAddedToValueWeb> {
         val request = RequestModel(
             UUID.fromString(valueWebId),
             name,
             CharacterId(UUID.fromString(characterId))
         )
-        addOppositionToValueWeb(request)
+        return addOppositionToValueWeb(request)
     }
 
-    private fun addOppositionToValueWeb(requestModel: RequestModel)
+    private fun addOppositionToValueWeb(requestModel: RequestModel): Deferred<OppositionAddedToValueWeb>
     {
+        val deferred = CompletableDeferred<OppositionAddedToValueWeb>()
         threadTransformer.async {
-            addOppositionToValueWeb.invoke(
-                requestModel, addOppositionToValueWebOutputPort
-            )
+            addOppositionToValueWeb.invoke(requestModel) {
+                deferred.complete(it.oppositionAddedToValueWeb)
+                addOppositionToValueWebOutputPort.addedOppositionToValueWeb(it)
+            }
         }
+        return deferred
     }
 
 }

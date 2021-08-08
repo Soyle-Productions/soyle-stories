@@ -5,6 +5,9 @@ import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.theme.addSymbolicItemToOpposition.CharacterId
 import com.soyle.stories.usecase.theme.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.usecase.theme.addValueWebToTheme.AddValueWebToTheme.RequestModel
+import com.soyle.stories.usecase.theme.addValueWebToTheme.ValueWebAddedToTheme
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import java.util.*
 
 class AddValueWebToThemeControllerImpl(
@@ -13,18 +16,18 @@ class AddValueWebToThemeControllerImpl(
     private val addValueWebToThemeOutputPort: AddValueWebToTheme.OutputPort
 ) : AddValueWebToThemeController {
 
-    override fun addValueWebToTheme(themeId: String, name: NonBlankString, onError: (Throwable) -> Unit) {
+    override fun addValueWebToTheme(
+        themeId: String,
+        name: NonBlankString,
+        onError: (Throwable) -> Unit
+    ): Deferred<ValueWebAddedToTheme> {
         val preparedThemeId = UUID.fromString(themeId)
-        threadTransformer.async {
-            try {
-                addValueWebToTheme.invoke(
-                    RequestModel(
-                        preparedThemeId,
-                        name
-                    ), addValueWebToThemeOutputPort
-                )
-            } catch (t: Throwable) { onError(t) }
-        }
+        return addValueWebToTheme(
+            RequestModel(
+                preparedThemeId,
+                name
+            )
+        )
     }
 
     override fun addValueWebToThemeWithCharacter(
@@ -32,20 +35,27 @@ class AddValueWebToThemeControllerImpl(
         name: NonBlankString,
         characterId: String,
         onError: (Throwable) -> Unit
-    ) {
+    ): Deferred<ValueWebAddedToTheme> {
         val preparedThemeId = UUID.fromString(themeId)
         val preparedCharacterId = UUID.fromString(characterId)
+        return addValueWebToTheme(
+            RequestModel(
+                preparedThemeId,
+                name,
+                CharacterId(preparedCharacterId)
+            )
+        )
+    }
+
+    private fun addValueWebToTheme(request: RequestModel): Deferred<ValueWebAddedToTheme> {
+        val deferred = CompletableDeferred<ValueWebAddedToTheme>()
         threadTransformer.async {
-            try {
-                addValueWebToTheme.invoke(
-                    RequestModel(
-                        preparedThemeId,
-                        name,
-                        CharacterId(preparedCharacterId)
-                    ), addValueWebToThemeOutputPort
-                )
-            } catch (t: Throwable) { onError(t) }
+            addValueWebToTheme(request) {
+                deferred.complete(it.addedValueWeb)
+                addValueWebToThemeOutputPort.addedValueWebToTheme(it)
+            }
         }
+        return deferred
     }
 
 }

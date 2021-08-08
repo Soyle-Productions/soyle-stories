@@ -2,6 +2,7 @@ import librarires.Libraries
 
 plugins {
     kotlin("jvm")
+    id(plugin.constants.detekt)
     id(plugin.constants.ideaExt) version plugin.constants.ideaExtVersion
     `java-test-fixtures`
 }
@@ -30,6 +31,7 @@ dependencies {
     testImplementation(testFixtures(project(path = ":core:domain")))
 
     testFixturesImplementation(Libraries.junit.api)
+    testFixturesImplementation(Libraries.kotlin.coroutines)
 }
 
 task<Test>("integrationTest") {

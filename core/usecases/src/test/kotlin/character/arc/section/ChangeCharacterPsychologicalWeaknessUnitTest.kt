@@ -1,16 +1,17 @@
 package com.soyle.stories.usecase.character.arc.section
 
 import arrow.core.Either
-import com.soyle.stories.domain.character.CharacterArc
-import com.soyle.stories.domain.character.PsychologicalWeakness
-import com.soyle.stories.domain.character.makeCharacter
-import com.soyle.stories.domain.character.makeCharacterArcSection
+import com.soyle.stories.domain.character.*
 import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.shouldBe
 import com.soyle.stories.domain.str
 import com.soyle.stories.domain.theme.CharacterIsNotMajorCharacterInTheme
 import com.soyle.stories.domain.theme.CharacterNotInTheme
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.makeTheme
+import com.soyle.stories.usecase.character.CharacterArcDoesNotExist
+import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ArcSectionType
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeaknessUseCase
@@ -23,23 +24,15 @@ import com.soyle.stories.usecase.theme.characterNotInTheme
 import com.soyle.stories.usecase.theme.themeDoesNotExist
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class ChangeCharacterPsychologicalWeaknessUnitTest {
 
-    // preconditions
-    private val character = makeCharacter()
-    private val theme = makeTheme()
-        .withCharacterIncluded(character.id, character.name.value, character.media)
-        .withCharacterPromoted(character.id)
-    private val arcSection = makeCharacterArcSection(characterId = character.id, themeId = theme.id, template = PsychologicalWeakness)
-    private val characterArc = CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name)
-        .withArcSection(arcSection)
-
     // input
-    private val themeId = theme.id.uuid
-    private val characterId = character.id.uuid
+    private val themeId = Theme.Id()
+    private val characterId = Character.Id()
     private val providedWeakness = "Psychological Weakness ${str()}"
 
     // post-conditions
@@ -49,84 +42,171 @@ class ChangeCharacterPsychologicalWeaknessUnitTest {
     private var responseModel: ChangeCharacterPsychologicalWeakness.ResponseModel? = null
 
     @Test
-    fun `theme doesn't exist`() {
-        assertThrows<ThemeDoesNotExist> {
-            changeCharacterPsychologicalWeakness()
-        } shouldBe themeDoesNotExist(themeId)
+    fun `should throw error given theme does not exist`() {
+        val action = ::changeCharacterPsychologicalWeakness
+
+        val error = assertThrows<ThemeDoesNotExist>(action)
+        error.themeId.mustEqual(themeId.uuid)
     }
 
-    @Test
-    fun `character not in theme`() {
-        givenTheme()
-        assertThrows<CharacterNotInTheme> {
-            changeCharacterPsychologicalWeakness()
-        } shouldBe characterNotInTheme(themeId, characterId)
-    }
+    @Nested
+    inner class `Given Theme Exists`
+    {
 
-    @Test
-    fun `character is minor character`() {
-        givenTheme()
-        givenThemeHasCharacter()
-        assertThrows<CharacterIsNotMajorCharacterInTheme> {
-            changeCharacterPsychologicalWeakness()
-        } shouldBe characterIsNotMajorCharacterInTheme(themeId, characterId)
-    }
-
-    @Test
-    fun `happy path`() {
-        givenTheme()
-        givenThemeHasCharacter(asMajorCharacter = true)
-        changeCharacterPsychologicalWeakness()
-        updatedCharacterArc!!.arcSections.find { it.id == arcSection.id }!! shouldBe {
-            assertEquals(arcSection.id, it.id)
-            assertEquals(providedWeakness, it.value)
+        private val theme = makeTheme(id = themeId)
+        init {
+            themeRepository.givenTheme(theme)
         }
-        responseModel!!.changedCharacterPsychologicalWeakness shouldBe ::changedCharacterPsychologicalWeakness
-    }
 
-    @Test
-    fun `linked location set`() {
-        val linkedLocationId = Location.Id()
-        givenTheme()
-        givenThemeHasCharacter(asMajorCharacter = true)
-        givenArcSectionHasLinkedLocation(linkedLocationId)
-        changeCharacterPsychologicalWeakness()
-        updatedCharacterArc!!.arcSections.find { it.id == arcSection.id }!! shouldBe {
-            assertEquals(arcSection.id, it.id)
-            assertEquals(providedWeakness, it.value)
-            assertEquals(linkedLocationId, it.linkedLocation)
+        @Test
+        fun `should throw error given character is not in theme`() {
+            val action = ::changeCharacterPsychologicalWeakness
+
+            val error = assertThrows<CharacterNotInTheme>(action)
+            error.themeId.mustEqual(themeId.uuid)
+            error.characterId.mustEqual(characterId.uuid)
         }
-        responseModel!!.changedCharacterPsychologicalWeakness shouldBe ::changedCharacterPsychologicalWeakness
-    }
 
+        @Nested
+        inner class `Given Character is in Theme`
+        {
+
+            private val character = makeCharacter(id = characterId)
+            init {
+                themeRepository.givenTheme(theme.withCharacterIncluded(character))
+            }
+
+            @Test
+            fun `should throw error given character is not a major character`() {
+                val action = ::changeCharacterPsychologicalWeakness
+
+                val error = assertThrows<CharacterIsNotMajorCharacterInTheme>(action)
+                error.characterId.mustEqual(characterId.uuid)
+                error.themeId.mustEqual(themeId.uuid)
+            }
+
+            @Nested
+            inner class `Given Character is Major Character`
+            {
+
+                init {
+                    themeRepository.givenTheme(theme
+                        .withCharacterIncluded(character)
+                        .withCharacterPromoted(character.id)
+                    )
+                }
+
+                @Test
+                fun `should throw error given no accompanying character arc`() {
+                    val action = ::changeCharacterPsychologicalWeakness
+
+                    val error = assertThrows<CharacterArcDoesNotExist>(action)
+                    error.characterId.mustEqual(characterId.uuid)
+                    error.themeId.mustEqual(themeId.uuid)
+                }
+
+                @Nested
+                inner class `Given Accompanying Character Arc Exists`
+                {
+
+                    private val arc = makeCharacterArc(characterId, themeId)
+                    init {
+                        characterArcRepository.givenCharacterArc(arc)
+                    }
+
+                    @Test
+                    fun `should add arc section to character arc`() {
+                        changeCharacterPsychologicalWeakness()
+
+                        updatedCharacterArc!!.characterId.mustEqual(characterId)
+                        updatedCharacterArc!!.themeId.mustEqual(themeId)
+                        persistedArcSection()!!.value.mustEqual(providedWeakness)
+                    }
+
+                    @Test
+                    fun `should output arc section added event`() {
+                        changeCharacterPsychologicalWeakness()
+
+                        val section = persistedArcSection()!!
+                        responseModel!!.characterArcSectionAddedToArc.mustEqual(
+                            ArcSectionAddedToCharacterArc(
+                                section.id.uuid,
+                                arc.id.uuid,
+                                characterId.uuid,
+                                themeId.uuid,
+                                PsychologicalWeakness.id.uuid,
+                                PsychologicalWeakness.name,
+                                updatedCharacterArc!!.indexInMoralArgument(section.id),
+                                providedWeakness,
+                                emptyList()
+                            )
+                        )
+                    }
+
+                    @Test
+                    fun `should not output value changed event`() {
+                        changeCharacterPsychologicalWeakness()
+
+                        responseModel!!.changedCharacterPsychologicalWeakness.mustEqual(null)
+                    }
+
+                    private fun persistedArcSection(): CharacterArcSection? =
+                        updatedCharacterArc!!.arcSections.single { it.template isSameEntityAs PsychologicalWeakness }
+
+                    @Nested
+                    inner class `Given Character Arc has Psychological Weakness Section`
+                    {
+
+                        private val arc = this@`Given Accompanying Character Arc Exists`.arc.withArcSection(
+                            PsychologicalWeakness
+                        )
+                        init {
+                            characterArcRepository.givenCharacterArc(arc)
+                        }
+                        val arcSection = arc.arcSections.single { it.template isSameEntityAs PsychologicalWeakness }
+
+                        @Test
+                        fun `should update character arc section`() {
+                            changeCharacterPsychologicalWeakness()
+
+                            persistedArcSection()!!.id.mustEqual(arcSection.id)
+                            persistedArcSection()!!.value.mustEqual(providedWeakness)
+                        }
+
+                        @Test
+                        fun `should output value changed event`() {
+                            changeCharacterPsychologicalWeakness()
+
+                            responseModel!!.changedCharacterPsychologicalWeakness.mustEqual(
+                                ChangedCharacterArcSectionValue(
+                                    arcSection.id.uuid,
+                                    characterId.uuid,
+                                    themeId.uuid,
+                                    ArcSectionType.PsychologicalWeakness,
+                                    providedWeakness
+                                )
+                            )
+                        }
+
+                        @Test
+                        fun `should not output arc section added event`() {
+                            changeCharacterPsychologicalWeakness()
+
+                            responseModel!!.characterArcSectionAddedToArc.mustEqual(null)
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
 
     private val characterArcRepository = CharacterArcRepositoryDouble(onUpdateCharacterArc = ::updatedCharacterArc::set)
     private val themeRepository = ThemeRepositoryDouble()
-
-    private fun givenTheme() {
-        themeRepository.themes[theme.id] = theme.withoutCharacter(character.id)
-    }
-
-    private fun givenThemeHasCharacter(asMajorCharacter: Boolean = false) {
-        themeRepository.themes[theme.id] = if (asMajorCharacter) theme.also {
-            characterArcRepository.givenCharacterArc(characterArc)
-        } else {
-            (theme.demoteCharacter(theme.getMajorCharacterById(character.id)!!) as Either.Right).b
-        }
-    }
-
-    private fun givenArcSectionHasLinkedLocation(locationId: Location.Id)
-    {
-        runBlocking {
-            characterArcRepository.givenCharacterArc(
-                characterArcRepository.getCharacterArcByCharacterAndThemeId(character.id, theme.id)!!
-                    .withArcSectionsMapped {
-                        if (it.id == arcSection.id) it.withLinkedLocation(locationId)
-                        else it
-                    }
-            )
-        }
-    }
 
     private fun changeCharacterPsychologicalWeakness() {
         val useCase: ChangeCharacterPsychologicalWeakness =
@@ -137,15 +217,7 @@ class ChangeCharacterPsychologicalWeaknessUnitTest {
             }
         }
         runBlocking {
-            useCase.invoke(ChangeCharacterPsychologicalWeakness.RequestModel(themeId, characterId, providedWeakness), output)
+            useCase.invoke(ChangeCharacterPsychologicalWeakness.RequestModel(themeId.uuid, characterId.uuid, providedWeakness), output)
         }
-    }
-
-    private fun changedCharacterPsychologicalWeakness(it: ChangedCharacterArcSectionValue) {
-        assertEquals(themeId, it.themeId)
-        assertEquals(characterId, it.characterId)
-        assertEquals(arcSection.id.uuid, it.arcSectionId)
-        assertEquals(ArcSectionType.PsychologicalWeakness, it.type)
-        assertEquals(providedWeakness, it.newValue)
     }
 }

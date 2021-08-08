@@ -7,7 +7,10 @@ import com.soyle.stories.desktop.config.drivers.scene.SceneDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransformer
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
+import com.soyle.stories.desktop.config.locale.LocaleHolder
+import com.soyle.stories.desktop.config.soylestories.configureLocalization
 import com.soyle.stories.desktop.config.soylestories.configureModules
+import com.soyle.stories.desktop.locale.SoyleMessages
 import com.soyle.stories.desktop.view.runHeadless
 import com.soyle.stories.di.DI
 import com.soyle.stories.domain.character.Character
@@ -19,7 +22,9 @@ import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
+import kotlinx.coroutines.CoroutineScope
 import org.testfx.api.FxToolkit
+import java.util.*
 import kotlin.concurrent.thread
 
 lateinit var soyleStories: SoyleStories
@@ -28,8 +33,12 @@ lateinit var soyleStories: SoyleStories
 class GlobalHooks : En {
 
     companion object {
-        private val closeThread = thread(start = false) {
-            Thread.currentThread().interrupt()
+        private val closeThread by lazy {
+            val close = thread(start = false) {
+                Thread.currentThread().interrupt()
+            }
+            Runtime.getRuntime().addShutdownHook(close)
+            close
         }
     }
 
@@ -37,12 +46,15 @@ class GlobalHooks : En {
         DI.register(ThreadTransformer::class, ApplicationScope::class, { SyncThreadTransformer() })
     }
 
+    private val primaryTestThread = Thread.getAllStackTraces().keys.find { it.name == "main" }!!
+
     init {
         Before { scenario: Scenario ->
             if (! FxToolkit.isFXApplicationThreadRunning()) {
                 runHeadless()
-                Runtime.getRuntime().addShutdownHook(closeThread)
+                closeThread
                 SoyleStories.initialization = {
+                    configureLocalization()
                     configureModules()
                     synchronizeBackgroundTasks()
                 }
@@ -55,6 +67,11 @@ class GlobalHooks : En {
                             e.printStackTrace()
                         } else {
                             currentHandler?.uncaughtException(t, e)
+
+                            // sometimes, the gui thread just passed the error directly to the uncaught
+                            // exception handler and continues on it's merry way.  Throw again to ensure
+                            // that the test thread gets the error too
+                            throw e
                         }
                     }
                 }

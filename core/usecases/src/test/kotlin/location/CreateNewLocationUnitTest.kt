@@ -21,28 +21,24 @@ class CreateNewLocationUnitTest {
 	private var createdLocation: Location? = null
 	private var result: Any? = null
 
-	@BeforeEach
-	fun clear() {
-		createdLocation = null
-		result = null
-	}
+	private val locationRepository = LocationRepositoryDouble(onAddNewLocation = ::createdLocation::set)
 
 	@Test
 	fun `valid name`() {
-		whenExecuted()
+		createLocation()
 		val result = result as CreateNewLocation.ResponseModel
 		result.locationName.mustEqual(inputName.value)
 	}
 
 	@Test
 	fun `valid locations are persisted`() {
-		whenExecuted()
+		createLocation()
 		assertLocationProperlyCreated()
 	}
 
 	@Test
 	fun `description is optional`() {
-		whenExecuted()
+		createLocation()
 		assertLocationProperlyCreated()
 		val createdLocation = createdLocation!!
 		createdLocation.description.mustEqual("")
@@ -51,7 +47,7 @@ class CreateNewLocationUnitTest {
 	@Test
 	fun `can provide description`() {
 		val inputDescription = "I describe a location"
-		whenExecutedWith(inputDescription = inputDescription)
+		createLocation(inputDescription = inputDescription)
 		assertLocationProperlyCreated()
 		val createdLocation = createdLocation!!
 		createdLocation.description.mustEqual(inputDescription)
@@ -59,17 +55,14 @@ class CreateNewLocationUnitTest {
 
 	@Test
 	fun `output generated id`() {
-		whenExecuted()
+		createLocation()
 		val createdLocation = createdLocation!!
 		val result = result as CreateNewLocation.ResponseModel
 		result.locationId.mustEqual(createdLocation.id.uuid)
 	}
 
-	private fun whenExecuted() = whenExecutedWith()
-	private fun whenExecutedWith(inputName: SingleNonBlankLine = this.inputName, inputDescription: String? = null) {
-		val useCase: CreateNewLocation = CreateNewLocationUseCase(projectId.uuid, LocationRepositoryDouble(
-		  onAddNewLocation = { createdLocation = it }
-		))
+	private fun createLocation(inputName: SingleNonBlankLine = this.inputName, inputDescription: String? = null) {
+		val useCase: CreateNewLocation = CreateNewLocationUseCase(projectId.uuid, locationRepository)
 		runBlocking {
 			useCase.invoke(inputName, inputDescription, object : CreateNewLocation.OutputPort {
 				override fun receiveCreateNewLocationFailure(failure: Exception) {
@@ -85,6 +78,7 @@ class CreateNewLocationUnitTest {
 
 	private fun assertLocationProperlyCreated() {
 		val createdLocation = createdLocation!!
+		createdLocation.hostedScenes.isEmpty().mustEqual(true)
 		createdLocation.name.mustEqual(inputName)
 		createdLocation.projectId.mustEqual(projectId)
 	}

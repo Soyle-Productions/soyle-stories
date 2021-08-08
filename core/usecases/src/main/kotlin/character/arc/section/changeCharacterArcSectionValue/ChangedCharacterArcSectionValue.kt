@@ -2,7 +2,7 @@ package com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectio
 
 import java.util.*
 
-class ChangedCharacterArcSectionValue(
+data class ChangedCharacterArcSectionValue(
     val arcSectionId: UUID,
     val characterId: UUID,
     val themeId: UUID,

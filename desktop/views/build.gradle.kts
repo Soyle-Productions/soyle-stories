@@ -6,6 +6,7 @@ import org.openjfx.gradle.JavaFXPlatform
 
 plugins {
     kotlin("jvm")
+    id(plugin.constants.detekt)
     id(plugin.constants.javafx) version plugin.constants.javaFxVersion
     id(plugin.constants.ideaExt)
     id("java-test-fixtures")
@@ -16,6 +17,21 @@ sourceSets {
         java {
             srcDir("src/testFixtures/kotlin")
         }
+    }
+}
+
+val design by sourceSets.creating {
+    withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+        kotlin.srcDir("src/design/kotlin")
+        compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
+        runtimeClasspath += output + compileClasspath + sourceSets["testFixtures"].runtimeClasspath
+
+        idea {
+            module {
+                testSourceDirs.addAll(kotlin.srcDirs)
+            }
+        }
+
     }
 }
 
@@ -40,7 +56,7 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
     api (Libraries.kotlin.coroutines)
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
+    api ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
     implementation( "org.controlsfx:controlsfx:11.0.2")
     implementation( "org.fxmisc.richtext:richtextfx:0.10.5")
     implementation( "no.tornado:tornadofx-controlsfx:0.1")
@@ -52,6 +68,9 @@ dependencies {
     implementation( "de.jensd:fontawesomefx-emojione:2.2.7-11")
 
     testImplementation( Libraries.kotlin.reflection)
+    testImplementation( Libraries.junit.api)
+    testImplementation( Libraries.junit.engine)
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
 
     testFixturesApi( Libraries.junit.api)
     testFixturesApi( Libraries.junit.engine)
@@ -60,6 +79,15 @@ dependencies {
     testFixturesApi( "org.testfx:testfx-core:4.0.16-alpha")
     testFixturesApi( "org.testfx:testfx-junit5:4.0.16-alpha")
     testFixturesApi( "org.testfx:openjfx-monocle:jdk-12.0.1+2")
+
+    val designImplementation by configurations.getting {  }
+    val designRuntimeOnly by configurations.getting {  }
+
+    designImplementation( Libraries.junit.api)
+    designRuntimeOnly( Libraries.junit.engine)
+    designImplementation( Libraries.assertJ)
+    designImplementation( "org.testfx:testfx-core:4.0.16-alpha")
+    designImplementation( "org.testfx:testfx-junit5:4.0.16-alpha")
 
     JavaFXPlatform.values().forEach { platform ->
         val cfg = configurations.create("javafx_" + platform.classifier)
@@ -83,6 +111,16 @@ tasks.withType<CreateStartScripts> {
     }
 }
 
+tasks.create<Test>("design") {
+    description = "Validates the Design of the Views"
+    group = "verification"
+    testClassesDirs = design.output.classesDirs
+    classpath = design.runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter(tasks["test"])
+    useJUnitPlatform()
+}
+
 project.parent?.tasks?.getByName("runtime")?.doLast {
     JavaFXPlatform.values().forEach { platform ->
         val cfg = configurations["javafx_" + platform.classifier]
@@ -95,14 +133,17 @@ project.parent?.tasks?.getByName("runtime")?.doLast {
     }
 }
 
+
 idea {
     module {
-        testSourceDirs.add(file("src/integration/java"))
-        testSourceDirs.add(file("src/integration/kotlin"))
+        this as ExtensionAware
+        configure<org.jetbrains.gradle.ext.ModuleSettings> {
+            this as ExtensionAware
+            val packagePrefix = "com.soyle.stories.desktop.view"
 
-        (this as ExtensionAware).configure<org.jetbrains.gradle.ext.ModuleSettings> {
-            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = "com.soyle.stories.desktop.view"
-            (this as ExtensionAware).the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/testFixtures/kotlin"] = "com.soyle.stories.desktop.view"
+            the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = packagePrefix
+            the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/design/kotlin"] = packagePrefix
+            the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/testFixtures/kotlin"] = packagePrefix
         }
     }
 }

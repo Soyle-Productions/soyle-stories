@@ -2,49 +2,32 @@ package com.soyle.stories.scene.sceneCharacters.characterEditor
 
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.ComponentsStyles
-import com.soyle.stories.common.components.ComponentsStyles.Companion.card
 import com.soyle.stories.common.components.ComponentsStyles.Companion.lifted
-import com.soyle.stories.common.components.buttons.ButtonStyles
-import com.soyle.stories.common.components.buttons.primaryMenuButton
 import com.soyle.stories.common.components.buttons.secondaryButton
 import com.soyle.stories.common.components.dataDisplay.chip.Chip
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Companion.chip
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chip
-import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chipDeleteIcon
 import com.soyle.stories.common.components.text.SectionTitle.Companion.section
 import com.soyle.stories.common.components.text.SectionTitle.Companion.sectionTitle
-import com.soyle.stories.common.exists
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.resolve
-import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.sceneCharacters.*
 import com.soyle.stories.scene.sceneCharacters.controlledBy
 import com.soyle.stories.scene.sceneCharacters.includedCharacterItem.IncludedCharacterItemView
 import com.soyle.stories.scene.sceneCharacters.includedCharacterItem.IncludedCharacterItemView.Companion.includedCharacterItem
-import com.soyle.stories.soylestories.Styles
-import javafx.animation.Interpolator
 import javafx.beans.property.ObjectProperty
-import javafx.beans.property.ReadOnlyObjectProperty
-import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
-import javafx.scene.SnapshotParameters
 import javafx.scene.control.*
-import javafx.scene.image.WritableImage
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
-import javafx.util.Duration
 import tornadofx.*
-import tornadofx.Stylesheet.Companion.menuButton
 import tornadofx.controlsfx.popover
-import java.lang.ref.WeakReference
-import javax.swing.text.html.ImageView
-import kotlin.time.milliseconds
 
 class SelectedSceneCharacterEditor : View() {
 
@@ -119,8 +102,8 @@ class SelectedSceneCharacterEditor : View() {
     private fun Parent.coveredArcSectionChip(it: CoveredArcSectionViewModel) {
         chip(
             text = it.displayLabel,
-            color = Chip.Color.Secondary,
-            variant = Chip.Variant.Outlined
+            color = Chip.Color.secondary,
+            variant = Chip.Variant.outlined
         ) {
             id = it.arcSectionId.uuid.toString()
             addClass(Styles.coveredArcSectionChip)

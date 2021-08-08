@@ -7,7 +7,7 @@ import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
-import com.soyle.stories.location.createLocationDialog.createLocationDialog
+import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
 import com.soyle.stories.project.dialogs.ActiveDialogsView
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
@@ -54,7 +54,7 @@ class WorkBench : View() {
                     }
                     item("Location") {
                         id = "file_new_location"
-                        action { createLocationDialog(scope) }
+                        action { scope.get<CreateLocationDialog.Factory>().invoke().show() }
                     }
                     item("Scene") {
                         id = "file_new_scene"

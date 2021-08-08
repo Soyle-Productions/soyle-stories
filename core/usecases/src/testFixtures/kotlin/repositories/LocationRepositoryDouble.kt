@@ -24,6 +24,11 @@ class LocationRepositoryDouble(
 	}
 
 	override suspend fun getLocationById(locationId: Location.Id): Location? = locations[locationId]
+
+	override suspend fun getLocationsById(locationIds: Set<Location.Id>): List<Location> {
+		return locationIds.mapNotNull(locations::get)
+	}
+
 	override suspend fun getAllLocationsInProject(projectId: Project.Id): List<Location> {
 		return locations.values.filter { it.projectId == projectId }
 	}
@@ -31,6 +36,10 @@ class LocationRepositoryDouble(
 	override suspend fun updateLocation(location: Location) {
 		onUpdateLocation.invoke(location)
 		locations[location.id] = location
+	}
+
+	override suspend fun updateLocations(locations: Set<Location>) {
+		locations.forEach { updateLocation(it) }
 	}
 
 	override suspend fun removeLocation(location: Location) {
