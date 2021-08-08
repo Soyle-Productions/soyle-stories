@@ -16,6 +16,7 @@ import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.location.events.CreateNewLocationNotifier
 import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArcNotifier
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebControllerImpl
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebNotifier
