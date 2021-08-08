@@ -16,6 +16,7 @@ import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.location.events.CreateNewLocationNotifier
 import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArcNotifier
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebControllerImpl
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebNotifier
@@ -224,11 +225,6 @@ object ThemeModule {
                 get()
             )
         }
-        provide<ListAvailableOppositionValuesForCharacterInTheme> {
-            ListAvailableOppositionValuesForCharacterInThemeUseCase(
-                get()
-            )
-        }
         provide<ExamineCentralConflictOfTheme> { ExamineCentralConflictOfThemeUseCase(get(), get()) }
         provide<ListAvailablePerspectiveCharacters> { ListAvailablePerspectiveCharactersUseCase(get()) }
         provide(
@@ -316,7 +312,7 @@ object ThemeModule {
             ChangeCharacterMoralWeakness.OutputPort::class,
             ChangeCharacterArcSectionValue.OutputPort::class
         ) {
-            ChangeCharacterArcSectionValueOutput(get())
+            ChangeCharacterArcSectionValueOutput(get(), get())
         }
         provide(ChangeCharacterChange.OutputPort::class) {
             ChangeCharacterChangeOutput(get())
@@ -573,6 +569,8 @@ object ThemeModule {
                 presenter listensTo projectScope.get<CharacterIncludedInThemeNotifier>()
                 presenter listensTo projectScope.get<RemovedCharacterFromThemeNotifier>()
                 presenter listensTo projectScope.get<ChangeCharacterPropertyValueNotifier>()
+                presenter listensTo projectScope.get<RenameOppositionValueNotifier>()
+                presenter listensTo projectScope.get<RenameValueWebNotifier>()
 
                 CharacterValueComparisonController(
                     type.themeId.toString(),

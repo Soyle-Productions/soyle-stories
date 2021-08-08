@@ -73,6 +73,14 @@ runtime {
         imageOptions = listOf(
             "--icon", "\"Soyle Stories.ico\""
         )
+        /*
+        Windows limits us to only three dots in the appVersion and a max of 255 for the first two numbers.  Max of 65,535
+        for the third number.  In order for incremental builds to take advantage of windows' automatic updating, it must
+        always be a higher version number, even if it's just another build of the same release candidate.  So, we'll
+        use the same major and minor numbers as the branded version, but each build number will increment and will
+        typically be out of sync with the branded version.
+         */
+        appVersion = "0.13.03"
         imageName = application.applicationName
         installerName = application.applicationName
         installerOptions = listOf(

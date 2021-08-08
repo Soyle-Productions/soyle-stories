@@ -5,6 +5,7 @@ import com.soyle.stories.common.components.emptyListDisplay
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import com.soyle.stories.theme.deleteValueWebDialog.DeleteValueWebDialog
@@ -12,6 +13,7 @@ import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
 import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.valueWebList
 import com.soyle.stories.theme.themeOppositionWebs.components.oppositionValueCard
 import com.soyle.stories.theme.valueOppositionWebs.ValueOppositionWebsViewListener
+import com.soyle.stories.theme.valueWeb.create.CreateValueWebForm
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.animation.Timeline
@@ -19,10 +21,13 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.paint.Color
+import javafx.stage.Stage
+import javafx.stage.StageStyle
 import javafx.util.Duration
 import tornadofx.*
 import kotlin.math.max
@@ -52,7 +57,7 @@ class ValueOppositionWebs : View() {
             "".toProperty(),
             "Create First Value Web".toProperty()
         ) {
-            scope.projectScope.get<CreateValueWebDialog>().show(scope.themeId.toString(), currentWindow)
+            openCreateValueWebDialog()
         }
         anchorpane {
             addClass("populated")
@@ -196,7 +201,7 @@ class ValueOppositionWebs : View() {
                         graphic = MaterialIconView(MaterialIcon.ADD, "16px")
                         addClass("create-value-web-button")
                         action {
-                            scope.projectScope.get<CreateValueWebDialog>().show(scope.themeId.toString(), currentWindow)
+                            openCreateValueWebDialog()
                         }
                     }
                 }
@@ -247,6 +252,16 @@ class ValueOppositionWebs : View() {
         model.selectedValueWeb.onChange {
             if (it != null) viewListener.selectValueWeb(it.valueWebId)
         }
+    }
+
+    private fun openCreateValueWebDialog() {
+        val stage = Stage()
+        val createValueWebForm = scope.projectScope.get<CreateValueWebForm.Factory>()
+            .invoke(Theme.Id(scope.themeId)) { stage.close() }
+        stage.initOwner(currentWindow)
+        stage.scene = Scene(createValueWebForm)
+        stage.initStyle(StageStyle.UTILITY)
+        stage.show()
     }
 
     companion object {

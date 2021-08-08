@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.view.theme.oppositionWebTool
 
 import com.soyle.stories.common.components.EditableText
+import com.soyle.stories.domain.theme.oppositionValue.OppositionValue
 import com.soyle.stories.theme.themeOppositionWebs.Styles
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebs
 import javafx.scene.Node
@@ -54,6 +55,12 @@ class ValueOppositionWebDriver(private val valueOppositionWebTool: ValueOppositi
         return getAllOppositionValueCards().find {
             from(it).lookup(oppositionValueName).queryAll<Node>().isNotEmpty()
         }
+    }
+
+    fun getOppositionValueNameInput(oppositionValueId: OppositionValue.Id): EditableText
+    {
+        val card = getAllOppositionValueCards().find { it.id == oppositionValueId.uuid.toString() }
+        return from(card).lookup(".opposition-value-name").query<Node>().uiComponent()!!
     }
 
     fun getOppositionValueNameInput(index: Int): EditableText

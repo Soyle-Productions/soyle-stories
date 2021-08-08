@@ -10,11 +10,15 @@ import com.soyle.stories.common.components.ComponentsStyles.Companion.discourage
 import com.soyle.stories.common.components.ComponentsStyles.Companion.noDisableStyle
 import com.soyle.stories.common.components.ComponentsStyles.Companion.noSelectionMenuItem
 import com.soyle.stories.di.get
+import com.soyle.stories.di.resolve
 import com.soyle.stories.di.resolveLater
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.theme.characterValueComparison.CharacterComparedWithValuesViewModel
 import com.soyle.stories.theme.characterValueComparison.CharacterValueComparisonModel
 import com.soyle.stories.theme.characterValueComparison.CharacterValueComparisonViewListener
 import com.soyle.stories.theme.characterValueComparison.CharacterValueViewModel
+import com.soyle.stories.theme.characterValueComparison.components.addValueButton.AddValueButton
 import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialog
 import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
@@ -26,11 +30,13 @@ import javafx.scene.control.Tooltip
 import javafx.scene.layout.Region
 import javafx.util.Duration
 import tornadofx.*
+import java.util.*
 
 class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
 
     private val viewListener by resolveLater<CharacterValueComparisonViewListener>()
     private val model by resolveLater<CharacterValueComparisonModel>()
+    private val makeAddValueButton = resolve<AddValueButton.Factory>()
 
     private val viewModel = ItemViewModel<CharacterComparedWithValuesViewModel>()
 
@@ -52,6 +58,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
     private val valuesProperty = viewModel.bindImmutableList(CharacterComparedWithValuesViewModel::values)
 
     override val root: Parent = card {
+        idProperty().bind(itemProperty.stringBinding { it?.characterId })
         cardHeader {
             this += MaterialIconView(CharacterArcStyles.defaultCharacterImage, "2em")
             vbox {
@@ -106,95 +113,20 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
                     style { fontSize = 1.2.em }
                 }
                 spacer()
-                menubutton {
-                    this.textProperty().bind(addValueButtonLabelProperty)
-                    val loadingItem = item("Loading...") {
-                        isDisable = true
-                    }
-                    val createValueWebItem = MenuItem("[Create New Value Web]").apply {
-                        action {
-                            val characterId = itemProperty.get()?.characterId ?: return@action
-                            model.scope.projectScope.get<CreateValueWebDialog>().showToAutoLinkCharacter(
-                                model.scope.type.themeId.toString(),
-                                characterId,
-                                currentWindow
-                            )
-                        }
-                    }
-                    contextmenu {
-                        item("Yeah, fuck you")
-                    }
-                    model.availableOppositionValues.onChange {
-                        items.clear()
-                        when {
-                            it == null -> items.add(loadingItem)
-                            it.isEmpty() -> {
-                                items.add(createValueWebItem)
-                                item("No available values") {
-                                    isDisable = true
-                                }
-                            }
-                            else -> {
-                                items.add(createValueWebItem)
-                                it.forEach { availableValueWeb ->
-                                    item(availableValueWeb.label) {
-                                        addClass(noDisableStyle, noSelectionMenuItem, contextMenuSectionHeaderItem)
-                                        isDisable = true
-                                    }
-                                    val discourageTooltip = availableValueWeb.preSelectedOppositionValue?.let {
-                                            Tooltip("""
-                                                ${item.characterName} already represents the ${it.label} value for
-                                                the ${availableValueWeb.label} value web.  Selecting this value 
-                                                will replace ${it.label}.
-                                                """.trimIndent()
-                                            ).apply {
-                                                style { fontSize = 1.em }
-                                                showDelay = Duration.seconds(0.0)
-                                                hideDelay = Duration.seconds(0.0)
-                                            }
-                                        }
-                                    customitem {
-                                        addClass(contextMenuSectionedItem)
-                                        availableValueWeb.preSelectedOppositionValue?.let {
-                                            addClass(discouragedSelection)
-                                        }
-                                        label("[Create New Opposition Value]") {
-                                            tooltip = discourageTooltip
-                                        }
-                                        action {
-                                            val characterId = itemProperty.get()?.characterId ?: return@action
-                                            model.scope.projectScope.get<CreateOppositionValueDialog>().showToAutoLinkCharacter(
-                                                availableValueWeb.valueWebId,
-                                                characterId,
-                                                currentWindow
-                                            )
-                                        }
-                                    }
-                                    availableValueWeb.availableOppositions.forEach {
-                                        customitem {
-                                            addClass(contextMenuSectionedItem)
-                                            availableValueWeb.preSelectedOppositionValue?.let {
-                                                addClass(discouragedSelection)
-                                            }
-                                            label(it.label) {
-                                                tooltip = discourageTooltip
-                                            }
-                                            action {
-                                                val characterId = itemProperty.get()?.characterId ?: return@action
-                                                viewListener.selectOppositionValueForCharacter(characterId, it.oppositionId)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    setOnShowing { _ ->
-                        val characterId = itemProperty.get()?.characterId ?: return@setOnShowing
-                        viewListener.getAvailableOppositionValues(characterId)
-                    }
-                    setOnHidden {
-                        model.availableOppositionValues.value = null
+                val characterIdProperty = itemProperty.stringBinding { it?.characterId }
+                val addValueButtonProperty = characterIdProperty.objectBinding {
+                    if (it != null) {
+                        makeAddValueButton(
+                            Theme.Id(model.scope.type.themeId),
+                            Character.Id(UUID.fromString(it))
+                        )
+                    } else null
+                }
+                addValueButtonProperty.addListener { observable, oldValue, newValue ->
+                    if (oldValue != null && newValue != null) oldValue.replaceWith(newValue)
+                    else {
+                        oldValue?.removeFromParent()
+                        newValue?.let { add(it) }
                     }
                 }
             }
@@ -202,6 +134,7 @@ class CharacterCard : ItemFragment<CharacterComparedWithValuesViewModel>() {
                 isFillWidth = false
                 bindChildren(valuesProperty) {
                     chip(it.label, onDelete = removeChip(it)) {
+                        id = it.oppositionId
                         maxWidth = Region.USE_PREF_SIZE
                     }.node
                 }

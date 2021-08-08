@@ -33,6 +33,11 @@ interface SoyleMessageBundle {
     val pleaseProvideALocationName: String
     val replaceWith: String
     val removeFromScene: String
+    val addValue: String
+    val createNewValueWeb: String
+    val createOppositionValue: String
+    val themeHasNoValueWebs: String
+    val nameCannotBeBlank: String
 
     sealed class MessageSegment {
         abstract val message: String

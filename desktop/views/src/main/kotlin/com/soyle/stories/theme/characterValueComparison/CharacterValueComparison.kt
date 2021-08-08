@@ -30,11 +30,13 @@ class CharacterValueComparison : View() {
             }
             spacer()
             menubutton {
+                id = "add-character-button"
                 textProperty().bind(model.addCharacterButtonLabel)
                 val loadingItem = item("Loading...") {
                     isDisable = true
                 }
                 val createCharacterItem = MenuItem("[Create New Character]").apply {
+                    id = "create-new-character"
                     action {
                         createCharacterDialog(scope.projectScope, scope.type.themeId.toString())
                     }
@@ -51,6 +53,7 @@ class CharacterValueComparison : View() {
                             items.add(createCharacterItem)
                             it.forEach {
                                 item(it.characterName) {
+                                    id = it.characterId
                                     action { viewListener.addCharacter(it.characterId) }
                                 }
                             }

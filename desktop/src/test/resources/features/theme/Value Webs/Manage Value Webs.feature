@@ -7,14 +7,15 @@ Feature: Manage Value Webs
 
   Scenario: Create New Value Web
     When a value web is created with the name "Love" in the "Growing Up" theme
-    Then a value web named "Love" should have been created in the "Growing Up" theme
+    Then the "Growing Up" theme should have a value web named "Love"
 
   Scenario: Rename Value Web
-    Given a value web named "Love" has been created in the "Growing Up" theme
+    Given I have created a value web named "Love" in the "Growing Up" theme
     When the "Love" value web in the "Growing Up" theme is renamed to "Greed"
-    Then the value web originally named "Love" in the "Growing Up" theme should have been renamed to "Greed"
+    Then the "Growing Up" theme should not have a value web named "Love"
+    And the "Growing Up" theme should have a value web named "Greed"
 
   Scenario: Delete Value Web
-    Given a value web named "Love" has been created in the "Growing Up" theme
+    Given I have created a value web named "Love" in the "Growing Up" theme
     When the "Love" value web in the "Growing Up" theme is deleted
-    Then the "Love" value web in the "Growing Up" theme should have been deleted
+    Then the "Growing Up" theme should not have a value web named "Love"

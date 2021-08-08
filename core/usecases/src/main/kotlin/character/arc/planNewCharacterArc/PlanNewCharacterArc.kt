@@ -15,7 +15,7 @@ interface PlanNewCharacterArc {
         val createdTheme: CreatedTheme
     )
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun characterArcPlanned(response: ResponseModel)
     }
 }

@@ -21,7 +21,7 @@ interface AddValueWebToTheme {
         val symbolicItemAdded: SymbolicRepresentationAddedToOpposition?
     )
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun addedValueWebToTheme(response: ResponseModel)
     }
 }

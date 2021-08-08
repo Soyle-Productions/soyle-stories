@@ -31,6 +31,7 @@ dependencies {
     testImplementation(testFixtures(project(path = ":core:domain")))
 
     testFixturesImplementation(Libraries.junit.api)
+    testFixturesImplementation(Libraries.kotlin.coroutines)
 }
 
 task<Test>("integrationTest") {

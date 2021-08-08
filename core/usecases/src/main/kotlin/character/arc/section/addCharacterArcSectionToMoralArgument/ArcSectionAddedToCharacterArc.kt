@@ -4,7 +4,7 @@ import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.CharacterArcSection
 import java.util.*
 
-class ArcSectionAddedToCharacterArc(
+data class ArcSectionAddedToCharacterArc(
     val characterArcSectionId: UUID,
     val arcId: UUID,
     val characterId: UUID,

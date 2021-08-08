@@ -54,7 +54,7 @@ class CharacterProfileView : View() {
     private fun createNewAlternativeName(altName: NonBlankString) {
         state.executingNameChange.set(true)
         val controller = scope.projectScope.get<AddCharacterNameVariantController>()
-        scope.projectScope.applicationScope.get<ThreadTransformer>().gui {
+        CoroutineScope(Dispatchers.JavaFx).launch {
             try {
                 controller.addCharacterNameVariant(state.characterId.value, altName).join()
                 state.isCreatingName.set(false)
@@ -68,7 +68,7 @@ class CharacterProfileView : View() {
     private fun renameAlternativeName(currentName: NonBlankString, newName: NonBlankString) {
         state.executingNameChange.set(true)
         val controller = scope.projectScope.get<RenameCharacterNameVariantController>()
-        scope.projectScope.applicationScope.get<ThreadTransformer>().gui {
+        CoroutineScope(Dispatchers.JavaFx).launch {
             controller.renameCharacterNameVariant(state.characterId.value, currentName, newName)
                 .join()
             state.executingNameChange.set(false)
@@ -78,7 +78,7 @@ class CharacterProfileView : View() {
     private fun removeAlternativeName(altName: NonBlankString) {
         state.executingNameChange.set(true)
         val controller = scope.projectScope.get<RemoveCharacterNameVariantController>()
-        scope.projectScope.applicationScope.get<ThreadTransformer>().gui {
+        CoroutineScope(Dispatchers.JavaFx).launch {
             controller.removeCharacterNameVariant(state.characterId.value, altName)
                 .join()
             state.executingNameChange.set(false)
