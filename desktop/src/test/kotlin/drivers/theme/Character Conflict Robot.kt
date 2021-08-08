@@ -12,6 +12,7 @@ import com.soyle.stories.theme.characterConflict.CharacterConflictScope
 import com.soyle.stories.theme.themeList.ThemeList
 import org.junit.jupiter.api.Assertions.assertTrue
 import tornadofx.FX
+import tornadofx.Stylesheet.Companion.field
 
 fun ThemeList.givenCharacterConflictToolHasBeenOpenedFor(themeId: Theme.Id): CharacterConflict {
     return getOpenCharacterConflictToolFor(themeId) ?: openCharacterConflict(themeId).run {
@@ -57,6 +58,21 @@ fun CharacterConflict.changePsychologicalWeaknessTo(weakness: String)
         psychologicalWeaknessInput!!.requestFocus()
         psychologicalWeaknessInput!!.text = weakness
         moralWeaknessInput!!.requestFocus()
+    }
+}
+
+fun CharacterConflict.changeFieldValueTo(fieldName: String, newValue: String)
+{
+    val field = when (fieldName) {
+        "desire" -> access().desireInput
+        "moral weakness" -> access().moralWeaknessInput
+        "psychological weakness" -> access().psychologicalWeaknessInput
+        else -> error("no field defined for $fieldName")
+    }
+    drive {
+        field!!.requestFocus()
+        field.text = newValue
+        addOpponentSelection.requestFocus()
     }
 }
 

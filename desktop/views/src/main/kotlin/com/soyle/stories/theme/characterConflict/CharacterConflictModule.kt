@@ -5,6 +5,7 @@ import com.soyle.stories.characterarc.eventbus.ChangeCharacterPropertyValueNotif
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArcNotifier
 import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeNotifier
 import com.soyle.stories.theme.changeCharacterPerspectiveProperty.CharacterPerspectivePropertyChangedNotifier
 import com.soyle.stories.theme.includeCharacterInTheme.CharacterIncludedInThemeNotifier
@@ -35,6 +36,7 @@ object CharacterConflictModule {
                 presenter listensTo projectScope.get<CharacterPerspectivePropertyChangedNotifier>()
                 presenter listensTo projectScope.get<CharacterRemovedAsOpponentNotifier>()
                 presenter listensTo projectScope.get<RemovedCharacterFromThemeNotifier>()
+                presenter listensTo projectScope.get<ArcSectionAddedToCharacterArcNotifier>()
 
                 CharacterConflictController(
                     themeId,

@@ -24,14 +24,16 @@ open class NodeAccess<N : Node>(protected val node: N) : FxRobot() {
         }
     }
 
+    protected fun <Child : Node> Node?.findChild(rule: Rendered, secondaryMatch: (Child) -> Boolean = { true }): Child? {
+        if (this == null) return null
+        return from(this).lookup(rule.render()).queryAll<Child>().filter(secondaryMatch).firstOrNull()
+    }
+
     protected fun <Child : Node> temporaryChild(rule: Rendered, secondaryMatch: (Child) -> Boolean = { true }): ReadOnlyProperty<NodeAccess<N>, Child?> =
         node.temporaryChild<Child>(rule, secondaryMatch)
 
     protected fun <Child : Node> Node?.temporaryChild(rule: Rendered, secondaryMatch: (Child) -> Boolean = { true }): ReadOnlyProperty<NodeAccess<N>, Child?> = object : ReadOnlyProperty<NodeAccess<N>, Child?> {
-        override fun getValue(thisRef: NodeAccess<N>, property: KProperty<*>): Child? {
-            if (this@temporaryChild == null) return null
-            return from(this@temporaryChild).lookup(rule.render()).queryAll<Child>().filter(secondaryMatch).firstOrNull()
-        }
+        override fun getValue(thisRef: NodeAccess<N>, property: KProperty<*>): Child? = findChild(rule, secondaryMatch)
     }
 
     protected fun <Child: Node> children(rule: Rendered): ReadOnlyProperty<NodeAccess<N>, List<Child>> = object : ReadOnlyProperty<NodeAccess<N>, List<Child>> {

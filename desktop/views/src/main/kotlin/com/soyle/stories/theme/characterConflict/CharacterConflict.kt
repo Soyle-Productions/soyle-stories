@@ -216,7 +216,9 @@ class CharacterConflict : View() {
             characterChangeInput(valueProperty).apply {
                 hgrow = Priority.ALWAYS
                 onLoseFocus {
-                    setCharacterChangeField(text)
+                    if (text != valueProperty.value) {
+                        setCharacterChangeField(text)
+                    }
                 }
             }
         }

@@ -13,6 +13,7 @@ import org.testfx.api.FxRobot
 import tornadofx.CssRule
 import tornadofx.Field
 import tornadofx.Stylesheet
+import kotlin.reflect.KProperty
 
 class `Character Conflict View Access`(val view: CharacterConflict) : NodeAccess<Parent>(view.root) {
     companion object {
@@ -40,6 +41,15 @@ class `Character Conflict View Access`(val view: CharacterConflict) : NodeAccess
     {
         return items.find { it.id == characterId.uuid.toString() }
     }
+
+    private fun characterChangeField(fieldName: String): Field? {
+        val fieldId = fieldName.replace(" ", "-") + "-field"
+        return node.findChild(CssRule.id(fieldId))
+    }
+    fun characterChangeInput(fieldName: String): TextInputControl? = characterChangeField(fieldName).findChild(Stylesheet.textInput)
+
+    private val desireField: Field? by temporaryChild<Field>(CssRule.id("desire-field"))
+    val desireInput: TextInputControl? by desireField.temporaryChild(Stylesheet.textInput)
 
     private val psychologicalWeaknessField: Field? by temporaryChild<Field>(CssRule.id("psychological-weakness-field"))
     val psychologicalWeaknessInput: TextInputControl? by psychologicalWeaknessField.temporaryChild(Stylesheet.textInput)
