@@ -3,11 +3,15 @@ package com.soyle.stories.domain.storyevent
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.storyevent.events.StoryEventChange
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*
 
 class StoryEvent(
     val id: Id,
     val name: String,
+    val time: Long,
     val projectId: Project.Id,
     val previousStoryEventId: Id?,
     val nextStoryEventId: Id?,
@@ -15,15 +19,36 @@ class StoryEvent(
     val includedCharacterIds: List<Character.Id>
 ) {
 
-    constructor(name: String, projectId: Project.Id) : this(Id(), name, projectId, null, null, null, emptyList())
+    companion object {
+        fun create(name: NonBlankString, time: Long): StoryEventUpdate<StoryEventCreated> {
+            val storyEvent = StoryEvent(Id(), name.value, time, Project.Id(), null, null, null, listOf())
+            val change = StoryEventCreated(storyEvent.id, name.value, time)
+            return Successful(storyEvent, change)
+        }
+
+        private val equalityProps
+            get() = listOf(
+                StoryEvent::id,
+                StoryEvent::name,
+                StoryEvent::time,
+                StoryEvent::projectId,
+                StoryEvent::previousStoryEventId,
+                StoryEvent::nextStoryEventId,
+                StoryEvent::linkedLocationId,
+                StoryEvent::includedCharacterIds
+            )
+    }
+
+    constructor(name: String, projectId: Project.Id) : this(Id(), name, 0L, projectId, null, null, null, emptyList())
 
     private fun copy(
         name: String = this.name,
+        time: Long = this.time,
         previousStoryEventId: Id? = this.previousStoryEventId,
         nextStoryEventId: Id? = this.nextStoryEventId,
         linkedLocationId: Location.Id? = this.linkedLocationId,
         includedCharacterIds: List<Character.Id> = this.includedCharacterIds
-    ) = StoryEvent(id, name, projectId, previousStoryEventId, nextStoryEventId, linkedLocationId, includedCharacterIds)
+    ) = StoryEvent(id, name, time, projectId, previousStoryEventId, nextStoryEventId, linkedLocationId, includedCharacterIds)
 
 
     fun withName(newName: String) = copy(name = newName)
@@ -34,19 +59,6 @@ class StoryEvent(
         copy(includedCharacterIds = includedCharacterIds + characterId)
 
     fun withoutCharacterId(characterId: Character.Id) = copy(includedCharacterIds = includedCharacterIds - characterId)
-
-    companion object {
-        private val equalityProps
-            get() = listOf(
-                StoryEvent::id,
-                StoryEvent::name,
-                StoryEvent::projectId,
-                StoryEvent::previousStoryEventId,
-                StoryEvent::nextStoryEventId,
-                StoryEvent::linkedLocationId,
-                StoryEvent::includedCharacterIds
-            )
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

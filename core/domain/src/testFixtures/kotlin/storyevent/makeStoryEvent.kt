@@ -7,7 +7,8 @@ import com.soyle.stories.domain.str
 
 fun makeStoryEvent(
     id: StoryEvent.Id = StoryEvent.Id(),
-    name: String = "Story Event ${str()}",
+    name: String = storyEventName(),
+    time: Long = storyEventTime(),
     projectId: Project.Id = Project.Id(),
     previousStoryEventId: StoryEvent.Id? = null,
     nextStoryEventId: StoryEvent.Id? = null,
@@ -16,9 +17,14 @@ fun makeStoryEvent(
 ) = StoryEvent(
     id,
     name,
+    time,
     projectId,
     previousStoryEventId,
     nextStoryEventId,
     linkedLocationId,
     includedCharacterIds
 )
+
+fun storyEventName() = "Story Event ${str()}"
+
+fun storyEventTime() = (0L .. 100L).random()
