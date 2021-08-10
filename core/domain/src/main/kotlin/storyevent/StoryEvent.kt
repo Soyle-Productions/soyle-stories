@@ -20,9 +20,9 @@ class StoryEvent(
 ) {
 
     companion object {
-        fun create(name: NonBlankString, time: Long): StoryEventUpdate<StoryEventCreated> {
-            val storyEvent = StoryEvent(Id(), name.value, time, Project.Id(), null, null, null, listOf())
-            val change = StoryEventCreated(storyEvent.id, name.value, time)
+        fun create(name: NonBlankString, time: Long, projectId: Project.Id): StoryEventUpdate<StoryEventCreated> {
+            val storyEvent = StoryEvent(Id(), name.value, time, projectId, null, null, null, listOf())
+            val change = StoryEventCreated(storyEvent.id, name.value, time, projectId)
             return Successful(storyEvent, change)
         }
 
