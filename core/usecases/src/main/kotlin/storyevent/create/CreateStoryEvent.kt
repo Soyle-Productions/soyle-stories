@@ -49,7 +49,7 @@ interface CreateStoryEvent {
 
     fun interface OutputPort {
 
-        fun receiveCreateStoryEventResponse(response: ResponseModel)
+        suspend fun receiveCreateStoryEventResponse(response: ResponseModel)
     }
 
 }

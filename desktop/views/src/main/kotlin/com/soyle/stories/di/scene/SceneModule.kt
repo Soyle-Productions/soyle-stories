@@ -40,7 +40,7 @@ import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScen
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
 import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
+import com.soyle.stories.storyevent.create.CreateStoryEventOutput
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
@@ -149,7 +149,7 @@ object SceneModule {
             }
 
             provide(CreateNewScene.OutputPort::class) {
-                CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventNotifier>())
+                CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventOutput>())
             }
             provide(RenameScene.OutputPort::class) {
                 RenameSceneOutput(get(), get())

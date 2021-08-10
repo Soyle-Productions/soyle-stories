@@ -81,7 +81,7 @@ class CreateNewSceneUseCase(
 		  request,
 		  object : CreateStoryEvent.OutputPort {
 
-			  override fun receiveCreateStoryEventResponse(response: CreateStoryEvent.ResponseModel) {
+			  override suspend fun receiveCreateStoryEventResponse(response: CreateStoryEvent.ResponseModel) {
 				  createStoryEventResponse = response
 				  job.complete()
 			  }

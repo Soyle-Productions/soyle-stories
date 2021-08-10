@@ -4,13 +4,14 @@ import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneControllerImpl
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.*
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventController
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventControllerImpl
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
+import com.soyle.stories.storyevent.create.CreateStoryEventController
+import com.soyle.stories.storyevent.create.CreateStoryEventOutput
+import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogController
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogModel
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogPresenter
@@ -70,7 +71,7 @@ object StoryEventModule {
 			IncludedCharacterInStoryEventNotifier()
 		}
 		provide(CreateStoryEvent.OutputPort::class) {
-			CreateStoryEventNotifier(applicationScope.get())
+			CreateStoryEventOutput(applicationScope.get())
 		}
 		provide(LinkLocationToStoryEvent.OutputPort::class) {
 			LinkLocationToStoryEventNotifier(applicationScope.get())
@@ -92,8 +93,8 @@ object StoryEventModule {
 
 	private fun InScope<ProjectScope>.controllers() {
 		provide<CreateStoryEventController> {
-			CreateStoryEventControllerImpl(
-			  projectId.toString(),
+			CreateStoryEventController.invoke(
+			  Project.Id(projectId),
 			  applicationScope.get(),
 			  get(),
 			  get()
@@ -144,7 +145,7 @@ object StoryEventModule {
 				CreateStoryEventDialogController(
 				  CreateStoryEventDialogPresenter(
 					get<CreateStoryEventDialogModel>(),
-					get<CreateStoryEventNotifier>()
+					get<StoryEventCreatedNotifier>()
 				  ),
 				  get()
 				)

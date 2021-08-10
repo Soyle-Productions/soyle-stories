@@ -1,7 +1,7 @@
 package com.soyle.stories.storyevent.createStoryEventDialog
 
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventController
+import com.soyle.stories.storyevent.create.CreateStoryEventController
 
 class CreateStoryEventDialogController(
   private val presenter: CreateStoryEventDialogPresenter,

@@ -1,6 +1,8 @@
 package com.soyle.stories.storyevent.storyEventList.presenters
 
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.gui.View
+import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.storyEventList.StoryEventListViewModel
 import com.soyle.stories.usecase.storyevent.StoryEventItem
@@ -8,15 +10,15 @@ import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 
 internal class CreateStoryEventPresenter(
   private val view: View.Nullable<StoryEventListViewModel>
-) : CreateStoryEvent.OutputPort {
+) : StoryEventCreatedReceiver {
 
-	override fun receiveCreateStoryEventResponse(response: CreateStoryEvent.ResponseModel) {
+	override suspend fun receiveStoryEventCreated(event: StoryEventCreated) {
 		view.updateOrInvalidated {
 
 			val newItem = StoryEventListItemViewModel(StoryEventItem(
-				response.createdStoryEvent.storyEventId.uuid,
-				response.createdStoryEvent.name,
-				response.createdStoryEvent.time.toInt()
+				event.storyEventId.uuid,
+				event.name,
+				event.time.toInt()
 			))
 
 			copy(

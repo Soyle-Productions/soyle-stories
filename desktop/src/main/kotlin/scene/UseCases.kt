@@ -59,7 +59,7 @@ import com.soyle.stories.scene.locationsInScene.replace.ReplaceSettingInSceneCon
 import com.soyle.stories.scene.locationsInScene.replace.ReplaceSettingInSceneOutput
 import com.soyle.stories.scene.target.TargetScene
 import com.soyle.stories.scene.trackSymbolInScene.*
-import com.soyle.stories.storyevent.createStoryEvent.CreateStoryEventNotifier
+import com.soyle.stories.storyevent.create.CreateStoryEventOutput
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInScene
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInSceneUseCase
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
@@ -161,7 +161,7 @@ object UseCases {
         }
 
         provide(CreateNewScene.OutputPort::class) {
-            CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventNotifier>())
+            CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventOutput>())
         }
     }
 
