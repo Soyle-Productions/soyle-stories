@@ -26,8 +26,8 @@ import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventControllerI
 import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventNotifier
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventUseCase
-import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
-import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEventUseCase
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEventUseCase
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetails
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetailsUseCase
 import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEvent

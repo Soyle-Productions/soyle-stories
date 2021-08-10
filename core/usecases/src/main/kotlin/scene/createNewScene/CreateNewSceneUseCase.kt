@@ -10,7 +10,7 @@ import com.soyle.stories.usecase.scene.SceneRepository
 import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.usecase.storyevent.StoryEventRepository
-import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import kotlinx.coroutines.Job
 import java.util.*
 
@@ -48,7 +48,7 @@ class CreateNewSceneUseCase(
 	{
 		val createStoryEventRequest = makeCreateStoryEventRequest(request)
 		val response = callCreateStoryEventUseCase(createStoryEventRequest)
-		return getStoryEvent(response.storyEventId) to response
+		return getStoryEvent(response.createdStoryEvent.storyEventId.uuid) to response
 	}
 
 	private suspend fun makeCreateStoryEventRequest(request: CreateNewScene.RequestModel): CreateStoryEvent.RequestModel
@@ -57,11 +57,11 @@ class CreateNewSceneUseCase(
 			request.relativeToScene != null -> {
 				val relativeStoryEvent = getRelativeStoryEvent(request)
 				when(request.relativeToScene.second) {
-					true -> CreateStoryEvent.RequestModel.insertBefore(request.name, relativeStoryEvent.uuid)
-					false -> CreateStoryEvent.RequestModel.insertBefore(request.name, relativeStoryEvent.uuid)
+					true -> CreateStoryEvent.RequestModel(request.name, Project.Id(), relativeStoryEvent, -1)
+					false -> CreateStoryEvent.RequestModel(request.name, Project.Id(), relativeStoryEvent, +1)
 				}
 			}
-			else -> CreateStoryEvent.RequestModel(request.name, projectId.uuid)
+			else -> CreateStoryEvent.RequestModel(request.name, projectId)
 		}
 	}
 
@@ -80,9 +80,6 @@ class CreateNewSceneUseCase(
 		createStoryEvent.invoke(
 		  request,
 		  object : CreateStoryEvent.OutputPort {
-			  override fun receiveCreateStoryEventFailure(failure: Exception) {
-				  job.completeExceptionally(failure)
-			  }
 
 			  override fun receiveCreateStoryEventResponse(response: CreateStoryEvent.ResponseModel) {
 				  createStoryEventResponse = response
@@ -99,7 +96,7 @@ class CreateNewSceneUseCase(
 	}
 
 	private suspend fun createNewScene(storyEvent: StoryEvent, request: CreateNewScene.RequestModel): CreateNewScene.ResponseModel {
-		val (prose, proseCreated) = Prose.create(projectId)
+		val (prose, _) = Prose.create(projectId)
 		proseRepository.addProse(prose)
 		val scene = Scene(projectId, request.name, storyEvent.id, prose.id)
 		return insertScene(scene, request)

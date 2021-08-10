@@ -3,7 +3,7 @@ package com.soyle.stories.scene.createNewScene
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
-import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 
 class CreateNewSceneNotifier(
 	private val threadTransformer: ThreadTransformer,

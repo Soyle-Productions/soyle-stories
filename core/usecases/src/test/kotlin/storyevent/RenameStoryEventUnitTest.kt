@@ -97,7 +97,7 @@ class RenameStoryEventUnitTest {
 			  initialStoryEvents = storyEventIds.map { any ->
 				  val it = (any as? UUID) ?: ((any as? Pair<*, *>)?.first as? UUID) ?: UUID.randomUUID()
 				  val name = ((any as? Pair<*, *>)?.second as? String) ?: "Some Name"
-				  StoryEvent(StoryEvent.Id(it), name, Project.Id(), null, null, null, listOf())
+				  StoryEvent(StoryEvent.Id(it), name, 0, Project.Id(), null, null, null, listOf())
 			  },
 			  onUpdateStoryEvent = { update = it }
 			)

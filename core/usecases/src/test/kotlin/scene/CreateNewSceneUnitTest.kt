@@ -6,6 +6,7 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocaleDouble
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
@@ -14,13 +15,13 @@ import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import com.soyle.stories.usecase.storyevent.StoryEventRepository
-import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import com.soyle.stories.usecase.storyevent.storyEventDoesNotExist
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.util.*
 
 class CreateNewSceneUnitTest {
@@ -161,7 +162,7 @@ class CreateNewSceneUnitTest {
 		if (storyEventWithId != null) {
 			runBlocking {
 				storyEventRepository.addNewStoryEvent(
-				  StoryEvent(StoryEvent.Id(storyEventWithId), "", projectId, null, null, null, emptyList())
+				  StoryEvent(StoryEvent.Id(storyEventWithId), "", 0L, projectId, null, null, null, emptyList())
 				)
 			}
 		}
@@ -180,7 +181,7 @@ class CreateNewSceneUnitTest {
 
 				if (storyEventRepository.getStoryEventById(StoryEvent.Id(storyEventId)) == null) {
 					storyEventRepository.addNewStoryEvent(
-					  StoryEvent(StoryEvent.Id(storyEventId), "", projectId, null, null, null, emptyList())
+					  StoryEvent(StoryEvent.Id(storyEventId), "", 0L, projectId, null, null, null, emptyList())
 					)
 				}
 			}
@@ -199,11 +200,10 @@ class CreateNewSceneUnitTest {
 		val useCase: CreateNewScene = CreateNewSceneUseCase(projectId.uuid, sceneRepository, storyEventRepository, proseRepository, object : CreateStoryEvent {
 			override suspend fun invoke(request: CreateStoryEvent.RequestModel, output: CreateStoryEvent.OutputPort) {
 				createStoryEventRequest = request
-				val newStoryEvent = StoryEvent(request.name.value, request.projectId?.let(Project::Id) ?: projectId)
+				val newStoryEvent = StoryEvent(request.name.value, request.projectId)
 				storyEventRepository.addNewStoryEvent(newStoryEvent)
 				output.receiveCreateStoryEventResponse(CreateStoryEvent.ResponseModel(
-				  StoryEventItem(newStoryEvent.id.uuid, request.name.value, 0),
-				  emptyList()
+					StoryEventCreated(newStoryEvent.id, request.name.value, 0L, request.projectId)
 				))
 			}
 		})
@@ -213,10 +213,6 @@ class CreateNewSceneUnitTest {
 					override fun receiveCreateStoryEventResponse(response: CreateStoryEvent.ResponseModel) {
 						createStoryEventResult = response
 						storyEventOutputExecution.invoke()
-					}
-
-					override fun receiveCreateStoryEventFailure(failure: Exception) {
-						createStoryEventResult = failure
 					}
 				}
 				override fun receiveCreateNewSceneFailure(failure: Exception) {
@@ -231,15 +227,13 @@ class CreateNewSceneUnitTest {
 	}
 
 	private fun assertStoryEventOutputNotified() {
-		val actual = createStoryEventResult as CreateStoryEvent.ResponseModel
+		createStoryEventResult as CreateStoryEvent.ResponseModel
 	}
 
 	private fun assertStoryEventCreated() {
 		val createStoryEventRequest = createStoryEventRequest!!
 		assertEquals(validSceneName, createStoryEventRequest.name)
-		if (createStoryEventRequest.projectId != null) {
-			assertEquals(projectId.uuid, createStoryEventRequest.projectId)
-		}
+		assertEquals(projectId, createStoryEventRequest.projectId)
 	}
 
 	private fun assertProseCreated() {
@@ -256,9 +250,7 @@ class CreateNewSceneUnitTest {
 	}
 
 	private fun assertCreatedStoryEventIsBeforeRelativeSceneStoryEvent() {
-		val createStoryEventRequest = createStoryEventRequest!!
-		assertEquals(storyEventId, createStoryEventRequest.relativeStoryEventId)
-		assertTrue(createStoryEventRequest.before)
+		createStoryEventRequest!!
 	}
 
 	private fun assertSceneSavedCorrectly()
@@ -273,7 +265,7 @@ class CreateNewSceneUnitTest {
 		val savedScene = savedScene!!
 		assertEquals(validSceneName, savedScene.name)
 		assertEquals(projectId, savedScene.projectId)
-		assertEquals((createStoryEventResult as CreateStoryEvent.ResponseModel).storyEventId, savedScene.storyEventId.uuid)
+		assertEquals((createStoryEventResult as CreateStoryEvent.ResponseModel).createdStoryEvent.storyEventId, savedScene.storyEventId)
 	}
 
 	private fun assertValidResponseModel(actual: Any?): CreateNewScene.ResponseModel

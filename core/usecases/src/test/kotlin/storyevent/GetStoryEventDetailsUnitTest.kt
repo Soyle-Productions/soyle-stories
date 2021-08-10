@@ -101,7 +101,7 @@ class GetStoryEventDetailsUnitTest {
 			return StoryEventRepositoryDouble(
 			  initialStoryEvents = storyEventIds.map { (it, links) ->
 				  val (location, characterIds) = links
-				  StoryEvent(StoryEvent.Id(it), storyEventName, Project.Id(), null, null, location?.let(Location::Id), characterIds.map(Character::Id))
+				  StoryEvent(StoryEvent.Id(it), storyEventName, 0, Project.Id(), null, null, location?.let(Location::Id), characterIds.map(Character::Id))
 			  },
 			  onUpdateStoryEvent = { update = it }
 			)

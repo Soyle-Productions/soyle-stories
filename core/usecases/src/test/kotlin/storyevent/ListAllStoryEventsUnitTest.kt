@@ -55,7 +55,7 @@ class ListAllStoryEventsUnitTest {
 				val nextNodeId = matcher.group(3).takeUnless { it.isBlank() }
 				val prev = prevNodeId?.let { storyEvents[it] }
 				val next = nextNodeId?.let { storyEvents[it] }
-				val event = StoryEvent(StoryEvent.Id(), "", projectId, prev?.id, next?.id, null, listOf())
+				val event = StoryEvent(StoryEvent.Id(), "", 0, projectId, prev?.id, next?.id, null, listOf())
 				storyEvents[nodeId] = event
 				prevNodeId?.let { storyEvents[it]?.withNextId(event.id)?.let { storyEvents[prevNodeId] = it } }
 				nextNodeId?.let { storyEvents[it]?.withPreviousId(event.id)?.let { storyEvents[nextNodeId] = it } }
@@ -95,12 +95,12 @@ class ListAllStoryEventsUnitTest {
 		val storyEventMap: MutableMap<StoryEvent.Id, StoryEvent> = mutableMapOf()
 		repeat(numberOfCreatedStoryEvents) {
 			if (it < numberOfCreatedStoryEventsInProject) {
-				val event = StoryEvent(StoryEvent.Id(), "", projectId, previous?.id, null, null, listOf())
+				val event = StoryEvent(StoryEvent.Id(), "", 0, projectId, previous?.id, null, null, listOf())
 				storyEventMap[event.id] = event
 				previous?.let { storyEventMap[it.id] = it.withNextId(event.id) }
 				previous = event
 			} else {
-				val event = StoryEvent(StoryEvent.Id(), "", Project.Id(), null, null, null, listOf())
+				val event = StoryEvent(StoryEvent.Id(), "", 0, Project.Id(), null, null, null, listOf())
 				storyEventMap[event.id] = event
 			}
 		}

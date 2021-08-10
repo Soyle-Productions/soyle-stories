@@ -81,7 +81,7 @@ class LinkLocationToStoryEventUnitTest {
 	private fun makeRepository(storyEvents: List<Pair<UUID, UUID?>>): StoryEventRepository
 	{
 		return StoryEventRepositoryDouble(initialStoryEvents = storyEvents.map { (it, linkedTo) ->
-			StoryEvent(StoryEvent.Id(it), "", projectId, null, null, linkedTo?.let(Location::Id), listOf())
+			StoryEvent(StoryEvent.Id(it), "", 0, projectId, null, null, linkedTo?.let(Location::Id), listOf())
 		}, onUpdateStoryEvent = { updatedStoryEvent = it })
 	}
 

@@ -4,7 +4,7 @@ import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.SceneLocale
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
-import com.soyle.stories.usecase.storyevent.createStoryEvent.CreateStoryEvent
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import java.util.*
 
 interface CreateNewScene {

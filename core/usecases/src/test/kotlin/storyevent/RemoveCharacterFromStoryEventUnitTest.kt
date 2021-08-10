@@ -98,7 +98,7 @@ class RemoveCharacterFromStoryEventUnitTest {
 		{
 			return StoryEventRepositoryDouble(
 			  initialStoryEvents = storyEventIds.map { (it, characterIds) ->
-				  StoryEvent(StoryEvent.Id(it), "", Project.Id(), null, null, null, characterIds.map(Character::Id))
+				  StoryEvent(StoryEvent.Id(it), "", 0, Project.Id(), null, null, null, characterIds.map(Character::Id))
 			  },
 			  onUpdateStoryEvent = { update = it }
 			)
