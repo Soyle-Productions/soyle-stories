@@ -8,7 +8,13 @@ object Libraries {
 
         override val std = "org.jetbrains.kotlin:kotlin-stdlib:$version"
         override val reflection = "org.jetbrains.kotlin:kotlin-reflect:$version"
-        override val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+
+        override val coroutinesCore
+            get() = coroutines.core
+        override val coroutines: CoroutineLibraries = object : CoroutineLibraries {
+            override val core: String = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+            override val test: String = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
+        }
     }
     val junit: JUnitLibraries = object : JUnitLibraries {
         private val version = "5.7.0"

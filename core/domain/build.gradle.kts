@@ -27,7 +27,7 @@ val integrationTest = sourceSets.create("integrationTest") {
 }
 
 dependencies {
-    implementation(Libraries.kotlin.coroutines)
+    implementation(Libraries.kotlin.coroutines.core)
     implementation("io.arrow-kt:arrow-core:0.10.4")
     implementation( "io.arrow-kt:arrow-core-data:0.10.4")
 

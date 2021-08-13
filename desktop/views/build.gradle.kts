@@ -55,7 +55,7 @@ dependencies {
     api( "no.tornado:tornadofx:1.7.20") {
         exclude(group = "org.jetbrains.kotlin")
     }
-    api (Libraries.kotlin.coroutines)
+    api (Libraries.kotlin.coroutines.core)
     api ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
     implementation( "org.controlsfx:controlsfx:11.0.2")
     implementation( "org.fxmisc.richtext:richtextfx:0.10.5")
@@ -71,6 +71,7 @@ dependencies {
     testImplementation( Libraries.junit.api)
     testImplementation( Libraries.junit.engine)
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
+    testImplementation(Libraries.kotlin.coroutines.test)
 
     testFixturesApi( Libraries.junit.api)
     testFixturesApi( Libraries.junit.engine)
