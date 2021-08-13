@@ -7,7 +7,6 @@ import com.soyle.stories.storyevent.create.CreateStoryEventOutput
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventNotifier
 import com.soyle.stories.storyevent.storyEventList.StoryEventListController
-import com.soyle.stories.storyevent.storyEventList.StoryEventListModel
 import com.soyle.stories.storyevent.storyEventList.StoryEventListPresenter
 import com.soyle.stories.storyevent.storyEventList.StoryEventListViewListener
 
@@ -16,21 +15,6 @@ object StoryEventListModule {
 	init {
 
 		scoped<ProjectScope> {
-
-			provide<StoryEventListViewListener> {
-				StoryEventListController(
-				  applicationScope.get(),
-				  projectId.toString(),
-				  get(),
-				  StoryEventListPresenter(
-					get<StoryEventListModel>(),
-					get<StoryEventCreatedNotifier>(),
-					get<RenameStoryEventNotifier>()
-				  ),
-				  get(),
-				  get()
-				)
-			}
 
 		}
 
