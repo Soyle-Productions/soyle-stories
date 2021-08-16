@@ -210,7 +210,7 @@ class CreateNewSceneUnitTest {
 		runBlocking {
 			useCase.invoke(requestModel, object : CreateNewScene.OutputPort {
 				override val createStoryEventOutputPort: CreateStoryEvent.OutputPort = object : CreateStoryEvent.OutputPort {
-					override fun receiveCreateStoryEventResponse(response: CreateStoryEvent.ResponseModel) {
+					override suspend fun receiveCreateStoryEventResponse(response: CreateStoryEvent.ResponseModel) {
 						createStoryEventResult = response
 						storyEventOutputExecution.invoke()
 					}
