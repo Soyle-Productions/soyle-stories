@@ -70,9 +70,6 @@ object StoryEventModule {
 		provide(IncludedCharacterInStoryEventReceiver::class) {
 			IncludedCharacterInStoryEventNotifier()
 		}
-		provide(CreateStoryEvent.OutputPort::class) {
-			CreateStoryEventOutput(applicationScope.get())
-		}
 		provide(LinkLocationToStoryEvent.OutputPort::class) {
 			LinkLocationToStoryEventNotifier(applicationScope.get())
 		}

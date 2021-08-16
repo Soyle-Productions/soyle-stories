@@ -6,6 +6,7 @@ import com.soyle.stories.desktop.config.location.Locations
 import com.soyle.stories.desktop.config.project.Projects
 import com.soyle.stories.desktop.config.prose.Prose
 import com.soyle.stories.desktop.config.scene.Scenes
+import com.soyle.stories.desktop.config.storyevent.StoryEvents
 import com.soyle.stories.desktop.config.theme.Themes
 import com.soyle.stories.desktop.locale.SoyleMessages
 import com.soyle.stories.di.DI
@@ -42,6 +43,7 @@ fun configureModules() {
     configureDI()
     Projects()
     Scenes()
+    StoryEvents()
     Prose()
     Themes()
     Characters()

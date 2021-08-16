@@ -109,6 +109,7 @@ import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInco
 import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInScene
 import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInSceneUseCase
 import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.*
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 
 object UseCases {
 
@@ -161,7 +162,7 @@ object UseCases {
         }
 
         provide(CreateNewScene.OutputPort::class) {
-            CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventOutput>())
+            CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEvent.OutputPort>())
         }
     }
 
