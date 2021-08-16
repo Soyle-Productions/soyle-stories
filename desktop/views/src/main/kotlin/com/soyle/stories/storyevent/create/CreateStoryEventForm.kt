@@ -8,6 +8,7 @@ import javafx.scene.control.Spinner
 import javafx.scene.control.SpinnerValueFactory
 import javafx.scene.control.TextField
 import javafx.scene.layout.Pane
+import javafx.util.StringConverter
 import kotlinx.coroutines.runBlocking
 import tornadofx.*
 
@@ -20,12 +21,21 @@ class CreateStoryEventForm(
     }
     private val timeInput = Spinner<Long?>().apply {
         id = Styles.time.name
+        isEditable = true
         valueFactory = object : SpinnerValueFactory<Long?>() {
             override fun increment(steps: Int) {
                 value = value?.plus(steps)
             }
 
             override fun decrement(steps: Int) = increment(-steps)
+
+            init {
+                value = null
+                converter = object : StringConverter<Long?>() {
+                    override fun toString(`object`: Long?): String = `object`?.toString() ?: ""
+                    override fun fromString(string: String?): Long? = string?.toLongOrNull()
+                }
+            }
         }
     }
 
@@ -70,7 +80,7 @@ class CreateStoryEventForm(
     }
 
     private fun completeSubmission(potentialFailure: Throwable?) {
-        runBlocking {
+        runLater {
             nameInput.isDisable = false
             timeInput.isDisable = false
             if (potentialFailure == null) {

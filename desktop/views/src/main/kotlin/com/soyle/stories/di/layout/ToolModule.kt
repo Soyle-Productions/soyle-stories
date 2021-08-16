@@ -26,6 +26,7 @@ object ToolModule : RegisteredToolsConfig {
         SceneSymbols.getRegistration(),
         SceneSetting.getRegistration(),
         SceneCharacters.getRegistration(),
+        StoryEventList.getRegistration(),
         /**
          * Dynamic Tools
          */

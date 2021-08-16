@@ -25,13 +25,14 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                         //openTool(ToolType.LocationTracking)
                     }
                     stack(1) {
-                        tool(Tool(SceneList))
+                        tool(Tool(StoryEventList))
                         tool(Tool(LocationList))
                         tool(Tool(CharacterList))
                     }
                 }
                 primaryStack(6) {}
                 stack(2) {
+                    tool(Tool(SceneList))
                     tool(Tool(ThemeList, isOpen = false))
                     tool(Tool(SceneSymbols, isOpen = false))
                     tool(Tool(SceneSetting, isOpen = false))

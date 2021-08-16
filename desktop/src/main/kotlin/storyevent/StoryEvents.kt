@@ -7,5 +7,6 @@ object StoryEvents {
     operator fun invoke() {
         UseCases
         Notifiers
+        Presentation
     }
 }

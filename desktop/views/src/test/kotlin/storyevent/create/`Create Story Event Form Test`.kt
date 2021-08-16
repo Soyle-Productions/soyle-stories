@@ -48,7 +48,8 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should enable submit button when name and time inputs are populated`() {
             interact {
                 view.access().nameInput.text = "Banana"
-                view.access().timeInput.valueFactory.value = 0L
+                view.access().timeInput.editor.text = "0"
+                view.access().timeInput.commitValue()
             }
 
             assertThat(view.access().submitButton).isEnabled
@@ -66,7 +67,8 @@ class `Create Story Event Form Test` : FxRobot() {
         @Test
         fun `should not enable submit button when only time input has value`() {
             interact {
-                view.access().timeInput.valueFactory.value = 0L
+                view.access().timeInput.editor.text = "0"
+                view.access().timeInput.commitValue()
             }
 
             assertThat(view.access().submitButton).isDisabled
@@ -76,7 +78,8 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should not enable submit button when name input has blank value`() {
             interact {
                 view.access().nameInput.text = "    \r"
-                view.access().timeInput.valueFactory.value = 0L
+                view.access().timeInput.editor.text = "0"
+                view.access().timeInput.commitValue()
             }
 
             assertThat(view.access().submitButton).isDisabled
@@ -91,7 +94,8 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should clear the entered values`() {
             interact {
                 view.access().nameInput.text = "Banana"
-                view.access().timeInput.valueFactory.value = 0L
+                view.access().timeInput.editor.text = "0"
+                view.access().timeInput.commitValue()
                 view.access().cancelButton.fire()
             }
 
@@ -117,7 +121,8 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should disable all inputs`() {
             interact {
                 view.access().nameInput.text = "Banana"
-                view.access().timeInput.valueFactory.value = 0L
+                view.access().timeInput.editor.text = "0"
+                view.access().timeInput.commitValue()
                 view.access().submitButton.fire()
             }
 
@@ -142,7 +147,8 @@ class `Create Story Event Form Test` : FxRobot() {
 
             interact {
                 view.access().nameInput.text = randomNonBlankName
-                view.access().timeInput.valueFactory.value = 0L
+                view.access().timeInput.editor.text = "0"
+                view.access().timeInput.commitValue()
                 view.access().submitButton.fire()
             }
 
@@ -167,7 +173,8 @@ class `Create Story Event Form Test` : FxRobot() {
 
                 interact {
                     view.access().nameInput.text = "Banana"
-                    view.access().timeInput.valueFactory.value = 0L
+                    view.access().timeInput.editor.text = "0"
+                    view.access().timeInput.commitValue()
                 }
             }
 
@@ -215,7 +222,8 @@ class `Create Story Event Form Test` : FxRobot() {
 
                 interact {
                     view.access().nameInput.text = "Banana"
-                    view.access().timeInput.valueFactory.value = 0L
+                    view.access().timeInput.editor.text = "0"
+                    view.access().timeInput.commitValue()
                 }
 
             }
