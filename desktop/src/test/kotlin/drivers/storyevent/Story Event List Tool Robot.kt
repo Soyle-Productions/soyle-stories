@@ -30,6 +30,6 @@ fun WorkBench.openStoryEventListTool()
 
 fun StoryEventListTool.openCreateStoryEventDialog() {
     drive {
-        createStoryEventButton.fire()
+        createStoryEventButton!!.fire()
     }
 }

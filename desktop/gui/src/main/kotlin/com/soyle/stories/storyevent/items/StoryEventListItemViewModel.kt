@@ -2,7 +2,7 @@ package com.soyle.stories.storyevent.items
 
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 
-class StoryEventListItemViewModel (
+data class StoryEventListItemViewModel (
   val id: String,
   val ordinal: Int,
   val name: String

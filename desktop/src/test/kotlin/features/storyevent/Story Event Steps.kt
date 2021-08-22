@@ -6,6 +6,7 @@ import com.soyle.stories.desktop.config.drivers.storyevent.createStoryEventNamed
 import com.soyle.stories.desktop.config.drivers.storyevent.givenCreateStoryEventDialogHasBeenOpened
 import com.soyle.stories.desktop.config.drivers.storyevent.givenStoryEventListToolHasBeenOpened
 import com.soyle.stories.desktop.config.features.soyleStories
+import com.soyle.stories.desktop.view.storyevent.list.`Story Event List Tool Assertions`.Companion.assertThis
 import io.cucumber.java8.En
 import org.junit.jupiter.api.fail
 
@@ -42,7 +43,11 @@ class `Story Event Steps` : En {
             val storyEvent = storyEvents.getStoryEventByName(expectedName)
                 ?: fail("Story event named \"$expectedName\" was not created")
 
-            TODO("Ensure listed in story event list")
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .assertThis {
+                    hasStoryEvent(storyEvent)
+                }
         }
     }
 

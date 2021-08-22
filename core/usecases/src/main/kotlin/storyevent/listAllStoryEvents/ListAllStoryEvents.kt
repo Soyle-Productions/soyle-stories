@@ -9,7 +9,7 @@ interface ListAllStoryEvents {
 
 	class ResponseModel(val storyEventItems: List<StoryEventItem>)
 
-	interface OutputPort {
+	fun interface OutputPort {
 		fun receiveListAllStoryEventsResponse(response: ResponseModel)
 	}
 

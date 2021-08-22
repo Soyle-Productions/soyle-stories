@@ -46,9 +46,6 @@ object StoryEventModule {
 		provide<CreateStoryEvent> {
 			CreateStoryEventUseCase(get())
 		}
-		provide<ListAllStoryEvents> {
-			ListAllStoryEventsUseCase(get())
-		}
 		provide<LinkLocationToStoryEvent> {
 			LinkLocationToStoryEventUseCase(get(), get())
 		}
