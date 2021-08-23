@@ -10,58 +10,71 @@ import java.util.*
 
 interface CreateStoryEventController {
 
-	companion object {
-		operator fun invoke(
-			projectId: Project.Id,
-			threadTransformer: ThreadTransformer,
-			createStoryEvent: CreateStoryEvent,
-			createStoryEventOutputPort: CreateStoryEvent.OutputPort
-		): CreateStoryEventController = object : CreateStoryEventController {
+    companion object {
 
-			override fun createStoryEvent(name: NonBlankString): Job {
-				return createStoryEvent(CreateStoryEvent.RequestModel(name, projectId))
-			}
+        operator fun invoke(
+            projectId: Project.Id,
+            threadTransformer: ThreadTransformer,
+            createStoryEvent: CreateStoryEvent,
+            createStoryEventOutputPort: CreateStoryEvent.OutputPort
+        ): CreateStoryEventController = object : CreateStoryEventController {
 
-			override fun createStoryEventBefore(name: NonBlankString, relativeStoryEventId: String) {
-				val request = CreateStoryEvent.RequestModel(
-					name, projectId,
-					CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(
-						StoryEvent.Id(
-							UUID.fromString(
-								relativeStoryEventId
-							)
-						), -1
-					)
-				)
-				createStoryEvent(request)
-			}
+            override fun createStoryEvent(name: NonBlankString): Job {
+                return createStoryEvent(CreateStoryEvent.RequestModel(name, projectId))
+            }
 
-			override fun createStoryEventAfter(name: NonBlankString, relativeStoryEventId: String) {
-				val request = CreateStoryEvent.RequestModel(
-					name, projectId,
-					CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(
-						StoryEvent.Id(
-							UUID.fromString(
-								relativeStoryEventId
-							)
-						), +1
-					)
-				)
-				createStoryEvent(request)
-			}
+            override fun createStoryEvent(name: NonBlankString, timeUnit: Long): Job {
+                return createStoryEvent(
+                    CreateStoryEvent.RequestModel(
+                        name,
+                        projectId,
+                        CreateStoryEvent.RequestModel.RequestedStoryEventTime.Absolute(timeUnit)
+                    )
+                )
+            }
 
-			private fun createStoryEvent(request: CreateStoryEvent.RequestModel): Job {
-				return threadTransformer.async {
-					createStoryEvent.invoke(request, createStoryEventOutputPort)
-				}
-			}
-		}
-	}
+            override fun createStoryEventBefore(name: NonBlankString, relativeStoryEventId: String) {
+                val request = CreateStoryEvent.RequestModel(
+                    name, projectId,
+                    CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(
+                        StoryEvent.Id(
+                            UUID.fromString(
+                                relativeStoryEventId
+                            )
+                        ), -1
+                    )
+                )
+                createStoryEvent(request)
+            }
 
-	fun createStoryEvent(name: NonBlankString): Job
+            override fun createStoryEventAfter(name: NonBlankString, relativeStoryEventId: String) {
+                val request = CreateStoryEvent.RequestModel(
+                    name, projectId,
+                    CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(
+                        StoryEvent.Id(
+                            UUID.fromString(
+                                relativeStoryEventId
+                            )
+                        ), +1
+                    )
+                )
+                createStoryEvent(request)
+            }
 
-	fun createStoryEventBefore(name: NonBlankString, relativeStoryEventId: String)
+            private fun createStoryEvent(request: CreateStoryEvent.RequestModel): Job {
+                return threadTransformer.async {
+                    createStoryEvent.invoke(request, createStoryEventOutputPort)
+                }
+            }
+        }
+    }
 
-	fun createStoryEventAfter(name: NonBlankString, relativeStoryEventId: String)
+    fun createStoryEvent(name: NonBlankString): Job
+
+    fun createStoryEvent(name: NonBlankString, timeUnit: Long): Job
+
+    fun createStoryEventBefore(name: NonBlankString, relativeStoryEventId: String)
+
+    fun createStoryEventAfter(name: NonBlankString, relativeStoryEventId: String)
 
 }

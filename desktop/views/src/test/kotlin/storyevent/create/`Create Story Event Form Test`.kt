@@ -26,9 +26,16 @@ class `Create Story Event Form Test` : FxRobot() {
     private var createStoryEventBehavior: (name: NonBlankString) -> Job = { Job() }
     private val createStoryEventController = object : CreateStoryEventController {
         var requestedName: NonBlankString? = null
+        var requestedTime: Long? = null
 
         override fun createStoryEvent(name: NonBlankString): Job {
             requestedName = name
+            return createStoryEventBehavior(name)
+        }
+
+        override fun createStoryEvent(name: NonBlankString, timeUnit: Long): Job {
+            requestedName = name
+            requestedTime = timeUnit
             return createStoryEventBehavior(name)
         }
         override fun createStoryEventBefore(name: NonBlankString, relativeStoryEventId: String) = error("Should not be called")
@@ -37,7 +44,7 @@ class `Create Story Event Form Test` : FxRobot() {
     val view = CreateStoryEventForm(createStoryEventController)
 
     @Nested
-    inner class `Cannot Submit with Empty Inputs` {
+    inner class `Cannot Submit with Empty Name` {
 
         @Test
         fun `submit button should be disabled initially`() {
@@ -56,15 +63,6 @@ class `Create Story Event Form Test` : FxRobot() {
         }
 
         @Test
-        fun `should not enable submit button when only name input has value`() {
-            interact {
-                view.access().nameInput.text = "Banana"
-            }
-
-            assertThat(view.access().submitButton).isDisabled
-        }
-
-        @Test
         fun `should not enable submit button when only time input has value`() {
             interact {
                 view.access().timeInput.editor.text = "0"
@@ -75,10 +73,30 @@ class `Create Story Event Form Test` : FxRobot() {
         }
 
         @Test
+        fun `should enable submit button when only name input has value`() {
+            interact {
+                view.access().nameInput.text = "Banana"
+            }
+
+            assertThat(view.access().submitButton).isEnabled
+        }
+
+        @Test
         fun `should not enable submit button when name input has blank value`() {
             interact {
                 view.access().nameInput.text = "    \r"
                 view.access().timeInput.editor.text = "0"
+                view.access().timeInput.commitValue()
+            }
+
+            assertThat(view.access().submitButton).isDisabled
+        }
+
+        @Test
+        fun `should not enable submit button when time input has invalid value`() {
+            interact {
+                view.access().nameInput.text = "Banana"
+                view.access().timeInput.editor.text = "029afg"
                 view.access().timeInput.commitValue()
             }
 
@@ -141,18 +159,36 @@ class `Create Story Event Form Test` : FxRobot() {
         }
 
         @Test
-        fun `should send input values to controller`() {
+        fun `can create story event without providing time`() {
 
             val randomNonBlankName = UUID.randomUUID().toString()
 
             interact {
                 view.access().nameInput.text = randomNonBlankName
-                view.access().timeInput.editor.text = "0"
+                view.access().timeInput.editor.text = ""
                 view.access().timeInput.commitValue()
                 view.access().submitButton.fire()
             }
 
             assertThat(createStoryEventController.requestedName).isEqualTo(randomNonBlankName)
+            assertThat(createStoryEventController.requestedTime).isNull()
+        }
+
+        @Test
+        fun `should send input values to controller`() {
+
+            val randomNonBlankName = UUID.randomUUID().toString()
+            val randomTime = (-100 .. 100).random().toLong()
+
+            interact {
+                view.access().nameInput.text = randomNonBlankName
+                view.access().timeInput.editor.text = "$randomTime"
+                view.access().timeInput.commitValue()
+                view.access().submitButton.fire()
+            }
+
+            assertThat(createStoryEventController.requestedName).isEqualTo(randomNonBlankName)
+            assertThat(createStoryEventController.requestedTime).isEqualTo(randomTime)
         }
 
         @Nested

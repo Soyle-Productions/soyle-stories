@@ -28,12 +28,14 @@ fun WorkBench.givenCreateStoryEventDialogHasBeenOpened(): CreateStoryEventForm =
         getOpenCreateStoryEventDialogOrError()
     }
 
-fun CreateStoryEventForm.createStoryEventNamed(name: String, time: Int = 0) {
+fun CreateStoryEventForm.createStoryEventNamed(name: String, time: Int? = null) {
     with(access()) {
         interact {
             nameInput.text = name
-            timeInput.editor.text = "$time"
-            timeInput.commitValue()
+            if (time != null) {
+                timeInput.editor.text = "$time"
+                timeInput.commitValue()
+            }
             submitButton.fire()
         }
     }

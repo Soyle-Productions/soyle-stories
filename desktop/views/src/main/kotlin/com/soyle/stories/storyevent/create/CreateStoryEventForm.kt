@@ -9,6 +9,8 @@ import javafx.scene.control.SpinnerValueFactory
 import javafx.scene.control.TextField
 import javafx.scene.layout.Pane
 import javafx.util.StringConverter
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable.invokeOnCompletion
 import kotlinx.coroutines.runBlocking
 import tornadofx.*
 
@@ -41,7 +43,7 @@ class CreateStoryEventForm(
 
     private val submitButton = Button().apply {
         addClass(Stylesheet.default)
-        enableWhen(nameInput.textProperty().isNotBlank().and(timeInput.valueProperty().isNotNull))
+        enableWhen(nameInput.textProperty().isNotBlank().and(timeInput.valueProperty().isNotNull.or(timeInput.editor.textProperty().isBlank())))
         action(::submit)
     }
     private val cancelButton = Button().apply {
@@ -73,10 +75,19 @@ class CreateStoryEventForm(
         nameInput.isDisable = true
         timeInput.isDisable = true
 
-        val nonBlankName = NonBlankString.create(nameInput.text) ?: return
+        val nonBlankName = NonBlankString.create(nameInput.text) ?: return run {
+            nameInput.isDisable = false
+            timeInput.isDisable = false
+        }
 
-        createStoryEventController.createStoryEvent(nonBlankName)
+        createStoryEventJob(nonBlankName, timeInput.value)
             .invokeOnCompletion(::completeSubmission)
+    }
+
+    private fun createStoryEventJob(name: NonBlankString, time: Long?): Job
+    {
+        return if (time == null) createStoryEventController.createStoryEvent(name)
+        else createStoryEventController.createStoryEvent(name, time)
     }
 
     private fun completeSubmission(potentialFailure: Throwable?) {
