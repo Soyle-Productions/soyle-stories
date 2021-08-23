@@ -39,7 +39,7 @@ class `Story Event Robot` private constructor(private val projectScope: ProjectS
     private fun createStoryEvent(name: NonBlankString, time: Int) {
         val controller = projectScope.get<CreateStoryEventController>()
         runBlocking {
-            controller.createStoryEvent(name).join()
+            controller.createStoryEvent(name, time.toLong()).join()
         }
     }
 

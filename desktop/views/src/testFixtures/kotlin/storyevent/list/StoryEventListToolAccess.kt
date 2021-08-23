@@ -5,9 +5,7 @@ import com.soyle.stories.layout.config.fixed.StoryEventList
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.creationButton.StoryEventListTool
 import javafx.scene.Node
-import javafx.scene.control.Button
-import javafx.scene.control.ListCell
-import javafx.scene.control.ListView
+import javafx.scene.control.*
 import tornadofx.Stylesheet
 
 class StoryEventListToolAccess private constructor(private val tool: StoryEventListTool) : NodeAccess<Node>(tool.root) {
@@ -30,5 +28,9 @@ class StoryEventListToolAccess private constructor(private val tool: StoryEventL
         get() = storyEventList?.items.orEmpty()
 
     val retryButton: Button? by temporaryChild<Button>(Stylesheet.button) { it.id == "retry" }
+
+    val optionsButton: MenuButton? by temporaryChild(Stylesheet.menuButton)
+    fun MenuButton.insertNewStoryEventOption(placement: String): MenuItem? = items.find { it.id == "insert-story-event-$placement" }
+        ?.takeIf { isDisable == false }
 
 }

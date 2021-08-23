@@ -16,9 +16,11 @@ import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.storyevent.create.CreateStoryEventForm
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
+import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.ListStoryEventsController
 import com.soyle.stories.storyevent.list.creationButton.StoryEventListTool
 import com.soyle.stories.usecase.storyevent.StoryEventItem
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
 import javafx.application.Application
 import javafx.scene.Parent
@@ -29,6 +31,8 @@ import kotlinx.coroutines.*
 import org.assertj.core.internal.bytebuddy.implementation.bytecode.Throw
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.testfx.api.FxRobot
 import org.testfx.api.FxToolkit
 import org.testfx.assertions.api.Assertions.assertThat
@@ -47,8 +51,19 @@ class `Story Event List Tool Test` : FxRobot() {
         interact { primaryStage.show() }
     }
 
-    private val createStoryEventForm = CreateStoryEventForm(CreateStoryEventControllerDouble())
-    private val createStoryEventFormFactory = {
+    @AfterEach
+    fun `close opened dialogs`() {
+        val openDialogs = listTargetWindows().asSequence()
+            .filterNot { it == primaryStage }
+            .filter { it.scene.root == createStoryEventForm.root }
+            .filter { it.isShowing }
+        interact { openDialogs.forEach { it.hide() } }
+    }
+
+    private val createStoryEventForm = CreateStoryEventForm(null, CreateStoryEventControllerDouble())
+    private var createStoryEventFormRelativeRequest: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? = null
+    private val createStoryEventFormFactory = { relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? ->
+        createStoryEventFormRelativeRequest = relativeTo
         createStoryEventForm
     }
 
@@ -330,6 +345,86 @@ class `Story Event List Tool Test` : FxRobot() {
             interact {}
             interact {}
             tool.assertThis { hasStoryEvent(newStoryEvent) }
+        }
+
+    }
+
+    @Nested
+    inner class `Options Button is Only Available when Story Event is Selected` {
+
+        @Test
+        fun `options button should not be visible initially`() {
+            assertThat(tool.access().optionsButton)
+                .isNull()
+        }
+
+        @Nested
+        inner class `When Populated` {
+
+            init {
+                response = ListAllStoryEvents.ResponseModel(List(5) {
+                    StoryEventItem(UUID.randomUUID(), "name $it", it)
+                })
+            }
+
+            @Test
+            fun `options button should be visible but disabled`() {
+                awaitToolInitialization()
+                assertThat(tool.access().optionsButton)
+                    .isNotNull
+                    .isVisible
+                    .isDisabled
+            }
+
+            @Test
+            fun `options button should be enabled when item is selected`() {
+                awaitToolInitialization()
+                tool.drive {
+                    storyEventList!!.selectionModel.select(storyEventItems.random())
+                }
+                assertThat(tool.access().optionsButton)
+                    .isNotNull
+                    .isVisible
+                    .isEnabled
+            }
+
+        }
+
+    }
+
+    @Nested
+    inner class `When Insert Story Event Option is Selected` {
+
+        val selectedItem: StoryEventListItemViewModel
+
+        init {
+            response = ListAllStoryEvents.ResponseModel(List(5) {
+                StoryEventItem(UUID.randomUUID(), "name $it", it)
+            })
+            awaitToolInitialization()
+            selectedItem = tool.access().storyEventItems.random()
+            tool.drive {
+                storyEventList!!.selectionModel.select(selectedItem)
+            }
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = ["before", "after", "at-the-same-time-as"])
+        fun `should open create story event dialog with relative story event`(placement: String) {
+            tool.drive { optionsButton!!.insertNewStoryEventOption(placement)!!.fire() }
+            listTargetWindows().asSequence()
+                .filterNot { it == primaryStage }
+                .filter { it.scene.root == createStoryEventForm.root }
+                .single { it.isShowing }
+
+            val relativeRequest = createStoryEventFormRelativeRequest!!
+
+            assertThat(relativeRequest.relativeStoryEventId).isEqualTo(StoryEvent.Id(UUID.fromString(selectedItem.id)))
+            when (placement) {
+                "before" -> assertThat(relativeRequest.delta).isEqualTo(-1L)
+                "after" -> assertThat(relativeRequest.delta).isEqualTo(1L)
+                "at-the-same-time-as" -> assertThat(relativeRequest.delta).isEqualTo(0L)
+            }
         }
 
     }

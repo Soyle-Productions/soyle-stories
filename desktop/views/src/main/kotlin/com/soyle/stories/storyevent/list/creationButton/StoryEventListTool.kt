@@ -3,12 +3,14 @@ package com.soyle.stories.storyevent.list.creationButton
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.storyevent.create.CreateStoryEventForm
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.ListStoryEventsController
 import com.soyle.stories.usecase.storyevent.StoryEventItem
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
 import javafx.scene.Node
 import javafx.scene.Parent
@@ -16,6 +18,7 @@ import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.ListCell
 import javafx.scene.control.ListView
+import javafx.scene.control.MenuButton
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
@@ -23,10 +26,11 @@ import javafx.stage.Stage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import tornadofx.*
+import java.util.*
 
 class StoryEventListTool(
     private val projectId: Project.Id,
-    private val createStoryEventFormFactory: () -> CreateStoryEventForm,
+    private val createStoryEventFormFactory: (CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative?) -> CreateStoryEventForm,
     private val listStoryEventsInProject: ListStoryEventsController,
 
     // events
@@ -47,7 +51,7 @@ class StoryEventListTool(
         override fun addStoryEvent(storyEventItem: StoryEventItem): State = Populated(listOf(storyEventItem))
     }
     private inner class Populated(val items: List<StoryEventItem>) : State() {
-        override fun render(): List<Node> = listOf(createStoryEventButton, storyEventList(items))
+        override fun render(): List<Node> = listOf(createStoryEventButton, optionsButton, storyEventList(items))
         override fun addStoryEvent(storyEventItem: StoryEventItem): State = Populated(items + storyEventItem)
     }
 
@@ -74,10 +78,35 @@ class StoryEventListTool(
         storyEventList.items.setAll(newItems)
         return storyEventList
     }
+    private val optionsButton = MenuButton().apply {
+        enableWhen(storyEventList.selectionModel.selectedItemProperty().isNotNull)
+        item("") {
+            id = "insert-story-event-before"
+            action { openCreateStoryEventDialog(-1L) }
+        }
+        item("") {
+            id = "insert-story-event-at-the-same-time-as"
+            action { openCreateStoryEventDialog(0L) }
+        }
+        item("") {
+            id = "insert-story-event-after"
+            action { openCreateStoryEventDialog(1L) }
+        }
+    }
 
     private fun openCreateStoryEventDialog() {
         Stage().apply {
-            scene = Scene(createStoryEventFormFactory().root as Parent)
+            scene = Scene(createStoryEventFormFactory(null).root as Parent)
+            show()
+        }
+    }
+
+    private fun openCreateStoryEventDialog(delta: Long) {
+        val selectedId = storyEventList.selectedItem?.id?.let(UUID::fromString)?.let(StoryEvent::Id)!!
+        Stage().apply {
+            scene = Scene(createStoryEventFormFactory(
+                CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(selectedId, delta)
+            ).root as Parent)
             show()
         }
     }

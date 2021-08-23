@@ -4,6 +4,7 @@ import tornadofx.Component
 import tornadofx.FX
 import tornadofx.Scope
 import tornadofx.find
+import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.set
@@ -40,17 +41,19 @@ object DI {
 
     private val registeredTypes = mutableMapOf<Scope, HashMap<KClass<*>, Any>>()
     fun getRegisteredTypes(scope: Scope = FX.defaultScope): HashMap<KClass<*>, Any> {
-		val initial = ! registeredTypes.containsKey(scope)
+        val initial = !registeredTypes.containsKey(scope)
         val scopedTypes = registeredTypes.getOrPut(scope) { HashMap() }
-		if (initial) {
-			factories.entries.asSequence()
-				.filter { it.value.scopeType.isInstance(scope) && it.value.alwaysAvailable }
-				.forEach {
-					resolveClass<Any>(it.key as KClass<in Any>, scope)
-				}
-		}
+        if (initial) {
+            factories.entries.asSequence()
+                .filter { it.value.scopeType.isInstance(scope) && it.value.alwaysAvailable }
+                .forEach {
+                    resolveClass<Any>(it.key as KClass<in Any>, scope)
+                }
+        }
         return scopedTypes
     }
+    val activeScopes: List<Scope>
+        get() = registeredTypes.keys.toList()
 
     fun deregister(scope: Scope) {
         registeredTypes.remove(scope)
@@ -103,17 +106,18 @@ object DI {
     }
 
     @JvmName("registerTypeFactoryDefaultScope")
-    inline fun <reified T : Any> registerTypeFactory(noinline factory: (Scope) -> T): Unit = registerTypeFactory<T, Scope>(factory)
+    inline fun <reified T : Any> registerTypeFactory(noinline factory: (Scope) -> T): Unit =
+        registerTypeFactory<T, Scope>(factory)
 
     inline fun <reified T : Any, reified S : Scope> registerTypeFactory(noinline factory: (S) -> T): Unit =
-		register(T::class, S::class, factory)
+        register(T::class, S::class, factory)
 
     fun <T : Any, S : Scope> register(
         kClass: KClass<in T>,
         scopeClass: KClass<S>,
         factory: (S) -> T,
-		isSingleton: Boolean = true,
-		isAlwaysAvailable: Boolean = false,
+        isSingleton: Boolean = true,
+        isAlwaysAvailable: Boolean = false,
     ) {
         if (factories.containsKey(kClass) && verbose) {
             println("WARNING: Already registered type factory for $kClass as ${factories[kClass]?.scopeType}.  Replacing with $scopeClass")
@@ -157,8 +161,8 @@ class InScope<S : Scope>(val scopeClass: KClass<S>) {
         }
     }
 
-	inline fun <reified T : Any> keepInScope(noinline factory: S.() -> T) = keepInScope(T::class, factory)
-	fun <T : Any> keepInScope(type: KClass<T>, factory: S.() -> T) {
+    inline fun <reified T : Any> keepInScope(noinline factory: S.() -> T) = keepInScope(T::class, factory)
+    fun <T : Any> keepInScope(type: KClass<T>, factory: S.() -> T) {
         DI.register(type, scopeClass, factory = factory, isAlwaysAvailable = true)
     }
 }

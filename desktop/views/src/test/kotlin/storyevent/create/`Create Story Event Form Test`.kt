@@ -1,10 +1,13 @@
 package com.soyle.stories.desktop.view.storyevent.create
 
+import com.soyle.stories.desktop.adapter.storyevent.create.CreateStoryEventControllerDouble
 import com.soyle.stories.desktop.view.runHeadless
 import com.soyle.stories.desktop.view.storyevent.create.`Create Story Event Dialog Access`.Companion.access
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.storyevent.create.CreateStoryEventController
 import com.soyle.stories.storyevent.create.CreateStoryEventForm
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -24,24 +27,60 @@ class `Create Story Event Form Test` : FxRobot() {
     private val primaryStage = FxToolkit.registerPrimaryStage()
 
     private var createStoryEventBehavior: (name: NonBlankString) -> Job = { Job() }
-    private val createStoryEventController = object : CreateStoryEventController {
-        var requestedName: NonBlankString? = null
-        var requestedTime: Long? = null
+    var requestedName: NonBlankString? = null
+    var requestedTime: Long? = null
+    var requestedRelativity: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? = null
 
-        override fun createStoryEvent(name: NonBlankString): Job {
+    private val createStoryEventController = CreateStoryEventControllerDouble(
+        onCreateStoryEvent = { name, time ->
             requestedName = name
-            return createStoryEventBehavior(name)
-        }
-
-        override fun createStoryEvent(name: NonBlankString, timeUnit: Long): Job {
+            requestedTime = time
+            createStoryEventBehavior(name)
+        },
+        onCreateStoryEventRelativeTo = { name, relativeTo ->
             requestedName = name
-            requestedTime = timeUnit
-            return createStoryEventBehavior(name)
+            requestedRelativity = relativeTo
+            createStoryEventBehavior(name)
         }
-        override fun createStoryEventBefore(name: NonBlankString, relativeStoryEventId: String) = error("Should not be called")
-        override fun createStoryEventAfter(name: NonBlankString, relativeStoryEventId: String) = error("Should not be called")
+    )
+    private var relativePlacement: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? = null
+    val view by lazy {
+        CreateStoryEventForm(relativePlacement, createStoryEventController)
     }
-    val view = CreateStoryEventForm(createStoryEventController)
+
+    @Nested
+    inner class `When Created with Relative Story Event` {
+
+        init {
+            relativePlacement = CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(StoryEvent.Id(), 1L)
+            view
+        }
+
+        @Test
+        fun `time input should not be visible`() {
+            assertThat(view.access().timeInput).isNull()
+        }
+
+        @Nested
+        inner class `When Submitted` {
+
+            @Test
+            fun `should send name and relative story event to controller`() {
+
+                val randomNonBlankName = UUID.randomUUID().toString()
+
+                interact {
+                    view.access().nameInput.text = randomNonBlankName
+                    view.access().submitButton.fire()
+                }
+
+                assertThat(requestedName).isEqualTo(randomNonBlankName)
+                assertThat(requestedRelativity).isEqualTo(relativePlacement)
+            }
+
+        }
+
+    }
 
     @Nested
     inner class `Cannot Submit with Empty Name` {
@@ -55,8 +94,8 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should enable submit button when name and time inputs are populated`() {
             interact {
                 view.access().nameInput.text = "Banana"
-                view.access().timeInput.editor.text = "0"
-                view.access().timeInput.commitValue()
+                view.access().timeInput!!.editor.text = "0"
+                view.access().timeInput!!.commitValue()
             }
 
             assertThat(view.access().submitButton).isEnabled
@@ -65,8 +104,8 @@ class `Create Story Event Form Test` : FxRobot() {
         @Test
         fun `should not enable submit button when only time input has value`() {
             interact {
-                view.access().timeInput.editor.text = "0"
-                view.access().timeInput.commitValue()
+                view.access().timeInput!!.editor.text = "0"
+                view.access().timeInput!!.commitValue()
             }
 
             assertThat(view.access().submitButton).isDisabled
@@ -85,8 +124,8 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should not enable submit button when name input has blank value`() {
             interact {
                 view.access().nameInput.text = "    \r"
-                view.access().timeInput.editor.text = "0"
-                view.access().timeInput.commitValue()
+                view.access().timeInput!!.editor.text = "0"
+                view.access().timeInput!!.commitValue()
             }
 
             assertThat(view.access().submitButton).isDisabled
@@ -96,8 +135,8 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should not enable submit button when time input has invalid value`() {
             interact {
                 view.access().nameInput.text = "Banana"
-                view.access().timeInput.editor.text = "029afg"
-                view.access().timeInput.commitValue()
+                view.access().timeInput!!.editor.text = "029afg"
+                view.access().timeInput!!.commitValue()
             }
 
             assertThat(view.access().submitButton).isDisabled
@@ -112,13 +151,13 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should clear the entered values`() {
             interact {
                 view.access().nameInput.text = "Banana"
-                view.access().timeInput.editor.text = "0"
-                view.access().timeInput.commitValue()
+                view.access().timeInput!!.editor.text = "0"
+                view.access().timeInput!!.commitValue()
                 view.access().cancelButton.fire()
             }
 
             assertThat(view.access().nameInput.text).isEmpty()
-            assertThat(view.access().timeInput.valueFactory.value).isNull()
+            assertThat(view.access().timeInput!!.valueFactory.value).isNull()
         }
 
         @Test
@@ -139,8 +178,8 @@ class `Create Story Event Form Test` : FxRobot() {
         fun `should disable all inputs`() {
             interact {
                 view.access().nameInput.text = "Banana"
-                view.access().timeInput.editor.text = "0"
-                view.access().timeInput.commitValue()
+                view.access().timeInput!!.editor.text = "0"
+                view.access().timeInput!!.commitValue()
                 view.access().submitButton.fire()
             }
 
@@ -165,13 +204,13 @@ class `Create Story Event Form Test` : FxRobot() {
 
             interact {
                 view.access().nameInput.text = randomNonBlankName
-                view.access().timeInput.editor.text = ""
-                view.access().timeInput.commitValue()
+                view.access().timeInput!!.editor.text = ""
+                view.access().timeInput!!.commitValue()
                 view.access().submitButton.fire()
             }
 
-            assertThat(createStoryEventController.requestedName).isEqualTo(randomNonBlankName)
-            assertThat(createStoryEventController.requestedTime).isNull()
+            assertThat(requestedName).isEqualTo(randomNonBlankName)
+            assertThat(requestedTime).isNull()
         }
 
         @Test
@@ -182,13 +221,13 @@ class `Create Story Event Form Test` : FxRobot() {
 
             interact {
                 view.access().nameInput.text = randomNonBlankName
-                view.access().timeInput.editor.text = "$randomTime"
-                view.access().timeInput.commitValue()
+                view.access().timeInput!!.editor.text = "$randomTime"
+                view.access().timeInput!!.commitValue()
                 view.access().submitButton.fire()
             }
 
-            assertThat(createStoryEventController.requestedName).isEqualTo(randomNonBlankName)
-            assertThat(createStoryEventController.requestedTime).isEqualTo(randomTime)
+            assertThat(requestedName).isEqualTo(randomNonBlankName)
+            assertThat(requestedTime).isEqualTo(randomTime)
         }
 
         @Nested
@@ -209,8 +248,8 @@ class `Create Story Event Form Test` : FxRobot() {
 
                 interact {
                     view.access().nameInput.text = "Banana"
-                    view.access().timeInput.editor.text = "0"
-                    view.access().timeInput.commitValue()
+                    view.access().timeInput!!.editor.text = "0"
+                    view.access().timeInput!!.commitValue()
                 }
             }
 
@@ -229,7 +268,7 @@ class `Create Story Event Form Test` : FxRobot() {
                 runBlocking { job.join() }
 
                 assertThat(view.access().nameInput.text).isEqualTo("Banana")
-                assertThat(view.access().timeInput.valueFactory.value).isEqualTo(0L)
+                assertThat(view.access().timeInput!!.valueFactory.value).isEqualTo(0L)
             }
 
 
@@ -258,8 +297,8 @@ class `Create Story Event Form Test` : FxRobot() {
 
                 interact {
                     view.access().nameInput.text = "Banana"
-                    view.access().timeInput.editor.text = "0"
-                    view.access().timeInput.commitValue()
+                    view.access().timeInput!!.editor.text = "0"
+                    view.access().timeInput!!.commitValue()
                 }
 
             }
@@ -279,7 +318,7 @@ class `Create Story Event Form Test` : FxRobot() {
                 runBlocking { job.join() }
 
                 assertThat(view.access().nameInput.text).isEmpty()
-                assertThat(view.access().timeInput.valueFactory.value).isNull()
+                assertThat(view.access().timeInput!!.valueFactory.value).isNull()
             }
 
             @Test

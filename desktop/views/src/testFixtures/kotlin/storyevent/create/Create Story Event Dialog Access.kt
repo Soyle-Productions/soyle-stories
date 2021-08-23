@@ -19,5 +19,5 @@ class `Create Story Event Dialog Access` private constructor(private val view: C
     val submitButton: Button by mandatoryChild(Stylesheet.button) { it.hasClass(Stylesheet.default) }
     val cancelButton: Button by mandatoryChild(Stylesheet.button) { it.hasClass(Stylesheet.cancel) }
     val nameInput: TextInputControl by mandatoryChild(CreateStoryEventForm.Styles.name)
-    val timeInput: Spinner<Long?> by mandatoryChild(CreateStoryEventForm.Styles.time)
+    val timeInput: Spinner<Long?>? by temporaryChild(CreateStoryEventForm.Styles.time)
 }

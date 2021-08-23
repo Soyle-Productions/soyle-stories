@@ -1,10 +1,7 @@
 package com.soyle.stories.desktop.config.features.storyevent
 
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
-import com.soyle.stories.desktop.config.drivers.storyevent.`Story Event Robot`
-import com.soyle.stories.desktop.config.drivers.storyevent.createStoryEventNamed
-import com.soyle.stories.desktop.config.drivers.storyevent.givenCreateStoryEventDialogHasBeenOpened
-import com.soyle.stories.desktop.config.drivers.storyevent.givenStoryEventListToolHasBeenOpened
+import com.soyle.stories.desktop.config.drivers.storyevent.*
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.storyevent.list.`Story Event List Tool Assertions`.Companion.assertThis
 import com.soyle.stories.domain.storyevent.StoryEvent
@@ -46,6 +43,19 @@ class `Story Event Steps` : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCreateStoryEventDialogHasBeenOpened()
                 .createStoryEventNamed(name, time)
+        }
+        When(
+            "I create a story event named {string} {} the {story event}"
+        ) { name: String, placement: String, relativeStoryEvent: StoryEvent ->
+            val workBench = soyleStories.getAnyOpenWorkbenchOrError()
+            workBench
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(relativeStoryEvent)
+                .openCreateRelativeStoryEventDialog(placement = placement)
+
+            workBench
+                .getOpenCreateStoryEventDialogOrError()
+                .createStoryEventNamed(name)
         }
     }
 

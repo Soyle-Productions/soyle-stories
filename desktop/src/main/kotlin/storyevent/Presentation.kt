@@ -12,8 +12,17 @@ object Presentation {
 
     init {
         scoped<ProjectScope> {
-            provide { CreateStoryEventForm(get()) }
-            provide { StoryEventListTool(Project.Id(projectId), { get() }, get(), get<StoryEventCreatedNotifier>()) }
+            provide {
+                StoryEventListTool(
+                    projectId = Project.Id(projectId),
+                    createStoryEventFormFactory = { CreateStoryEventScope(it, this).get() },
+                    listStoryEventsInProject = get(),
+                    storyEventCreated = get<StoryEventCreatedNotifier>()
+                )
+            }
+        }
+        scoped<CreateStoryEventScope> {
+            provide<CreateStoryEventForm> { createStoryEventForm }
         }
     }
 

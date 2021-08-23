@@ -33,32 +33,12 @@ interface CreateStoryEventController {
                 )
             }
 
-            override fun createStoryEventBefore(name: NonBlankString, relativeStoryEventId: String) {
+            override fun createStoryEvent(name: NonBlankString, relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative): Job {
                 val request = CreateStoryEvent.RequestModel(
                     name, projectId,
-                    CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(
-                        StoryEvent.Id(
-                            UUID.fromString(
-                                relativeStoryEventId
-                            )
-                        ), -1
-                    )
+                    relativeTo
                 )
-                createStoryEvent(request)
-            }
-
-            override fun createStoryEventAfter(name: NonBlankString, relativeStoryEventId: String) {
-                val request = CreateStoryEvent.RequestModel(
-                    name, projectId,
-                    CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(
-                        StoryEvent.Id(
-                            UUID.fromString(
-                                relativeStoryEventId
-                            )
-                        ), +1
-                    )
-                )
-                createStoryEvent(request)
+                return createStoryEvent(request)
             }
 
             private fun createStoryEvent(request: CreateStoryEvent.RequestModel): Job {
@@ -73,8 +53,6 @@ interface CreateStoryEventController {
 
     fun createStoryEvent(name: NonBlankString, timeUnit: Long): Job
 
-    fun createStoryEventBefore(name: NonBlankString, relativeStoryEventId: String)
-
-    fun createStoryEventAfter(name: NonBlankString, relativeStoryEventId: String)
+    fun createStoryEvent(name: NonBlankString, relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative): Job
 
 }

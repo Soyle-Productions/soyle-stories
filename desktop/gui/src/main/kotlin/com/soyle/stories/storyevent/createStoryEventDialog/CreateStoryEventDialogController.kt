@@ -12,12 +12,12 @@ class CreateStoryEventDialogController(
 		presenter.displayCreateStoryEventDialog()
 	}
 
-	override fun createStoryEvent(name: NonBlankString, relativeStoryEventId: String?, relativePosition: String?) {
+	override fun createStoryEvent(name: NonBlankString, relativeStoryEventId: String?, relativePosition: String?) {/*
 		when (relativePosition) {
 			"before" -> createStoryEventController.createStoryEventBefore(name, relativeStoryEventId!!)
 			"after" -> createStoryEventController.createStoryEventAfter(name, relativeStoryEventId!!)
 			null -> createStoryEventController.createStoryEvent(name)
-		}
+		}*/
 	}
 
 }

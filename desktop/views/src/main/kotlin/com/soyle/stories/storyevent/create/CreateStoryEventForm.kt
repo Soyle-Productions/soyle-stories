@@ -1,6 +1,8 @@
 package com.soyle.stories.storyevent.create
 
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import javafx.application.Platform
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -15,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import tornadofx.*
 
 class CreateStoryEventForm(
+    private val relativePlacement: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative?,
     private val createStoryEventController: CreateStoryEventController
 ) {
 
@@ -86,8 +89,11 @@ class CreateStoryEventForm(
 
     private fun createStoryEventJob(name: NonBlankString, time: Long?): Job
     {
-        return if (time == null) createStoryEventController.createStoryEvent(name)
-        else createStoryEventController.createStoryEvent(name, time)
+        return when {
+            relativePlacement != null -> createStoryEventController.createStoryEvent(name, relativePlacement)
+            time == null -> createStoryEventController.createStoryEvent(name)
+            else -> createStoryEventController.createStoryEvent(name, time)
+        }
     }
 
     private fun completeSubmission(potentialFailure: Throwable?) {
@@ -104,7 +110,7 @@ class CreateStoryEventForm(
 
     val root: Node = Pane().apply {
         add(nameInput)
-        add(timeInput)
+        if (relativePlacement == null) add(timeInput)
         add(submitButton)
         add(cancelButton)
     }

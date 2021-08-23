@@ -70,6 +70,7 @@ dependencies {
     testImplementation( Libraries.kotlin.reflection)
     testImplementation( Libraries.junit.api)
     testImplementation( Libraries.junit.engine)
+    testImplementation( Libraries.junit.params)
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
     testImplementation(Libraries.kotlin.coroutines.test)
     testImplementation(testFixtures(project(":desktop:adapters")))
