@@ -7,8 +7,12 @@ import com.soyle.stories.desktop.config.drivers.storyevent.givenCreateStoryEvent
 import com.soyle.stories.desktop.config.drivers.storyevent.givenStoryEventListToolHasBeenOpened
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.storyevent.list.`Story Event List Tool Assertions`.Companion.assertThis
+import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.validation.NonBlankString
+import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import org.junit.jupiter.api.fail
+import org.testfx.assertions.api.Assertions.assertThat
 
 class `Story Event Steps` : En {
 
@@ -22,7 +26,14 @@ class `Story Event Steps` : En {
         get() = `Story Event Robot`(soyleStories.getAnyOpenWorkbenchOrError())
 
     private fun givens() {
-
+        Given("I have created a story event named {string} at time {int}") { name: String, time: Int ->
+            storyEvents.givenStoryEventExists(withName = NonBlankString.create(name)!!, atTime = time)
+        }
+        Given("I have created the following story events") { data: DataTable ->
+            data.asLists().drop(1).forEach { (name, time) ->
+                storyEvents.givenStoryEventExists(withName = NonBlankString.create(name)!!, atTime = time.toInt())
+            }
+        }
     }
 
     private fun whens() {
@@ -42,6 +53,15 @@ class `Story Event Steps` : En {
         Then("a story event named {string} should have been created") { expectedName: String ->
             val storyEvent = storyEvents.getStoryEventByName(expectedName)
                 ?: fail("Story event named \"$expectedName\" was not created")
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .assertThis {
+                    hasStoryEvent(storyEvent)
+                }
+        }
+        Then("the {story event} should be at time {int}") { storyEvent: StoryEvent, expectedTime: Int ->
+            assertThat(storyEvent.time.toInt()).isEqualTo(expectedTime)
 
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenStoryEventListToolHasBeenOpened()

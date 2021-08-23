@@ -6,6 +6,7 @@ import com.soyle.stories.desktop.config.drivers.location.LocationDriver
 import com.soyle.stories.desktop.config.drivers.scene.SceneDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransformer
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
+import com.soyle.stories.desktop.config.drivers.storyevent.`Story Event Robot`
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
 import com.soyle.stories.desktop.config.locale.LocaleHolder
 import com.soyle.stories.desktop.config.soylestories.configureLocalization
@@ -17,6 +18,7 @@ import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArcTemplate
 import com.soyle.stories.domain.character.CharacterArcTemplateSection
 import com.soyle.stories.domain.location.Location
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
@@ -103,6 +105,9 @@ class GlobalHooks : En {
         }
         ParameterType<com.soyle.stories.domain.scene.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { name: String ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).getSceneByNameOrError(name)
+        }
+        ParameterType<StoryEvent>("story event", "story event \"(.*?)\"|\"(.*?)\" story event") { name: String ->
+            `Story Event Robot`(soyleStories.getAnyOpenWorkbenchOrError()).getStoryEventByName(name)
         }
         ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { name: String ->
             CharacterArcTemplate.default().sections.single { it.name == name }
