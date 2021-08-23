@@ -1,8 +1,11 @@
 package com.soyle.stories.storyevent.list.creationButton
 
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.storyevent.create.CreateStoryEventForm
+import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.ListStoryEventsController
 import com.soyle.stories.usecase.storyevent.StoryEventItem
@@ -24,26 +27,28 @@ import tornadofx.*
 class StoryEventListTool(
     private val projectId: Project.Id,
     private val createStoryEventFormFactory: () -> CreateStoryEventForm,
-    private val listStoryEventsInProject: ListStoryEventsController
+    private val listStoryEventsInProject: ListStoryEventsController,
+
+    // events
+    storyEventCreated: Notifier<StoryEventCreatedReceiver>
 ) {
 
     private sealed class State {
-        abstract fun render(): List<Node>
+        open fun render(): List<Node> = emptyList()
+        open fun addStoryEvent(storyEventItem: StoryEventItem): State = this
     }
-    private inner class Uninitialized : State() {
-        override fun render(): List<Node> = emptyList()
-    }
-    private inner class Loading : State() {
-        override fun render(): List<Node> = emptyList()
-    }
+    private inner class Uninitialized : State()
+    private inner class Loading : State()
     private inner class FailedToLoad : State() {
         override fun render(): List<Node> = listOf(retryButton)
     }
     private inner class Empty : State() {
         override fun render(): List<Node> = listOf(createStoryEventButton)
+        override fun addStoryEvent(storyEventItem: StoryEventItem): State = Populated(listOf(storyEventItem))
     }
     private inner class Populated(val items: List<StoryEventItem>) : State() {
         override fun render(): List<Node> = listOf(createStoryEventButton, storyEventList(items))
+        override fun addStoryEvent(storyEventItem: StoryEventItem): State = Populated(items + storyEventItem)
     }
 
     private val state = objectProperty<State>(Uninitialized())
@@ -61,7 +66,7 @@ class StoryEventListTool(
         action(::loadStoryEvents)
     }
     private val storyEventList = ListView<StoryEventListItemViewModel>().apply {
-        setCellFactory { Cell() }
+        cellFormat { text = it.name }
         vgrow = Priority.ALWAYS
     }
     private fun storyEventList(items: List<StoryEventItem>): Node {
@@ -90,7 +95,10 @@ class StoryEventListTool(
         }
     }
 
+    private val eventReceiver = EventReceiver()
+
     init {
+        storyEventCreated.addListener(eventReceiver)
         state.onChangeWithCurrent {
             runLater {
                 _root.children.setAll(it!!.render())
@@ -103,6 +111,13 @@ class StoryEventListTool(
         override fun updateItem(item: StoryEventListItemViewModel?, empty: Boolean) {
             super.updateItem(item, empty)
             text = item?.name ?: ""
+        }
+    }
+
+    private inner class EventReceiver : StoryEventCreatedReceiver {
+        override suspend fun receiveStoryEventCreated(event: StoryEventCreated) {
+            val newItem = StoryEventItem(event.storyEventId.uuid, event.name, event.time.toInt())
+            state.set(state.value.addStoryEvent(newItem))
         }
     }
 

@@ -1,13 +1,21 @@
 package com.soyle.stories.desktop.view.storyevent.list
 
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.cells
 import com.soyle.stories.desktop.adapter.storyevent.create.CreateStoryEventControllerDouble
 import com.soyle.stories.desktop.adapter.storyevent.list.ListStoryEventsControllerDouble
 import com.soyle.stories.desktop.view.runHeadless
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.access
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.drive
+import com.soyle.stories.desktop.view.storyevent.list.`Story Event List Tool Assertions`.Companion.assertThis
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.StoryEventUpdate
+import com.soyle.stories.domain.storyevent.Successful
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.storyevent.create.CreateStoryEventForm
+import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.list.ListStoryEventsController
 import com.soyle.stories.storyevent.list.creationButton.StoryEventListTool
 import com.soyle.stories.usecase.storyevent.StoryEventItem
@@ -17,10 +25,7 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.stage.FileChooser
 import javafx.stage.Stage
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import org.assertj.core.internal.bytebuddy.implementation.bytecode.Throw
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -54,6 +59,8 @@ class `Story Event List Tool Test` : FxRobot() {
         output.receiveListAllStoryEventsResponse(response)
     })
 
+    private val storyEventCreatedNotifier = StoryEventCreatedNotifier()
+
     private val projectId = Project.Id()
     private val tool by lazy {
         interact {
@@ -65,7 +72,7 @@ class `Story Event List Tool Test` : FxRobot() {
                 } else handler.uncaughtException(thread, throwable)
             }
         }
-        StoryEventListTool(projectId, createStoryEventFormFactory, listStoryEventsController)
+        StoryEventListTool(projectId, createStoryEventFormFactory, listStoryEventsController, storyEventCreatedNotifier)
     }
 
     private fun awaitToolInitialization() {
@@ -296,6 +303,33 @@ class `Story Event List Tool Test` : FxRobot() {
                 .filterNot { it == primaryStage }
                 .filter { it.scene.root == createStoryEventForm.root }
                 .single { it.isShowing }
+        }
+
+    }
+
+    @Nested
+    inner class `When New Story Event is created` {
+
+        private val newStoryEvent: StoryEvent
+        private val storyEventCreated: StoryEventCreated
+
+        init {
+            StoryEvent.create(NonBlankString.create(("Frank dies"))!!, 0L, projectId).also {
+                newStoryEvent = it.storyEvent
+                storyEventCreated = (it as Successful).change
+            }
+            awaitToolInitialization()
+        }
+
+        @Test
+        fun `should display new story event`() {
+            runBlocking {
+                storyEventCreatedNotifier.receiveStoryEventCreated(storyEventCreated)
+            }
+            interact {}
+            interact {}
+            interact {}
+            tool.assertThis { hasStoryEvent(newStoryEvent) }
         }
 
     }
