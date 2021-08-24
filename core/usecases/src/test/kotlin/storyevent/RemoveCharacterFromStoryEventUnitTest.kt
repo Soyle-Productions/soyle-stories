@@ -3,6 +3,7 @@ package com.soyle.stories.usecase.storyevent
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.storyEventName
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventUseCase
@@ -98,7 +99,7 @@ class RemoveCharacterFromStoryEventUnitTest {
 		{
 			return StoryEventRepositoryDouble(
 			  initialStoryEvents = storyEventIds.map { (it, characterIds) ->
-				  StoryEvent(StoryEvent.Id(it), "", 0, Project.Id(), null, null, null, characterIds.map(Character::Id))
+				  StoryEvent(StoryEvent.Id(it), storyEventName(), 0, Project.Id(), null, null, null, characterIds.map(Character::Id))
 			  },
 			  onUpdateStoryEvent = { update = it }
 			)

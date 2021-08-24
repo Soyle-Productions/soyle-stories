@@ -7,6 +7,7 @@ import com.soyle.stories.domain.scene.SceneLocaleDouble
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.storyevent.storyEventName
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
@@ -162,7 +163,7 @@ class CreateNewSceneUnitTest {
 		if (storyEventWithId != null) {
 			runBlocking {
 				storyEventRepository.addNewStoryEvent(
-				  StoryEvent(StoryEvent.Id(storyEventWithId), "", 0L, projectId, null, null, null, emptyList())
+				  StoryEvent(StoryEvent.Id(storyEventWithId), storyEventName(), 0L, projectId, null, null, null, emptyList())
 				)
 			}
 		}
@@ -181,7 +182,7 @@ class CreateNewSceneUnitTest {
 
 				if (storyEventRepository.getStoryEventById(StoryEvent.Id(storyEventId)) == null) {
 					storyEventRepository.addNewStoryEvent(
-					  StoryEvent(StoryEvent.Id(storyEventId), "", 0L, projectId, null, null, null, emptyList())
+					  StoryEvent(StoryEvent.Id(storyEventId), storyEventName(), 0L, projectId, null, null, null, emptyList())
 					)
 				}
 			}
@@ -200,7 +201,7 @@ class CreateNewSceneUnitTest {
 		val useCase: CreateNewScene = CreateNewSceneUseCase(projectId.uuid, sceneRepository, storyEventRepository, proseRepository, object : CreateStoryEvent {
 			override suspend fun invoke(request: CreateStoryEvent.RequestModel, output: CreateStoryEvent.OutputPort) {
 				createStoryEventRequest = request
-				val newStoryEvent = StoryEvent(request.name.value, request.projectId)
+				val newStoryEvent = StoryEvent(request.name, request.projectId)
 				storyEventRepository.addNewStoryEvent(newStoryEvent)
 				output.receiveCreateStoryEventResponse(CreateStoryEvent.ResponseModel(
 					StoryEventCreated(newStoryEvent.id, request.name.value, 0L, request.projectId)

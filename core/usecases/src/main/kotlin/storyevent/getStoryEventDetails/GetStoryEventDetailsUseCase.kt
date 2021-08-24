@@ -24,7 +24,7 @@ class GetStoryEventDetailsUseCase(
 	private fun responseModel(storyEvent: StoryEvent) =
 		GetStoryEventDetails.ResponseModel(
 			storyEvent.id.uuid,
-			storyEvent.name,
+			storyEvent.name.value,
             storyEvent.linkedLocationId?.uuid,
 			storyEvent.includedCharacterIds.map(Character.Id::uuid)
 		)

@@ -8,6 +8,7 @@ import com.soyle.stories.usecase.character.CharacterRepository
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.storyEventName
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetails
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetailsUseCase
@@ -101,7 +102,7 @@ class GetStoryEventDetailsUnitTest {
 			return StoryEventRepositoryDouble(
 			  initialStoryEvents = storyEventIds.map { (it, links) ->
 				  val (location, characterIds) = links
-				  StoryEvent(StoryEvent.Id(it), storyEventName, 0, Project.Id(), null, null, location?.let(Location::Id), characterIds.map(Character::Id))
+				  StoryEvent(StoryEvent.Id(it), storyEventName(), 0, Project.Id(), null, null, location?.let(Location::Id), characterIds.map(Character::Id))
 			  },
 			  onUpdateStoryEvent = { update = it }
 			)
