@@ -11,6 +11,6 @@ interface RenameStoryEvent {
 	class ResponseModel(val storyEventRenamed: StoryEventRenamed)
 
 	fun interface OutputPort {
-		fun receiveRenameStoryEventResponse(response: ResponseModel)
+		suspend fun receiveRenameStoryEventResponse(response: ResponseModel)
 	}
 }
