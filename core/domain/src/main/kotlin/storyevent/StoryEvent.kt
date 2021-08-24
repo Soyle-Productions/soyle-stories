@@ -5,12 +5,13 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.events.StoryEventChange
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*
 
 class StoryEvent(
     val id: Id,
-    val name: String,
+    val name: NonBlankString,
     val time: Long,
     val projectId: Project.Id,
     val previousStoryEventId: Id?,
@@ -21,7 +22,7 @@ class StoryEvent(
 
     companion object {
         fun create(name: NonBlankString, time: Long, projectId: Project.Id): StoryEventUpdate<StoryEventCreated> {
-            val storyEvent = StoryEvent(Id(), name.value, time, projectId, null, null, null, listOf())
+            val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, listOf())
             val change = StoryEventCreated(storyEvent.id, name.value, time, projectId)
             return Successful(storyEvent, change)
         }
@@ -39,10 +40,10 @@ class StoryEvent(
             )
     }
 
-    constructor(name: String, projectId: Project.Id) : this(Id(), name, 0L, projectId, null, null, null, emptyList())
+    constructor(name: NonBlankString, projectId: Project.Id) : this(Id(), name, 0L, projectId, null, null, null, emptyList())
 
     private fun copy(
-        name: String = this.name,
+        name: NonBlankString = this.name,
         time: Long = this.time,
         previousStoryEventId: Id? = this.previousStoryEventId,
         nextStoryEventId: Id? = this.nextStoryEventId,
@@ -51,7 +52,10 @@ class StoryEvent(
     ) = StoryEvent(id, name, time, projectId, previousStoryEventId, nextStoryEventId, linkedLocationId, includedCharacterIds)
 
 
-    fun withName(newName: String) = copy(name = newName)
+    fun withName(newName: NonBlankString): StoryEventUpdate<StoryEventRenamed> {
+        if (newName == name) return noUpdate()
+        return Successful(copy(name = newName), StoryEventRenamed(id, newName.value))
+    }
     fun withPreviousId(storyEventId: Id?) = copy(previousStoryEventId = storyEventId)
     fun withNextId(storyEventId: Id?) = copy(nextStoryEventId = storyEventId)
     fun withLocationId(locationId: Location.Id?) = copy(linkedLocationId = locationId)
@@ -85,5 +89,7 @@ class StoryEvent(
     data class Id(val uuid: UUID = UUID.randomUUID()) {
         override fun toString(): String = "StoryEvent($uuid)"
     }
+
+    inline fun noUpdate() = UnSuccessful(this)
 
 }

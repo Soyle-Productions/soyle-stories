@@ -2,7 +2,7 @@ package com.soyle.stories.domain.storyevent
 
 import com.soyle.stories.domain.storyevent.events.StoryEventChange
 
-sealed class StoryEventUpdate<E : StoryEventChange>() {
+sealed class StoryEventUpdate<out E : StoryEventChange>() {
 
     abstract val storyEvent: StoryEvent
     operator fun component1() = storyEvent

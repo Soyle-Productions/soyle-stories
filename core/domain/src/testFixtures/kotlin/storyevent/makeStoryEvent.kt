@@ -9,7 +9,7 @@ import com.soyle.stories.domain.validation.NonBlankString
 
 fun makeStoryEvent(
     id: StoryEvent.Id = StoryEvent.Id(),
-    name: String = storyEventName().value,
+    name: NonBlankString = storyEventName(),
     time: Long = storyEventTime(),
     projectId: Project.Id = Project.Id(),
     previousStoryEventId: StoryEvent.Id? = null,
