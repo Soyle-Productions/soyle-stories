@@ -1,17 +1,16 @@
 package com.soyle.stories.desktop.view.storyevent.list
 
 import com.soyle.stories.desktop.view.common.NodeAccess
-import com.soyle.stories.layout.config.fixed.StoryEventList
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
-import com.soyle.stories.storyevent.list.creationButton.StoryEventListTool
+import com.soyle.stories.storyevent.list.StoryEventListToolView
 import javafx.scene.Node
 import javafx.scene.control.*
 import tornadofx.Stylesheet
 
-class StoryEventListToolAccess private constructor(private val tool: StoryEventListTool) : NodeAccess<Node>(tool.root) {
+class StoryEventListToolAccess private constructor(private val tool: StoryEventListToolView) : NodeAccess<Node>(tool.root) {
     companion object {
-        fun StoryEventListTool.access() = StoryEventListToolAccess(this)
-        fun <T> StoryEventListTool.drive(op: StoryEventListToolAccess.() -> T): T
+        fun StoryEventListToolView.access() = StoryEventListToolAccess(this)
+        fun <T> StoryEventListToolView.drive(op: StoryEventListToolAccess.() -> T): T
         {
             var result: Result<T> = Result.failure(NotImplementedError())
             val access = access()
@@ -32,5 +31,6 @@ class StoryEventListToolAccess private constructor(private val tool: StoryEventL
     val optionsButton: MenuButton? by temporaryChild(Stylesheet.menuButton)
     fun MenuButton.insertNewStoryEventOption(placement: String): MenuItem? = items.find { it.id == "insert-story-event-$placement" }
         ?.takeIf { isDisable == false }
-
+    val MenuButton.renameOption: MenuItem?
+        get() = items.find { it.id == "rename" }?.takeIf { isDisable == false }
 }

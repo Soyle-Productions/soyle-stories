@@ -2,14 +2,12 @@ package com.soyle.stories.desktop.view.storyevent.list
 
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.access
 import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.storyevent.list.creationButton.StoryEventListTool
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.fail
-import tornadofx.Stylesheet.Companion.cell
+import com.soyle.stories.storyevent.list.StoryEventListToolView
+import org.junit.jupiter.api.Assertions.*
 
 class `Story Event List Tool Assertions` private constructor(private val access: StoryEventListToolAccess) {
     companion object {
-        fun StoryEventListTool.assertThis(op: `Story Event List Tool Assertions`.() -> Unit) {
+        fun StoryEventListToolView.assertThis(op: `Story Event List Tool Assertions`.() -> Unit) {
             `Story Event List Tool Assertions`(access()).op()
         }
     }
@@ -18,6 +16,11 @@ class `Story Event List Tool Assertions` private constructor(private val access:
         val item = access.storyEventItems.find { it.id == storyEvent.id.uuid.toString() }
             ?: fail("Story Event List does not have an item matching the id ${storyEvent.id}")
         assertEquals(storyEvent.name, item.name)
+    }
+
+    fun doesNotHaveStoryEventNamed(name: String) {
+        val item = access.storyEventItems.find { it.name == name }
+        assertNull(item)
     }
 
 }

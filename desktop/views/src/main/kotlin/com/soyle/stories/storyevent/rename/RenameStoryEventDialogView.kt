@@ -5,16 +5,20 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.scene.Node
+import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.TextField
 import javafx.scene.layout.Pane
+import javafx.stage.Stage
 import tornadofx.*
 
-class RenameStoryEventForm(
-    private val storyEventId: StoryEvent.Id,
-    currentName: String,
+class RenameStoryEventDialogView(
+    props: RenameStoryEventDialog.Props,
     private val renameStoryEventController: RenameStoryEventController
-) {
+) : View() {
+
+    private val storyEventId = props.storyEventId
 
     private val submitting = booleanProperty(false)
 
@@ -24,12 +28,12 @@ class RenameStoryEventForm(
         disableWhen(submitting)
     }
     private val nameInput = TextField().apply {
-        text = currentName
+        text = props.currentName
         disableWhen(submitting)
     }
     private val submitButton = Button().apply {
         addClass(Stylesheet.default)
-        enableWhen(nameIsValid(currentName).and(submitting.not()))
+        enableWhen(nameIsValid(props.currentName).and(submitting.not()))
         action(::submit)
     }
 
@@ -37,7 +41,7 @@ class RenameStoryEventForm(
         isNotEmpty.and(isNotEqualTo(currentName))
     }
 
-    val root: Node = Pane().apply {
+    override val root: Parent = Pane().apply {
         add(nameInput)
         add(submitButton)
         add(cancelButton)
@@ -75,6 +79,17 @@ class RenameStoryEventForm(
         submitting.set(false)
         if (failure == null) {
             isCompleted = true
+        }
+    }
+
+    init {
+        root.properties[UI_COMPONENT_PROPERTY] = this // because tornadofx doesn't do it without using its DI framework
+    }
+
+    init {
+        Stage().apply {
+            scene = Scene(root)
+            show()
         }
     }
 

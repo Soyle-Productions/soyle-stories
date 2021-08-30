@@ -1,8 +1,10 @@
 package com.soyle.stories.storyevent.storyEventList
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventController
+import com.soyle.stories.storyevent.rename.RenameStoryEventController
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
 import java.util.*
 
@@ -27,7 +29,7 @@ class StoryEventListController(
 		openToolController.openStoryEventDetailsTool(storyEventId)
 	}
 
-	override fun renameStoryEvent(storyEventId: String, newName: String) {
+	override fun renameStoryEvent(storyEventId: StoryEvent.Id, newName: NonBlankString) {
 		renameStoryEventController.renameStoryEvent(storyEventId, newName)
 	}
 

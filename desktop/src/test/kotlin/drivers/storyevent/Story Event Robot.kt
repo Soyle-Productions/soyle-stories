@@ -32,7 +32,7 @@ class `Story Event Robot` private constructor(private val projectScope: ProjectS
         val storyEventRepository = projectScope.get<StoryEventRepository>()
         val projectId = Project.Id(projectScope.projectId)
         val allStoryEvents = runBlocking { storyEventRepository.listStoryEventsInProject(projectId) }
-        val storyEvent = allStoryEvents.find { it.name == name }
+        val storyEvent = allStoryEvents.find { it.name.value == name }
         return storyEvent
     }
 

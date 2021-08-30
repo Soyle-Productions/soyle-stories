@@ -8,6 +8,7 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.fail
 import org.testfx.assertions.api.Assertions.assertThat
 
@@ -57,6 +58,17 @@ class `Story Event Steps` : En {
                 .getOpenCreateStoryEventDialogOrError()
                 .createStoryEventNamed(name)
         }
+        When("I rename the {story event} to {string}") { storyEvent: StoryEvent, newName: String ->
+            val workBench = soyleStories.getAnyOpenWorkbenchOrError()
+            workBench
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+                .openRenameStoryEventDialog()
+
+            workBench
+                .getOpenRenameStoryEventDialogOrError()
+                .renameStoryEvent(newName)
+        }
     }
 
     private fun thens() {
@@ -77,6 +89,15 @@ class `Story Event Steps` : En {
                 .givenStoryEventListToolHasBeenOpened()
                 .assertThis {
                     hasStoryEvent(storyEvent)
+                }
+        }
+        Then("there should not be a story event named {string}") { nameThatShouldNotExist: String ->
+            assertNull(storyEvents.getStoryEventByName(nameThatShouldNotExist))
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .assertThis {
+                    doesNotHaveStoryEventNamed(nameThatShouldNotExist)
                 }
         }
     }

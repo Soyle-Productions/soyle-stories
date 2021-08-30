@@ -10,7 +10,6 @@ import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.Include
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneControllerImpl
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.*
 import com.soyle.stories.storyevent.create.CreateStoryEventController
-import com.soyle.stories.storyevent.create.CreateStoryEventOutput
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogController
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogModel
@@ -22,9 +21,8 @@ import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStory
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventController
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
 import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventNotifier
-import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventController
-import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventControllerImpl
-import com.soyle.stories.storyevent.renameStoryEvent.RenameStoryEventNotifier
+import com.soyle.stories.storyevent.rename.RenameStoryEventController
+import com.soyle.stories.storyevent.rename.RenameStoryEventOutput
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventUseCase
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
@@ -33,19 +31,14 @@ import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDe
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetailsUseCase
 import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEvent
 import com.soyle.stories.usecase.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventUseCase
-import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
-import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEventsUseCase
 import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventUseCase
-import com.soyle.stories.usecase.storyevent.renameStoryEvent.RenameStoryEvent
-import com.soyle.stories.usecase.storyevent.renameStoryEvent.RenameStoryEventUseCase
+import com.soyle.stories.usecase.storyevent.rename.RenameStoryEvent
+import com.soyle.stories.usecase.storyevent.rename.RenameStoryEventUseCase
 
 object StoryEventModule {
 
 	private fun InScope<ProjectScope>.usecases() {
-		provide<CreateStoryEvent> {
-			CreateStoryEventUseCase(get())
-		}
 		provide<LinkLocationToStoryEvent> {
 			LinkLocationToStoryEventUseCase(get(), get())
 		}
@@ -57,9 +50,6 @@ object StoryEventModule {
 		}
 		provide<RemoveCharacterFromStoryEvent> {
 			RemoveCharacterFromStoryEventUseCase(get())
-		}
-		provide<RenameStoryEvent> {
-			RenameStoryEventUseCase(get())
 		}
 	}
 
@@ -81,7 +71,7 @@ object StoryEventModule {
 			}
 		}
 		provide(RenameStoryEvent.OutputPort::class) {
-			RenameStoryEventNotifier(applicationScope.get())
+			RenameStoryEventOutput(applicationScope.get())
 		}
 	}
 
@@ -113,14 +103,6 @@ object StoryEventModule {
 
 		provide(RemoveCharacterFromStoryEventController::class) {
 			RemoveCharacterFromStoryEventControllerImpl(
-			  applicationScope.get(),
-			  get(),
-			  get()
-			)
-		}
-
-		provide<RenameStoryEventController> {
-			RenameStoryEventControllerImpl(
 			  applicationScope.get(),
 			  get(),
 			  get()

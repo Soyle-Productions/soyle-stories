@@ -6,26 +6,30 @@ import com.soyle.stories.desktop.view.storyevent.rename.`Rename Story Event Dial
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.storyevent.rename.RenameStoryEventController
-import com.soyle.stories.storyevent.rename.RenameStoryEventForm
+import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
+import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.testfx.api.FxRobot
 import org.testfx.api.FxToolkit
 import org.testfx.assertions.api.Assertions.assertThat
 
-class `Rename Story Event Form Test` : FxRobot() {
-
-    init {
-        runHeadless()
+class `Rename Story Event Dialog Test` : FxRobot() {
+    companion object {
+        private val primaryStage by lazy { FxToolkit.registerPrimaryStage() }
+        @JvmStatic
+        @BeforeAll
+        fun `setup toolkit`() {
+            runHeadless()
+            primaryStage // initialize primary stage
+        }
     }
 
-    private val primaryStage = FxToolkit.registerPrimaryStage()
-
-    private val storyEventId = StoryEvent.Id()
-    private val currentName = "Current Story Event Name"
+    private val props = RenameStoryEventDialog.Props(StoryEvent.Id(), "Current Story Event Name")
 
     private var requestedStoryEvent: StoryEvent.Id? = null
     private var requestedName: String? = null
@@ -47,11 +51,15 @@ class `Rename Story Event Form Test` : FxRobot() {
         }
     }
 
-    private val form = RenameStoryEventForm(storyEventId, currentName, renameStoryEventController)
+    private val form = run {
+        var view: RenameStoryEventDialogView? = null
+        interact { view =  RenameStoryEventDialogView(props, renameStoryEventController) }
+        view!!
+    }
 
     @Test
     fun `name input should contain current name`() {
-        assertThat(form.access().nameInput).hasText(currentName)
+        assertThat(form.access().nameInput).hasText(props.currentName)
     }
 
     @Test
@@ -99,7 +107,7 @@ class `Rename Story Event Form Test` : FxRobot() {
         @Test
         fun `submit button should be disabled if name returns to current name`() {
             form.drive { nameInput.text = "New Name" }
-            form.drive { nameInput.text = currentName }
+            form.drive { nameInput.text = props.currentName }
             assertThat(form.access().submitButton).isDisabled
         }
 
@@ -123,7 +131,7 @@ class `Rename Story Event Form Test` : FxRobot() {
         @Test
         fun `should request rename with input values`() {
             form.drive { submitButton.fire() }
-            assertThat(requestedStoryEvent).isEqualTo(storyEventId)
+            assertThat(requestedStoryEvent).isEqualTo(props.storyEventId)
             assertThat(requestedName).isEqualTo("New Name")
         }
 
@@ -172,7 +180,7 @@ class `Rename Story Event Form Test` : FxRobot() {
         @Test
         fun `should notify listener of completion`() {
             renameStoryEventController.completion.complete()
-            runBlocking(Dispatchers.Main) {
+            runBlocking {
                 assertTrue(completed)
             }
         }

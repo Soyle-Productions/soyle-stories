@@ -1,8 +1,6 @@
 package com.soyle.stories.desktop.view.storyevent.list
 
-import com.soyle.stories.common.Notifier
-import com.soyle.stories.common.cells
-import com.soyle.stories.desktop.adapter.storyevent.create.CreateStoryEventControllerDouble
+import com.soyle.stories.desktop.adapter.storyevent.RenameStoryEventControllerDouble
 import com.soyle.stories.desktop.adapter.storyevent.list.ListStoryEventsControllerDouble
 import com.soyle.stories.desktop.view.runHeadless
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.access
@@ -10,61 +8,86 @@ import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.C
 import com.soyle.stories.desktop.view.storyevent.list.`Story Event List Tool Assertions`.Companion.assertThis
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.domain.storyevent.StoryEventUpdate
 import com.soyle.stories.domain.storyevent.Successful
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.storyevent.create.CreateStoryEventForm
+import com.soyle.stories.storyevent.create.CreateStoryEventDialog
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
-import com.soyle.stories.storyevent.list.ListStoryEventsController
-import com.soyle.stories.storyevent.list.creationButton.StoryEventListTool
+import com.soyle.stories.storyevent.list.StoryEventListToolView
+import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
+import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
+import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.usecase.storyevent.StoryEventItem
-import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
-import javafx.application.Application
 import javafx.scene.Parent
 import javafx.scene.Scene
-import javafx.stage.FileChooser
+import javafx.scene.layout.Pane
 import javafx.stage.Stage
 import kotlinx.coroutines.*
-import org.assertj.core.internal.bytebuddy.implementation.bytecode.Throw
+import kotlinx.coroutines.javafx.JavaFx
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.testfx.api.FxRobot
 import org.testfx.api.FxToolkit
 import org.testfx.assertions.api.Assertions.assertThat
+import org.testfx.util.WaitForAsyncUtils
+import tornadofx.UIComponent
+import tornadofx.runLater
 import java.util.*
-import java.util.concurrent.TimeUnit
 
-@Timeout(10L, unit = TimeUnit.SECONDS)
 class `Story Event List Tool Test` : FxRobot() {
 
-    init {
-        runHeadless()
+    companion object {
+
+        private val expectedFailure = Exception("Intentional Failure")
+
+        lateinit var primaryStage: Stage
+
+        @JvmStatic
+        @BeforeAll
+        fun `setup toolkit`() {
+            runHeadless()
+            primaryStage = FxToolkit.registerPrimaryStage()
+            WaitForAsyncUtils.waitFor(WaitForAsyncUtils.asyncFx {
+                val handler = Thread.currentThread().uncaughtExceptionHandler
+                Thread.currentThread().uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { thread, throwable ->
+                    if (throwable == expectedFailure) { println("Expected error received: $throwable")
+                    } else handler.uncaughtException(thread, throwable)
+                }
+            })
+            WaitForAsyncUtils.waitForFxEvents()
+        }
     }
 
-    private val primaryStage = FxToolkit.registerPrimaryStage()
-    init {
-        interact { primaryStage.show() }
+    // given
+    private val projectId = Project.Id()
+
+    // setup
+    private var createStoryEventProps: CreateStoryEventDialog.Props? = null
+    private val createStoryEventDialog = object : CreateStoryEventDialog {
+        override fun invoke(props: CreateStoryEventDialog.Props): UIComponent {
+            createStoryEventProps = props
+            return object : UIComponent() {
+                override val root: Parent = Pane()
+            }
+        }
     }
 
-    @AfterEach
-    fun `close opened dialogs`() {
-        val openDialogs = listTargetWindows().asSequence()
-            .filterNot { it == primaryStage }
-            .filter { it.scene.root == createStoryEventForm.root }
-            .filter { it.isShowing }
-        interact { openDialogs.forEach { it.hide() } }
+    private var renameStoryEventDialogProps: RenameStoryEventDialog.Props? = null
+    private val renameStoryEventForm by lazy {
+        RenameStoryEventDialogView(
+            renameStoryEventDialogProps!!,
+            RenameStoryEventControllerDouble()
+        )
     }
-
-    private val createStoryEventForm = CreateStoryEventForm(null, CreateStoryEventControllerDouble())
-    private var createStoryEventFormRelativeRequest: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? = null
-    private val createStoryEventFormFactory = { relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? ->
-        createStoryEventFormRelativeRequest = relativeTo
-        createStoryEventForm
+    private val renameStoryEventDialog = RenameStoryEventDialog {
+        renameStoryEventDialogProps = it
+        object : UIComponent() {
+            override val root: Parent = Pane()
+        }
     }
 
     private var requestedProjectId: Project.Id? = null
@@ -75,36 +98,29 @@ class `Story Event List Tool Test` : FxRobot() {
     })
 
     private val storyEventCreatedNotifier = StoryEventCreatedNotifier()
+    private val storyEventRenamedNotifier = StoryEventRenamedNotifier()
 
-    private val projectId = Project.Id()
+    // tool under test
     private val tool by lazy {
-        interact {
-            val handler = Thread.currentThread().uncaughtExceptionHandler
-            Thread.currentThread().uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { thread, throwable ->
-                val temp = listStoryEventsController
-                val expected = temp.shouldFailWith
-                if (throwable == expected) { /* fine */
-                } else handler.uncaughtException(thread, throwable)
-            }
-        }
-        StoryEventListTool(projectId, createStoryEventFormFactory, listStoryEventsController, storyEventCreatedNotifier)
+        StoryEventListToolView(
+            projectId,
+            createStoryEventDialog,
+            renameStoryEventDialog,
+            listStoryEventsController,
+            storyEventCreatedNotifier,
+            storyEventRenamedNotifier
+        )
+    }
+
+    init {
+        interact { primaryStage.show() }
     }
 
     private fun awaitToolInitialization() {
         tool
         interact {
-            primaryStage.scene = Scene(tool.root as Parent)
+            primaryStage.scene = Scene(tool.root)
         }
-    }
-
-    @Test
-    fun `should not open create story event dialog immediately`() {
-        awaitToolInitialization()
-        listTargetWindows().asSequence()
-            .filterNot { it == primaryStage }
-            .filter { it.scene.root == createStoryEventForm.root }
-            .none { it.isShowing }
-            .let(::assertTrue)
     }
 
     @Nested
@@ -120,7 +136,7 @@ class `Story Event List Tool Test` : FxRobot() {
         inner class `If failed` {
 
             init {
-                listStoryEventsController.failWhenCalled()
+                listStoryEventsController.failWhenCalled(expectedFailure)
             }
 
             @Test
@@ -173,7 +189,7 @@ class `Story Event List Tool Test` : FxRobot() {
                 inner class `Another failure` {
 
                     init {
-                        listStoryEventsController.failWhenCalled()
+                        listStoryEventsController.failWhenCalled(expectedFailure)
                     }
 
                     @Test
@@ -281,20 +297,25 @@ class `Story Event List Tool Test` : FxRobot() {
                 @Test
                 fun `should show all resulting story events`() {
                     awaitToolInitialization()
-                    assertThat(tool.access().storyEventItems.map { it.id }).isEqualTo(listOf(
-                        "33a14d76-dab1-4277-87c8-7d46b13a178d",
-                        "6c3d08f7-a46f-4d1d-9013-d8c45364d7f5",
-                        "254a75e5-4cd4-4257-a24d-c733101946f6",
-                        "d642b5a2-5bd2-43c2-8cf7-d87c49166d66",
-                        "d7f12ca3-d0ba-4b16-a5e2-b315d6b28a57"
-                    ))
-                    assertThat(tool.access().storyEventListCells.map { it.text }.take(5)).isEqualTo(listOf(
-                        "e4448d63-ad47-43ae-9911-12255ad5ace9",
-                        "70856ee7-16d0-408c-a2a6-9fec24813924",
-                        "8df48034-9b46-4a1b-9b90-6d466000b491",
-                        "f6d436cb-5d37-4bf8-9273-29ee75854b1f",
-                        "394b8867-b7b5-4c39-8fe7-7b0fa45bf78c"
-                    ))
+                    interact {}
+                    assertThat(tool.access().storyEventItems.map { it.id }).isEqualTo(
+                        listOf(
+                            "33a14d76-dab1-4277-87c8-7d46b13a178d",
+                            "6c3d08f7-a46f-4d1d-9013-d8c45364d7f5",
+                            "254a75e5-4cd4-4257-a24d-c733101946f6",
+                            "d642b5a2-5bd2-43c2-8cf7-d87c49166d66",
+                            "d7f12ca3-d0ba-4b16-a5e2-b315d6b28a57"
+                        )
+                    )
+                    assertThat(tool.access().storyEventListCells.map { it.text }.take(5)).isEqualTo(
+                        listOf(
+                            "e4448d63-ad47-43ae-9911-12255ad5ace9",
+                            "70856ee7-16d0-408c-a2a6-9fec24813924",
+                            "8df48034-9b46-4a1b-9b90-6d466000b491",
+                            "f6d436cb-5d37-4bf8-9273-29ee75854b1f",
+                            "394b8867-b7b5-4c39-8fe7-7b0fa45bf78c"
+                        )
+                    )
                 }
             }
 
@@ -314,10 +335,7 @@ class `Story Event List Tool Test` : FxRobot() {
 
         @Test
         fun `should open create story event dialog`() {
-            listTargetWindows().asSequence()
-                .filterNot { it == primaryStage }
-                .filter { it.scene.root == createStoryEventForm.root }
-                .single { it.isShowing }
+            createStoryEventProps!!
         }
 
     }
@@ -341,8 +359,6 @@ class `Story Event List Tool Test` : FxRobot() {
             runBlocking {
                 storyEventCreatedNotifier.receiveStoryEventCreated(storyEventCreated)
             }
-            interact {}
-            interact {}
             interact {}
             tool.assertThis { hasStoryEvent(newStoryEvent) }
         }
@@ -402,6 +418,7 @@ class `Story Event List Tool Test` : FxRobot() {
                 StoryEventItem(UUID.randomUUID(), "name $it", it)
             })
             awaitToolInitialization()
+
             selectedItem = tool.access().storyEventItems.random()
             tool.drive {
                 storyEventList!!.selectionModel.select(selectedItem)
@@ -412,12 +429,8 @@ class `Story Event List Tool Test` : FxRobot() {
         @ValueSource(strings = ["before", "after", "at-the-same-time-as"])
         fun `should open create story event dialog with relative story event`(placement: String) {
             tool.drive { optionsButton!!.insertNewStoryEventOption(placement)!!.fire() }
-            listTargetWindows().asSequence()
-                .filterNot { it == primaryStage }
-                .filter { it.scene.root == createStoryEventForm.root }
-                .single { it.isShowing }
 
-            val relativeRequest = createStoryEventFormRelativeRequest!!
+            val relativeRequest = createStoryEventProps!!.relativePlacement!!
 
             assertThat(relativeRequest.relativeStoryEventId).isEqualTo(StoryEvent.Id(UUID.fromString(selectedItem.id)))
             when (placement) {
@@ -425,6 +438,69 @@ class `Story Event List Tool Test` : FxRobot() {
                 "after" -> assertThat(relativeRequest.delta).isEqualTo(1L)
                 "at-the-same-time-as" -> assertThat(relativeRequest.delta).isEqualTo(0L)
             }
+        }
+
+    }
+
+    @Nested
+    inner class `When Rename Story Event Option is Selected` {
+
+        val selectedItem: StoryEventListItemViewModel
+
+        init {
+            response = ListAllStoryEvents.ResponseModel(List(5) {
+                StoryEventItem(UUID.randomUUID(), "name $it", it)
+            })
+            awaitToolInitialization()
+            selectedItem = tool.access().storyEventItems.random()
+            tool.drive {
+                storyEventList!!.selectionModel.select(selectedItem)
+            }
+        }
+
+        @Test
+        fun `should create rename story event dialog with relative story event`() {
+            tool.drive { optionsButton!!.renameOption!!.fire() }
+            assertThat(renameStoryEventDialogProps!!.storyEventId).isEqualTo(StoryEvent.Id(UUID.fromString(selectedItem.id)))
+            assertThat(renameStoryEventDialogProps!!.currentName).isEqualTo(selectedItem.name)
+        }
+
+    }
+
+    @Nested
+    inner class `When Story Event is Renamed` {
+
+        private val renamedStoryEventId = StoryEvent.Id()
+        private val newName = "Some new story event name"
+
+        private val items = List(5) {
+            StoryEventItem(UUID.randomUUID(), "name $it", it)
+        } + StoryEventItem(renamedStoryEventId.uuid, "Some name", 0)
+
+        init {
+            response = ListAllStoryEvents.ResponseModel(items.shuffled())
+        }
+
+        @Test
+        fun `should rename corresponding story event cell`() {
+            awaitToolInitialization()
+            runBlocking {
+                storyEventRenamedNotifier.receiveStoryEventRenamed(StoryEventRenamed(renamedStoryEventId, newName))
+            }
+            interact {}
+
+            println("list size: ")
+            println(tool.access().storyEventList!!.boundsInLocal)
+
+            println("Ids: ")
+            println(tool.access().storyEventListCells.map { it.item?.id })
+
+            println("Text: ")
+            println(tool.access().storyEventListCells.map { it.text })
+
+            assertThat(tool.access().storyEventListCells.find { it.item?.id == renamedStoryEventId.uuid.toString() })
+                .hasText(newName)
+
         }
 
     }
