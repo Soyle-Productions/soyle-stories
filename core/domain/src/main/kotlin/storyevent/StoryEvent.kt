@@ -6,6 +6,7 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.events.StoryEventChange
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
+import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*
 
@@ -56,6 +57,10 @@ class StoryEvent(
         if (newName == name) return noUpdate()
         return Successful(copy(name = newName), StoryEventRenamed(id, newName.value))
     }
+    fun withTime(newTime: Long): StoryEventUpdate<StoryEventRescheduled> {
+        if (newTime == time) return noUpdate()
+        return Successful(copy(time = newTime), StoryEventRescheduled(id, newTime, time))
+    }
     fun withPreviousId(storyEventId: Id?) = copy(previousStoryEventId = storyEventId)
     fun withNextId(storyEventId: Id?) = copy(nextStoryEventId = storyEventId)
     fun withLocationId(locationId: Location.Id?) = copy(linkedLocationId = locationId)
@@ -90,6 +95,6 @@ class StoryEvent(
         override fun toString(): String = "StoryEvent($uuid)"
     }
 
-    inline fun noUpdate() = UnSuccessful(this)
+    fun noUpdate() = UnSuccessful(this)
 
 }

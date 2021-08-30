@@ -5,6 +5,7 @@ import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
+import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -75,6 +76,47 @@ class `Story Event Unit Test` {
                 update as UnSuccessful
 
                 update.storyEvent.name.mustEqual(storyEvent.name)
+            }
+
+        }
+
+    }
+
+    @Nested
+    inner class `Reschedule Story Event` {
+
+        private val storyEvent = makeStoryEvent(time = 7L)
+        private val inputTime = 18L
+
+        @Test
+        fun `should produce story event with new time`() {
+            val (updatedStoryEvent: StoryEvent) = storyEvent.withTime(inputTime)
+
+            updatedStoryEvent.id.mustEqual(storyEvent.id)
+            updatedStoryEvent.time.mustEqual(inputTime)
+        }
+
+        @Test
+        fun `should produce story event rescheduled event`() {
+            val update: StoryEventUpdate<StoryEventRescheduled> = storyEvent.withTime(inputTime)
+            update as Successful
+
+            update.change.mustEqual(StoryEventRescheduled(
+                storyEventId = storyEvent.id,
+                newTime = inputTime,
+                originalTime = storyEvent.time
+            ))
+        }
+
+        @Nested
+        inner class `When time is identical` {
+
+            @Test
+            fun `should not produce event`() {
+                val update: StoryEventUpdate<StoryEventRescheduled> = storyEvent.withTime(storyEvent.time)
+                update as UnSuccessful
+
+                update.storyEvent.time.mustEqual(storyEvent.time)
             }
 
         }
