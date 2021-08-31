@@ -69,6 +69,17 @@ class `Story Event Steps` : En {
                 .getOpenRenameStoryEventDialogOrError()
                 .renameStoryEvent(newName)
         }
+        When("I change the {story event}'s time to {int}") { storyEvent: StoryEvent, time: Int ->
+            val workBench = soyleStories.getAnyOpenWorkbenchOrError()
+            workBench
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+                .openStoryEventTimeAdjustmentDialog()
+
+            workBench
+                .getOpenStoryEventTimeAdjustmentDialogOrError()
+                .adjustTime(time.toLong())
+        }
     }
 
     private fun thens() {

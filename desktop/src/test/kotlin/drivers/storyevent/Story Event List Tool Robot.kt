@@ -39,11 +39,11 @@ fun StoryEventListToolView.openCreateStoryEventDialog() {
 }
 
 fun StoryEventListToolView.givenStoryEventHasBeenSelected(storyEvent: StoryEvent): StoryEventListToolView {
-    if (access().storyEventList?.selectedItem?.id == storyEvent.id.uuid.toString()) return this
+    if (access().storyEventList?.selectedItem?.id == storyEvent.id) return this
     drive {
-        storyEventList!!.selectionModel!!.select(storyEventItems.find { it.id == storyEvent.id.uuid.toString() })
+        storyEventList!!.selectionModel!!.select(storyEventItems.find { it.id == storyEvent.id })
     }
-    if (access().storyEventList?.selectedItem?.id != storyEvent.id.uuid.toString()) {
+    if (access().storyEventList?.selectedItem?.id != storyEvent.id) {
         fail<Nothing>("Did not correctly select the story event")
     }
     return this
@@ -71,5 +71,12 @@ fun StoryEventListToolView.openRenameStoryEventDialog() {
     drive {
         optionsButton!!.show()
         optionsButton!!.renameOption!!.fire()
+    }
+}
+
+fun StoryEventListToolView.openStoryEventTimeAdjustmentDialog() {
+    drive {
+        optionsButton!!.show()
+        optionsButton!!.rescheduleOption!!.fire()
     }
 }

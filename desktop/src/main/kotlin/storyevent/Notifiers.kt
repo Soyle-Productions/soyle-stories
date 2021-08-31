@@ -8,6 +8,8 @@ import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.rename.StoryEventRenamedReceiver
+import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledNotifier
+import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledReceiver
 
 object Notifiers {
 
@@ -15,6 +17,7 @@ object Notifiers {
         scoped<ProjectScope> {
             storyEventCreated()
             storyEventRenamed()
+            storyEventRescheduled()
         }
     }
 
@@ -27,6 +30,12 @@ object Notifiers {
     private fun InProjectScope.storyEventRenamed() {
         provide(StoryEventRenamedReceiver::class) {
             StoryEventRenamedNotifier()
+        }
+    }
+
+    private fun InProjectScope.storyEventRescheduled() {
+        provide(StoryEventRescheduledReceiver::class) {
+            StoryEventRescheduledNotifier()
         }
     }
 

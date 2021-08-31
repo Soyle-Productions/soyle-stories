@@ -11,6 +11,9 @@ import com.soyle.stories.storyevent.list.StoryEventListToolView
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
+import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
+import com.soyle.stories.storyevent.time.RescheduleStoryEventDialogView
+import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledNotifier
 import tornadofx.UIComponent
 
 object Presentation {
@@ -24,9 +27,11 @@ object Presentation {
                             projectId = projectId,
                             createStoryEventDialog = get(),
                             renameStoryEventDialog = get(),
+                            rescheduleStoryEventDialog = get(),
                             listStoryEventsInProject = get(),
                             storyEventCreated = get<StoryEventCreatedNotifier>(),
-                            storyEventRenamed = get<StoryEventRenamedNotifier>()
+                            storyEventRenamed = get<StoryEventRenamedNotifier>(),
+                            storyEventRescheduled = get<StoryEventRescheduledNotifier>()
                         )
                         if (projectId.uuid == this@provide.projectId) {
                             DI.getRegisteredTypes(this@provide)[StoryEventListToolView::class] = view
@@ -54,6 +59,14 @@ object Presentation {
                             props,
                             get()
                         )
+                    }
+                }
+            }
+
+            provide<RescheduleStoryEventDialog> {
+                object : RescheduleStoryEventDialog {
+                    override fun invoke(props: RescheduleStoryEventDialog.Props) {
+                        RescheduleStoryEventDialogView(props, get())
                     }
                 }
             }
