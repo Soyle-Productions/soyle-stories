@@ -34,6 +34,11 @@ dependencies {
     testFixturesImplementation(Libraries.kotlin.coroutines.core)
 }
 
+tasks.getByName<Test>("test") {
+    reports.junitXml.isEnabled = false
+    reports.html.isEnabled = false
+}
+
 task<Test>("integrationTest") {
     description = "Runs the integration tests"
     group = "verification"
