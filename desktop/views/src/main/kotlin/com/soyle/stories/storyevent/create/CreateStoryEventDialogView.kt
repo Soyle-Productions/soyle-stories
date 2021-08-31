@@ -1,20 +1,17 @@
 package com.soyle.stories.storyevent.create
 
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.storyevent.NullableLongSpinnerValueFactory
 import javafx.application.Platform
-import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.BooleanExpression
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Spinner
-import javafx.scene.control.SpinnerValueFactory
 import javafx.scene.control.TextField
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
-import javafx.util.StringConverter
 import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
 import tornadofx.*
 
 class CreateStoryEventDialogView(
@@ -57,21 +54,7 @@ class CreateStoryEventDialogView(
     private fun timeInput() = Spinner<Long?>().apply {
         id = Styles.time.name
         isEditable = true
-        valueFactory = object : SpinnerValueFactory<Long?>() {
-            override fun increment(steps: Int) {
-                value = value?.plus(steps)
-            }
-
-            override fun decrement(steps: Int) = increment(-steps)
-
-            init {
-                value = null
-                converter = object : StringConverter<Long?>() {
-                    override fun toString(`object`: Long?): String = `object`?.toString() ?: ""
-                    override fun fromString(string: String?): Long? = string?.toLongOrNull()
-                }
-            }
-        }
+        valueFactory = NullableLongSpinnerValueFactory()
     }
 
     private fun cancelButton() = Button().apply {
