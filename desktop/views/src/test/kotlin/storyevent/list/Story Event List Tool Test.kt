@@ -11,6 +11,7 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.Successful
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
+import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.storyevent.create.CreateStoryEventDialog
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
@@ -19,8 +20,11 @@ import com.soyle.stories.storyevent.list.StoryEventListToolView
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
+import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
+import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledNotifier
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
+import com.soyle.stories.usecase.storyevent.time.reschedule.RescheduleStoryEvent
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.layout.Pane
@@ -90,6 +94,11 @@ class `Story Event List Tool Test` : FxRobot() {
         }
     }
 
+    private var rescheduleStoryEventDialogProps: RescheduleStoryEventDialog.Props? = null
+    private val rescheduleStoryEventDialog = RescheduleStoryEventDialog {
+        rescheduleStoryEventDialogProps = it
+    }
+
     private var requestedProjectId: Project.Id? = null
     private var response: ListAllStoryEvents.ResponseModel = ListAllStoryEvents.ResponseModel(emptyList())
     private val listStoryEventsController = ListStoryEventsControllerDouble({ projectId, output ->
@@ -99,6 +108,7 @@ class `Story Event List Tool Test` : FxRobot() {
 
     private val storyEventCreatedNotifier = StoryEventCreatedNotifier()
     private val storyEventRenamedNotifier = StoryEventRenamedNotifier()
+    private val storyEventRescheduledNotifier = StoryEventRescheduledNotifier()
 
     // tool under test
     private val tool by lazy {
@@ -106,9 +116,11 @@ class `Story Event List Tool Test` : FxRobot() {
             projectId,
             createStoryEventDialog,
             renameStoryEventDialog,
+            rescheduleStoryEventDialog,
             listStoryEventsController,
             storyEventCreatedNotifier,
-            storyEventRenamedNotifier
+            storyEventRenamedNotifier,
+            storyEventRescheduledNotifier
         )
     }
 
@@ -250,27 +262,27 @@ class `Story Event List Tool Test` : FxRobot() {
                     response = ListAllStoryEvents.ResponseModel(
                         listOf(
                             StoryEventItem(
-                                UUID.fromString("33a14d76-dab1-4277-87c8-7d46b13a178d"),
+                                StoryEvent.Id(UUID.fromString("33a14d76-dab1-4277-87c8-7d46b13a178d")),
                                 "e4448d63-ad47-43ae-9911-12255ad5ace9",
                                 0
                             ),
                             StoryEventItem(
-                                UUID.fromString("6c3d08f7-a46f-4d1d-9013-d8c45364d7f5"),
+                                StoryEvent.Id(UUID.fromString("6c3d08f7-a46f-4d1d-9013-d8c45364d7f5")),
                                 "70856ee7-16d0-408c-a2a6-9fec24813924",
                                 0
                             ),
                             StoryEventItem(
-                                UUID.fromString("254a75e5-4cd4-4257-a24d-c733101946f6"),
+                                StoryEvent.Id(UUID.fromString("254a75e5-4cd4-4257-a24d-c733101946f6")),
                                 "8df48034-9b46-4a1b-9b90-6d466000b491",
                                 0
                             ),
                             StoryEventItem(
-                                UUID.fromString("d642b5a2-5bd2-43c2-8cf7-d87c49166d66"),
+                                StoryEvent.Id(UUID.fromString("d642b5a2-5bd2-43c2-8cf7-d87c49166d66")),
                                 "f6d436cb-5d37-4bf8-9273-29ee75854b1f",
                                 0
                             ),
                             StoryEventItem(
-                                UUID.fromString("d7f12ca3-d0ba-4b16-a5e2-b315d6b28a57"),
+                                StoryEvent.Id(UUID.fromString("d7f12ca3-d0ba-4b16-a5e2-b315d6b28a57")),
                                 "394b8867-b7b5-4c39-8fe7-7b0fa45bf78c",
                                 0
                             )
@@ -298,7 +310,7 @@ class `Story Event List Tool Test` : FxRobot() {
                 fun `should show all resulting story events`() {
                     awaitToolInitialization()
                     interact {}
-                    assertThat(tool.access().storyEventItems.map { it.id }).isEqualTo(
+                    assertThat(tool.access().storyEventItems.map { it.id.uuid.toString() }).isEqualTo(
                         listOf(
                             "33a14d76-dab1-4277-87c8-7d46b13a178d",
                             "6c3d08f7-a46f-4d1d-9013-d8c45364d7f5",
@@ -307,15 +319,17 @@ class `Story Event List Tool Test` : FxRobot() {
                             "d7f12ca3-d0ba-4b16-a5e2-b315d6b28a57"
                         )
                     )
-                    assertThat(tool.access().storyEventListCells.map { it.text }.take(5)).isEqualTo(
-                        listOf(
-                            "e4448d63-ad47-43ae-9911-12255ad5ace9",
-                            "70856ee7-16d0-408c-a2a6-9fec24813924",
-                            "8df48034-9b46-4a1b-9b90-6d466000b491",
-                            "f6d436cb-5d37-4bf8-9273-29ee75854b1f",
-                            "394b8867-b7b5-4c39-8fe7-7b0fa45bf78c"
+                    with (tool.access()) {
+                        assertThat(tool.access().storyEventListCells.map { it.nameLabel?.text?.orEmpty() }.take(5)).isEqualTo(
+                            listOf(
+                                "e4448d63-ad47-43ae-9911-12255ad5ace9",
+                                "70856ee7-16d0-408c-a2a6-9fec24813924",
+                                "8df48034-9b46-4a1b-9b90-6d466000b491",
+                                "f6d436cb-5d37-4bf8-9273-29ee75854b1f",
+                                "394b8867-b7b5-4c39-8fe7-7b0fa45bf78c"
+                            )
                         )
-                    )
+                    }
                 }
             }
 
@@ -379,7 +393,7 @@ class `Story Event List Tool Test` : FxRobot() {
 
             init {
                 response = ListAllStoryEvents.ResponseModel(List(5) {
-                    StoryEventItem(UUID.randomUUID(), "name $it", it)
+                    StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
                 })
             }
 
@@ -415,7 +429,7 @@ class `Story Event List Tool Test` : FxRobot() {
 
         init {
             response = ListAllStoryEvents.ResponseModel(List(5) {
-                StoryEventItem(UUID.randomUUID(), "name $it", it)
+                StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
             })
             awaitToolInitialization()
 
@@ -432,7 +446,7 @@ class `Story Event List Tool Test` : FxRobot() {
 
             val relativeRequest = createStoryEventProps!!.relativePlacement!!
 
-            assertThat(relativeRequest.relativeStoryEventId).isEqualTo(StoryEvent.Id(UUID.fromString(selectedItem.id)))
+            assertThat(relativeRequest.relativeStoryEventId).isEqualTo(selectedItem.id)
             when (placement) {
                 "before" -> assertThat(relativeRequest.delta).isEqualTo(-1L)
                 "after" -> assertThat(relativeRequest.delta).isEqualTo(1L)
@@ -449,7 +463,7 @@ class `Story Event List Tool Test` : FxRobot() {
 
         init {
             response = ListAllStoryEvents.ResponseModel(List(5) {
-                StoryEventItem(UUID.randomUUID(), "name $it", it)
+                StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
             })
             awaitToolInitialization()
             selectedItem = tool.access().storyEventItems.random()
@@ -461,7 +475,7 @@ class `Story Event List Tool Test` : FxRobot() {
         @Test
         fun `should create rename story event dialog with relative story event`() {
             tool.drive { optionsButton!!.renameOption!!.fire() }
-            assertThat(renameStoryEventDialogProps!!.storyEventId).isEqualTo(StoryEvent.Id(UUID.fromString(selectedItem.id)))
+            assertThat(renameStoryEventDialogProps!!.storyEventId).isEqualTo(selectedItem.id)
             assertThat(renameStoryEventDialogProps!!.currentName).isEqualTo(selectedItem.name)
         }
 
@@ -474,8 +488,8 @@ class `Story Event List Tool Test` : FxRobot() {
         private val newName = "Some new story event name"
 
         private val items = List(5) {
-            StoryEventItem(UUID.randomUUID(), "name $it", it)
-        } + StoryEventItem(renamedStoryEventId.uuid, "Some name", 0)
+            StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
+        } + StoryEventItem(renamedStoryEventId, "Some name", 0)
 
         init {
             response = ListAllStoryEvents.ResponseModel(items.shuffled())
@@ -487,19 +501,68 @@ class `Story Event List Tool Test` : FxRobot() {
             runBlocking {
                 storyEventRenamedNotifier.receiveStoryEventRenamed(StoryEventRenamed(renamedStoryEventId, newName))
             }
-            interact {}
+            WaitForAsyncUtils.waitForFxEvents()
 
-            println("list size: ")
-            println(tool.access().storyEventList!!.boundsInLocal)
+            with(tool.access()) {
+                val nameLabel = storyEventListCells.find { it.item?.id == renamedStoryEventId }!!
+                    .nameLabel!!
+                assertThat(nameLabel).hasText(newName)
+            }
+        }
 
-            println("Ids: ")
-            println(tool.access().storyEventListCells.map { it.item?.id })
+    }
 
-            println("Text: ")
-            println(tool.access().storyEventListCells.map { it.text })
+    @Nested
+    inner class `When Reschedule Story Event Option is Selected` {
 
-            assertThat(tool.access().storyEventListCells.find { it.item?.id == renamedStoryEventId.uuid.toString() })
-                .hasText(newName)
+        val selectedItem: StoryEventListItemViewModel
+
+        init {
+            response = ListAllStoryEvents.ResponseModel(List(5) {
+                StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
+            })
+            awaitToolInitialization()
+            selectedItem = tool.access().storyEventItems.random()
+            tool.drive {
+                storyEventList!!.selectionModel.select(selectedItem)
+            }
+        }
+
+        @Test
+        fun `should create rename story event dialog with relative story event`() {
+            tool.drive { optionsButton!!.rescheduleOption!!.fire() }
+            assertThat(rescheduleStoryEventDialogProps!!.storyEventId).isEqualTo(selectedItem.id)
+            assertThat(rescheduleStoryEventDialogProps!!.currentTime).isEqualTo(selectedItem.time)
+        }
+
+    }
+
+    @Nested
+    inner class `When Story Event is Rescheduled` {
+
+        private val rescheduledStoryEventId = StoryEvent.Id()
+        private val newTime = 23L
+
+        private val items = List(5) {
+            StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
+        } + StoryEventItem(rescheduledStoryEventId, "Some name", 18L)
+
+        init {
+            response = ListAllStoryEvents.ResponseModel(items.shuffled())
+        }
+
+        @Test
+        fun `should reschedule corresponding story event cell`() {
+            awaitToolInitialization()
+            runBlocking {
+                storyEventRescheduledNotifier.receiveStoryEventRescheduled(StoryEventRescheduled(rescheduledStoryEventId, newTime, 18L))
+            }
+            WaitForAsyncUtils.waitForFxEvents()
+
+            with(tool.access()) {
+                val cell = storyEventListCells.find { it.item?.id == rescheduledStoryEventId }!!
+                assertThat(cell.timeLabel).hasText("23")
+            }
 
         }
 

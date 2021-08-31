@@ -14,7 +14,7 @@ interface ListStoryEventsController {
         ): ListStoryEventsController = object : ListStoryEventsController {
             override fun listStoryEventsInProject(projectId: Project.Id, output: ListAllStoryEvents.OutputPort): Job {
                 return threadTransformer.async {
-                    listAllStoryEvents(projectId.uuid, output)
+                    listAllStoryEvents(projectId, output)
                 }
             }
         }

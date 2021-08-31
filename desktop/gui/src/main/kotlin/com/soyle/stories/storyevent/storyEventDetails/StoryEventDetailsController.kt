@@ -4,6 +4,7 @@ import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.character.characterList.LiveCharacterList
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.isListeningTo
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.location.locationList.LiveLocationList
 import com.soyle.stories.location.locationList.LocationListListener
 import com.soyle.stories.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventController
@@ -32,7 +33,7 @@ class StoryEventDetailsController(
 
 	override fun getValidState() {
 		threadTransformer.async {
-			getStoryEventDetails.invoke(UUID.fromString(storyEventId), getStoryEventDetailsOutputPort)
+			getStoryEventDetails.invoke(StoryEvent.Id(UUID.fromString(storyEventId)), getStoryEventDetailsOutputPort)
 		}
 		if (locationListListener isListeningTo liveLocationList) {
 			liveLocationList.removeListener(locationListListener)

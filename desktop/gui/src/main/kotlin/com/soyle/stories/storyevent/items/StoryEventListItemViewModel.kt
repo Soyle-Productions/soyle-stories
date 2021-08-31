@@ -1,11 +1,12 @@
 package com.soyle.stories.storyevent.items
 
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 
 data class StoryEventListItemViewModel (
-  val id: String,
-  val ordinal: Int,
-  val name: String
+  val id: StoryEvent.Id,
+  val name: String,
+  val time: Long
 ) {
-	constructor(item: StoryEventItem) : this(item.storyEventId.toString(), item.influenceOrderIndex + 1, item.storyEventName)
+	constructor(item: StoryEventItem) : this(item.storyEventId, item.storyEventName, item.time)
 }

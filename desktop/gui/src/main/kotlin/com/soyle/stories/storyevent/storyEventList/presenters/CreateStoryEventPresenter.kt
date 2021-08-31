@@ -16,13 +16,13 @@ internal class CreateStoryEventPresenter(
 		view.updateOrInvalidated {
 
 			val newItem = StoryEventListItemViewModel(StoryEventItem(
-				event.storyEventId.uuid,
+				event.storyEventId,
 				event.name,
-				event.time.toInt()
+				event.time.toLong()
 			))
 
 			copy(
-			  storyEvents = (storyEvents + newItem).sortedBy { it.ordinal }
+			  storyEvents = (storyEvents + newItem)
 			)
 		}
 	}

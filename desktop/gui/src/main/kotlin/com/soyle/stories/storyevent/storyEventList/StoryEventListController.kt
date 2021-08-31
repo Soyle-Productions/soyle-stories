@@ -1,6 +1,7 @@
 package com.soyle.stories.storyevent.storyEventList
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.layout.openTool.OpenToolController
@@ -17,7 +18,7 @@ class StoryEventListController(
   private val renameStoryEventController: RenameStoryEventController
 ) : StoryEventListViewListener {
 
-	private val projectId: UUID = UUID.fromString(projectId)
+	private val projectId = Project.Id(UUID.fromString(projectId))
 
 	override fun getValidState() {
 		threadTransformer.async {

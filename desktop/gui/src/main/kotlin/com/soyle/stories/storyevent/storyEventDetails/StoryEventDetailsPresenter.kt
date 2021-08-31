@@ -4,6 +4,7 @@ import com.soyle.stories.character.characterList.CharacterListListener
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.location.items.LocationItemViewModel
@@ -39,14 +40,14 @@ class StoryEventDetailsPresenter(
 	override fun receiveGetStoryEventDetailsResponse(response: GetStoryEventDetails.ResponseModel) {
 		view.update {
 
-			val includedCharacterIds = response.includedCharacterIds.map(UUID::toString).toSet()
+			val includedCharacterIds = response.includedCharacterIds.map(Character.Id::uuid).map(UUID::toString).toSet()
 
 			if (this != null) copy(
 			  title = "Story Event Details - ${response.storyEventName}",
 			  selectedLocationId = response.locationId.toString(),
 			  selectedLocation = response.locationId?.let {
 				  val selectedLocationId = it
-				  locations.find { it.id.uuid == selectedLocationId }
+				  locations.find { it.id == selectedLocationId }
 			  },
 			  includedCharacterIds = includedCharacterIds,
 			  includedCharacters = characters.filter {
@@ -134,10 +135,6 @@ class StoryEventDetailsPresenter(
 				characters = characters.filterNot { it.characterId == removedCharacterId }
 			)
 		}
-	}
-
-	override fun receiveGetStoryEventDetailsFailure(failure: Exception) {
-
 	}
 
 }

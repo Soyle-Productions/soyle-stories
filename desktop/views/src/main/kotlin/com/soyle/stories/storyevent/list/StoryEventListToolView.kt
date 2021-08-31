@@ -6,22 +6,22 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
+import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.storyevent.create.CreateStoryEventDialog
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedReceiver
+import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
+import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledReceiver
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import com.sun.scenario.effect.impl.prism.PrEffectHelper.render
 import javafx.application.Platform
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
-import javafx.scene.control.Button
-import javafx.scene.control.ListCell
-import javafx.scene.control.ListView
-import javafx.scene.control.MenuButton
+import javafx.scene.control.*
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
@@ -32,11 +32,13 @@ class StoryEventListToolView(
     private val projectId: Project.Id,
     private val createStoryEventDialog: CreateStoryEventDialog,
     private val renameStoryEventDialog: RenameStoryEventDialog,
+    private val rescheduleStoryEventDialog: RescheduleStoryEventDialog,
     private val listStoryEventsInProject: ListStoryEventsController,
 
     // events
     storyEventCreated: Notifier<StoryEventCreatedReceiver>,
-    storyEventRenamed: Notifier<StoryEventRenamedReceiver>
+    storyEventRenamed: Notifier<StoryEventRenamedReceiver>,
+    storyEventRescheduled: Notifier<StoryEventRescheduledReceiver>
 ) : View() {
 
     private sealed class State {
@@ -73,9 +75,9 @@ class StoryEventListToolView(
             storyEventId: StoryEvent.Id,
             replaceWith: StoryEventListItemViewModel.() -> StoryEventListItemViewModel
         ): State {
-            if (items.any { it.id == storyEventId.uuid.toString() }) {
+            if (items.any { it.id == storyEventId }) {
                 return Populated(items.map {
-                    if (it.id == storyEventId.uuid.toString()) it.replaceWith()
+                    if (it.id == storyEventId) it.replaceWith()
                     else it
                 })
             }
@@ -98,7 +100,7 @@ class StoryEventListToolView(
         action(::loadStoryEvents)
     }
     private val storyEventList = ListView<StoryEventListItemViewModel>().apply {
-        cellFormat { text = it.name }
+        cellFragment(Cell::class)
         vgrow = Priority.ALWAYS
     }
 
@@ -125,6 +127,12 @@ class StoryEventListToolView(
             id = "rename"
             action(::openRenameStoryEventDialog)
         }
+        item("") {
+            id = "reschedule"
+            action {
+                rescheduleStoryEventDialog.invoke(RescheduleStoryEventDialog.Props(storyEventList.selectionModel.selectedItem!!.id, storyEventList.selectionModel.selectedItem!!.time))
+            }
+        }
     }
 
     private fun openCreateStoryEventDialog() {
@@ -132,7 +140,7 @@ class StoryEventListToolView(
     }
 
     private fun openCreateStoryEventDialog(delta: Long) {
-        val selectedId = storyEventList.selectedItem?.id?.let(UUID::fromString)?.let(StoryEvent::Id)!!
+        val selectedId = storyEventList.selectedItem?.id!!
         createStoryEventDialog(CreateStoryEventDialog.Props(
             CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(selectedId, delta)
         ))
@@ -140,7 +148,7 @@ class StoryEventListToolView(
 
     private fun openRenameStoryEventDialog() {
         val selectedItem = storyEventList.selectedItem!!
-        val selectedId = selectedItem.id.let(UUID::fromString).let(StoryEvent::Id)
+        val selectedId = selectedItem.id
         renameStoryEventDialog(RenameStoryEventDialog.Props(selectedId, selectedItem.name))
     }
 
@@ -166,6 +174,7 @@ class StoryEventListToolView(
     init {
         storyEventCreated.addListener(eventReceiver)
         storyEventRenamed.addListener(eventReceiver)
+        storyEventRescheduled.addListener(eventReceiver)
         state.onChangeWithCurrent {
             if (Platform.isFxApplicationThread()) render(it!!)
             else runLater { render(it!!) }
@@ -173,24 +182,31 @@ class StoryEventListToolView(
         loadStoryEvents()
     }
 
-    private class Cell : ListCell<StoryEventListItemViewModel>() {
+    class Cell : ListCellFragment<StoryEventListItemViewModel>() {
 
-        override fun updateItem(item: StoryEventListItemViewModel?, empty: Boolean) {
-            super.updateItem(item, empty)
-            text = item?.name ?: ""
+        val textProperty = itemProperty.select { it.name.toProperty() }
+        val timeProperty = itemProperty.select { it.time.toProperty() }
+
+        override val root: Parent = hbox {
+            label(textProperty) { addClass("name") }
+            label(timeProperty) { addClass("time") }
         }
     }
 
-    private inner class EventReceiver : StoryEventCreatedReceiver, StoryEventRenamedReceiver {
+    private inner class EventReceiver : StoryEventCreatedReceiver, StoryEventRenamedReceiver, StoryEventRescheduledReceiver {
 
         override suspend fun receiveStoryEventCreated(event: StoryEventCreated) {
             val newItem =
-                StoryEventListItemViewModel(event.storyEventId.uuid.toString(), event.time.toInt(), event.name)
+                StoryEventListItemViewModel(event.storyEventId, event.name, event.time)
             state.set(state.value.addStoryEvent(newItem))
         }
 
         override suspend fun receiveStoryEventRenamed(event: StoryEventRenamed) {
             state.set(state.value.replaceStoryEvent(event.storyEventId) { copy(name = event.newName) })
+        }
+
+        override suspend fun receiveStoryEventRescheduled(event: StoryEventRescheduled) {
+            state.set(state.value.replaceStoryEvent(event.storyEventId) { copy(time = event.newTime) })
         }
     }
 

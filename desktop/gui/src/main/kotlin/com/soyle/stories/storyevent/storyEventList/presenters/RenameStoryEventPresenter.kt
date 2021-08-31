@@ -12,12 +12,12 @@ class RenameStoryEventPresenter(
 ) : StoryEventRenamedReceiver {
 
 	override suspend fun receiveStoryEventRenamed(event: StoryEventRenamed) {
-		val storyEventId = event.storyEventId.uuid.toString()
+		val storyEventId = event.storyEventId
 		view.updateOrInvalidated {
 			copy(
 			  storyEvents = storyEvents.map {
 				  if (it.id == storyEventId) {
-					  StoryEventListItemViewModel(it.id, it.ordinal, event.newName)
+					  StoryEventListItemViewModel(it.id, event.newName, it.time)
 				  } else it
 			  }
 			)

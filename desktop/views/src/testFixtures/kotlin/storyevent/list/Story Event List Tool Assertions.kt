@@ -13,7 +13,7 @@ class `Story Event List Tool Assertions` private constructor(private val access:
     }
 
     fun hasStoryEvent(storyEvent: StoryEvent) {
-        val item = access.storyEventItems.find { it.id == storyEvent.id.uuid.toString() }
+        val item = access.storyEventItems.find { it.id == storyEvent.id }
             ?: fail("Story Event List does not have an item matching the id ${storyEvent.id}")
         assertEquals(storyEvent.name, item.name)
     }

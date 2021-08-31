@@ -5,7 +5,9 @@ import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.StoryEventListToolView
 import javafx.scene.Node
 import javafx.scene.control.*
+import tornadofx.CssRule
 import tornadofx.Stylesheet
+import tornadofx.cssclass
 
 class StoryEventListToolAccess private constructor(private val tool: StoryEventListToolView) : NodeAccess<Node>(tool.root) {
     companion object {
@@ -33,4 +35,12 @@ class StoryEventListToolAccess private constructor(private val tool: StoryEventL
         ?.takeIf { isDisable == false }
     val MenuButton.renameOption: MenuItem?
         get() = items.find { it.id == "rename" }?.takeIf { isDisable == false }
+    val MenuButton.rescheduleOption: MenuItem?
+        get() = items.find { it.id == "reschedule" }?.takeIf { isDisable == false }
+
+    val ListCell<StoryEventListItemViewModel>.nameLabel: Label?
+        get() = findChild(CssRule.c("name"))
+    val ListCell<StoryEventListItemViewModel>.timeLabel: Label?
+        get() = findChild(CssRule.c("time"))
+
 }
