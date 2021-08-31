@@ -7,29 +7,22 @@ import com.soyle.stories.usecase.storyevent.StoryEventRepository
 import java.util.*
 
 class GetStoryEventDetailsUseCase(
-  private val storyEventRepository: StoryEventRepository
+    private val storyEventRepository: StoryEventRepository
 ) : GetStoryEventDetails {
 
-	override suspend fun invoke(storyEventId: UUID, output: GetStoryEventDetails.OutputPort) {
-		val response = try {
-			val storyEvent = getStoryEvent(storyEventId)
+    override suspend fun invoke(storyEventId: StoryEvent.Id, output: GetStoryEventDetails.OutputPort) {
 
-			responseModel(storyEvent)
-		} catch (e: Exception) {
-			return output.receiveGetStoryEventDetailsFailure(e)
-		}
-		output.receiveGetStoryEventDetailsResponse(response)
-	}
+        val storyEvent = storyEventRepository.getStoryEventOrError(storyEventId)
 
-	private fun responseModel(storyEvent: StoryEvent) =
-		GetStoryEventDetails.ResponseModel(
-			storyEvent.id.uuid,
-			storyEvent.name.value,
-            storyEvent.linkedLocationId?.uuid,
-			storyEvent.includedCharacterIds.map(Character.Id::uuid)
-		)
+        val response = responseModel(storyEvent)
+        output.receiveGetStoryEventDetailsResponse(response)
+    }
 
-	private suspend fun getStoryEvent(storyEventId: UUID) =
-	  (storyEventRepository.getStoryEventById(StoryEvent.Id(storyEventId))
-		?: throw StoryEventDoesNotExist(storyEventId))
+    private fun responseModel(storyEvent: StoryEvent) =
+        GetStoryEventDetails.ResponseModel(
+            storyEvent.id.uuid,
+            storyEvent.name.value,
+            storyEvent.linkedLocationId,
+            storyEvent.includedCharacterIds
+        )
 }
