@@ -11,22 +11,18 @@ import com.soyle.stories.storyevent.create.CreateStoryEventDialog
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
-import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedReceiver
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
-import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledReceiver
+import com.soyle.stories.storyevent.time.StoryEventRescheduledReceiver
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
-import com.sun.scenario.effect.impl.prism.PrEffectHelper.render
 import javafx.application.Platform
+import javafx.collections.ObservableList
 import javafx.scene.Node
 import javafx.scene.Parent
-import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
-import javafx.stage.Stage
 import tornadofx.*
-import java.util.*
 
 class StoryEventListToolView(
     private val projectId: Project.Id,
@@ -102,6 +98,7 @@ class StoryEventListToolView(
     private val storyEventList = ListView<StoryEventListItemViewModel>().apply {
         cellFragment(Cell::class)
         vgrow = Priority.ALWAYS
+        selectionModel.selectionMode = SelectionMode.MULTIPLE
     }
 
     private fun storyEventList(items: List<StoryEventListItemViewModel>): Node {
@@ -129,8 +126,17 @@ class StoryEventListToolView(
         }
         item("") {
             id = "reschedule"
+            storyEventList.selectionModel.selectedItems.onChange { change ->
+                isDisable = change.list.size != 1
+            }
             action {
                 rescheduleStoryEventDialog.invoke(RescheduleStoryEventDialog.Props(storyEventList.selectionModel.selectedItem!!.id, storyEventList.selectionModel.selectedItem!!.time))
+            }
+        }
+        item("") {
+            id = "adjust"
+            action {
+                rescheduleStoryEventDialog.invoke(RescheduleStoryEventDialog.AdjustTimes(storyEventList.selectionModel.selectedItems.map { it.id }.toSet()))
             }
         }
     }
@@ -193,7 +199,8 @@ class StoryEventListToolView(
         }
     }
 
-    private inner class EventReceiver : StoryEventCreatedReceiver, StoryEventRenamedReceiver, StoryEventRescheduledReceiver {
+    private inner class EventReceiver : StoryEventCreatedReceiver, StoryEventRenamedReceiver,
+        StoryEventRescheduledReceiver {
 
         override suspend fun receiveStoryEventCreated(event: StoryEventCreated) {
             val newItem =
@@ -205,8 +212,11 @@ class StoryEventListToolView(
             state.set(state.value.replaceStoryEvent(event.storyEventId) { copy(name = event.newName) })
         }
 
-        override suspend fun receiveStoryEventRescheduled(event: StoryEventRescheduled) {
-            state.set(state.value.replaceStoryEvent(event.storyEventId) { copy(time = event.newTime) })
+        override suspend fun receiveStoryEventsRescheduled(events: List<StoryEventRescheduled>) {
+            events.fold(state.value) { nextState, event ->
+                nextState.replaceStoryEvent(event.storyEventId) { copy(time = event.newTime) }
+            }
+                .let(state::set)
         }
     }
 

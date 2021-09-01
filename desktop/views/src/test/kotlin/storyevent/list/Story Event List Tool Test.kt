@@ -21,16 +21,15 @@ import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
-import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledNotifier
+import com.soyle.stories.storyevent.time.StoryEventRescheduledNotifier
+import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
-import com.soyle.stories.usecase.storyevent.time.reschedule.RescheduleStoryEvent
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.layout.Pane
 import javafx.stage.Stage
 import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
 import org.junit.jupiter.api.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -39,7 +38,6 @@ import org.testfx.api.FxToolkit
 import org.testfx.assertions.api.Assertions.assertThat
 import org.testfx.util.WaitForAsyncUtils
 import tornadofx.UIComponent
-import tornadofx.runLater
 import java.util.*
 
 class `Story Event List Tool Test` : FxRobot() {
@@ -529,23 +527,69 @@ class `Story Event List Tool Test` : FxRobot() {
         }
 
         @Test
-        fun `should create rename story event dialog with relative story event`() {
+        fun `reschedule story event option should not be available when multiple items are selected`() {
+            tool.drive {
+                storyEventItems.shuffled().take(2).forEach {
+                    storyEventList!!.selectionModel.select(it)
+                }
+            }
+
+            with (tool.access()) {
+                assertThat(optionsButton!!.rescheduleOption!!.isDisable).isTrue()
+            }
+        }
+
+        @Test
+        fun `should create reschedule story event dialog with relative story event`() {
             tool.drive { optionsButton!!.rescheduleOption!!.fire() }
-            assertThat(rescheduleStoryEventDialogProps!!.storyEventId).isEqualTo(selectedItem.id)
-            assertThat(rescheduleStoryEventDialogProps!!.currentTime).isEqualTo(selectedItem.time)
+
+            with(rescheduleStoryEventDialogProps as RescheduleStoryEventDialog.Reschedule) {
+                assertThat(storyEventId).isEqualTo(selectedItem.id)
+                assertThat(currentTime).isEqualTo(selectedItem.time)
+            }
+
         }
 
     }
 
     @Nested
-    inner class `When Story Event is Rescheduled` {
+    inner class `When Adjust Story Event Time Option is Selected` {
 
-        private val rescheduledStoryEventId = StoryEvent.Id()
-        private val newTime = 23L
+        val selectedItems: List<StoryEventListItemViewModel>
+
+        init {
+            response = ListAllStoryEvents.ResponseModel(List(5) {
+                StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
+            })
+            awaitToolInitialization()
+            selectedItems = tool.access().storyEventItems.shuffled().take(3)
+            tool.drive {
+                selectedItems.forEach { storyEventList!!.selectionModel.select(storyEventItems.indexOf(it)) }
+            }
+        }
+
+        @Test
+        fun `should create adjust story events time dialog with relative story event`() {
+            tool.drive { optionsButton!!.adjustTimeOption!!.fire() }
+
+            (rescheduleStoryEventDialogProps as RescheduleStoryEventDialog.AdjustTimes).run {
+                assertThat(storyEventIds).containsExactlyInAnyOrderElementsOf(selectedItems.map { it.id })
+            }
+        }
+
+    }
+
+    @Nested
+    inner class `When Story Events are Rescheduled` {
+
+        private val rescheduledStoryEventIds = List(7) { StoryEvent.Id() }
+        private val newTimes = rescheduledStoryEventIds.associate { it to (20L..40L).random() }
 
         private val items = List(5) {
             StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
-        } + StoryEventItem(rescheduledStoryEventId, "Some name", 18L)
+        } + rescheduledStoryEventIds.mapIndexed { index, id ->
+            StoryEventItem(id, "Some name $index", 10L + index)
+        }
 
         init {
             response = ListAllStoryEvents.ResponseModel(items.shuffled())
@@ -555,13 +599,15 @@ class `Story Event List Tool Test` : FxRobot() {
         fun `should reschedule corresponding story event cell`() {
             awaitToolInitialization()
             runBlocking {
-                storyEventRescheduledNotifier.receiveStoryEventRescheduled(StoryEventRescheduled(rescheduledStoryEventId, newTime, 18L))
+                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.map { StoryEventRescheduled(it.key, it.value, 0L) })
             }
             WaitForAsyncUtils.waitForFxEvents()
 
             with(tool.access()) {
-                val cell = storyEventListCells.find { it.item?.id == rescheduledStoryEventId }!!
-                assertThat(cell.timeLabel).hasText("23")
+                newTimes.forEach { (id, newTime) ->
+                    val cell = storyEventListCells.find { it.item?.id == id }!!
+                    assertThat(cell.timeLabel).hasText("$newTime")
+                }
             }
 
         }

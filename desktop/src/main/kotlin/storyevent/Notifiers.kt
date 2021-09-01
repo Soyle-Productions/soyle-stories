@@ -2,14 +2,13 @@ package com.soyle.stories.desktop.config.storyevent
 
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.scoped
-import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.rename.StoryEventRenamedReceiver
-import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledNotifier
-import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledReceiver
+import com.soyle.stories.storyevent.time.StoryEventRescheduledNotifier
+import com.soyle.stories.storyevent.time.StoryEventRescheduledReceiver
 
 object Notifiers {
 

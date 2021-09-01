@@ -13,7 +13,7 @@ import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialogView
-import com.soyle.stories.storyevent.time.reschedule.StoryEventRescheduledNotifier
+import com.soyle.stories.storyevent.time.StoryEventRescheduledNotifier
 import tornadofx.UIComponent
 
 object Presentation {
@@ -66,7 +66,7 @@ object Presentation {
             provide<RescheduleStoryEventDialog> {
                 object : RescheduleStoryEventDialog {
                     override fun invoke(props: RescheduleStoryEventDialog.Props) {
-                        RescheduleStoryEventDialogView(props, get())
+                        RescheduleStoryEventDialogView(props, get(), get())
                     }
                 }
             }

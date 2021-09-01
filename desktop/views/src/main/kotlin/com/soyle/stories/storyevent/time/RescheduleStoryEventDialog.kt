@@ -6,7 +6,13 @@ import tornadofx.Component
 /** Opens a dialog that allows the user to reschedule one or more story events */
 fun interface RescheduleStoryEventDialog {
 
-    class Props(val storyEventId: StoryEvent.Id, val currentTime: Long)
+    sealed class Props {
+        companion object {
+            operator fun invoke(storyEventId: StoryEvent.Id, currentTime: Long) = Reschedule(storyEventId, currentTime)
+        }
+    }
+    class Reschedule(val storyEventId: StoryEvent.Id, val currentTime: Long) : Props()
+    class AdjustTimes(val storyEventIds: Set<StoryEvent.Id>) : Props()
 
     operator fun invoke(props: Props)
 
