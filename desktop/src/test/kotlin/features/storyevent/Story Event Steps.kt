@@ -8,6 +8,7 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.fail
 import org.testfx.assertions.api.Assertions.assertThat
@@ -31,6 +32,15 @@ class `Story Event Steps` : En {
             data.asLists().drop(1).forEach { (name, time) ->
                 storyEvents.givenStoryEventExists(withName = NonBlankString.create(name)!!, atTime = time.toInt())
             }
+        }
+        Given("I have selected the following story events to increment their time") { data: DataTable ->
+            val selectedStoryEvents = data.asList().map { name ->
+                storyEvents.givenStoryEventExists(NonBlankString.create(name)!!, 0)
+            }
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventsHaveBeenSelected(selectedStoryEvents)
         }
     }
 
@@ -74,11 +84,21 @@ class `Story Event Steps` : En {
             workBench
                 .givenStoryEventListToolHasBeenOpened()
                 .givenStoryEventHasBeenSelected(storyEvent)
+                .openRescheduleStoryEventDialog()
+
+            workBench
+                .getOpenStoryEventTimeAdjustmentDialogOrError()
+                .reschedule(time.toLong())
+        }
+        When("I increment the selected story events' times by {int}") { adjustment: Int ->
+            val workBench = soyleStories.getAnyOpenWorkbenchOrError()
+            workBench
+                .givenStoryEventListToolHasBeenOpened()
                 .openStoryEventTimeAdjustmentDialog()
 
             workBench
                 .getOpenStoryEventTimeAdjustmentDialogOrError()
-                .adjustTime(time.toLong())
+                .adjustTime(by = adjustment.toLong())
         }
     }
 
@@ -110,6 +130,15 @@ class `Story Event Steps` : En {
                 .assertThis {
                     doesNotHaveStoryEventNamed(nameThatShouldNotExist)
                 }
+        }
+        Then("the following story events should take place at these times") { data: DataTable ->
+            data.asMaps().forEach {
+                val expectedTime = it.getValue("Time").toLong()
+                val storyEvent = storyEvents.getStoryEventByName(it.getValue("Name"))!!
+                assertEquals(expectedTime, storyEvent.time) {
+                    "${storyEvent.name} should take place at time $expectedTime, but was found at time ${storyEvent.time}"
+                }
+            }
         }
     }
 

@@ -11,6 +11,7 @@ import com.soyle.stories.layout.config.fixed.StoryEventList
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.storyevent.list.StoryEventListTool
 import com.soyle.stories.storyevent.list.StoryEventListToolView
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
 import tornadofx.lookup
 import tornadofx.selectedItem
@@ -49,6 +50,23 @@ fun StoryEventListToolView.givenStoryEventHasBeenSelected(storyEvent: StoryEvent
     return this
 }
 
+fun StoryEventListToolView.givenStoryEventsHaveBeenSelected(storyEvents: List<StoryEvent>): StoryEventListToolView {
+    if (access().storyEventList!!.selectionModel.selectedItems.map { it.id }.toSet() == storyEvents.map { it.id }
+            .toSet()) return this
+    drive {
+        storyEvents.forEach { storyEvent ->
+            storyEventList!!.selectionModel!!.select(storyEventItems.find { it.id == storyEvent.id })
+        }
+    }
+    assertEquals(
+        storyEvents.map { it.id }.toSet(),
+        access().storyEventList!!.selectionModel.selectedItems.map { it.id }.toSet()
+    ) {
+        "Did not correctly select all of the story events"
+    }
+    return this
+}
+
 /**
  * @param placement either "before", "after", or "at the same time as"
  */
@@ -74,9 +92,16 @@ fun StoryEventListToolView.openRenameStoryEventDialog() {
     }
 }
 
-fun StoryEventListToolView.openStoryEventTimeAdjustmentDialog() {
+fun StoryEventListToolView.openRescheduleStoryEventDialog() {
     drive {
         optionsButton!!.show()
         optionsButton!!.rescheduleOption!!.fire()
+    }
+}
+
+fun StoryEventListToolView.openStoryEventTimeAdjustmentDialog() {
+    drive {
+        optionsButton!!.show()
+        optionsButton!!.adjustTimeOption!!.fire()
     }
 }

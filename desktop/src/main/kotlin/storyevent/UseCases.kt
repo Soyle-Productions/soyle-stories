@@ -8,6 +8,8 @@ import com.soyle.stories.storyevent.create.CreateStoryEventOutput
 import com.soyle.stories.storyevent.list.ListStoryEventsController
 import com.soyle.stories.storyevent.rename.RenameStoryEventController
 import com.soyle.stories.storyevent.rename.RenameStoryEventOutput
+import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
+import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeOutput
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventOutput
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
@@ -16,6 +18,8 @@ import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvent
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEventsUseCase
 import com.soyle.stories.usecase.storyevent.rename.RenameStoryEvent
 import com.soyle.stories.usecase.storyevent.rename.RenameStoryEventUseCase
+import com.soyle.stories.usecase.storyevent.time.adjust.AdjustStoryEventsTime
+import com.soyle.stories.usecase.storyevent.time.adjust.AdjustStoryEventsTimeUseCase
 import com.soyle.stories.usecase.storyevent.time.reschedule.RescheduleStoryEvent
 import com.soyle.stories.usecase.storyevent.time.reschedule.RescheduleStoryEventUseCase
 
@@ -27,6 +31,7 @@ object UseCases {
             listStoryEvents()
             renameStoryEvent()
             rescheduleStoryEvent()
+            adjustStoryEventsTime()
         }
     }
 
@@ -50,6 +55,12 @@ object UseCases {
         provide<RescheduleStoryEvent> { RescheduleStoryEventUseCase(get()) }
         provide<RescheduleStoryEvent.OutputPort> { RescheduleStoryEventOutput(get()) }
         provide<RescheduleStoryEventController> { RescheduleStoryEventController(applicationScope.get(), get(), get()) }
+    }
+
+    private fun InProjectScope.adjustStoryEventsTime() {
+        provide<AdjustStoryEventsTime> { AdjustStoryEventsTimeUseCase(get()) }
+        provide<AdjustStoryEventsTime.OutputPort> { AdjustStoryEventsTimeOutput(get()) }
+        provide<AdjustStoryEventsTimeController> { AdjustStoryEventsTimeController(applicationScope.get(), get(), get()) }
     }
 
 }

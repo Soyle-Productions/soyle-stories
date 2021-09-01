@@ -12,10 +12,19 @@ fun WorkBench.getOpenStoryEventTimeAdjustmentDialog(): RescheduleStoryEventDialo
 fun WorkBench.getOpenStoryEventTimeAdjustmentDialogOrError(): RescheduleStoryEventDialogView =
     getOpenStoryEventTimeAdjustmentDialog() ?: error("Reschedule Story Event Dialog is not open")
 
-fun RescheduleStoryEventDialogView.adjustTime(to: Long) {
+fun RescheduleStoryEventDialogView.reschedule(to: Long) {
     robot.interact {
         val timeInput = robot.from(root).lookup("#time").query<Spinner<Long?>>()
         timeInput.editor.text = to.toString()
+        timeInput.commitValue()
+        robot.from(root).lookup("#save").queryButton().fire()
+    }
+}
+
+fun RescheduleStoryEventDialogView.adjustTime(by: Long) {
+    robot.interact {
+        val timeInput = robot.from(root).lookup("#time").query<Spinner<Long?>>()
+        timeInput.editor.text = by.toString()
         timeInput.commitValue()
         robot.from(root).lookup("#save").queryButton().fire()
     }
