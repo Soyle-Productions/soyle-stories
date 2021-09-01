@@ -21,4 +21,6 @@ interface StoryEventRepository {
     suspend fun updateStoryEvent(storyEvent: StoryEvent)
     suspend fun updateStoryEvents(vararg storyEvents: StoryEvent)
 
+    suspend fun removeStoryEvent(storyEventId: StoryEvent.Id)
+
 }

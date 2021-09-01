@@ -9,7 +9,8 @@ class StoryEventRepositoryDouble(
 	initialStoryEvents: List<StoryEvent> = emptyList(),
 
 	private val onAddNewStoryEvent: (StoryEvent) -> Unit = {},
-	private val onUpdateStoryEvent: (StoryEvent) -> Unit = {}
+	private val onUpdateStoryEvent: (StoryEvent) -> Unit = {},
+	private val onRemoveStoryEvent: (StoryEvent.Id) -> Unit = {}
 ) : StoryEventRepository {
 
 	private val storyEvents = initialStoryEvents.associateBy { it.id }.toMutableMap()
@@ -46,5 +47,10 @@ class StoryEventRepositoryDouble(
 	override suspend fun updateStoryEvents(vararg storyEvents: StoryEvent) {
 		this.storyEvents.putAll(storyEvents.associateBy { it.id })
 		storyEvents.forEach(onUpdateStoryEvent)
+	}
+
+	override suspend fun removeStoryEvent(storyEventId: StoryEvent.Id) {
+		storyEvents.remove(storyEventId)
+		onRemoveStoryEvent(storyEventId)
 	}
 }
