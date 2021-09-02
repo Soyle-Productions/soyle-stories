@@ -5,5 +5,6 @@ enum class DialogType {
 	ReorderScene,
 	DeleteTheme,
 	DeleteSymbol,
-	DeleteValueWeb
+	DeleteValueWeb,
+	DeleteStoryEvent
 }

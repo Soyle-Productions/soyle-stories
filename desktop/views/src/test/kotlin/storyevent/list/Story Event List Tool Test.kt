@@ -10,6 +10,7 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.Successful
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.storyevent.events.StoryEventNoLongerHappens
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.NonBlankString
@@ -17,6 +18,8 @@ import com.soyle.stories.storyevent.create.CreateStoryEventDialog
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.StoryEventListToolView
+import com.soyle.stories.storyevent.remove.RemoveStoryEventController
+import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensNotifier
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
@@ -31,6 +34,7 @@ import javafx.scene.layout.Pane
 import javafx.stage.Stage
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.testfx.api.FxRobot
@@ -104,9 +108,20 @@ class `Story Event List Tool Test` : FxRobot() {
         output.receiveListAllStoryEventsResponse(response)
     })
 
+    private val removeStoryEventController = object : RemoveStoryEventController {
+        var requestedStoryEventIds: Set<StoryEvent.Id>? = null
+        override fun removeStoryEvent(storyEventIds: Set<StoryEvent.Id>) {
+            requestedStoryEventIds = storyEventIds
+        }
+
+        override fun confirmRemoveStoryEvent(storyEventIds: Set<StoryEvent.Id>): Job =
+            error("Should never be called from story event list")
+    }
+
     private val storyEventCreatedNotifier = StoryEventCreatedNotifier()
     private val storyEventRenamedNotifier = StoryEventRenamedNotifier()
     private val storyEventRescheduledNotifier = StoryEventRescheduledNotifier()
+    private val storyEventRemovedNotifier = StoryEventNoLongerHappensNotifier()
 
     // tool under test
     private val tool by lazy {
@@ -115,10 +130,12 @@ class `Story Event List Tool Test` : FxRobot() {
             createStoryEventDialog,
             renameStoryEventDialog,
             rescheduleStoryEventDialog,
+            removeStoryEventController,
             listStoryEventsController,
             storyEventCreatedNotifier,
             storyEventRenamedNotifier,
-            storyEventRescheduledNotifier
+            storyEventRescheduledNotifier,
+            storyEventRemovedNotifier
         )
     }
 
@@ -569,12 +586,39 @@ class `Story Event List Tool Test` : FxRobot() {
         }
 
         @Test
-        fun `should create adjust story events time dialog with relative story event`() {
+        fun `should create adjust story events time dialog with selected story events`() {
             tool.drive { optionsButton!!.adjustTimeOption!!.fire() }
 
             (rescheduleStoryEventDialogProps as RescheduleStoryEventDialog.AdjustTimes).run {
                 assertThat(storyEventIds).containsExactlyInAnyOrderElementsOf(selectedItems.map { it.id })
             }
+        }
+
+    }
+
+    @Nested
+    inner class `When Remove Story Event Option is Selected` {
+
+        val selectedItems: List<StoryEventListItemViewModel>
+
+        init {
+            response = ListAllStoryEvents.ResponseModel(List(5) {
+                StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
+            })
+            awaitToolInitialization()
+            selectedItems = tool.access().storyEventItems.shuffled().take(3)
+            tool.drive {
+                selectedItems.forEach { storyEventList!!.selectionModel.select(storyEventItems.indexOf(it)) }
+            }
+        }
+
+        @Test
+        fun `should send selected story event ids to remove story event controller`() {
+            tool.drive { optionsButton!!.deleteOption!!.fire() }
+
+            assertThat(removeStoryEventController.requestedStoryEventIds)
+                .containsExactlyInAnyOrderElementsOf(selectedItems.map { it.id })
+
         }
 
     }
@@ -607,6 +651,48 @@ class `Story Event List Tool Test` : FxRobot() {
                 newTimes.forEach { (id, newTime) ->
                     val cell = storyEventListCells.find { it.item?.id == id }!!
                     assertThat(cell.timeLabel).hasText("$newTime")
+                }
+            }
+
+        }
+
+    }
+
+    @Nested
+    inner class `When Story Events are Removed` {
+
+        private val removedStoryEventIds = List(7) { StoryEvent.Id() }
+
+        private val items = List(5) {
+            StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
+        } + removedStoryEventIds.mapIndexed { index, id ->
+            StoryEventItem(id, "Some name $index", 10L + index)
+        }
+
+        init {
+            response = ListAllStoryEvents.ResponseModel(items.shuffled())
+        }
+
+        @Test
+        fun `should reschedule corresponding story event cell`() {
+            awaitToolInitialization()
+            val (firstHalf, secondHalf) = removedStoryEventIds.withIndex().partition { it.index > (removedStoryEventIds.size / 2) }
+            runBlocking {
+                firstHalf.forEach {
+                    storyEventRemovedNotifier.receiveStoryEventNoLongerHappens(StoryEventNoLongerHappens(it.value))
+                }
+            }
+            runBlocking {
+                secondHalf.forEach {
+                    storyEventRemovedNotifier.receiveStoryEventNoLongerHappens(StoryEventNoLongerHappens(it.value))
+                }
+            }
+            WaitForAsyncUtils.waitForFxEvents()
+
+            with(tool.access()) {
+                removedStoryEventIds.forEach { id ->
+                    val cell = storyEventListCells.find { it.item?.id == id }
+                    assertNull(cell) { "$id" }
                 }
             }
 

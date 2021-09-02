@@ -39,6 +39,8 @@ class StoryEventListToolAccess private constructor(private val tool: StoryEventL
         get() = items.find { it.id == "reschedule" }?.takeIf { isDisable == false }
     val MenuButton.adjustTimeOption: MenuItem?
         get() = items.find { it.id == "adjust" }?.takeIf { isDisable == false }
+    val MenuButton.deleteOption: MenuItem?
+        get() = items.find { it.id == "delete" }?.takeIf { isDisable == false }
 
     val ListCell<StoryEventListItemViewModel>.nameLabel: Label?
         get() = findChild(CssRule.c("name"))

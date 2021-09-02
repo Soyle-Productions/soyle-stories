@@ -32,6 +32,7 @@ class SettingsDialogPresenter(
 			DialogType.DeleteTheme -> "Confirm Delete Theme Dialog"
 			DialogType.DeleteSymbol -> "Confirm Delete Symbol Dialog"
 			DialogType.DeleteValueWeb -> "Confirm Delete Value Web Dialog"
+			DialogType.DeleteStoryEvent -> "Confirm Delete Story Event Dialog"
 		}
 	}
 

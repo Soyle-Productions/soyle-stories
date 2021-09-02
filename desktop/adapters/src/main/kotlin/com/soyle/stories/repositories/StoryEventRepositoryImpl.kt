@@ -33,4 +33,8 @@ class StoryEventRepositoryImpl : StoryEventRepository {
 		this.storyEvents.putAll(storyEvents.associateBy { it.id })
 	}
 
+	override suspend fun removeStoryEvent(storyEventId: StoryEvent.Id) {
+		this.storyEvents.remove(storyEventId)
+	}
+
 }

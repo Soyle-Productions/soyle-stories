@@ -5,11 +5,14 @@ import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.storyevent.events.StoryEventNoLongerHappens
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.storyevent.create.CreateStoryEventDialog
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
+import com.soyle.stories.storyevent.remove.RemoveStoryEventController
+import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensReceiver
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
 import com.soyle.stories.storyevent.rename.StoryEventRenamedReceiver
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
@@ -23,18 +26,22 @@ import javafx.scene.control.*
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import tornadofx.*
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicReferenceArray
 
 class StoryEventListToolView(
     private val projectId: Project.Id,
     private val createStoryEventDialog: CreateStoryEventDialog,
     private val renameStoryEventDialog: RenameStoryEventDialog,
     private val rescheduleStoryEventDialog: RescheduleStoryEventDialog,
+    private val removeStoryEventController: RemoveStoryEventController,
     private val listStoryEventsInProject: ListStoryEventsController,
 
     // events
     storyEventCreated: Notifier<StoryEventCreatedReceiver>,
     storyEventRenamed: Notifier<StoryEventRenamedReceiver>,
-    storyEventRescheduled: Notifier<StoryEventRescheduledReceiver>
+    storyEventRescheduled: Notifier<StoryEventRescheduledReceiver>,
+    storyEventNoLongerHappens: Notifier<StoryEventNoLongerHappensReceiver>
 ) : View() {
 
     private sealed class State {
@@ -44,6 +51,9 @@ class StoryEventListToolView(
         open fun replaceStoryEvent(
             storyEventId: StoryEvent.Id,
             replaceWith: StoryEventListItemViewModel.() -> StoryEventListItemViewModel
+        ): State = this
+        open fun removeStoryEvent(
+            storyEventId: StoryEvent.Id
         ): State = this
     }
 
@@ -76,6 +86,13 @@ class StoryEventListToolView(
                     if (it.id == storyEventId) it.replaceWith()
                     else it
                 })
+            }
+            return this
+        }
+
+        override fun removeStoryEvent(storyEventId: StoryEvent.Id): State {
+            if (items.any { it.id == storyEventId }) {
+                return Populated(items.filter { it.id != storyEventId })
             }
             return this
         }
@@ -139,6 +156,12 @@ class StoryEventListToolView(
                 rescheduleStoryEventDialog.invoke(RescheduleStoryEventDialog.AdjustTimes(storyEventList.selectionModel.selectedItems.map { it.id }.toSet()))
             }
         }
+        item("") {
+            id = "delete"
+            action {
+                removeStoryEventController.removeStoryEvent(storyEventList.selectionModel.selectedItems.map { it.id }.toSet())
+            }
+        }
     }
 
     private fun openCreateStoryEventDialog() {
@@ -181,6 +204,7 @@ class StoryEventListToolView(
         storyEventCreated.addListener(eventReceiver)
         storyEventRenamed.addListener(eventReceiver)
         storyEventRescheduled.addListener(eventReceiver)
+        storyEventNoLongerHappens.addListener(eventReceiver)
         state.onChangeWithCurrent {
             if (Platform.isFxApplicationThread()) render(it!!)
             else runLater { render(it!!) }
@@ -200,7 +224,7 @@ class StoryEventListToolView(
     }
 
     private inner class EventReceiver : StoryEventCreatedReceiver, StoryEventRenamedReceiver,
-        StoryEventRescheduledReceiver {
+        StoryEventRescheduledReceiver, StoryEventNoLongerHappensReceiver {
 
         override suspend fun receiveStoryEventCreated(event: StoryEventCreated) {
             val newItem =
@@ -215,8 +239,25 @@ class StoryEventListToolView(
         override suspend fun receiveStoryEventsRescheduled(events: List<StoryEventRescheduled>) {
             events.fold(state.value) { nextState, event ->
                 nextState.replaceStoryEvent(event.storyEventId) { copy(time = event.newTime) }
+            }.let(state::set)
+        }
+
+        private val awaitingRemovalEvents = mutableListOf<StoryEventNoLongerHappens>()
+        override suspend fun receiveStoryEventNoLongerHappens(event: StoryEventNoLongerHappens) {
+            // many events could be coming, so, let's debounce it as much as possible
+            synchronized(this@EventReceiver) {
+                if (awaitingRemovalEvents.isEmpty()) {
+                    runLater {
+                        synchronized(this@EventReceiver) {
+                            awaitingRemovalEvents.fold(state.value) { nextState, nextEvent ->
+                                nextState.removeStoryEvent(nextEvent.storyEventId)
+                            }.let(state::set)
+                            awaitingRemovalEvents.clear()
+                        }
+                    }
+                }
+                awaitingRemovalEvents.add(event)
             }
-                .let(state::set)
         }
     }
 
