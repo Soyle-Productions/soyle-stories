@@ -1,25 +1,38 @@
 package com.soyle.stories.storyevent.create
 
+import com.soyle.stories.common.components.ComponentsStyles
+import com.soyle.stories.common.components.surfaces.Elevation
+import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.soylestories.Styles
 import com.soyle.stories.storyevent.NullableLongSpinnerValueFactory
+import de.jensd.fx.glyphs.materialicons.MaterialIcon
+import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.application.Platform
 import javafx.beans.binding.BooleanExpression
+import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Spinner
 import javafx.scene.control.TextField
 import javafx.scene.layout.VBox
+import javafx.stage.Modality
 import javafx.stage.Stage
+import javafx.stage.StageStyle
 import kotlinx.coroutines.*
+import org.controlsfx.control.action.ActionMap.action
 import tornadofx.*
+import tornadofx.Stylesheet.Companion.root
+import java.util.*
 
 class CreateStoryEventDialogView(
     private val props: CreateStoryEventDialog.Props,
     private val createStoryEventController: CreateStoryEventController
 ) : View() {
 
-    private val stage = Stage()
+    private val stage = Stage(StageStyle.UTILITY)
 
     private val awaitingSubmission = booleanProperty(false)
 
@@ -32,6 +45,8 @@ class CreateStoryEventDialogView(
         submitButton.enableWhen(nameIsValid() and timeIsValid() and awaitingSubmission.not())
         submitButton.action(::submit)
         cancelButton.action(::cancel)
+        nameInput.action(::submit)
+        timeInput?.editor?.action(::submit)
     }
 
     private fun submit() {
@@ -59,10 +74,14 @@ class CreateStoryEventDialogView(
 
     private fun cancelButton() = Button().apply {
         addClass(Stylesheet.cancel)
+        addClass(ComponentsStyles.secondary)
+        addClass(ComponentsStyles.outlined)
     }
 
     private fun submitButton() = Button().apply {
         addClass(Stylesheet.default)
+        addClass(ComponentsStyles.primary)
+        addClass(ComponentsStyles.filled)
     }
 
     private fun nameIsValid() = nameInput.textProperty().isNotBlank()
@@ -91,10 +110,12 @@ class CreateStoryEventDialogView(
         timeInput?.isDisable = false
     }
 
-    private fun createStoryEventJob(name: NonBlankString, time: Long?): Job
-    {
+    private fun createStoryEventJob(name: NonBlankString, time: Long?): Job {
         return when {
-            props.relativePlacement != null -> createStoryEventController.createStoryEvent(name, props.relativePlacement)
+            props.relativePlacement != null -> createStoryEventController.createStoryEvent(
+                name,
+                props.relativePlacement
+            )
             time == null -> createStoryEventController.createStoryEvent(name)
             else -> createStoryEventController.createStoryEvent(name, time)
         }
@@ -118,10 +139,36 @@ class CreateStoryEventDialogView(
     }
 
     override val root: Parent = VBox().apply {
-        add(nameInput)
-        if (timeInput != null) add(timeInput)
-        add(cancelButton)
-        add(submitButton)
+        isFillWidth = true
+        asSurface {
+            absoluteElevation = Elevation.get(16)!!
+        }
+        vbox(spacing = 8) {
+            style { padding = box(12.px) }
+            isFillWidth = true
+            vbox(spacing = 4) {
+                isFillWidth = true
+                fieldLabel("Name").labelFor = nameInput
+                add(nameInput)
+            }
+            if (timeInput != null) vbox(spacing = 4) {
+                isFillWidth = true
+                fieldLabel("Time").labelFor = timeInput
+                add(timeInput.apply {
+                    styleClass.clear()
+                    maxWidth = Double.MAX_VALUE
+                })
+            }
+        }
+        hbox(spacing = 8, alignment = Pos.BASELINE_RIGHT) {
+            style { padding = box(12.px) }
+            add(cancelButton.apply {
+                text = "cancel".uppercase(Locale.getDefault())
+            })
+            add(submitButton.apply {
+                text = "create".uppercase(Locale.getDefault())
+            })
+        }
     }
 
     init {
@@ -130,7 +177,10 @@ class CreateStoryEventDialogView(
 
     init {
         stage.apply {
+            title = "Create New Story Event"
+            initModality(Modality.APPLICATION_MODAL)
             scene = Scene(root)
+            FX.applyStylesheetsTo(scene)
             show()
         }
     }

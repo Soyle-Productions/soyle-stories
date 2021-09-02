@@ -26,7 +26,7 @@ class ButtonStyles : Stylesheet() {
         }
     }
     init {
-        val modenaWithPrimaryBase = modena(secondaryColor)
+        val modenaWithPrimaryBase = modena(ColorStyles.secondaryColor)
         val modenaWithSecondaryBase = modena(ColorStyles.primaryColor)
         val standardButton = mixin {
             padding = box(8.px, 6.px)
@@ -49,18 +49,18 @@ class ButtonStyles : Stylesheet() {
             }
             and(ComponentsStyles.outlined) {
                 +standardButton
-                padding = box(3.px, 7.px)
+                padding = box(6.px, 8.px)
                 backgroundColor = multi(Color.TRANSPARENT)
                 borderWidth = multi(box(2.px))
                 borderRadius = multi(box(4.px))
             }
             and(ComponentsStyles.primary) {
-                textFill = secondaryColor
+                textFill = ColorStyles.secondaryColor
                 and(hover) {
-                    backgroundColor = multi(secondaryColor.deriveColor(1.0, 1.0, 1.0, 0.1))
+                    backgroundColor = multi(ColorStyles.secondaryColor.deriveColor(1.0, 1.0, 1.0, 0.1))
                 }
                 and(ComponentsStyles.outlined) {
-                    borderColor = multi(box(secondaryColor))
+                    borderColor = multi(box(ColorStyles.secondaryColor))
                 }
                 and(ComponentsStyles.filled) {
                     textFill = Color.WHITE
@@ -113,7 +113,7 @@ class ButtonStyles : Stylesheet() {
             }
 
             and(ComponentsStyles.filled) {
-                baseColor = secondaryColor
+                baseColor = ColorStyles.secondaryColor
                 arrow {
                     backgroundColor = multi(Color.WHITE)
                 }
@@ -123,13 +123,13 @@ class ButtonStyles : Stylesheet() {
                 borderWidth = multi(box(2.px))
                 borderRadius = multi(box(4.px))
                 padding = box(7.px, 6.px)
-                borderColor = multi(box(secondaryColor))
+                borderColor = multi(box(ColorStyles.secondaryColor))
                 label {
-                    fill = secondaryColor
-                    textFill = secondaryColor
+                    fill = ColorStyles.secondaryColor
+                    textFill = ColorStyles.secondaryColor
                 }
                 arrow {
-                    backgroundColor = multi(secondaryColor)
+                    backgroundColor = multi(ColorStyles.secondaryColor)
                 }
             }
         }
