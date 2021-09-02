@@ -105,3 +105,10 @@ fun StoryEventListToolView.openStoryEventTimeAdjustmentDialog() {
         optionsButton!!.adjustTimeOption!!.fire()
     }
 }
+
+fun StoryEventListToolView.openDeleteStoryEventDialog() {
+    drive {
+        optionsButton!!.show()
+        optionsButton!!.deleteOption!!.fire()
+    }
+}

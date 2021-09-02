@@ -80,7 +80,20 @@ Feature: Manage Story Events in Project
       | Something else    | 2    |
       | Another thing     | 3    |
 
-  Scenario: Delete a Story Event
+  Scenario: Request to Delete a Story Event
     Given I have created a story event named "Something happens" at time 3
-    When I delete the "Something happens" story event
-    And there should not be a story event named "Something happens"
+    When I want to delete the "Something happens" story event
+    Then I should be prompted to confirm deleting the "Something happens" story event
+    But the "Something happens" story event should not have been deleted
+
+  Scenario: Immediately Delete Story Event
+    Given I have created a story event named "Something happens" at time 3
+    And I have requested to not be prompted to confirm deleting a story event
+    When I want to delete the "Something happens" story event
+    Then there should not be a story event named "Something happens"
+
+  Scenario: Confirm Delete Story Event
+    Given I have created a story event named "Something happens" at time 3
+    And I am deleting the "Something happens" story event
+    When I confirm I want to delete the "Something happens" story event
+    Then there should not be a story event named "Something happens"

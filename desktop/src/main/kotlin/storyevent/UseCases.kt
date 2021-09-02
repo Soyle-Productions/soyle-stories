@@ -6,6 +6,8 @@ import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.create.CreateStoryEventOutput
 import com.soyle.stories.storyevent.list.ListStoryEventsController
+import com.soyle.stories.storyevent.remove.RemoveStoryEventController
+import com.soyle.stories.storyevent.remove.RemoveStoryEventOutput
 import com.soyle.stories.storyevent.rename.RenameStoryEventController
 import com.soyle.stories.storyevent.rename.RenameStoryEventOutput
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
@@ -16,6 +18,8 @@ import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEventUseCase
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEventsUseCase
+import com.soyle.stories.usecase.storyevent.remove.RemoveStoryEventFromProject
+import com.soyle.stories.usecase.storyevent.remove.RemoveStoryEventFromProjectUseCase
 import com.soyle.stories.usecase.storyevent.rename.RenameStoryEvent
 import com.soyle.stories.usecase.storyevent.rename.RenameStoryEventUseCase
 import com.soyle.stories.usecase.storyevent.time.adjust.AdjustStoryEventsTime
@@ -32,6 +36,7 @@ object UseCases {
             renameStoryEvent()
             rescheduleStoryEvent()
             adjustStoryEventsTime()
+            removeStoryEvent()
         }
     }
 
@@ -61,6 +66,12 @@ object UseCases {
         provide<AdjustStoryEventsTime> { AdjustStoryEventsTimeUseCase(get()) }
         provide<AdjustStoryEventsTime.OutputPort> { AdjustStoryEventsTimeOutput(get()) }
         provide<AdjustStoryEventsTimeController> { AdjustStoryEventsTimeController(applicationScope.get(), get(), get()) }
+    }
+
+    private fun InProjectScope.removeStoryEvent() {
+        provide<RemoveStoryEventFromProject> { RemoveStoryEventFromProjectUseCase(get()) }
+        provide<RemoveStoryEventFromProject.OutputPort> { RemoveStoryEventOutput(get()) }
+        provide<RemoveStoryEventController> { RemoveStoryEventController(applicationScope.get(), get(), get(), get()) }
     }
 
 }

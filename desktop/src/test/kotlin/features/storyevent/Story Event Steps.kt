@@ -100,6 +100,12 @@ class `Story Event Steps` : En {
                 .getOpenStoryEventTimeAdjustmentDialogOrError()
                 .adjustTime(by = adjustment.toLong())
         }
+        When("I want to delete the {story event}") { storyEvent: StoryEvent ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+                .openDeleteStoryEventDialog()
+        }
     }
 
     private fun thens() {
