@@ -51,7 +51,7 @@ fun StoryEventListToolView.givenStoryEventHasBeenSelected(storyEvent: StoryEvent
 }
 
 fun StoryEventListToolView.givenStoryEventsHaveBeenSelected(storyEvents: List<StoryEvent>): StoryEventListToolView {
-    if (access().storyEventList!!.selectionModel.selectedItems.map { it.id }.toSet() == storyEvents.map { it.id }
+    if (access().storyEventList?.selectionModel?.selectedItems?.map { it.id }?.toSet() == storyEvents.map { it.id }
             .toSet()) return this
     drive {
         storyEvents.forEach { storyEvent ->

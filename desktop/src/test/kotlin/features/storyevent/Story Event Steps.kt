@@ -8,8 +8,7 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.fail
 import org.testfx.assertions.api.Assertions.assertThat
 
@@ -41,6 +40,10 @@ class `Story Event Steps` : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenStoryEventListToolHasBeenOpened()
                 .givenStoryEventsHaveBeenSelected(selectedStoryEvents)
+        }
+        Given("I am deleting the {story event}") { storyEvent: StoryEvent ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenDeleteStoryEventDialogHasBeenOpened(listOf(storyEvent))
         }
     }
 
@@ -106,6 +109,11 @@ class `Story Event Steps` : En {
                 .givenStoryEventHasBeenSelected(storyEvent)
                 .openDeleteStoryEventDialog()
         }
+        When("I confirm I want to delete the {story event}") { storyEvent: StoryEvent ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .getOpenDeleteStoryEventDialogOrError()
+                .confirm()
+        }
     }
 
     private fun thens() {
@@ -145,6 +153,14 @@ class `Story Event Steps` : En {
                     "${storyEvent.name} should take place at time $expectedTime, but was found at time ${storyEvent.time}"
                 }
             }
+        }
+        Then("I should be prompted to confirm deleting the {story event}") { storyEvent: StoryEvent ->
+            val dialog = soyleStories.getAnyOpenWorkbenchOrError()
+                .getOpenDeleteStoryEventDialog()
+            assertNotNull(dialog)
+        }
+        Then("the {story event} should not have been deleted") { storyEvent: StoryEvent ->
+            // if we make it here, it should pass since the storyEvent was found
         }
     }
 
