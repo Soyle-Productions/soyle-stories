@@ -10,6 +10,14 @@ class CreateStoryEventControllerDouble(
     private val onCreateStoryEventRelativeTo: (NonBlankString, CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative) -> Job = { _, _ -> Job() }
 ) : CreateStoryEventController {
 
+    override fun requestToCreateStoryEvent() {
+        TODO("Not yet implemented")
+    }
+
+    override fun requestToCreateStoryEvent(relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative) {
+        TODO("Not yet implemented")
+    }
+
     override fun createStoryEvent(name: NonBlankString): Job = onCreateStoryEvent(name, null)
 
     override fun createStoryEvent(name: NonBlankString, timeUnit: Long): Job = onCreateStoryEvent(name, timeUnit)

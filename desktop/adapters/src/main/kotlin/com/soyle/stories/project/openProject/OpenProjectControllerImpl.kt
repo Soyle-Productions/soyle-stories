@@ -2,6 +2,7 @@ package com.soyle.stories.project.openProject
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.workspace.usecases.openProject.OpenProject
+import kotlinx.coroutines.Job
 
 class OpenProjectControllerImpl(
     private val threadTransformer: ThreadTransformer,
@@ -9,8 +10,8 @@ class OpenProjectControllerImpl(
     private val openProjectOutput: OpenProject.OutputPort
 ) : OpenProjectController {
 
-    override fun openProject(location: String) {
-        threadTransformer.async {
+    override fun openProject(location: String): Job {
+        return threadTransformer.async {
             openProject.invoke(location, openProjectOutput)
         }
     }

@@ -37,6 +37,10 @@ class `Rename Story Event Dialog Test` : FxRobot() {
         var failWith: Throwable? = null
         val completion = Job()
 
+        override fun requestToRenameStoryEvent(storyEventId: StoryEvent.Id, currentName: String) {
+            TODO("Not yet implemented")
+        }
+
         override fun renameStoryEvent(storyEventId: StoryEvent.Id, newName: NonBlankString): Job {
             requestedStoryEvent = storyEventId
             requestedName = newName.value
@@ -53,7 +57,7 @@ class `Rename Story Event Dialog Test` : FxRobot() {
 
     private val form = run {
         var view: RenameStoryEventDialogView? = null
-        interact { view =  RenameStoryEventDialogView(props, renameStoryEventController) }
+        interact { view =  RenameStoryEventDialogView(props.storyEventId, props.currentName, renameStoryEventController) }
         view!!
     }
 

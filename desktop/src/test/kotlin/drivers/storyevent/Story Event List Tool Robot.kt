@@ -18,7 +18,7 @@ import tornadofx.selectedItem
 
 fun WorkBench.getOpenStoryEventListTool(): StoryEventListToolView? =
     (DI.getRegisteredTypes(scope)[StoryEventListToolView::class] as? StoryEventListToolView)
-        ?.takeIf { it.root.scene?.window?.isShowing == true }
+        ?.takeIf { it.scene?.window?.isShowing == true }
 
 fun WorkBench.getOpenStoryEventListToolOrError(): StoryEventListToolView = getOpenStoryEventListTool()
     ?: error("Story Event List Tool was not opened in this workbench ${scope.projectViewModel}")
@@ -30,7 +30,11 @@ fun WorkBench.givenStoryEventListToolHasBeenOpened(): StoryEventListToolView = g
 
 fun WorkBench.openStoryEventListTool() {
     findMenuItemById("tools_storyeventlist")!!
-        .apply { robot.interact { fire() } }
+        .apply {
+            robot.interact {
+                fire()
+            }
+        }
 }
 
 fun StoryEventListToolView.openCreateStoryEventDialog() {

@@ -7,6 +7,7 @@ import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 import com.soyle.stories.usecase.project.startNewProject.StartNewProjectUseCase
 import com.soyle.stories.repositories.ProjectRepositoryImpl
 import com.soyle.stories.stores.ProjectFileStore
+import kotlinx.coroutines.Job
 import java.io.File
 
 class StartProjectControllerImpl(
@@ -16,7 +17,7 @@ class StartProjectControllerImpl(
     private val openProjectController: OpenProjectController
 ) : StartProjectController {
 
-    override fun startProject(directory: String, name: NonBlankString) {
+    override fun startProject(directory: String, name: NonBlankString): Job {
         val projectLocation = directory + File.separator + name + ".stry"
         val startProjectUseCase = StartNewProjectUseCase(
             ProjectRepositoryImpl(
@@ -24,10 +25,10 @@ class StartProjectControllerImpl(
                 fileStore
             )
         )
-        threadTransformer.async {
+        return threadTransformer.async {
             startProjectUseCase.invoke(name, object : StartNewProject.OutputPort {
                 override suspend fun receiveStartNewProjectResponse(response: StartNewProject.ResponseModel) {
-                    openProjectController.openProject(projectLocation)
+                    openProjectController.openProject(projectLocation).join()
                     startNewProjectOutput.receiveStartNewProjectResponse(response)
                 }
 

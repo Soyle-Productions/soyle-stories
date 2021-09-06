@@ -28,9 +28,12 @@ class ProjectDriver(private val soyleStories: SoyleStories)
     }
 
     fun openProject(): Project {
-        soyleStories.scope.get<StartProjectController>().startProject(
+        val job = soyleStories.scope.get<StartProjectController>().startProject(
             "A Place", NonBlankString.create("Untitled")!!
         )
+        runBlocking {
+            job.join()
+        }
         return getOpenProjectOrError()
     }
 }

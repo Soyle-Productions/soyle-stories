@@ -16,8 +16,18 @@ interface CreateStoryEventController {
             projectId: Project.Id,
             threadTransformer: ThreadTransformer,
             createStoryEvent: CreateStoryEvent,
-            createStoryEventOutputPort: CreateStoryEvent.OutputPort
+            createStoryEventOutputPort: CreateStoryEvent.OutputPort,
+
+            createStoryEventPrompt: CreateStoryEventPrompt
         ): CreateStoryEventController = object : CreateStoryEventController {
+
+            override fun requestToCreateStoryEvent() {
+                createStoryEventPrompt.promptToCreateStoryEvent(null)
+            }
+
+            override fun requestToCreateStoryEvent(relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative) {
+                createStoryEventPrompt.promptToCreateStoryEvent(relativeTo)
+            }
 
             override fun createStoryEvent(name: NonBlankString): Job {
                 return createStoryEvent(CreateStoryEvent.RequestModel(name, projectId))
@@ -48,6 +58,9 @@ interface CreateStoryEventController {
             }
         }
     }
+
+    fun requestToCreateStoryEvent()
+    fun requestToCreateStoryEvent(relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative)
 
     fun createStoryEvent(name: NonBlankString): Job
 

@@ -81,7 +81,8 @@ object StoryEventModule {
 			  Project.Id(projectId),
 			  applicationScope.get(),
 			  get(),
-			  get()
+			  get(),
+				get()
 			)
 		}
 

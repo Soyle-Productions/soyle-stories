@@ -7,15 +7,20 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.create.*
-import com.soyle.stories.storyevent.list.StoryEventListTool
-import com.soyle.stories.storyevent.list.StoryEventListToolView
+import com.soyle.stories.storyevent.list.*
 import com.soyle.stories.storyevent.remove.*
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
 import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
+import com.soyle.stories.storyevent.rename.RenameStoryEventPrompt
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialogView
 import com.soyle.stories.storyevent.time.StoryEventRescheduledNotifier
+import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimePrompt
+import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventPrompt
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
+import javafx.scene.Node
+import javafx.scene.control.ListCell
 import kotlinx.coroutines.Job
 import tornadofx.UIComponent
 
@@ -25,53 +30,86 @@ object Presentation {
         scoped<ProjectScope> {
             provide<StoryEventListTool> {
                 object : StoryEventListTool {
-                    override fun invoke(projectId: Project.Id): UIComponent {
-                        val view = StoryEventListToolView(
+                    override fun invoke(projectId: Project.Id): Node {
+                        val presenter = StoryEventListPresenter(
                             projectId = projectId,
-                            createStoryEventDialog = get(),
-                            renameStoryEventDialog = get(),
-                            rescheduleStoryEventDialog = get(),
+                            createStoryEventController = get(),
+                            renameStoryEventController = get(),
+                            rescheduleStoryEventController = get(),
+                            adjustStoryEventsTimeController = get(),
                             removeStoryEventController = get(),
-                            listStoryEventsInProject = get(),
+                            listStoryEventsController = get(),
                             storyEventCreated = get<StoryEventCreatedNotifier>(),
                             storyEventRenamed = get<StoryEventRenamedNotifier>(),
                             storyEventRescheduled = get<StoryEventRescheduledNotifier>(),
-                            storyEventNoLongerHappens = get<StoryEventNoLongerHappensNotifier>()
+                            storyEventNoLongerHappens = get<StoryEventNoLongerHappensNotifier>(),
+                            threadTransformer = applicationScope.get()
                         )
+
+                        val view = StoryEventListToolView(
+                            presenter,
+                            presenter.viewModel,
+                            get()
+                        )
+
                         if (projectId.uuid == this@provide.projectId) {
                             DI.getRegisteredTypes(this@provide)[StoryEventListToolView::class] = view
                         }
+
                         return view
                     }
                 }
             }
 
-            provide<CreateStoryEventDialog> {
-                object : CreateStoryEventDialog {
-                    override fun invoke(props: CreateStoryEventDialog.Props): UIComponent {
-                        return CreateStoryEventDialogView(
-                            props,
+            provide<StoryEventListCell> {
+                object : StoryEventListCell {
+                    override fun invoke(): ListCell<StoryEventListItemViewModel> {
+                        return object : ListCell<StoryEventListItemViewModel>() {
+                            override fun updateItem(item: StoryEventListItemViewModel?, empty: Boolean) {
+                                super.updateItem(item, empty)
+                                if (empty || item == null) {
+                                    graphic = null
+                                    text = null
+                                } else {
+                                    graphic = StoryEventListItemView(item)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            provide<CreateStoryEventPrompt> {
+                object : CreateStoryEventPrompt {
+                    override fun promptToCreateStoryEvent(relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative?) {
+                        CreateStoryEventDialogView(
+                            relativeTo,
                             get<CreateStoryEventController>()
                         )
                     }
                 }
             }
 
-            provide<RenameStoryEventDialog> {
-                object : RenameStoryEventDialog {
-                    override fun invoke(props: RenameStoryEventDialog.Props): UIComponent {
-                        return RenameStoryEventDialogView(
-                            props,
+            provide<RenameStoryEventPrompt> {
+                object : RenameStoryEventPrompt {
+                    override fun promptForNewName(storyEventId: StoryEvent.Id, currentName: String) {
+                        RenameStoryEventDialogView(
+                            storyEventId,
+                            currentName,
                             get()
                         )
                     }
                 }
             }
 
-            provide<RescheduleStoryEventDialog> {
-                object : RescheduleStoryEventDialog {
-                    override fun invoke(props: RescheduleStoryEventDialog.Props) {
-                        RescheduleStoryEventDialogView(props, get(), get())
+            provide(RescheduleStoryEventPrompt::class, AdjustStoryEventsTimePrompt::class) {
+                object : RescheduleStoryEventPrompt, AdjustStoryEventsTimePrompt {
+                    override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
+                        RescheduleStoryEventDialogView(RescheduleStoryEventDialog.Props(storyEventId, currentTime), get(), get())
+                    }
+
+                    override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>) {
+                        RescheduleStoryEventDialogView(RescheduleStoryEventDialog.AdjustTimes(storyEventIds), get(), get())
                     }
                 }
             }

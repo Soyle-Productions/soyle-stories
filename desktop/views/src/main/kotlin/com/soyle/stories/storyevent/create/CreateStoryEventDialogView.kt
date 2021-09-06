@@ -7,6 +7,7 @@ import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.soylestories.Styles
 import com.soyle.stories.storyevent.NullableLongSpinnerValueFactory
+import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.application.Platform
@@ -28,7 +29,7 @@ import tornadofx.Stylesheet.Companion.root
 import java.util.*
 
 class CreateStoryEventDialogView(
-    private val props: CreateStoryEventDialog.Props,
+    private val relativePlacement: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? = null,
     private val createStoryEventController: CreateStoryEventController
 ) : View() {
 
@@ -37,7 +38,7 @@ class CreateStoryEventDialogView(
     private val awaitingSubmission = booleanProperty(false)
 
     private val nameInput = nameInput()
-    private val timeInput: Spinner<Long?>? = if (props.relativePlacement == null) timeInput() else null
+    private val timeInput: Spinner<Long?>? = if (relativePlacement == null) timeInput() else null
     private val cancelButton: Button = cancelButton()
     private val submitButton: Button = submitButton()
 
@@ -58,7 +59,6 @@ class CreateStoryEventDialogView(
     private fun cancel() {
         nameInput.text = ""
         timeInput?.valueFactory?.value = null
-        props.onCancelled?.invoke()
         stage.hide()
     }
 
@@ -112,9 +112,9 @@ class CreateStoryEventDialogView(
 
     private fun createStoryEventJob(name: NonBlankString, time: Long?): Job {
         return when {
-            props.relativePlacement != null -> createStoryEventController.createStoryEvent(
+            relativePlacement != null -> createStoryEventController.createStoryEvent(
                 name,
-                props.relativePlacement
+                relativePlacement
             )
             time == null -> createStoryEventController.createStoryEvent(name)
             else -> createStoryEventController.createStoryEvent(name, time)
@@ -133,7 +133,6 @@ class CreateStoryEventDialogView(
         if (potentialFailure == null) {
             nameInput.text = ""
             timeInput?.valueFactory?.value = null
-            props.onCreated?.invoke()
             stage.hide()
         }
     }

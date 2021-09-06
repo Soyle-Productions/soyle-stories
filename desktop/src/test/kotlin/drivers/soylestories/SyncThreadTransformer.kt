@@ -9,7 +9,9 @@ import kotlinx.coroutines.javafx.*
 class SyncThreadTransformer : ThreadTransformer {
 
 	override fun async(task: suspend CoroutineScope.() -> Unit): Job {
-		return runBlocking {
+		return if (Platform.isFxApplicationThread()) {
+			guiScope.launch { task() }
+		} else runBlocking {
 			launch {
 				task()
 			}

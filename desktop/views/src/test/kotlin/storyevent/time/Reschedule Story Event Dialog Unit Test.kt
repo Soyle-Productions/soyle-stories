@@ -38,6 +38,9 @@ class `Reschedule Story Event Dialog Unit Test` : FxRobot() {
     private var requestedStoryEventTime: Long? = null
     private val rescheduleStoryEventController = object : RescheduleStoryEventController {
         lateinit var currentJob: CompletableJob
+        override fun requestToRescheduleStoryEvent(storyEventId: StoryEvent.Id, currentTime: Long) {
+            TODO("Not yet implemented")
+        }
         override fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, time: Long): Job {
             requestedStoryEventId = storyEventId
             requestedStoryEventTime = time
@@ -52,6 +55,9 @@ class `Reschedule Story Event Dialog Unit Test` : FxRobot() {
         var requestedAdjustmentTime: Long? = null
 
         lateinit var currentJob: CompletableJob
+        override fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>) {
+            TODO("Not yet implemented")
+        }
         override fun adjustStoryEventsTime(storyEventIds: Set<StoryEvent.Id>, amount: Long): Job {
             requestedStoryEventIds = storyEventIds
             requestedAdjustmentTime = amount

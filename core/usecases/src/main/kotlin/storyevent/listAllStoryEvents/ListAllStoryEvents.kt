@@ -11,7 +11,7 @@ interface ListAllStoryEvents {
 	class ResponseModel(val storyEventItems: List<StoryEventItem>)
 
 	fun interface OutputPort {
-		fun receiveListAllStoryEventsResponse(response: ResponseModel)
+		suspend fun receiveListAllStoryEventsResponse(response: ResponseModel)
 	}
 
 }

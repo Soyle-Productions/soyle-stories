@@ -1,7 +1,7 @@
 package com.soyle.stories.desktop.view.storyevent.list
 
 import com.soyle.stories.desktop.view.common.NodeAccess
-import com.soyle.stories.storyevent.items.StoryEventListItemViewModel
+import com.soyle.stories.storyevent.list.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.StoryEventListToolView
 import javafx.scene.Node
 import javafx.scene.control.*
@@ -9,7 +9,7 @@ import tornadofx.CssRule
 import tornadofx.Stylesheet
 import tornadofx.cssclass
 
-class StoryEventListToolAccess private constructor(private val tool: StoryEventListToolView) : NodeAccess<Node>(tool.root) {
+class StoryEventListToolAccess private constructor(private val tool: StoryEventListToolView) : NodeAccess<Node>(tool) {
     companion object {
         fun StoryEventListToolView.access() = StoryEventListToolAccess(this)
         fun <T> StoryEventListToolView.drive(op: StoryEventListToolAccess.() -> T): T
@@ -31,8 +31,11 @@ class StoryEventListToolAccess private constructor(private val tool: StoryEventL
     val retryButton: Button? by temporaryChild<Button>(Stylesheet.button) { it.id == "retry" }
 
     val optionsButton: MenuButton? by temporaryChild(Stylesheet.menuButton)
-    fun MenuButton.insertNewStoryEventOption(placement: String): MenuItem? = items.find { it.id == "insert-story-event-$placement" }
+    fun MenuButton.insertNewStoryEventOption(placement: String): MenuItem? = (items.find { it.id == "insert" } as? Menu)
         ?.takeIf { isDisable == false }
+        ?.items?.find { it.id == placement }
+        ?.takeIf { isDisable == false }
+
     val MenuButton.renameOption: MenuItem?
         get() = items.find { it.id == "rename" }?.takeIf { isDisable == false }
     val MenuButton.rescheduleOption: MenuItem?

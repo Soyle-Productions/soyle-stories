@@ -53,19 +53,19 @@ object UseCases {
     private fun InProjectScope.renameStoryEvent() {
         provide<RenameStoryEvent> { RenameStoryEventUseCase(get()) }
         provide<RenameStoryEvent.OutputPort> { RenameStoryEventOutput(get()) }
-        provide<RenameStoryEventController> { RenameStoryEventController(applicationScope.get(), get(), get()) }
+        provide<RenameStoryEventController> { RenameStoryEventController(applicationScope.get(), get(), get(), get()) }
     }
 
     private fun InProjectScope.rescheduleStoryEvent() {
         provide<RescheduleStoryEvent> { RescheduleStoryEventUseCase(get()) }
         provide<RescheduleStoryEvent.OutputPort> { RescheduleStoryEventOutput(get()) }
-        provide<RescheduleStoryEventController> { RescheduleStoryEventController(applicationScope.get(), get(), get()) }
+        provide<RescheduleStoryEventController> { RescheduleStoryEventController(applicationScope.get(), get(), get(), get()) }
     }
 
     private fun InProjectScope.adjustStoryEventsTime() {
         provide<AdjustStoryEventsTime> { AdjustStoryEventsTimeUseCase(get()) }
         provide<AdjustStoryEventsTime.OutputPort> { AdjustStoryEventsTimeOutput(get()) }
-        provide<AdjustStoryEventsTimeController> { AdjustStoryEventsTimeController(applicationScope.get(), get(), get()) }
+        provide<AdjustStoryEventsTimeController> { AdjustStoryEventsTimeController(applicationScope.get(), get(), get(), get()) }
     }
 
     private fun InProjectScope.removeStoryEvent() {

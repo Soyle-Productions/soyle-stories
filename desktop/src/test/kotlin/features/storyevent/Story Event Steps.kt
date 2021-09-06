@@ -8,6 +8,8 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.fail
 import org.testfx.assertions.api.Assertions.assertThat
@@ -57,6 +59,7 @@ class `Story Event Steps` : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCreateStoryEventDialogHasBeenOpened()
                 .createStoryEventNamed(name, time)
+            runBlocking { delay(100) } // given events time to propagate
         }
         When(
             "I create a story event named {string} {} the {story event}"
@@ -70,6 +73,7 @@ class `Story Event Steps` : En {
             workBench
                 .getOpenCreateStoryEventDialogOrError()
                 .createStoryEventNamed(name)
+            runBlocking { delay(100) } // given events time to propagate
         }
         When("I rename the {story event} to {string}") { storyEvent: StoryEvent, newName: String ->
             val workBench = soyleStories.getAnyOpenWorkbenchOrError()
@@ -81,6 +85,7 @@ class `Story Event Steps` : En {
             workBench
                 .getOpenRenameStoryEventDialogOrError()
                 .renameStoryEvent(newName)
+            runBlocking { delay(100) } // given events time to propagate
         }
         When("I change the {story event}'s time to {int}") { storyEvent: StoryEvent, time: Int ->
             val workBench = soyleStories.getAnyOpenWorkbenchOrError()
@@ -92,6 +97,7 @@ class `Story Event Steps` : En {
             workBench
                 .getOpenStoryEventTimeAdjustmentDialogOrError()
                 .reschedule(time.toLong())
+            runBlocking { delay(100) } // given events time to propagate
         }
         When("I increment the selected story events' times by {int}") { adjustment: Int ->
             val workBench = soyleStories.getAnyOpenWorkbenchOrError()
@@ -102,6 +108,7 @@ class `Story Event Steps` : En {
             workBench
                 .getOpenStoryEventTimeAdjustmentDialogOrError()
                 .adjustTime(by = adjustment.toLong())
+            runBlocking { delay(100) } // given events time to propagate
         }
         When("I want to delete the {story event}") { storyEvent: StoryEvent ->
             soyleStories.getAnyOpenWorkbenchOrError()
@@ -113,6 +120,7 @@ class `Story Event Steps` : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .getOpenDeleteStoryEventDialogOrError()
                 .confirm()
+            runBlocking { delay(100) } // given events time to propagate
         }
     }
 

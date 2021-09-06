@@ -7,6 +7,7 @@ import kotlinx.coroutines.Job
 
 interface RescheduleStoryEventController {
 
+    fun requestToRescheduleStoryEvent(storyEventId: StoryEvent.Id, currentTime: Long)
     fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, time: Long): Job
 
     companion object {
@@ -14,8 +15,15 @@ interface RescheduleStoryEventController {
         operator fun invoke(
             threadTransformer: ThreadTransformer,
             rescheduleStoryEvent: RescheduleStoryEvent,
-            rescheduleStoryEventOutput: RescheduleStoryEvent.OutputPort
+            rescheduleStoryEventOutput: RescheduleStoryEvent.OutputPort,
+
+            newTimePrompt: RescheduleStoryEventPrompt
         ): RescheduleStoryEventController = object : RescheduleStoryEventController {
+
+            override fun requestToRescheduleStoryEvent(storyEventId: StoryEvent.Id, currentTime: Long) {
+                newTimePrompt.promptForNewTime(storyEventId, currentTime)
+            }
+
             override fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, time: Long): Job {
                 return threadTransformer.async {
                     rescheduleStoryEvent.invoke(storyEventId, time, rescheduleStoryEventOutput)

@@ -26,8 +26,10 @@ object StoryEventList : ToolConfig<StoryEventList>, FixedTool() {
     override fun getTabConfig(tool: ToolViewModel, type: StoryEventList): ToolTabConfig = object : ToolTabConfig {
         override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
             val list = projectScope.get<StoryEventListTool>().invoke(Project.Id(projectScope.projectId))
-            tabPane.add(list.root)
-            return tabPane.tabs.last()
+            tabPane.add(list)
+            return tabPane.tabs.last().apply {
+                text = getViewModelConfig(type).toolName()
+            }
         }
     }
 

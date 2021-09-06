@@ -14,11 +14,10 @@ import javafx.stage.Stage
 import tornadofx.*
 
 class RenameStoryEventDialogView(
-    props: RenameStoryEventDialog.Props,
+    private val storyEventId: StoryEvent.Id,
+    currentName: String,
     private val renameStoryEventController: RenameStoryEventController
 ) : View() {
-
-    private val storyEventId = props.storyEventId
 
     private val submitting = booleanProperty(false)
 
@@ -28,12 +27,12 @@ class RenameStoryEventDialogView(
         disableWhen(submitting)
     }
     private val nameInput = TextField().apply {
-        text = props.currentName
+        text = currentName
         disableWhen(submitting)
     }
     private val submitButton = Button().apply {
         addClass(Stylesheet.default)
-        enableWhen(nameIsValid(props.currentName).and(submitting.not()))
+        enableWhen(nameIsValid(currentName).and(submitting.not()))
         action(::submit)
     }
 

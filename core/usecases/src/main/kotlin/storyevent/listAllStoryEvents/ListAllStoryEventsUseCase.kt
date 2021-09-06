@@ -15,6 +15,6 @@ class ListAllStoryEventsUseCase(
 		storyEventRepository.listStoryEventsInProject(projectId)
 			.map(StoryEvent::toItem)
 			.let(ListAllStoryEvents::ResponseModel)
-			.let(output::receiveListAllStoryEventsResponse)
+			.let { output.receiveListAllStoryEventsResponse(it) }
 	}
 }

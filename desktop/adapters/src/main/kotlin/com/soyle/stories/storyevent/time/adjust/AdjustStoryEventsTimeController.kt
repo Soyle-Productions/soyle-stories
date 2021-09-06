@@ -7,14 +7,21 @@ import kotlinx.coroutines.Job
 
 interface AdjustStoryEventsTimeController {
 
+    fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>)
     fun adjustStoryEventsTime(storyEventIds: Set<StoryEvent.Id>, amount: Long): Job
 
     companion object {
         operator fun invoke(
             threadTransformer: ThreadTransformer,
             adjustStoryEventsTime: AdjustStoryEventsTime,
-            adjustStoryEventsTimeOutput: AdjustStoryEventsTime.OutputPort
+            adjustStoryEventsTimeOutput: AdjustStoryEventsTime.OutputPort,
+
+            adjustStoryEventsTimePrompt: AdjustStoryEventsTimePrompt
         ) = object : AdjustStoryEventsTimeController {
+            override fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>) {
+                adjustStoryEventsTimePrompt.promptForAdjustmentAmount(storyEventIds)
+            }
+
             override fun adjustStoryEventsTime(storyEventIds: Set<StoryEvent.Id>, amount: Long): Job {
                 return threadTransformer.async {
                     adjustStoryEventsTime.invoke(storyEventIds, amount, adjustStoryEventsTimeOutput)

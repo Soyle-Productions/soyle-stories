@@ -2,6 +2,7 @@ package com.soyle.stories.common.components
 
 import com.soyle.stories.common.ColorStyles
 import com.soyle.stories.common.components.buttons.ButtonStyles
+import com.soyle.stories.common.components.dataDisplay.list.ListStyles
 import com.soyle.stories.common.components.inputs.InputStyles
 import com.soyle.stories.common.components.surfaces.SurfaceStyles
 import com.soyle.stories.common.components.text.TextStyles
@@ -60,6 +61,7 @@ class ComponentsStyles : Stylesheet() {
             ButtonStyles // reference to initialize
             TextStyles // reference to initialize
             InputStyles // reference to initialize
+            ListStyles // reference to initialize
         }
     }
 
@@ -210,19 +212,19 @@ class ComponentsStyles : Stylesheet() {
 
         radioButton and selected {
             radio {
-                borderColor = multi(box(Styles.Purple))
+                borderColor = multi(box(ColorStyles.Purple))
             }
             dot {
-                backgroundColor = multi(Styles.Purple)
+                backgroundColor = multi(ColorStyles.Purple)
             }
         }
 
         checkBox and selected {
             box {
-                borderColor = multi(box(Styles.Purple))
+                borderColor = multi(box(ColorStyles.Purple))
             }
             mark {
-                backgroundColor = multi(Styles.Purple)
+                backgroundColor = multi(ColorStyles.Purple)
             }
         }
 

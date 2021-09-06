@@ -57,7 +57,7 @@ class `Create Story Event Dialog Test` : FxRobot() {
     private fun createStoryEventDialog(props: CreateStoryEventDialog.Props): CreateStoryEventDialogView {
         var dialog: CreateStoryEventDialogView? = null
         interact {
-            dialog = CreateStoryEventDialogView(props, createStoryEventController)
+            dialog = CreateStoryEventDialogView(props.relativePlacement, createStoryEventController)
         }
         return dialog!!
     }

@@ -7,6 +7,10 @@ import kotlinx.coroutines.Job
 
 class RenameStoryEventControllerDouble : RenameStoryEventController {
 
+    override fun requestToRenameStoryEvent(storyEventId: StoryEvent.Id, currentName: String) {
+
+    }
+
     override fun renameStoryEvent(storyEventId: StoryEvent.Id, newName: NonBlankString): Job {
         return Job()
     }

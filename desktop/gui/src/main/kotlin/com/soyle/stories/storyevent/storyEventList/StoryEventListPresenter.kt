@@ -22,7 +22,7 @@ class StoryEventListPresenter(
 	  RenameStoryEventPresenter(view) listensTo renameStoryEventNotifier
 	)
 
-	override fun receiveListAllStoryEventsResponse(response: ListAllStoryEvents.ResponseModel) {
+	override suspend fun receiveListAllStoryEventsResponse(response: ListAllStoryEvents.ResponseModel) {
 		view.update {
 			StoryEventListViewModel(
 			  "Story Events",

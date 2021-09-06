@@ -10,6 +10,9 @@ class ListStoryEventsControllerDouble(
     private val exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { context, it -> context.cancel(CancellationException("", it)) }
 ) : ListStoryEventsController {
 
+    var requestedProjectId: Project.Id? = null
+        private set
+
     var shouldFailWith: Throwable? = null
     var failAfterResult = false
 
@@ -19,6 +22,7 @@ class ListStoryEventsControllerDouble(
 
 
     override fun listStoryEventsInProject(projectId: Project.Id, output: ListAllStoryEvents.OutputPort): Job {
+        requestedProjectId = projectId
         val failure = shouldFailWith
         return CoroutineScope(Dispatchers.Default).launch(exceptionHandler) {
             if (failure != null) {
