@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import tornadofx.fitToParentSize
 import tornadofx.objectProperty
@@ -57,8 +58,10 @@ class `Story Event List Tool Design` : DesignTest() {
             }
         }
     }
+    private val view by lazy {
+        StoryEventListToolView(actions, viewModel, cell)
+    }
     override val node: Node by lazy {
-        val view = StoryEventListToolView(actions, viewModel, cell)
         TabPane(Tab("Story Events", view).apply {
 
         })

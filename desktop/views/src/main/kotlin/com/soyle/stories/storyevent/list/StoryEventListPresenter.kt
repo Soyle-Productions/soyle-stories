@@ -222,7 +222,7 @@ class StoryEventListPresenter(
                 }
                 if (ids.isEmpty()) return@withContext
                 val vm = viewModel.value as? PopulatedStoryEventListViewModel ?: return@withContext
-                val newItems = vm.items.filterNot { it.id in ids }
+                val newItems = vm.items.asSequence().filterNot { it.id in ids }.orderAndGroupByTime()
                 if (newItems.isEmpty()) viewModel.set(EmptyStoryEventListViewModel)
                 else vm.items.setAll(newItems)
             }

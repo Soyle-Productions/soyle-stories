@@ -27,9 +27,11 @@ class StoryEventListToolView(
     private val StoryEventListCell: StoryEventListCell
 ) : VBox() {
 
+    private val isEmpty = viewModel.booleanBinding { it == null || !it.isPopulated }
+
     init {
         id = StoryEventListStyles.storyEventList.name
-        toggleClass(Stylesheet.empty, viewModel.booleanBinding { it == null || !it.isPopulated })
+        toggleClass(Stylesheet.empty, isEmpty)
         dynamicContent(viewModel) {
             when (it) {
                 null -> Unit

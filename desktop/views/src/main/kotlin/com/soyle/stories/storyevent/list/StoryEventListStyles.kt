@@ -26,6 +26,7 @@ class StoryEventListStyles : Stylesheet() {
     init {
         storyEventList {
             fillWidth = true
+            spacing = 0.px
             and(empty) {
                 spacing = 16.px
                 alignment = Pos.CENTER
@@ -33,7 +34,6 @@ class StoryEventListStyles : Stylesheet() {
 
             listView {
                 padding = box(8.px)
-             //   backgroundColor = multi(SurfaceStyles.lightBackground(8.0))
             }
         }
 

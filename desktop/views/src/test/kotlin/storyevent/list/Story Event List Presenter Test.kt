@@ -640,30 +640,83 @@ class `Story Event List Presenter Test` {
     @Nested
     inner class `When Story Events are Removed` {
 
-        private val removedStoryEventIds = List(7) { StoryEvent.Id() }
+        private val removedStoryEvents = listOf(
+            StoryEventItem(StoryEvent.Id(), "Some name 0", 4L),
+            StoryEventItem(StoryEvent.Id(), "Some name 1", 4L),
+            StoryEventItem(StoryEvent.Id(), "Some name 2", 4L),
+            StoryEventItem(StoryEvent.Id(), "Some name 3", 2L),
+            StoryEventItem(StoryEvent.Id(), "Some name 4", 1L),
+            StoryEventItem(StoryEvent.Id(), "Some name 5", 5L),
+            StoryEventItem(StoryEvent.Id(), "Some name 6", 2L),
+        )
 
-        private val items = (List(5) {
-            StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
-        } + removedStoryEventIds.mapIndexed { index, id ->
-            StoryEventItem(id, "Some name $index", (0..5).random().toLong())
-        })
+        private val items = removedStoryEvents + listOf(
+            StoryEventItem(StoryEvent.Id(), "name 0", 0L),
+            StoryEventItem(StoryEvent.Id(), "name 1", 1L),
+            StoryEventItem(StoryEvent.Id(), "name 2", 2L),
+            StoryEventItem(StoryEvent.Id(), "name 3", 3L),
+            StoryEventItem(StoryEvent.Id(), "name 4", 4L),
+        )
+
+        /*
+        Ordered Events:
+            StoryEventItem(StoryEvent.Id(), "name 0", 0L),
+            StoryEventItem(StoryEvent.Id(), "Some name 4", 1L),
+            StoryEventItem(StoryEvent.Id(), "name 1", 1L),
+            StoryEventItem(StoryEvent.Id(), "Some name 3", 2L),
+            StoryEventItem(StoryEvent.Id(), "Some name 6", 2L),
+            StoryEventItem(StoryEvent.Id(), "name 2", 2L),
+            StoryEventItem(StoryEvent.Id(), "name 3", 3L),
+            StoryEventItem(StoryEvent.Id(), "Some name 0", 4L),
+            StoryEventItem(StoryEvent.Id(), "Some name 1", 4L),
+            StoryEventItem(StoryEvent.Id(), "Some name 2", 4L),
+            StoryEventItem(StoryEvent.Id(), "Some name 5", 5L),
+            StoryEventItem(StoryEvent.Id(), "name 4", 4L),
+
+        After Deletion:
+            StoryEventItem(StoryEvent.Id(), "name 0", 0L),
+            StoryEventItem(StoryEvent.Id(), "name 1", 1L),
+            StoryEventItem(StoryEvent.Id(), "name 2", 2L),
+            StoryEventItem(StoryEvent.Id(), "name 3", 3L),
+            StoryEventItem(StoryEvent.Id(), "name 4", 4L),
+
+         */
 
         init {
+            items.forEach {
+                println("StoryEventItem(StoryEvent.Id(), \"${it.storyEventName}\", ${it.time}L),")
+            }
+
             `When Loading Succeeds`().`given controller responded with`(items)
         }
 
         @Test
         fun `should remove corresponding story event items`() {
             runBlocking {
-                removedStoryEventIds.forEach {
-                    storyEventRemovedNotifier.receiveStoryEventNoLongerHappens(StoryEventNoLongerHappens(it))
+                removedStoryEvents.forEach {
+                    storyEventRemovedNotifier.receiveStoryEventNoLongerHappens(StoryEventNoLongerHappens(it.storyEventId))
                 }
             }
 
             with(viewModel as PopulatedStoryEventListViewModel) {
-                removedStoryEventIds.forEach { id ->
-                    assertThat(items.find { it.id == id }).isNull()
+                removedStoryEvents.forEach { storyEvent ->
+                    assertThat(items.find { it.id == storyEvent.storyEventId }).isNull()
                 }
+            }
+        }
+
+        @Test
+        fun `should update prev time match for each item`() {
+            runBlocking {
+                removedStoryEvents.forEach {
+                    storyEventRemovedNotifier.receiveStoryEventNoLongerHappens(StoryEventNoLongerHappens(it.storyEventId))
+                }
+            }
+
+            with(viewModel as PopulatedStoryEventListViewModel) {
+                assertThat(items.map { it.prevItemHasSameTime.value }).isEqualTo(listOf(
+                    true, false, false, false, false
+                ))
             }
         }
 
@@ -675,9 +728,9 @@ class `Story Event List Presenter Test` {
             }
             val processesCompletedCount = AtomicInteger(0)
             val send = CoroutineScope(Dispatchers.Main).launch {
-                removedStoryEventIds.map {
+                removedStoryEvents.map {
                     launch {
-                        storyEventRemovedNotifier.receiveStoryEventNoLongerHappens(StoryEventNoLongerHappens(it))
+                        storyEventRemovedNotifier.receiveStoryEventNoLongerHappens(StoryEventNoLongerHappens(it.storyEventId))
                         processesCompletedCount.getAndIncrement()
                     }
                 }.joinAll()
