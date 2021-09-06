@@ -1,6 +1,7 @@
 package com.soyle.stories.project.usecases
 
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.DirectoryDoesNotExist
 import com.soyle.stories.project.FileAlreadyExists
 import com.soyle.stories.project.LocalProjectException
@@ -119,7 +120,7 @@ class StartNewLocalProjectUnitTest {
                 private set
             var createdProject: Project? = null
 
-            override suspend fun invoke(name: String, output: StartNewProject.OutputPort) {
+            override suspend fun invoke(name: NonBlankString, output: StartNewProject.OutputPort) {
                 called = true
                 when (val result = setup.baseUseCaseResult) {
                     is Throwable -> output.receiveStartNewProjectFailure(result)
@@ -132,7 +133,7 @@ class StartNewLocalProjectUnitTest {
                         output.receiveStartNewProjectResponse(
                             StartNewProject.ResponseModel(
                                 createdProject!!.id.uuid,
-                                name
+                                name.value
                             )
                         )
                     }
@@ -191,7 +192,7 @@ class StartNewLocalProjectUnitTest {
         }
         assertions = StartNewLocalProjectAssertions(
             setup.requestDirectory,
-            setup.requestFileName,
+            setup.requestFileName.value,
             output.result,
             repo.createdFile,
             baseUseCase.createdProject?.id
@@ -205,7 +206,7 @@ class StartNewLocalProjectUnitTest {
     class StartNewLocalProjectSetup {
 
         val requestDirectory = "C:\\Some\\local\\directory"
-        val requestFileName = "My epic tale"
+        val requestFileName = NonBlankString.create("My epic tale")!!
 
         var directoryExists: Boolean = true
             private set
@@ -235,7 +236,7 @@ class StartNewLocalProjectUnitTest {
         }
 
         fun startNewProjectUseCaseWillSucceed() {
-            baseUseCaseResult = StartNewProject.ResponseModel(UUID.randomUUID(), requestFileName)
+            baseUseCaseResult = StartNewProject.ResponseModel(UUID.randomUUID(), requestFileName.value)
         }
     }
 

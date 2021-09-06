@@ -6,6 +6,7 @@
 package com.soyle.stories.workspace.usecases
 
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.workspace.ProjectDoesNotExistAtLocation
 import com.soyle.stories.workspace.ProjectException
 import com.soyle.stories.workspace.UnexpectedProjectAlreadyOpenAtLocation
@@ -231,7 +232,7 @@ class OpenProjectTest {
         }
         private val projectRepository = object : ProjectRepository {
             override suspend fun getProjectAtLocation(location: String): Project? =
-                project?.let { Project(it.projectId, it.projectName) }
+                project?.let { Project(it.projectId, NonBlankString.create(it.projectName)!!) }
         }
 
         private val closeProjectUseCase = object : CloseProject {
