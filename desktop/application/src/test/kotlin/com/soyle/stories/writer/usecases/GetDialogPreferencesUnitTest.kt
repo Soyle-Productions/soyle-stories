@@ -1,11 +1,11 @@
 package com.soyle.stories.writer.usecases
 
-import com.soyle.stories.entities.Preferences
-import com.soyle.stories.entities.Writer
+import com.soyle.stories.domain.writer.Writer
+import com.soyle.stories.domain.writer.Preferences
+import com.soyle.stories.usecase.writer.WriterRepository
 import com.soyle.stories.writer.DialogType
 import com.soyle.stories.writer.UnexpectedPreferenceValue
 import com.soyle.stories.writer.doubles.WriterRepositoryDouble
-import com.soyle.stories.writer.repositories.WriterRepository
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
 import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferencesUseCase
 import kotlinx.coroutines.runBlocking

@@ -1,7 +1,7 @@
 package com.soyle.stories.writer.doubles
 
-import com.soyle.stories.entities.Writer
-import com.soyle.stories.writer.repositories.WriterRepository
+import com.soyle.stories.domain.writer.Writer
+import com.soyle.stories.usecase.writer.WriterRepository
 
 class WriterRepositoryDouble(
   private val onReplaceWriter: (Writer) -> Unit = {}

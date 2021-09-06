@@ -1,6 +1,6 @@
 package com.soyle.stories.writer.usecases
 
-import com.soyle.stories.writer.WriterNotRegistered
+import com.soyle.stories.usecase.writer.WriterNotRegistered
 import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.*
 
