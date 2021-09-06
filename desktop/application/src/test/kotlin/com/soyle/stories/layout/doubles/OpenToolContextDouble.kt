@@ -1,6 +1,7 @@
 package com.soyle.stories.layout.doubles
 
 import com.soyle.stories.layout.repositories.OpenToolContext
+import com.soyle.stories.usecase.repositories.*
 
 class OpenToolContextDouble : OpenToolContext {
 

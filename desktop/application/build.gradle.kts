@@ -18,5 +18,6 @@ dependencies {
     implementation(Libraries.kotlin.coroutines)
 
     testImplementation(Libraries.junit.params)
+    testImplementation(testFixtures(project(path = ":core:usecases")))
     implementation("de.jodamob.junit5:junit5-kotlin:0.0.1")
 }
