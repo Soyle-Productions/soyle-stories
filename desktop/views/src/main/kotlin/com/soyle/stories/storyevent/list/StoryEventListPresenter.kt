@@ -9,7 +9,6 @@ import com.soyle.stories.domain.storyevent.events.StoryEventNoLongerHappens
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.storyevent.create.CreateStoryEventController
-import com.soyle.stories.storyevent.create.CreateStoryEventDialog
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.remove.RemoveStoryEventController
 import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensReceiver

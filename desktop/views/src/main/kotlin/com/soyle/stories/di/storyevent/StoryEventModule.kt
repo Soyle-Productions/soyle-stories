@@ -12,7 +12,6 @@ import com.soyle.stories.storyevent.addCharacterToStoryEvent.*
 import com.soyle.stories.storyevent.create.CreateStoryEventController
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogController
-import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogModel
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogPresenter
 import com.soyle.stories.storyevent.createStoryEventDialog.CreateStoryEventDialogViewListener
 import com.soyle.stories.storyevent.linkLocationToStoryEvent.LinkLocationToStoryEventController
@@ -117,16 +116,6 @@ object StoryEventModule {
 			usecases()
 			notifiers()
 			controllers()
-
-			provide<CreateStoryEventDialogViewListener> {
-				CreateStoryEventDialogController(
-				  CreateStoryEventDialogPresenter(
-					get<CreateStoryEventDialogModel>(),
-					get<StoryEventCreatedNotifier>()
-				  ),
-				  get()
-				)
-			}
 
 		}
 

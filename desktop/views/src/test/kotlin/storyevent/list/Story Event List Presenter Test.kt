@@ -14,7 +14,6 @@ import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.storyevent.create.CreateStoryEventController
-import com.soyle.stories.storyevent.create.CreateStoryEventDialog
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.list.*
 import com.soyle.stories.storyevent.remove.RemoveStoryEventController

@@ -1,11 +1,13 @@
 package com.soyle.stories.desktop.config.storyevent
 
+import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.project.WorkBench
 import com.soyle.stories.storyevent.create.*
 import com.soyle.stories.storyevent.list.*
 import com.soyle.stories.storyevent.remove.*
@@ -21,6 +23,8 @@ import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventPrompt
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import javafx.scene.Node
 import javafx.scene.control.ListCell
+import javafx.stage.Modality
+import javafx.stage.StageStyle
 import kotlinx.coroutines.Job
 import tornadofx.UIComponent
 
@@ -82,10 +86,17 @@ object Presentation {
             provide<CreateStoryEventPrompt> {
                 object : CreateStoryEventPrompt {
                     override fun promptToCreateStoryEvent(relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative?) {
-                        CreateStoryEventDialogView(
+                        val presenter = CreateStoryEventPromptPresenter(
                             relativeTo,
-                            get<CreateStoryEventController>()
+                            get<CreateStoryEventController>(),
+                            applicationScope.get()
                         )
+                        CreateStoryEventPromptView(presenter, presenter.viewModel).apply {
+                            val stage = openModal(modality = Modality.APPLICATION_MODAL, owner = get<WorkBench>().currentStage)
+                            presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
+                                if (it == true) stage?.hide()
+                            }
+                        }
                     }
                 }
             }

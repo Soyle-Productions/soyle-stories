@@ -5,21 +5,21 @@ import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.desktop.view.storyevent.create.`Create Story Event Dialog Access`.Companion.access
 import com.soyle.stories.di.DI
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.storyevent.create.CreateStoryEventDialogView
+import com.soyle.stories.storyevent.create.CreateStoryEventPromptView
 
-fun WorkBench.getOpenCreateStoryEventDialog(): CreateStoryEventDialogView? =
-    robot.getOpenDialog<CreateStoryEventDialogView>()
+fun WorkBench.getOpenCreateStoryEventDialog(): CreateStoryEventPromptView? =
+    robot.getOpenDialog<CreateStoryEventPromptView>()
 
-fun WorkBench.getOpenCreateStoryEventDialogOrError(): CreateStoryEventDialogView =
+fun WorkBench.getOpenCreateStoryEventDialogOrError(): CreateStoryEventPromptView =
     getOpenCreateStoryEventDialog() ?: error("Create Story Event Dialog is not open")
 
-fun WorkBench.givenCreateStoryEventDialogHasBeenOpened(): CreateStoryEventDialogView =
+fun WorkBench.givenCreateStoryEventDialogHasBeenOpened(): CreateStoryEventPromptView =
     getOpenCreateStoryEventDialog() ?: run {
         givenStoryEventListToolHasBeenOpened().openCreateStoryEventDialog()
         getOpenCreateStoryEventDialogOrError()
     }
 
-fun CreateStoryEventDialogView.createStoryEventNamed(name: String, time: Int? = null) {
+fun CreateStoryEventPromptView.createStoryEventNamed(name: String, time: Int? = null) {
     with(access()) {
         interact {
             nameInput.text = name
