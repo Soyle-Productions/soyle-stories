@@ -11,9 +11,9 @@ import com.soyle.stories.project.WorkBench
 import com.soyle.stories.storyevent.create.*
 import com.soyle.stories.storyevent.list.*
 import com.soyle.stories.storyevent.remove.*
-import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
-import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
 import com.soyle.stories.storyevent.rename.RenameStoryEventPrompt
+import com.soyle.stories.storyevent.rename.RenameStoryEventPromptPresenter
+import com.soyle.stories.storyevent.rename.RenameStoryEventPromptView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
 import com.soyle.stories.storyevent.time.RescheduleStoryEventDialogView
@@ -104,11 +104,18 @@ object Presentation {
             provide<RenameStoryEventPrompt> {
                 object : RenameStoryEventPrompt {
                     override fun promptForNewName(storyEventId: StoryEvent.Id, currentName: String) {
-                        RenameStoryEventDialogView(
+                        val presenter = RenameStoryEventPromptPresenter(
                             storyEventId,
                             currentName,
-                            get()
+                            get(),
+                            applicationScope.get()
                         )
+                        RenameStoryEventPromptView(presenter.viewModel, presenter).apply {
+                            val stage = openModal(modality = Modality.APPLICATION_MODAL, owner = get<WorkBench>().currentStage)
+                            presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
+                                if (it == true) stage?.hide()
+                            }
+                        }
                     }
                 }
             }

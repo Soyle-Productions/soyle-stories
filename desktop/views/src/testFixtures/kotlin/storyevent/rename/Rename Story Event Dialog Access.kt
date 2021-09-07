@@ -1,19 +1,19 @@
 package com.soyle.stories.desktop.view.storyevent.rename
 
 import com.soyle.stories.desktop.view.common.NodeAccess
-import com.soyle.stories.storyevent.rename.RenameStoryEventDialogView
+import com.soyle.stories.storyevent.rename.RenameStoryEventPromptView
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.TextInputControl
 import tornadofx.Stylesheet
 import tornadofx.hasClass
 
-class `Rename Story Event Dialog Access` private constructor(private val view: RenameStoryEventDialogView) : NodeAccess<Node>(view.root) {
+class `Rename Story Event Dialog Access` private constructor(private val view: RenameStoryEventPromptView) : NodeAccess<Node>(view.root) {
     companion object {
-        fun RenameStoryEventDialogView.access(): `Rename Story Event Dialog Access` {
+        fun RenameStoryEventPromptView.access(): `Rename Story Event Dialog Access` {
             return `Rename Story Event Dialog Access`(this)
         }
-        fun RenameStoryEventDialogView.drive(op:  `Rename Story Event Dialog Access`.() -> Unit) {
+        fun RenameStoryEventPromptView.drive(op:  `Rename Story Event Dialog Access`.() -> Unit) {
             val access = `Rename Story Event Dialog Access`(this)
             access.interact { access.op() }
         }
