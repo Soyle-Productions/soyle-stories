@@ -15,6 +15,7 @@ class CreateStoryEventPromptPresenter(
 
     override fun createStoryEvent() {
         if (! viewModel.isValid.value) return
+        if (viewModel.isCreating.value) return
         val name = NonBlankString.create(viewModel.name.value) ?: return
         viewModel.isCreating.set(true)
         val job = if (relativePlacement == null) {

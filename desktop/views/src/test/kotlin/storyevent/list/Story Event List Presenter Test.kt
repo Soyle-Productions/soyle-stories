@@ -19,7 +19,6 @@ import com.soyle.stories.storyevent.list.*
 import com.soyle.stories.storyevent.remove.RemoveStoryEventController
 import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensNotifier
 import com.soyle.stories.storyevent.rename.RenameStoryEventController
-import com.soyle.stories.storyevent.rename.RenameStoryEventDialog
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.time.StoryEventRescheduledNotifier
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController

@@ -265,6 +265,23 @@ class `Create Story Event Prompt Presenter Test` {
             assertThat(presenter.viewModel.isCreating.value).isFalse()
         }
 
+        @Test
+        fun `should only produce one request when called twice`() {
+            presenter.viewModel.name.set("Some name")
+            presenter.viewModel.timeText.set("9")
+            presenter.createStoryEvent()
+
+            createStoryEventController.requestedName = null
+            createStoryEventController.requestedTimeUnit = null
+
+            presenter.createStoryEvent()
+            with(createStoryEventController) {
+                assertThat(requestedName).isNull()
+                assertThat(requestedTimeUnit).isNull()
+            }
+        }
+
+
         @Nested
         inner class `When Successful` {
 
