@@ -37,7 +37,7 @@ val design by sourceSets.creating {
 
 javafx {
     version = "14"
-    modules = listOf("javafx.controls", "javafx.fxml"/*, 'javafx.web', 'javafx.swing'*/)
+    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml"/*, 'javafx.web', 'javafx.swing'*/)
     configuration = "compileOnly"
 }
 
@@ -47,25 +47,27 @@ val javaFXOptions = convention.findByType<JavaFXOptions>()
 
 dependencies {
 
-    // use of api is temporary until more things are moved to root config project
     api( project(":core:usecases"))
     api( project(":desktop:application"))
     api( project(":desktop:adapters"))
     api( project(":desktop:gui"))
     api( "no.tornado:tornadofx:1.7.20") {
         exclude(group = "org.jetbrains.kotlin")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
     }
     api (Libraries.kotlin.coroutines.core)
-    api ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
-    implementation( "org.controlsfx:controlsfx:11.0.2")
-    implementation( "org.fxmisc.richtext:richtextfx:0.10.5")
-    implementation( "no.tornado:tornadofx-controlsfx:0.1")
+    api ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.2")
+    implementation( "org.controlsfx:controlsfx:11.1.0") {
+        exclude(group = "org.jetbrains.kotlin")
+    }
+    implementation( "org.fxmisc.richtext:richtextfx:0.10.6")
+    implementation( "no.tornado:tornadofx-controlsfx:0.1.1")
 
     implementation( "de.jensd:fontawesomefx-commons:11.0")
     implementation( "de.jensd:fontawesomefx-controls:11.0")
     implementation( "de.jensd:fontawesomefx-fontawesome:4.7.0-11")
     implementation( "de.jensd:fontawesomefx-materialicons:2.2.0-11")
-    implementation( "de.jensd:fontawesomefx-emojione:2.2.7-11")
+    implementation("de.jensd:fontawesomefx-emojione:3.1.1-9.1.2")
 
     testImplementation( Libraries.kotlin.reflection)
     testImplementation( Libraries.junit.api)
@@ -81,7 +83,7 @@ dependencies {
     testFixturesApi( "org.fxmisc.richtext:richtextfx:0.10.5")
     testFixturesApi( "org.testfx:testfx-core:4.0.16-alpha")
     testFixturesApi( "org.testfx:testfx-junit5:4.0.16-alpha")
-    testFixturesApi( "org.testfx:openjfx-monocle:jdk-12.0.1+2")
+    testFixturesApi("org.testfx:openjfx-monocle:1.8.0_20")
 
     val designImplementation by configurations.getting {  }
     val designRuntimeOnly by configurations.getting {  }

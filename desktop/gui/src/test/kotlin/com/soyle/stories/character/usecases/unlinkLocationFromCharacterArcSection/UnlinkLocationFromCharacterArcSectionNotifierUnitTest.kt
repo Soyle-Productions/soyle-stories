@@ -1,6 +1,5 @@
 package com.soyle.stories.character.usecases.unlinkLocationFromCharacterArcSection
 
-import com.soyle.stories.characterarc.CharacterArcException
 import com.soyle.stories.characterarc.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSectionNotifier
 import com.soyle.stories.usecase.character.arc.section.unlinkLocationFromCharacterArcSection.UnlinkLocationFromCharacterArcSection
 import com.soyle.stories.common.ThreadTransformer
@@ -18,7 +17,7 @@ class UnlinkLocationFromCharacterArcSectionNotifierUnitTest {
 	@Test
 	fun `failure routes to failures`() {
 		val outputPort = getOutputPort()
-		val failure = object : CharacterArcException() {}
+		val failure = Exception()
 		outputPort.receiveUnlinkLocationFromCharacterArcSectionFailure(failure)
 		assertEquals(failure, forwardedEvent)
 	}
@@ -40,7 +39,7 @@ class UnlinkLocationFromCharacterArcSectionNotifierUnitTest {
 
 		return UnlinkLocationFromCharacterArcSectionNotifier(threadTransformer).apply {
 			addListener(object : UnlinkLocationFromCharacterArcSection.OutputPort {
-				override fun receiveUnlinkLocationFromCharacterArcSectionFailure(failure: CharacterArcException) {
+				override fun receiveUnlinkLocationFromCharacterArcSectionFailure(failure: Exception) {
 					forwardedEvent = failure
 				}
 

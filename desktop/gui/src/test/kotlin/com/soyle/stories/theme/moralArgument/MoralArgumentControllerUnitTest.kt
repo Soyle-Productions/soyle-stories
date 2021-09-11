@@ -10,10 +10,11 @@ import com.soyle.stories.theme.changeThemeDetails.changeCentralMoralQuestion.Cha
 import com.soyle.stories.theme.changeThemeDetails.changeThematicRevelation.ChangeThematicRevelationController
 import com.soyle.stories.theme.changeThemeDetails.changeThemeLine.ChangeThemeLineController
 import com.soyle.stories.theme.outlineMoralArgument.OutlineMoralArgumentController
-import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
-import com.soyle.stories.theme.usecases.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
-import com.soyle.stories.theme.usecases.outlineMoralArgument.GetMoralArgumentFrame
-import com.soyle.stories.theme.usecases.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
+import com.soyle.stories.usecase.theme.listAvailablePerspectiveCharacters.AvailablePerspectiveCharacters
+import com.soyle.stories.usecase.theme.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
+import com.soyle.stories.usecase.theme.outlineMoralArgument.GetMoralArgumentFrame
+import com.soyle.stories.usecase.theme.outlineMoralArgument.OutlineMoralArgumentForCharacterInTheme
+import kotlinx.coroutines.Job
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -117,7 +118,7 @@ class MoralArgumentControllerUnitTest {
                 characterId: String,
                 arcSectionId: String,
                 value: String
-            ) {
+            ): Job {
                 TODO("Not yet implemented")
             }
 

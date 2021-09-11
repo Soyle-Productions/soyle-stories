@@ -3,7 +3,16 @@ package com.soyle.stories.character.createArcSectionDialog
 import com.soyle.stories.character.createArcSection.CreateArcSectionController
 import com.soyle.stories.characterarc.changeSectionValue.ChangeSectionValueController
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogController
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogPresenter
+import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogViewModel
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.CharacterArcSection
+import com.soyle.stories.domain.character.CharacterArcTemplate
+import com.soyle.stories.domain.character.CharacterArcTemplateSection
+import com.soyle.stories.domain.theme.Theme
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.doubles.ControlledThreadTransformer
+import com.soyle.stories.gui.View
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.AvailableCharacterArcSectionTypesForCharacterArc
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.GetAvailableCharacterArcSectionTypesForCharacterArc
 import kotlinx.coroutines.*
@@ -29,23 +38,23 @@ class CreateArcSectionDialogControllerTest {
     @Nested
     inner class getValidState {
 
-        private val themeId = UUID.randomUUID()
-        private val characterId = UUID.randomUUID()
+        private val themeId = Theme.Id()
+        private val characterId = Character.Id()
 
         @Test
         fun `should call get availability use case`() {
-            controller.getValidState(themeId.toString(), characterId.toString())
+            controller.getValidState(themeId, characterId)
 
             val request = getAvailabilityRequest ?: error("use case was not called")
-            assertEquals(themeId, request[0]) { "themeId UUID does not match expected" }
-            assertEquals(characterId, request[1]) { "characterId UUID does not match expected" }
-            assertEquals(getAvailabilityOutputPort, request[2]) { "Output Port does not match expected" }
+            assertEquals(themeId.uuid, request[0]) { "themeId UUID does not match expected" }
+            assertEquals(characterId.uuid, request[1]) { "characterId UUID does not match expected" }
+            (request[2] as CreateArcSectionDialogPresenter)
         }
 
         @Test
         fun `should not block calling thread`() {
             threadTransformer.ensureRunAsync(::getAvailabilityRequest::get) {
-                controller.getValidState(themeId.toString(), characterId.toString())
+                controller.getValidState(themeId, characterId)
             }
         }
 
@@ -54,9 +63,9 @@ class CreateArcSectionDialogControllerTest {
     @Nested
     inner class createArcSection {
 
-        private val characterId: String = "character id"
-        private val themeId: String = "theme id"
-        private val sectionTemplateId: String = "section template id"
+        private val themeId = Theme.Id()
+        private val characterId = Character.Id()
+        private val sectionTemplateId = CharacterArcTemplateSection.Id()
         private val value: String = "value 252"
         private val sceneId: String = "scene id"
 
@@ -66,7 +75,6 @@ class CreateArcSectionDialogControllerTest {
                 characterId,
                 themeId,
                 sectionTemplateId,
-                sceneId,
                 value,
             )
 
@@ -75,8 +83,7 @@ class CreateArcSectionDialogControllerTest {
                 characterId,
                 themeId,
                 sectionTemplateId,
-                value,
-                sceneId
+                value
             ).forEachIndexed { index, s ->
                 assertEquals(s, request[index])
             }
@@ -87,9 +94,9 @@ class CreateArcSectionDialogControllerTest {
     @Nested
     inner class modifyArcSection {
 
-        private val characterId: String = "character id"
-        private val themeId: String = "theme id"
-        private val sectionId: String = "section id"
+        private val themeId = Theme.Id()
+        private val characterId = Character.Id()
+        private val sectionId = CharacterArcSection.Id(UUID.randomUUID())
         private val value: String = "value 252"
         private val sceneId: String = "scene id"
 
@@ -99,17 +106,15 @@ class CreateArcSectionDialogControllerTest {
                 characterId,
                 themeId,
                 sectionId,
-                sceneId,
                 value,
             )
 
             val request = modifyArcSectionParameters ?: error("modify arc section controller not called")
             listOf(
-                themeId,
-                characterId,
-                sectionId,
-                value,
-                sceneId
+                themeId.uuid.toString(),
+                characterId.uuid.toString(),
+                sectionId.uuid.toString(),
+                value
             ).forEachIndexed { index, s ->
                 assertEquals(s, request[index])
             }
@@ -138,9 +143,19 @@ class CreateArcSectionDialogControllerTest {
                 value: String,
                 sceneId: String
             ) {
+                TODO("Not yet implemented")
+            }
+
+            override fun createArcSection(
+                characterId: Character.Id,
+                themeId: Theme.Id,
+                sectionTemplateId: CharacterArcTemplateSection.Id,
+                value: String
+            ): Job {
                 createArcSectionParameters = listOf(
-                    characterId, themeId, sectionTemplateId, value, sceneId
+                    characterId, themeId, sectionTemplateId, value
                 )
+                return Job()
             }
         }
         modifyArcSectionController = object : ChangeSectionValueController {
@@ -149,8 +164,9 @@ class CreateArcSectionDialogControllerTest {
                 characterId: String,
                 arcSectionId: String,
                 value: String
-            ) {
+            ): Job {
                 modifyArcSectionParameters = listOf(themeId, characterId, arcSectionId, value)
+                return Job()
             }
 
             override fun changeValueOfArcSectionAndCoverInScene(
@@ -178,9 +194,28 @@ class CreateArcSectionDialogControllerTest {
         controller = CreateArcSectionDialogController(
             threadTransformer,
             getAvailability,
-            getAvailabilityOutputPort,
             createArcSectionController,
-            modifyArcSectionController
+            modifyArcSectionController,
+            object : View.Nullable<CreateArcSectionDialogViewModel> {
+                override fun updateIf(
+                    condition: CreateArcSectionDialogViewModel.() -> Boolean,
+                    update: CreateArcSectionDialogViewModel.() -> CreateArcSectionDialogViewModel
+                ) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun updateOrInvalidated(update: CreateArcSectionDialogViewModel.() -> CreateArcSectionDialogViewModel) {
+                    TODO("Not yet implemented")
+                }
+
+                override val viewModel: CreateArcSectionDialogViewModel
+                    get() = TODO("Not yet implemented")
+
+                override fun update(update: CreateArcSectionDialogViewModel?.() -> CreateArcSectionDialogViewModel) {
+                    TODO("Not yet implemented")
+                }
+
+            }
         )
     }
 
