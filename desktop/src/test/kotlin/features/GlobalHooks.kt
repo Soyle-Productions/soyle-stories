@@ -25,6 +25,7 @@ import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
 import kotlinx.coroutines.CoroutineScope
+import org.junit.jupiter.api.fail
 import org.testfx.api.FxToolkit
 import java.util.*
 import kotlin.concurrent.thread
@@ -106,8 +107,8 @@ class GlobalHooks : En {
         ParameterType<com.soyle.stories.domain.scene.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { name: String ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).getSceneByNameOrError(name)
         }
-        ParameterType<StoryEvent>("story event", "story event \"(.*?)\"|\"(.*?)\" story event") { name: String ->
-            `Story Event Robot`(soyleStories.getAnyOpenWorkbenchOrError()).getStoryEventByName(name)
+        ParameterType<StoryEvent>("story event", "story event \"(.*?)\"|\"(.*?)\" story event") { temp: String?, name: String ->
+            `Story Event Robot`(soyleStories.getAnyOpenWorkbenchOrError()).getStoryEventByName(name)!!
         }
         ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { name: String ->
             CharacterArcTemplate.default().sections.single { it.name == name }

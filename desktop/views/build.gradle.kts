@@ -83,7 +83,7 @@ dependencies {
     testFixturesApi( "org.fxmisc.richtext:richtextfx:0.10.5")
     testFixturesApi( "org.testfx:testfx-core:4.0.16-alpha")
     testFixturesApi( "org.testfx:testfx-junit5:4.0.16-alpha")
-    testFixturesApi("org.testfx:openjfx-monocle:1.8.0_20")
+    testFixturesApi("org.testfx:openjfx-monocle:jdk-12.0.1+2")
 
     val designImplementation by configurations.getting {  }
     val designRuntimeOnly by configurations.getting {  }
