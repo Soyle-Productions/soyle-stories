@@ -133,13 +133,19 @@ object Presentation {
                     override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
                         val presenter = presenter(setOf(storyEventId), currentTime)
 
-                        TimeAdjustmentPromptView(presenter, presenter.viewModel)
+                        val stage = TimeAdjustmentPromptView(presenter, presenter.viewModel).openModal()!!
+                        presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
+                            if (it == true) stage.hide()
+                        }
                     }
 
                     override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>) {
                         val presenter = presenter(storyEventIds, null)
 
-                        TimeAdjustmentPromptView(presenter, presenter.viewModel)
+                        val stage = TimeAdjustmentPromptView(presenter, presenter.viewModel).openModal()!!
+                        presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
+                            if (it == true) stage.hide()
+                        }
                     }
                 }
             }

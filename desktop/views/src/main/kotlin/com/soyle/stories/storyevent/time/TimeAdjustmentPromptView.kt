@@ -27,6 +27,7 @@ class TimeAdjustmentPromptView(
         vbox {
             addClass(form)
             fieldLabel("Time").labelFor = spinner<Long?> {
+                id = "time"
                 valueFactory = NullableLongSpinnerValueFactory()
                 editor.text = viewModel.time.value
                 viewModel.time.bind(editor.textProperty())
@@ -36,6 +37,7 @@ class TimeAdjustmentPromptView(
         hbox {
             addClass(buttonBar)
             button("RESCHEDULE") {
+                id = "save"
                 addClass(primary, filled)
                 enableWhen(viewModel.canSubmit)
                 action(actions::submit)
