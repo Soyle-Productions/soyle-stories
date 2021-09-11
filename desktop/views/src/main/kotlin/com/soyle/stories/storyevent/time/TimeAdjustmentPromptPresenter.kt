@@ -6,20 +6,40 @@ import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
 import kotlinx.coroutines.Job
 
-class TimeAdjustmentPromptPresenter(
+class TimeAdjustmentPromptPresenter private constructor(
     private val storyEventIds: Set<StoryEvent.Id>,
-    currentTime: Long? = null,
+    private val currentTime: Long?,
     private val rescheduleStoryEventController: RescheduleStoryEventController,
     private val adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
     private val threadTransformer: ThreadTransformer
-): TimeAdjustmentPromptViewActions {
+) : TimeAdjustmentPromptViewActions {
+
+    // rescheduling
+    constructor(
+        storyEventId: StoryEvent.Id, currentTime: Long, rescheduleStoryEventController: RescheduleStoryEventController,
+        adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
+        threadTransformer: ThreadTransformer
+    ) : this(
+        setOf(storyEventId),
+        currentTime,
+        rescheduleStoryEventController,
+        adjustStoryEventsTimeController,
+        threadTransformer
+    )
+
+    // adjusting the time
+    constructor(
+        storyEventIds: Set<StoryEvent.Id>, rescheduleStoryEventController: RescheduleStoryEventController,
+        adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
+        threadTransformer: ThreadTransformer
+    ) : this(storyEventIds, null, rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
 
     val viewModel = TimeAdjustmentPromptViewModel(currentTime)
 
     private fun canSubmit() = viewModel.canSubmit.value
 
     override fun submit() {
-        if (! canSubmit()) return
+        if (!canSubmit()) return
         val time = viewModel.time.value.toLongOrNull() ?: return
         startSubmission(time)
     }
@@ -35,7 +55,7 @@ class TimeAdjustmentPromptPresenter(
     }
 
     private fun getSubmissionJob(time: Long): Job {
-        return if (storyEventIds.onlyHasOneItem()) {
+        return if (currentTime != null) {
             rescheduleStoryEventController.rescheduleStoryEvent(storyEventIds.single(), time)
         } else {
             adjustStoryEventsTimeController.adjustStoryEventsTime(storyEventIds, time)

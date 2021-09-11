@@ -121,28 +121,30 @@ object Presentation {
             provide(RescheduleStoryEventPrompt::class, AdjustStoryEventsTimePrompt::class) {
                 object : RescheduleStoryEventPrompt, AdjustStoryEventsTimePrompt {
 
-                    private fun presenter(storyEventIds: Set<StoryEvent.Id>, currentTime: Long?) =
-                        TimeAdjustmentPromptPresenter(
-                            storyEventIds,
+                    override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
+                        val presenter = TimeAdjustmentPromptPresenter(
+                            storyEventId,
                             currentTime,
                             get(),
                             get(),
                             applicationScope.get()
                         )
 
-                    override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
-                        val presenter = presenter(setOf(storyEventId), currentTime)
-
-                        val stage = TimeAdjustmentPromptView(presenter, presenter.viewModel).openModal()!!
+                        val stage = TimeAdjustmentPromptView(presenter, presenter.viewModel).openModal(owner = get<WorkBench>().root.scene?.window)!!
                         presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
                             if (it == true) stage.hide()
                         }
                     }
 
                     override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>) {
-                        val presenter = presenter(storyEventIds, null)
+                        val presenter = TimeAdjustmentPromptPresenter(
+                            storyEventIds,
+                            get(),
+                            get(),
+                            applicationScope.get()
+                        )
 
-                        val stage = TimeAdjustmentPromptView(presenter, presenter.viewModel).openModal()!!
+                        val stage = TimeAdjustmentPromptView(presenter, presenter.viewModel).openModal(owner = get<WorkBench>().root.scene?.window)!!
                         presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
                             if (it == true) stage.hide()
                         }

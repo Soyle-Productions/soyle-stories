@@ -91,11 +91,11 @@ class `Time Adjustment Prompt Presenter Test` {
     }
 
     private fun timeAdjustmentPromptPresenter(storyEventIds: Set<StoryEvent.Id>) =
-        TimeAdjustmentPromptPresenter(storyEventIds, null, rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
+        TimeAdjustmentPromptPresenter(storyEventIds, rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
             .apply(::enforceGUIUpdates)
 
     private fun timeAdjustmentPromptPresenter(time: Long) =
-        TimeAdjustmentPromptPresenter(setOf(storyEventId), time, rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
+        TimeAdjustmentPromptPresenter(storyEventId, time, rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
             .apply(::enforceGUIUpdates)
 
     private fun enforceGUIUpdates(presenter: TimeAdjustmentPromptPresenter) {
@@ -151,6 +151,21 @@ class `Time Adjustment Prompt Presenter Test` {
                 assertThat(rescheduleStoryEventController.requestedTime).isEqualTo(5L)
             }
 
+            @Test
+            fun `if only one story event provided - should still reschedule time`() {
+                val presenter = timeAdjustmentPromptPresenter(9)
+
+                presenter.viewModel.time.set("5")
+                presenter.submit()
+
+                assertThat(adjustStoryEventsTimeController.requestedStoryEventIds).isNull()
+                assertThat(adjustStoryEventsTimeController.requestedAmount).isNull()
+
+                assertThat(rescheduleStoryEventController.requestedStoryEvent).isEqualTo(storyEventId)
+                assertThat(rescheduleStoryEventController.requestedTime).isEqualTo(5L)
+
+            }
+
         }
 
         @Nested
@@ -166,6 +181,21 @@ class `Time Adjustment Prompt Presenter Test` {
 
                 assertThat(adjustStoryEventsTimeController.requestedStoryEventIds).isEqualTo(storyEventIds)
                 assertThat(adjustStoryEventsTimeController.requestedAmount).isEqualTo(5L)
+            }
+
+            @Test
+            fun `if only one story event provided - should still adjust time`() {
+                val presenter = timeAdjustmentPromptPresenter(setOf(storyEventId))
+
+                presenter.viewModel.time.set("5")
+                presenter.submit()
+
+                assertThat(adjustStoryEventsTimeController.requestedStoryEventIds).isEqualTo(setOf(storyEventId))
+                assertThat(adjustStoryEventsTimeController.requestedAmount).isEqualTo(5L)
+
+                assertThat(rescheduleStoryEventController.requestedStoryEvent).isNull()
+                assertThat(rescheduleStoryEventController.requestedTime).isNull()
+
             }
 
         }

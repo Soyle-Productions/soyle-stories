@@ -30,8 +30,10 @@ class TimeAdjustmentPromptView(
                 id = "time"
                 valueFactory = NullableLongSpinnerValueFactory()
                 editor.text = viewModel.time.value
+                isEditable = true
                 viewModel.time.bind(editor.textProperty())
                 disableWhen(viewModel.submitting)
+                editor.action(actions::submit)
             }
         }
         hbox {
