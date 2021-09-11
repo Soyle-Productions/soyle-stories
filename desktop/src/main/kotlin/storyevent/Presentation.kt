@@ -15,9 +15,7 @@ import com.soyle.stories.storyevent.rename.RenameStoryEventPrompt
 import com.soyle.stories.storyevent.rename.RenameStoryEventPromptPresenter
 import com.soyle.stories.storyevent.rename.RenameStoryEventPromptView
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
-import com.soyle.stories.storyevent.time.RescheduleStoryEventDialog
-import com.soyle.stories.storyevent.time.RescheduleStoryEventDialogView
-import com.soyle.stories.storyevent.time.StoryEventRescheduledNotifier
+import com.soyle.stories.storyevent.time.*
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimePrompt
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventPrompt
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
@@ -122,12 +120,26 @@ object Presentation {
 
             provide(RescheduleStoryEventPrompt::class, AdjustStoryEventsTimePrompt::class) {
                 object : RescheduleStoryEventPrompt, AdjustStoryEventsTimePrompt {
+
+                    private fun presenter(storyEventIds: Set<StoryEvent.Id>, currentTime: Long?) =
+                        TimeAdjustmentPromptPresenter(
+                            storyEventIds,
+                            currentTime,
+                            get(),
+                            get(),
+                            applicationScope.get()
+                        )
+
                     override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
-                        RescheduleStoryEventDialogView(RescheduleStoryEventDialog.Props(storyEventId, currentTime), get(), get())
+                        val presenter = presenter(setOf(storyEventId), currentTime)
+
+                        TimeAdjustmentPromptView(presenter, presenter.viewModel)
                     }
 
                     override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>) {
-                        RescheduleStoryEventDialogView(RescheduleStoryEventDialog.AdjustTimes(storyEventIds), get(), get())
+                        val presenter = presenter(storyEventIds, null)
+
+                        TimeAdjustmentPromptView(presenter, presenter.viewModel)
                     }
                 }
             }
