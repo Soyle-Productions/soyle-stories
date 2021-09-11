@@ -28,6 +28,7 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import tornadofx.*
 import tornadofx.controlsfx.popover
+import tornadofx.controlsfx.showPopover
 
 class SelectedSceneCharacterEditor : View() {
 
@@ -239,7 +240,7 @@ class SelectedSceneCharacterEditor : View() {
             popover {
                 hyperlink(props.previousMotivationSourceName).controlledBy(logic::previousMotivationLink)
             }
-            action { popover?.show(this) }
+            action { showPopover() }
         }
     }
 
