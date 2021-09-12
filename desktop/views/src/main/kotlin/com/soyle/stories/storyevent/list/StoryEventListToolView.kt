@@ -12,13 +12,17 @@ import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.common.emptyProperty
 import com.soyle.stories.common.onChangeWithCurrent
+import com.soyle.stories.domain.storyevent.StoryEvent
 import javafx.beans.value.ObservableValue
+import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.TextAlignment
 import tornadofx.*
+import java.lang.ref.WeakReference
 
 class StoryEventListToolView(
     private val controller: StoryEventListViewActions,
@@ -104,10 +108,10 @@ class StoryEventListToolView(
 
         private fun list() {
             listview<StoryEventListItemViewModel>(populatedViewModel.items) {
-                asSurface { inheritedElevation = Elevation.get(8)!! }
+                asSurface { inheritedElevation = Elevation[8]!! }
                 addClass(ListStyles.noCellShading)
                 selectionModel.selectionMode = SelectionMode.MULTIPLE
-                populatedViewModel.selectedItems.bind(selectionModel.selectedItems) { it }
+                populatedViewModel.selectedItems.bindTo(selectionModel.selectedItems)
                 vgrow = Priority.ALWAYS
                 setCellFactory {
                     StoryEventListCell().apply {
@@ -163,6 +167,20 @@ class StoryEventListToolView(
             }.items
         }
 
+    }
+
+    private fun <T> ObservableList<T>.bindTo(source: ObservableList<T>) {
+        source.addListener(object : ListChangeListener<T> {
+            val targetRef = WeakReference(this@bindTo)
+            override fun onChanged(change: ListChangeListener.Change<out T>?) {
+                val list = targetRef.get()
+                if (list == null) {
+                    change?.list?.removeListener(this)
+                } else {
+                    list.setAll(change?.list.orEmpty())
+                }
+            }
+        })
     }
 
     override fun getUserAgentStylesheet(): String = StoryEventListStyles().externalForm

@@ -23,12 +23,29 @@ sourceSets {
 val design by sourceSets.creating {
     withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
         kotlin.srcDir("src/design/kotlin")
+        val designKotlin = kotlin
         compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
         runtimeClasspath += output + compileClasspath + sourceSets["testFixtures"].runtimeClasspath
 
         idea {
             module {
-                testSourceDirs.addAll(kotlin.srcDirs)
+                testSourceDirs = testSourceDirs + designKotlin.srcDirs
+            }
+        }
+
+    }
+}
+
+val integration: SourceSet by sourceSets.creating {
+    withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
+        kotlin.srcDir("src/integration/kotlin")
+        val intKotlin = kotlin
+        compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
+        runtimeClasspath += output + compileClasspath + sourceSets["testFixtures"].runtimeClasspath
+
+        idea {
+            module {
+                testSourceDirs = testSourceDirs + intKotlin.srcDirs
             }
         }
 
@@ -84,6 +101,16 @@ dependencies {
     testFixturesApi( "org.testfx:testfx-core:4.0.16-alpha")
     testFixturesApi( "org.testfx:testfx-junit5:4.0.16-alpha")
     testFixturesApi("org.testfx:openjfx-monocle:jdk-12.0.1+2")
+
+    val integrationImplementation by configurations.getting {  }
+    val integrationRuntimeOnly by configurations.getting {  }
+
+    integrationImplementation( Libraries.junit.api)
+    integrationRuntimeOnly( Libraries.junit.engine)
+    integrationImplementation( Libraries.assertJ)
+    integrationImplementation( Libraries.kotlin.coroutines.core)
+    integrationImplementation( "org.testfx:testfx-core:4.0.16-alpha")
+    integrationImplementation( "org.testfx:testfx-junit5:4.0.16-alpha")
 
     val designImplementation by configurations.getting {  }
     val designRuntimeOnly by configurations.getting {  }

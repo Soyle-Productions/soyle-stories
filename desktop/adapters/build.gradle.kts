@@ -21,6 +21,7 @@ dependencies {
 
     testFixturesImplementation(Libraries.kotlin.coroutines.core)
     testFixturesImplementation(project(":core:usecases"))
+    testFixturesApi("io.mockk:mockk:1.12.0")
 }
 
 

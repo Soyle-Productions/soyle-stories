@@ -200,10 +200,28 @@ class StoryEventListPresenter(
             withContext(Dispatchers.JavaFx) {
                 val vm = viewModel.value as? PopulatedStoryEventListViewModel ?: return@withContext
                 val eventsById = events.associateBy { it.storyEventId }
-                vm.items.setAll(vm.items.asSequence().onEach {
+
+                vm.items.onEach {
                     val rescheduled = eventsById[it.id] ?: return@onEach
                     it.timeProperty.set(rescheduled.newTime)
-                }.orderAndGroupByTime())
+                }
+                vm.items.sortWith { item1, item2 ->
+                    (item1.timeProperty.value - item2.timeProperty.value).toInt()
+                }
+                val seenIds = mutableSetOf<StoryEvent.Id>()
+                vm.items.windowed(2) {
+                    val first = it[0]
+                    if (first.id !in seenIds) {
+                        first.prevItemHasSameTime.set(true)
+                        seenIds.add(first.id)
+                    }
+                    val second = it.getOrNull(1)
+                    if (second != null) {
+                        second.prevItemHasSameTime.set(first.timeProperty.value == second.timeProperty.value)
+                        seenIds.add(second.id)
+                    }
+                }
+
             }
         }
 

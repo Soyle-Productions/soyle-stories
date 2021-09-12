@@ -197,7 +197,7 @@ class `Story Event List Presenter Test` {
         @Test
         fun `should be in failed state`() {
             listStoryEventsController.job.completeExceptionally(expectedFailure)
-            runBlocking { Dispatchers.JavaFx.get(Job)?.join() }
+            runBlocking { Dispatchers.JavaFx[Job]?.join() }
 
             assertThat(viewModel).isEqualTo(FailedStoryEventListViewModel)
         }
@@ -596,7 +596,7 @@ class `Story Event List Presenter Test` {
     inner class `When Story Events are Rescheduled` {
 
         private val rescheduledStoryEventIds = List(7) { StoryEvent.Id() }
-        private val newTimes = rescheduledStoryEventIds.associate { it to (0L..5L).random() }
+        private val newTimes = rescheduledStoryEventIds.associateWith { (0L..5L).random() }
 
         private val items = (List(5) {
             StoryEventItem(StoryEvent.Id(), "name $it", it.toLong())
