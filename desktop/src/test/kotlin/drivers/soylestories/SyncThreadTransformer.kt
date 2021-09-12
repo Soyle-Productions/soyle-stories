@@ -19,6 +19,7 @@ class SyncThreadTransformer : ThreadTransformer {
 	}
 
 	private val guiScope = CoroutineScope(Dispatchers.JavaFx)
+	override fun isGuiThread(): Boolean = Platform.isFxApplicationThread()
 
 	override fun gui(update: suspend CoroutineScope.() -> Unit) {
 		if (Platform.isFxApplicationThread()) {

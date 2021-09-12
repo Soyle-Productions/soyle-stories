@@ -1,5 +1,6 @@
 package com.soyle.stories.common
 
+import javafx.application.Platform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.runBlocking
@@ -12,6 +13,8 @@ class SyncThreadTransformer : ThreadTransformer, ApplicationTest() {
         job.complete()
         return job
     }
+
+    override fun isGuiThread(): Boolean = Platform.isFxApplicationThread()
     override fun gui(update: suspend CoroutineScope.() -> Unit) {
         interact { runBlocking { update() } }
     }

@@ -1,6 +1,7 @@
 package com.soyle.stories.common
 
 import com.soyle.stories.soylestories.ApplicationScope
+import javafx.application.Platform
 import kotlinx.coroutines.*
 import tornadofx.FX
 import tornadofx.runLater
@@ -25,6 +26,8 @@ class AsyncThreadTransformer(val applicationScope: ApplicationScope) : ThreadTra
             }
         }
     }
+
+    override fun isGuiThread(): Boolean = Platform.isFxApplicationThread()
 
     override fun gui(update: suspend CoroutineScope.() -> Unit) {
         FX.runAndWait {

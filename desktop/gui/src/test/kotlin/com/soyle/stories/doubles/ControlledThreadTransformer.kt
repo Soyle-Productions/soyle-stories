@@ -20,6 +20,9 @@ class ControlledThreadTransformer : ThreadTransformer {
         }
     }
 
+    override fun isGuiThread(): Boolean {
+        TODO("Not yet implemented")
+    }
 
     override fun async(task: suspend CoroutineScope.() -> Unit): Job {
         val job = Job()
