@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.config.storyevent
 
 import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -25,6 +26,8 @@ import javafx.stage.Modality
 import javafx.stage.StageStyle
 import kotlinx.coroutines.Job
 import tornadofx.UIComponent
+import tornadofx.onChange
+import tornadofx.onChangeOnce
 
 object Presentation {
 
@@ -153,25 +156,24 @@ object Presentation {
             }
 
             provide<RemoveStoryEventConfirmation> {
-                RemoveStoryEventConfirmationDialog(
-                    applicationScope.get(),
-
-                    // acts as a proxy to allow the dialog to initialize.  The implementation of
-                    // RemoveStoryEventController depends on RemoveStoryEventConfirmation, so we run into an infinite
-                    // dependency loop otherwise.  This allows both to instantiate before calling each other.
-                    object : RemoveStoryEventController {
-                        private val actual by lazy { get<RemoveStoryEventController>() }
-                        override fun confirmRemoveStoryEvent(storyEventIds: Set<StoryEvent.Id>): Job =
-                            actual.confirmRemoveStoryEvent(storyEventIds)
-
-                        override fun removeStoryEvent(storyEventIds: Set<StoryEvent.Id>) =
-                            actual.removeStoryEvent(storyEventIds)
-                    },
-                    get(),
-                    {
-                        RemoveStoryEventConfirmationDialogView(it, get(), get())
+                object : RemoveStoryEventConfirmation {
+                    override fun requestDeleteStoryEventConfirmation(storyEventIds: Set<StoryEvent.Id>) {
+                        val viewModel = RemoveStoryEventConfirmationPromptViewModel(applicationScope.get())
+                        val presenter = RemoveStoryEventConfirmationPromptPresenter(
+                            storyEventIds,
+                            viewModel,
+                            get(),
+                            get()
+                        )
+                        val stageInit = lazy {
+                            RemoveStoryEventConfirmationPromptView(presenter, viewModel).openModal(owner = get<WorkBench>().root.scene?.window)
+                        }
+                        viewModel.showing().onChangeWithCurrent {
+                            if (it == true) stageInit.value?.show()
+                            else if (stageInit.isInitialized()) stageInit.value?.hide()
+                        }
                     }
-                )
+                }
             }
         }
     }

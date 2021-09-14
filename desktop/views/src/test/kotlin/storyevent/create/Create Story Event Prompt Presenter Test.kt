@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.view.storyevent.create
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.desktop.view.common.ThreadTransformerDouble
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.storyevent.create.CreateStoryEventController
@@ -59,20 +60,7 @@ class `Create Story Event Prompt Presenter Test` {
 
     }
 
-    private val threadTransformer = object : ThreadTransformer {
-        var isInGui = false
-            private set
-
-        override fun gui(update: suspend CoroutineScope.() -> Unit) {
-            isInGui = true
-            runBlocking { update() }
-            isInGui = false
-        }
-
-        override fun async(task: suspend CoroutineScope.() -> Unit): Job {
-            TODO("Not yet implemented")
-        }
-    }
+    private val threadTransformer = ThreadTransformerDouble()
 
     private fun createStoryEventPromptPresenter() =
         CreateStoryEventPromptPresenter(null, createStoryEventController, threadTransformer)
@@ -299,7 +287,7 @@ class `Create Story Event Prompt Presenter Test` {
                 presenter.viewModel.name.set("Some name")
                 presenter.createStoryEvent()
                 presenter.viewModel.isCompleted.onChange {
-                    if (!threadTransformer.isInGui) fail("Did not switch to gui thread")
+                    if (!threadTransformer.isGuiThread()) fail("Did not switch to gui thread")
                 }
                 createStoryEventController.job.complete()
             }
@@ -332,7 +320,7 @@ class `Create Story Event Prompt Presenter Test` {
                 presenter.viewModel.name.set("Some name")
                 presenter.createStoryEvent()
                 presenter.viewModel.isCreating.onChange {
-                    if (!threadTransformer.isInGui) fail("Did not switch to gui thread")
+                    if (!threadTransformer.isGuiThread()) fail("Did not switch to gui thread")
                 }
                 createStoryEventController.job.completeExceptionally(Error("Intentional Error"))
             }

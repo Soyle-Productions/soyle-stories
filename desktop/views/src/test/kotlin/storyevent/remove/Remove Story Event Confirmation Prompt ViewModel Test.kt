@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.view.storyevent.remove
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.desktop.view.common.ThreadTransformerDouble
 import com.soyle.stories.storyevent.remove.RemoveStoryEventConfirmationPromptViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -35,21 +36,7 @@ class `Remove Story Event Confirmation Prompt ViewModel Test` {
 
     }
 
-    private val threadTransformer = object : ThreadTransformer {
-        override fun async(task: suspend CoroutineScope.() -> Unit): Job {
-            TODO("Not yet implemented")
-        }
-
-        var _isGuiThread = false
-            private set
-        override fun isGuiThread(): Boolean = _isGuiThread
-
-        override fun gui(update: suspend CoroutineScope.() -> Unit) {
-            _isGuiThread = true
-            runBlocking { update() }
-            _isGuiThread = false
-        }
-    }
+    private val threadTransformer = ThreadTransformerDouble()
     val viewModel = RemoveStoryEventConfirmationPromptViewModel(threadTransformer).apply {
         showing().onChange { if (! threadTransformer.isGuiThread()) fail("showing property changed outside gui thread") }
         completed().onChange { if (! threadTransformer.isGuiThread()) fail("showing property changed outside gui thread") }
@@ -60,20 +47,13 @@ class `Remove Story Event Confirmation Prompt ViewModel Test` {
     inner class `Prompt Can be Unneeded` {
 
         @Test
-        fun `should be completed`() {
+        fun `should be confirming`() {
             viewModel.unneeded()
 
-            assertThat(viewModel.isCompleted).isTrue
-        }
-
-        @Test
-        fun `can detect when completed`() {
-            var detected = false
-            viewModel.completed().onChange { detected = true }
-
-            viewModel.unneeded()
-
-            assertThat(detected).isTrue
+            assertThat(viewModel.isConfirming).isTrue
+            assertThat(viewModel.canConfirm).isFalse
+            assertThat(viewModel.isCompleted).isFalse
+            assertThat(viewModel.shouldNotShowAgain).isTrue
         }
 
     }
@@ -86,6 +66,7 @@ class `Remove Story Event Confirmation Prompt ViewModel Test` {
             viewModel.needed()
 
             assertThat(viewModel.isShowing).isTrue
+            assertThat(viewModel.shouldNotShowAgain).isFalse
         }
 
         @Test
@@ -232,6 +213,16 @@ class `Remove Story Event Confirmation Prompt ViewModel Test` {
                 viewModel.complete()
 
                 assert(viewModel.isCompleted)
+            }
+
+            @Test
+            fun `can detect when completed`() {
+                var detected = false
+                viewModel.completed().onChange { detected = true }
+
+                viewModel.complete()
+
+                assertThat(detected).isTrue
             }
 
             @Test

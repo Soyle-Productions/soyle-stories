@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.view.storyevent.list
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.adapter.storyevent.list.ListStoryEventsControllerDouble
+import com.soyle.stories.desktop.view.common.ThreadTransformerDouble
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.access
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.drive
 import com.soyle.stories.desktop.view.storyevent.list.`Story Event List Tool Assertions`.Companion.assertThis
@@ -168,14 +169,9 @@ class `Story Event List Presenter Test` {
             storyEventRenamedNotifier,
             storyEventRescheduledNotifier,
             storyEventRemovedNotifier,
-            object : ThreadTransformer {
-                override fun async(task: suspend CoroutineScope.() -> Unit): Job {
-                    TODO("Not yet implemented")
-                }
-                override fun gui(update: suspend CoroutineScope.() -> Unit) {
-                    CoroutineScope(Dispatchers.JavaFx).launch { update() }
-                }
-            }
+            ThreadTransformerDouble(guiUpdate = {
+                CoroutineScope(Dispatchers.JavaFx).launch { it() }
+            })
         )
 
     private val viewModel

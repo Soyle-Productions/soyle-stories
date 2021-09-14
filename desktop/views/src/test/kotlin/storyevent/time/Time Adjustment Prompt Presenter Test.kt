@@ -22,22 +22,25 @@ class `Time Adjustment Prompt Presenter Test` {
     private val storyEventId = StoryEvent.Id()
 
     private val threadTransformer = object : ThreadTransformer {
-        var isGuiThread = true
+
+        override fun isGuiThread(): Boolean = _isGuiThread
+
+        var _isGuiThread = true
             private set
 
         fun falseAsync(block: () -> Unit) {
-            isGuiThread = false
+            _isGuiThread = false
             block()
-            isGuiThread = true
+            _isGuiThread = true
         }
 
         override fun async(task: suspend CoroutineScope.() -> Unit): Job =
             fail("Should not be called by presenter")
 
         override fun gui(update: suspend CoroutineScope.() -> Unit) {
-            isGuiThread = true
+            _isGuiThread = true
             runBlocking { update() }
-            isGuiThread = false
+            _isGuiThread = false
         }
     }
 
@@ -100,8 +103,8 @@ class `Time Adjustment Prompt Presenter Test` {
 
     private fun enforceGUIUpdates(presenter: TimeAdjustmentPromptPresenter) {
         presenter.apply {
-            viewModel.submitting.onChange { if (! threadTransformer.isGuiThread) fail("Not on GUI thread") }
-            viewModel.isCompleted.onChange { if (! threadTransformer.isGuiThread) fail("Not on GUI thread") }
+            viewModel.submitting.onChange { if (! threadTransformer.isGuiThread()) fail("Not on GUI thread") }
+            viewModel.isCompleted.onChange { if (! threadTransformer.isGuiThread()) fail("Not on GUI thread") }
         }
     }
 

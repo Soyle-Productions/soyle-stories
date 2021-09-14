@@ -3,11 +3,9 @@ package com.soyle.stories.storyevent.remove
 import com.soyle.stories.common.ThreadTransformer
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.BooleanExpression
+import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
-import tornadofx.booleanBinding
-import tornadofx.getValue
-import tornadofx.objectProperty
-import tornadofx.setValue
+import tornadofx.*
 
 class RemoveStoryEventConfirmationPromptViewModel(
     private val threadTransformer: ThreadTransformer
@@ -21,7 +19,7 @@ class RemoveStoryEventConfirmationPromptViewModel(
     ) {
 
         Undefined(false, false, false, false),
-        Unneeded(false, false, false, true),
+        Unneeded(false, true, false, false),
         AwaitingConfirmation(true, false, true, false),
         Confirming(true, true, false, false),
         Confirmed(false, false, false, true)
@@ -50,8 +48,13 @@ class RemoveStoryEventConfirmationPromptViewModel(
     fun canConfirm(): BooleanExpression = canConfirmProperty
     val canConfirm: Boolean by canConfirmProperty
 
+    private val shouldNotShowAgainProperty: BooleanProperty = booleanProperty()
+    fun shouldNotShowAgain() = shouldNotShowAgainProperty
+    var shouldNotShowAgain: Boolean by shouldNotShowAgainProperty
+
     fun unneeded() {
         invariant = Invariant.Unneeded
+        shouldNotShowAgain = true
     }
 
     fun needed() {

@@ -71,7 +71,7 @@ object UseCases {
     private fun InProjectScope.removeStoryEvent() {
         provide<RemoveStoryEventFromProject> { RemoveStoryEventFromProjectUseCase(get()) }
         provide<RemoveStoryEventFromProject.OutputPort> { RemoveStoryEventOutput(get()) }
-        provide<RemoveStoryEventController> { RemoveStoryEventController(applicationScope.get(), get(), get(), get()) }
+        provide<RemoveStoryEventController> { RemoveStoryEventController(applicationScope.get(), get(), get(), get(), get(), get()) }
     }
 
 }

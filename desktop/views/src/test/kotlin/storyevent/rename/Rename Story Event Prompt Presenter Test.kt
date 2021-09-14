@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.view.storyevent.rename
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.desktop.view.common.ThreadTransformerDouble
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.storyevent.rename.RenameStoryEventController
@@ -31,20 +32,7 @@ class `Rename Story Event Prompt Presenter Test` {
             fail("Should not be called by presenter")
     }
 
-    private val threadTransformer = object : ThreadTransformer {
-        override fun async(task: suspend CoroutineScope.() -> Unit): Job {
-            fail("Should not call async from presenter")
-        }
-
-        var isGuiThread = false
-            private set
-
-        override fun gui(update: suspend CoroutineScope.() -> Unit) {
-            isGuiThread = true
-            runBlocking { update() }
-            isGuiThread = false
-        }
-    }
+    private val threadTransformer = ThreadTransformerDouble()
 
     private val providedInputId = StoryEvent.Id()
     private val providedInputName = "Provided Input Name"
@@ -79,10 +67,10 @@ class `Rename Story Event Prompt Presenter Test` {
             @BeforeEach
             fun `should update view model on gui thread`() {
                 presenter.viewModel.isCompleted.onChange {
-                    if (!threadTransformer.isGuiThread) fail("Did not update on gui thread")
+                    if (!threadTransformer.isGuiThread()) fail("Did not update on gui thread")
                 }
                 presenter.viewModel.isDisabled.onChange { disabled ->
-                    if (!disabled && !threadTransformer.isGuiThread) fail("Did not update on gui thread")
+                    if (!disabled && !threadTransformer.isGuiThread()) fail("Did not update on gui thread")
                 }
             }
 
