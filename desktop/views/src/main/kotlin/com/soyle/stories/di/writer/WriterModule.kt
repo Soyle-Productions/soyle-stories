@@ -22,12 +22,6 @@ object WriterModule {
 	init {
 		scoped<ProjectScope> {
 
-			provide<GetDialogPreferences> {
-				GetDialogPreferencesUseCase(
-				  applicationScope.writerId,
-				  get()
-				)
-			}
 			provide<GetAllDialogPreferences> {
 				GetAllDialogPreferencesUseCase(
 				  applicationScope.writerId,

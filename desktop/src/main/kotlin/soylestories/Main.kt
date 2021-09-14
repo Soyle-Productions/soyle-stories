@@ -8,6 +8,7 @@ import com.soyle.stories.desktop.config.prose.Prose
 import com.soyle.stories.desktop.config.scene.Scenes
 import com.soyle.stories.desktop.config.storyevent.StoryEvents
 import com.soyle.stories.desktop.config.theme.Themes
+import com.soyle.stories.desktop.config.writer.Writers
 import com.soyle.stories.desktop.locale.SoyleMessages
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.configureDI
@@ -48,4 +49,5 @@ fun configureModules() {
     Themes()
     Characters()
     Locations()
+    Writers()
 }
