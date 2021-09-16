@@ -53,7 +53,9 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
     }
 
     private fun createScene(sceneName: String) {
-        projectScope.get<CreateNewSceneController>().createNewScene(NonBlankString.create(sceneName)!!)
+        runBlocking {
+            projectScope.get<CreateNewSceneController>().createNewScene(NonBlankString.create(sceneName)!!).await()
+        }
     }
 
     fun getScenesAtOnePointNamed(sceneName: String): List<Scene> {

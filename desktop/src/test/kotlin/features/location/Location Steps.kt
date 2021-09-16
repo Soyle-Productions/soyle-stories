@@ -9,6 +9,7 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import org.junit.jupiter.api.Assertions.assertNull
 
 class `Location Steps` : En {
 
@@ -95,6 +96,8 @@ class `Location Steps` : En {
             LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByNameOrError(expectedName)
         }
         Then("the {location} should not host a scene named {string}") { location: Location, sceneName: String ->
+            assertNull(location.hostedScenes.find { it.sceneName == sceneName }) { "Should not host scene named $sceneName" }
+
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenLocationListToolHasBeenOpened()
                 .givenLocationDetailsToolHasBeenOpenedFor(location)
@@ -103,6 +106,9 @@ class `Location Steps` : En {
                 }
         }
         Then("the {scene} should take place at the {location}") { scene: Scene, location: Location ->
+            assert(location.hostedScenes.containsEntityWithId(scene.id)) { "${location.id} does not host ${scene.id}" }
+            assert(scene.settings.containsEntityWithId(location.id)) { "${scene.id} does not take place at ${location.id}" }
+
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenLocationListToolHasBeenOpened()
                 .givenLocationDetailsToolHasBeenOpenedFor(location)

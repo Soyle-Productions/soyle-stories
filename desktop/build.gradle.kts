@@ -33,6 +33,7 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:openjfx-monocle:jdk-12.0.1+2")
     testImplementation(librarires.Libraries.junit.api)
+    testImplementation(librarires.Libraries.kotlin.coroutines.test)
 
     testImplementation(testFixtures(project(path = ":desktop:views"))) {
         if (this is ModuleDependency) {

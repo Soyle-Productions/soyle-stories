@@ -92,29 +92,29 @@ class GlobalHooks : En {
             }
         }
 
-        ParameterType<Character?>("character", "character \"(.*?)\"|\"(.*?)\" character") { name: String ->
+        ParameterType<Character?>("character", "character \"(.*?)\"|\"(.*?)\" character") { _: String?, name: String ->
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByNameOrError(name)
         }
-        ParameterType<Location?>("location", "location \"(.*?)\"|\"(.*?)\" location") { name: String ->
+        ParameterType<Location?>("location", "location \"(.*?)\"|\"(.*?)\" location") { _: String?, name: String ->
             LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByName(name)
         }
-        ParameterType<Theme>("theme", "theme \"(.*?)\"|\"(.*?)\" theme") { name: String ->
+        ParameterType<Theme>("theme", "theme \"(.*?)\"|\"(.*?)\" theme") { _: String?, name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
         }
-        ParameterType<Theme>("moral argument", "moral argument \"(.*?)\"|\"(.*?)\" moral argument") { name: String ->
+        ParameterType<Theme>("moral argument", "moral argument \"(.*?)\"|\"(.*?)\" moral argument") { _: String?, name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
         }
-        ParameterType<com.soyle.stories.domain.scene.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { name: String ->
+        ParameterType<com.soyle.stories.domain.scene.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { _: String?, name: String ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).getSceneByNameOrError(name)
         }
-        ParameterType<StoryEvent>("story event", "story event \"(.*?)\"|\"(.*?)\" story event") { temp: String?, name: String ->
+        ParameterType<StoryEvent>("story event", "story event \"(.*?)\"|\"(.*?)\" story event") { _: String?, name: String ->
             `Story Event Robot`(soyleStories.getAnyOpenWorkbenchOrError()).getStoryEventByName(name)!!
         }
-        ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { name: String ->
+        ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { _: String?, name: String ->
             CharacterArcTemplate.default().sections.single { it.name == name }
         }
 
-        ParameterType("ordinal", "(\\d+)(?:st|nd|rd|th)") { ordinal: String ->
+        ParameterType("ordinal", "(\\d+)(?:st|nd|rd|th)") { _: String?, ordinal: String ->
             Regex("(\\d+)").find(ordinal)?.value?.toIntOrNull()?.minus(1)
                 ?: error("detected ordinal, but did not find parsable string")
         }

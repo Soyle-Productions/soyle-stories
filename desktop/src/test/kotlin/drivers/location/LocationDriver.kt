@@ -36,7 +36,7 @@ class LocationDriver private constructor(private val projectScope: ProjectScope)
 
     fun createLocationWithName(locationName: String) {
         runBlocking {
-            projectScope.get<CreateNewLocationController>().createNewLocation(SingleNonBlankLine.create(countLines(locationName) as SingleLine)!!, "")
+            projectScope.get<CreateNewLocationController>().createNewLocation(SingleNonBlankLine.create(countLines(locationName) as SingleLine)!!, "").await()
         }
     }
 
