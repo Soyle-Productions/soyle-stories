@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.config.storyevent
 
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.onChangeWithCurrent
+import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -19,6 +20,9 @@ import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.time.*
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimePrompt
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventPrompt
+import com.soyle.stories.storyevent.timeline.TimelinePresenter
+import com.soyle.stories.storyevent.timeline.TimelineToolPresenter
+import com.soyle.stories.storyevent.timeline.TimelineView
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import javafx.scene.Node
 import javafx.scene.control.ListCell
@@ -44,6 +48,7 @@ object Presentation {
                             adjustStoryEventsTimeController = get(),
                             removeStoryEventController = get(),
                             listStoryEventsController = get(),
+                            requestToViewStoryEventInTimeline = get<TimelineToolPresenter>()::viewTimeline,
                             storyEventCreated = get<StoryEventCreatedNotifier>(),
                             storyEventRenamed = get<StoryEventRenamedNotifier>(),
                             storyEventRescheduled = get<StoryEventRescheduledNotifier>(),
@@ -175,7 +180,17 @@ object Presentation {
                     }
                 }
             }
+
+            timeline()
         }
+    }
+
+    private fun InProjectScope.timeline() {
+        provide {
+            TimelineToolPresenter(this, applicationScope.get(), get(), get())
+        }
+        provide { TimelinePresenter() }
+        provide { TimelineView() }
     }
 
 }

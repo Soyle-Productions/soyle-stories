@@ -164,6 +164,12 @@ class StoryEventListToolView(
                     id = "delete"
                     action(controller::deleteSelectedItems)
                 }
+                separator()
+                item("View in Timeline") {
+                    id = "view-in-timeline"
+                    enableWhen(populatedViewModel.hasSingleSelection)
+                    action(controller::viewSelectedItemInTimeline)
+                }
             }.items
         }
 

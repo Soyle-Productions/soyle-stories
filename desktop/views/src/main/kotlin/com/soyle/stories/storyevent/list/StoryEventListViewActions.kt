@@ -21,4 +21,5 @@ interface StoryEventListViewActions {
     fun rescheduleSelectedItem()
     fun adjustTimesOfSelectedItems()
     fun deleteSelectedItems()
+    fun viewSelectedItemInTimeline()
 }

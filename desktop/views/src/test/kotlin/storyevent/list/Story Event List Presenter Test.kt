@@ -150,11 +150,18 @@ class `Story Event List Presenter Test` {
             requestedStoryEventIds = storyEventIds
         }
 
-        override fun confirmRemoveStoryEvent(storyEventIds: Set<StoryEvent.Id>): Job =
+        override fun confirmRemoveStoryEvent(storyEventIds: Set<StoryEvent.Id>, shouldShowAgain: Boolean): Job =
             error("Should never be called from story event list")
     }
 
     private val storyEventRemovedNotifier = StoryEventNoLongerHappensNotifier()
+
+    private val requestToViewItemInTimeline = object : (StoryEvent.Id) -> Unit {
+        var requestedStoryEvent: StoryEvent.Id? = null
+        override fun invoke(p1: StoryEvent.Id) {
+            requestedStoryEvent = p1
+        }
+    }
 
     private val presenter =
         StoryEventListPresenter(
@@ -165,12 +172,13 @@ class `Story Event List Presenter Test` {
             rescheduleStoryEventController,
             adjustStoryEventsTimeController,
             removeStoryEventController,
+            requestToViewItemInTimeline,
             storyEventCreatedNotifier,
             storyEventRenamedNotifier,
             storyEventRescheduledNotifier,
             storyEventRemovedNotifier,
             ThreadTransformerDouble(guiUpdate = {
-                CoroutineScope(Dispatchers.JavaFx).launch { it() }
+                TestCoroutineScope().launch { it() }
             })
         )
 
@@ -652,30 +660,6 @@ class `Story Event List Presenter Test` {
             StoryEventItem(StoryEvent.Id(), "name 4", 4L),
         )
 
-        /*
-        Ordered Events:
-            StoryEventItem(StoryEvent.Id(), "name 0", 0L),
-            StoryEventItem(StoryEvent.Id(), "Some name 4", 1L),
-            StoryEventItem(StoryEvent.Id(), "name 1", 1L),
-            StoryEventItem(StoryEvent.Id(), "Some name 3", 2L),
-            StoryEventItem(StoryEvent.Id(), "Some name 6", 2L),
-            StoryEventItem(StoryEvent.Id(), "name 2", 2L),
-            StoryEventItem(StoryEvent.Id(), "name 3", 3L),
-            StoryEventItem(StoryEvent.Id(), "Some name 0", 4L),
-            StoryEventItem(StoryEvent.Id(), "Some name 1", 4L),
-            StoryEventItem(StoryEvent.Id(), "Some name 2", 4L),
-            StoryEventItem(StoryEvent.Id(), "Some name 5", 5L),
-            StoryEventItem(StoryEvent.Id(), "name 4", 4L),
-
-        After Deletion:
-            StoryEventItem(StoryEvent.Id(), "name 0", 0L),
-            StoryEventItem(StoryEvent.Id(), "name 1", 1L),
-            StoryEventItem(StoryEvent.Id(), "name 2", 2L),
-            StoryEventItem(StoryEvent.Id(), "name 3", 3L),
-            StoryEventItem(StoryEvent.Id(), "name 4", 4L),
-
-         */
-
         init {
             items.forEach {
                 println("StoryEventItem(StoryEvent.Id(), \"${it.storyEventName}\", ${it.time}L),")
@@ -746,6 +730,57 @@ class `Story Event List Presenter Test` {
             }
 
             assertThat(viewModel).isEqualTo(EmptyStoryEventListViewModel)
+        }
+
+    }
+
+    @Nested
+    inner class `Can View Single Story Events in Timeline` {
+
+        val items = listOf(
+            StoryEventItem(StoryEvent.Id(), "Some name 0", 4L),
+            StoryEventItem(StoryEvent.Id(), "Some name 1", 4L),
+        )
+
+        init {
+            `When Loading Succeeds`().`given controller responded with`(items)
+        }
+
+        @Test
+        fun `should not do anything if nothing is selected`() {
+            presenter.viewSelectedItemInTimeline()
+
+            assertNull(requestToViewItemInTimeline.requestedStoryEvent)
+        }
+
+        @Test
+        fun `should not do anything if multiple items are selected`() {
+            with(viewModel as PopulatedStoryEventListViewModel) {
+                selectedItems.setAll(items)
+            }
+
+            presenter.viewSelectedItemInTimeline()
+
+            assertNull(requestToViewItemInTimeline.requestedStoryEvent)
+        }
+
+        @Nested
+        inner class `Given a Single Item is Selected` {
+
+            private val populatedViewModel = viewModel as PopulatedStoryEventListViewModel
+            val selectedItem = populatedViewModel.items.random()
+
+            init {
+                populatedViewModel.selectedItems.setAll(selectedItem)
+            }
+
+            @Test
+            fun `should request to view selected item in timeline`() {
+                presenter.viewSelectedItemInTimeline()
+
+                assertThat(requestToViewItemInTimeline.requestedStoryEvent).isEqualTo(selectedItem.id)
+            }
+
         }
 
     }

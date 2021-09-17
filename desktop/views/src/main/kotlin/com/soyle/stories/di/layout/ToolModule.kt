@@ -27,6 +27,7 @@ object ToolModule : RegisteredToolsConfig {
         SceneSetting.getRegistration(),
         SceneCharacters.getRegistration(),
         StoryEventList.getRegistration(),
+        Timeline.getRegistration(),
         /**
          * Dynamic Tools
          */

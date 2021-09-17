@@ -41,6 +41,7 @@ class StoryEventListPresenter(
     private val rescheduleStoryEventController: RescheduleStoryEventController,
     private val adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
     private val removeStoryEventController: RemoveStoryEventController,
+    private val requestToViewStoryEventInTimeline: (StoryEvent.Id) -> Unit,
 
     storyEventCreated: Notifier<StoryEventCreatedReceiver>,
     storyEventRenamed: Notifier<StoryEventRenamedReceiver>,
@@ -156,6 +157,11 @@ class StoryEventListPresenter(
     override fun deleteSelectedItems() {
         val selectedItems = (viewModel.value as PopulatedStoryEventListViewModel).selectedItems
         removeStoryEventController.removeStoryEvent(selectedItems.map { it.id }.toSet())
+    }
+
+    override fun viewSelectedItemInTimeline() {
+        val selectedItem = (viewModel.value as PopulatedStoryEventListViewModel).selectedItems.singleOrNull() ?: return
+        requestToViewStoryEventInTimeline(selectedItem.id)
     }
 
     private val eventReceiver = EventReceiver()

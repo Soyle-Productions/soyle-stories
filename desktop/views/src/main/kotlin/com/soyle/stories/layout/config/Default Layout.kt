@@ -43,7 +43,7 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
             stack(2) {
                 marker(DeleteSceneRamifications::class)
                 marker(ReorderSceneRamifications::class)
-                //openTool(ToolType.Timeline)
+                tool(Tool(Timeline, isOpen = false))
                 //openTool(ToolType.ContinuityErrors)
             }
         }
