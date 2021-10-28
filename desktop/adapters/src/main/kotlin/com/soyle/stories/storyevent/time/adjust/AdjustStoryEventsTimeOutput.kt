@@ -8,6 +8,8 @@ class AdjustStoryEventsTimeOutput(
 ) : AdjustStoryEventsTime.OutputPort {
 
     override suspend fun adjustedTimesForStoryEvents(response: AdjustStoryEventsTime.ResponseModel) {
-        storyEventRescheduledReceiver.receiveStoryEventsRescheduled(response.rescheduledStoryEvents)
+        storyEventRescheduledReceiver.receiveStoryEventsRescheduled(
+            response.rescheduledStoryEvents.associateBy { it.storyEventId }
+        )
     }
 }

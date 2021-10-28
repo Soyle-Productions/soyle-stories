@@ -7,6 +7,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.*
 import kotlinx.coroutines.test.TestCoroutineContext
 import kotlinx.coroutines.test.TestCoroutineScope
+import kotlin.coroutines.CoroutineContext
 
 class SyncThreadTransformer : ThreadTransformer {
 
@@ -15,6 +16,12 @@ class SyncThreadTransformer : ThreadTransformer {
 			task()
 		}
 	}
+
+	override val asyncContext: CoroutineContext
+		get() = asyncScope.coroutineContext
+
+	override val guiContext: CoroutineContext
+		get() = guiScope.coroutineContext
 
 	private val guiScope = TestCoroutineScope() + Dispatchers.JavaFx
 	private val asyncScope = TestCoroutineScope()

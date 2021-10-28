@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.fail
 import org.testfx.assertions.api.Assertions.assertThat
+import com.soyle.stories.desktop.view.storyevent.timeline.TimelineAssertions.Companion.assertThat
 
 class `Story Event Steps` : En {
 
@@ -46,6 +47,10 @@ class `Story Event Steps` : En {
         Given("I am deleting the {story event}") { storyEvent: StoryEvent ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenDeleteStoryEventDialogHasBeenOpened(listOf(storyEvent))
+        }
+        Given("I am viewing the project timeline") {
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenTimelineToolHasBeenOpened()
         }
     }
 
@@ -99,6 +104,18 @@ class `Story Event Steps` : En {
                 .reschedule(time.toLong())
             runBlocking { delay(100) } // given events time to propagate
         }
+        When("I reschedule the {story event} to time {int}") { storyEvent: StoryEvent, time: Int ->
+            val workBench = soyleStories.getAnyOpenWorkbenchOrError()
+            workBench
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+                .openRescheduleStoryEventDialog()
+
+            workBench
+                .getOpenStoryEventTimeAdjustmentDialogOrError()
+                .reschedule(time.toLong())
+            runBlocking { delay(100) } // given events time to propagate
+        }
         When("I increment the selected story events' times by {int}") { adjustment: Int ->
             val workBench = soyleStories.getAnyOpenWorkbenchOrError()
             workBench
@@ -120,7 +137,34 @@ class `Story Event Steps` : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .getOpenDeleteStoryEventDialogOrError()
                 .confirm()
-            runBlocking { delay(100) } // given events time to propagate
+            runBlocking { delay(100) } // give events time to propagate
+        }
+        When("I delete the {story event}") { storyEvent: StoryEvent ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+                .openDeleteStoryEventDialog()
+
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .getOpenDeleteStoryEventDialogOrError()
+                .confirm()
+            runBlocking { delay(100) } // give events time to propagate
+        }
+        When("I view the {story event} in the timeline") { storyEvent: StoryEvent ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+                .viewStoryEventInTimeline()
+        }
+        When("I insert {int} units of time before time unit {int}") { insertAmount: Int, unit: Int ->
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench.givenTimelineToolHasBeenOpened()
+                .givenTimeUnitInView(unit.toLong())
+                .givenTimeUnitHasBeenSelected(unit.toLong())
+                .openInsertTimeDialog()
+
+            workbench.getOpenInsertTimeDialogOrError()
+                .insertTime(insertAmount.toLong())
         }
     }
 
@@ -135,7 +179,7 @@ class `Story Event Steps` : En {
                     hasStoryEvent(storyEvent)
                 }
         }
-        Then("the {story event} should be at time {int}") { storyEvent: StoryEvent, expectedTime: Int ->
+        Then("the {story event} should (still )be at time {int}") { storyEvent: StoryEvent, expectedTime: Int ->
             assertThat(storyEvent.time.toInt()).isEqualTo(expectedTime)
 
             soyleStories.getAnyOpenWorkbenchOrError()
@@ -169,6 +213,40 @@ class `Story Event Steps` : En {
         }
         Then("the {story event} should not have been deleted") { storyEvent: StoryEvent ->
             // if we make it here, it should pass since the storyEvent was found
+        }
+        Then("I should see the {story event} in the timeline") { storyEvent: StoryEvent ->
+            val timeline = soyleStories.getAnyOpenWorkbenchOrError()
+                .getOpenTimelineToolOrError()
+
+            assertThat(timeline) {
+                hasStoryPointLabel(storyEvent.id)
+                andStoryPointLabel(storyEvent.id) {
+                    hasName(storyEvent.name.value)
+                    isAtTime(storyEvent.time)
+                    isInView()
+                }
+            }
+        }
+        Then("there should not be a story event in the timeline named {string}") { unexpectedName: String ->
+            val timeline = soyleStories.getAnyOpenWorkbenchOrError()
+                .getOpenTimelineToolOrError()
+
+            assertThat(timeline) {
+                doesNotHaveStoryPointLabelWithName(unexpectedName)
+            }
+        }
+        Then(
+            "the timeline should show the {story event} at time {int}"
+        ) { storyEvent: StoryEvent, expectedTime: Int ->
+            val timeline = soyleStories.getAnyOpenWorkbenchOrError()
+                .getOpenTimelineToolOrError()
+
+            assertThat(timeline) {
+                hasStoryPointLabel(storyEvent.id)
+                andStoryPointLabel(storyEvent.id) {
+                    isAtTime(expectedTime.toLong())
+                }
+            }
         }
     }
 

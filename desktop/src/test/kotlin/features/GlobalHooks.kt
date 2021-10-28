@@ -114,7 +114,7 @@ class GlobalHooks : En {
             CharacterArcTemplate.default().sections.single { it.name == name }
         }
 
-        ParameterType("ordinal", "(\\d+)(?:st|nd|rd|th)") { _: String?, ordinal: String ->
+        ParameterType<Int>("ordinal", "(\\d+)(?:st|nd|rd|th)") { _: String?, ordinal: String ->
             Regex("(\\d+)").find(ordinal)?.value?.toIntOrNull()?.minus(1)
                 ?: error("detected ordinal, but did not find parsable string")
         }

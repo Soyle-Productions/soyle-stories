@@ -29,7 +29,7 @@ class `Remove Story Event Confirmation Prompt Design` : DesignTest() {
     }
     private val viewModel = RemoveStoryEventConfirmationPromptViewModel(threadTransformer)
     override val node: Node
-        get() = RemoveStoryEventConfirmationPromptView(viewModel).root
+        get() = RemoveStoryEventConfirmationPromptView(actions, viewModel).root
 
     @Test
     fun `awaiting confirmation`() {

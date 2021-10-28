@@ -8,6 +8,8 @@ class RescheduleStoryEventOutput(
 ) : RescheduleStoryEvent.OutputPort {
 
     override suspend fun storyEventRescheduled(response: RescheduleStoryEvent.ResponseModel) {
-        storyEventRescheduledReceiver.receiveStoryEventsRescheduled(listOf(response.storyEventRescheduled))
+        storyEventRescheduledReceiver.receiveStoryEventsRescheduled(
+            listOf(response.storyEventRescheduled).associateBy { it.storyEventId }
+        )
     }
 }

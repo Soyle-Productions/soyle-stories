@@ -12,6 +12,6 @@ class RescheduleStoryEventControllerDouble : RescheduleStoryEventController {
     }
 
     override fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, time: Long): Job {
-        TODO("Not yet implemented")
+        return Job()
     }
 }

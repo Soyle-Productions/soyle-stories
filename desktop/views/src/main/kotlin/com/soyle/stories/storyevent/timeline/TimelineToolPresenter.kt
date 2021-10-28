@@ -6,6 +6,11 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.layout.config.fixed.Timeline
 import com.soyle.stories.layout.usecases.openTool.OpenTool
 import com.soyle.stories.project.ProjectScope
+import javafx.application.Platform
+import javafx.stage.Stage
+import kotlinx.coroutines.withContext
+import java.util.logging.Level
+import java.util.logging.Logger
 
 /**
  * Not to be confused with the TimelinePresenter.  This accepts requests to view the timeline in various ways from
@@ -27,7 +32,13 @@ class TimelineToolPresenter(
     fun viewTimeline(withStoryEventFocused: StoryEvent.Id) {
         threadTransformer.async {
             openTool.invoke(Timeline, openToolOutputPort)
-            projectScope.get<TimelinePresenter>().focusOn(withStoryEventFocused)
+            withContext(threadTransformer.guiContext) {
+                val timeline = Stage.getWindows().asSequence()
+                    .mapNotNull { it.scene?.root?.lookup(".${TimelineStyles.timeline.name}") as? com.soyle.stories.storyevent.timeline.Timeline }
+                    .firstOrNull()
+                    ?: return@withContext Logger.getGlobal().log(Level.WARNING, "Could not find timeline in workspace")
+                timeline.focusOn(withStoryEventFocused)
+            }
         }
     }
 

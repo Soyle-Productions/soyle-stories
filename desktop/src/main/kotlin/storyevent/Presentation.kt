@@ -1,5 +1,7 @@
 package com.soyle.stories.desktop.config.storyevent
 
+import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.desktop.config.InProjectScope
@@ -11,27 +13,39 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.storyevent.create.*
+import com.soyle.stories.storyevent.item.StoryEventItemMenuComponent
+import com.soyle.stories.storyevent.item.StoryEventItemSelection
 import com.soyle.stories.storyevent.list.*
 import com.soyle.stories.storyevent.remove.*
-import com.soyle.stories.storyevent.rename.RenameStoryEventPrompt
-import com.soyle.stories.storyevent.rename.RenameStoryEventPromptPresenter
-import com.soyle.stories.storyevent.rename.RenameStoryEventPromptView
-import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
+import com.soyle.stories.storyevent.rename.*
 import com.soyle.stories.storyevent.time.*
+import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimePrompt
+import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventPrompt
-import com.soyle.stories.storyevent.timeline.TimelinePresenter
-import com.soyle.stories.storyevent.timeline.TimelineToolPresenter
-import com.soyle.stories.storyevent.timeline.TimelineView
+import com.soyle.stories.storyevent.timeline.*
+import com.soyle.stories.storyevent.timeline.header.TimelineHeaderComponent
+import com.soyle.stories.storyevent.timeline.header.TimelineHeaderCreateButtonComponent
+import com.soyle.stories.storyevent.timeline.header.TimelineHeaderOptionsButtonComponent
+import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPort
+import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPortComponent
+import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGrid
+import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridComponent
+import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
+import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
+import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRuler
+import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRulerComponent
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
+import javafx.beans.property.BooleanProperty
+import javafx.collections.ObservableList
+import javafx.collections.ObservableSet
 import javafx.scene.Node
+import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListCell
 import javafx.stage.Modality
-import javafx.stage.StageStyle
-import kotlinx.coroutines.Job
-import tornadofx.UIComponent
-import tornadofx.onChange
-import tornadofx.onChangeOnce
+import kotlin.coroutines.CoroutineContext
 
 object Presentation {
 
@@ -98,7 +112,8 @@ object Presentation {
                             applicationScope.get()
                         )
                         CreateStoryEventPromptView(presenter, presenter.viewModel).apply {
-                            val stage = openModal(modality = Modality.APPLICATION_MODAL, owner = get<WorkBench>().currentStage)
+                            val stage =
+                                openModal(modality = Modality.APPLICATION_MODAL, owner = get<WorkBench>().currentStage)
                             presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
                                 if (it == true) stage?.hide()
                             }
@@ -117,7 +132,8 @@ object Presentation {
                             applicationScope.get()
                         )
                         RenameStoryEventPromptView(presenter.viewModel, presenter).apply {
-                            val stage = openModal(modality = Modality.APPLICATION_MODAL, owner = get<WorkBench>().currentStage)
+                            val stage =
+                                openModal(modality = Modality.APPLICATION_MODAL, owner = get<WorkBench>().currentStage)
                             presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
                                 if (it == true) stage?.hide()
                             }
@@ -138,7 +154,10 @@ object Presentation {
                             applicationScope.get()
                         )
 
-                        val stage = TimeAdjustmentPromptView(presenter, presenter.viewModel).openModal(owner = get<WorkBench>().root.scene?.window)!!
+                        val stage = TimeAdjustmentPromptView(
+                            presenter,
+                            presenter.viewModel
+                        ).openModal(owner = get<WorkBench>().root.scene?.window)!!
                         presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
                             if (it == true) stage.hide()
                         }
@@ -152,7 +171,10 @@ object Presentation {
                             applicationScope.get()
                         )
 
-                        val stage = TimeAdjustmentPromptView(presenter, presenter.viewModel).openModal(owner = get<WorkBench>().root.scene?.window)!!
+                        val stage = TimeAdjustmentPromptView(
+                            presenter,
+                            presenter.viewModel
+                        ).openModal(owner = get<WorkBench>().root.scene?.window)!!
                         presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
                             if (it == true) stage.hide()
                         }
@@ -171,7 +193,10 @@ object Presentation {
                             get()
                         )
                         val stageInit = lazy {
-                            RemoveStoryEventConfirmationPromptView(presenter, viewModel).openModal(owner = get<WorkBench>().root.scene?.window)
+                            RemoveStoryEventConfirmationPromptView(
+                                presenter,
+                                viewModel
+                            ).openModal(owner = get<WorkBench>().root.scene?.window)
                         }
                         viewModel.showing().onChangeWithCurrent {
                             if (it == true) stageInit.value?.show()
@@ -186,11 +211,103 @@ object Presentation {
     }
 
     private fun InProjectScope.timeline() {
-        provide {
-            TimelineToolPresenter(this, applicationScope.get(), get(), get())
+        provide<TimelineComponent> {
+            val threadTransformer = applicationScope.get<ThreadTransformer>()
+            TimelineModule(this, threadTransformer.asyncContext, threadTransformer.guiContext)
         }
-        provide { TimelinePresenter() }
-        provide { TimelineView() }
+        provide { TimelineToolPresenter(this, applicationScope.get(), get(), get()) }
     }
 
+    private class TimelineModule(
+        private val projectScope: ProjectScope,
+        private val asyncContext: CoroutineContext,
+        override val guiContext: CoroutineContext
+    ) :
+        TimelineComponent,
+        TimelineComponent.Dependencies,
+        TimelineViewPortComponent.Dependencies,
+
+        TimelineComponent.GUI,
+        TimelineHeaderComponent.Gui,
+        TimelineHeaderOptionsButtonComponent.Gui,
+        TimelineViewPortComponent.Gui,
+        TimelineRulerComponent.Gui,
+        TimelineViewPortGridComponent.Gui,
+        StoryPointLabelComponent.GUIComponents,
+
+        StoryPointLabelComponent.Dependencies,
+        StoryEventItemMenuComponent.Dependencies {
+
+        override val listStoryEventsController: ListStoryEventsController
+            get() = projectScope.get()
+
+        override val storyEventCreated: Notifier<StoryEventCreatedReceiver>
+            get() = projectScope.get<StoryEventCreatedNotifier>()
+
+        override val storyEventNoLongerHappens: Notifier<StoryEventNoLongerHappensReceiver>
+            get() = projectScope.get<StoryEventNoLongerHappensNotifier>()
+
+        override val storyEventRenamed: Notifier<StoryEventRenamedReceiver>
+            get() = projectScope.get<StoryEventRenamedNotifier>()
+
+        override val storyEventRescheduled: Notifier<StoryEventRescheduledReceiver>
+            get() = projectScope.get<StoryEventRescheduledNotifier>()
+
+        override val adjustStoryEventsTimeController: AdjustStoryEventsTimeController
+            get() = projectScope.get()
+
+        override val renameStoryEventController: RenameStoryEventController
+            get() = projectScope.get()
+
+        override val rescheduleStoryEventController: RescheduleStoryEventController
+            get() = projectScope.get()
+
+        override val removeStoryEventController: RemoveStoryEventController
+            get() = projectScope.get()
+
+        override fun Timeline(): Timeline {
+            return TimelineComponent.Implementation(
+                Project.Id(projectScope.projectId),
+                this,
+                this
+            ).Timeline()
+        }
+
+        override fun TimelineHeader(condensedProperty: BooleanProperty, selection: TimelineSelectionModel): Node {
+            return TimelineHeaderComponent.Implementation(this).TimelineHeader(condensedProperty, selection)
+        }
+
+        override fun TimelineHeaderCreateButton(): Node {
+            return TimelineHeaderCreateButtonComponent.Implementation(projectScope.get()).TimelineHeaderCreateButton()
+        }
+
+        override fun TimelineHeaderOptionsButton(selection: TimelineSelectionModel): Node {
+            return TimelineHeaderOptionsButtonComponent.Implementation(this).TimelineHeaderOptionsButton(selection)
+        }
+
+        override fun TimelineViewPort(storyEventItems: ObservableList<StoryPointLabel>): TimelineViewPort {
+            return TimelineViewPortComponent.Implementation(this, this).TimelineViewPort(storyEventItems)
+        }
+
+        override fun TimelineRuler(selection: ObservableSet<UnitOfTime>): TimelineRuler {
+            return TimelineRulerComponent.Implementation(this).TimelineRuler(selection)
+        }
+
+        override fun TimelineViewPortGrid(): TimelineViewPortGrid {
+            return TimelineViewPortGridComponent.Implementation(asyncContext, guiContext, this).TimelineViewPortGrid()
+        }
+
+        override fun TimeSpanLabel(selection: ObservableSet<UnitOfTime>): TimeSpanLabel {
+            return TimeSpanLabelComponent.Implementation().TimeSpanLabel(selection)
+        }
+
+        override fun StoryPointLabel(storyEventId: StoryEvent.Id, name: String, time: UnitOfTime): StoryPointLabel {
+            return StoryPointLabelComponent.Implementation(this, this).StoryPointLabel(storyEventId, name, time)
+        }
+
+        override fun StoryEventItemMenu(selection: StoryEventItemSelection): ContextMenu {
+            return StoryEventItemMenuComponent.Implementation(this).StoryEventItemMenu(selection)
+        }
+
+    }
 }

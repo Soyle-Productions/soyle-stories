@@ -41,6 +41,7 @@ class `Story Event List Tool Design` : DesignTest() {
         override fun rescheduleSelectedItem() = Unit
         override fun adjustTimesOfSelectedItems() = Unit
         override fun deleteSelectedItems() = Unit
+        override fun viewSelectedItemInTimeline() = Unit
     }
     private val viewModel = objectProperty<StoryEventListViewModel>(null)
     private val cell = object : StoryEventListCell {

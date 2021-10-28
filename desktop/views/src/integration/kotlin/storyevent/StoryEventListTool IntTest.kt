@@ -80,6 +80,7 @@ class `StoryEventListTool IntTest` : FxRobot() {
             rescheduleStoryEventController = mockk(relaxed = true),
             adjustStoryEventsTimeController = mockk(relaxed = true),
             removeStoryEventController = mockk(relaxed = true),
+            requestToViewStoryEventInTimeline = mockk(relaxed = true),
             storyEventCreated = StoryEventCreatedNotifier(),
             storyEventRenamed = StoryEventRenamedNotifier(),
             storyEventRescheduled = storyEventRescheduledNotifier,
@@ -131,7 +132,7 @@ class `StoryEventListTool IntTest` : FxRobot() {
     private fun `when the story event item is rescheduled`(id: StoryEvent.Id, currentTime: Long) {
         runBlocking {
             storyEventRescheduledNotifier.receiveStoryEventsRescheduled(
-                listOf(StoryEventRescheduled(id, currentTime + 5, currentTime))
+                listOf(StoryEventRescheduled(id, currentTime + 5, currentTime)).associateBy { it.storyEventId }
             )
         }
     }
@@ -139,7 +140,7 @@ class `StoryEventListTool IntTest` : FxRobot() {
     private fun `when the story event item is adjusted`(id: StoryEvent.Id, currentTime: Long) {
         runBlocking {
             storyEventRescheduledNotifier.receiveStoryEventsRescheduled(
-                listOf(StoryEventRescheduled(id, currentTime - 5, currentTime))
+                listOf(StoryEventRescheduled(id, currentTime - 5, currentTime)).associateBy { it.storyEventId }
             )
         }
     }

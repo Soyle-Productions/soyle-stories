@@ -202,13 +202,12 @@ class StoryEventListPresenter(
             }
         }
 
-        override suspend fun receiveStoryEventsRescheduled(events: List<StoryEventRescheduled>) {
+        override suspend fun receiveStoryEventsRescheduled(events: Map<StoryEvent.Id, StoryEventRescheduled>) {
             withContext(Dispatchers.JavaFx) {
                 val vm = viewModel.value as? PopulatedStoryEventListViewModel ?: return@withContext
-                val eventsById = events.associateBy { it.storyEventId }
 
                 vm.items.onEach {
-                    val rescheduled = eventsById[it.id] ?: return@onEach
+                    val rescheduled = events[it.id] ?: return@onEach
                     it.timeProperty.set(rescheduled.newTime)
                 }
                 vm.items.sortWith { item1, item2 ->

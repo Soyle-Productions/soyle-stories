@@ -615,7 +615,7 @@ class `Story Event List Presenter Test` {
         @Test
         fun `should update the times of corresponding story event items`() {
             runBlocking {
-                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.map { StoryEventRescheduled(it.key, it.value, 0L) })
+                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.mapValues { StoryEventRescheduled(it.key, it.value, 0L) })
             }
 
             with(viewModel as PopulatedStoryEventListViewModel) {
@@ -629,7 +629,7 @@ class `Story Event List Presenter Test` {
         @Test
         fun `should update the order of items`() {
             runBlocking {
-                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.map { StoryEventRescheduled(it.key, it.value, 0L) })
+                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.mapValues { StoryEventRescheduled(it.key, it.value, 0L) })
             }
 
             with(viewModel as PopulatedStoryEventListViewModel) {

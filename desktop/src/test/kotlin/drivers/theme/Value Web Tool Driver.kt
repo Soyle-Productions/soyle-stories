@@ -12,7 +12,6 @@ import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import com.soyle.stories.theme.themeList.ThemeList
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebs
 import com.soyle.stories.theme.themeOppositionWebs.ValueOppositionWebsScope
-import io.cucumber.messages.internal.com.google.protobuf.Value
 import javafx.event.ActionEvent
 import org.junit.jupiter.api.Assertions.assertNotNull
 import tornadofx.FX

@@ -122,8 +122,8 @@ open class Chip : ButtonBase() {
         init {
             chip {
                 prefHeight = 32.px
-                backgroundRadius += box(100.percent)
-                borderRadius = multi(box(100.percent))
+                backgroundRadius += box(16.px)
+                borderRadius = multi(box(16.px))
 
                 chipDeleteIcon {
                     fill = javafx.scene.paint.Color.grayRgb(0, 0.26)

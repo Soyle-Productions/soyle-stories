@@ -116,3 +116,10 @@ fun StoryEventListToolView.openDeleteStoryEventDialog() {
         optionsButton!!.deleteOption!!.fire()
     }
 }
+
+fun StoryEventListToolView.viewStoryEventInTimeline() {
+    drive {
+        optionsButton!!.show()
+        optionsButton!!.viewInTimeline!!.fire()
+    }
+}

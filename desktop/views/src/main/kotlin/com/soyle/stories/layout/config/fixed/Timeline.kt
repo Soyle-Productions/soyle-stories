@@ -9,6 +9,7 @@ import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import com.soyle.stories.storyevent.list.StoryEventListTool
+import com.soyle.stories.storyevent.timeline.TimelineComponent
 import com.soyle.stories.storyevent.timeline.TimelineView
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
@@ -16,6 +17,10 @@ import tornadofx.add
 import kotlin.reflect.KClass
 
 object Timeline : ToolConfig<Timeline>, FixedTool() {
+
+    override fun toString(): String {
+        return "Timeline"
+    }
 
     override fun getFixedType(): FixedTool = Timeline
 
@@ -25,10 +30,11 @@ object Timeline : ToolConfig<Timeline>, FixedTool() {
 
     override fun getTabConfig(tool: ToolViewModel, type: Timeline): ToolTabConfig = object : ToolTabConfig {
         override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-            val timeline = projectScope.get<TimelineView>()
-            timeline.title = getViewModelConfig(type).toolName()
-            tabPane.add(timeline.root)
-            return tabPane.tabs.last()
+            val timeline = projectScope.get<TimelineComponent>().Timeline()
+            tabPane.add(timeline)
+            return tabPane.tabs.last().also {
+                it.text = getViewModelConfig(Timeline).toolName()
+            }
         }
     }
 
