@@ -1,14 +1,20 @@
 package com.soyle.stories.desktop.view.storyevent.timeline.viewport.ruler.label
 
+import com.soyle.stories.desktop.view.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponentDouble
 import com.soyle.stories.storyevent.timeline.UnitOfTime
+import com.soyle.stories.storyevent.timeline.viewport.ruler.TimeRangeSelection
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
 import javafx.collections.ObservableSet
 
 class TimelineViewPortRulerLabelComponentDouble : TimeSpanLabelComponent {
 
-    override fun TimeSpanLabel(selection: ObservableSet<UnitOfTime>): TimeSpanLabel {
-        return com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel(selection)
+    private val gui = object : TimeSpanLabelComponent.Gui,
+        TimelineRulerLabelMenuComponent by TimelineRulerLabelMenuComponentDouble() {}
+
+    override fun TimeSpanLabel(selection: TimeRangeSelection): TimeSpanLabel {
+        return TimeSpanLabel(selection, gui)
     }
 
 }

@@ -3,32 +3,43 @@ package com.soyle.stories.storyevent.timeline.viewport.ruler.label
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.surfaces.Elevation
 import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.storyevent.timeline.TimeRange
+import com.soyle.stories.storyevent.timeline.TimelineSelectionModel
 import com.soyle.stories.storyevent.timeline.TimelineStyles
 import com.soyle.stories.storyevent.timeline.UnitOfTime
+import com.soyle.stories.storyevent.timeline.viewport.ruler.TimeRangeSelection
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.property.LongProperty
+import javafx.beans.property.ObjectProperty
 import javafx.collections.ObservableSet
 import javafx.event.EventTarget
+import javafx.scene.control.ContextMenu
+import javafx.scene.input.MouseEvent
+import javafx.scene.input.TransferMode
 import javafx.scene.layout.Region
 import tornadofx.*
 
 interface TimeSpanLabelComponent {
 
-    fun TimeSpanLabel(selection: ObservableSet<UnitOfTime>): TimeSpanLabel
+    fun TimeSpanLabel(selection: TimeRangeSelection): TimeSpanLabel
 
     @ViewBuilder
     fun EventTarget.timeSpanLabel(
-        selection: ObservableSet<UnitOfTime>,
+        selection: TimeRangeSelection,
         op: TimeSpanLabel.() -> Unit = {}): TimeSpanLabel = TimeSpanLabel(selection)
         .also { add(it) }
         .apply(op)
 
+    interface Gui : TimelineRulerLabelMenuComponent
+
     companion object {
         fun Implementation(
-
+            gui: Gui
         ) = object : TimeSpanLabelComponent {
-            override fun TimeSpanLabel(selection: ObservableSet<UnitOfTime>): TimeSpanLabel {
-                return com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel(selection)
+            override fun TimeSpanLabel(selection: TimeRangeSelection): TimeSpanLabel {
+                return TimeSpanLabel(selection, gui)
             }
         }
     }
@@ -36,43 +47,64 @@ interface TimeSpanLabelComponent {
 }
 
 class TimeSpanLabel(
-    private val selection: ObservableSet<UnitOfTime> = observableSetOf()
+    private val selection: TimeRangeSelection = TimelineSelectionModel(),
+
+    gui: TimeSpanLabelComponent.Gui
 ) : Region() {
 
-    private val numberProperty: LongProperty = longProperty(0)
-    fun number(): LongProperty = numberProperty
-    var number: Long by number()
+    private val rangeProperty: ObjectProperty<TimeRange> = objectProperty(TimeRange(0 .. 0L))
+    fun range() = rangeProperty
+    var range: TimeRange by rangeProperty
 
-    private val truncatedAboveThousand = longBinding(numberProperty) {
-        get() % 1000
-    }
-
-    private val selectedProperty = booleanBinding(selection, numberProperty) { selection.contains(UnitOfTime(number)) }
-    fun selected(): BooleanExpression = selectedProperty
-    var selected: Boolean
-        get() = selectedProperty.get()
-        set(value) {
-            if (value) selection.add(UnitOfTime(number))
-            else selection.remove(UnitOfTime(number))
-        }
+    private val truncatedAboveThousand = longBinding(rangeProperty) { get().start.value % 1000 }
 
     private val label = label {
         textProperty().bind(truncatedAboveThousand.asString("%d"))
     }
 
+    private val contextMenuProperty = objectProperty<TimelineRulerLabelMenu?>(gui.TimelineRulerLabelMenu(selection))
+    fun contextMenu() = contextMenuProperty
+    var contextMenu by contextMenuProperty
+
     init {
         addClass(TimelineStyles.timeLabel)
-        toggleClass(Stylesheet.selected, selected())
         asSurface {
             relativeElevation = Elevation[2]!!
         }
-        minHeight = Region.USE_PREF_SIZE
-        setOnMouseClicked {
-            selected = true
+        minHeight = USE_PREF_SIZE
+        setOnMousePressed {
+            if (! selection.contains(range)) {
+                if (it.isShiftDown) selection.extendFromRecentStart(range)
+                else if (it.isShortcutDown) selection.add(range)
+                else selection.restart(range)
+            }
+        }
+        setOnMouseDragged {
+            if (it.isPrimaryButtonDown) {
+                it.consume()
+                val draggedToNode = it.pickResult?.intersectedNode
+                if (draggedToNode is TimeSpanLabel) {
+                    selection.extendFromRecentStart(draggedToNode.range)
+                }
+            }
+        }
+        setOnDragDetected {
+            if (it.isPrimaryButtonDown) {
+                it.consume()
+                startFullDrag()
+            }
+        }
+        setOnContextMenuRequested { event ->
+            if (selection.contains(range)) {
+                contextMenu?.run {
+                    show(this@TimeSpanLabel, event.screenX, event.screenY)
+                    event.consume()
+                }
+            }
         }
     }
 
     override fun toString(): String {
-        return super.toString()+"\'${label.text}\'"
+        return super.toString()+"\'${label.text}\'" + if (pseudoClassStates.isNotEmpty()) " (${pseudoClassStates})" else ""
     }
 }

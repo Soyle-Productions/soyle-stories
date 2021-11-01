@@ -213,7 +213,7 @@ private class TimelineViewPortPresenter(
     }
 
     override fun mouseClicked(mouseEvent: MouseEvent) {
-        viewModel.selection.storyEvents.clear()
+        viewModel.selection.clear()
         setFocus(true)
     }
 

@@ -33,10 +33,13 @@ import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGrid
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridComponent
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
+import com.soyle.stories.storyevent.timeline.viewport.ruler.TimeRangeSelection
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRuler
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRulerComponent
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import javafx.beans.property.BooleanProperty
 import javafx.collections.ObservableList
@@ -232,6 +235,7 @@ object Presentation {
         TimelineHeaderOptionsButtonComponent.Gui,
         TimelineViewPortComponent.Gui,
         TimelineRulerComponent.Gui,
+        TimeSpanLabelComponent.Gui,
         TimelineViewPortGridComponent.Gui,
         StoryPointLabelComponent.GUIComponents,
 
@@ -289,7 +293,7 @@ object Presentation {
             return TimelineViewPortComponent.Implementation(this, this).TimelineViewPort(storyEventItems)
         }
 
-        override fun TimelineRuler(selection: ObservableSet<UnitOfTime>): TimelineRuler {
+        override fun TimelineRuler(selection: TimeRangeSelection): TimelineRuler {
             return TimelineRulerComponent.Implementation(this).TimelineRuler(selection)
         }
 
@@ -297,8 +301,12 @@ object Presentation {
             return TimelineViewPortGridComponent.Implementation(asyncContext, guiContext, this).TimelineViewPortGrid()
         }
 
-        override fun TimeSpanLabel(selection: ObservableSet<UnitOfTime>): TimeSpanLabel {
-            return TimeSpanLabelComponent.Implementation().TimeSpanLabel(selection)
+        override fun TimeSpanLabel(selection: TimeRangeSelection): TimeSpanLabel {
+            return TimeSpanLabelComponent.Implementation(this).TimeSpanLabel(selection)
+        }
+
+        override fun TimelineRulerLabelMenu(selection: TimeRangeSelection): TimelineRulerLabelMenu {
+            return TimelineRulerLabelMenuComponent.Implementation().TimelineRulerLabelMenu(selection)
         }
 
         override fun StoryPointLabel(storyEventId: StoryEvent.Id, name: String, time: UnitOfTime): StoryPointLabel {
