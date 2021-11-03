@@ -8,6 +8,7 @@ import com.soyle.stories.storyevent.timeline.*
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.incrementalLabelHolder
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.largeMagnitudeLabelHolder
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.rulerSpacing
+import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
@@ -38,12 +39,13 @@ interface TimelineRulerComponent {
     @ViewBuilder
     fun EventTarget.timelineRuler(
         selection: TimeRangeSelection,
+        storyPointLabels: List<StoryPointLabel>,
         op: TimelineRuler.() -> Unit = {}
-    ): TimelineRuler = TimelineRuler(selection)
+    ): TimelineRuler = TimelineRuler(selection, storyPointLabels)
         .also { add(it) }
         .apply(op)
 
-    fun TimelineRuler(selection: TimeRangeSelection): TimelineRuler
+    fun TimelineRuler(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimelineRuler
 
     interface Gui : TimeSpanLabelComponent, TimelineRulerLabelMenuComponent
 
@@ -51,8 +53,8 @@ interface TimelineRulerComponent {
         fun Implementation(
             gui: Gui
         ) = object : TimelineRulerComponent {
-            override fun TimelineRuler(selection: TimeRangeSelection): TimelineRuler {
-                return TimelineRuler(selection, gui)
+            override fun TimelineRuler(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimelineRuler {
+                return TimelineRuler(selection, storyPointLabels, gui)
             }
         }
     }
@@ -60,6 +62,7 @@ interface TimelineRulerComponent {
 
 class TimelineRuler(
     private val selection: TimeRangeSelection = TimelineSelectionModel(),
+    storyPointLabels: List<StoryPointLabel>,
     private val gui: TimelineRulerComponent.Gui,
 ) : Control() {
 
@@ -94,7 +97,7 @@ class TimelineRuler(
 
     fun labelWidth(): DoubleExpression = labelWidthProperty
 
-    private val labelMenu = gui.TimelineRulerLabelMenu(selection)
+    private val labelMenu = gui.TimelineRulerLabelMenu(selection, storyPointLabels)
 
     private val labelsProperty = createObjectBinding({
         if (width <= 0.0) return@createObjectBinding emptyList()
@@ -105,7 +108,7 @@ class TimelineRuler(
         val finalLabelValue = (finalVisibleUnit / labelStep) * labelStep
 
         (firstLabelValue.value..finalLabelValue.value step labelStep.value).map {
-            gui.TimeSpanLabel(selection).apply {
+            gui.TimeSpanLabel(selection, storyPointLabels).apply {
                 range = TimeRange(it .. (labelStep + it).value)
                 contextMenu = labelMenu
                 minWidthProperty().bind(labelWidth())

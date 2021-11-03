@@ -17,6 +17,8 @@ value class UnitOfTime(val value: Long) : Comparable<UnitOfTime> {
     operator fun rangeTo(other: UnitOfTime): TimeRange = TimeRange(value..other.value)
 }
 
+val Long.unit get() = UnitOfTime(this)
+
 @JvmInline
 value class TimeRange(val range: LongRange) : ClosedRange<UnitOfTime>, Iterable<UnitOfTime> {
 

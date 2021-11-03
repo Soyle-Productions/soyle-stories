@@ -25,7 +25,7 @@ class `Ruler Time Label Unit Test` {
 
         @Test
         fun `click without keys pressed should start selection`() {
-            val label = component.TimeSpanLabel(selection)
+            val label = component.TimeSpanLabel(selection, listOf())
             label.range = TimeRange(42L .. 43)
             val event = MouseEvent(
                 this,
@@ -58,7 +58,7 @@ class `Ruler Time Label Unit Test` {
         @Test
         fun `dragging over a time label should extend the current selection`() {
             selection.restart(UnitOfTime(16))
-            val label = component.TimeSpanLabel(selection)
+            val label = component.TimeSpanLabel(selection, listOf())
             label.range = TimeRange(42L .. 43)
             val event = MouseEvent(
                 this,
@@ -91,7 +91,7 @@ class `Ruler Time Label Unit Test` {
         @Test
         fun `if shift is pressed, should extend selection`() {
             selection.restart(UnitOfTime(16))
-            val label = component.TimeSpanLabel(selection)
+            val label = component.TimeSpanLabel(selection, listOf())
             label.range = TimeRange(42L .. 43)
             val event = MouseEvent(
                 this,
@@ -124,7 +124,7 @@ class `Ruler Time Label Unit Test` {
         @Test
         fun `if control or command is pressed, should add new selection`() {
             selection.restart(UnitOfTime(16))
-            val label = component.TimeSpanLabel(selection)
+            val label = component.TimeSpanLabel(selection, listOf())
             label.range = TimeRange(42L .. 43)
             val event = MouseEvent(
                 this,
@@ -158,7 +158,7 @@ class `Ruler Time Label Unit Test` {
         @Test
         fun `if control and command is not pressed, should restart selection`() {
             selection.restart(UnitOfTime(16))
-            val label = component.TimeSpanLabel(selection)
+            val label = component.TimeSpanLabel(selection, listOf())
             label.range = TimeRange(42L .. 43)
             val event = MouseEvent(
                 this,
@@ -190,7 +190,7 @@ class `Ruler Time Label Unit Test` {
 
         @Test
         fun `when representing a larger time range, should select the entire time range`() {
-            val label = component.TimeSpanLabel(selection)
+            val label = component.TimeSpanLabel(selection, listOf())
             label.range = TimeRange(42L .. 64)
             val event = MouseEvent(
                 this,

@@ -8,33 +8,41 @@ import kotlinx.coroutines.Job
 
 class TimeAdjustmentPromptPresenter private constructor(
     private val storyEventIds: Set<StoryEvent.Id>,
-    private val currentTime: Long?,
+    val viewModel: TimeAdjustmentPromptViewModel,
     private val rescheduleStoryEventController: RescheduleStoryEventController,
     private val adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
     private val threadTransformer: ThreadTransformer
 ) : TimeAdjustmentPromptViewActions {
 
-    // rescheduling
-    constructor(
-        storyEventId: StoryEvent.Id, currentTime: Long, rescheduleStoryEventController: RescheduleStoryEventController,
-        adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
-        threadTransformer: ThreadTransformer
-    ) : this(
-        setOf(storyEventId),
-        currentTime,
-        rescheduleStoryEventController,
-        adjustStoryEventsTimeController,
-        threadTransformer
-    )
+    interface Builder {
+        operator fun invoke(storyEventIds: Set<StoryEvent.Id>): TimeAdjustmentPromptPresenter
+        operator fun invoke(storyEventId: StoryEvent.Id, currentTime: Long): TimeAdjustmentPromptPresenter
+        operator fun invoke(storyEventIds: Set<StoryEvent.Id>, initialAdjustment: Long): TimeAdjustmentPromptPresenter
+    }
 
-    // adjusting the time
-    constructor(
-        storyEventIds: Set<StoryEvent.Id>, rescheduleStoryEventController: RescheduleStoryEventController,
-        adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
-        threadTransformer: ThreadTransformer
-    ) : this(storyEventIds, null, rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
+    companion object {
 
-    val viewModel = TimeAdjustmentPromptViewModel(currentTime)
+        operator fun invoke(
+            rescheduleStoryEventController: RescheduleStoryEventController,
+            adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
+            threadTransformer: ThreadTransformer
+        ): Builder = object : Builder {
+            override fun invoke(storyEventIds: Set<StoryEvent.Id>): TimeAdjustmentPromptPresenter {
+                return TimeAdjustmentPromptPresenter(storyEventIds, TimeAdjustmentPromptViewModel.adjustment(), rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
+            }
+
+            override fun invoke(storyEventId: StoryEvent.Id, currentTime: Long): TimeAdjustmentPromptPresenter {
+                return TimeAdjustmentPromptPresenter(setOf(storyEventId), TimeAdjustmentPromptViewModel.reschedule(currentTime), rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
+            }
+
+            override fun invoke(storyEventIds: Set<StoryEvent.Id>, initialAdjustment: Long): TimeAdjustmentPromptPresenter {
+                return TimeAdjustmentPromptPresenter(storyEventIds, TimeAdjustmentPromptViewModel.adjustment(initialAdjustment), rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
+            }
+        }
+
+    }
+
+    //val viewModel = TimeAdjustmentPromptViewModel.reschedule(currentTime ?: 0)
 
     private fun canSubmit() = viewModel.canSubmit.value
 
@@ -55,10 +63,10 @@ class TimeAdjustmentPromptPresenter private constructor(
     }
 
     private fun getSubmissionJob(time: Long): Job {
-        return if (currentTime != null) {
-            rescheduleStoryEventController.rescheduleStoryEvent(storyEventIds.single(), time)
-        } else {
+        return if (viewModel.adjustment) {
             adjustStoryEventsTimeController.adjustStoryEventsTime(storyEventIds, time)
+        } else {
+            rescheduleStoryEventController.rescheduleStoryEvent(storyEventIds.single(), time)
         }
     }
 

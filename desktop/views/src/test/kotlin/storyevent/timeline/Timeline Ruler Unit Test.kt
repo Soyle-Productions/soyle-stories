@@ -19,7 +19,7 @@ import tornadofx.observableSetOf
 class `Timeline Ruler Unit Test` {
 
     val selection = TimelineSelectionModel()
-    val ruler = TimelineRuler(selection, gui = TimelineViewPortRulerComponentDouble().gui)
+    val ruler = TimelineRuler(selection, listOf(), gui = TimelineViewPortRulerComponentDouble().gui)
 
     @Nested
     inner class `Should create enough labels to cover entire visible range` {

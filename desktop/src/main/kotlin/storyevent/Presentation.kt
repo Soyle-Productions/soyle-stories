@@ -148,14 +148,16 @@ object Presentation {
             provide(RescheduleStoryEventPrompt::class, AdjustStoryEventsTimePrompt::class) {
                 object : RescheduleStoryEventPrompt, AdjustStoryEventsTimePrompt {
 
-                    override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
-                        val presenter = TimeAdjustmentPromptPresenter(
-                            storyEventId,
-                            currentTime,
+                    private val presenterBuilder by lazy {
+                        TimeAdjustmentPromptPresenter(
                             get(),
                             get(),
                             applicationScope.get()
                         )
+                    }
+
+                    override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
+                        val presenter = presenterBuilder(storyEventId, currentTime)
 
                         val stage = TimeAdjustmentPromptView(
                             presenter,
@@ -167,12 +169,19 @@ object Presentation {
                     }
 
                     override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>) {
-                        val presenter = TimeAdjustmentPromptPresenter(
-                            storyEventIds,
-                            get(),
-                            get(),
-                            applicationScope.get()
-                        )
+                        val presenter = presenterBuilder.invoke(storyEventIds)
+
+                        val stage = TimeAdjustmentPromptView(
+                            presenter,
+                            presenter.viewModel
+                        ).openModal(owner = get<WorkBench>().root.scene?.window)!!
+                        presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
+                            if (it == true) stage.hide()
+                        }
+                    }
+
+                    override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>, amount: Long) {
+                        val presenter = presenterBuilder(storyEventIds, amount)
 
                         val stage = TimeAdjustmentPromptView(
                             presenter,
@@ -229,6 +238,7 @@ object Presentation {
         TimelineComponent,
         TimelineComponent.Dependencies,
         TimelineViewPortComponent.Dependencies,
+        TimelineRulerLabelMenuComponent.Dependencies,
 
         TimelineComponent.GUI,
         TimelineHeaderComponent.Gui,
@@ -293,20 +303,29 @@ object Presentation {
             return TimelineViewPortComponent.Implementation(this, this).TimelineViewPort(storyEventItems)
         }
 
-        override fun TimelineRuler(selection: TimeRangeSelection): TimelineRuler {
-            return TimelineRulerComponent.Implementation(this).TimelineRuler(selection)
+        override fun TimelineRuler(
+            selection: TimeRangeSelection,
+            storyPointLabels: List<StoryPointLabel>
+        ): TimelineRuler {
+            return TimelineRulerComponent.Implementation(this).TimelineRuler(selection, storyPointLabels)
         }
 
         override fun TimelineViewPortGrid(): TimelineViewPortGrid {
             return TimelineViewPortGridComponent.Implementation(asyncContext, guiContext, this).TimelineViewPortGrid()
         }
 
-        override fun TimeSpanLabel(selection: TimeRangeSelection): TimeSpanLabel {
-            return TimeSpanLabelComponent.Implementation(this).TimeSpanLabel(selection)
+        override fun TimeSpanLabel(
+            selection: TimeRangeSelection,
+            storyPointLabels: List<StoryPointLabel>
+        ): TimeSpanLabel {
+            return TimeSpanLabelComponent.Implementation(this).TimeSpanLabel(selection, storyPointLabels)
         }
 
-        override fun TimelineRulerLabelMenu(selection: TimeRangeSelection): TimelineRulerLabelMenu {
-            return TimelineRulerLabelMenuComponent.Implementation().TimelineRulerLabelMenu(selection)
+        override fun TimelineRulerLabelMenu(
+            selection: TimeRangeSelection,
+            storyPointLabels: List<StoryPointLabel>
+        ): TimelineRulerLabelMenu {
+            return TimelineRulerLabelMenuComponent.Implementation(this).TimelineRulerLabelMenu(selection, storyPointLabels)
         }
 
         override fun StoryPointLabel(storyEventId: StoryEvent.Id, name: String, time: UnitOfTime): StoryPointLabel {

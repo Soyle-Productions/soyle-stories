@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.view.storyevent.timeline.viewport.ruler
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.ruler.label.TimelineViewPortRulerLabelComponentDouble
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponentDouble
 import com.soyle.stories.storyevent.timeline.UnitOfTime
+import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimeRangeSelection
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRuler
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRulerComponent
@@ -18,8 +19,8 @@ class TimelineViewPortRulerComponentDouble :
         TimeSpanLabelComponent by TimelineViewPortRulerLabelComponentDouble(),
         TimelineRulerLabelMenuComponent by TimelineRulerLabelMenuComponentDouble() {}
 
-    override fun TimelineRuler(selection: TimeRangeSelection): TimelineRuler {
-        return TimelineRulerComponent.Implementation(gui).TimelineRuler(selection)
+    override fun TimelineRuler(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimelineRuler {
+        return TimelineRulerComponent.Implementation(gui).TimelineRuler(selection, storyPointLabels)
     }
 
 }

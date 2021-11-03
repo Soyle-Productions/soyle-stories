@@ -7,6 +7,7 @@ import com.soyle.stories.storyevent.timeline.TimeRange
 import com.soyle.stories.storyevent.timeline.TimelineSelectionModel
 import com.soyle.stories.storyevent.timeline.TimelineStyles
 import com.soyle.stories.storyevent.timeline.UnitOfTime
+import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimeRangeSelection
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
@@ -23,12 +24,13 @@ import tornadofx.*
 
 interface TimeSpanLabelComponent {
 
-    fun TimeSpanLabel(selection: TimeRangeSelection): TimeSpanLabel
+    fun TimeSpanLabel(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimeSpanLabel
 
     @ViewBuilder
     fun EventTarget.timeSpanLabel(
         selection: TimeRangeSelection,
-        op: TimeSpanLabel.() -> Unit = {}): TimeSpanLabel = TimeSpanLabel(selection)
+        storyPointLabels: List<StoryPointLabel>,
+        op: TimeSpanLabel.() -> Unit = {}): TimeSpanLabel = TimeSpanLabel(selection, storyPointLabels)
         .also { add(it) }
         .apply(op)
 
@@ -38,8 +40,8 @@ interface TimeSpanLabelComponent {
         fun Implementation(
             gui: Gui
         ) = object : TimeSpanLabelComponent {
-            override fun TimeSpanLabel(selection: TimeRangeSelection): TimeSpanLabel {
-                return TimeSpanLabel(selection, gui)
+            override fun TimeSpanLabel(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimeSpanLabel {
+                return TimeSpanLabel(selection, storyPointLabels, gui)
             }
         }
     }
@@ -48,6 +50,7 @@ interface TimeSpanLabelComponent {
 
 class TimeSpanLabel(
     private val selection: TimeRangeSelection = TimelineSelectionModel(),
+    storyPointLabels: List<StoryPointLabel>,
 
     gui: TimeSpanLabelComponent.Gui
 ) : Region() {
@@ -62,7 +65,7 @@ class TimeSpanLabel(
         textProperty().bind(truncatedAboveThousand.asString("%d"))
     }
 
-    private val contextMenuProperty = objectProperty<TimelineRulerLabelMenu?>(gui.TimelineRulerLabelMenu(selection))
+    private val contextMenuProperty = objectProperty<TimelineRulerLabelMenu?>(gui.TimelineRulerLabelMenu(selection, storyPointLabels))
     fun contextMenu() = contextMenuProperty
     var contextMenu by contextMenuProperty
 

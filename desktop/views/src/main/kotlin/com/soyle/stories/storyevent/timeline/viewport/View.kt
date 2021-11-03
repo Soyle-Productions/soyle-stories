@@ -32,7 +32,7 @@ class TimelineViewPortView(
 
     private val backgroundLines = Pane()
 
-    private val ruler: TimelineRuler = gui.TimelineRuler(viewPort.selection).apply {
+    private val ruler: TimelineRuler = gui.TimelineRuler(viewPort.selection, viewPort.storyEventItems).apply {
         visibleRange().bind(viewPort.visibleRange())
         scale().bind(viewPort.scale())
         offsetX().bind(viewPort.offsetX())

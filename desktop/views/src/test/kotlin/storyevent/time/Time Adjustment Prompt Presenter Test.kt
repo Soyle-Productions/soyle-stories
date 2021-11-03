@@ -12,8 +12,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.testfx.assertions.api.Assertions.assertThat
 import tornadofx.onChange
 
@@ -91,30 +89,48 @@ class `Time Adjustment Prompt Presenter Test` {
         override fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>) {
             fail("Should not be called from prompt")
         }
+
+        override fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>, amount: Long) {
+
+        }
     }
 
-    private fun timeAdjustmentPromptPresenter(storyEventIds: Set<StoryEvent.Id>) =
-        TimeAdjustmentPromptPresenter(storyEventIds, rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
-            .apply(::enforceGUIUpdates)
+    private val timeAdjustmentPromptPresenter = object : TimeAdjustmentPromptPresenter.Builder {
+        private val builder = TimeAdjustmentPromptPresenter(
+            rescheduleStoryEventController,
+            adjustStoryEventsTimeController,
+            threadTransformer
+        )
 
-    private fun timeAdjustmentPromptPresenter(time: Long) =
-        TimeAdjustmentPromptPresenter(storyEventId, time, rescheduleStoryEventController, adjustStoryEventsTimeController, threadTransformer)
-            .apply(::enforceGUIUpdates)
+        override fun invoke(storyEventIds: Set<StoryEvent.Id>): TimeAdjustmentPromptPresenter =
+            builder(storyEventIds).apply(::enforceGUIUpdates)
+
+        override fun invoke(
+            storyEventIds: Set<StoryEvent.Id>,
+            initialAdjustment: Long
+        ): TimeAdjustmentPromptPresenter = builder(storyEventIds, initialAdjustment).apply(::enforceGUIUpdates)
+
+        override fun invoke(storyEventId: StoryEvent.Id, currentTime: Long): TimeAdjustmentPromptPresenter =
+            builder(storyEventId, currentTime).apply(::enforceGUIUpdates)
+    }
 
     private fun enforceGUIUpdates(presenter: TimeAdjustmentPromptPresenter) {
         presenter.apply {
-            viewModel.submitting.onChange { if (! threadTransformer.isGuiThread()) fail("Not on GUI thread") }
-            viewModel.isCompleted.onChange { if (! threadTransformer.isGuiThread()) fail("Not on GUI thread") }
+            viewModel.submitting.onChange { if (!threadTransformer.isGuiThread()) fail("Not on GUI thread") }
+            viewModel.isCompleted.onChange { if (!threadTransformer.isGuiThread()) fail("Not on GUI thread") }
         }
     }
 
     @Test
     fun `should provide current time to view model`() {
-        timeAdjustmentPromptPresenter(9).let {
+        timeAdjustmentPromptPresenter(storyEventId, 9).let {
             assertThat(it.viewModel.time.value).isEqualTo("9")
         }
         timeAdjustmentPromptPresenter(setOf()).let {
-            assertThat(it.viewModel.time.value).isEqualTo("")
+            assertThat(it.viewModel.time.value).isEqualTo("0")
+        }
+        timeAdjustmentPromptPresenter(setOf(), 9).let {
+            assertThat(it.viewModel.time.value).isEqualTo("9")
         }
     }
 
@@ -127,12 +143,26 @@ class `Time Adjustment Prompt Presenter Test` {
         assertThat(presenter.viewModel.submitting.value).isFalse
     }
 
+    @Test
+    fun `can submit if view model is in valid state`() {
+        val allPresenters = listOf(
+            timeAdjustmentPromptPresenter(setOf(storyEventId)).apply { viewModel.time.set("4") },
+            timeAdjustmentPromptPresenter(setOf(), 6),
+            timeAdjustmentPromptPresenter(storyEventId, 8).apply { viewModel.time.set("4") },
+        )
+
+        allPresenters.onEach { it.submit() }
+
+        assertThat(allPresenters)
+            .allMatch { it.viewModel.submitting.value }
+    }
+
     @Nested
     inner class `Given View Model is in Valid State` {
 
         @Test
         fun `submit should update view model`() {
-            val presenter = timeAdjustmentPromptPresenter(7)
+            val presenter = timeAdjustmentPromptPresenter(storyEventId, 7)
 
             presenter.viewModel.time.set("5")
             presenter.submit()
@@ -143,7 +173,7 @@ class `Time Adjustment Prompt Presenter Test` {
         @Nested
         inner class `Given Rescheduling a Story Event` {
 
-            val presenter = timeAdjustmentPromptPresenter(7)
+            val presenter = timeAdjustmentPromptPresenter(storyEventId, 7)
 
             @Test
             fun `submitting should send request to reschedule controller`() {
@@ -156,7 +186,7 @@ class `Time Adjustment Prompt Presenter Test` {
 
             @Test
             fun `if only one story event provided - should still reschedule time`() {
-                val presenter = timeAdjustmentPromptPresenter(9)
+                val presenter = timeAdjustmentPromptPresenter(storyEventId, 9)
 
                 presenter.viewModel.time.set("5")
                 presenter.submit()
@@ -218,7 +248,7 @@ class `Time Adjustment Prompt Presenter Test` {
 
             @Test
             fun `when submission fails - should notify view model`() {
-                val presenter = timeAdjustmentPromptPresenter(9)
+                val presenter = timeAdjustmentPromptPresenter(storyEventId, 9)
                 given(presenter)
 
                 rescheduleStoryEventController.completeJob(Error("Intentional Error"))
@@ -229,7 +259,7 @@ class `Time Adjustment Prompt Presenter Test` {
 
             @Test
             fun `when submission succeeds - should notify view model`() {
-                val presenter = timeAdjustmentPromptPresenter(9)
+                val presenter = timeAdjustmentPromptPresenter(storyEventId, 9)
                 given(presenter)
 
                 rescheduleStoryEventController.completeJob()
