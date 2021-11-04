@@ -213,6 +213,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
                 makeStoryPointLabel(time = UnitOfTime(25)),
                 makeStoryPointLabel(time = UnitOfTime(27))
             ).onEach {
+                it.text = UUID.randomUUID().toString().run { take((0 .. length).random()) }
                 it.resize(100.0, 10.0)
                 it.skin = object : SkinBase<StoryPointLabel>(it) {
                     override fun computePrefWidth(
@@ -225,7 +226,6 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
                         return 120.0
                     }
                 }
-                it.text = UUID.randomUUID().toString().run { take((0 .. length).random()) }
             }
             grid.labels.setAll(labels)
 

@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.view.storyevent.list
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.desktop.adapter.storyevent.AdjustStoryEventsTimeControllerDouble
 import com.soyle.stories.desktop.adapter.storyevent.list.ListStoryEventsControllerDouble
 import com.soyle.stories.desktop.view.common.ThreadTransformerDouble
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.access
@@ -131,14 +132,10 @@ class `Story Event List Presenter Test` {
         }
     }
 
-    private val adjustStoryEventsTimeController = object : AdjustStoryEventsTimeController {
+    private val adjustStoryEventsTimeController = object : AdjustStoryEventsTimeController by AdjustStoryEventsTimeControllerDouble() {
         var requestedIds: Set<StoryEvent.Id>? = null
         override fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>) {
             requestedIds = storyEventIds
-        }
-
-        override fun adjustStoryEventsTime(storyEventIds: Set<StoryEvent.Id>, amount: Long): Job {
-            fail("Should not be called by story event list")
         }
     }
 

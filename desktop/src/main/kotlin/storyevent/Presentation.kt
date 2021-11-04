@@ -29,15 +29,20 @@ import com.soyle.stories.storyevent.timeline.header.TimelineHeaderCreateButtonCo
 import com.soyle.stories.storyevent.timeline.header.TimelineHeaderOptionsButtonComponent
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPort
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPortComponent
+import com.soyle.stories.storyevent.timeline.viewport.TimelineViewportContext
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGrid
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridComponent
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
+import com.soyle.stories.storyevent.timeline.viewport.ruler.TimeRangeSelection
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRuler
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRulerComponent
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
+import javafx.beans.binding.ObjectExpression
 import javafx.beans.property.BooleanProperty
 import javafx.collections.ObservableList
 import javafx.collections.ObservableSet
@@ -145,14 +150,16 @@ object Presentation {
             provide(RescheduleStoryEventPrompt::class, AdjustStoryEventsTimePrompt::class) {
                 object : RescheduleStoryEventPrompt, AdjustStoryEventsTimePrompt {
 
-                    override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
-                        val presenter = TimeAdjustmentPromptPresenter(
-                            storyEventId,
-                            currentTime,
+                    private val presenterBuilder by lazy {
+                        TimeAdjustmentPromptPresenter(
                             get(),
                             get(),
                             applicationScope.get()
                         )
+                    }
+
+                    override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
+                        val presenter = presenterBuilder(storyEventId, currentTime)
 
                         val stage = TimeAdjustmentPromptView(
                             presenter,
@@ -164,12 +171,19 @@ object Presentation {
                     }
 
                     override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>) {
-                        val presenter = TimeAdjustmentPromptPresenter(
-                            storyEventIds,
-                            get(),
-                            get(),
-                            applicationScope.get()
-                        )
+                        val presenter = presenterBuilder.invoke(storyEventIds)
+
+                        val stage = TimeAdjustmentPromptView(
+                            presenter,
+                            presenter.viewModel
+                        ).openModal(owner = get<WorkBench>().root.scene?.window)!!
+                        presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
+                            if (it == true) stage.hide()
+                        }
+                    }
+
+                    override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>, amount: Long) {
+                        val presenter = presenterBuilder(storyEventIds, amount)
 
                         val stage = TimeAdjustmentPromptView(
                             presenter,
@@ -226,12 +240,14 @@ object Presentation {
         TimelineComponent,
         TimelineComponent.Dependencies,
         TimelineViewPortComponent.Dependencies,
+        TimelineRulerLabelMenuComponent.Dependencies,
 
         TimelineComponent.GUI,
         TimelineHeaderComponent.Gui,
         TimelineHeaderOptionsButtonComponent.Gui,
         TimelineViewPortComponent.Gui,
         TimelineRulerComponent.Gui,
+        TimeSpanLabelComponent.Gui,
         TimelineViewPortGridComponent.Gui,
         StoryPointLabelComponent.GUIComponents,
 
@@ -289,16 +305,26 @@ object Presentation {
             return TimelineViewPortComponent.Implementation(this, this).TimelineViewPort(storyEventItems)
         }
 
-        override fun TimelineRuler(selection: ObservableSet<UnitOfTime>): TimelineRuler {
-            return TimelineRulerComponent.Implementation(this).TimelineRuler(selection)
+        override fun TimelineRuler(context: TimelineViewportContext): TimelineRuler {
+            return TimelineRulerComponent.Implementation(this).TimelineRuler(context)
         }
 
         override fun TimelineViewPortGrid(): TimelineViewPortGrid {
             return TimelineViewPortGridComponent.Implementation(asyncContext, guiContext, this).TimelineViewPortGrid()
         }
 
-        override fun TimeSpanLabel(selection: ObservableSet<UnitOfTime>): TimeSpanLabel {
-            return TimeSpanLabelComponent.Implementation().TimeSpanLabel(selection)
+        override fun TimeSpanLabel(
+            selection: TimeRangeSelection,
+            storyPointLabels: List<StoryPointLabel>
+        ): TimeSpanLabel {
+            return TimeSpanLabelComponent.Implementation(this).TimeSpanLabel(selection, storyPointLabels)
+        }
+
+        override fun TimelineRulerLabelMenu(
+            selection: TimeRangeSelection,
+            storyPointLabels: List<StoryPointLabel>
+        ): TimelineRulerLabelMenu {
+            return TimelineRulerLabelMenuComponent.Implementation(this).TimelineRulerLabelMenu(selection, storyPointLabels)
         }
 
         override fun StoryPointLabel(storyEventId: StoryEvent.Id, name: String, time: UnitOfTime): StoryPointLabel {

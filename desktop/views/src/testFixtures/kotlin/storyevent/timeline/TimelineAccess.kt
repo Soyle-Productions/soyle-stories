@@ -55,10 +55,4 @@ class TimelineAccess private constructor(val timeline: Timeline) : NodeAccess<Ti
         val requiredPixels = viewport.scale(UnitOfTime(unit))
         return requiredPixels.value in viewport.offsetX.value .. viewport.offsetX.value+viewport.width
     }
-
-    fun timeUnitSelected(unit: Long): Boolean {
-        val state = (timeline.state as? Timeline.State.Loaded) ?: return false
-        return state.selection.timeUnits.contains(UnitOfTime(unit))
-    }
-
 }

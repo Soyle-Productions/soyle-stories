@@ -9,8 +9,10 @@ import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import javafx.beans.InvalidationListener
 import javafx.beans.WeakInvalidationListener
 import javafx.beans.binding.Binding
+import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.binding.DoubleExpression
 import javafx.beans.binding.LongExpression
+import javafx.beans.binding.ObjectExpression
 import javafx.beans.property.*
 import javafx.beans.value.WeakChangeListener
 import javafx.collections.ListChangeListener
@@ -31,7 +33,7 @@ class TimelineViewPort(
 
     private val gui: TimelineViewPortComponent.Gui,
     private val dependencies: TimelineViewPortComponent.Dependencies
-) : Control() {
+) : Control(), TimelineViewportContext {
 
     private val scaleProperty = object : ReadOnlyObjectWrapper<Scale>(Scale.maxZoomIn()) {
         override fun invalidated() {
@@ -40,7 +42,7 @@ class TimelineViewPort(
         }
     }
 
-    fun scale(): ReadOnlyObjectProperty<Scale> = scaleProperty.readOnlyProperty
+    override fun scale(): ReadOnlyObjectProperty<Scale> = scaleProperty.readOnlyProperty
     val scale by scale()
 
     private val offsetXProperty = object : ReadOnlyObjectWrapper<Pixels>(Pixels(0.0)) {
@@ -55,7 +57,7 @@ class TimelineViewPort(
         }
     }
 
-    fun offsetX(): ReadOnlyObjectProperty<Pixels> = offsetXProperty.readOnlyProperty
+    override fun offsetX(): ReadOnlyObjectProperty<Pixels> = offsetXProperty.readOnlyProperty
     val offsetX: Pixels by offsetX()
 
     private val offsetYProperty = ReadOnlyObjectWrapper(Pixels(0.0))
@@ -64,7 +66,7 @@ class TimelineViewPort(
 
     private val selectionProperty = objectProperty<TimelineSelectionModel>(TimelineSelectionModel())
     fun selection(): ObjectProperty<TimelineSelectionModel> = selectionProperty
-    var selection by selectionProperty
+    override var selection by selectionProperty
 
     /**
      * Whether all the labels should be collapsed or not
@@ -78,8 +80,12 @@ class TimelineViewPort(
     var areLabelsCollapsed: Boolean by labelsCollapsed()
 
     private val maxRightBoundsProperty = doubleProperty(0.0)
-    private val maxOffsetXProperty = doubleBinding(maxRightBoundsProperty, widthProperty(), offsetXProperty) {
-        max((maxRightBoundsProperty.get() - widthProperty().get()).coerceAtLeast(0.0), offsetX.value)
+    private val maxOffsetXProperty = doubleBinding(maxRightBoundsProperty, widthProperty(), offsetXProperty, selection.timeRange, scaleProperty) {
+        listOf(
+            (maxRightBoundsProperty.get() - widthProperty().get() / 2).coerceAtLeast(0.0),
+            offsetX.value,
+            selection.timeRange.value?.let { scale(it.endInclusive + 1).value - widthProperty().get() }?.coerceAtLeast(0.0) ?: 0.0
+        ).maxOfOrNull { it }!!
     }
 
     private fun calculateMaxOffset() {
@@ -120,11 +126,11 @@ class TimelineViewPort(
 
     fun maxOffsetX(): DoubleExpression = maxOffsetXProperty
 
-    private val visibleRangeProperty = offsetXProperty.objectBinding(widthProperty(), scaleProperty) {
+    private val visibleRangeProperty = createObjectBinding({
         scale(offsetX)..scale(offsetX + width)
-    }
+    }, offsetXProperty, widthProperty(), scaleProperty)
 
-    fun visibleRange(): Binding<TimeRange?> = visibleRangeProperty
+    override fun visibleRange(): ObjectExpression<TimeRange> = visibleRangeProperty
 
     private val actions: TimelineViewPortActions = TimelineViewPortPresenter(this, dependencies)
 
@@ -213,7 +219,7 @@ private class TimelineViewPortPresenter(
     }
 
     override fun mouseClicked(mouseEvent: MouseEvent) {
-        viewModel.selection.storyEvents.clear()
+        viewModel.selection.clear()
         setFocus(true)
     }
 

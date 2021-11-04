@@ -7,14 +7,30 @@ import javafx.beans.property.StringProperty
 import tornadofx.booleanBinding
 import tornadofx.stringProperty
 
-class TimeAdjustmentPromptViewModel(currentTime: Long? = null) {
+class TimeAdjustmentPromptViewModel private constructor(
+    val time: StringProperty,
+    private val timeShouldNotEqual: Long,
+    val adjustment: Boolean
+) {
 
-    val time: StringProperty = stringProperty(currentTime?.toString() ?: "")
-    private val timeShouldNotEqual = currentTime ?: 0L
+    companion object {
+        fun adjustment(initialValue: Long = 0L) = TimeAdjustmentPromptViewModel(
+            stringProperty(initialValue.toString()),
+            0,
+            true
+        )
+        fun reschedule(currentTime: Long) = TimeAdjustmentPromptViewModel(
+            stringProperty(currentTime.toString()),
+            currentTime,
+            false
+        )
+    }
+
     private val _submitting = ReadOnlyBooleanWrapper()
     val submitting: ReadOnlyBooleanProperty = _submitting.readOnlyProperty
-    val canSubmit: BooleanBinding = time.booleanBinding {
-        it?.toLongOrNull() != null && it.toLongOrNull() != timeShouldNotEqual
+    val canSubmit: BooleanBinding = booleanBinding(time) {
+        val timeAsLong = time.get().toLongOrNull() ?: return@booleanBinding false
+        timeAsLong != timeShouldNotEqual
     }.and(submitting.not())
     private val _isCompleted = ReadOnlyBooleanWrapper()
     val isCompleted: ReadOnlyBooleanProperty = _isCompleted.readOnlyProperty

@@ -1,6 +1,8 @@
 package com.soyle.stories.desktop.view.storyevent.time
 
 import com.soyle.stories.storyevent.time.TimeAdjustmentPromptViewModel
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -12,11 +14,23 @@ class `Time Adjustment Prompt ViewModel Test` {
     @Nested
     inner class `Given Created to Adjust Time` {
 
-        val viewModel = TimeAdjustmentPromptViewModel()
+        val viewModel = TimeAdjustmentPromptViewModel.adjustment()
 
         @Test
-        fun `time adjustment should be empty`() {
-            assertThat(viewModel.time.value).isBlank
+        fun `time adjustment should equal zero`() {
+            assertThat(viewModel.time.value).isEqualTo("0")
+        }
+
+        @Test
+        fun `when initial adjustment is provided, should display initial value`() {
+            val viewModel = TimeAdjustmentPromptViewModel.adjustment(9L)
+            assertThat(viewModel.time.value).isEqualTo("9")
+        }
+
+        @Test
+        fun `should be in adjusting state`() {
+            assertTrue(TimeAdjustmentPromptViewModel.adjustment().adjustment)
+            assertTrue(TimeAdjustmentPromptViewModel.adjustment(9L).adjustment)
         }
 
         @Nested
@@ -33,6 +47,13 @@ class `Time Adjustment Prompt ViewModel Test` {
             @Test
             fun `when a valid number - should be able to submit change`() {
                 viewModel.time.set("14")
+
+                assertThat(viewModel.canSubmit.value).isTrue
+            }
+
+            @Test
+            fun `when created with an initial value - should be able to submit change`() {
+                val viewModel = TimeAdjustmentPromptViewModel.adjustment(9L)
 
                 assertThat(viewModel.canSubmit.value).isTrue
             }
@@ -88,11 +109,16 @@ class `Time Adjustment Prompt ViewModel Test` {
     inner class `Given Created to Reschedule` {
 
         private val currentTime = 9L
-        val viewModel = TimeAdjustmentPromptViewModel(currentTime)
+        val viewModel = TimeAdjustmentPromptViewModel.reschedule(currentTime)
 
         @Test
         fun `time should be equal to the current time`() {
             assertThat(viewModel.time.value).isEqualTo("9")
+        }
+
+        @Test
+        fun `should be in rescheduling state`() {
+            assertFalse(TimeAdjustmentPromptViewModel.reschedule(currentTime).adjustment)
         }
 
         @Nested

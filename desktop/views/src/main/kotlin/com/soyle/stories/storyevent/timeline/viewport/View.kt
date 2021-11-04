@@ -1,24 +1,21 @@
 package com.soyle.stories.storyevent.timeline.viewport
 
-import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
-import com.soyle.stories.storyevent.timeline.Pixels
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.RULER_PADDING
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.backgroundLine
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.unlabeled
 import com.soyle.stories.storyevent.timeline.UnitOfTime
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGrid
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRuler
+import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.geometry.VPos
-import javafx.scene.control.ListView
+import javafx.scene.Node
 import javafx.scene.control.ScrollBar
 import javafx.scene.control.SkinBase
-import javafx.scene.input.KeyCode
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.*
-import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import tornadofx.*
 import java.lang.Double.isNaN
@@ -32,11 +29,45 @@ class TimelineViewPortView(
 
     private val backgroundLines = Pane()
 
-    private val ruler: TimelineRuler = gui.TimelineRuler(viewPort.selection.timeUnits).apply {
-        visibleRange().bind(viewPort.visibleRange())
-        scale().bind(viewPort.scale())
-        offsetX().bind(viewPort.offsetX())
-        setOnScroll(actions::scroll)
+    private val ruler: TimelineRuler = gui.TimelineRuler(viewPort)
+        .apply {
+            setOnScroll(actions::scroll)
+        }
+
+    private var dragTarget: TimeSpanLabel? = null
+
+    init {
+        viewPort.addEventFilter(MouseEvent.DRAG_DETECTED) {
+            val target = it.target as? TimeSpanLabel ?: (it.target as? Node)?.findParent<TimeSpanLabel>()
+            if (it.isPrimaryButtonDown && target != null) {
+                dragTarget = target
+            }
+        }
+        viewPort.addEventFilter(MouseEvent.MOUSE_RELEASED) {
+            dragTarget = null
+        }
+        viewPort.addEventFilter(MouseEvent.MOUSE_DRAGGED) {
+            dragTarget ?: return@addEventFilter
+            if (it.isPrimaryButtonDown) {
+                it.consume()
+                val coordsInScene = viewPort.localToScene(it.x, it.y)
+                val draggedToNode = it.pickResult?.intersectedNode
+                if (draggedToNode is TimeSpanLabel) {
+                    viewPort.selection.extendFromRecentStart(draggedToNode.range)
+                } else {
+                    val intersectedLabel = ruler.labels().get().find { otherLabel ->
+                        val relativeCoords = otherLabel.sceneToLocal(coordsInScene)
+                        otherLabel.contains(relativeCoords.x, 0.0)
+                    }
+                    if (intersectedLabel != null) {
+                        viewPort.selection.extendFromRecentStart(intersectedLabel.range)
+                    }
+                }
+
+                if (viewPort.width > 10 && it.x > (viewPort.width - 10)) actions.hScroll(viewPort.offsetX.value + (it.x - (viewPort.width - 10)))
+                else if (it.x < 0)  actions.hScroll((viewPort.offsetX.value + it.x))
+            }
+        }
     }
 
     private val grid: TimelineViewPortGrid = gui.TimelineViewPortGrid().apply {
@@ -158,7 +189,7 @@ class TimelineViewPortView(
     }
 
     override fun layoutChildren(contentX: Double, contentY: Double, contentWidth: Double, contentHeight: Double) {
-        val rulerHeight = ruler.prefHeight(contentWidth)
+        val rulerHeight = ruler.prefHeight(contentWidth).coerceAtLeast(24.0)
 
         layoutInArea(
             backgroundLines,
