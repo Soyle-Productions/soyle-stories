@@ -1,18 +1,23 @@
 package com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu
 
+import com.soyle.stories.common.collections.binarySubList
 import com.soyle.stories.storyevent.timeline.TimeRange
 import com.soyle.stories.storyevent.timeline.TimelineSelectionModel
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimeRangeSelection
 import javafx.beans.InvalidationListener
 import javafx.beans.WeakInvalidationListener
+import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import tornadofx.action
+import tornadofx.booleanBinding
+import tornadofx.disableWhen
+import tornadofx.enableWhen
 
 class TimelineRulerLabelMenu(
     selection: TimeRangeSelection = TimelineSelectionModel(),
-    private val storyPointLabels: List<StoryPointLabel>,
+    private val storyPointLabels: ObservableList<StoryPointLabel>,
 
     private val dependencies: TimelineRulerLabelMenuComponent.Dependencies
 ) : ContextMenu() {
@@ -39,6 +44,12 @@ class TimelineRulerLabelMenu(
             MenuItem().apply {
                 id = "delete"
                 text = "Remove ${range.duration.value} unit${if (range.duration.value == 1L) "" else "s"} of time"
+                disableWhen(booleanBinding(storyPointLabels) {
+                    storyPointLabels.binarySubList(
+                        predicate = { range.range.contains(it.time) },
+                        lookForward = { it.time < range.range.last }
+                    ).isNotEmpty()
+                })
                 action(remove(range))
             }
         )

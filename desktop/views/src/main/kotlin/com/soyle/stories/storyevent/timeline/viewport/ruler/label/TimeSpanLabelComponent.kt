@@ -14,6 +14,7 @@ import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineR
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.property.LongProperty
 import javafx.beans.property.ObjectProperty
+import javafx.collections.ObservableList
 import javafx.collections.ObservableSet
 import javafx.event.EventTarget
 import javafx.scene.control.ContextMenu
@@ -24,12 +25,12 @@ import tornadofx.*
 
 interface TimeSpanLabelComponent {
 
-    fun TimeSpanLabel(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimeSpanLabel
+    fun TimeSpanLabel(selection: TimeRangeSelection, storyPointLabels: ObservableList<StoryPointLabel>): TimeSpanLabel
 
     @ViewBuilder
     fun EventTarget.timeSpanLabel(
         selection: TimeRangeSelection,
-        storyPointLabels: List<StoryPointLabel>,
+        storyPointLabels: ObservableList<StoryPointLabel>,
         op: TimeSpanLabel.() -> Unit = {}): TimeSpanLabel = TimeSpanLabel(selection, storyPointLabels)
         .also { add(it) }
         .apply(op)
@@ -40,7 +41,7 @@ interface TimeSpanLabelComponent {
         fun Implementation(
             gui: Gui
         ) = object : TimeSpanLabelComponent {
-            override fun TimeSpanLabel(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimeSpanLabel {
+            override fun TimeSpanLabel(selection: TimeRangeSelection, storyPointLabels: ObservableList<StoryPointLabel>): TimeSpanLabel {
                 return TimeSpanLabel(selection, storyPointLabels, gui)
             }
         }
@@ -50,7 +51,7 @@ interface TimeSpanLabelComponent {
 
 class TimeSpanLabel(
     private val selection: TimeRangeSelection = TimelineSelectionModel(),
-    storyPointLabels: List<StoryPointLabel>,
+    storyPointLabels: ObservableList<StoryPointLabel>,
 
     gui: TimeSpanLabelComponent.Gui
 ) : Region() {

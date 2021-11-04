@@ -17,13 +17,14 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.testfx.api.FxToolkit
 import org.testfx.assertions.api.Assertions.assertThat
+import tornadofx.observableListOf
 
 class `Timeline Ruler Label Menu Unit Test` {
 
     private val dependencies = TimelineRulerLabelMenuComponentDouble.Dependencies(spyk())
     private val component = TimelineRulerLabelMenuComponentDouble(dependencies)
     private val selection = TimelineSelectionModel()
-    private val storyPointLabels = mutableListOf<StoryPointLabel>()
+    private val storyPointLabels = observableListOf<StoryPointLabel>()
     private val menu = component.TimelineRulerLabelMenu(selection, storyPointLabels)
 
     @Nested
@@ -143,6 +144,23 @@ class `Timeline Ruler Label Menu Unit Test` {
                     -5L
                 )
             }
+        }
+
+        @Nested
+        inner class `Cannot remove time if a story event is contained within it` {
+
+            @Test
+            fun `when story event is contained, option should be disabled`() {
+                assertThat(menu.access().removeTimeOption!!.isDisable).isTrue
+            }
+
+            @Test
+            fun `when no story event is contained, option should be enabled`() {
+                selection.restart(TimeRange(9 until 12L))
+
+                assertThat(menu.access().removeTimeOption!!.isDisable).isFalse
+            }
+
         }
 
     }

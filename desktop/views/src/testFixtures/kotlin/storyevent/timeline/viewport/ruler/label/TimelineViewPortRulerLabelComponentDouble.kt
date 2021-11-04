@@ -9,13 +9,12 @@ import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelC
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
 import javafx.collections.ObservableSet
 
-class TimelineViewPortRulerLabelComponentDouble : TimeSpanLabelComponent {
+class TimelineViewPortRulerLabelComponentDouble(
+    val gui: TimeSpanLabelComponent.Gui
+) : TimeSpanLabelComponent by TimeSpanLabelComponent.Implementation(gui) {
 
-    private val gui = object : TimeSpanLabelComponent.Gui,
+    constructor() : this(object : TimeSpanLabelComponent.Gui,
         TimelineRulerLabelMenuComponent by TimelineRulerLabelMenuComponentDouble() {}
-
-    override fun TimeSpanLabel(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimeSpanLabel {
-        return TimeSpanLabel(selection, storyPointLabels, gui)
-    }
+    )
 
 }
