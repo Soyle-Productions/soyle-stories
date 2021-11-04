@@ -29,6 +29,7 @@ import com.soyle.stories.storyevent.timeline.header.TimelineHeaderCreateButtonCo
 import com.soyle.stories.storyevent.timeline.header.TimelineHeaderOptionsButtonComponent
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPort
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPortComponent
+import com.soyle.stories.storyevent.timeline.viewport.TimelineViewportContext
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGrid
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridComponent
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
@@ -41,6 +42,7 @@ import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelC
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
+import javafx.beans.binding.ObjectExpression
 import javafx.beans.property.BooleanProperty
 import javafx.collections.ObservableList
 import javafx.collections.ObservableSet
@@ -303,11 +305,8 @@ object Presentation {
             return TimelineViewPortComponent.Implementation(this, this).TimelineViewPort(storyEventItems)
         }
 
-        override fun TimelineRuler(
-            selection: TimeRangeSelection,
-            storyPointLabels: List<StoryPointLabel>
-        ): TimelineRuler {
-            return TimelineRulerComponent.Implementation(this).TimelineRuler(selection, storyPointLabels)
+        override fun TimelineRuler(context: TimelineViewportContext): TimelineRuler {
+            return TimelineRulerComponent.Implementation(this).TimelineRuler(context)
         }
 
         override fun TimelineViewPortGrid(): TimelineViewPortGrid {

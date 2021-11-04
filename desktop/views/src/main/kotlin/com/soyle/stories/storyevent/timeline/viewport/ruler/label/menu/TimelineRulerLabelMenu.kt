@@ -17,9 +17,9 @@ class TimelineRulerLabelMenu(
     private val dependencies: TimelineRulerLabelMenuComponent.Dependencies
 ) : ContextMenu() {
 
-    private fun populateItems(selection: Set<TimeRange>) {
-        val newItems = if (selection.size == 1) singleRangeSelectionItems(selection.single())
-        else itemsForMultiSelection()
+    private fun populateItems(selection: TimeRange?) {
+        val newItems = if (selection != null) singleRangeSelectionItems(selection)
+        else listOf(MenuItem())
         items.setAll(newItems)
     }
 
@@ -40,14 +40,6 @@ class TimelineRulerLabelMenu(
                 id = "delete"
                 text = "Remove ${range.duration.value} unit${if (range.duration.value == 1L) "" else "s"} of time"
                 action(remove(range))
-            }
-        )
-    }
-
-    private fun itemsForMultiSelection(): List<MenuItem> {
-        return listOf(
-            MenuItem("Remove all ranges").apply {
-                id = "delete"
             }
         )
     }
@@ -81,12 +73,12 @@ class TimelineRulerLabelMenu(
         .map { it.storyEventId }
         .toSet()
 
-    private val selectionListener = InvalidationListener { populateItems(selection) }
+    private val selectionListener = InvalidationListener { populateItems(selection.get()) }
     private val weakSelectionListener = WeakInvalidationListener(selectionListener)
 
     init {
         selection.addListener(weakSelectionListener)
-        populateItems(selection)
+        populateItems(selection.get())
     }
 
 }

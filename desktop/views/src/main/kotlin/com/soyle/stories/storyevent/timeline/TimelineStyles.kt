@@ -116,7 +116,7 @@ class TimelineStyles : Stylesheet() {
                 }
                 incrementalLabelHolder {
                     backgroundColor = multi(SurfaceStyles.lightBackground(5.0))
-                    padding = box(0.px, RULER_PADDING.px, 0.px, RULER_PADDING.px)
+                    //padding = box(0.px, RULER_PADDING.px, 0.px, RULER_PADDING.px)
                     spacing = rulerSpacing.px
                 }
                 timeLabel {

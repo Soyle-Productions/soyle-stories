@@ -5,7 +5,7 @@ import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 
 interface AdjustStoryEventsTime {
 
-    suspend operator fun invoke(storyEventIds: Set<StoryEvent.Id>, adjustment: Long, output: AdjustStoryEventsTime.OutputPort)
+    suspend operator fun invoke(storyEventIds: Set<StoryEvent.Id>, adjustment: Long, output: OutputPort)
 
     class ResponseModel(
         val rescheduledStoryEvents: List<StoryEventRescheduled>

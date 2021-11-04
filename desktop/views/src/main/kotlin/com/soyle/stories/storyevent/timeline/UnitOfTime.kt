@@ -66,7 +66,7 @@ value class Scale private constructor(val unitInPixels: Double) {
             return Result.success(Scale(round(pixelDensity)))
         }
 
-        fun maxZoomIn(): Scale = Scale.at(48.0).getOrThrow()
+        fun maxZoomIn(): Scale = at(48.0).getOrThrow()
         fun maxZoomOut(): Scale = at(1.0).getOrThrow()
 
         private val stepLookup = listOf<Long>(

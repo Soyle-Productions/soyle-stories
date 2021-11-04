@@ -76,29 +76,19 @@ class TimeSpanLabel(
         }
         minHeight = USE_PREF_SIZE
         setOnMousePressed {
-            if (! selection.contains(range)) {
+            if (selection.value?.hasOverlapWith(range) != true) {
                 if (it.isShiftDown) selection.extendFromRecentStart(range)
-                else if (it.isShortcutDown) selection.add(range)
                 else selection.restart(range)
             }
         }
-        setOnMouseDragged {
-            if (it.isPrimaryButtonDown) {
-                it.consume()
-                val draggedToNode = it.pickResult?.intersectedNode
-                if (draggedToNode is TimeSpanLabel) {
-                    selection.extendFromRecentStart(draggedToNode.range)
-                }
-            }
-        }
-        setOnDragDetected {
-            if (it.isPrimaryButtonDown) {
-                it.consume()
-                startFullDrag()
-            }
-        }
+//        setOnDragDetected {
+//            if (it.isPrimaryButtonDown) {
+//                it.consume()
+//                startFullDrag()
+//            }
+//        }
         setOnContextMenuRequested { event ->
-            if (selection.contains(range)) {
+            if (selection.value?.hasOverlapWith(range) == true) {
                 contextMenu?.run {
                     show(this@TimeSpanLabel, event.screenX, event.screenY)
                     event.consume()

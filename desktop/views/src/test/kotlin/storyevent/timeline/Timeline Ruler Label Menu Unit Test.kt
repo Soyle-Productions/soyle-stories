@@ -1,6 +1,5 @@
 package com.soyle.stories.desktop.view.storyevent.timeline
 
-import com.soyle.stories.desktop.adapter.storyevent.AdjustStoryEventsTimeControllerDouble
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label.StoryPointLabelComponentDouble
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label.makeStoryPointLabel
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuAccess.Companion.access
@@ -11,8 +10,6 @@ import com.soyle.stories.storyevent.timeline.TimelineSelectionModel
 import com.soyle.stories.storyevent.timeline.UnitOfTime
 import com.soyle.stories.storyevent.timeline.unit
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
-import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
-import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import io.mockk.spyk
 import io.mockk.verify
@@ -30,46 +27,23 @@ class `Timeline Ruler Label Menu Unit Test` {
     private val menu = component.TimelineRulerLabelMenu(selection, storyPointLabels)
 
     @Nested
-    inner class `Selection determines available items` {
+    inner class `Length of selection determines available items` {
 
-        @Nested
-        inner class `When a single range is selected` {
-
-            init {
-                selection.timeRanges.add(UnitOfTime(4))
-            }
-
-            val itemsById = menu.items.associateBy { it.id }
-
-            @Test
-            fun `should be able to insert time`() {
-                assertThat(itemsById.getValue("insert-before").text).isEqualTo("Insert 1 unit of time before")
-                assertThat(itemsById.getValue("insert-after").text).isEqualTo("Insert 1 unit of time after")
-            }
-
-            @Test
-            fun `should be able to remove time`() {
-                assertThat(itemsById.getValue("delete").text).isEqualTo("Remove 1 unit of time")
-            }
-
+        init {
+            selection.timeRange.restart(UnitOfTime(4))
         }
 
-        @Nested
-        inner class `When multiple ranges are selected` {
+        val itemsById = menu.items.associateBy { it.id }
 
-            init {
-                selection.timeRanges.add(UnitOfTime(4))
-                selection.timeRanges.add(UnitOfTime(8))
-            }
+        @Test
+        fun `should be able to insert time`() {
+            assertThat(itemsById.getValue("insert-before").text).isEqualTo("Insert 1 unit of time before")
+            assertThat(itemsById.getValue("insert-after").text).isEqualTo("Insert 1 unit of time after")
+        }
 
-            val itemsById = menu.items.associateBy { it.id }
-
-            @Test
-            fun `should only be able to remove time`() {
-                assertThat(itemsById).hasSize(1)
-                assertThat(itemsById.getValue("delete").text).isEqualTo("Remove all ranges")
-            }
-
+        @Test
+        fun `should be able to remove time`() {
+            assertThat(itemsById.getValue("delete").text).isEqualTo("Remove 1 unit of time")
         }
 
     }
@@ -86,7 +60,7 @@ class `Timeline Ruler Label Menu Unit Test` {
         )
 
         init {
-            selection.add(TimeRange(3 .. 8L))
+            selection.restart(TimeRange(3 .. 8L))
 
             storyPointLabels.addAll(storyEventItems.map {
                 storyPointLabelComponent.makeStoryPointLabel(it.storyEventId, it.storyEventName, it.time.unit)
@@ -119,7 +93,7 @@ class `Timeline Ruler Label Menu Unit Test` {
         )
 
         init {
-            selection.add(TimeRange(3 .. 8L))
+            selection.restart(TimeRange(3 .. 8L))
 
             storyPointLabels.addAll(storyEventItems.map {
                 storyPointLabelComponent.makeStoryPointLabel(it.storyEventId, it.storyEventName, it.time.unit)
@@ -143,44 +117,32 @@ class `Timeline Ruler Label Menu Unit Test` {
     @Nested
     inner class `Remove time` {
 
-        @Nested
-        inner class `When single range is selected` {
+        private val storyEventItems = listOf(
+            StoryEventItem(StoryEvent.Id(), "", 2), // <- should not be included
+            StoryEventItem(StoryEvent.Id(), "", 3),
+            StoryEventItem(StoryEvent.Id(), "", 6),
+            StoryEventItem(StoryEvent.Id(), "", 8),
+            StoryEventItem(StoryEvent.Id(), "", 12),
+        )
 
-            private val storyEventItems = listOf(
-                StoryEventItem(StoryEvent.Id(), "", 2), // <- should not be included
-                StoryEventItem(StoryEvent.Id(), "", 3),
-                StoryEventItem(StoryEvent.Id(), "", 6),
-                StoryEventItem(StoryEvent.Id(), "", 8),
-                StoryEventItem(StoryEvent.Id(), "", 12),
-            )
+        init {
+            selection.restart(TimeRange(3 .. 8L))
 
-            init {
-                selection.add(TimeRange(3 .. 8L))
-
-                storyPointLabels.addAll(storyEventItems.map {
-                    storyPointLabelComponent.makeStoryPointLabel(it.storyEventId, it.storyEventName, it.time.unit)
-                })
-            }
-
-            @Test
-            fun `should request to adjust time of all story events after start`() {
-                menu.access().removeTimeOption!!.fire()
-
-                verify {
-                    dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(
-                        storyEventItems.drop(1).map { it.storyEventId }.toSet(),
-                        -5L
-                    )
-                }
-            }
-
+            storyPointLabels.addAll(storyEventItems.map {
+                storyPointLabelComponent.makeStoryPointLabel(it.storyEventId, it.storyEventName, it.time.unit)
+            })
         }
 
-        @Nested
-        inner class `When multiple ranges are selected` {
+        @Test
+        fun `should request to adjust time of all story events after start`() {
+            menu.access().removeTimeOption!!.fire()
 
-
-
+            verify {
+                dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(
+                    storyEventItems.drop(1).map { it.storyEventId }.toSet(),
+                    -5L
+                )
+            }
         }
 
     }

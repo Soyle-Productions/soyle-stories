@@ -4,10 +4,12 @@ import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.surfaces.Elevation
 import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
 import com.soyle.stories.common.existsWhen
+import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.storyevent.timeline.*
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.incrementalLabelHolder
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.largeMagnitudeLabelHolder
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.rulerSpacing
+import com.soyle.stories.storyevent.timeline.viewport.TimelineViewportContext
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
@@ -18,17 +20,15 @@ import javafx.beans.binding.BooleanExpression
 import javafx.beans.binding.DoubleExpression
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.binding.ObjectExpression
-import javafx.beans.property.LongProperty
 import javafx.beans.property.ObjectProperty
-import javafx.collections.ObservableSet
 import javafx.event.EventTarget
 import javafx.scene.control.Control
 import javafx.scene.control.Label
 import javafx.scene.control.Skin
 import javafx.scene.control.SkinBase
-import javafx.scene.layout.Pane
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import tornadofx.*
 import java.text.NumberFormat
 import java.util.*
@@ -38,14 +38,13 @@ interface TimelineRulerComponent {
 
     @ViewBuilder
     fun EventTarget.timelineRuler(
-        selection: TimeRangeSelection,
-        storyPointLabels: List<StoryPointLabel>,
+        context: TimelineViewportContext,
         op: TimelineRuler.() -> Unit = {}
-    ): TimelineRuler = TimelineRuler(selection, storyPointLabels)
+    ): TimelineRuler = TimelineRuler(context)
         .also { add(it) }
         .apply(op)
 
-    fun TimelineRuler(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimelineRuler
+    fun TimelineRuler(context: TimelineViewportContext): TimelineRuler
 
     interface Gui : TimeSpanLabelComponent, TimelineRulerLabelMenuComponent
 
@@ -53,39 +52,37 @@ interface TimelineRulerComponent {
         fun Implementation(
             gui: Gui
         ) = object : TimelineRulerComponent {
-            override fun TimelineRuler(selection: TimeRangeSelection, storyPointLabels: List<StoryPointLabel>): TimelineRuler {
-                return TimelineRuler(selection, storyPointLabels, gui)
+            override fun TimelineRuler(context: TimelineViewportContext): TimelineRuler {
+                return TimelineRuler(context, gui)
             }
         }
     }
 }
 
 class TimelineRuler(
-    private val selection: TimeRangeSelection = TimelineSelectionModel(),
-    storyPointLabels: List<StoryPointLabel>,
+    context: TimelineViewportContext,
+
     private val gui: TimelineRulerComponent.Gui,
 ) : Control() {
 
-    private val visibleRangeProperty = objectProperty(UnitOfTime(0)..UnitOfTime(1))
-    fun visibleRange(): ObjectProperty<TimeRange> = visibleRangeProperty
-    var visibleRange: TimeRange by visibleRangeProperty
+    val visibleRange: TimeRange by context.visibleRange()
+    val scale: Scale by context.scale()
 
-    private val scaleProperty: ObjectProperty<Scale> = objectProperty(Scale.maxZoomIn())
-    fun scale(): ObjectProperty<Scale> = scaleProperty
-    var scale: Scale by scaleProperty
+    private val observableOffsetX = context.offsetX()
+    fun offsetX() = observableOffsetX
+    val offsetX: Pixels by observableOffsetX
 
-    private val offsetXProperty = objectProperty(Pixels(0.0))
-    fun offsetX(): ObjectProperty<Pixels> = offsetXProperty
-    var offsetX: Pixels by offsetXProperty
+    private val selection = context.selection
+    private val storyPointLabels = context.storyPointLabels
 
-    private val visibleOver1KProperty = booleanBinding(visibleRangeProperty) { visibleRange.endInclusive >= 1_000 }
+    private val visibleOver1KProperty = booleanBinding(context.visibleRange()) { visibleRange.endInclusive >= 1_000 }
     fun isVisibleOver1K(): BooleanExpression = visibleOver1KProperty
 
     private val labelStepProperty = createObjectBinding({
         val requiredLabelWidth = rulerSpacing + (2 * TimelineStyles.rulerTimeLabelPadding) + 32
         labelStepOptions.first { scale(UnitOfTime(it)).value >= requiredLabelWidth }
             .let(::UnitOfTime)
-    }, scaleProperty)
+    }, context.scale())
 
     fun labelStep(): ObjectExpression<UnitOfTime> = labelStepProperty
     private val labelStep: UnitOfTime by labelStepProperty
@@ -100,7 +97,7 @@ class TimelineRuler(
     private val labelMenu = gui.TimelineRulerLabelMenu(selection, storyPointLabels)
 
     private val labelsProperty = createObjectBinding({
-        if (width <= 0.0) return@createObjectBinding emptyList()
+        //if (width <= 0.0) return@createObjectBinding emptyList()
 
         val firstVisibleUnit = visibleRange.start
         val finalVisibleUnit = visibleRange.endInclusive
@@ -115,7 +112,7 @@ class TimelineRuler(
                 prefWidthProperty().bind(labelWidth())
             }
         }
-    }, visibleRangeProperty, labelStepProperty, labelWidthProperty)
+    }, context.visibleRange(), labelStepProperty, labelWidthProperty)
 
     fun labels(): ObjectBinding<List<TimeSpanLabel>> = labelsProperty
     private val labels: List<TimeSpanLabel> by labels()
@@ -141,27 +138,24 @@ class TimelineRuler(
                 }
                 .toList()
         } else listOf<Label>()
-    }, visibleRangeProperty)
+    }, context.visibleRange())
 
     fun secondaryLabels(): ObjectBinding<List<Label>> = secondaryLabelsProperty
 
-    private val relativeOffsetXProperty = offsetXProperty.doubleBinding(labelsProperty) {
+    private val relativeOffsetXProperty = observableOffsetX.doubleBinding(labelsProperty, context.scale()) {
         val firstLabel = labels.firstOrNull() ?: return@doubleBinding 0.0
-        scale(firstLabel.range.start).value - offsetX.value
+        (scale(firstLabel.range.start).value - offsetX.value)
     }
 
     fun relativeOffsetX() = relativeOffsetXProperty
 
-    private val selectionRegionsProperty = createObjectBinding({
-        if (selection.isEmpty()) emptyList<Region>()
-        else selection.asSequence()
-            .filter { it.start <= visibleRange.endInclusive && it.endInclusive >= visibleRange.start }
-            .map { SelectionRegion(it, scale) }
-            .toList()
-    }, selection, scaleProperty, visibleRangeProperty)
-    fun selectionRegions(): ObjectExpression<List<Region>> = selectionRegionsProperty
-    val selectionRegions: List<Region>
-        get() = selectionRegionsProperty.get()
+    private val selectionRegionProperty: ObjectExpression<Region?> = createObjectBinding({
+        if (selection.get() == null) null
+        else SelectionRegion(selection.get()!!, scale)
+    }, selection, context.scale(), context.visibleRange())
+    fun selectionRegion(): ObjectExpression<Region?> = selectionRegionProperty
+    val selectionRegion: Region?
+        get() = selectionRegionProperty.get()
 
     override fun createDefaultSkin(): Skin<*> = TimelineRulerSkin(this, gui)
 
@@ -213,10 +207,8 @@ class TimelineRulerSkin(ruler: TimelineRuler, gui: TimelineRulerComponent.Gui) :
                     paddingLeftProperty.bind(ruler.offsetX().doubleBinding { -(it?.value ?: 0.0) })
                     pane {
                         isPickOnBounds = false
-                        dynamicContent(ruler.selectionRegions()) { regions ->
-                            children.setAll(regions.orEmpty().onEach {
-
-                            })
+                        dynamicContent(ruler.selectionRegion()) { region ->
+                            region?.let(children::add)
                         }
                     }
                 }
