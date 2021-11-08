@@ -70,15 +70,9 @@ class TimelineViewPortView(
         }
     }
 
-    private val grid: TimelineViewPortGrid = gui.TimelineViewPortGrid().apply {
-        labels.bind(viewPort.storyEventItems) { it }
-        scale().bind(viewPort.scale())
-        offsetX().bind(viewPort.offsetX())
-        offsetY().bind(viewPort.offsetY())
-        labelsCollapsed().bind(viewPort.labelsCollapsed())
-
+    private val grid: TimelineViewPortGrid = gui.TimelineViewPortGrid(viewPort).apply {
         setOnScroll(actions::scroll)
-        setOnMouseClicked(actions::mouseClicked)
+        setOnMousePressed(actions::mousePressed)
     }
 
     private val vbar: ScrollBar = ScrollBar().apply {

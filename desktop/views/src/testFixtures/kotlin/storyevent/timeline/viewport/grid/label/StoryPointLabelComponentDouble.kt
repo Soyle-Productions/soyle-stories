@@ -11,6 +11,9 @@ import com.soyle.stories.storyevent.timeline.UnitOfTime
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
 import javafx.scene.Node
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlin.coroutines.CoroutineContext
 
 class StoryPointLabelComponentDouble(
     val dependencies: StoryPointLabelComponent.Dependencies = Dependencies()
@@ -18,7 +21,8 @@ class StoryPointLabelComponentDouble(
 
     class Dependencies(
         override val storyEventRenamed: Notifier<StoryEventRenamedReceiver> = StoryEventRenamedNotifier(),
-        override val storyEventRescheduled: Notifier<StoryEventRescheduledReceiver> = StoryEventRescheduledNotifier()
+        override val storyEventRescheduled: Notifier<StoryEventRescheduledReceiver> = StoryEventRescheduledNotifier(),
+        override val guiContext: CoroutineContext = Dispatchers.JavaFx
     ) : StoryPointLabelComponent.Dependencies
 
     override fun StoryPointLabel(storyEventId: StoryEvent.Id, name: String, time: UnitOfTime): StoryPointLabel {

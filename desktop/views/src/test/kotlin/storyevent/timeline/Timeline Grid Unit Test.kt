@@ -1,14 +1,21 @@
 package com.soyle.stories.desktop.view.storyevent.timeline
 
+import com.soyle.stories.desktop.view.common.events.dragDetectedEvent
+import com.soyle.stories.desktop.view.common.events.mouseDraggedEvent
+import com.soyle.stories.desktop.view.common.events.pickResult
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label.StoryPointLabelComponentDouble
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label.makeStoryPointLabel
 import com.soyle.stories.storyevent.timeline.Pixels
 import com.soyle.stories.storyevent.timeline.Scale
 import com.soyle.stories.storyevent.timeline.UnitOfTime
+import com.soyle.stories.storyevent.timeline.unit
+import com.soyle.stories.storyevent.timeline.viewport.TimelineViewportContext
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGrid
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridComponent
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
+import javafx.beans.binding.BooleanExpression
+import javafx.beans.binding.ObjectExpression
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.SkinBase
@@ -18,9 +25,15 @@ import kotlinx.coroutines.javafx.awaitPulse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.testfx.api.FxToolkit
 import org.testfx.assertions.api.Assertions.assertThat
 import org.testfx.assertions.api.Assertions.fail
+import tornadofx.booleanProperty
+import tornadofx.objectProperty
+import tornadofx.getValue
+import tornadofx.setValue
 import java.util.*
 
 class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelComponentDouble(), TimelineViewPortGridComponent.Gui {
@@ -31,8 +44,18 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
 
     private val asyncContext = newSingleThreadContext("Async")
     private val guiContext = Dispatchers.JavaFx
+    private val mockedViewPortContext = object : TimelineViewportContext {
+        val scaleProp = objectProperty<Scale>(Scale.maxZoomIn())
+        override fun scale(): ObjectExpression<Scale> = scaleProp
 
-    private val grid = TimelineViewPortGrid(asyncContext, guiContext, this)
+        val offsetXProp = objectProperty<Pixels>(Pixels(0.0))
+        override fun offsetX(): ObjectExpression<Pixels> = offsetXProp
+
+        val labelsCollapsedProp = booleanProperty(false)
+        override fun labelsCollapsed(): BooleanExpression = labelsCollapsedProp
+    }
+
+    private val grid = TimelineViewPortGrid(asyncContext, guiContext, mockedViewPortContext, this)
 
     @Nested
     inner class Layout {
@@ -40,8 +63,8 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
         // Rule: story events should be placed horizontally based on their starting point * scale
 
         init {
-            grid.scale = Scale.at(30.0).getOrThrow()
-            grid.offsetX = Pixels(874.0)
+            mockedViewPortContext.scaleProp.set(Scale.at(30.0).getOrThrow())
+            mockedViewPortContext.offsetXProp.set(Pixels(874.0))
         }
 
         private val firstLabel = makeStoryPointLabel(time = UnitOfTime(56)).apply {
@@ -99,15 +122,15 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
 
         @Test
         fun `should use standard width if collapsed`() {
-            grid.scale = Scale.at(33.0).getOrThrow()
-            grid.offsetX = Pixels(0.0)
+            mockedViewPortContext.scaleProp.set(Scale.at(33.0).getOrThrow())
+            mockedViewPortContext.offsetXProp.set(Pixels(0.0))
             val labels = List(5) {
                 makeStoryPointLabel(time = UnitOfTime(it.toLong() + 1)).apply {
                     resize(100.0, 24.0)
                 }
             }
             grid.labels.setAll(labels)
-            grid.areLabelsCollapsed = true
+            mockedViewPortContext.labelsCollapsedProp.set(true)
 
             runBlocking {
                 withContext(asyncContext) { awaitPulse() }
@@ -133,7 +156,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
 
             @Test
             fun `label completely before clip`() {
-                grid.offsetX = Pixels(906.0)
+                mockedViewPortContext.offsetXProp.set(Pixels(906.0))
 
                 runBlocking {
                     withContext(asyncContext) { awaitPulse() }
@@ -145,7 +168,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
 
             @Test
             fun `label intersecting with start of clip`() {
-                grid.offsetX = Pixels(1700.0)
+                mockedViewPortContext.offsetXProp.set(Pixels(1700.0))
 
                 runBlocking {
                     withContext(asyncContext) { awaitPulse() }
@@ -157,7 +180,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
 
             @Test
             fun `label intersecting with end of clip`() {
-                grid.offsetX = Pixels(1400.0)
+                mockedViewPortContext.offsetXProp.set(Pixels(1400.0))
 
                 runBlocking {
                     withContext(asyncContext) { awaitPulse() }
@@ -169,7 +192,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
 
             @Test
             fun `label completely after clip`() {
-                grid.offsetX = Pixels(506.0)
+                mockedViewPortContext.offsetXProp.set(Pixels(506.0))
 
                 runBlocking {
                     withContext(asyncContext) { awaitPulse() }
@@ -181,7 +204,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
 
             @Test
             fun `all of the above`() {
-                grid.offsetX = Pixels(500.0)
+                mockedViewPortContext.offsetXProp.set(Pixels(500.0))
                 val labels = listOf(
                     makeStoryPointLabel(time = UnitOfTime(13)),
                     makeStoryPointLabel(time = UnitOfTime(15)),
@@ -205,7 +228,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
         @Test
         fun `should auto-size labels that are visible`() {
             grid.resize(300.0, 200.0)
-            grid.offsetX = Pixels(500.0)
+            mockedViewPortContext.offsetXProp.set(Pixels(500.0))
             val labels = listOf(
                 makeStoryPointLabel(time = UnitOfTime(13)),
                 makeStoryPointLabel(time = UnitOfTime(15)),
@@ -243,7 +266,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
 
     @Test
     fun `whenever a cached width is updated, should layout`() {
-        grid.offsetX = Pixels(1356.0)
+        mockedViewPortContext.offsetXProp.set(Pixels(1356.0))
         grid.labels.setAll(
             listOf(
                 makeStoryPointLabel(time = UnitOfTime(13)),
@@ -290,7 +313,7 @@ class `Timeline Grid Unit Test` : StoryPointLabelComponent by StoryPointLabelCom
             withContext(guiContext) { awaitPulse() }
         }
         grid.layout()
-        grid.scale = Scale.maxZoomOut()
+        mockedViewPortContext.scaleProp.set(Scale.maxZoomOut())
         runBlocking {
             withContext(asyncContext) { awaitPulse() }
             withContext(guiContext) { awaitPulse() }

@@ -13,12 +13,15 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.storyevent.timeline.*
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPort
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPortComponent
+import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.usecase.storyevent.StoryEventItem
+import io.mockk.verify
 import javafx.geometry.HorizontalDirection
 import javafx.geometry.VerticalDirection
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.input.MouseButton
 import javafx.scene.input.ScrollEvent
 import javafx.stage.Stage
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +37,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.testfx.api.FxRobot
 import org.testfx.api.FxToolkit
 import org.testfx.assertions.api.Assertions.assertThat
+import java.awt.MouseInfo
 
 class `Timeline Int Test` {
 
@@ -238,9 +242,55 @@ class `Timeline Int Test` {
 
     }
 
+    @Nested
+    inner class `Users can drag story point labels to adjust their time` {
+
+        init {
+            runBlocking {
+                listStoryEventsController.`given story events have been loaded`(
+                    *Array(8) { StoryEventItem(StoryEvent.Id(), "Some name", (0 .. 10L).random()) }
+                )
+                withContext(Dispatchers.JavaFx) { awaitPulse() }
+                withContext(Dispatchers.JavaFx) { awaitPulse() }
+            }
+        }
+
+        @Nested
+        inner class `Given single story point label has been selected` {
+
+            val selectedLabel: StoryPointLabel = (timeline.state as Timeline.State.Loaded).run {
+                storyEventItems.random().also(selection.storyEvents::add)
+            }
+
+            @Test
+            fun `should move story point label to dragged location`() {
+                FxRobot().apply {
+                    interact {
+                        moveTo(selectedLabel)
+                        press(MouseButton.PRIMARY)
+//                        drag(MouseButton.PRIMARY)
+//                        moveTo(
+//                            selectedLabel.localToScreen(100.0, 0.0)
+//                        )
+                        release(MouseButton.PRIMARY)
+                    }
+                }
+
+                verify {
+                    component.viewPortDependencies.adjustStoryEventsTimeController.adjustStoryEventsTime(
+                        setOf(selectedLabel.storyEventId),
+                        any()
+                    )
+                }
+            }
+
+        }
+
+    }
+
     companion object {
         init {
-            runHeadless()
+//            runHeadless()
             FxToolkit.registerPrimaryStage()
         }
     }

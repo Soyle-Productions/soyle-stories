@@ -309,20 +309,20 @@ object Presentation {
             return TimelineRulerComponent.Implementation(this).TimelineRuler(context)
         }
 
-        override fun TimelineViewPortGrid(): TimelineViewPortGrid {
-            return TimelineViewPortGridComponent.Implementation(asyncContext, guiContext, this).TimelineViewPortGrid()
+        override fun TimelineViewPortGrid(viewportContext: TimelineViewportContext): TimelineViewPortGrid {
+            return TimelineViewPortGridComponent.Implementation(asyncContext, guiContext, this).TimelineViewPortGrid(viewportContext)
         }
 
         override fun TimeSpanLabel(
             selection: TimeRangeSelection,
-            storyPointLabels: List<StoryPointLabel>
+            storyPointLabels: ObservableList<StoryPointLabel>
         ): TimeSpanLabel {
             return TimeSpanLabelComponent.Implementation(this).TimeSpanLabel(selection, storyPointLabels)
         }
 
         override fun TimelineRulerLabelMenu(
             selection: TimeRangeSelection,
-            storyPointLabels: List<StoryPointLabel>
+            storyPointLabels: ObservableList<StoryPointLabel>
         ): TimelineRulerLabelMenu {
             return TimelineRulerLabelMenuComponent.Implementation(this).TimelineRulerLabelMenu(selection, storyPointLabels)
         }

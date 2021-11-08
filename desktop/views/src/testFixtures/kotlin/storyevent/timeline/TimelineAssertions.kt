@@ -25,7 +25,7 @@ class TimelineAssertions private constructor(private val access: TimelineAccess)
     fun hasStoryPointLabel(storyEventId: StoryEvent.Id) {
         val viewport = access.viewport ?: fail("No story events have yet been loaded in the timeline.")
         assertTrue(
-            viewport.storyEventItems.any { it.storyEventId == storyEventId },
+            viewport.storyPointLabels.any { it.storyEventId == storyEventId },
             "Could not find story point label with id $storyEventId"
         )
     }
@@ -33,14 +33,14 @@ class TimelineAssertions private constructor(private val access: TimelineAccess)
     fun doesNotHaveStoryPointLabelWithName(name: String) {
         val viewport = access.viewport ?: return
         assertNull(
-            viewport.storyEventItems.find { it.name == name },
+            viewport.storyPointLabels.find { it.name == name },
             "Expected not to find story point label with name \"$name\""
         )
     }
 
     fun andStoryPointLabel(storyEventId: StoryEvent.Id, op: StoryPointLabelAssertions.() -> Unit) {
         val viewport = access.viewport ?: fail("No story events have yet been loaded in the timeline.")
-        val label = viewport.storyEventItems.single { it.storyEventId == storyEventId }
+        val label = viewport.storyPointLabels.single { it.storyEventId == storyEventId }
         assertThat(label, op)
     }
 

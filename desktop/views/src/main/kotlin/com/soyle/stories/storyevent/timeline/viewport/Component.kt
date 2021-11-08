@@ -3,8 +3,10 @@ package com.soyle.stories.storyevent.timeline.viewport
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.storyevent.item.StoryEventItemViewModel
 import com.soyle.stories.storyevent.remove.RemoveStoryEventController
+import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridComponent
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
+import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRulerComponent
 import javafx.collections.ObservableList
 import javafx.event.EventTarget
@@ -26,10 +28,11 @@ interface TimelineViewPortComponent {
             .also { add(it) }
             .apply(op)
 
-    interface Gui : TimelineViewPortGridComponent, TimelineRulerComponent
+    interface Gui : TimelineViewPortGridComponent, TimelineRulerComponent, StoryPointLabelComponent
 
     interface Dependencies {
         val removeStoryEventController: RemoveStoryEventController
+        val adjustStoryEventsTimeController: AdjustStoryEventsTimeController
     }
 
     companion object {
