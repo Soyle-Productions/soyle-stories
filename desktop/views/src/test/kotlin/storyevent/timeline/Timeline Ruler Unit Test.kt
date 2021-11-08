@@ -30,11 +30,6 @@ class `Timeline Ruler Unit Test` {
     inner class `Should create enough labels to cover entire visible range` {
 
         @Test
-        fun `no labels when width is zero`() {
-            assertThat(ruler.labels().value).isEmpty()
-        }
-
-        @Test
         fun `at least one label should render when width is less than label step`() {
             ruler.resize(1.0, 1.0)
             visibleRangeProperty.set(TimeRange(0L..0L))

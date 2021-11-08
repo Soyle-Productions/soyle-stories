@@ -5,10 +5,8 @@ import com.soyle.stories.common.components.surfaces.Elevation
 import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.storyevent.timeline.Pixels
-import com.soyle.stories.storyevent.timeline.Scale
-import com.soyle.stories.storyevent.timeline.TimeRange
-import com.soyle.stories.storyevent.timeline.UnitOfTime
+import com.soyle.stories.storyevent.timeline.*
+import com.soyle.stories.storyevent.timeline.viewport.TimelineViewportContext
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridStyles.Companion.LABEL_SPACING
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridStyles.Companion.ROW_HEIGHT
 import com.soyle.stories.storyevent.timeline.viewport.grid.TimelineViewPortGridStyles.Companion.ROW_V_PADDING
@@ -17,11 +15,17 @@ import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel.Companion.INVALID_CACHE
 import javafx.beans.InvalidationListener
 import javafx.beans.WeakInvalidationListener
+import javafx.beans.binding.BooleanExpression
+import javafx.beans.binding.ObjectExpression
 import javafx.beans.property.*
 import javafx.beans.value.WeakChangeListener
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.WeakListChangeListener
+import javafx.event.EventHandler
+import javafx.event.WeakEventHandler
+import javafx.geometry.Point2D
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Region
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -51,6 +55,7 @@ import kotlin.coroutines.CoroutineContext
 class TimelineViewPortGrid(
     private val asyncContext: CoroutineContext,
     private val guiContext: CoroutineContext,
+    viewportContext: TimelineViewportContext,
     gui: TimelineViewPortGridComponent.Gui
 ) : Region(), CoroutineScope by CoroutineScope(asyncContext) {
 
@@ -67,7 +72,7 @@ class TimelineViewPortGrid(
     /**
      * the labels to arrange.
      */
-    val labels = observableListOf<StoryPointLabel>()
+    val labels = viewportContext.storyPointLabels
 
     /**
      * keeps the labels sorted so that the arrangement can arrange everything properly.
@@ -79,38 +84,38 @@ class TimelineViewPortGrid(
     /**
      * the scale at which to render the labels.
      */
-    private val scaleProperty = objectProperty<Scale>(Scale.maxZoomIn())
+    private val scaleProperty: ObjectExpression<Scale> = viewportContext.scale()
     /** @see scaleProperty */
-    fun scale(): ObjectProperty<Scale> = scaleProperty
+    fun scale(): ObjectExpression<Scale> = scaleProperty
     /** @see scaleProperty */
-    var scale: Scale by scaleProperty
+    val scale: Scale by scaleProperty
 
     /**
      * The amount in which the labels are shifted upward
      */
-    private val offsetYProperty = objectProperty<Pixels>(Pixels(0.0))
+    private val offsetYProperty: ObjectExpression<Pixels> = viewportContext.offsetY()
     /** @see offsetYProperty */
     fun offsetY() = offsetYProperty
     /** @see offsetYProperty */
-    var offsetY: Pixels by offsetYProperty
+    val offsetY: Pixels by offsetYProperty
 
     /**
      * The amount in which the labels are shifted left
      */
-    private val offsetXProperty = objectProperty<Pixels>(Pixels(0.0))
+    private val offsetXProperty: ObjectExpression<Pixels> = viewportContext.offsetX()
     /** @see offsetXProperty */
     fun offsetX() = offsetXProperty
     /** @see offsetXProperty */
-    var offsetX: Pixels by offsetXProperty
+    val offsetX: Pixels by offsetXProperty
 
     /**
      * Whether all the labels should be collapsed or not
      */
-    private val labelsCollapsedProperty = booleanProperty(false)
+    private val labelsCollapsedProperty: BooleanExpression = viewportContext.labelsCollapsed()
     /** @see labelsCollapsedProperty */
     fun labelsCollapsed() = labelsCollapsedProperty
     /** @see labelsCollapsedProperty */
-    var areLabelsCollapsed: Boolean by labelsCollapsed()
+    val areLabelsCollapsed: Boolean by labelsCollapsed()
 
 
     //**************************************************************************
@@ -367,16 +372,16 @@ class TimelineViewPortGrid(
         }
     }
 
+    private val cachedHeightChangeListener = InvalidationListener {
+        requestMinHeight()
+    }
+    private val weakCachedHeightChangeListener = WeakInvalidationListener(cachedHeightChangeListener)
+
     //**************************************************************************
     //*                                                                        *
     //* endregion Height                                                       *
     //*                                                                        *
     //**************************************************************************
-
-    private val cachedHeightChangeListener = InvalidationListener {
-        requestMinHeight()
-    }
-    private val weakCachedHeightChangeListener = WeakInvalidationListener(cachedHeightChangeListener)
 
     private fun initializeAddedLabel(label: StoryPointLabel) {
         label.collapsed().bind(labelsCollapsedProperty)
@@ -384,7 +389,8 @@ class TimelineViewPortGrid(
             inheritedElevation = Elevation[4]!!
             relativeElevation = Elevation[4]!!
         }
-        label.layoutXProperty().bind(scaleProperty.doubleBinding(label.time()) { scale(UnitOfTime(label.time)).value })
+        label.layoutXProperty().bind(scaleProperty.doubleBinding(label.time()) {
+            scale(UnitOfTime(label.time)).value })
         label.cachedWidth().addListener(weakInvalidDurationListener)
         // the assumption is that all labels will have invalid caches when first added, but if not, their durations
         // will need to be calculated
@@ -449,6 +455,17 @@ class TimelineViewPortGrid(
         labelGroup.layoutXProperty().bind(offsetXProperty.doubleBinding { -(it?.value ?: 0.0) })
         labelGroup.layoutYProperty().bind(offsetYProperty.doubleBinding { -(it?.value ?: 0.0) })
     }
+
+    private val dragGroup = group {}
+    init {
+        dragGroup.dynamicContent(viewportContext.dragLabels()) {
+            val labels = it.orEmpty()
+            labels.onEach { it.layoutY = it.row * ROW_HEIGHT + ROW_V_PADDING }
+            dragGroup.children.setAll(labels)
+        }
+        dragGroup.layoutXProperty().bind(offsetXProperty.doubleBinding { -(it?.value ?: 0.0) })
+        dragGroup.layoutYProperty().bind(offsetYProperty.doubleBinding { -(it?.value ?: 0.0) })
+    }
     // endregion labelGroup
 
     init {
@@ -463,6 +480,8 @@ class TimelineViewPortGrid(
         prefHeight = USE_COMPUTED_SIZE
         prefWidth = USE_COMPUTED_SIZE
         isFocusTraversable = true
+
+        labels.forEach { initializeAddedLabel(it) }
     }
 
     private class OccupiedCells {

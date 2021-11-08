@@ -151,12 +151,15 @@ constructor(
 
     private val selectedProperty = booleanProperty(false)
     fun selected(): BooleanExpression = selectedProperty
-    val selected: Boolean = false
+    val selected: Boolean by selected()
 
     private val selectionListener: InvalidationListener = InvalidationListener {
         selectedProperty.set(selectionProperty.get().contains(storyEventId))
     }
     private val weakSelectionListener = WeakInvalidationListener(selectionListener)
+    init {
+        selectionProperty.get().addListener(weakSelectionListener)
+    }
 
     init {
         graphic = guiComponent.StoryEventItemIcon()
@@ -167,11 +170,6 @@ constructor(
             absoluteElevation = Elevation[8]!!
         }
         isPickOnBounds = false
-        setOnMouseClicked {
-            if (!it.isShiftDown) selectionProperty.get().clear()
-            selectionProperty.get().add(this)
-            it.consume()
-        }
         isFocusTraversable = true
     }
 

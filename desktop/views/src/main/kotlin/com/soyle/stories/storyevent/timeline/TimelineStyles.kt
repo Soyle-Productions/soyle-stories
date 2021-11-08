@@ -30,6 +30,8 @@ class TimelineStyles : Stylesheet() {
         val backgroundLine by cssclass()
         val unlabeled by csspseudoclass()
 
+        val dragging by csspseudoclass()
+
         const val RULER_PADDING = 8.0
         const val rulerSpacing = 8.0
         const val rulerTimeLabelPadding = 4.0

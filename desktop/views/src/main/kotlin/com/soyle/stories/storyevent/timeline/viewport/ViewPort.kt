@@ -18,18 +18,18 @@ import javafx.beans.value.WeakChangeListener
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.collections.WeakListChangeListener
+import javafx.event.EventHandler
+import javafx.event.WeakEventHandler
+import javafx.scene.Node
 import javafx.scene.control.Control
 import javafx.scene.control.Skin
-import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyEvent
-import javafx.scene.input.MouseEvent
-import javafx.scene.input.ScrollEvent
+import javafx.scene.input.*
 import tornadofx.*
 import tornadofx.Stylesheet.Companion.viewport
 import kotlin.math.max
 
 class TimelineViewPort(
-    val storyEventItems: ObservableList<StoryPointLabel>,
+    override val storyPointLabels: ObservableList<StoryPointLabel>,
 
     private val gui: TimelineViewPortComponent.Gui,
     private val dependencies: TimelineViewPortComponent.Dependencies
@@ -61,7 +61,7 @@ class TimelineViewPort(
     val offsetX: Pixels by offsetX()
 
     private val offsetYProperty = ReadOnlyObjectWrapper(Pixels(0.0))
-    fun offsetY(): ReadOnlyObjectProperty<Pixels> = offsetYProperty.readOnlyProperty
+    override fun offsetY(): ReadOnlyObjectProperty<Pixels> = offsetYProperty.readOnlyProperty
     val offsetY: Pixels by offsetY()
 
     private val selectionProperty = objectProperty<TimelineSelectionModel>(TimelineSelectionModel())
@@ -74,22 +74,28 @@ class TimelineViewPort(
     private val labelsCollapsedProperty = booleanProperty(false)
 
     /** @see labelsCollapsedProperty */
-    fun labelsCollapsed() = labelsCollapsedProperty
+    override fun labelsCollapsed() = labelsCollapsedProperty
 
     /** @see labelsCollapsedProperty */
     var areLabelsCollapsed: Boolean by labelsCollapsed()
 
+    private val dragLabelsProperty = objectProperty<List<StoryPointLabel>>(emptyList())
+    override fun dragLabels(): ObjectExpression<List<StoryPointLabel>> = dragLabelsProperty
+    val dragLabels: List<StoryPointLabel> get() = dragLabels().get()
+
     private val maxRightBoundsProperty = doubleProperty(0.0)
-    private val maxOffsetXProperty = doubleBinding(maxRightBoundsProperty, widthProperty(), offsetXProperty, selection.timeRange, scaleProperty) {
-        listOf(
-            (maxRightBoundsProperty.get() - widthProperty().get() / 2).coerceAtLeast(0.0),
-            offsetX.value,
-            selection.timeRange.value?.let { scale(it.endInclusive + 1).value - widthProperty().get() }?.coerceAtLeast(0.0) ?: 0.0
-        ).maxOfOrNull { it }!!
-    }
+    private val maxOffsetXProperty =
+        doubleBinding(maxRightBoundsProperty, widthProperty(), offsetXProperty, selection.timeRange, scaleProperty) {
+            listOf(
+                (maxRightBoundsProperty.get() - widthProperty().get() / 2).coerceAtLeast(0.0),
+                offsetX.value,
+                selection.timeRange.value?.let { scale(it.endInclusive + 1).value - widthProperty().get() }
+                    ?.coerceAtLeast(0.0) ?: 0.0
+            ).maxOfOrNull { it }!!
+        }
 
     private fun calculateMaxOffset() {
-        maxRightBoundsProperty.set(storyEventItems.maxOfOrNull { scale(UnitOfTime(it.time)).value + it.cachedWidth }
+        maxRightBoundsProperty.set(storyPointLabels.maxOfOrNull { scale(UnitOfTime(it.time)).value + it.cachedWidth }
             ?: 0.0)
     }
 
@@ -108,6 +114,7 @@ class TimelineViewPort(
                 change.addedSubList.forEach {
                     it.cachedWidth().addListener(weakStoryEventItemWidthChanged)
                     it.time().addListener(weakStoryEventItemTimeChanged)
+                    it.setOnMousePressed(actions::mousePressedOnLabel)
                 }
             }
             if (change.wasRemoved()) {
@@ -121,7 +128,7 @@ class TimelineViewPort(
     private val weakStoryEventItemChanged = WeakListChangeListener(storyEventItemChanged)
 
     init {
-        storyEventItems.addListener(weakStoryEventItemChanged)
+        storyPointLabels.addListener(weakStoryEventItemChanged)
     }
 
     fun maxOffsetX(): DoubleExpression = maxOffsetXProperty
@@ -131,6 +138,54 @@ class TimelineViewPort(
     }, offsetXProperty, widthProperty(), scaleProperty)
 
     override fun visibleRange(): ObjectExpression<TimeRange> = visibleRangeProperty
+
+    private var dragStartTime: UnitOfTime? = null
+
+    private val dragDetectedListener = EventHandler<MouseEvent> {
+        if (it.target !is StoryPointLabel && (it.target as? Node)?.findParent<StoryPointLabel>() == null) return@EventHandler
+        dragStartTime = scale(Pixels(it.x + offsetX.value))
+        val sources = storyPointLabels.filter { it.selected }
+            .onEach { if (! it.hasClass(TimelineStyles.dragging)) it.addClass(TimelineStyles.dragging) }
+            .map {
+                gui.StoryPointLabel(it.storyEventId, it.name, it.time.unit)
+                    .apply {
+                        row = it.row
+                        resize(it.width, it.height)
+                        properties["origin"] = it
+                        layoutXProperty().bind(scaleProperty.doubleBinding(time()) { scale(UnitOfTime(time)).value })
+                        asSurface {
+                            inheritedElevation = Elevation.getValue(8)
+                            relativeElevation = Elevation.getValue(6)
+                        }
+                    }
+            }
+
+        dragLabelsProperty.set(sources)
+    }
+    private val mouseDraggedListener = EventHandler<MouseEvent> { event ->
+        val dragStartTime = dragStartTime ?: return@EventHandler
+        val adjustment = scale(Pixels(event.x) + offsetX) - dragStartTime
+        dragLabels.forEach { it.time = (it.properties["origin"] as StoryPointLabel).time + adjustment.value }
+
+        if (event.x > width - 10) {
+            offsetXProperty.set(offsetX + event.x - (width - 10))
+        } else if (event.x < 10) {
+            offsetXProperty.set(offsetX + (event.x - 10))
+        }
+    }
+    private val mouseDragReleaseListener = EventHandler<MouseEvent> { event ->
+        val dragStartTime = dragStartTime ?: return@EventHandler
+        val dragLabels = dragLabels.takeUnless { it.isEmpty() } ?: return@EventHandler
+        val adjustment = dragLabels.first().let { it.time - (it.properties["origin"] as StoryPointLabel).time }
+        val originLabels= dragLabels.map { it.properties["origin"] as StoryPointLabel }
+        originLabels.onEach { it.removeClass(TimelineStyles.dragging) }
+
+        dependencies.adjustStoryEventsTimeController.adjustStoryEventsTime(
+            dragLabels.map { it.storyEventId }.toSet(),
+            adjustment
+        )
+        dragLabelsProperty.set(emptyList())
+    }
 
     private val actions: TimelineViewPortActions = TimelineViewPortPresenter(this, dependencies)
 
@@ -145,6 +200,10 @@ class TimelineViewPort(
         prefWidth = USE_COMPUTED_SIZE
         isFocusTraversable = true
         setOnKeyPressed(actions::keyPressed)
+
+        addEventFilter(MouseEvent.DRAG_DETECTED, dragDetectedListener)
+        addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseDraggedListener)
+        addEventFilter(MouseDragEvent.MOUSE_RELEASED, mouseDragReleaseListener)
     }
 
     fun scrollToTime(time: UnitOfTime) {
@@ -171,7 +230,8 @@ interface TimelineViewPortActions {
     fun offsetX(): ObjectProperty<Pixels>
     fun offsetY(): ObjectProperty<Pixels>
     fun scroll(scrollEvent: ScrollEvent)
-    fun mouseClicked(mouseEvent: MouseEvent)
+    fun mousePressed(mouseEvent: MouseEvent)
+    fun mousePressedOnLabel(mouseEvent: MouseEvent)
     fun maxOffsetY(): DoubleProperty
     fun hScroll(value: Double)
     fun vScroll(value: Double)
@@ -218,9 +278,19 @@ private class TimelineViewPortPresenter(
         offsetYProperty.value = Pixels(value.coerceIn(0.0, maxOffsetYProperty.value))
     }
 
-    override fun mouseClicked(mouseEvent: MouseEvent) {
-        viewModel.selection.clear()
-        setFocus(true)
+    override fun mousePressedOnLabel(mouseEvent: MouseEvent) {
+        val sourceAsPointLabel = mouseEvent.source as? StoryPointLabel
+        if (! mouseEvent.isShiftDown && sourceAsPointLabel?.selected != true) {
+            viewModel.selection.clear()
+        }
+        sourceAsPointLabel?.let(viewModel.selection.storyEvents::add)
+        if (sourceAsPointLabel != null) mouseEvent.consume()
+    }
+
+    override fun mousePressed(mouseEvent: MouseEvent) {
+        if (! mouseEvent.isShiftDown) {
+            viewModel.selection.clear()
+        }
     }
 
     override fun keyPressed(keyEvent: KeyEvent) {
@@ -230,7 +300,7 @@ private class TimelineViewPortPresenter(
     }
 
     private fun deleteSelection() {
-        if (! viewModel.selection.empty().value) {
+        if (!viewModel.selection.empty().value) {
             dependencies.removeStoryEventController.removeStoryEvent(viewModel.selection.storyEvents.selectedIds)
         }
     }

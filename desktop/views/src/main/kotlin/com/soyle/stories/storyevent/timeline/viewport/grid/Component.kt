@@ -1,6 +1,7 @@
 package com.soyle.stories.storyevent.timeline.viewport.grid
 
 import com.soyle.stories.common.ViewBuilder
+import com.soyle.stories.storyevent.timeline.viewport.TimelineViewportContext
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
 import javafx.event.EventTarget
 import tornadofx.add
@@ -8,10 +9,13 @@ import kotlin.coroutines.CoroutineContext
 
 @Suppress("FunctionName")
 interface TimelineViewPortGridComponent {
-    fun TimelineViewPortGrid(): TimelineViewPortGrid
+    fun TimelineViewPortGrid(viewportContext: TimelineViewportContext): TimelineViewPortGrid
 
     @ViewBuilder
-    fun EventTarget.timelineViewPortGrid(op: TimelineViewPortGrid.() -> Unit = {}): TimelineViewPortGrid = TimelineViewPortGrid()
+    fun EventTarget.timelineViewPortGrid(
+        viewportContext: TimelineViewportContext,
+        op: TimelineViewPortGrid.() -> Unit = {}
+    ): TimelineViewPortGrid = TimelineViewPortGrid(viewportContext)
         .also { add(it) }
         .apply(op)
 
@@ -21,9 +25,10 @@ interface TimelineViewPortGridComponent {
             guiContext: CoroutineContext,
             gui: Gui
         ): TimelineViewPortGridComponent = object : TimelineViewPortGridComponent {
-            override fun TimelineViewPortGrid(): TimelineViewPortGrid = TimelineViewPortGrid(
-                asyncContext, guiContext, gui
-            )
+            override fun TimelineViewPortGrid(viewportContext: TimelineViewportContext): TimelineViewPortGrid =
+                TimelineViewPortGrid(
+                    asyncContext, guiContext, viewportContext, gui
+                )
         }
     }
 
