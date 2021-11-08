@@ -3,6 +3,7 @@ package com.soyle.stories.storyevent.timeline.viewport.grid.label
 import com.soyle.stories.common.ColorStyles
 import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.storyevent.item.icon.StoryEventItemIconStyles
+import com.soyle.stories.storyevent.timeline.TimelineStyles
 import javafx.application.Platform
 import javafx.geometry.Pos
 import javafx.scene.control.ContentDisplay
@@ -66,6 +67,10 @@ class StoryPointLabelStyles : Stylesheet() {
             and(emphasized) {
                 borderColor = multi(box(ColorStyles.secondaryColor))
                 borderWidth = multi(box(4.px))
+            }
+
+            and(TimelineStyles.dragging) {
+                opacity = 0.5
             }
         }
     }

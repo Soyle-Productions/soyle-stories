@@ -10,6 +10,7 @@ import com.soyle.stories.storyevent.time.StoryEventRescheduledReceiver
 import com.soyle.stories.storyevent.timeline.UnitOfTime
 import javafx.event.EventTarget
 import tornadofx.add
+import kotlin.coroutines.CoroutineContext
 
 @Suppress("FunctionName")
 interface StoryPointLabelComponent {
@@ -25,6 +26,7 @@ interface StoryPointLabelComponent {
     interface Dependencies {
         val storyEventRenamed: Notifier<StoryEventRenamedReceiver>
         val storyEventRescheduled: Notifier<StoryEventRescheduledReceiver>
+        val guiContext: CoroutineContext
     }
 
     companion object {

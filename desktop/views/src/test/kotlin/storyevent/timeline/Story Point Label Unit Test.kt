@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.view.storyevent.timeline
 
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label.StoryPointLabelComponentDouble
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.storyevent.item.StoryEventItemSelection
 import com.soyle.stories.storyevent.timeline.UnitOfTime
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
@@ -230,6 +231,26 @@ class `Story Point Label Unit Test` : StoryPointLabelComponent by StoryPointLabe
         label.collapsed().onChange { wasNotified = true }
         label.isCollapsed = true
         assertThat(wasNotified).isTrue
+    }
+
+    @Test
+    fun `when selection is updated, should be selected`() {
+        val label = StoryPointLabel(StoryEvent.Id(), "", UnitOfTime(8))
+        val selection = StoryEventItemSelection()
+        selection.add(label)
+
+        label.selection().set(selection)
+
+        assertThat(label.selected).isTrue
+    }
+
+    @Test
+    fun `when added to selection, should be selected`() {
+        val label = StoryPointLabel(StoryEvent.Id(), "", UnitOfTime(8))
+
+        label.selection().get().add(label)
+
+        assertThat(label.selected).isTrue
     }
 
 }
