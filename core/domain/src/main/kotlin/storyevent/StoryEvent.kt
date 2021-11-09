@@ -13,7 +13,7 @@ import java.util.*
 class StoryEvent(
     val id: Id,
     val name: NonBlankString,
-    val time: Long,
+    val time: ULong,
     val projectId: Project.Id,
     val previousStoryEventId: Id?,
     val nextStoryEventId: Id?,
@@ -22,7 +22,7 @@ class StoryEvent(
 ) {
 
     companion object {
-        fun create(name: NonBlankString, time: Long, projectId: Project.Id): StoryEventUpdate<StoryEventCreated> {
+        fun create(name: NonBlankString, time: ULong, projectId: Project.Id): StoryEventUpdate<StoryEventCreated> {
             val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, listOf())
             val change = StoryEventCreated(storyEvent.id, name.value, time, projectId)
             return Successful(storyEvent, change)
@@ -41,11 +41,12 @@ class StoryEvent(
             )
     }
 
-    constructor(name: NonBlankString, projectId: Project.Id) : this(Id(), name, 0L, projectId, null, null, null, emptyList())
+    constructor(name: NonBlankString, projectId: Project.Id) : this(Id(), name,
+        0u, projectId, null, null, null, emptyList())
 
     private fun copy(
         name: NonBlankString = this.name,
-        time: Long = this.time,
+        time: ULong = this.time,
         previousStoryEventId: Id? = this.previousStoryEventId,
         nextStoryEventId: Id? = this.nextStoryEventId,
         linkedLocationId: Location.Id? = this.linkedLocationId,
@@ -57,7 +58,7 @@ class StoryEvent(
         if (newName == name) return noUpdate()
         return Successful(copy(name = newName), StoryEventRenamed(id, newName.value))
     }
-    fun withTime(newTime: Long): StoryEventUpdate<StoryEventRescheduled> {
+    fun withTime(newTime: ULong): StoryEventUpdate<StoryEventRescheduled> {
         if (newTime == time) return noUpdate()
         return Successful(copy(time = newTime), StoryEventRescheduled(id, newTime, time))
     }

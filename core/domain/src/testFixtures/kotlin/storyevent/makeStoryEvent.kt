@@ -10,7 +10,7 @@ import com.soyle.stories.domain.validation.NonBlankString
 fun makeStoryEvent(
     id: StoryEvent.Id = StoryEvent.Id(),
     name: NonBlankString = storyEventName(),
-    time: Long = storyEventTime(),
+    time: ULong = storyEventTime(),
     projectId: Project.Id = Project.Id(),
     previousStoryEventId: StoryEvent.Id? = null,
     nextStoryEventId: StoryEvent.Id? = null,
@@ -29,4 +29,4 @@ fun makeStoryEvent(
 
 fun storyEventName() = nonBlankStr("Story Event ${str()}")
 
-fun storyEventTime() = (0L .. 100L).random()
+fun storyEventTime(): ULong = ULongRange(0u, 100u).random()

@@ -17,7 +17,7 @@ class `Story Event Unit Test` {
     inner class `Create Story Event` {
 
         val inputName = nonBlankStr("New Story Event Name ${randomUUID()}")
-        val inputTime = (0L .. 10L).random()
+        val inputTime = ULongRange(0u, 10u).random()
         val projectId = Project.Id()
 
         @Test
@@ -85,8 +85,8 @@ class `Story Event Unit Test` {
     @Nested
     inner class `Reschedule Story Event` {
 
-        private val storyEvent = makeStoryEvent(time = 7L)
-        private val inputTime = 18L
+        private val storyEvent = makeStoryEvent(time = 7u)
+        private val inputTime: ULong = 18u
 
         @Test
         fun `should produce story event with new time`() {
