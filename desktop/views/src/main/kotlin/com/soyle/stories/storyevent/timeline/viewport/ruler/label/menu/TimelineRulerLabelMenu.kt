@@ -56,21 +56,21 @@ class TimelineRulerLabelMenu(
     }
 
     private fun insertBefore(range: TimeRange): () -> Unit = {
-        dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(
+        dependencies.adjustStoryEventsTimeController.adjustTimesBy(
             setOfIdsAfterStart(range),
             range.duration.value
         )
     }
 
     private fun insertAfter(range: TimeRange): () -> Unit = {
-        dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(
+        dependencies.adjustStoryEventsTimeController.adjustTimesBy(
             setOfIdsAfterEnd(range),
             range.duration.value
         )
     }
 
     private fun remove(range: TimeRange): () -> Unit = {
-        dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(
+        dependencies.adjustStoryEventsTimeController.adjustTimesBy(
             setOfIdsAfterStart(range),
             -range.duration.value
         )

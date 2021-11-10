@@ -149,7 +149,7 @@ class StoryEventListPresenter(
 
     override fun adjustTimesOfSelectedItems() {
         val selectedItems = (viewModel.value as PopulatedStoryEventListViewModel).selectedItems
-        adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(selectedItems.map { it.id }.toSet())
+        adjustStoryEventsTimeController.adjustTimes(selectedItems.map { it.id }.toSet())
     }
 
     override fun deleteSelectedItems() {

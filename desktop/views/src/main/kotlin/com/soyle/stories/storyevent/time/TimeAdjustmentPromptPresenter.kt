@@ -64,7 +64,7 @@ class TimeAdjustmentPromptPresenter private constructor(
 
     private fun getSubmissionJob(time: Long): Job {
         return if (viewModel.adjustment) {
-            adjustStoryEventsTimeController.adjustStoryEventsTime(storyEventIds, time)
+            adjustStoryEventsTimeController.adjustTimesBy(storyEventIds, time)
         } else {
             rescheduleStoryEventController.rescheduleStoryEvent(storyEventIds.single(), time)
         }

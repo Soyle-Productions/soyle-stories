@@ -65,7 +65,7 @@ class StoryEventItemMenuPresenter(
 
     override fun adjustTimesOfSelectedItems() {
         val selectedItems = viewModel.selection.selectedIds
-        dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(selectedItems)
+        dependencies.adjustStoryEventsTimeController.adjustTimes(selectedItems)
     }
 
     override fun deleteSelectedItems() {

@@ -21,6 +21,7 @@ import com.soyle.stories.storyevent.rename.*
 import com.soyle.stories.storyevent.time.*
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimePrompt
+import com.soyle.stories.storyevent.time.adjust.StoryEventTimeChangePromptPresenter
 import com.soyle.stories.storyevent.time.normalization.NormalizationPromptPresenter
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventPrompt
@@ -135,8 +136,12 @@ object Presentation {
                 }
             }
 
-            provide(RescheduleStoryEventPrompt::class, AdjustStoryEventsTimePrompt::class) {
-                object : RescheduleStoryEventPrompt, AdjustStoryEventsTimePrompt {
+            provide<AdjustStoryEventsTimePrompt> {
+                StoryEventTimeChangePromptPresenter(get<WorkBench>()::currentStage)
+            }
+
+            provide(RescheduleStoryEventPrompt::class) {
+                object : RescheduleStoryEventPrompt {
 
                     private val presenterBuilder by lazy {
                         TimeAdjustmentPromptPresenter(
@@ -148,30 +153,6 @@ object Presentation {
 
                     override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
                         val presenter = presenterBuilder(storyEventId, currentTime)
-
-                        val stage = TimeAdjustmentPromptView(
-                            presenter,
-                            presenter.viewModel
-                        ).openModal(owner = get<WorkBench>().root.scene?.window)!!
-                        presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
-                            if (it == true) stage.hide()
-                        }
-                    }
-
-                    override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>) {
-                        val presenter = presenterBuilder.invoke(storyEventIds)
-
-                        val stage = TimeAdjustmentPromptView(
-                            presenter,
-                            presenter.viewModel
-                        ).openModal(owner = get<WorkBench>().root.scene?.window)!!
-                        presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
-                            if (it == true) stage.hide()
-                        }
-                    }
-
-                    override fun promptForAdjustmentAmount(storyEventIds: Set<StoryEvent.Id>, amount: Long) {
-                        val presenter = presenterBuilder(storyEventIds, amount)
 
                         val stage = TimeAdjustmentPromptView(
                             presenter,

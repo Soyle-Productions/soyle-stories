@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.storyevent
 
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
@@ -59,19 +60,45 @@ object UseCases {
     private fun InProjectScope.rescheduleStoryEvent() {
         provide<RescheduleStoryEvent> { RescheduleStoryEventUseCase(get()) }
         provide<RescheduleStoryEvent.OutputPort> { RescheduleStoryEventOutput(get()) }
-        provide<RescheduleStoryEventController> { RescheduleStoryEventController(applicationScope.get(), get(), get(), get()) }
+        provide<RescheduleStoryEventController> {
+            RescheduleStoryEventController(
+                applicationScope.get(),
+                get(),
+                get(),
+                get()
+            )
+        }
     }
 
     private fun InProjectScope.adjustStoryEventsTime() {
         provide<AdjustStoryEventsTime> { AdjustStoryEventsTimeUseCase(get()) }
         provide<AdjustStoryEventsTime.OutputPort> { AdjustStoryEventsTimeOutput(get()) }
-        provide<AdjustStoryEventsTimeController> { AdjustStoryEventsTimeController(applicationScope.get(), get(), get(), get()) }
+        provide<AdjustStoryEventsTimeController> {
+            AdjustStoryEventsTimeController.Implementation(
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
     }
 
     private fun InProjectScope.removeStoryEvent() {
         provide<RemoveStoryEventFromProject> { RemoveStoryEventFromProjectUseCase(get()) }
         provide<RemoveStoryEventFromProject.OutputPort> { RemoveStoryEventOutput(get()) }
-        provide<RemoveStoryEventController> { RemoveStoryEventController(applicationScope.get(), get(), get(), get(), get(), get()) }
+        provide<RemoveStoryEventController> {
+            RemoveStoryEventController(
+                applicationScope.get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
     }
 
 }

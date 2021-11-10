@@ -182,9 +182,10 @@ class TimelineViewPort(
         val originLabels= dragLabels.map { it.properties["origin"] as StoryPointLabel }
         originLabels.onEach { it.removeClass(TimelineStyles.dragging) }
 
-        dependencies.adjustStoryEventsTimeController.adjustStoryEventsTime(
+        dependencies.adjustStoryEventsTimeController.adjustTimesBy(
             dragLabels.map { it.storyEventId }.toSet(),
-            adjustment
+            adjustment,
+            confirmation = true
         )
         dragLabelsProperty.set(emptyList())
     }
