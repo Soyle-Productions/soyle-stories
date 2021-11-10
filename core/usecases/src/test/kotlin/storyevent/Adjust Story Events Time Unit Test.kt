@@ -28,7 +28,11 @@ class `Adjust Story Events Time Unit Test` {
     /** A project has been created and opened */
     private val projectId = Project.Id()
     /** The story events exist */
-    private val storyEvents = List(6) { makeStoryEvent(projectId = projectId) }
+    private val storyEvents = listOf(
+        List(6) { makeStoryEvent(projectId = projectId) },
+        List(6) { makeStoryEvent(projectId = Project.Id()) },
+        List(6) { makeStoryEvent(projectId = Project.Id()) }
+    ).flatten()
 
     // post conditions
     /** outputs story event rescheduled events */
@@ -116,6 +120,7 @@ class `Adjust Story Events Time Unit Test` {
             }
 
         }
+
     }
 
 }

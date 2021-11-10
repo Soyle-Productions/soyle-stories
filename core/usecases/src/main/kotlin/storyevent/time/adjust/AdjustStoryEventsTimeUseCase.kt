@@ -8,6 +8,7 @@ import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.toEntitySet
 import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.usecase.storyevent.StoryEventRepository
+import kotlinx.coroutines.flow.*
 import java.util.*
 
 class AdjustStoryEventsTimeUseCase(
@@ -18,15 +19,23 @@ class AdjustStoryEventsTimeUseCase(
         // An adjustment of 0 would not result in any changes, so we can avoid any expensive calls by returning here
         if (adjustment == 0L) return
 
-        // get all the story events from the repo, perform the adjustment, then separate the
-        // updated storyEvents and the rescheduled events into separate lists
-        val entities = storyEventIds.map { storyEventRepository.getStoryEventOrError(it) }
-            .toEntitySet()
-        val (storyEvents, events) = StoryEventTimeService(storyEventRepository)
-            .adjustStoryEventTimesBy(entities, adjustment)
+        // get all the story events from the repo and create entity sets per project
+        val entities = storyEventIds
+            .map { storyEventRepository.getStoryEventOrError(it) }
+            .groupBy { it.projectId }
+            .mapValues { it.value.toEntitySet() }
+
+        val service = StoryEventTimeService(storyEventRepository)
+
+        //perform the adjustment, then separate the updated storyEvents and the
+        // rescheduled events into separate lists
+        val (storyEvents, events) = entities
             .asSequence()
+            .asFlow()
+            .flatMapConcat { service.adjustStoryEventTimesBy(it.value, adjustment).asFlow() }
             .filterIsInstance<Successful<StoryEventRescheduled>>()
             .map { it.storyEvent to it.change }
+            .toList()
             .unzip()
 
         // update the story events and output the rescheduled events
