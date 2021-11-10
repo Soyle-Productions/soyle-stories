@@ -1,46 +1,55 @@
 package com.soyle.stories.storyevent.create
 
-import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
-import tornadofx.*
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.Window
+import kotlinx.coroutines.CompletableDeferred
 
-class CreateStoryEventPromptPresenter(
-    private val relativePlacement: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? = null,
-    private val createStoryEventController: CreateStoryEventController,
-    private val threadTransformer: ThreadTransformer
-) : CreateStoryEventPromptUserActions {
+class CreateStoryEventPromptPresenter(private val ownerWindow: () -> Window?) : CreateStoryEventController.PropertiesPrompt {
 
-    val viewModel = CreateStoryEventPromptViewModel(relativePlacement != null)
+    private val prompt = CreateStoryEventPrompt()
+    private var view = CreateStoryEventPromptView(prompt)
 
-    override fun createStoryEvent() {
-        if (! viewModel.isValid.value) return
-        if (viewModel.isCreating.value) return
-        val name = NonBlankString.create(viewModel.name.value) ?: return
-        viewModel.isCreating.set(true)
-        val job = if (relativePlacement == null) {
-            val time = viewModel.timeText.value?.toLongOrNull()
-            if (time == null) {
-                createStoryEventController.createStoryEvent(name)
-            } else {
-                createStoryEventController.createStoryEvent(name, time)
+    override suspend fun requestNameAndTime(): Pair<NonBlankString, Long>? {
+        if (view.currentStage?.isShowing != true) view.openModal(modality = Modality.APPLICATION_MODAL, owner = ownerWindow())
+        prompt.isTimeFieldShown = true
+
+        val deferred = CompletableDeferred<Pair<NonBlankString, Long>?>()
+        prompt.setOnSubmit {
+            if (! deferred.isCompleted) {
+                val name = prompt.name ?: return@setOnSubmit
+                val time = prompt.time ?: return@setOnSubmit
+                deferred.complete(name to time)
             }
-        } else {
-            createStoryEventController.createStoryEvent(name, relativePlacement)
         }
-        job.invokeOnCompletion { failure ->
-            threadTransformer.gui {
-                if (failure != null) {
-                    viewModel.isCreating.set(false)
-                } else {
-                    viewModel.isCompleted.set(true)
-                }
+        view.currentStage?.completeWhenHidden(deferred)
+        return deferred.await()
+    }
+
+    override suspend fun requestName(): NonBlankString? {
+        if (view.currentStage?.isShowing != true) view.openModal(modality = Modality.APPLICATION_MODAL, owner = ownerWindow())
+        prompt.isTimeFieldShown = false
+
+        val deferred = CompletableDeferred<NonBlankString?>()
+        prompt.setOnSubmit {
+            if (! deferred.isCompleted) {
+                val name = prompt.name ?: return@setOnSubmit
+                deferred.complete(name)
             }
+        }
+        view.currentStage?.completeWhenHidden(deferred)
+        return deferred.await()
+    }
+
+    private fun <T : Any> Stage.completeWhenHidden(deferred: CompletableDeferred<T?>) {
+        setOnHidden {
+            if (! deferred.isCompleted) { deferred.complete(null) }
+            view = CreateStoryEventPromptView(prompt)
         }
     }
 
-    override fun cancel() {
-        viewModel.isCompleted.set(true)
+    override suspend fun close() {
+        view.close()
     }
-
 }

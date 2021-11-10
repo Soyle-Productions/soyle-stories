@@ -1,5 +1,6 @@
 package com.soyle.stories.di.storyevent
 
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
@@ -37,90 +38,93 @@ import com.soyle.stories.usecase.storyevent.rename.RenameStoryEventUseCase
 
 object StoryEventModule {
 
-	private fun InScope<ProjectScope>.usecases() {
-		provide<LinkLocationToStoryEvent> {
-			LinkLocationToStoryEventUseCase(get(), get())
-		}
-		provide<AddCharacterToStoryEvent> {
-			AddCharacterToStoryEventUseCase(get(), get())
-		}
-		provide<GetStoryEventDetails> {
-			GetStoryEventDetailsUseCase(get())
-		}
-		provide<RemoveCharacterFromStoryEvent> {
-			RemoveCharacterFromStoryEventUseCase(get())
-		}
-	}
+    private fun InScope<ProjectScope>.usecases() {
+        provide<LinkLocationToStoryEvent> {
+            LinkLocationToStoryEventUseCase(get(), get())
+        }
+        provide<AddCharacterToStoryEvent> {
+            AddCharacterToStoryEventUseCase(get(), get())
+        }
+        provide<GetStoryEventDetails> {
+            GetStoryEventDetailsUseCase(get())
+        }
+        provide<RemoveCharacterFromStoryEvent> {
+            RemoveCharacterFromStoryEventUseCase(get())
+        }
+    }
 
-	private fun InScope<ProjectScope>.notifiers() {
-		provide(IncludedCharacterInStoryEventReceiver::class) {
-			IncludedCharacterInStoryEventNotifier()
-		}
-		provide(LinkLocationToStoryEvent.OutputPort::class) {
-			LinkLocationToStoryEventNotifier(applicationScope.get())
-		}
-		provide(AddCharacterToStoryEvent.OutputPort::class) {
-			get<IncludeCharacterInSceneControllerImpl>() listensTo get<IncludedCharacterInStoryEventNotifier>()
+    private fun InScope<ProjectScope>.notifiers() {
+        provide(IncludedCharacterInStoryEventReceiver::class) {
+            IncludedCharacterInStoryEventNotifier()
+        }
+        provide(LinkLocationToStoryEvent.OutputPort::class) {
+            LinkLocationToStoryEventNotifier(applicationScope.get())
+        }
+        provide(AddCharacterToStoryEvent.OutputPort::class) {
+            get<IncludeCharacterInSceneControllerImpl>() listensTo get<IncludedCharacterInStoryEventNotifier>()
 
-			AddCharacterToStoryEventOutput(applicationScope.get(), get())
-		}
-		provide(RemoveCharacterFromStoryEvent.OutputPort::class) {
-			RemoveCharacterFromStoryEventNotifier(applicationScope.get()).also {
-				get<RemoveCharacterFromSceneControllerImpl>() listensTo it
-			}
-		}
-		provide(RenameStoryEvent.OutputPort::class) {
-			RenameStoryEventOutput(applicationScope.get())
-		}
-	}
+            AddCharacterToStoryEventOutput(applicationScope.get(), get())
+        }
+        provide(RemoveCharacterFromStoryEvent.OutputPort::class) {
+            RemoveCharacterFromStoryEventNotifier(applicationScope.get()).also {
+                get<RemoveCharacterFromSceneControllerImpl>() listensTo it
+            }
+        }
+        provide(RenameStoryEvent.OutputPort::class) {
+            RenameStoryEventOutput(applicationScope.get())
+        }
+    }
 
-	private fun InScope<ProjectScope>.controllers() {
-		provide<CreateStoryEventController> {
-			CreateStoryEventController.invoke(
-			  Project.Id(projectId),
-			  applicationScope.get(),
-			  get(),
-			  get(),
-				get()
-			)
-		}
+    private fun InScope<ProjectScope>.controllers() {
+        provide<CreateStoryEventController> {
+            CreateStoryEventController.Implementation(
+                Project.Id(projectId),
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
 
-		provide<LinkLocationToStoryEventController> {
-			LinkLocationToStoryEventControllerImpl(
-			  applicationScope.get(),
-			  get(),
-			  get()
-			)
-		}
+        provide<LinkLocationToStoryEventController> {
+            LinkLocationToStoryEventControllerImpl(
+                applicationScope.get(),
+                get(),
+                get()
+            )
+        }
 
-		provide<AddCharacterToStoryEventController> {
-			AddCharacterToStoryEventControllerImpl(
-			  applicationScope.get(),
-			  get(),
-			  get()
-			)
-		}
+        provide<AddCharacterToStoryEventController> {
+            AddCharacterToStoryEventControllerImpl(
+                applicationScope.get(),
+                get(),
+                get()
+            )
+        }
 
-		provide(RemoveCharacterFromStoryEventController::class) {
-			RemoveCharacterFromStoryEventControllerImpl(
-			  applicationScope.get(),
-			  get(),
-			  get()
-			)
-		}
-	}
+        provide(RemoveCharacterFromStoryEventController::class) {
+            RemoveCharacterFromStoryEventControllerImpl(
+                applicationScope.get(),
+                get(),
+                get()
+            )
+        }
+    }
 
-	init {
-		scoped<ProjectScope> {
+    init {
+        scoped<ProjectScope> {
 
-			usecases()
-			notifiers()
-			controllers()
+            usecases()
+            notifiers()
+            controllers()
 
-		}
+        }
 
-		StoryEventListModule
-		StoryEventDetailsModule
-	}
+        StoryEventListModule
+        StoryEventDetailsModule
+    }
 
 }

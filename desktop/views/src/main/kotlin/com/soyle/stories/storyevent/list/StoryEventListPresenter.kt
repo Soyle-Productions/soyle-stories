@@ -114,18 +114,16 @@ class StoryEventListPresenter(
     }
 
     override fun createStoryEvent() {
-        createStoryEventController.requestToCreateStoryEvent()
+        createStoryEventController.create()
     }
 
-    override fun insertStoryEventBeforeSelectedItem() = insertStoryEvent(-1)
-    override fun insertStoryEventAtSameTimeAsSelectedItem() = insertStoryEvent(0)
-    override fun insertStoryEventAfterSelectedItem() = insertStoryEvent(1)
+    override fun insertStoryEventBeforeSelectedItem() = insertStoryEvent(createStoryEventController::before)
+    override fun insertStoryEventAtSameTimeAsSelectedItem() = insertStoryEvent(createStoryEventController::inPlaceWith)
+    override fun insertStoryEventAfterSelectedItem() = insertStoryEvent(createStoryEventController::after)
 
-    private fun insertStoryEvent(delta: Long) {
+    private fun insertStoryEvent(ifSelected: (StoryEvent.Id) -> Unit) {
         selectedItem {
-            createStoryEventController.requestToCreateStoryEvent(
-                CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(it.id, delta)
-            )
+            ifSelected(it.id)
         }
     }
 

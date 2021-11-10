@@ -14,8 +14,7 @@ class `Time Adjustment Prompt Design` : DesignTest() {
         override fun cancel() = Unit
     }
 
-    private var currentTime: Long? = null
-    private val viewModel by lazy { TimeAdjustmentPromptViewModel(currentTime) }
+    private var viewModel: TimeAdjustmentPromptViewModel = TimeAdjustmentPromptViewModel.adjustment()
     override val node: Node
         get() = TimeAdjustmentPromptView(actions, viewModel).root
 
@@ -26,13 +25,13 @@ class `Time Adjustment Prompt Design` : DesignTest() {
 
     @Test
     fun `created with current time`() {
-        currentTime = 9L
+        viewModel = TimeAdjustmentPromptViewModel.reschedule(9L)
         verifyDesign()
     }
 
     @Test
     fun submitting() {
-        viewModel.time.set("4")
+        viewModel = TimeAdjustmentPromptViewModel.reschedule(4)
         viewModel.submitting()
         verifyDesign()
     }

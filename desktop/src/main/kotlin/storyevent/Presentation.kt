@@ -21,6 +21,7 @@ import com.soyle.stories.storyevent.rename.*
 import com.soyle.stories.storyevent.time.*
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimePrompt
+import com.soyle.stories.storyevent.time.normalization.NormalizationPromptPresenter
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventPrompt
 import com.soyle.stories.storyevent.timeline.*
@@ -42,10 +43,8 @@ import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelC
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
-import javafx.beans.binding.ObjectExpression
 import javafx.beans.property.BooleanProperty
 import javafx.collections.ObservableList
-import javafx.collections.ObservableSet
 import javafx.scene.Node
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListCell
@@ -108,23 +107,12 @@ object Presentation {
                 }
             }
 
-            provide<CreateStoryEventPrompt> {
-                object : CreateStoryEventPrompt {
-                    override fun promptToCreateStoryEvent(relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative?) {
-                        val presenter = CreateStoryEventPromptPresenter(
-                            relativeTo,
-                            get<CreateStoryEventController>(),
-                            applicationScope.get()
-                        )
-                        CreateStoryEventPromptView(presenter, presenter.viewModel).apply {
-                            val stage =
-                                openModal(modality = Modality.APPLICATION_MODAL, owner = get<WorkBench>().currentStage)
-                            presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
-                                if (it == true) stage?.hide()
-                            }
-                        }
-                    }
-                }
+            provide<CreateStoryEventController.PropertiesPrompt> {
+                CreateStoryEventPromptPresenter(get<WorkBench>()::currentStage)
+            }
+
+            provide<NormalizationPrompt> {
+                NormalizationPromptPresenter(get<WorkBench>()::currentStage)
             }
 
             provide<RenameStoryEventPrompt> {

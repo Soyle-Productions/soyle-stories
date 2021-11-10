@@ -17,8 +17,7 @@ import org.controlsfx.control.action.ActionMap.action
 import tornadofx.*
 
 class CreateStoryEventPromptView(
-    private val actions: CreateStoryEventPromptUserActions,
-    private val viewModel: CreateStoryEventPromptViewModel
+    private val viewModel: CreateStoryEventPrompt
 ) : Fragment() {
 
     init {
@@ -26,47 +25,43 @@ class CreateStoryEventPromptView(
     }
 
     override val root: Parent = vbox {
-        asSurface { absoluteElevation = Elevation.get(16)!! }
+        asSurface { absoluteElevation = Elevation[16]!! }
         addClass(Styles.createStoryEventPrompt)
         vbox {
             addClass(Stylesheet.form)
             vbox {
                 fieldLabel("Name").labelFor = textfield {
                     id = "name"
-                    disableWhen(viewModel.isCreating)
-                    viewModel.name.bind(textProperty())
-                    action(actions::createStoryEvent)
+                    disableWhen(viewModel.submitting())
+                    viewModel.name().cleanBind(textProperty())
+                    action(viewModel::submit)
                 }
             }
             vbox {
-                existsWhen(viewModel.timeNotAlreadySpecified)
+                existsWhen(viewModel.timeFieldShown())
                 fieldLabel("Time").labelFor = spinner<Long?>(editable = true) {
-                    disableWhen(viewModel.isCreating)
-                    viewModel.timeText.bind(editor.textProperty())
+                    disableWhen(viewModel.submitting())
+                    viewModel.timeText().cleanBind(editor.textProperty())
                     valueFactory = NullableLongSpinnerValueFactory()
-                    editor.action(actions::createStoryEvent)
+                    editor.action(viewModel::submit)
                 }
             }
         }
         hbox {
             addClass(Stylesheet.buttonBar)
             button("Create") {
-                disableWhen(viewModel.isCreating)
+                disableWhen(viewModel.submitting())
                 addClass(ComponentsStyles.primary, ComponentsStyles.filled)
                 isDefaultButton = true
-                enableWhen(viewModel.isValid)
-                action(actions::createStoryEvent)
+                enableWhen(viewModel.canSubmit())
+                action(viewModel::submit)
             }
             button("Cancel") {
                 addClass(ComponentsStyles.secondary, ComponentsStyles.outlined)
                 isCancelButton = true
-                action(actions::cancel)
+                action { close() }
             }
         }
-    }
-
-    init {
-        root.properties[UI_COMPONENT_PROPERTY] = this
     }
 
     class Styles : Stylesheet() {

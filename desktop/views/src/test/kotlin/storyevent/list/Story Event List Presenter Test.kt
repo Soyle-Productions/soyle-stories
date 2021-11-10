@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.view.storyevent.list
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.adapter.storyevent.AdjustStoryEventsTimeControllerDouble
+import com.soyle.stories.desktop.adapter.storyevent.create.CreateStoryEventControllerDouble
 import com.soyle.stories.desktop.adapter.storyevent.list.ListStoryEventsControllerDouble
 import com.soyle.stories.desktop.view.common.ThreadTransformerDouble
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.access
@@ -9,6 +10,7 @@ import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.C
 import com.soyle.stories.desktop.view.storyevent.list.`Story Event List Tool Assertions`.Companion.assertThis
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.StoryEventTimeService
 import com.soyle.stories.domain.storyevent.Successful
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventNoLongerHappens
@@ -29,6 +31,8 @@ import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
+import io.mockk.Called
+import io.mockk.verify
 import javafx.beans.binding.When
 import javafx.scene.Parent
 import javafx.scene.layout.Pane
@@ -73,34 +77,7 @@ class `Story Event List Presenter Test` {
         }
     }
 
-    private val createStoryEventController = object : CreateStoryEventController {
-        var requestWasMade = false
-        var requestedRelative: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative? = null
-
-        override fun requestToCreateStoryEvent() {
-            requestWasMade = true
-        }
-
-        override fun requestToCreateStoryEvent(relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative) {
-            requestWasMade = true
-            requestedRelative = relativeTo
-        }
-
-        override fun createStoryEvent(name: NonBlankString): Job {
-            fail("Should not be called by story event list")
-        }
-
-        override fun createStoryEvent(name: NonBlankString, timeUnit: Long): Job {
-            fail("Should not be called by story event list")
-        }
-
-        override fun createStoryEvent(
-            name: NonBlankString,
-            relativeTo: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative
-        ): Job {
-            fail("Should not be called by story event list")
-        }
-    }
+    private val createStoryEventController = CreateStoryEventControllerDouble()
 
     private val storyEventCreatedNotifier = StoryEventCreatedNotifier()
 
@@ -132,12 +109,13 @@ class `Story Event List Presenter Test` {
         }
     }
 
-    private val adjustStoryEventsTimeController = object : AdjustStoryEventsTimeController by AdjustStoryEventsTimeControllerDouble() {
-        var requestedIds: Set<StoryEvent.Id>? = null
-        override fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>) {
-            requestedIds = storyEventIds
+    private val adjustStoryEventsTimeController =
+        object : AdjustStoryEventsTimeController by AdjustStoryEventsTimeControllerDouble() {
+            var requestedIds: Set<StoryEvent.Id>? = null
+            override fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>) {
+                requestedIds = storyEventIds
+            }
         }
-    }
 
     private val storyEventRescheduledNotifier = StoryEventRescheduledNotifier()
 
@@ -184,7 +162,7 @@ class `Story Event List Presenter Test` {
 
     @Test
     fun `should be loading story events when first created`() {
-        Assertions.assertThat(listStoryEventsController.requestedProjectId).isEqualTo(projectId)
+        assertThat(listStoryEventsController.requestedProjectId).isEqualTo(projectId)
         assertThat(viewModel).isEqualTo(LoadingStoryEventListViewModel)
     }
 
@@ -307,8 +285,9 @@ class `Story Event List Presenter Test` {
         fun `should request create story event dialog without relative placement`() {
             presenter.createStoryEvent()
 
-            assertThat(createStoryEventController.requestWasMade).isTrue()
-            assertNull(createStoryEventController.requestedRelative)
+            verify {
+                createStoryEventController.create()
+            }
         }
 
     }
@@ -336,10 +315,8 @@ class `Story Event List Presenter Test` {
             fun `before - should request create story event dialog relative to selected item`() {
                 presenter.insertStoryEventBeforeSelectedItem()
 
-                assertThat(createStoryEventController.requestWasMade).isTrue()
-                with(createStoryEventController.requestedRelative!!) {
-                    assertThat(relativeStoryEventId).isEqualTo(selectedItem.id)
-                    assertThat(delta).isEqualTo(-1L)
+                verify {
+                    createStoryEventController.before(selectedItem.id)
                 }
             }
 
@@ -347,10 +324,8 @@ class `Story Event List Presenter Test` {
             fun `after - should request create story event dialog relative to selected item`() {
                 presenter.insertStoryEventAfterSelectedItem()
 
-                assertThat(createStoryEventController.requestWasMade).isTrue()
-                with(createStoryEventController.requestedRelative!!) {
-                    assertThat(relativeStoryEventId).isEqualTo(selectedItem.id)
-                    assertThat(delta).isEqualTo(1L)
+                verify {
+                    createStoryEventController.after(selectedItem.id)
                 }
             }
 
@@ -358,10 +333,8 @@ class `Story Event List Presenter Test` {
             fun `at the same time - should request create story event dialog relative to selected item`() {
                 presenter.insertStoryEventAtSameTimeAsSelectedItem()
 
-                assertThat(createStoryEventController.requestWasMade).isTrue()
-                with(createStoryEventController.requestedRelative!!) {
-                    assertThat(relativeStoryEventId).isEqualTo(selectedItem.id)
-                    assertThat(delta).isEqualTo(0L)
+                verify {
+                    createStoryEventController.inPlaceWith(selectedItem.id)
                 }
             }
 
@@ -428,13 +401,13 @@ class `Story Event List Presenter Test` {
         @Test
         fun `cannot insert new story event relative to multiple story events`() {
             presenter.insertStoryEventBeforeSelectedItem()
-            assertThat(createStoryEventController.requestWasMade).isFalse()
+            verify { createStoryEventController.before(any()) wasNot Called }
 
             presenter.insertStoryEventAtSameTimeAsSelectedItem()
-            assertThat(createStoryEventController.requestWasMade).isFalse()
+            verify { createStoryEventController.inPlaceWith(any()) wasNot Called }
 
             presenter.insertStoryEventAfterSelectedItem()
-            assertThat(createStoryEventController.requestWasMade).isFalse()
+            verify { createStoryEventController.after(any()) wasNot Called }
         }
 
         @Nested
@@ -468,15 +441,8 @@ class `Story Event List Presenter Test` {
     @Nested
     inner class `When New Story Event is created` {
 
-        private val newStoryEvent: StoryEvent
-        private val storyEventCreated: StoryEventCreated
-
-        init {
-            StoryEvent.create(NonBlankString.create(("Story Event 3.1"))!!, 3L, projectId).also {
-                newStoryEvent = it.storyEvent
-                storyEventCreated = (it as Successful).change
-            }
-        }
+        private val storyEventCreated: StoryEventCreated =
+            StoryEventCreated(StoryEvent.Id(), "Story Event 3.1", 3u, projectId)
 
         fun storyEventCreated() {
             runBlocking {
@@ -497,9 +463,9 @@ class `Story Event List Presenter Test` {
 
                 with(viewModel as PopulatedStoryEventListViewModel) {
                     val item = items.single()
-                    assertThat(item.id).isEqualTo(newStoryEvent.id)
-                    assertThat(item.nameProperty.value).isEqualTo(newStoryEvent.name.value)
-                    assertThat(item.timeProperty.value).isEqualTo(newStoryEvent.time)
+                    assertThat(item.id).isEqualTo(storyEventCreated.storyEventId)
+                    assertThat(item.nameProperty.value).isEqualTo(storyEventCreated.name)
+                    assertThat(item.timeProperty.value).isEqualTo(storyEventCreated.time.toLong())
                     assertThat(item.prevItemHasSameTime.value).isTrue()
                 }
             }
@@ -612,7 +578,13 @@ class `Story Event List Presenter Test` {
         @Test
         fun `should update the times of corresponding story event items`() {
             runBlocking {
-                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.mapValues { StoryEventRescheduled(it.key, it.value, 0L) })
+                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.mapValues {
+                    StoryEventRescheduled(
+                        it.key,
+                        it.value.toULong(),
+                        0u
+                    )
+                })
             }
 
             with(viewModel as PopulatedStoryEventListViewModel) {
@@ -626,7 +598,13 @@ class `Story Event List Presenter Test` {
         @Test
         fun `should update the order of items`() {
             runBlocking {
-                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.mapValues { StoryEventRescheduled(it.key, it.value, 0L) })
+                storyEventRescheduledNotifier.receiveStoryEventsRescheduled(newTimes.mapValues {
+                    StoryEventRescheduled(
+                        it.key,
+                        it.value.toULong(),
+                        0u
+                    )
+                })
             }
 
             with(viewModel as PopulatedStoryEventListViewModel) {
@@ -689,9 +667,11 @@ class `Story Event List Presenter Test` {
             }
 
             with(viewModel as PopulatedStoryEventListViewModel) {
-                assertThat(items.map { it.prevItemHasSameTime.value }).isEqualTo(listOf(
-                    true, false, false, false, false
-                ))
+                assertThat(items.map { it.prevItemHasSameTime.value }).isEqualTo(
+                    listOf(
+                        true, false, false, false, false
+                    )
+                )
             }
         }
 

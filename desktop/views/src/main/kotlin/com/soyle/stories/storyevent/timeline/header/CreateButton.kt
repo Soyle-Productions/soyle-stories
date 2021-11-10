@@ -42,5 +42,5 @@ fun timelineHeaderCreateButton(
 class TimelineHeaderCreateButtonPresenter(
     private val createStoryEventController: CreateStoryEventController
 ) : TimelineHeaderCreateButtonActions {
-    override fun createStoryEvent() = createStoryEventController.requestToCreateStoryEvent()
+    override fun createStoryEvent() { createStoryEventController.create() }
 }
