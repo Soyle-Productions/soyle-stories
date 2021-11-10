@@ -7,6 +7,7 @@ import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.usecase.character.CharacterRepository
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.domain.storyevent.storyEventName
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
@@ -112,7 +113,7 @@ class AddCharacterToStoryEventUnitTest {
 		{
 			return StoryEventRepositoryDouble(
 			  initialStoryEvents = storyEventIds.map { (it, characterIds) ->
-				  StoryEvent(StoryEvent.Id(it), storyEventName(), 0L, Project.Id(), null, null, null, characterIds.map(Character::Id))
+				  makeStoryEvent(StoryEvent.Id(it), time = 0u, includedCharacterIds = characterIds.map(Character::Id))
 			  },
 			  onUpdateStoryEvent = { update = it }
 			)

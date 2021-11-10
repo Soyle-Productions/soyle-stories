@@ -2,8 +2,10 @@ package com.soyle.stories.usecase.storyevent.time.adjust
 
 import arrow.core.toT
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.StoryEventTimeService
 import com.soyle.stories.domain.storyevent.Successful
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
+import com.soyle.stories.domain.validation.toEntitySet
 import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.usecase.storyevent.StoryEventRepository
 import java.util.*
@@ -18,9 +20,11 @@ class AdjustStoryEventsTimeUseCase(
 
         // get all the story events from the repo, perform the adjustment, then separate the
         // updated storyEvents and the rescheduled events into separate lists
-        val (storyEvents, events) = storyEventIds.map { storyEventRepository.getStoryEventOrError(it) }
+        val entities = storyEventIds.map { storyEventRepository.getStoryEventOrError(it) }
+            .toEntitySet()
+        val (storyEvents, events) = StoryEventTimeService(storyEventRepository)
+            .adjustStoryEventTimesBy(entities, adjustment)
             .asSequence()
-            .map { it.withTime(it.time + adjustment) }
             .filterIsInstance<Successful<StoryEventRescheduled>>()
             .map { it.storyEvent to it.change }
             .unzip()

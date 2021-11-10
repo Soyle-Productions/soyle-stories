@@ -2,6 +2,7 @@ package com.soyle.stories.usecase.storyevent.create
 
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.StoryEventTimeService
 import com.soyle.stories.domain.storyevent.StoryEventUpdate
 import com.soyle.stories.domain.storyevent.SuccessfulStoryEventUpdate
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
@@ -21,21 +22,26 @@ class CreateStoryEventUseCase(
     }
 
     private suspend fun createStoryEvent(request: CreateStoryEvent.RequestModel): CreateStoryEvent.ResponseModel {
-        val (storyEvent, storyEventCreated) = makeNewStoryEvent(request) as SuccessfulStoryEventUpdate
+        val updates = makeNewStoryEvent(request)
 
-        storyEventRepository.addNewStoryEvent(storyEvent)
+        updates.forEach {
+            storyEventRepository.updateStoryEvent(it.storyEvent)
+        }
 
         return CreateStoryEvent.ResponseModel(
-            storyEventCreated
+            (updates.single {
+                it is SuccessfulStoryEventUpdate && it.change is StoryEventCreated
+            } as SuccessfulStoryEventUpdate).change as StoryEventCreated
         )
     }
 
-    private suspend fun makeNewStoryEvent(request: CreateStoryEvent.RequestModel): StoryEventUpdate<StoryEventCreated> {
-        return StoryEvent.create(
-            request.name,
-            calculateStoryEventTime(request),
-            request.projectId
-        )
+    private suspend fun makeNewStoryEvent(request: CreateStoryEvent.RequestModel): List<StoryEventUpdate<*>> {
+        return StoryEventTimeService(storyEventRepository)
+            .createStoryEvent(
+                request.name,
+                calculateStoryEventTime(request),
+                request.projectId
+            )
     }
 
     private suspend fun calculateStoryEventTime(request: CreateStoryEvent.RequestModel): Long {
@@ -48,7 +54,7 @@ class CreateStoryEventUseCase(
 
     private suspend fun calculateRelativeTime(relativeTime: CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative): Long {
         val relativeStoryEvent = getRelativeStoryEvent(relativeTime.relativeStoryEventId)
-        return relativeStoryEvent.time + relativeTime.delta
+        return relativeStoryEvent.time.toLong() + relativeTime.delta
     }
 
     private suspend fun getRelativeStoryEvent(storyEventId: StoryEvent.Id): StoryEvent {
@@ -57,7 +63,7 @@ class CreateStoryEventUseCase(
     }
 
     private suspend fun getMaximumStoryEventTimeInProject(projectId: Project.Id): Long {
-        return storyEventRepository.listStoryEventsInProject(projectId).maxOfOrNull { it.time } ?: 0L
+        return storyEventRepository.listStoryEventsInProject(projectId).maxOfOrNull { it.time.toLong() } ?: 0L
     }
 
 }

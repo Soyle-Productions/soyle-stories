@@ -113,7 +113,7 @@ class `Create Story Event Unit Test` {
 		fun `should create new story event at the end of the story`() {
 			createStoryEvent(request)
 
-			storyEvent!!.time.mustEqual(preExistingStoryEvents.maxOf { it.time } + 1)
+			storyEvent!!.time.mustEqual(preExistingStoryEvents.maxOf { it.time.toLong() } + 1)
 			createdStoryEvent!!.time.mustEqual(storyEvent!!.time)
 		}
 
@@ -147,7 +147,7 @@ class `Create Story Event Unit Test` {
 				val request = CreateStoryEvent.RequestModel(storyEventName(), projectId, relativeStoryEvent.id, -1)
 				createStoryEvent(request)
 
-				storyEvent!!.time.mustEqual(relativeStoryEvent.time - 1)
+				storyEvent!!.time.mustEqual(relativeStoryEvent.time - 1u)
 				createdStoryEvent!!.time.mustEqual(storyEvent!!.time)
 			}
 
@@ -156,7 +156,7 @@ class `Create Story Event Unit Test` {
 				val request = CreateStoryEvent.RequestModel(storyEventName(), projectId, relativeStoryEvent.id, +1)
 				createStoryEvent(request)
 
-				storyEvent!!.time.mustEqual(relativeStoryEvent.time + 1)
+				storyEvent!!.time.mustEqual(relativeStoryEvent.time + 1u)
 				createdStoryEvent!!.time.mustEqual(storyEvent!!.time)
 			}
 

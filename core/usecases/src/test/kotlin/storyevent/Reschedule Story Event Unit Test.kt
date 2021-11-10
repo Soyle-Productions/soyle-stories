@@ -25,7 +25,7 @@ class `Reschedule Story Event Unit Test` {
     /** A project has been created and opened */
     private val projectId = Project.Id()
     /** The story event exists */
-    private val storyEvent = makeStoryEvent(time = 27L)
+    private val storyEvent = makeStoryEvent(time = 27u)
 
     // post conditions
     /** outputs a story event rescheduled event */
@@ -36,7 +36,7 @@ class `Reschedule Story Event Unit Test` {
 
     // Use Case
     private val useCase: RescheduleStoryEvent = RescheduleStoryEventUseCase(storyEventRepository)
-    private fun rescheduleStoryEvent(inputTime: Long = storyEventTime()) {
+    private fun rescheduleStoryEvent(inputTime: Long = storyEventTime().toLong()) {
         runBlocking {
             useCase.invoke(storyEvent.id, inputTime) {
                 rescheduledStoryEvent = it.storyEventRescheduled
@@ -61,14 +61,14 @@ class `Reschedule Story Event Unit Test` {
         fun `should update story event`() {
             val inputTime = 12L
             rescheduleStoryEvent(inputTime)
-            updatedStoryEvent!!.mustEqual(storyEvent.withTime(inputTime).storyEvent)
+            updatedStoryEvent!!.time.mustEqual(inputTime)
         }
 
         @Test
         fun `should output story event rescheduled event`() {
             val inputTime = 47L
             rescheduleStoryEvent(inputTime)
-            rescheduledStoryEvent!!.mustEqual((storyEvent.withTime(inputTime) as Successful).change)
+            rescheduledStoryEvent!!.newTime.mustEqual(inputTime)
         }
 
         @Nested
@@ -76,13 +76,13 @@ class `Reschedule Story Event Unit Test` {
 
             @Test
             fun `should not update story event`() {
-                rescheduleStoryEvent(storyEvent.time)
+                rescheduleStoryEvent(storyEvent.time.toLong())
                 Assertions.assertNull(updatedStoryEvent)
             }
 
             @Test
             fun `should not produce event`() {
-                rescheduleStoryEvent(storyEvent.time)
+                rescheduleStoryEvent(storyEvent.time.toLong())
                 Assertions.assertNull(rescheduledStoryEvent)
             }
 

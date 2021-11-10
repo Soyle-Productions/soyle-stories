@@ -44,7 +44,7 @@ class `Adjust Story Events Time Unit Test` {
 
     // Use Case
     private val useCase: AdjustStoryEventsTime = AdjustStoryEventsTimeUseCase(storyEventRepository)
-    private fun adjustStoryEventTimes(number: Long = storyEventTime()) {
+    private fun adjustStoryEventTimes(number: Long = storyEventTime().toLong()) {
         runBlocking {
             useCase.invoke(storyEvents.map { it.id }.toSet(), number) {
                 rescheduledStoryEvents.addAll(it.rescheduledStoryEvents)
@@ -80,7 +80,7 @@ class `Adjust Story Events Time Unit Test` {
             updatedStoryEvents.map { it.id }.toSet().mustEqual(storyEventsById.keys)
             updatedStoryEvents.forEach { updatedStoryEvent ->
                 val originalStoryEvent = storyEventsById.getValue(updatedStoryEvent.id)
-                updatedStoryEvent.mustEqual(originalStoryEvent.withTime(originalStoryEvent.time + inputTime).storyEvent)
+                updatedStoryEvent.time.mustEqual(originalStoryEvent.time + inputTime.toULong())
             }
         }
 
@@ -95,10 +95,8 @@ class `Adjust Story Events Time Unit Test` {
             rescheduledStoryEvents.map { it.storyEventId }.toSet().mustEqual(storyEventsById.keys)
             rescheduledStoryEvents.forEach { rescheduledStoryEvent ->
                 val originalStoryEvent = storyEventsById.getValue(rescheduledStoryEvent.storyEventId)
-                val expectedEvent = (originalStoryEvent.withTime(originalStoryEvent.time + inputTime) as Successful)
-                    .change
-
-                rescheduledStoryEvent.mustEqual(expectedEvent)
+                rescheduledStoryEvent.newTime.mustEqual(originalStoryEvent.time + inputTime.toULong())
+                rescheduledStoryEvent.originalTime.mustEqual(originalStoryEvent.time)
             }
         }
 
