@@ -59,7 +59,7 @@ class StoryEventItemMenuPresenter(
 
     override fun rescheduleSelectedItem() {
         singleSelection {
-            dependencies.rescheduleStoryEventController.requestToRescheduleStoryEvent(it.storyEventId, it.time)
+            dependencies.rescheduleStoryEventController.rescheduleStoryEvent(it.storyEventId)
         }
     }
 

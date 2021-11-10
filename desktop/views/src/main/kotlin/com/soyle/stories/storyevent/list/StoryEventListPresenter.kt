@@ -135,9 +135,8 @@ class StoryEventListPresenter(
 
     override fun rescheduleSelectedItem() {
         selectedItem {
-            rescheduleStoryEventController.requestToRescheduleStoryEvent(
-                it.id,
-                it.timeProperty.value
+            rescheduleStoryEventController.rescheduleStoryEvent(
+                it.id
             )
         }
     }

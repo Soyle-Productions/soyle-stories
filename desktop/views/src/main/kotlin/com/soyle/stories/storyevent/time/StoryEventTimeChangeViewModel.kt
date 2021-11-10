@@ -1,33 +1,33 @@
-package com.soyle.stories.storyevent.time.adjust
+package com.soyle.stories.storyevent.time
 
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.beans.property.StringProperty
-import tornadofx.booleanBinding
-import tornadofx.stringProperty
-import tornadofx.getValue
-import tornadofx.objectProperty
+import tornadofx.*
 
-class StoryEventTimeChangeViewModel {
+abstract class StoryEventTimeChangeViewModel {
 
-    private val adjustmentProperty = stringProperty()
-    fun adjustment(): StringProperty = adjustmentProperty
-    var adjustment: Long?
+    private val timeTextProperty = stringProperty("")
+    fun timeText(): StringProperty = timeTextProperty
+    var time: Long?
         get() {
-            val adjustmentText = adjustmentProperty.get()
-            if (adjustmentText.isBlank()) return 0
+            val adjustmentText = timeTextProperty.get()
+            if (adjustmentText.isEmpty()) return 0
             else return adjustmentText.toLongOrNull()
         }
         set(value) {
-            adjustmentProperty.set(value.toString())
+            timeTextProperty.set(value.toString())
         }
 
-    private val canSubmitExpression = booleanBinding(adjustmentProperty) { adjustment != null && adjustment != 0L }
+    protected abstract val canSubmitExpression: BooleanExpression
     fun canSubmit(): BooleanExpression = canSubmitExpression
-    val canSubmit: Boolean by canSubmit()
+    val canSubmit: Boolean
+        get() = canSubmitExpression.get()
 
     private val submittingExpression = ReadOnlyBooleanWrapper(false)
     fun submitting(): BooleanExpression = submittingExpression.readOnlyProperty
+    val isSubmitting: Boolean
+        get() = submittingExpression.get()
 
     private val onSubmitProperty = objectProperty<() -> Unit> {}
     fun setOnSubmit(block: () -> Unit) {

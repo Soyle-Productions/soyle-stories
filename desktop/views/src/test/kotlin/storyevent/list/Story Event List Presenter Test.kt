@@ -27,6 +27,7 @@ import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
 import com.soyle.stories.storyevent.time.StoryEventRescheduledNotifier
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
+import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventControllerDouble
 import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
@@ -96,26 +97,9 @@ class `Story Event List Presenter Test` {
 
     private val storyEventRenamedNotifier = StoryEventRenamedNotifier()
 
-    private val rescheduleStoryEventController = object : RescheduleStoryEventController {
-        var requestedId: StoryEvent.Id? = null
-        var requestedTime: Long? = null
-        override fun requestToRescheduleStoryEvent(storyEventId: StoryEvent.Id, currentTime: Long) {
-            requestedId = storyEventId
-            requestedTime = currentTime
-        }
+    private val rescheduleStoryEventController = RescheduleStoryEventControllerDouble()
 
-        override fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, time: Long): Job {
-            fail("Should not be called by story event list")
-        }
-    }
-
-    private val adjustStoryEventsTimeController =
-        object : AdjustStoryEventsTimeController by AdjustStoryEventsTimeControllerDouble() {
-            var requestedIds: Set<StoryEvent.Id>? = null
-            override fun requestToAdjustStoryEventsTimes(storyEventIds: Set<StoryEvent.Id>) {
-                requestedIds = storyEventIds
-            }
-        }
+    private val adjustStoryEventsTimeController = AdjustStoryEventsTimeControllerDouble()
 
     private val storyEventRescheduledNotifier = StoryEventRescheduledNotifier()
 
@@ -360,8 +344,9 @@ class `Story Event List Presenter Test` {
             fun `should request to reschedule the selected story event`() {
                 presenter.rescheduleSelectedItem()
 
-                assertThat(rescheduleStoryEventController.requestedId).isEqualTo(selectedItem.id)
-                assertThat(rescheduleStoryEventController.requestedTime).isEqualTo(selectedItem.timeProperty.value)
+                verify {
+                    rescheduleStoryEventController.rescheduleStoryEvent(selectedItem.id)
+                }
             }
 
         }
@@ -395,7 +380,9 @@ class `Story Event List Presenter Test` {
         fun `cannot reschedule multiple story events`() {
             presenter.rescheduleSelectedItem()
 
-            assertThat(rescheduleStoryEventController.requestedId).isNull()
+            verify {
+                rescheduleStoryEventController.rescheduleStoryEvent(any()) wasNot Called
+            }
         }
 
         @Test
@@ -417,8 +404,9 @@ class `Story Event List Presenter Test` {
             fun `should request to adjust the times of all selected items`() {
                 presenter.adjustTimesOfSelectedItems()
 
-                assertThat(adjustStoryEventsTimeController.requestedIds)
-                    .containsExactlyInAnyOrderElementsOf(selectedItems.map { it.id })
+                verify {
+                    adjustStoryEventsTimeController.adjustTimes(selectedItems.map { it.id }.toSet())
+                }
             }
 
         }

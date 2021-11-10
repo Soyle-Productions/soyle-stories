@@ -1,4 +1,4 @@
-package com.soyle.stories.storyevent.time.adjust
+package com.soyle.stories.storyevent.time
 
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
@@ -25,7 +25,7 @@ class StoryEventTimeChangeView(
                 id = "time"
                 valueFactory = NullableLongSpinnerValueFactory()
                 isEditable = true
-                viewModel.adjustment().bindBidirectional(editor.textProperty())
+                viewModel.timeText().bindBidirectional(editor.textProperty())
                 disableWhen(viewModel.submitting())
                 editor.action(viewModel::submit)
             }

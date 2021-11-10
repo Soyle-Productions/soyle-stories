@@ -341,7 +341,7 @@ class `Timeline ViewPort Unit Test` :
                     viewPort.fireEvent(mouseReleasedEvent())
 
                     verify {
-                        component.dependencies.adjustStoryEventsTimeController.adjustStoryEventsTime(
+                        component.dependencies.adjustStoryEventsTimeController.adjustTimesBy(
                             any(),
                             expectedAdjustment
                         )
@@ -353,7 +353,7 @@ class `Timeline ViewPort Unit Test` :
                     viewPort.fireEvent(mouseReleasedEvent())
 
                     verify {
-                        component.dependencies.adjustStoryEventsTimeController.adjustStoryEventsTime(
+                        component.dependencies.adjustStoryEventsTimeController.adjustTimesBy(
                             (additionalLabels.take(3) + label).map { it.storyEventId }.toSet(), any()
                         )
                     }

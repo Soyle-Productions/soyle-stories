@@ -2,33 +2,51 @@ package com.soyle.stories.storyevent.time.reschedule
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.storyevent.time.NormalizationPrompt
+import com.soyle.stories.usecase.storyevent.StoryEventRepository
 import com.soyle.stories.usecase.storyevent.time.reschedule.RescheduleStoryEvent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
 interface RescheduleStoryEventController {
 
-    fun requestToRescheduleStoryEvent(storyEventId: StoryEvent.Id, currentTime: Long)
-    fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, time: Long): Job
+    fun rescheduleStoryEvent(storyEventId: StoryEvent.Id): Job
 
     companion object {
+        fun Implementation(
+            guiContext: CoroutineContext,
+            asyncContext: CoroutineContext,
 
-        operator fun invoke(
-            threadTransformer: ThreadTransformer,
+            newTimePrompt: RescheduleStoryEventPrompt,
+            normalizationPrompt: NormalizationPrompt,
+
+            storyEventRepository: StoryEventRepository,
+
             rescheduleStoryEvent: RescheduleStoryEvent,
             rescheduleStoryEventOutput: RescheduleStoryEvent.OutputPort,
-
-            newTimePrompt: RescheduleStoryEventPrompt
-        ): RescheduleStoryEventController = object : RescheduleStoryEventController {
-
-            override fun requestToRescheduleStoryEvent(storyEventId: StoryEvent.Id, currentTime: Long) {
-                newTimePrompt.promptForNewTime(storyEventId, currentTime)
-            }
-
-            override fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, time: Long): Job {
-                return threadTransformer.async {
-                    rescheduleStoryEvent.invoke(storyEventId, time, rescheduleStoryEventOutput)
+        ): RescheduleStoryEventController = object : RescheduleStoryEventController, CoroutineScope by CoroutineScope(guiContext) {
+            override fun rescheduleStoryEvent(storyEventId: StoryEvent.Id): Job = launch {
+                val storyEvent = storyEventRepository.getStoryEventOrError(storyEventId)
+                newTimePrompt.use {
+                    rescheduleStoryEvent(storyEventId, storyEvent.time.toLong())
                 }
             }
+
+            private tailrec suspend fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, currentTime: Long) {
+                val newTime = newTimePrompt.requestNewTime(currentTime) ?: return
+
+                if (newTime > 0 || normalizationPrompt.confirmNormalization()) {
+                    withContext(asyncContext) {
+                        rescheduleStoryEvent(storyEventId, newTime, rescheduleStoryEventOutput)
+                    }
+                    return
+                }
+                rescheduleStoryEvent(storyEventId, currentTime)
+            }
+
         }
     }
 

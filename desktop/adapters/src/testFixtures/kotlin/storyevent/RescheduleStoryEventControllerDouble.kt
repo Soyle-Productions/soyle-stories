@@ -2,16 +2,8 @@
 package com.soyle.stories.storyevent.time.reschedule
 
 import com.soyle.stories.domain.storyevent.StoryEvent
+import io.mockk.spyk
 import kotlinx.coroutines.Job
 
 
-class RescheduleStoryEventControllerDouble : RescheduleStoryEventController {
-
-    override fun requestToRescheduleStoryEvent(storyEventId: StoryEvent.Id, currentTime: Long) {
-
-    }
-
-    override fun rescheduleStoryEvent(storyEventId: StoryEvent.Id, time: Long): Job {
-        return Job()
-    }
-}
+class RescheduleStoryEventControllerDouble : RescheduleStoryEventController by spyk()

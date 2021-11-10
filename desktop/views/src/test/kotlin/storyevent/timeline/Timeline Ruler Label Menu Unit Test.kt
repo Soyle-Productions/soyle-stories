@@ -73,7 +73,7 @@ class `Timeline Ruler Label Menu Unit Test` {
             menu.access().insertBeforeOption!!.fire()
 
             verify {
-                dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(
+                dependencies.adjustStoryEventsTimeController.adjustTimesBy(
                     storyEventItems.drop(1).map { it.storyEventId }.toSet(),
                     5L
                 )
@@ -106,7 +106,7 @@ class `Timeline Ruler Label Menu Unit Test` {
             menu.access().insertAfterOption!!.fire()
 
             verify {
-                dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(
+                dependencies.adjustStoryEventsTimeController.adjustTimesBy(
                     storyEventItems.drop(3).map { it.storyEventId }.toSet(),
                     5L
                 )
@@ -139,7 +139,7 @@ class `Timeline Ruler Label Menu Unit Test` {
             menu.access().removeTimeOption!!.fire()
 
             verify {
-                dependencies.adjustStoryEventsTimeController.requestToAdjustStoryEventsTimes(
+                dependencies.adjustStoryEventsTimeController.adjustTimesBy(
                     storyEventItems.drop(1).map { it.storyEventId }.toSet(),
                     -5L
                 )

@@ -21,7 +21,7 @@ import com.soyle.stories.storyevent.rename.*
 import com.soyle.stories.storyevent.time.*
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimePrompt
-import com.soyle.stories.storyevent.time.adjust.StoryEventTimeChangePromptPresenter
+import com.soyle.stories.storyevent.time.StoryEventTimeChangePromptPresenter
 import com.soyle.stories.storyevent.time.normalization.NormalizationPromptPresenter
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventPrompt
@@ -43,7 +43,6 @@ import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
-import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import javafx.beans.property.BooleanProperty
 import javafx.collections.ObservableList
 import javafx.scene.Node
@@ -136,33 +135,8 @@ object Presentation {
                 }
             }
 
-            provide<AdjustStoryEventsTimePrompt> {
+            provide(RescheduleStoryEventPrompt::class, AdjustStoryEventsTimePrompt::class) {
                 StoryEventTimeChangePromptPresenter(get<WorkBench>()::currentStage)
-            }
-
-            provide(RescheduleStoryEventPrompt::class) {
-                object : RescheduleStoryEventPrompt {
-
-                    private val presenterBuilder by lazy {
-                        TimeAdjustmentPromptPresenter(
-                            get(),
-                            get(),
-                            applicationScope.get()
-                        )
-                    }
-
-                    override fun promptForNewTime(storyEventId: StoryEvent.Id, currentTime: Long) {
-                        val presenter = presenterBuilder(storyEventId, currentTime)
-
-                        val stage = TimeAdjustmentPromptView(
-                            presenter,
-                            presenter.viewModel
-                        ).openModal(owner = get<WorkBench>().root.scene?.window)!!
-                        presenter.viewModel.isCompleted.onChangeUntil({ it == true }) {
-                            if (it == true) stage.hide()
-                        }
-                    }
-                }
             }
 
             provide<RemoveStoryEventConfirmation> {

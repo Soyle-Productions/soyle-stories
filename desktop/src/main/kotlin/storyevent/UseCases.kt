@@ -61,8 +61,11 @@ object UseCases {
         provide<RescheduleStoryEvent> { RescheduleStoryEventUseCase(get()) }
         provide<RescheduleStoryEvent.OutputPort> { RescheduleStoryEventOutput(get()) }
         provide<RescheduleStoryEventController> {
-            RescheduleStoryEventController(
-                applicationScope.get(),
+            RescheduleStoryEventController.Implementation(
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get(),
+                get(),
                 get(),
                 get(),
                 get()
