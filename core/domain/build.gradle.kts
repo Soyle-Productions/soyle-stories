@@ -33,6 +33,7 @@ dependencies {
 
     testImplementation(Libraries.junit.api)
     testImplementation(Libraries.junit.engine)
+    testImplementation(Libraries.junit.params)
 
     testFixturesApi( Libraries.junit.api)
     testFixturesApi( Libraries.junit.engine)

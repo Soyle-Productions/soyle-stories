@@ -1,6 +1,7 @@
 package com.soyle.stories.domain.storyevent
 
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.events.StoryEventChange
@@ -11,7 +12,7 @@ import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*
 
 class StoryEvent(
-    val id: Id,
+    override val id: Id,
     val name: NonBlankString,
     val time: ULong,
     val projectId: Project.Id,
@@ -19,7 +20,7 @@ class StoryEvent(
     val nextStoryEventId: Id?,
     val linkedLocationId: Location.Id?,
     val includedCharacterIds: List<Character.Id>
-) {
+) : Entity<StoryEvent.Id> {
 
     companion object {
         fun create(name: NonBlankString, time: ULong, projectId: Project.Id): StoryEventUpdate<StoryEventCreated> {
@@ -58,7 +59,7 @@ class StoryEvent(
         if (newName == name) return noUpdate()
         return Successful(copy(name = newName), StoryEventRenamed(id, newName.value))
     }
-    fun withTime(newTime: ULong): StoryEventUpdate<StoryEventRescheduled> {
+    internal fun withTime(newTime: ULong): StoryEventUpdate<StoryEventRescheduled> {
         if (newTime == time) return noUpdate()
         return Successful(copy(time = newTime), StoryEventRescheduled(id, newTime, time))
     }
