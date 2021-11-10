@@ -3,13 +3,26 @@ package com.soyle.stories.domain.storyevent
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.EntitySet
+import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.entitySetOf
-import javax.swing.text.html.parser.Entity
+import com.soyle.stories.domain.validation.toEntitySet
 import kotlin.math.abs
 
 class StoryEventTimeService(
     private val storyEventRepository: StoryEventRepository
 ) {
+
+    suspend fun createStoryEvent(
+        name: NonBlankString,
+        time: Long,
+        projectId: Project.Id
+    ): List<StoryEventUpdate<*>> {
+        if (time < 0) {
+            val creation = StoryEvent.create(name, 0u, projectId)
+            return normalizeAllStoryEventsAboveZero(creation.storyEvent, time).plus(creation)
+        }
+        return listOf(StoryEvent.create(name, time.toULong(), projectId))
+    }
 
     suspend fun rescheduleStoryEvent(
         storyEvent: StoryEvent,

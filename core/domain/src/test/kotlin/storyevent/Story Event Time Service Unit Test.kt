@@ -2,6 +2,7 @@ package com.soyle.stories.domain.storyevent
 
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.entitySetOf
 import com.soyle.stories.domain.validation.toEntitySet
@@ -21,6 +22,76 @@ class `Story Event Time Service Unit Test` {
         }
     }
     private val service = StoryEventTimeService(repository)
+
+    @Nested
+    inner class `Create Story Event` {
+
+        private val name = storyEventName()
+        private val projectId = Project.Id()
+        private val otherStoryEvents = List(5) { makeStoryEvent(projectId = projectId, time = it.toULong()) }
+            .onEach { repoMap[it.id] = it }
+
+        @Nested
+        inner class `When Time is Greater Than or Equal to Zero` {
+
+            @ParameterizedTest
+            @ValueSource(longs = [0, 8])
+            fun `should return single creation update for provided story event`(inputTime: Long): Unit = runBlocking {
+                val updates: List<StoryEventUpdate<*>> =
+                    service.createStoryEvent(name, inputTime, projectId)
+
+                updates.single().storyEvent.name.mustEqual(name)
+                updates.single().storyEvent.time.mustEqual(inputTime.toULong())
+                updates.single().storyEvent.projectId.mustEqual(projectId)
+            }
+
+            @ParameterizedTest
+            @ValueSource(longs = [0, 8])
+            fun `should successfully create story event`(inputTime: Long): Unit = runBlocking {
+                val updates: List<StoryEventUpdate<*>> =
+                    service.createStoryEvent(name, inputTime, projectId)
+
+                with(updates.single() as Successful) {
+                    (change as StoryEventCreated).time.mustEqual(inputTime.toULong())
+                }
+            }
+
+        }
+
+        @Nested
+        inner class `When New Time is Less Than Zero` {
+
+            @Test
+            fun `should only create story event with time at zero`(): Unit = runBlocking {
+                val updates = service.createStoryEvent(name, -9, projectId)
+
+                val update = updates.single { it.storyEvent.id !in repoMap }
+                update.storyEvent.time.mustEqual(0L.toULong())
+                ((update as Successful).change as StoryEventCreated).time.mustEqual(0L.toULong())
+            }
+
+            @Nested
+            inner class `Given Other Story Events in Project` {
+
+                @Test
+                fun `should normalize all other story events above zero`(): Unit = runBlocking {
+                    val updates = service.createStoryEvent(name, -9, projectId)
+
+                    updates.size.mustEqual(6)
+                    updates.filter { it.storyEvent.id in repoMap }
+                        .map { it as Successful }
+                        .forEach { (newStoryEvent, change) ->
+                            val originalStoryEvent = repoMap.getValue(newStoryEvent.id)
+                            newStoryEvent.time.mustEqual(originalStoryEvent.time + 9u)
+                            (change as StoryEventRescheduled).newTime.mustEqual(originalStoryEvent.time + 9u)
+                        }
+                }
+
+            }
+
+        }
+
+    }
 
     @Nested
     inner class `Reschedule Story Event` {

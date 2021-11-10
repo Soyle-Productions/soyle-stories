@@ -23,7 +23,7 @@ class StoryEvent(
 ) : Entity<StoryEvent.Id> {
 
     companion object {
-        fun create(name: NonBlankString, time: ULong, projectId: Project.Id): StoryEventUpdate<StoryEventCreated> {
+        internal fun create(name: NonBlankString, time: ULong, projectId: Project.Id): StoryEventUpdate<StoryEventCreated> {
             val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, listOf())
             val change = StoryEventCreated(storyEvent.id, name.value, time, projectId)
             return Successful(storyEvent, change)
@@ -41,9 +41,6 @@ class StoryEvent(
                 StoryEvent::includedCharacterIds
             )
     }
-
-    constructor(name: NonBlankString, projectId: Project.Id) : this(Id(), name,
-        0u, projectId, null, null, null, emptyList())
 
     private fun copy(
         name: NonBlankString = this.name,
