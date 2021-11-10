@@ -3,6 +3,7 @@ package com.soyle.stories.usecase.storyevent.create
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import java.util.*
@@ -44,7 +45,8 @@ interface CreateStoryEvent {
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
     class ResponseModel(
-        val createdStoryEvent: StoryEventCreated
+        val createdStoryEvent: StoryEventCreated,
+        val rescheduledStoryEvents: List<StoryEventRescheduled>?
     )
 
     fun interface OutputPort {

@@ -205,7 +205,8 @@ class CreateNewSceneUnitTest {
 				val newStoryEvent = makeStoryEvent(name = request.name, projectId = request.projectId)
 				storyEventRepository.addNewStoryEvent(newStoryEvent)
 				output.receiveCreateStoryEventResponse(CreateStoryEvent.ResponseModel(
-					StoryEventCreated(newStoryEvent.id, request.name.value, 0u, request.projectId)
+					StoryEventCreated(newStoryEvent.id, request.name.value, 0u, request.projectId),
+					null
 				))
 			}
 		})

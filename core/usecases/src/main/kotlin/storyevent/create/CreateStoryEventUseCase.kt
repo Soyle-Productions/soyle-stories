@@ -1,11 +1,9 @@
 package com.soyle.stories.usecase.storyevent.create
 
 import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.domain.storyevent.StoryEventTimeService
-import com.soyle.stories.domain.storyevent.StoryEventUpdate
-import com.soyle.stories.domain.storyevent.SuccessfulStoryEventUpdate
+import com.soyle.stories.domain.storyevent.*
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.usecase.storyevent.StoryEventRepository
 import com.soyle.stories.usecase.storyevent.getOrderOfEventsInProject
@@ -22,16 +20,16 @@ class CreateStoryEventUseCase(
     }
 
     private suspend fun createStoryEvent(request: CreateStoryEvent.RequestModel): CreateStoryEvent.ResponseModel {
-        val updates = makeNewStoryEvent(request)
+        val updates = makeNewStoryEvent(request).filterIsInstance<SuccessfulStoryEventUpdate<*>>()
 
         updates.forEach {
-            storyEventRepository.updateStoryEvent(it.storyEvent)
+            if (it.change is StoryEventCreated) storyEventRepository.addNewStoryEvent(it.storyEvent)
+            else storyEventRepository.updateStoryEvent(it.storyEvent)
         }
 
         return CreateStoryEvent.ResponseModel(
-            (updates.single {
-                it is SuccessfulStoryEventUpdate && it.change is StoryEventCreated
-            } as SuccessfulStoryEventUpdate).change as StoryEventCreated
+            updates.single { it.change is StoryEventCreated }.change as StoryEventCreated,
+            updates.mapNotNull { it.change as? StoryEventRescheduled }
         )
     }
 
