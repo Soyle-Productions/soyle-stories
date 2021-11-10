@@ -12,9 +12,9 @@ interface RescheduleStoryEvent {
      *
      * @throws StoryEventDoesNotExist if the supplied story event does not exist in the project
      */
-    operator suspend fun invoke(storyEventId: StoryEvent.Id, time: Long, output: OutputPort)
+    suspend operator fun invoke(storyEventId: StoryEvent.Id, time: Long, output: OutputPort)
 
-    class ResponseModel(val storyEventRescheduled: StoryEventRescheduled)
+    class ResponseModel(val storyEventsRescheduled: List<StoryEventRescheduled>)
 
     fun interface OutputPort {
         suspend fun storyEventRescheduled(response: ResponseModel)

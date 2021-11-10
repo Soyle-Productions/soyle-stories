@@ -79,7 +79,7 @@ class `List All Story Events Unit Test` {
 			listAllStoryEvents()
 			val storyEventMap = storyEventsInProject.associateBy { it.id }
 			responseModel!!.storyEventItems.forEach {
-				it.time.mustEqual(storyEventMap.getValue(it.storyEventId).time)
+				it.time.mustEqual(storyEventMap.getValue(it.storyEventId).time.toLong())
 			}
 		}
 

@@ -28,6 +28,8 @@ import java.util.*
 
 class CreateNewSceneUnitTest {
 
+	// TODO("Update to handle new story event invariants")
+
 	private val createStoryEventOutputException = Exception("I was thrown from the output of creating a story event.")
 
 	val projectId = Project.Id()
