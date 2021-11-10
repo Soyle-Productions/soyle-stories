@@ -9,7 +9,7 @@ class RescheduleStoryEventOutput(
 
     override suspend fun storyEventRescheduled(response: RescheduleStoryEvent.ResponseModel) {
         storyEventRescheduledReceiver.receiveStoryEventsRescheduled(
-            listOf(response.storyEventRescheduled).associateBy { it.storyEventId }
+            response.storyEventsRescheduled.associateBy { it.storyEventId }
         )
     }
 }

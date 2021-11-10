@@ -66,7 +66,7 @@ class TimelinePresenter(
             override suspend fun receiveStoryEventCreated(event: StoryEventCreated) {
                 withContext(guiScope.coroutineContext) {
                     with(gui) {
-                        val newLabel = StoryPointLabel(event.storyEventId, event.name, UnitOfTime(event.time))
+                        val newLabel = StoryPointLabel(event.storyEventId, event.name, UnitOfTime(event.time.toLong()))
                         newLabel.contextMenu = loaded.storyPointLabelMenu
                         storyEventItemsProperty.add(newLabel)
                     }

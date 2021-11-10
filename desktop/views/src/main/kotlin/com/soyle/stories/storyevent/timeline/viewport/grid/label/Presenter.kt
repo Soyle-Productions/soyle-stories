@@ -25,7 +25,7 @@ class StoryPointLabelPresenter(
     override suspend fun receiveStoryEventsRescheduled(events: Map<StoryEvent.Id, StoryEventRescheduled>) {
         val relevantEvent = events[label.storyEventId] ?: return
         withContext(guiContext) {
-            label.time = relevantEvent.newTime
+            label.time = relevantEvent.newTime.toLong()
         }
     }
 

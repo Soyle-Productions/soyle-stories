@@ -42,7 +42,7 @@ object UseCases {
 
     private fun InProjectScope.createStoryEvent() {
         provide<CreateStoryEvent> { CreateStoryEventUseCase(get()) }
-        provide<CreateStoryEvent.OutputPort> { CreateStoryEventOutput(get()) }
+        provide<CreateStoryEvent.OutputPort> { CreateStoryEventOutput(get(), get()) }
     }
 
     private fun InProjectScope.listStoryEvents() {

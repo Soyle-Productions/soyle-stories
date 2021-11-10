@@ -92,7 +92,7 @@ class StoryEventListPresenter(
     }
 
     private fun StoryEventItem.toViewModel() = createStoryEventViewModel(storyEventId, storyEventName, time)
-    private fun StoryEventCreated.toViewModel() = createStoryEventViewModel(storyEventId, name, time)
+    private fun StoryEventCreated.toViewModel() = createStoryEventViewModel(storyEventId, name, time.toLong())
 
     private fun Sequence<StoryEventListItemViewModel>.orderAndGroupByTime(): List<StoryEventListItemViewModel> {
         val seenIds = mutableSetOf<StoryEvent.Id>()
@@ -208,7 +208,7 @@ class StoryEventListPresenter(
 
                 vm.items.onEach {
                     val rescheduled = events[it.id] ?: return@onEach
-                    it.timeProperty.set(rescheduled.newTime)
+                    it.timeProperty.set(rescheduled.newTime.toLong())
                 }
                 vm.items.sortWith { item1, item2 ->
                     (item1.timeProperty.value - item2.timeProperty.value).toInt()

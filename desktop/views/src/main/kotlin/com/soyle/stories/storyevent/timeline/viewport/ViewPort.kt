@@ -107,15 +107,17 @@ class TimelineViewPort(
         calculateMaxOffset()
     }
     private val weakStoryEventItemTimeChanged = WeakInvalidationListener(storyEventItemTimeChanged)
+
+    private fun initializeAddedStoryPointLabel(label: StoryPointLabel) {
+        label.cachedWidth().addListener(weakStoryEventItemWidthChanged)
+        label.time().addListener(weakStoryEventItemTimeChanged)
+        label.setOnMousePressed(actions::mousePressedOnLabel)
+    }
     private val storyEventItemChanged = ListChangeListener<StoryPointLabel> { change ->
         calculateMaxOffset()
         while (change.next()) {
             if (change.wasAdded()) {
-                change.addedSubList.forEach {
-                    it.cachedWidth().addListener(weakStoryEventItemWidthChanged)
-                    it.time().addListener(weakStoryEventItemTimeChanged)
-                    it.setOnMousePressed(actions::mousePressedOnLabel)
-                }
+                change.addedSubList.forEach(::initializeAddedStoryPointLabel)
             }
             if (change.wasRemoved()) {
                 change.removed.forEach {
@@ -204,6 +206,8 @@ class TimelineViewPort(
         addEventFilter(MouseEvent.DRAG_DETECTED, dragDetectedListener)
         addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseDraggedListener)
         addEventFilter(MouseDragEvent.MOUSE_RELEASED, mouseDragReleaseListener)
+
+        storyPointLabels.forEach(::initializeAddedStoryPointLabel)
     }
 
     fun scrollToTime(time: UnitOfTime) {
