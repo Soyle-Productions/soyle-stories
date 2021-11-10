@@ -76,12 +76,14 @@ interface CreateStoryEventController {
                 val name = prompt.requestName() ?: return@launch
 
                 createStoryEvent(name, CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(storyEventId, 0))
+                prompt.close()
             }
 
             override fun after(storyEventId: StoryEvent.Id): Job = launch {
                 val name = prompt.requestName() ?: return@launch
 
                 createStoryEvent(name, CreateStoryEvent.RequestModel.RequestedStoryEventTime.Relative(storyEventId, +1))
+                prompt.close()
             }
 
             private suspend fun createStoryEvent(name: NonBlankString, time: CreateStoryEvent.RequestModel.RequestedStoryEventTime) {
