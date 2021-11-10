@@ -4,6 +4,7 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.StoryEventTimeService
 import com.soyle.stories.usecase.prose.ProseRepository
 import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -77,16 +78,10 @@ class CreateNewSceneUseCase(
 	{
 		val job = Job()
 		var createStoryEventResponse: CreateStoryEvent.ResponseModel? = null
-		createStoryEvent.invoke(
-		  request,
-		  object : CreateStoryEvent.OutputPort {
-
-			  override suspend fun receiveCreateStoryEventResponse(response: CreateStoryEvent.ResponseModel) {
-				  createStoryEventResponse = response
-				  job.complete()
-			  }
-		  }
-		)
+		createStoryEvent.invoke(request) { response ->
+			createStoryEventResponse = response
+			job.complete()
+		}
 		job.join()
 		return createStoryEventResponse!!
 	}
