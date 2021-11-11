@@ -4,10 +4,10 @@ import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.storyevent.events.StoryEventChange
-import com.soyle.stories.domain.storyevent.events.StoryEventCreated
-import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
-import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.storyevent.events.*
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCoverage
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventException
 import com.soyle.stories.domain.validation.NonBlankString
 import java.util.*
 
@@ -16,6 +16,7 @@ class StoryEvent(
     val name: NonBlankString,
     val time: ULong,
     val projectId: Project.Id,
+    val sceneId: Scene.Id?,
     val previousStoryEventId: Id?,
     val nextStoryEventId: Id?,
     val linkedLocationId: Location.Id?,
@@ -23,8 +24,12 @@ class StoryEvent(
 ) : Entity<StoryEvent.Id> {
 
     companion object {
-        internal fun create(name: NonBlankString, time: ULong, projectId: Project.Id): StoryEventUpdate<StoryEventCreated> {
-            val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, listOf())
+        internal fun create(
+            name: NonBlankString,
+            time: ULong,
+            projectId: Project.Id
+        ): StoryEventUpdate<StoryEventCreated> {
+            val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, null, listOf())
             val change = StoryEventCreated(storyEvent.id, name.value, time, projectId)
             return Successful(storyEvent, change)
         }
@@ -35,6 +40,7 @@ class StoryEvent(
                 StoryEvent::name,
                 StoryEvent::time,
                 StoryEvent::projectId,
+                StoryEvent::sceneId,
                 StoryEvent::previousStoryEventId,
                 StoryEvent::nextStoryEventId,
                 StoryEvent::linkedLocationId,
@@ -45,21 +51,50 @@ class StoryEvent(
     private fun copy(
         name: NonBlankString = this.name,
         time: ULong = this.time,
+        sceneId: Scene.Id? = this.sceneId,
         previousStoryEventId: Id? = this.previousStoryEventId,
         nextStoryEventId: Id? = this.nextStoryEventId,
         linkedLocationId: Location.Id? = this.linkedLocationId,
         includedCharacterIds: List<Character.Id> = this.includedCharacterIds
-    ) = StoryEvent(id, name, time, projectId, previousStoryEventId, nextStoryEventId, linkedLocationId, includedCharacterIds)
+    ) = StoryEvent(
+        id,
+        name,
+        time,
+        projectId,
+        sceneId,
+        previousStoryEventId,
+        nextStoryEventId,
+        linkedLocationId,
+        includedCharacterIds
+    )
 
 
     fun withName(newName: NonBlankString): StoryEventUpdate<StoryEventRenamed> {
         if (newName == name) return noUpdate()
         return Successful(copy(name = newName), StoryEventRenamed(id, newName.value))
     }
+
     internal fun withTime(newTime: ULong): StoryEventUpdate<StoryEventRescheduled> {
         if (newTime == time) return noUpdate()
         return Successful(copy(time = newTime), StoryEventRescheduled(id, newTime, time))
     }
+
+    fun coveredByScene(sceneId: Scene.Id): StoryEventUpdate<StoryEventCoveredByScene> {
+        val currentSceneId = this.sceneId
+        if (currentSceneId == sceneId) return noUpdate()
+        return copy(sceneId = sceneId).updatedBy(
+            StoryEventCoveredByScene(
+                id,
+                sceneId,
+                currentSceneId?.let { StoryEventUncoveredFromScene(id, currentSceneId) })
+        )
+    }
+
+    fun withoutCoverage(): StoryEventUpdate<StoryEventUncoveredFromScene> {
+        if (sceneId == null) return noUpdate(StoryEventAlreadyWithoutCoverage)
+        return copy(sceneId = null).updatedBy(StoryEventUncoveredFromScene(id, sceneId))
+    }
+
     fun withPreviousId(storyEventId: Id?) = copy(previousStoryEventId = storyEventId)
     fun withNextId(storyEventId: Id?) = copy(nextStoryEventId = storyEventId)
     fun withLocationId(locationId: Location.Id?) = copy(linkedLocationId = locationId)
@@ -94,6 +129,7 @@ class StoryEvent(
         override fun toString(): String = "StoryEvent($uuid)"
     }
 
-    fun noUpdate() = UnSuccessful(this)
+    fun noUpdate(reason: StoryEventException? = null) = UnSuccessful(this, reason as? Throwable)
+    private fun <Change : StoryEventChange> updatedBy(change: Change) = Successful(this, change)
 
 }

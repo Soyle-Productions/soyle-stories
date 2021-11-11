@@ -16,5 +16,8 @@ class Successful<E : StoryEventChange>(
 }
 typealias SuccessfulStoryEventUpdate<E> = Successful<E>
 
-class UnSuccessful(override val storyEvent: StoryEvent) : StoryEventUpdate<Nothing>()
+class UnSuccessful(
+    override val storyEvent: StoryEvent,
+    val reason: Throwable? = null
+    ) : StoryEventUpdate<Nothing>()
 typealias UnSuccessfulStoryEventUpdate = UnSuccessful
