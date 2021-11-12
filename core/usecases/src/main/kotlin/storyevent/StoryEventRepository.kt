@@ -3,6 +3,7 @@ package com.soyle.stories.usecase.storyevent
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.scene.Scene
 
 interface StoryEventRepository : com.soyle.stories.domain.storyevent.StoryEventRepository {
 
@@ -17,6 +18,7 @@ interface StoryEventRepository : com.soyle.stories.domain.storyevent.StoryEventR
 
     suspend fun getStoryEventsWithCharacter(characterId: Character.Id): List<StoryEvent>
     suspend fun getLastStoryEventInProject(projectId: Project.Id): StoryEvent?
+    suspend fun getStoryEventsCoveredByScene(sceneId: Scene.Id): List<StoryEvent>
     suspend fun updateStoryEvent(storyEvent: StoryEvent)
     suspend fun updateStoryEvents(vararg storyEvents: StoryEvent)
 

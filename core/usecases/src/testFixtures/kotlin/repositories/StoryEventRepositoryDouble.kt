@@ -2,6 +2,7 @@ package com.soyle.stories.usecase.repositories
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.usecase.storyevent.StoryEventRepository
 
@@ -37,6 +38,10 @@ class StoryEventRepositoryDouble(
 
 	override suspend fun getStoryEventsWithCharacter(characterId: Character.Id): List<StoryEvent> {
 		return storyEvents.values.filter { it.includedCharacterIds.contains(characterId) }
+	}
+
+	override suspend fun getStoryEventsCoveredByScene(sceneId: Scene.Id): List<StoryEvent> {
+		return storyEvents.values.filter { it.sceneId == sceneId }
 	}
 
 	override suspend fun updateStoryEvent(storyEvent: StoryEvent) {
