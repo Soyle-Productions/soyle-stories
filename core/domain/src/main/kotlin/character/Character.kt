@@ -4,7 +4,6 @@ import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
 import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import com.soyle.stories.domain.entities.Entity
-import com.soyle.stories.domain.entities.EntityUpdate
 import com.soyle.stories.domain.media.Media
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.validation.NonBlankString

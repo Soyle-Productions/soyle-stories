@@ -31,6 +31,29 @@ class Scene private constructor(
     defaultConstructorMarker: Unit = Unit
 ) : Entity<Scene.Id> {
 
+    companion object {
+        @JvmStatic
+        internal fun create(projectId: Project.Id, name: NonBlankString, proseId: Prose.Id): SceneUpdate<SceneCreated> {
+            val newScene = Scene(projectId, name, StoryEvent.Id(), proseId)
+            return Updated(newScene, SceneCreated(newScene.id, newScene.name.value, proseId, newScene.storyEventId))
+        }
+
+        @JvmStatic
+        private val equalityProps
+            get() = listOf(
+                Scene::id,
+                Scene::projectId,
+                Scene::name,
+                Scene::storyEventId,
+                Scene::settings,
+                Scene::proseId,
+                Scene::charactersInScene,
+                Scene::symbols,
+                Scene::conflict,
+                Scene::resolution
+            )
+    }
+
     constructor(
         projectId: Project.Id,
         name: NonBlankString,
@@ -131,23 +154,6 @@ class Scene private constructor(
         resolution,
         defaultConstructorMarker = Unit
     )
-
-    companion object {
-
-        private val equalityProps
-            get() = listOf(
-                Scene::id,
-                Scene::projectId,
-                Scene::name,
-                Scene::storyEventId,
-                Scene::settings,
-                Scene::proseId,
-                Scene::charactersInScene,
-                Scene::symbols,
-                Scene::conflict,
-                Scene::resolution
-            )
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -370,7 +376,7 @@ class Scene private constructor(
         return Updated(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
     }
 
-    fun noUpdate(reason: Any? = null) = WithoutChange(this, reason)
+    fun noUpdate(reason: Throwable? = null) = WithoutChange(this, reason)
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
 

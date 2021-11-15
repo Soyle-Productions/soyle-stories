@@ -3,10 +3,10 @@ package com.soyle.stories.domain.scene
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.character.makeCharacterArcSection
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.nonBlankStr
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.events.SceneRenamed
-import com.soyle.stories.domain.scene.events.SymbolTrackedInScene
-import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,6 +16,35 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class SceneTest {
+
+    @Nested
+    inner class `When Scene is Created` {
+
+        val projectId = Project.Id()
+        val proseId = Prose.Id()
+        val inputName = sceneName()
+
+        @Test
+        fun `should produce new scene with provided inputs`() {
+            val update: SceneUpdate<*> = Scene.create(projectId, inputName, proseId)
+
+            update.scene.name.mustEqual(inputName)
+            update.scene.projectId.mustEqual(projectId)
+            update.scene.proseId.mustEqual(proseId)
+        }
+
+        @Test
+        fun `should produce scene created event`() {
+            val update: SceneUpdate<SceneCreated> = Scene.create(projectId, inputName, proseId)
+
+            update as Updated
+            update.event.sceneId.mustEqual(update.scene.id)
+            update.event.name.mustEqual(update.scene.name)
+            update.event.proseId.mustEqual(update.scene.proseId)
+            update.event.storyEventId.mustEqual(update.scene.storyEventId)
+        }
+
+    }
 
     @Nested
     inner class `With Scene Renamed` {
@@ -114,7 +143,6 @@ class SceneTest {
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
             update.scene.trackedSymbols.single().isPinned.mustEqual(false)
             update as Updated
-            update.event as SymbolTrackedInScene
         }
 
         @Test
@@ -146,7 +174,6 @@ class SceneTest {
                 update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
                 update.scene.trackedSymbols.single().isPinned.mustEqual(true)
                 update as Updated
-                update.event as SymbolTrackedInScene
             }
 
             @Test
@@ -240,7 +267,6 @@ class SceneTest {
                 .withoutSymbolTracked(symbol.id)
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(false) { "Did not stop tracking symbol"}
             update as Updated
-            update.event as TrackedSymbolRemoved
         }
 
         @Test
