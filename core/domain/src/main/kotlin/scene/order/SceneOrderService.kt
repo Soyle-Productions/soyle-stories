@@ -5,23 +5,27 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneUpdate
+import com.soyle.stories.domain.scene.Updated
+import com.soyle.stories.domain.scene.WithoutChange
 import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.storyevent.StoryEventRepository
 import com.soyle.stories.domain.storyevent.StoryEventTimeService
 import com.soyle.stories.domain.validation.NonBlankString
 
-class SceneOrderService(
-    private val sceneOrderRepository: SceneOrderRepository
-) {
+class SceneOrderService {
 
-    suspend fun createScene(
-        projectId: Project.Id,
+    fun createScene(
+        sceneOrder: SceneOrder,
         name: NonBlankString,
-        proseId: Prose.Id
-    ): Pair<SceneOrderUpdate, SceneUpdate<SceneCreated>> {
-        val sceneOrder = sceneOrderRepository.getSceneOrderForProject(projectId) ?: SceneOrder(projectId, setOf())
-        val sceneUpdate = Scene.create(projectId, name, proseId)
-        return sceneOrder.withScene(sceneUpdate.scene.id) to sceneUpdate
+        proseId: Prose.Id,
+        index: Int = -1
+    ): Pair<SceneOrderUpdate, Updated<SceneCreated>?> {
+        val sceneUpdate = Scene.create(sceneOrder.projectId, name, proseId)
+        val sceneOrderUpdate = sceneOrder.withScene(sceneUpdate.scene.id, index)
+        if (sceneOrderUpdate is UnSuccessfulSceneOrderUpdate || sceneUpdate !is Updated) {
+            return sceneOrderUpdate to null
+        }
+        return sceneOrderUpdate to sceneUpdate
     }
 
 }

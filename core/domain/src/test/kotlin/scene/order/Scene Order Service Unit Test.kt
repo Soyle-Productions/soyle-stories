@@ -5,24 +5,17 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.Updated
+import com.soyle.stories.domain.scene.WithoutChange
 import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.sceneName
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class `Scene Order Service Unit Test` {
 
-    private val sceneOrderRepository = object : SceneOrderRepository {
-        private val sceneOrders = mutableMapOf<Project.Id, SceneOrder>()
-        fun givenSceneOrder(sceneOrder: SceneOrder) {
-            sceneOrders[sceneOrder.projectId] = sceneOrder
-        }
-
-        override suspend fun getSceneOrderForProject(projectId: Project.Id): SceneOrder? = sceneOrders[projectId]
-    }
-
-    private val service = SceneOrderService(sceneOrderRepository)
+    private val service = SceneOrderService()
     private val projectId = Project.Id()
     private val proseId = Prose.Id()
     private val inputName = sceneName()
@@ -30,12 +23,14 @@ class `Scene Order Service Unit Test` {
     @Nested
     inner class `Given No Scenes Exist Yet` {
 
+        val sceneOrder = SceneOrder(projectId, setOf())
+
         @Test
         fun `should create new scene in project`() {
-            val (_, update) = runBlocking { service.createScene(projectId, inputName, proseId) }
+            val (_, update) = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
 
             update as Updated<*>
-            val event = update.event as SceneCreated
+            val event = update.event
             event.name.mustEqual(inputName.value)
             event.proseId.mustEqual(proseId)
             event.storyEventId.mustEqual(update.scene.storyEventId)
@@ -43,12 +38,11 @@ class `Scene Order Service Unit Test` {
 
         @Test
         fun `first scene should be at the first index`() {
-            val (update, sceneUpdate) = runBlocking { service.createScene(projectId, inputName, proseId) }
+            val (update, sceneUpdate) = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
 
             update as SuccessfulSceneOrderUpdate
             update.sceneOrder.order.size.mustEqual(1)
-            update.sceneOrder.projectId.mustEqual(projectId)
-            update.sceneOrder.order.single().mustEqual(sceneUpdate.scene.id)
+            update.sceneOrder.order.single().mustEqual(sceneUpdate!!.scene.id)
         }
 
     }
@@ -56,17 +50,32 @@ class `Scene Order Service Unit Test` {
     @Nested
     inner class `Given Scenes Exist Already` {
 
-        init {
-            sceneOrderRepository.givenSceneOrder(SceneOrder(projectId, List(4) { Scene.Id() }.toSet()))
-        }
+        val sceneOrder = SceneOrder(projectId, List(4) { Scene.Id() }.toSet())
 
         @Test
         fun `scene should be added to the end of the project`() {
-            val (update, sceneUpdate) = runBlocking { service.createScene(projectId, inputName, proseId) }
+            val (update, sceneUpdate) = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
 
             update as SuccessfulSceneOrderUpdate
             update.sceneOrder.order.size.mustEqual(5)
-            update.sceneOrder.order.last().mustEqual(sceneUpdate.scene.id)
+            update.sceneOrder.order.last().mustEqual(sceneUpdate!!.scene.id)
+        }
+
+        @Test
+        fun `new scene should be at provided index`() {
+            val (update, sceneUpdate) = runBlocking { service.createScene(sceneOrder, inputName, proseId, 2) }
+
+            update as SuccessfulSceneOrderUpdate
+            update.sceneOrder.order.size.mustEqual(5)
+            update.sceneOrder.order.toList()[2].mustEqual(sceneUpdate!!.scene.id)
+        }
+
+        @Test
+        fun `if scene insertion fails, should not create new scene`() {
+            val (update, sceneUpdate) = runBlocking { service.createScene(sceneOrder, inputName, proseId, -4) }
+
+            update as UnSuccessfulSceneOrderUpdate
+            assertNull(sceneUpdate)
         }
 
     }
