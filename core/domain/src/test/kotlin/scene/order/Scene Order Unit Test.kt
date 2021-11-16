@@ -2,9 +2,12 @@ package com.soyle.stories.domain.scene.order
 
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.order.exceptions.cannotAddSceneOutOfBounds
 import com.soyle.stories.domain.scene.order.exceptions.sceneCannotBeAddedTwice
+import com.soyle.stories.domain.storyevent.StoryEvent
 import org.junit.jupiter.api.Test
 
 class `Scene Order Unit Test` {
@@ -15,12 +18,14 @@ class `Scene Order Unit Test` {
         val order = SceneOrder(projectId, setOf())
 
         val sceneId = Scene.Id()
-        val update = order.withScene(sceneId)
+        val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
+        val update = order.withScene(sceneCreated)
 
         update as SuccessfulSceneOrderUpdate
         update.sceneOrder.order.size.mustEqual(1)
         update.sceneOrder.order.single().mustEqual(sceneId)
         update.sceneOrder.projectId.mustEqual(projectId)
+        update.change.mustEqual(sceneCreated)
     }
 
     @Test
@@ -29,7 +34,7 @@ class `Scene Order Unit Test` {
         val sceneId = Scene.Id()
         val order = SceneOrder(projectId, setOf(sceneId))
 
-        val update = order.withScene(sceneId)
+        val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()))
 
         update as UnSuccessfulSceneOrderUpdate
         update.sceneOrder.order.size.mustEqual(1)
@@ -45,12 +50,14 @@ class `Scene Order Unit Test` {
         val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
 
         val sceneId = Scene.Id()
-        val update = order.withScene(sceneId)
+        val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
+        val update = order.withScene(sceneCreated)
 
         update as SuccessfulSceneOrderUpdate
         update.sceneOrder.order.size.mustEqual(6)
         update.sceneOrder.order.last().mustEqual(sceneId)
         update.sceneOrder.projectId.mustEqual(projectId)
+        update.change.mustEqual(sceneCreated)
     }
 
     @Test
@@ -59,11 +66,13 @@ class `Scene Order Unit Test` {
         val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
 
         val sceneId = Scene.Id()
-        val update = order.withScene(sceneId, at = 3)
+        val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
+        val update = order.withScene(sceneCreated, at = 3)
 
         update as SuccessfulSceneOrderUpdate
         update.sceneOrder.order.size.mustEqual(6)
         update.sceneOrder.order.toList()[3].mustEqual(sceneId)
+        update.change.mustEqual(sceneCreated)
     }
 
     @Test
@@ -72,7 +81,7 @@ class `Scene Order Unit Test` {
         val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
 
         val sceneId = Scene.Id()
-        val update = order.withScene(sceneId, at = -2)
+        val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()), at = -2)
 
         update as UnSuccessfulSceneOrderUpdate
         update.sceneOrder.order.size.mustEqual(5)
@@ -86,7 +95,7 @@ class `Scene Order Unit Test` {
         val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
 
         val sceneId = Scene.Id()
-        val update = order.withScene(sceneId, at = 6)
+        val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()), at = 6)
 
         update as UnSuccessfulSceneOrderUpdate
         update.sceneOrder.order.size.mustEqual(5)

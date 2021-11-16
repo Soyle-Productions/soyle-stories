@@ -19,13 +19,14 @@ class SceneOrderService {
         name: NonBlankString,
         proseId: Prose.Id,
         index: Int = -1
-    ): Pair<SceneOrderUpdate, Updated<SceneCreated>?> {
-        val sceneUpdate = Scene.create(sceneOrder.projectId, name, proseId)
-        val sceneOrderUpdate = sceneOrder.withScene(sceneUpdate.scene.id, index)
-        if (sceneOrderUpdate is UnSuccessfulSceneOrderUpdate || sceneUpdate !is Updated) {
-            return sceneOrderUpdate to null
+    ): SceneOrderUpdate<Updated<SceneCreated>> {
+        val sceneUpdate = Scene.create(sceneOrder.projectId, name, proseId) as Updated
+        val update = sceneOrder.withScene(sceneUpdate.change, index)
+        if (update is UnSuccessfulSceneOrderUpdate) {
+            return update
+        } else {
+            return SuccessfulSceneOrderUpdate(update.sceneOrder, sceneUpdate)
         }
-        return sceneOrderUpdate to sceneUpdate
     }
 
 }

@@ -27,22 +27,23 @@ class `Scene Order Service Unit Test` {
 
         @Test
         fun `should create new scene in project`() {
-            val (_, update) = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
 
-            update as Updated<*>
-            val event = update.event
-            event.name.mustEqual(inputName.value)
-            event.proseId.mustEqual(proseId)
-            event.storyEventId.mustEqual(update.scene.storyEventId)
+            update as SuccessfulSceneOrderUpdate
+            val sceneUpdate = update.change
+            sceneUpdate.change.name.mustEqual(inputName.value)
+            sceneUpdate.change.proseId.mustEqual(proseId)
+            sceneUpdate.change.storyEventId.mustEqual(sceneUpdate.scene.storyEventId)
         }
 
         @Test
         fun `first scene should be at the first index`() {
-            val (update, sceneUpdate) = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
 
             update as SuccessfulSceneOrderUpdate
+            val sceneUpdate = update.change
             update.sceneOrder.order.size.mustEqual(1)
-            update.sceneOrder.order.single().mustEqual(sceneUpdate!!.scene.id)
+            update.sceneOrder.order.single().mustEqual(sceneUpdate.scene.id)
         }
 
     }
@@ -54,28 +55,27 @@ class `Scene Order Service Unit Test` {
 
         @Test
         fun `scene should be added to the end of the project`() {
-            val (update, sceneUpdate) = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
 
             update as SuccessfulSceneOrderUpdate
             update.sceneOrder.order.size.mustEqual(5)
-            update.sceneOrder.order.last().mustEqual(sceneUpdate!!.scene.id)
+            update.sceneOrder.order.last().mustEqual(update.change.scene.id)
         }
 
         @Test
         fun `new scene should be at provided index`() {
-            val (update, sceneUpdate) = runBlocking { service.createScene(sceneOrder, inputName, proseId, 2) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId, 2) }
 
             update as SuccessfulSceneOrderUpdate
             update.sceneOrder.order.size.mustEqual(5)
-            update.sceneOrder.order.toList()[2].mustEqual(sceneUpdate!!.scene.id)
+            update.sceneOrder.order.toList()[2].mustEqual(update.change.scene.id)
         }
 
         @Test
         fun `if scene insertion fails, should not create new scene`() {
-            val (update, sceneUpdate) = runBlocking { service.createScene(sceneOrder, inputName, proseId, -4) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId, -4) }
 
             update as UnSuccessfulSceneOrderUpdate
-            assertNull(sceneUpdate)
         }
 
     }
