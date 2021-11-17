@@ -48,7 +48,7 @@ class `Adjust Story Events Time Unit Test` {
 
     // Use Case
     private val useCase: AdjustStoryEventsTime = AdjustStoryEventsTimeUseCase(storyEventRepository)
-    private fun adjustStoryEventTimes(number: Long = storyEventTime().toLong()) {
+    private fun adjustStoryEventTimes(number: Long = (1 .. 100L).random()) {
         runBlocking {
             useCase.invoke(storyEvents.map { it.id }.toSet(), number) {
                 rescheduledStoryEvents.addAll(it.rescheduledStoryEvents)
