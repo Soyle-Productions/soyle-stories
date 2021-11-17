@@ -6,101 +6,196 @@ import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.order.exceptions.cannotAddSceneOutOfBounds
+import com.soyle.stories.domain.scene.order.exceptions.sceneAlreadyAtIndex
 import com.soyle.stories.domain.scene.order.exceptions.sceneCannotBeAddedTwice
 import com.soyle.stories.domain.storyevent.StoryEvent
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import kotlin.IndexOutOfBoundsException
 
 class `Scene Order Unit Test` {
 
-    @Test
-    fun `adding scene should add it to the end of the list`() {
+    @Nested
+    inner class `Can add a newly created scene` {
+
         val projectId = Project.Id()
-        val order = SceneOrder(projectId, setOf())
-
         val sceneId = Scene.Id()
-        val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
-        val update = order.withScene(sceneCreated)
 
-        update as SuccessfulSceneOrderUpdate
-        update.sceneOrder.order.size.mustEqual(1)
-        update.sceneOrder.order.single().mustEqual(sceneId)
-        update.sceneOrder.projectId.mustEqual(projectId)
-        update.change.mustEqual(sceneCreated)
+        @Test
+        fun `adding scene should add it to the end of the list`() {
+            val order = SceneOrder(projectId, setOf())
+
+            val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
+            val update = order.withScene(sceneCreated)
+
+            update as SuccessfulSceneOrderUpdate
+            update.sceneOrder.order.size.mustEqual(1)
+            update.sceneOrder.order.single().mustEqual(sceneId)
+            update.sceneOrder.projectId.mustEqual(projectId)
+            update.change.mustEqual(sceneCreated)
+        }
+
+        @Test
+        fun `cannot add the same scene twice`() {
+            val order = SceneOrder(projectId, setOf(sceneId))
+
+            val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()))
+
+            update as UnSuccessfulSceneOrderUpdate
+            update.sceneOrder.order.size.mustEqual(1)
+            update.sceneOrder.order.single().mustEqual(sceneId)
+            update.sceneOrder.projectId.mustEqual(projectId)
+
+            update.reason.mustEqual(sceneCannotBeAddedTwice(sceneId))
+        }
+
+        @Test
+        fun `should add new scenes to end of scene order`() {
+            val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+
+            val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
+            val update = order.withScene(sceneCreated)
+
+            update as SuccessfulSceneOrderUpdate
+            update.sceneOrder.order.size.mustEqual(6)
+            update.sceneOrder.order.last().mustEqual(sceneId)
+            update.sceneOrder.projectId.mustEqual(projectId)
+            update.change.mustEqual(sceneCreated)
+        }
+
+        @Test
+        fun `should add scene at specified index`() {
+            val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+
+            val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
+            val update = order.withScene(sceneCreated, at = 3)
+
+            update as SuccessfulSceneOrderUpdate
+            update.sceneOrder.order.size.mustEqual(6)
+            update.sceneOrder.order.toList()[3].mustEqual(sceneId)
+            update.change.mustEqual(sceneCreated)
+        }
+
+        @Test
+        fun `cannot add scene at index less than negative one`() {
+            val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+
+            val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()), at = -2)
+
+            update as UnSuccessfulSceneOrderUpdate
+            update.sceneOrder.order.size.mustEqual(5)
+
+            update.reason.mustEqual(cannotAddSceneOutOfBounds(sceneId, -2))
+        }
+
+        @Test
+        fun `cannot add scene at index greater than size of current order`() {
+            val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+
+            val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()), at = 6)
+
+            update as UnSuccessfulSceneOrderUpdate
+            update.sceneOrder.order.size.mustEqual(5)
+
+            update.reason.mustEqual(cannotAddSceneOutOfBounds(sceneId, 6))
+        }
+
     }
 
-    @Test
-    fun `cannot add the same scene twice`() {
-        val projectId = Project.Id()
-        val sceneId = Scene.Id()
-        val order = SceneOrder(projectId, setOf(sceneId))
+    @Nested
+    inner class `Can Move Scene to Different Position` {
 
-        val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()))
+        @Test
+        fun `when scene is not in scene order, should not return modification interface`() {
+            val modifications = SceneOrder(Project.Id(), setOf()).withScene(Scene.Id())
 
-        update as UnSuccessfulSceneOrderUpdate
-        update.sceneOrder.order.size.mustEqual(1)
-        update.sceneOrder.order.single().mustEqual(sceneId)
-        update.sceneOrder.projectId.mustEqual(projectId)
+            assertNull(modifications)
+        }
 
-        update.reason.mustEqual(sceneCannotBeAddedTwice(sceneId))
-    }
+        @Nested
+        inner class `Given Scene is in Scene Order` {
 
-    @Test
-    fun `should add new scenes to end of scene order`() {
-        val projectId = Project.Id()
-        val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+            val sceneId = Scene.Id()
 
-        val sceneId = Scene.Id()
-        val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
-        val update = order.withScene(sceneCreated)
+            @Test
+            fun `when no other scenes exist, no where for it to move`() {
+                val sceneOrder = SceneOrder(Project.Id(), setOf(sceneId))
+                val modifications = sceneOrder.withScene(sceneId)!!
+                val update = modifications.movedTo(1)
 
-        update as SuccessfulSceneOrderUpdate
-        update.sceneOrder.order.size.mustEqual(6)
-        update.sceneOrder.order.last().mustEqual(sceneId)
-        update.sceneOrder.projectId.mustEqual(projectId)
-        update.change.mustEqual(sceneCreated)
-    }
+                update as UnSuccessfulSceneOrderUpdate
+                update.sceneOrder === sceneOrder
+                update.reason as IndexOutOfBoundsException
+            }
 
-    @Test
-    fun `should add scene at specified index`() {
-        val projectId = Project.Id()
-        val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+            @Nested
+            inner class `Given Other Scenes Exist` {
 
-        val sceneId = Scene.Id()
-        val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
-        val update = order.withScene(sceneCreated, at = 3)
+                val sceneOrder = SceneOrder(Project.Id(),
+                    setOf(Scene.Id(), Scene.Id()) + sceneId +
+                            setOf(Scene.Id(), Scene.Id())
+                )
 
-        update as SuccessfulSceneOrderUpdate
-        update.sceneOrder.order.size.mustEqual(6)
-        update.sceneOrder.order.toList()[3].mustEqual(sceneId)
-        update.change.mustEqual(sceneCreated)
-    }
+                @Test
+                fun `if current index is used, no update should happen`() {
+                    val update = sceneOrder.withScene(sceneId)!!.movedTo(2)
 
-    @Test
-    fun `cannot add scene at index less than negative one`() {
-        val projectId = Project.Id()
-        val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+                    update as UnSuccessfulSceneOrderUpdate
+                    update.reason.mustEqual(sceneAlreadyAtIndex(sceneId, 2))
+                }
 
-        val sceneId = Scene.Id()
-        val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()), at = -2)
+                @ParameterizedTest
+                @ValueSource(ints = [-1, 5])
+                fun `index out of bounds should not produce update`(index: Int) {
+                    val update = sceneOrder.withScene(sceneId)!!.movedTo(index)
 
-        update as UnSuccessfulSceneOrderUpdate
-        update.sceneOrder.order.size.mustEqual(5)
+                    update as UnSuccessfulSceneOrderUpdate
+                    update.reason as IndexOutOfBoundsException
+                }
 
-        update.reason.mustEqual(cannotAddSceneOutOfBounds(sceneId, -2))
-    }
+                @Test
+                fun `moving back should offset events before`() {
+                    val update = sceneOrder.withScene(sceneId)!!.movedTo(0)
 
-    @Test
-    fun `cannot add scene at index greater than size of current order`() {
-        val projectId = Project.Id()
-        val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+                    update as SuccessfulSceneOrderUpdate
+                    update.sceneOrder.order.mustEqual(
+                        sceneOrder.order.toList().let {
+                            setOf(
+                                sceneId,
+                                it[0],
+                                it[1],
+                                it[3],
+                                it[4]
+                            )
+                        }
+                    )
+                }
 
-        val sceneId = Scene.Id()
-        val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()), at = 6)
+                @Test
+                fun `moving forward should offset events after`() {
+                    val update = sceneOrder.withScene(sceneId)!!.movedTo(4)
 
-        update as UnSuccessfulSceneOrderUpdate
-        update.sceneOrder.order.size.mustEqual(5)
+                    update as SuccessfulSceneOrderUpdate
+                    update.sceneOrder.order.mustEqual(
+                        sceneOrder.order.toList().let {
+                            setOf(
+                                it[0],
+                                it[1],
+                                it[3],
+                                it[4],
+                                sceneId,
+                            )
+                        }
+                    )
+                }
 
-        update.reason.mustEqual(cannotAddSceneOutOfBounds(sceneId, 6))
+            }
+
+        }
+
     }
 
 }

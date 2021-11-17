@@ -7,3 +7,6 @@ data class DuplicateSceneOrderOperation(override val message: String) : Duplicat
 
 internal fun sceneCannotBeAddedTwice(sceneId: Scene.Id) =
     DuplicateSceneOrderOperation("Scene cannot be added to Scene Order twice.  Scene: $sceneId")
+
+internal fun sceneAlreadyAtIndex(sceneId: Scene.Id, index: Int) =
+    DuplicateSceneOrderOperation("$sceneId is already at index $index in scene order")
