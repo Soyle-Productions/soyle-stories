@@ -23,7 +23,7 @@ class `Scene Order Service Unit Test` {
     @Nested
     inner class `Given No Scenes Exist Yet` {
 
-        val sceneOrder = SceneOrder(projectId, setOf())
+        val sceneOrder = SceneOrder.initializeInProject(projectId)
 
         @Test
         fun `should create new scene in project`() {
@@ -51,7 +51,7 @@ class `Scene Order Service Unit Test` {
     @Nested
     inner class `Given Scenes Exist Already` {
 
-        val sceneOrder = SceneOrder(projectId, List(4) { Scene.Id() }.toSet())
+        val sceneOrder = SceneOrder.reInstantiate(projectId, List(4) { Scene.Id() })
 
         @Test
         fun `scene should be added to the end of the project`() {

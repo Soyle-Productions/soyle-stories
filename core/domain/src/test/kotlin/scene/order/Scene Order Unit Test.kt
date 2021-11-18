@@ -5,6 +5,7 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SceneCreated
+import com.soyle.stories.domain.scene.events.SceneRemoved
 import com.soyle.stories.domain.scene.order.exceptions.cannotAddSceneOutOfBounds
 import com.soyle.stories.domain.scene.order.exceptions.sceneAlreadyAtIndex
 import com.soyle.stories.domain.scene.order.exceptions.sceneCannotBeAddedTwice
@@ -26,7 +27,7 @@ class `Scene Order Unit Test` {
 
         @Test
         fun `adding scene should add it to the end of the list`() {
-            val order = SceneOrder(projectId, setOf())
+            val order = SceneOrder.initializeInProject(projectId)
 
             val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
             val update = order.withScene(sceneCreated)
@@ -40,7 +41,7 @@ class `Scene Order Unit Test` {
 
         @Test
         fun `cannot add the same scene twice`() {
-            val order = SceneOrder(projectId, setOf(sceneId))
+            val order = SceneOrder.reInstantiate(projectId, listOf(sceneId))
 
             val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()))
 
@@ -54,7 +55,7 @@ class `Scene Order Unit Test` {
 
         @Test
         fun `should add new scenes to end of scene order`() {
-            val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+            val order = SceneOrder.reInstantiate(projectId, List(5) { Scene.Id() })
 
             val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
             val update = order.withScene(sceneCreated)
@@ -68,7 +69,7 @@ class `Scene Order Unit Test` {
 
         @Test
         fun `should add scene at specified index`() {
-            val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+            val order = SceneOrder.reInstantiate(projectId, List(5) { Scene.Id() })
 
             val sceneCreated = SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id())
             val update = order.withScene(sceneCreated, at = 3)
@@ -81,7 +82,7 @@ class `Scene Order Unit Test` {
 
         @Test
         fun `cannot add scene at index less than negative one`() {
-            val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+            val order = SceneOrder.reInstantiate(projectId, List(5) { Scene.Id() })
 
             val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()), at = -2)
 
@@ -93,7 +94,7 @@ class `Scene Order Unit Test` {
 
         @Test
         fun `cannot add scene at index greater than size of current order`() {
-            val order = SceneOrder(projectId, List(5) { Scene.Id() }.toSet())
+            val order = SceneOrder.reInstantiate(projectId, List(5) { Scene.Id() })
 
             val update = order.withScene(SceneCreated(sceneId, "Some name", Prose.Id(), StoryEvent.Id()), at = 6)
 
@@ -110,7 +111,7 @@ class `Scene Order Unit Test` {
 
         @Test
         fun `when scene is not in scene order, should not return modification interface`() {
-            val modifications = SceneOrder(Project.Id(), setOf()).withScene(Scene.Id())
+            val modifications = SceneOrder.initializeInProject(Project.Id()).withScene(Scene.Id())
 
             assertNull(modifications)
         }
@@ -122,7 +123,7 @@ class `Scene Order Unit Test` {
 
             @Test
             fun `when no other scenes exist, no where for it to move`() {
-                val sceneOrder = SceneOrder(Project.Id(), setOf(sceneId))
+                val sceneOrder = SceneOrder.reInstantiate(Project.Id(), listOf(sceneId))
                 val modifications = sceneOrder.withScene(sceneId)!!
                 val update = modifications.movedTo(1)
 
@@ -134,9 +135,9 @@ class `Scene Order Unit Test` {
             @Nested
             inner class `Given Other Scenes Exist` {
 
-                val sceneOrder = SceneOrder(Project.Id(),
-                    setOf(Scene.Id(), Scene.Id()) + sceneId +
-                            setOf(Scene.Id(), Scene.Id())
+                val sceneOrder = SceneOrder.reInstantiate(Project.Id(),
+                    listOf(Scene.Id(), Scene.Id()) + sceneId +
+                            listOf(Scene.Id(), Scene.Id())
                 )
 
                 @Test
@@ -192,6 +193,52 @@ class `Scene Order Unit Test` {
                     )
                 }
 
+            }
+
+        }
+
+    }
+
+    @Nested
+    inner class `Can Remove Scene` {
+
+        val sceneId = Scene.Id()
+        val sceneOrder = SceneOrder
+                .initializeInProject(Project.Id())
+                .withScene(SceneCreated(sceneId, "", Prose.Id(), StoryEvent.Id())).sceneOrder
+
+        @Test
+        fun `scene should no longer be in scene order`() {
+            val update = sceneOrder.withScene(sceneId)!!.removed()
+
+            update.sceneOrder.order.contains(sceneId).mustEqual(false)
+        }
+
+        @Test
+        fun `should produce scene removed event`() {
+            val update = sceneOrder.withScene(sceneId)!!.removed()
+
+            update as SuccessfulSceneOrderUpdate
+            update.change.sceneId.mustEqual(sceneId)
+            update.change.newOrder.mustEqual(update.sceneOrder.order.toList())
+        }
+
+        @Nested
+        inner class `Given Other Scenes Exist` {
+
+            val otherScenes = List(5) { Scene.Id() }
+            val sceneOrder = SceneOrder
+                .reInstantiate(Project.Id(), otherScenes + sceneId)
+
+            @Test
+            fun `should still contain other scenes`() {
+                val update = sceneOrder.withScene(sceneId)!!.removed()
+
+                update as SuccessfulSceneOrderUpdate
+                otherScenes.forEach {
+                    update.sceneOrder.order.contains(it).mustEqual(true)
+                    update.change.newOrder.contains(it).mustEqual(true)
+                }
             }
 
         }
