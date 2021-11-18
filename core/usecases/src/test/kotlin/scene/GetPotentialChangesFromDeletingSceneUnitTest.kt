@@ -9,6 +9,7 @@ import com.soyle.stories.domain.scene.CharacterInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocaleDouble
 import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.scene.order.SceneOrder
 import com.soyle.stories.domain.shouldBe
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.toEntitySet
@@ -31,7 +32,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
     fun `clean up`() {
         result = null
         sceneRepository.scenes.clear()
-        sceneRepository.sceneOrder.clear()
+        sceneRepository.sceneOrders.clear()
     }
 
     @AfterEach
@@ -313,14 +314,14 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
                 scene.withCharacterIncluded(character).scene.withMotivationForCharacter(character.id, motiveInScene)
             }
         }
-        sceneRepository.sceneOrder[projectId] = scenes.map(Scene::id)
+        sceneRepository.sceneOrders[projectId] = SceneOrder.reInstantiate(projectId, scenes.map(Scene::id))
         sceneRepository.scenes.putAll(scenes.associateBy(Scene::id))
     }
 
     private var targetScene: Scene? = null
 
     private fun givenDeletedSceneIs(selector: List<Scene>.() -> Scene) {
-        val orderOf = sceneRepository.sceneOrder.getValue(projectId).withIndex().associate { it.value to it.index }
+        val orderOf = sceneRepository.sceneOrders.getValue(projectId).order.withIndex().associate { it.value to it.index }
         val orderedScenes = sceneRepository.scenes.values.filter { it.projectId == projectId }.sortedBy {
             orderOf.getValue(it.id)
         }
@@ -332,9 +333,11 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
             targetScene.name,
             targetScene.storyEventId,
             charactersInScene = targetScene.duplicateCharactersForNewScene(sceneId))
-        sceneRepository.sceneOrder[projectId] = sceneRepository.sceneOrder.getValue(projectId).map {
+        sceneRepository.sceneOrders[projectId] = sceneRepository.sceneOrders.getValue(projectId).order.map {
             if (it == targetScene.id) sceneId
             else it
+        }.let {
+            SceneOrder.reInstantiate(projectId, it)
         }
         this.targetScene = sceneRepository.scenes[sceneId]
     }

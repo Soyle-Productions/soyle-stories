@@ -1,12 +1,12 @@
 package com.soyle.stories.usecase.scene.character
 
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.character.characterName
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.scene.order.SceneOrder
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.domain.str
@@ -16,13 +16,11 @@ import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.scene.NoSceneExistsWithStoryEventId
-import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.common.IncludedCharacterInScene
 import com.soyle.stories.usecase.scene.character.listAvailableCharacters.AvailableCharactersToAddToScene
 import com.soyle.stories.usecase.scene.character.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
 import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInScene
 import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInSceneUseCase
-import com.soyle.stories.usecase.scene.sceneDoesNotExist
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEvent
 import com.soyle.stories.usecase.storyevent.characterDoesNotExist
@@ -143,7 +141,8 @@ class IncludeCharacterInSceneUnitTest {
 
             init {
                 sceneRepository.givenScene(previousScene)
-                sceneRepository.sceneOrder[scene.projectId] = listOf(previousScene.id, scene.id)
+                sceneRepository.sceneOrders[scene.projectId] = listOf(previousScene.id, scene.id)
+                    .let { SceneOrder.reInstantiate(scene.projectId, it) }
             }
 
             @Test
@@ -298,7 +297,8 @@ class IncludeCharacterInSceneUnitTest {
                 }
         }
         val previousIds = sceneRepository.scenes.values.filterNot { it.id == sceneId }.map { it.id }
-        sceneRepository.sceneOrder[projectId] = previousIds + sceneId
+        sceneRepository.sceneOrders[projectId] = (previousIds + sceneId)
+            .let { SceneOrder.reInstantiate(projectId, it) }
         lastMotiveSource = sceneRepository.scenes.getValue(previousIds.last())
     }
 

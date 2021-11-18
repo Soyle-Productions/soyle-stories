@@ -103,7 +103,7 @@ class GetPotentialChangesFromDeletingSceneUseCase(
 		.filterNot { it.isInherited() }.toList()
 
 	private suspend fun getScenesBeforeAndAfter(scene: Scene): Pair<List<Scene>, List<Scene>> {
-		val sceneOrder = sceneRepository.getSceneIdsInOrder(scene.projectId).withIndex().associate { it.value to it.index }
+		val sceneOrder = sceneRepository.getSceneIdsInOrder(scene.projectId)!!.order.withIndex().associate { it.value to it.index }
 		val scenes = sceneRepository.listAllScenesInProject(scene.projectId).sortedBy {
 			sceneOrder.getValue(it.id)
 		}

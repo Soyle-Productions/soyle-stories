@@ -19,7 +19,8 @@ class PreviousMotivations(private val scene: Scene, private val sceneRepository:
 
 	companion object {
 		suspend fun List<Scene>.sortedByProjectOrder(projectId: Project.Id, sceneRepository: SceneRepository): List<Scene> {
-			val indexOf = sceneRepository.getSceneIdsInOrder(projectId)
+			val indexOf = sceneRepository.getSceneIdsInOrder(projectId)!!
+				.order
 				.withIndex()
 				.associate { it.value to it.index }
 			return sortedBy { indexOf.getValue(it.id) }

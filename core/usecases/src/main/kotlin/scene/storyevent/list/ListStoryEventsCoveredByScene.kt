@@ -6,6 +6,6 @@ interface ListStoryEventsCoveredByScene {
     suspend operator fun invoke(sceneId: Scene.Id, output: OutputPort)
 
     fun interface OutputPort {
-        fun receiveStoryEventsCoveredByScene(storyEventsInScene: StoryEventsInScene)
+        suspend fun receiveStoryEventsCoveredByScene(storyEventsInScene: StoryEventsInScene)
     }
 }

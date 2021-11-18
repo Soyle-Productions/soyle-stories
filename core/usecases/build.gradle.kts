@@ -29,6 +29,7 @@ dependencies {
     testImplementation(Libraries.junit.engine)
     testImplementation(Libraries.junit.params)
     testImplementation(testFixtures(project(path = ":core:domain")))
+    testImplementation(Libraries.kluent)
 
     testFixturesImplementation(Libraries.junit.api)
     testFixturesImplementation(Libraries.kotlin.coroutines.core)

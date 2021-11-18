@@ -1,11 +1,12 @@
 package com.soyle.stories.domain.storyevent
 
+import com.soyle.stories.domain.entities.updates.Update
 import com.soyle.stories.domain.storyevent.events.StoryEventChange
 
-sealed class StoryEventUpdate<out E : StoryEventChange>() {
+sealed class StoryEventUpdate<out E : StoryEventChange> : Update<StoryEvent> {
 
     abstract val storyEvent: StoryEvent
-    operator fun component1() = storyEvent
+    override operator fun component1() = storyEvent
 }
 
 class Successful<E : StoryEventChange>(

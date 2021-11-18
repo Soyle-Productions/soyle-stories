@@ -2,6 +2,8 @@ package com.soyle.stories.domain.storyevent
 
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.entitySetOf
@@ -85,6 +87,85 @@ class `Story Event Time Service Unit Test` {
                             newStoryEvent.time.mustEqual(originalStoryEvent.time + 9u)
                             (change as StoryEventRescheduled).newTime.mustEqual(originalStoryEvent.time + 9u)
                         }
+                }
+
+            }
+
+        }
+
+        @Nested
+        inner class `When Scene is Provided` {
+
+            private val inputScene = makeScene(name = name, projectId = projectId)
+
+            @Test
+            fun `should be covered by input scene id`(): Unit = runBlocking {
+                val updates: List<StoryEventUpdate<*>> =
+                    service.createStoryEvent(inputScene, 0)
+
+                updates.single().storyEvent.sceneId.mustEqual(inputScene.id)
+                updates.single().storyEvent.name.mustEqual(name)
+                updates.single().storyEvent.projectId.mustEqual(projectId)
+            }
+
+            @Nested
+            inner class `When Time is Greater Than or Equal to Zero` {
+
+                @ParameterizedTest
+                @ValueSource(longs = [0, 8])
+                fun `should return single creation update for provided story event`(inputTime: Long): Unit = runBlocking {
+                    val updates: List<StoryEventUpdate<*>> =
+                        service.createStoryEvent(inputScene, inputTime)
+
+                    updates.single().storyEvent.sceneId.mustEqual(inputScene.id)
+                    updates.single().storyEvent.name.mustEqual(name)
+                    updates.single().storyEvent.time.mustEqual(inputTime.toULong())
+                    updates.single().storyEvent.projectId.mustEqual(projectId)
+                }
+
+                @ParameterizedTest
+                @ValueSource(longs = [0, 8])
+                fun `should successfully create story event`(inputTime: Long): Unit = runBlocking {
+                    val updates: List<StoryEventUpdate<*>> =
+                        service.createStoryEvent(inputScene, inputTime)
+
+                    with(updates.single() as Successful) {
+                        (change as StoryEventCreated).time.mustEqual(inputTime.toULong())
+                    }
+                }
+
+            }
+
+            @Nested
+            inner class `When New Time is Less Than Zero` {
+
+                @Test
+                fun `should only create story event with time at zero`(): Unit = runBlocking {
+                    val updates = service.createStoryEvent(inputScene, -9)
+
+                    val update = updates.single { it.storyEvent.id !in repoMap }
+                    update.storyEvent.time.mustEqual(0L.toULong())
+                    update.storyEvent.sceneId.mustEqual(inputScene.id)
+                    ((update as Successful).change as StoryEventCreated).time.mustEqual(0L.toULong())
+                }
+
+                @Nested
+                inner class `Given Other Story Events in Project` {
+
+                    @Test
+                    fun `should normalize all other story events above zero`(): Unit = runBlocking {
+                        val updates = service.createStoryEvent(inputScene, -9)
+
+                        updates.size.mustEqual(6)
+                        updates.filter { it.storyEvent.id in repoMap }
+                            .map { it as Successful }
+                            .forEach { (newStoryEvent, change) ->
+                                val originalStoryEvent = repoMap.getValue(newStoryEvent.id)
+                                newStoryEvent.time.mustEqual(originalStoryEvent.time + 9u)
+                                (change as StoryEventRescheduled).newTime.mustEqual(originalStoryEvent.time + 9u)
+                            }
+                    }
+
                 }
 
             }

@@ -43,6 +43,37 @@ class `Story Event Unit Test` {
 
         }
 
+        @Test
+        fun `should not be covered by a scene`() {
+            val update: StoryEventUpdate<StoryEventCreated> = StoryEvent.create(inputName, inputTime, projectId)
+            update as Successful
+
+            update.storyEvent.sceneId.mustEqual(null)
+        }
+
+        @Nested
+        inner class `When Scene Is is Provided` {
+
+            val sceneId = Scene.Id()
+
+            @Test
+            fun `should be covered by scene`() {
+                val update: StoryEventUpdate<StoryEventCreated> = StoryEvent.create(inputName, inputTime, projectId, sceneId)
+                update as Successful
+
+                update.storyEvent.sceneId.mustEqual(sceneId)
+            }
+
+            @Test
+            fun `output event should include scene id`() {
+                val update: StoryEventUpdate<StoryEventCreated> = StoryEvent.create(inputName, inputTime, projectId, sceneId)
+                update as Successful
+
+                update.change.sceneId.mustEqual(sceneId)
+            }
+
+        }
+
     }
 
     @Nested

@@ -1,6 +1,7 @@
 package com.soyle.stories.domain.storyevent
 
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
@@ -13,9 +14,20 @@ class StoryEventTimeService(
 ) {
 
     suspend fun createStoryEvent(
+        scene: Scene,
+        time: Long,
+    ): List<StoryEventUpdate<*>> {
+        if (time < 0) {
+            val creation = StoryEvent.create(scene.name, 0u, scene.projectId, scene.id)
+            return normalizeAllStoryEventsAboveZero(creation.storyEvent, time).plus(creation)
+        }
+        return listOf(StoryEvent.create(scene.name, time.toULong(), scene.projectId, scene.id))
+    }
+
+    suspend fun createStoryEvent(
         name: NonBlankString,
         time: Long,
-        projectId: Project.Id
+        projectId: Project.Id,
     ): List<StoryEventUpdate<*>> {
         if (time < 0) {
             val creation = StoryEvent.create(name, 0u, projectId)

@@ -1,17 +1,18 @@
 package com.soyle.stories.usecase.scene.deleteScene
 
 import com.soyle.stories.domain.location.events.HostedSceneRemoved
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocale
+import com.soyle.stories.domain.scene.events.SceneRemoved
 import java.util.UUID
 
 interface DeleteScene {
 
-	suspend operator fun invoke(sceneId: UUID, locale: SceneLocale, output: OutputPort)
+	suspend operator fun invoke(sceneId: Scene.Id, output: OutputPort)
 
-	class ResponseModel(val sceneId: UUID, val hostedScenesRemoved: List<HostedSceneRemoved>)
+	class ResponseModel(val sceneRemoved: SceneRemoved, val hostedScenesRemoved: List<HostedSceneRemoved>)
 
-	interface OutputPort {
-		fun receiveDeleteSceneFailure(failure: Exception)
-		fun receiveDeleteSceneResponse(responseModel: ResponseModel)
+	fun interface OutputPort {
+		suspend fun receiveDeleteSceneResponse(responseModel: ResponseModel)
 	}
 }

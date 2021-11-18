@@ -5,8 +5,8 @@ import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.RoleInScene
 import com.soyle.stories.domain.scene.makeScene
+import com.soyle.stories.domain.scene.order.SceneOrder
 import com.soyle.stories.usecase.exceptions.scene.assertThrowsSceneDoesNotExist
-import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInScene
 import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInSceneUseCase
@@ -86,7 +86,8 @@ class `List Characters in Scene Unit Test` {
                 .withCharacterIncluded(includedCharacters.first()).scene
                 .withMotivationForCharacter(includedCharacters.first().id, "Previous Motive")
             sceneRepository.givenScene(inheritedScene)
-            sceneRepository.sceneOrder[scene.projectId] = listOf(inheritedScene.id, scene.id)
+            sceneRepository.sceneOrders[scene.projectId] = listOf(inheritedScene.id, scene.id)
+                .let { SceneOrder.reInstantiate(scene.projectId, it) }
             val result = listCharactersInScene()
             result.charactersInScene.find { it.characterId == includedCharacters.first().id }!!
                 .inheritedMotivation!!.run {

@@ -3,133 +3,101 @@ package com.soyle.stories.usecase.scene.createNewScene
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.scene.Updated
+import com.soyle.stories.domain.scene.events.SceneCreated
+import com.soyle.stories.domain.scene.order.SceneOrder
+import com.soyle.stories.domain.scene.order.SceneOrderService
+import com.soyle.stories.domain.scene.order.SceneOrderUpdate
+import com.soyle.stories.domain.scene.order.SuccessfulSceneOrderUpdate
 import com.soyle.stories.domain.storyevent.StoryEventTimeService
+import com.soyle.stories.domain.storyevent.Successful
+import com.soyle.stories.domain.storyevent.SuccessfulStoryEventUpdate
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.usecase.prose.ProseRepository
 import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.SceneRepository
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
-import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.usecase.storyevent.StoryEventRepository
-import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
-import kotlinx.coroutines.Job
-import java.util.*
 
 class CreateNewSceneUseCase(
-	projectId: UUID,
-	private val sceneRepository: SceneRepository,
-	private val storyEventRepository: StoryEventRepository,
-	private val proseRepository: ProseRepository,
-	private val createStoryEvent: CreateStoryEvent
+    private val sceneOrderService: SceneOrderService,
+    private val storyEventTimeService: StoryEventTimeService,
+    private val sceneRepository: SceneRepository,
+    private val proseRepository: ProseRepository,
+    private val storyEventRepository: StoryEventRepository
 ) : CreateNewScene {
 
-	private val projectId = Project.Id(projectId)
+    override suspend fun invoke(request: CreateNewScene.RequestModel, output: CreateNewScene.OutputPort) {
+        val (prose) = Prose.create(request.projectId)
+        val sceneOrderUpdate = createSceneInProject(request, prose.id)
+        val storyEventUpdate = createCorrespondingStoryEvent(sceneOrderUpdate.change.scene)
 
-	override suspend fun invoke(request: CreateNewScene.RequestModel, output: CreateNewScene.OutputPort) {
-		val (response, createdStoryEventResponse) = try { execute(request) }
-		catch (e: Exception) { return outputException(output, e) }
-		output.receiveCreateNewSceneResponse(response)
-		if (createdStoryEventResponse != null) {
-			output.createStoryEventOutputPort.receiveCreateStoryEventResponse(createdStoryEventResponse)
-		}
-	}
+        commitChanges(sceneOrderUpdate, prose, storyEventUpdate)
 
-	private suspend fun execute(request: CreateNewScene.RequestModel): Pair<CreateNewScene.ResponseModel, CreateStoryEvent.ResponseModel?> {
-		val (storyEvent, createdStoryEventResponse) = getOrCreateStoryEvent(request)
-		val response = createNewScene(storyEvent, request)
-		return response to createdStoryEventResponse
-	}
+        output.newSceneCreated(response(sceneOrderUpdate, storyEventUpdate))
+    }
 
-	private suspend fun getOrCreateStoryEvent(request: CreateNewScene.RequestModel): Pair<StoryEvent, CreateStoryEvent.ResponseModel?> {
-		return if (request.storyEventId != null) getStoryEvent(request.storyEventId) to null
-		else createStoryEvent(request)
-	}
+    private suspend fun commitChanges(
+        sceneOrderUpdate: SceneOrderUpdate.Successful<Updated<SceneCreated>>,
+        prose: Prose,
+        storyEventUpdate: Successful<*>
+    ) {
+        sceneRepository.createNewScene(sceneOrderUpdate.change.scene)
+        sceneRepository.updateSceneOrder(sceneOrderUpdate.sceneOrder)
+        proseRepository.addProse(prose)
+        storyEventRepository.addNewStoryEvent(storyEventUpdate.storyEvent)
+    }
 
-	private suspend fun createStoryEvent(request: CreateNewScene.RequestModel): Pair<StoryEvent, CreateStoryEvent.ResponseModel>
-	{
-		val createStoryEventRequest = makeCreateStoryEventRequest(request)
-		val response = callCreateStoryEventUseCase(createStoryEventRequest)
-		return getStoryEvent(response.createdStoryEvent.storyEventId.uuid) to response
-	}
+    private fun response(
+        sceneOrderUpdate: SceneOrderUpdate.Successful<Updated<SceneCreated>>,
+        storyEventUpdate: Successful<StoryEventCreated>
+    ) = CreateNewScene.ResponseModel(
+        sceneOrderUpdate.change.change,
+        storyEventUpdate.change,
+        sceneOrderUpdate
+    )
 
-	private suspend fun makeCreateStoryEventRequest(request: CreateNewScene.RequestModel): CreateStoryEvent.RequestModel
-	{
-		return when {
-			request.relativeToScene != null -> {
-				val relativeStoryEvent = getRelativeStoryEvent(request)
-				when(request.relativeToScene.second) {
-					true -> CreateStoryEvent.RequestModel(request.name, Project.Id(), relativeStoryEvent, -1)
-					false -> CreateStoryEvent.RequestModel(request.name, Project.Id(), relativeStoryEvent, +1)
-				}
-			}
-			else -> CreateStoryEvent.RequestModel(request.name, projectId)
-		}
-	}
+    private suspend fun createSceneInProject(
+        request: CreateNewScene.RequestModel,
+        proseId: Prose.Id
+    ): SceneOrderUpdate.Successful<Updated<SceneCreated>> {
+        val sceneOrder = sceneRepository.getSceneIdsInOrder(request.projectId) ?: SceneOrder.initializeInProject(request.projectId)
 
-	private suspend fun getRelativeStoryEvent(request: CreateNewScene.RequestModel): StoryEvent.Id
-	{
-		val relativeScene = sceneRepository.getSceneById(Scene.Id(request.relativeToScene!!.first))
-		  ?: throw SceneDoesNotExist(request.locale, request.relativeToScene.first)
-		val relativeStoryEvent = getStoryEvent(relativeScene.storyEventId.uuid)
-		return relativeStoryEvent.id
-	}
+        return sceneOrderService.createScene(
+            sceneOrder,
+            request.name,
+            proseId,
+            relativeSceneIndex(request, sceneOrder.order)
+        ) as SuccessfulSceneOrderUpdate
+    }
 
-	private suspend fun callCreateStoryEventUseCase(request: CreateStoryEvent.RequestModel): CreateStoryEvent.ResponseModel
-	{
-		val job = Job()
-		var createStoryEventResponse: CreateStoryEvent.ResponseModel? = null
-		createStoryEvent.invoke(request) { response ->
-			createStoryEventResponse = response
-			job.complete()
-		}
-		job.join()
-		return createStoryEventResponse!!
-	}
+    private fun relativeSceneIndex(
+        request: CreateNewScene.RequestModel,
+        sceneOrder: Set<Scene.Id>
+    ): Int {
+        val relativeSceneId = request.relativeSceneId ?: return -1
+        if (relativeSceneId !in sceneOrder) throw SceneDoesNotExist(relativeSceneId.uuid)
+        val indexOfRelativeScene = sceneOrder.indexOf(relativeSceneId)
+        return if (request.isBeforeScene) {
+            indexOfRelativeScene
+        } else indexOfRelativeScene + 1
+    }
 
-	private fun outputException(output: CreateNewScene.OutputPort, exception: Exception) {
-		output.receiveCreateNewSceneFailure(exception)
-	}
+    private suspend fun createCorrespondingStoryEvent(scene: Scene): Successful<StoryEventCreated> {
+        val update = storyEventTimeService.createStoryEvent(
+            scene,
+            maxStoryEventTimeInProject(scene.projectId)
+        ).single() as Successful
 
-	private suspend fun createNewScene(storyEvent: StoryEvent, request: CreateNewScene.RequestModel): CreateNewScene.ResponseModel {
-		val (prose, _) = Prose.create(projectId)
-		proseRepository.addProse(prose)
-		val scene = Scene(projectId, request.name, storyEvent.id, prose.id)
-		return insertScene(scene, request)
-	}
+        update.change as StoryEventCreated
 
-	private suspend fun insertScene(scene: Scene, request: CreateNewScene.RequestModel): CreateNewScene.ResponseModel
-	{
-		val idOrder = sceneRepository.getSceneIdsInOrder(projectId)
-		val index = getInsertionIndex(idOrder, request)
-		val affectedScenes = insertSceneAt(idOrder, scene, index)
-		return CreateNewScene.ResponseModel(scene.id.uuid, scene.proseId, request.name.value, index, affectedScenes)
-	}
+        @Suppress("UNCHECKED_CAST")
+        return update as Successful<StoryEventCreated>
+    }
 
-	private fun getInsertionIndex(idOrder: List<Scene.Id>, request: CreateNewScene.RequestModel): Int
-	{
-		return if (request.relativeToScene != null) {
-			val relativeIndex = idOrder.indexOf(Scene.Id(request.relativeToScene.first))
-			if (relativeIndex == -1) throw Error("Repository does not contain index of Scene ${request.relativeToScene.first}")
-			val insertIndex = relativeIndex + if (request.relativeToScene.second) 0 else 1
-			insertIndex
-		} else {
-			idOrder.size
-		}
-	}
+    private suspend fun maxStoryEventTimeInProject(projectId: Project.Id) =
+        (storyEventRepository.listStoryEventsInProject(projectId)
+            .maxOfOrNull { it.time.toLong() } ?: 0L)
+            .plus(1)
 
-	private suspend fun insertSceneAt(idOrder: List<Scene.Id>, scene: Scene, index: Int): List<SceneItem>
-	{
-		sceneRepository.createNewScene(scene, idOrder.toMutableList().apply { add(index, scene.id) })
-		return if (index < idOrder.size) {
-			val affectedIds = idOrder.asSequence().withIndex().filter { it.index >= index }.associate { it.value to it.index }
-			sceneRepository.listAllScenesInProject(projectId).filter { it.id in affectedIds }.map {
-				SceneItem(it.id.uuid,it.proseId, it.name.value, affectedIds.getValue(it.id) + 1)
-			}
-		} else listOf()
-	}
-
-	private suspend fun getStoryEvent(storyEventId: UUID) =
-	  (storyEventRepository.getStoryEventById(StoryEvent.Id(storyEventId))
-		?: throw StoryEventDoesNotExist(storyEventId))
 
 }

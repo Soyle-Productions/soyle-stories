@@ -54,7 +54,7 @@ class Scene private constructor(
             )
     }
 
-    constructor(
+    private constructor(
         projectId: Project.Id,
         name: NonBlankString,
         storyEventId: StoryEvent.Id,

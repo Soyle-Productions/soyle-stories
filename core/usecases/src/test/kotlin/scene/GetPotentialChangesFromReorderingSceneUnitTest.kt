@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import java.util.*
 
 class GetPotentialChangesFromReorderingSceneUnitTest {
     /*
@@ -199,11 +198,10 @@ class GetPotentialChangesFromReorderingSceneUnitTest {
 
     private fun givenScenes(vararg names: String)
     {
-        sceneRepository.sceneOrder[projectId] = names.map {
+        names.forEach {
             val scene = makeScene(projectId = projectId, name = NonBlankString.create(it)!!)
-            sceneRepository.scenes[scene.id] = scene
+            sceneRepository.givenScene(scene)
             sceneNameMap[it] = scene.id
-            scene.id
         }
     }
 
