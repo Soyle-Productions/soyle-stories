@@ -5,6 +5,7 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.order.SceneOrder
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -12,17 +13,20 @@ import com.soyle.stories.usecase.scene.SceneRepository
 class SceneRepositoryImpl : SceneRepository {
 
 	private val scenes = mutableMapOf<Scene.Id, Scene>()
-	private val sceneOrder = mutableMapOf<Project.Id, List<Scene.Id>>()
+	private val sceneOrder = mutableMapOf<Project.Id, SceneOrder>()
 
 	// indexes
 	private val scenesByStoryEventId = mutableMapOf<StoryEvent.Id, Scene.Id>()
 	private val scenesByProseId = mutableMapOf<Prose.Id, Scene.Id>()
 
-	override suspend fun createNewScene(scene: Scene, idOrder: List<Scene.Id>) {
+	override suspend fun createNewScene(scene: Scene) {
 		scenes[scene.id] = scene
 		scenesByStoryEventId[scene.storyEventId] = scene.id
 		scenesByProseId[scene.proseId] = scene.id
-		sceneOrder[scene.projectId] = idOrder
+	}
+
+	override suspend fun updateSceneOrder(sceneOrder: SceneOrder) {
+		this.sceneOrder[sceneOrder.projectId] = sceneOrder
 	}
 
 	override suspend fun listAllScenesInProject(projectId: Project.Id, exclude: Set<Scene.Id>): List<Scene> =
@@ -40,16 +44,12 @@ class SceneRepositoryImpl : SceneRepository {
 		return scenes.values.filter { it.includesCharacter(characterId) }
 	}
 
-	override suspend fun getSceneIdsInOrder(projectId: Project.Id): List<Scene.Id> {
-		return sceneOrder[projectId] ?: emptyList()
+	override suspend fun getSceneIdsInOrder(projectId: Project.Id): SceneOrder? {
+		return sceneOrder[projectId]
 	}
 
 	override suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene? {
 		return scenesByStoryEventId[storyEventId]?.let { scenes[it] }
-	}
-
-	override suspend fun updateSceneOrder(projectId: Project.Id, order: List<Scene.Id>) {
-		sceneOrder[projectId] = order
 	}
 
 	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =
@@ -61,8 +61,8 @@ class SceneRepositoryImpl : SceneRepository {
 		scenesByProseId[scene.proseId] = scene.id
 	}
 
-	override suspend fun removeScene(scene: Scene) {
-		scenes.remove(scene.id)
+	override suspend fun removeScene(sceneId: Scene.Id) {
+		val scene = scenes.remove(sceneId) ?: return
 		scenesByStoryEventId.remove(scene.storyEventId)
 		scenesByProseId.remove(scene.proseId)
 	}

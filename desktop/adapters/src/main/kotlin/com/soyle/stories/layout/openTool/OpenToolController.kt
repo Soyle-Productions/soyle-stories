@@ -37,6 +37,7 @@ interface OpenToolController {
 		fun openSymbolsInScene(sceneItem: SceneItem?)
 		fun openSceneLocations(sceneItem: SceneItem?)
 		fun openSceneCharacters(sceneItem: SceneItem?)
+		fun openSceneOutline()
 	}
 	interface OpenThemeToolController {
 		fun openCharacterValueComparison(themeId: String)

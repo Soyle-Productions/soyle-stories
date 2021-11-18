@@ -1,6 +1,5 @@
 package com.soyle.stories.scene.charactersInScene.listCharactersInScene
 
-import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInScene
