@@ -4,7 +4,7 @@ import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterRece
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.gui.View
-import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
+import com.soyle.stories.scene.delete.SceneDeletedReceiver
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.DeleteCharacterPresenter
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.DeleteScenePresenter
 import com.soyle.stories.scene.deleteSceneRamifications.presenters.Invalidater

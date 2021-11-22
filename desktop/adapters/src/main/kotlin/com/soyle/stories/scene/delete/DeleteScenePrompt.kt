@@ -1,6 +1,9 @@
 package com.soyle.stories.scene.delete
 
-interface DeleteScenePrompt {
-    suspend fun requestConfirmation(): Boolean?
-    suspend fun requestShouldConfirmNextTime(): Boolean?
+import com.soyle.stories.common.Confirmation
+import com.soyle.stories.scene.PromptChoice
+
+interface DeleteScenePrompt : AutoCloseable {
+
+    suspend fun requestConfirmation(sceneName: String): Confirmation<PromptChoice>?
 }

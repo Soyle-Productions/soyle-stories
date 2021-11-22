@@ -28,8 +28,7 @@ import com.soyle.stories.project.eventbus.ToggleToolOpenedNotifier
 import com.soyle.stories.project.layout.LayoutController
 import com.soyle.stories.project.layout.LayoutPresenter
 import com.soyle.stories.project.layout.LayoutViewListener
-import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
-import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
+import com.soyle.stories.scene.delete.SceneDeletedNotifier
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedNotifier
 
 object LayoutModule {

@@ -6,13 +6,11 @@ import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.layout.config.dynamic.LocationDetails
 import com.soyle.stories.location.details.LocationDetailsView
 import com.soyle.stories.location.details.LocationDetailsScope
 import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.createSceneDialog.CreateSceneDialog
-import javafx.event.ActionEvent
+import com.soyle.stories.scene.create.CreateScenePromptView
 import javafx.scene.control.MenuButton
 
 fun LocationList.givenLocationDetailsToolHasBeenOpenedFor(location: Location): LocationDetailsView {
@@ -45,12 +43,12 @@ fun LocationDetailsView.requestScenesToHost()
     }
 }
 
-fun LocationDetailsView.selectCreateSceneOption(): CreateSceneDialog
+fun LocationDetailsView.selectCreateSceneOption(): CreateScenePromptView
 {
     return drive {
         if ((hostSceneButton?.button as? MenuButton)?.isShowing != true) hostSceneButton!!.button.fire()
         hostSceneButton!!.createSceneItem!!.fire()
-        getOpenDialog<CreateSceneDialog>() ?: error("Create Scene Dialog was not opened")
+        getOpenDialog<CreateScenePromptView>() ?: error("Create Scene Dialog was not opened")
     }
 }
 

@@ -127,7 +127,7 @@ class SymbolsInSceneView : View() {
     init {
         (scope as ProjectScope).get<SceneTargetedNotifier>().addListener(guiEventListener)
         (FX.getComponents(scope)[SceneListModel::class] as? SceneListModel)?.let {
-            it.selectedItem.value?.let { targetSceneItem(Scene.Id(UUID.fromString(it.id)), it.proseId, it.name) }
+            it.selectedItem.value?.let { targetSceneItem(it.id, it.proseId, it.name) }
         }
     }
 

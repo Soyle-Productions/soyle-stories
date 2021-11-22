@@ -1,10 +1,13 @@
 package com.soyle.stories.scene.delete
 
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.SceneLocale
+import com.soyle.stories.scene.PromptChoice
+import com.soyle.stories.usecase.scene.SceneRepository
 import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
+import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import com.soyle.stories.writer.DialogType
 import com.soyle.stories.writer.usecases.DialogPreference
-import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
 import com.soyle.stories.writer.usecases.setDialogPreferences.SetDialogPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -23,36 +26,71 @@ interface DeleteSceneController {
 
             dialogPreferences: suspend (DialogType) -> DialogPreference,
 
-            prompt: DeleteScenePrompt,
+            getPromptForScene: (Scene.Id) -> DeleteScenePrompt,
+            getReportForScene: (Scene.Id) -> DeleteSceneRamificationsReport,
+
+            sceneRepository: SceneRepository,
+            locale: SceneLocale,
 
             deleteScene: DeleteScene,
             deleteSceneOutput: DeleteScene.OutputPort,
+
             setDialogPreferences: SetDialogPreferences,
-            setDialogPreferencesOutput: SetDialogPreferences.OutputPort
+            setDialogPreferencesOutput: SetDialogPreferences.OutputPort,
+
+            getPotentialChangesFromDeletingScene: GetPotentialChangesFromDeletingScene,
         ): DeleteSceneController = object : DeleteSceneController, CoroutineScope by CoroutineScope(guiContext) {
+
             override fun deleteScene(sceneId: Scene.Id): Job = launch {
-                if (dialogPreferences(DialogType.DeleteScene).shouldShow) {
-                    val confirmed = prompt.requestConfirmation() ?: return@launch
-                    val shouldShowNextTime = prompt.requestShouldConfirmNextTime()
-                    if (confirmed) {
-                        withContext(asyncContext) {
-                            deleteScene.invoke(sceneId, deleteSceneOutput)
-                        }
-                    }
-                    if (shouldShowNextTime != null) {
-                        withContext(asyncContext) {
-                            setDialogPreferences(DialogType.DeleteScene, shouldShowNextTime, setDialogPreferencesOutput)
-                        }
-                    }
+                val preferences = dialogPreferences(DialogType.DeleteScene)
+                if (preferences.shouldShow) {
+                    showPrompt(sceneId)
                 } else {
-                    withContext(asyncContext) {
-                        deleteScene.invoke(sceneId, deleteSceneOutput)
-                    }
+                    deleteSceneConfirmed(sceneId)
                 }
 
             }
 
+            private suspend fun showPrompt(sceneId: Scene.Id) {
+                val scene = withContext(asyncContext) {
+                    sceneRepository.getSceneOrError(sceneId.uuid)
+                }
+                val prompt = getPromptForScene(sceneId)
+                prompt.use {
+                    val confirmation = prompt.requestConfirmation(scene.name.value) ?: return
+                    when (confirmation.choice) {
+                        PromptChoice.Confirm -> deleteSceneConfirmed(sceneId)
+                        PromptChoice.ShowRamifications -> showRamifications(sceneId)
+                    }
+                    updateDialogPreferences(confirmation.showAgain)
+                }
+            }
+
+            private suspend fun deleteSceneConfirmed(sceneId: Scene.Id) {
+                withContext(asyncContext) {
+                    deleteScene.invoke(sceneId, deleteSceneOutput)
+                }
+            }
+
+            private suspend fun showRamifications(sceneId: Scene.Id) {
+                val report = getReportForScene(sceneId)
+                withContext(asyncContext) {
+                    getPotentialChangesFromDeletingScene.invoke(
+                        GetPotentialChangesFromDeletingScene.RequestModel(sceneId.uuid, locale),
+                        report
+                    )
+                }
+                report.requestContinuation() ?: return
+                deleteSceneConfirmed(sceneId)
+            }
+
+            private suspend fun updateDialogPreferences(showAgain: Boolean) {
+                setDialogPreferences(
+                    DialogType.DeleteScene,
+                    showAgain,
+                    setDialogPreferencesOutput
+                )
+            }
         }
     }
-
 }

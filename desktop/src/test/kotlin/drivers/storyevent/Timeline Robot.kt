@@ -9,6 +9,7 @@ import com.soyle.stories.project.WorkBench
 import com.soyle.stories.storyevent.timeline.Timeline
 import com.soyle.stories.storyevent.timeline.TimelineStyles
 import com.soyle.stories.storyevent.timeline.UnitOfTime
+import com.soyle.stories.storyevent.timeline.unit
 import org.junit.jupiter.api.Assertions.assertTrue
 
 fun WorkBench.givenTimelineToolHasBeenOpened(): Timeline =
@@ -43,8 +44,8 @@ fun Timeline.givenTimeUnitInView(unit: Long): Timeline {
 }
 
 fun Timeline.givenTimeUnitHasBeenSelected(unit: Long): Timeline {
-    if (! access().timeUnitSelected(unit)) selectTimeUnit(unit)
-    assertTrue(access().timeUnitSelected(unit))
+    if (access().viewport!!.selection.timeRange.value?.range?.contains(unit) != true) selectTimeUnit(unit)
+    assertTrue(access().viewport!!.selection.timeRange.value?.range?.contains(unit) == true)
     return this
 }
 
@@ -64,7 +65,7 @@ fun Timeline.openInsertTimeDialog() {
 
 fun Timeline.selectTimeUnit(unit: Long) {
     drive {
-        val label = viewport!!.access().ruler.labels().value.single { it.number == unit }
+        val label = viewport!!.access().ruler.labels().value.single { it.range.hasOverlapWith(unit.unit .. unit.unit) }
         clickOn(label)
     }
 }

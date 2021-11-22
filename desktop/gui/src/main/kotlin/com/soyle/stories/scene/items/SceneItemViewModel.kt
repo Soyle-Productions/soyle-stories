@@ -1,10 +1,11 @@
 package com.soyle.stories.scene.items
 
 import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 
 data class SceneItemViewModel(
-    val id: String,
+    val id: Scene.Id,
     val proseId: Prose.Id,
     val name: String,
     val index: Int,
@@ -13,7 +14,7 @@ data class SceneItemViewModel(
     val inconsistentSettings: Boolean
 ) {
     constructor(sceneItem: SceneItem, invalidEntitiesMentioned: Boolean = false, unusedSymbols: Boolean = false, inconsistentSettings: Boolean = false) : this(
-        sceneItem.id.toString(),
+        Scene.Id(sceneItem.id),
         sceneItem.proseId,
         sceneItem.sceneName,
         sceneItem.index,

@@ -43,4 +43,10 @@ fun MenuItem.collectItems(): Sequence<MenuItem> = when (this) {
 fun WorkBench.findMenuItemById(id: String): MenuItem? = getMenuBar()
     .menus.asSequence()
     .flatMap { it.collectItems() }
-    .find { it.id == id }
+    .toList()
+    .run {
+        find { it.id == id }
+            .also {
+                if (it == null) println("Did not find menu with id $id in\n${map { it.id }}")
+            }
+    }

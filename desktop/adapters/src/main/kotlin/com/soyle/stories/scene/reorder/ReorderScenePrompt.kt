@@ -1,6 +1,8 @@
 package com.soyle.stories.scene.reorder
 
-interface ReorderScenePrompt {
-    suspend fun requestConfirmation(): Boolean?
-    suspend fun requestShouldShowNextTime(): Boolean?
+import com.soyle.stories.common.Confirmation
+import com.soyle.stories.scene.PromptChoice
+
+interface ReorderScenePrompt : AutoCloseable {
+    suspend fun requestConfirmation(sceneName: String): Confirmation<PromptChoice>?
 }

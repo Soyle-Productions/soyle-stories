@@ -1,8 +1,9 @@
 package com.soyle.stories.scene.reorderSceneRamifications
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.closeTool.CloseToolController
-import com.soyle.stories.scene.reorderScene.ReorderSceneController
+import com.soyle.stories.scene.reorder.ReorderSceneController
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
 import java.util.*
 
@@ -29,7 +30,7 @@ class ReorderSceneRamificationsController(
     }
 
     override fun reorderScene() {
-        reorderSceneController.reorderScene(sceneId.toString(), newIndex)
+        reorderSceneController.reorderScene(Scene.Id(sceneId), newIndex)
         closeToolController.closeTool(toolId)
     }
 

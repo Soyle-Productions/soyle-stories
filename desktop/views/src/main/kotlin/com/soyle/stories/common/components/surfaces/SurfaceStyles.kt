@@ -42,26 +42,26 @@ class SurfaceStyles : Stylesheet() {
                 val calculatedBackgroundColor = lightBackground(index.toDouble() + 1)
                 backgroundColor = multi(calculatedBackgroundColor)
 
-                treeCell {
+                select(treeCell, listCell) {
                     backgroundColor = multi(Color.TRANSPARENT)
-                }
-                treeCell and hover {
-                    textFill = Color.BLACK
-                    backgroundColor = multi(ColorStyles.lightHighlightColor)
-                    effect = dropShadow(2.0)
-                    and(empty) {
-                        backgroundColor = multi(Color.TRANSPARENT)
-                        //unsafe("-fx-effect", raw("none"))
-                    }
-                }
-                treeCell and selected {
-                    textFill = ColorStyles.lightSelectionTextColor
-                    treeDisclosureNode {
-                        arrow {
-                            backgroundColor = multi(ColorStyles.lightSelectionTextColor)
+                    and(hover) {
+                        textFill = Color.BLACK
+                        backgroundColor = multi(ColorStyles.lightHighlightColor)
+                        effect = dropShadow(2.0)
+                        and(empty) {
+                            backgroundColor = multi(Color.TRANSPARENT)
+                            //unsafe("-fx-effect", raw("none"))
                         }
                     }
-                    backgroundColor = multi(ColorStyles.lightSelectionColor)
+                    and(selected) {
+                        textFill = ColorStyles.lightSelectionTextColor
+                        treeDisclosureNode {
+                            arrow {
+                                backgroundColor = multi(ColorStyles.lightSelectionTextColor)
+                            }
+                        }
+                        backgroundColor = multi(ColorStyles.lightSelectionColor)
+                    }
                 }
             }
         }

@@ -2,10 +2,9 @@ package com.soyle.stories.scene.deleteSceneRamifications
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.closeTool.CloseToolController
-import com.soyle.stories.layout.openTool.OpenToolController
-import com.soyle.stories.layout.usecases.closeTool.CloseTool
-import com.soyle.stories.scene.deleteScene.DeleteSceneController
+import com.soyle.stories.scene.delete.DeleteSceneController
 import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
 import java.util.*
 
@@ -31,7 +30,7 @@ class DeleteSceneRamificationsController(
 		}
 	}
 
-	override fun deleteScene(sceneId: String) {
+	override fun deleteScene(sceneId: Scene.Id) {
 		deleteSceneController.deleteScene(sceneId)
 	}
 

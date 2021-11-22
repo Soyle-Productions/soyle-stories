@@ -17,7 +17,7 @@ class TimelineViewPortGridComponentDouble(
 
     constructor() : this(
         object : TimelineViewPortGridComponent.Gui,
-            StoryPointLabelComponent by StoryPointLabelComponentDouble()
-        {}
+            StoryPointLabelComponent by StoryPointLabelComponentDouble() {}
     )
+
 }

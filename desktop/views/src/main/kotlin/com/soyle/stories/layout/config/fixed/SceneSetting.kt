@@ -39,7 +39,7 @@ object SceneSetting : ToolConfig<SceneSetting>, FixedTool() {
             val locale = projectScope.applicationScope.get<SceneSettingToolLocale>()
             val tab = Tab().apply {
                 val selectedScene = projectScope.get<SceneListModel>().selectedItem.value?.let {
-                    Scene.Id(UUID.fromString(it.id)) to it.name
+                    it.id to it.name
                 }
                 val sceneSettingRoot = factory.invoke(selectedScene)
                 content = sceneSettingRoot

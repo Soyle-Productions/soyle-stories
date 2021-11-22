@@ -2,6 +2,7 @@ package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.items.SceneItemViewModel
 
 interface SceneListViewListener {
@@ -12,7 +13,8 @@ interface SceneListViewListener {
 	fun trackCharacters(sceneItem: SceneItemViewModel)
 	fun trackLocations(sceneItem: SceneItemViewModel)
 	fun trackSymbols(sceneItem: SceneItemViewModel)
-	fun reorderScene(sceneId: String, newIndex: Int)
+	fun outlineScene(sceneItem: SceneItemViewModel)
+	fun reorderScene(sceneId: Scene.Id, newIndex: Int)
 
 
 }

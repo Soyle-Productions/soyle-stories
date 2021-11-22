@@ -5,12 +5,9 @@ import com.soyle.stories.common.components.buttons.primaryButton
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
-import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.createSceneDialog.createSceneDialog
+import com.soyle.stories.scene.create.CreateNewSceneController
 import com.soyle.stories.scene.items.SceneItemViewModel
-import com.soyle.stories.scene.target.SceneTargeted
-import com.soyle.stories.scene.target.SceneTargetedReceiver
 import com.soyle.stories.scene.target.TargetScene
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
@@ -24,8 +21,6 @@ import javafx.scene.effect.InnerShadow
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
-import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
 import tornadofx.*
 import java.util.*
 
@@ -73,7 +68,7 @@ class SceneListView : View() {
             addClass("center-button")
             alignment = Pos.CENTER
             isMnemonicParsing = false
-            action { createSceneDialog(scope) }
+            action { scope.get<CreateNewSceneController>().create() }
         }
     }
     private fun Parent.populatedDisplay() = vbox {
@@ -93,7 +88,7 @@ class SceneListView : View() {
                 id = "actionBar_create"
                 isDisable = false
                 action {
-                    createSceneDialog(scope)
+                    scope.get<CreateNewSceneController>().create()
                 }
                 isMnemonicParsing = false
             }
@@ -117,7 +112,7 @@ class SceneListView : View() {
                 model.selectedItem.value = selectedItem
                 if (selectedItem != null) {
                     scope.get<TargetScene>().invoke(
-                        Scene.Id(UUID.fromString(selectedItem.id)),
+                        selectedItem.id,
                         selectedItem.proseId,
                         selectedItem.name
                     )

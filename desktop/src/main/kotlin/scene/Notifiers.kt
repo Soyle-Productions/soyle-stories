@@ -17,8 +17,8 @@ import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.Remove
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedNotifier
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
-import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
-import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
+import com.soyle.stories.scene.delete.SceneDeletedNotifier
+import com.soyle.stories.scene.delete.SceneDeletedReceiver
 import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
 import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesReceiver
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedNotifier

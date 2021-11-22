@@ -222,7 +222,7 @@ class `Story Event Steps` : En {
                 hasStoryPointLabel(storyEvent.id)
                 andStoryPointLabel(storyEvent.id) {
                     hasName(storyEvent.name.value)
-                    isAtTime(storyEvent.time)
+                    isAtTime(storyEvent.time.toLong())
                     isInView()
                 }
             }

@@ -5,10 +5,7 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.config.dynamic.*
-import com.soyle.stories.layout.config.fixed.SceneCharacters
-import com.soyle.stories.layout.config.fixed.SceneList
-import com.soyle.stories.layout.config.fixed.SceneSetting
-import com.soyle.stories.layout.config.fixed.SceneSymbols
+import com.soyle.stories.layout.config.fixed.*
 import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications
 import com.soyle.stories.layout.usecases.openTool.OpenTool
@@ -110,12 +107,11 @@ class OpenToolControllerImpl(
         }
     }
 
-    override fun openReorderSceneRamificationsTool(sceneId: String, newIndex: Int) {
+    override fun openReorderSceneRamificationsTool(sceneId: String) {
         threadTransformer.async {
             openTool.invoke(
                 ReorderSceneRamifications(
                     UUID.fromString(sceneId),
-                    newIndex,
                     localeManager.getCurrentLocale()
                 ),
                 openToolOutputPort
@@ -141,6 +137,12 @@ class OpenToolControllerImpl(
         )
         threadTransformer.async {
             openTool.invoke(request, openToolOutputPort)
+        }
+    }
+
+    override fun openSceneOutline() {
+        threadTransformer.async {
+            openTool.invoke(SceneOutline, openToolOutputPort)
         }
     }
 

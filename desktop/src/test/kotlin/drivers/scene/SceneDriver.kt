@@ -1,6 +1,8 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
 import com.soyle.stories.desktop.config.drivers.prose.ProseDriver
+import com.soyle.stories.desktop.config.drivers.robot
+import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.domain.character.Character
@@ -20,12 +22,13 @@ import com.soyle.stories.prose.editProse.EditProseController
 import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneController
-import com.soyle.stories.scene.createNewScene.CreateNewSceneController
+import com.soyle.stories.scene.create.CreateNewSceneController
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
+import com.soyle.stories.scene.create.CreateScenePromptView
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
 import com.soyle.stories.usecase.scene.SceneRepository
 import kotlinx.coroutines.runBlocking
@@ -53,9 +56,8 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
     }
 
     private fun createScene(sceneName: String) {
-        runBlocking {
-            projectScope.get<CreateNewSceneController>().createNewScene(NonBlankString.create(sceneName)!!).await()
-        }
+        projectScope.get<CreateNewSceneController>().create()
+        robot.getOpenDialog<CreateScenePromptView>()!!.createSceneWithName(sceneName)
     }
 
     fun getScenesAtOnePointNamed(sceneName: String): List<Scene> {

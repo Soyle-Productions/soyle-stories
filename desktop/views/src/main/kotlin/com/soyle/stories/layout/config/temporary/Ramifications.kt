@@ -11,10 +11,11 @@ import com.soyle.stories.layout.tools.TemporaryTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
-import com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamificationsScope
+import com.soyle.stories.scene.delete.ramifications.DeleteSceneRamificationsReportView
 import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import tornadofx.FX
 import tornadofx.onChange
 import tornadofx.tab
 import java.util.*
@@ -37,13 +38,12 @@ object DeleteSceneRamificationsConfig : ToolConfig<DeleteSceneRamifications> {
 	override fun getTabConfig(tool: ToolViewModel, type: DeleteSceneRamifications): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-				val scope = DeleteSceneRamificationsScope(tool.toolId, type, projectScope)
-				val view = scope.get<com.soyle.stories.scene.deleteSceneRamifications.DeleteSceneRamifications>()
+				val view = projectScope.get<DeleteSceneRamificationsReportView>()
 				view.title = tool.name
 				val tab = tabPane.tab(view)
 				tab.tabPaneProperty().onChange {
 					if (it == null) {
-						scope.close()
+						FX.getComponents(projectScope).remove(DeleteSceneRamificationsReportView::class)
 					}
 				}
 				return tab

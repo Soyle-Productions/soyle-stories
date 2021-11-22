@@ -41,7 +41,7 @@ interface CreateNewScene {
     )
 
     fun interface OutputPort {
-        fun newSceneCreated(response: ResponseModel)
+        suspend fun newSceneCreated(response: ResponseModel)
     }
 
 }

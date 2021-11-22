@@ -17,6 +17,6 @@ interface ReorderScene {
 
 	fun interface OutputPort
 	{
-		fun sceneReordered(response: ResponseModel)
+		suspend fun sceneReordered(response: ResponseModel)
 	}
 }

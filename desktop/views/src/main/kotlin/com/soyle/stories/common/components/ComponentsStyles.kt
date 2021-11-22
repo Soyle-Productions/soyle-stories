@@ -49,6 +49,8 @@ class ComponentsStyles : Stylesheet() {
         val loading by csspseudoclass()
         val loaded by csspseudoclass()
 
+        val failed by csspseudoclass()
+
         val primary by csspseudoclass()
         val secondary by csspseudoclass()
 

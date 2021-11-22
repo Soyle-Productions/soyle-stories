@@ -7,18 +7,18 @@ import com.soyle.stories.desktop.view.scene.sceneList.drive
 import com.soyle.stories.desktop.view.scene.sceneList.driver
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialog
+import com.soyle.stories.scene.delete.DeleteScenePromptView
 import com.soyle.stories.scene.sceneList.SceneListView
 
-fun WorkBench.givenDeleteSceneDialogHasBeenOpened(scene: Scene): DeleteSceneDialog =
+fun WorkBench.givenDeleteSceneDialogHasBeenOpened(scene: Scene): DeleteScenePromptView =
     getOpenDeleteSceneDialog(scene) ?: givenSceneListToolHasBeenOpened().openDeleteSceneDialog(scene)
         .run { getOpenDeleteSceneDialogOrError(scene) }
 
-fun WorkBench.getOpenDeleteSceneDialogOrError(scene: Scene): DeleteSceneDialog =
+fun WorkBench.getOpenDeleteSceneDialogOrError(scene: Scene): DeleteScenePromptView =
     getOpenDeleteSceneDialog(scene) ?: error("Delete scene dialog for ${scene.name} is not open")
 
-fun WorkBench.getOpenDeleteSceneDialog(scene: Scene): DeleteSceneDialog? =
-    robot.getOpenDialog<DeleteSceneDialog>()?.takeIf { it.sceneId == scene.id.uuid.toString() }
+fun WorkBench.getOpenDeleteSceneDialog(scene: Scene): DeleteScenePromptView? =
+    robot.getOpenDialog<DeleteScenePromptView>()
 
 
 fun SceneListView.openDeleteSceneDialog(scene: Scene) {
@@ -30,7 +30,7 @@ fun SceneListView.openDeleteSceneDialog(scene: Scene) {
     }
 }
 
-fun DeleteSceneDialog.confirmDelete() {
+fun DeleteScenePromptView.confirmDelete() {
     val driver = DeleteSceneDialogDriver(this)
     driver.interact {
         driver.confirmButton.fire()

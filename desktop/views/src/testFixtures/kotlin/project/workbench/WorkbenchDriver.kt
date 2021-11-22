@@ -1,17 +1,18 @@
 package com.soyle.stories.desktop.view.project.workbench
 
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.scene.createSceneDialog.CreateSceneDialog
-import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialog
+import com.soyle.stories.scene.create.CreateScenePromptPresenter
+import com.soyle.stories.scene.create.CreateScenePromptView
+import com.soyle.stories.scene.delete.DeleteScenePromptView
 import org.testfx.api.FxRobot
 import tornadofx.UIComponent
 import tornadofx.uiComponent
 
 class WorkbenchDriver(private val workbench: WorkBench) : FxRobot() {
 
-    fun getCreateSceneDialog(): CreateSceneDialog? = getOpenDialog()
+    fun getCreateSceneDialog(): CreateScenePromptView? = getOpenDialog()
 
-    fun getConfirmDeleteSceneDialog(): DeleteSceneDialog? = getOpenDialog()
+    fun getConfirmDeleteSceneDialog(): DeleteScenePromptView? = getOpenDialog()
 }
 
 inline fun <reified T : UIComponent> FxRobot.getOpenDialog(): T? =

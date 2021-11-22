@@ -11,10 +11,11 @@ import com.soyle.stories.layout.tools.TemporaryTool
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
-import com.soyle.stories.scene.reorderSceneRamifications.ReorderSceneRamificationsScope
+import com.soyle.stories.scene.reorder.ramifications.ReorderSceneRamificationsReportView
 import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import tornadofx.FX
 import tornadofx.onChange
 import tornadofx.tab
 import java.util.*
@@ -37,13 +38,12 @@ object ReorderSceneRamificationsConfig : ToolConfig<ReorderSceneRamifications> {
     override fun getTabConfig(tool: ToolViewModel, type: ReorderSceneRamifications): ToolTabConfig {
         return object : ToolTabConfig {
             override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-                val scope = ReorderSceneRamificationsScope(tool.toolId, type, projectScope)
-                val view = scope.get<com.soyle.stories.scene.reorderSceneRamifications.ReorderSceneRamifications>()
+                val view = projectScope.get<ReorderSceneRamificationsReportView>()
                 view.title = tool.name
                 val tab = tabPane.tab(view)
                 tab.tabPaneProperty().onChange {
                     if (it == null) {
-                        scope.close()
+                        FX.getComponents(projectScope).remove(view::class)
                     }
                 }
                 return tab
@@ -52,7 +52,7 @@ object ReorderSceneRamificationsConfig : ToolConfig<ReorderSceneRamifications> {
     }
 }
 
-data class ReorderSceneRamifications(val sceneId: UUID, val newIndex: Int, private val locale: SceneLocale) : TemporaryTool() {
+data class ReorderSceneRamifications(val sceneId: UUID, private val locale: SceneLocale) : TemporaryTool() {
     override suspend fun validate(context: OpenToolContext) {
         context.sceneRepository.getSceneById(Scene.Id(sceneId))
             ?: throw SceneDoesNotExist(locale, sceneId)

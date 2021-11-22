@@ -14,7 +14,7 @@ class SceneInconsistenciesPresenter(
         view.updateOrInvalidated {
             copy(
                 scenes = scenes.map {
-                    if (it.id != sceneInconsistencies.sceneId.uuid.toString()) it
+                    if (it.id != sceneInconsistencies.sceneId) it
                     else {
                         it.copy(
                             inconsistentSettings = sceneInconsistencies

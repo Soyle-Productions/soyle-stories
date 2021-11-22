@@ -1,5 +1,5 @@
 package com.soyle.stories.scene.target
 
-interface SceneTargetedReceiver {
+fun interface SceneTargetedReceiver {
     suspend fun receiveSceneTargeted(event: SceneTargeted)
 }

@@ -1,10 +1,13 @@
 package com.soyle.stories.desktop.config.scene
 
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.order.SceneOrderService
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.prose.editProse.ContentReplacedNotifier
 import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneController
@@ -13,12 +16,10 @@ import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverAr
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverCharacterArcSectionsInSceneOutputPort
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.ListAvailableArcSectionsToCoverInSceneController
-import com.soyle.stories.scene.createNewScene.CreateNewSceneController
-import com.soyle.stories.scene.createNewScene.CreateNewSceneControllerImpl
-import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
-import com.soyle.stories.scene.deleteScene.DeleteSceneController
-import com.soyle.stories.scene.deleteScene.DeleteSceneControllerImpl
-import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
+import com.soyle.stories.scene.create.CreateNewSceneController
+import com.soyle.stories.scene.create.CreateNewSceneOutput
+import com.soyle.stories.scene.delete.DeleteSceneController
+import com.soyle.stories.scene.delete.DeleteSceneOutput
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneOutput
@@ -46,20 +47,21 @@ import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInS
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
 import com.soyle.stories.scene.renameScene.RenameSceneOutput
-import com.soyle.stories.scene.reorderScene.ReorderSceneController
-import com.soyle.stories.scene.reorderScene.ReorderSceneControllerImpl
-import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
+import com.soyle.stories.scene.reorder.ReorderSceneController
+import com.soyle.stories.scene.reorder.ReorderSceneControllerImpl
+import com.soyle.stories.scene.reorder.ReorderSceneNotifier
 import com.soyle.stories.scene.sceneFrame.*
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.create.CreateScenePromptPresenter
 import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsController
 import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsOutput
 import com.soyle.stories.scene.locationsInScene.replace.ReplaceSettingInSceneController
 import com.soyle.stories.scene.locationsInScene.replace.ReplaceSettingInSceneOutput
+import com.soyle.stories.scene.outline.OutlineSceneController
 import com.soyle.stories.scene.target.TargetScene
 import com.soyle.stories.scene.trackSymbolInScene.*
-import com.soyle.stories.storyevent.create.CreateStoryEventOutput
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInScene
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInSceneUseCase
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
@@ -108,6 +110,8 @@ import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInco
 import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettingsUseCase
 import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInScene
 import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInSceneUseCase
+import com.soyle.stories.usecase.scene.storyevent.list.ListStoryEventsCoveredByScene
+import com.soyle.stories.usecase.scene.storyevent.list.ListStoryEventsCoveredBySceneUseCase
 import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.*
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 
@@ -115,11 +119,14 @@ object UseCases {
 
     init {
         scoped<ProjectScope> {
+            provide { SceneOrderService() }
+
             createNewScene()
             listAllScenes()
             renameScene()
             deleteScene()
             targetScene()
+            outlineScene()
             includeCharacterInScene()
             setMotivationForCharacterInScene()
             listCharactersInScene()
@@ -148,21 +155,23 @@ object UseCases {
 
     private fun InProjectScope.createNewScene() {
         provide<CreateNewScene> {
-            CreateNewSceneUseCase(projectId, get(), get(), get(), get())
+            CreateNewSceneUseCase(get(), get(), get(), get(), get())
         }
 
         provide<CreateNewSceneController> {
-            CreateNewSceneControllerImpl(
-                projectId.toString(),
-                applicationScope.get(),
-                applicationScope.get(),
+            CreateNewSceneController.Implementation(
+                Project.Id(projectId),
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get<CreateScenePromptPresenter>(),
+                get(),
                 get(),
                 get()
             )
         }
 
         provide(CreateNewScene.OutputPort::class) {
-            CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEvent.OutputPort>())
+            CreateNewSceneOutput(get(), get())
         }
     }
 
@@ -200,21 +209,48 @@ object UseCases {
         }
 
         provide<DeleteSceneController> {
-            DeleteSceneControllerImpl(
-                applicationScope.get(),
-                applicationScope.get(),
+            DeleteSceneController.Implementation(
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
                 get(),
                 get()
             )
         }
 
         provide(DeleteScene.OutputPort::class) {
-            DeleteSceneOutput(applicationScope.get(), get(), get())
+            DeleteSceneOutput(get(), get())
         }
     }
 
     private fun InProjectScope.targetScene() {
         provide<TargetScene> { TargetScene(applicationScope.get(), get()) }
+    }
+
+    private fun InProjectScope.outlineScene() {
+        provide<OutlineSceneController> {
+            OutlineSceneController.Implementation(
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get(),
+                get(),
+                get()
+            )
+        }
+
+        provide<ListStoryEventsCoveredByScene> {
+            ListStoryEventsCoveredBySceneUseCase(
+                get(),
+                get()
+            )
+        }
     }
 
     private fun InProjectScope.includeCharacterInScene() {
@@ -320,14 +356,20 @@ object UseCases {
         provide<ReorderSceneController> {
             ReorderSceneControllerImpl(
                 applicationScope.get(),
-                applicationScope.get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
                 get(),
                 get()
             )
         }
 
         provide(ReorderScene.OutputPort::class) {
-            ReorderSceneNotifier(applicationScope.get())
+            ReorderSceneNotifier()
         }
     }
 

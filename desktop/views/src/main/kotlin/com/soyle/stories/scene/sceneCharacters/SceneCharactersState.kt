@@ -101,10 +101,7 @@ class SceneCharactersState : ProjectScopedModel<SceneCharactersViewModel>() {
     init {
         scope.get<SceneTargetedNotifier>().addListener(guiEventListener)
         (FX.getComponents(scope)[SceneListModel::class] as? SceneListModel)?.selectedItem?.value?.let {
-            selectScene(
-                it.id.let(UUID::fromString).let(Scene::Id),
-                it.name
-            )
+            selectScene(it.id, it.name)
         }
     }
 

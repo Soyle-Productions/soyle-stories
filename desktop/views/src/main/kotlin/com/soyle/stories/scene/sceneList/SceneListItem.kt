@@ -4,8 +4,9 @@ import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.common.editingCell
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.get
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.items.SceneItemViewModel
-import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialog
+import com.soyle.stories.scene.reorder.ReorderSceneController
 import com.soyle.stories.scene.sceneList.SceneListItem.Styles.Companion.hasIssue
 import com.soyle.stories.scene.sceneList.SceneListItem.Styles.Companion.sceneListCell
 import com.soyle.stories.soylestories.Styles.Companion.Orange
@@ -13,6 +14,7 @@ import javafx.scene.Parent
 import javafx.scene.input.KeyCode
 import javafx.scene.paint.Color
 import tornadofx.*
+import java.util.*
 
 class SceneListItem : TreeCellFragment<SceneItemViewModel?>() {
 
@@ -65,7 +67,7 @@ class SceneListItem : TreeCellFragment<SceneItemViewModel?>() {
             it?.addClass(sceneListCell)
             it?.enableDrag()
             it?.enableDrop { sceneId, name, newIndex ->
-                scope.get<ReorderSceneDialog>().show(sceneId, name, newIndex)
+                scope.get<ReorderSceneController>().reorderScene(Scene.Id(UUID.fromString(sceneId)), newIndex)
             }
         }
         isEditing.onChange {
@@ -88,7 +90,7 @@ class SceneListItem : TreeCellFragment<SceneItemViewModel?>() {
         val sceneId = item?.id ?: return null
         val validName = NonBlankString.create(newName) ?: return Error("Name cannot be blank")
         stopEdit()
-        viewListener.renameScene(sceneId, validName)
+        viewListener.renameScene(sceneId.uuid.toString(), validName)
         return null
     }
 

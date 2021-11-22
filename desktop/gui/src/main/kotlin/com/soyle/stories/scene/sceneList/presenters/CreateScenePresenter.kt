@@ -1,6 +1,8 @@
 package com.soyle.stories.scene.sceneList.presenters
 
+import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.gui.View
+import com.soyle.stories.scene.create.SceneCreatedReceiver
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListViewModel
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
@@ -8,16 +10,13 @@ import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 
 class CreateScenePresenter(
     private val view: View.Nullable<SceneListViewModel>
-) : CreateNewScene.OutputPort {
+) : SceneCreatedReceiver {
 
-    override val createStoryEventOutputPort: CreateStoryEvent.OutputPort
-        get() = error("$this does not supply create story event output port")
+    override suspend fun receiveSceneCreated(event: SceneCreated) {
+        TODO()
+        /*view.updateOrInvalidated {
 
-    override fun receiveCreateNewSceneFailure(failure: Exception) {
-    }
-
-    override fun receiveCreateNewSceneResponse(response: CreateNewScene.ResponseModel) {
-        view.updateOrInvalidated {
+            event
 
             val affectedScenes = response.affectedScenes.associateBy { it.id.toString() }
 
@@ -36,7 +35,7 @@ class CreateScenePresenter(
                     false
                 )).sortedBy { it.index }
             )
-        }
+        }*/
     }
 
 }

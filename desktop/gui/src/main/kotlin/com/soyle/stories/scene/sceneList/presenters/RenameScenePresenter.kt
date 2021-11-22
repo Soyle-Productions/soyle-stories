@@ -14,7 +14,7 @@ class RenameScenePresenter(
 		view.updateOrInvalidated {
 			copy(
 			  scenes = scenes.map {
-				  if (it.id == event.sceneId.uuid.toString()) {
+				  if (it.id == event.sceneId) {
 				  	it.copy(name = event.sceneName)
 				  } else it
 			  },

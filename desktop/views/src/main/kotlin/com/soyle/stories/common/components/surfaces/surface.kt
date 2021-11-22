@@ -262,6 +262,7 @@ class Surface<N : Node>(val node: N) : ElevatedSurface, Elevated by SurfaceGraph
             newValue?.let { node.addClass(it) }
         }
         liftedRuleProperty.value?.let { node.addClass(it) }
+        node.pickOnBoundsProperty().bind(liftedRuleProperty.booleanBinding { it == SurfaceStyles.elevated[0] })
     }
 
     operator fun component1() = node

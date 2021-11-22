@@ -10,16 +10,15 @@ import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.common.guiUpdate
 import com.soyle.stories.common.scopedListener
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.events.SceneRemoved
 import com.soyle.stories.domain.scene.events.SceneRenamed
-import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
-import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesReceiver
+import com.soyle.stories.scene.delete.SceneDeletedReceiver
 import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
 import com.soyle.stories.scene.setting.list.SceneSettingInviteImage.Companion.sceneSettingInviteImage
 import com.soyle.stories.scene.setting.list.SceneSettingItemList
 import com.soyle.stories.scene.target.SceneTargeted
 import com.soyle.stories.scene.target.SceneTargetedReceiver
 import javafx.application.Platform
-import javafx.beans.property.ObjectPropertyBase
 import javafx.geometry.Pos
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
@@ -27,7 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.withContext
 import tornadofx.*
-import java.util.*
 
 class SceneSettingToolRoot(
     initialScene: Pair<Scene.Id, String>?,
@@ -121,11 +119,11 @@ class SceneSettingToolRoot(
             }
         }
 
-        override suspend fun receiveSceneDeleted(event: Scene.Id) {
+        override suspend fun receiveSceneDeleted(event: SceneRemoved) {
             withContext(Dispatchers.JavaFx) {
                 val currentModel = model.value
                 if (currentModel is SceneSettingToolModel.SceneSelected) {
-                    if (currentModel.sceneId != event) return@withContext
+                    if (currentModel.sceneId != event.sceneId) return@withContext
                     model.set(SceneSettingToolModel.NoSceneSelected)
                 }
             }

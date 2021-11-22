@@ -25,7 +25,7 @@ class DetectedInvalidMentionsPresenter(
         view.updateOrInvalidated {
             copy(
                 scenes = scenes.map {
-                    if (it.id == response.sceneId.uuid.toString()) {
+                    if (it.id == response.sceneId) {
                         it.copy(unusedSymbols = response.unusedSymbolIds.isNotEmpty())
                     } else it
                 }

@@ -7,18 +7,15 @@ import com.soyle.stories.desktop.view.scene.sceneSetting.`Scene Setting Tool Roo
 import com.soyle.stories.desktop.view.scene.sceneSetting.list.SceneSettingItemListFactory
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.events.SceneRemoved
 import com.soyle.stories.domain.scene.events.SceneRenamed
 import com.soyle.stories.scene.target.SceneTargeted
-import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
-import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
-import com.soyle.stories.scene.items.SceneItemViewModel
+import com.soyle.stories.scene.delete.SceneDeletedNotifier
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
 import com.soyle.stories.scene.target.SceneTargetedNotifier
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 import javafx.scene.control.Label
 import javafx.scene.text.Text
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
@@ -158,7 +155,7 @@ class `Scene Setting Tool Root Unit Test` : NodeTest<SceneSettingToolRoot>() {
 
             private fun sceneRemoved(sceneId: Scene.Id) {
                 runBlocking {
-                    sceneRemovedNotifier.receiveSceneDeleted(sceneId)
+                    sceneRemovedNotifier.receiveSceneDeleted(SceneRemoved(sceneId, listOf()))
                 }
             }
 

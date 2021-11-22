@@ -3,12 +3,12 @@ package com.soyle.stories.scene.reorderSceneRamifications
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.scene.events.SceneRemoved
 import com.soyle.stories.gui.View
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
-import com.soyle.stories.scene.deleteScene.SceneDeletedReceiver
+import com.soyle.stories.scene.delete.SceneDeletedReceiver
 import com.soyle.stories.scene.deleteSceneRamifications.CharacterRamificationsViewModel
 import com.soyle.stories.scene.deleteSceneRamifications.SceneRamificationsViewModel
-import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
 import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.PotentialChangesFromReorderingScene
 import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
@@ -50,7 +50,7 @@ class ReorderSceneRamificationsPresenter(
         }
     }
 
-    override suspend fun receiveSceneDeleted(event: Scene.Id) {
+    override suspend fun receiveSceneDeleted(event: SceneRemoved) {
         view.updateOrInvalidated { copy(invalid = true) }
     }
 

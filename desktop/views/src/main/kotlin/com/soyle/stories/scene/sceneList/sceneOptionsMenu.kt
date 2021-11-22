@@ -2,10 +2,10 @@ package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.di.get
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.createSceneDialog.createSceneDialog
-import com.soyle.stories.scene.deleteSceneDialog.deleteSceneDialog
+import com.soyle.stories.scene.create.CreateNewSceneController
+import com.soyle.stories.scene.delete.DeleteSceneController
 import com.soyle.stories.scene.items.SceneItemViewModel
-import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialog
+import com.soyle.stories.scene.reorder.ReorderSceneController
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.SeparatorMenuItem
@@ -17,7 +17,7 @@ internal fun sceneOptionsMenu(viewListener: SceneListViewListener, scope: Projec
     MenuItem("Edit").apply {
         id = "edit"
         toggleClass(SceneListItem.Styles.hasIssue, sceneItemViewModel.invalidEntitiesMentioned)
-        action { viewListener.editScene(sceneItemViewModel.id, sceneItemViewModel.proseId) }
+        action { viewListener.editScene(sceneItemViewModel.id.uuid.toString(), sceneItemViewModel.proseId) }
     },
     MenuItem("Track Characters").apply {
         id = "open_scene_characters"
@@ -34,23 +34,27 @@ internal fun sceneOptionsMenu(viewListener: SceneListViewListener, scope: Projec
         toggleClass(SceneListItem.Styles.hasIssue, sceneItemViewModel.unusedSymbols)
         action { viewListener.trackSymbols(sceneItemViewModel) }
     },
+    MenuItem("Outline").apply {
+        id = "open_scene_outline"
+        action { viewListener.outlineScene(sceneItemViewModel) }
+    },
     SeparatorMenuItem(),
     Menu("Insert").apply {
         item("New Scene Before") {
-            action { createSceneDialog(scope, sceneItemViewModel.id, true) }
+            action { scope.get<CreateNewSceneController>().before(sceneItemViewModel.id) }
         }
         item("New Scene After") {
-            action { createSceneDialog(scope, sceneItemViewModel.id, false) }
+            action { scope.get<CreateNewSceneController>().after(sceneItemViewModel.id) }
         }
     },
     MenuItem("Move Up").apply  {
         action {
-            scope.get<ReorderSceneDialog>().show(sceneItemViewModel.id, sceneItemViewModel.name, sceneItemViewModel.index - 1)
+            scope.get<ReorderSceneController>().reorderScene(sceneItemViewModel.id, sceneItemViewModel.index - 1)
         }
     },
     MenuItem("Move Down").apply  {
         action {
-            scope.get<ReorderSceneDialog>().show(sceneItemViewModel.id, sceneItemViewModel.name, sceneItemViewModel.index + 1)
+            scope.get<ReorderSceneController>().reorderScene(sceneItemViewModel.id, sceneItemViewModel.index + 1)
         }
     },
     SeparatorMenuItem(),
@@ -62,6 +66,6 @@ internal fun sceneOptionsMenu(viewListener: SceneListViewListener, scope: Projec
     },
     MenuItem("Delete").apply {
         id = "delete"
-        action {deleteSceneDialog(scope, sceneItemViewModel) }
+        action { scope.get<DeleteSceneController>().deleteScene(sceneItemViewModel.id) }
     }
 )

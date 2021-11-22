@@ -26,6 +26,7 @@ object ToolModule : RegisteredToolsConfig {
         SceneSymbols.getRegistration(),
         SceneSetting.getRegistration(),
         SceneCharacters.getRegistration(),
+        SceneOutline.getRegistration(),
         StoryEventList.getRegistration(),
         Timeline.getRegistration(),
         /**

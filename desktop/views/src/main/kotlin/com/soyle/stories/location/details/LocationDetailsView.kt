@@ -8,7 +8,7 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.location.details.components.LocationDetailsRoot
 import com.soyle.stories.location.hostedScene.listAvailableScenes.ListScenesToHostInLocationController
 import com.soyle.stories.location.redescribeLocation.ReDescribeLocationController
-import com.soyle.stories.scene.createSceneDialog.createSceneDialog
+import com.soyle.stories.scene.create.CreateNewSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.RemoveLocationFromSceneController
 import javafx.scene.Parent
@@ -19,6 +19,8 @@ class LocationDetailsView : View() {
 
     override val scope: LocationDetailsScope = super.scope as LocationDetailsScope
 
+    private val createSceneController: CreateNewSceneController by resolveLater()
+
     private val locationId = Location.Id(UUID.fromString(scope.locationId))
 
     private val locale: LocationDetailsLocale by resolveLater()
@@ -26,7 +28,7 @@ class LocationDetailsView : View() {
 
     private val actions = object : LocationDetailsActions {
         override fun createSceneToHost() {
-            createSceneDialog(scope.projectScope, onSceneCreated = ::hostScene)
+            createSceneController.create(linkedLocation = locationId)
         }
 
         override fun hostScene(sceneId: Scene.Id) {

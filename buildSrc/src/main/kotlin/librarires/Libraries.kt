@@ -23,6 +23,7 @@ object Libraries {
         override val engine = "org.junit.jupiter:junit-jupiter-engine:$version"
         override val params = "org.junit.jupiter:junit-jupiter-params:$version"
     }
+    val kluent = "org.amshove.kluent:kluent:1.68"
     val assertJ = "org.assertj:assertj-core:3.15.0"
 
 }

@@ -1,24 +1,17 @@
 package com.soyle.stories.di.scene
 
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
+import com.soyle.stories.common.LocaleManager
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.*
-import com.soyle.stories.scene.createNewScene.CreateNewSceneController
-import com.soyle.stories.scene.createNewScene.CreateNewSceneControllerImpl
-import com.soyle.stories.scene.createNewScene.CreateNewSceneNotifier
-import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogController
-import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogPresenter
-import com.soyle.stories.scene.createNewSceneDialog.CreateNewSceneDialogViewListener
-import com.soyle.stories.scene.createSceneDialog.CreateSceneDialogModel
-import com.soyle.stories.scene.deleteScene.DeleteSceneController
-import com.soyle.stories.scene.deleteScene.DeleteSceneControllerImpl
-import com.soyle.stories.scene.deleteScene.DeleteSceneOutput
-import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogController
-import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogModel
-import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogPresenter
-import com.soyle.stories.scene.deleteSceneDialog.DeleteSceneDialogViewListener
+import com.soyle.stories.scene.create.CreateNewSceneController
+import com.soyle.stories.scene.create.CreateNewSceneOutput
+import com.soyle.stories.scene.delete.DeleteSceneController
+import com.soyle.stories.scene.delete.DeleteSceneOutput
 import com.soyle.stories.scene.deleteSceneRamifications.*
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.*
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
@@ -28,19 +21,18 @@ import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.Remove
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneControllerImpl
 import com.soyle.stories.scene.renameScene.RenameSceneOutput
-import com.soyle.stories.scene.reorderScene.ReorderSceneController
-import com.soyle.stories.scene.reorderScene.ReorderSceneControllerImpl
-import com.soyle.stories.scene.reorderScene.ReorderSceneNotifier
-import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogController
-import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogModel
-import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogPresenter
-import com.soyle.stories.scene.reorderSceneDialog.ReorderSceneDialogViewListener
+import com.soyle.stories.scene.reorder.ReorderSceneController
+import com.soyle.stories.scene.reorder.ReorderSceneControllerImpl
+import com.soyle.stories.scene.reorder.ReorderSceneNotifier
 import com.soyle.stories.scene.reorderSceneRamifications.*
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
-import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
-import com.soyle.stories.storyevent.create.CreateStoryEventOutput
+import com.soyle.stories.scene.delete.DeleteScenePromptPresenter
+import com.soyle.stories.scene.delete.SceneDeletedNotifier
+import com.soyle.stories.scene.delete.ramifications.DeleteSceneRamificationsReportPresenter
+import com.soyle.stories.scene.reorder.ReorderScenePromptPresenter
+import com.soyle.stories.scene.reorder.ramifications.ReorderSceneRamificationsReportPresenter
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
@@ -65,6 +57,10 @@ import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderSceneUseCase
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInScene
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
+import com.soyle.stories.writer.DialogType
+import com.soyle.stories.writer.usecases.DialogPreference
+import com.soyle.stories.writer.usecases.getDialogPreferences.GetDialogPreferences
+import kotlinx.coroutines.CompletableDeferred
 
 object SceneModule {
 
@@ -74,7 +70,7 @@ object SceneModule {
 
             provide<CreateNewScene> {
                 CreateNewSceneUseCase(
-                    projectId,
+                    get(),
                     get(),
                     get(),
                     get(),
@@ -149,13 +145,13 @@ object SceneModule {
             }
 
             provide(CreateNewScene.OutputPort::class) {
-                CreateNewSceneNotifier(applicationScope.get(), get<CreateStoryEventOutput>())
+                CreateNewSceneOutput(applicationScope.get(), get())
             }
             provide(RenameScene.OutputPort::class) {
                 RenameSceneOutput(get(), get())
             }
             provide(DeleteScene.OutputPort::class) {
-                DeleteSceneOutput(applicationScope.get(), get(), get())
+                DeleteSceneOutput(applicationScope.get(), get())
             }
             provide(SetMotivationForCharacterInScene.OutputPort::class) {
                 SetMotivationForCharacterInSceneNotifier(applicationScope.get())
@@ -164,9 +160,7 @@ object SceneModule {
                 IncludeCharacterInSceneOutput(get(), get())
             }
 
-            provide(ReorderScene.OutputPort::class) {
-                ReorderSceneNotifier(applicationScope.get())
-            }
+            provide(ReorderScene.OutputPort::class) { ReorderSceneNotifier() }
             provide(
                 CoverCharacterArcSectionsInScene.OutputPort::class,
                 ChangeCharacterArcSectionValueAndCoverInScene.OutputPort::class,
@@ -176,10 +170,12 @@ object SceneModule {
             }
 
             provide<CreateNewSceneController> {
-                CreateNewSceneControllerImpl(
-                    projectId.toString(),
-                    applicationScope.get(),
-                    applicationScope.get(),
+                CreateNewSceneController.Implementation(
+                    Project.Id(projectId),
+                    applicationScope.get<ThreadTransformer>().guiContext,
+                    applicationScope.get<ThreadTransformer>().asyncContext,
+                    get(),
+                    get(),
                     get(),
                     get()
                 )
@@ -192,10 +188,33 @@ object SceneModule {
                     get()
                 )
             }
+            provide<suspend (DialogType) -> DialogPreference> {
+                {
+                    val deferred = CompletableDeferred<DialogPreference>()
+                    get<GetDialogPreferences>().invoke(it, object : GetDialogPreferences.OutputPort {
+                        override fun gotDialogPreferences(response: DialogPreference) {
+                            deferred.complete(response)
+                        }
+
+                        override fun failedToGetDialogPreferences(failure: Exception) {
+                            deferred.complete(DialogPreference(it, true))
+                        }
+                    })
+                    deferred.await()
+                }
+            }
             provide<DeleteSceneController> {
-                DeleteSceneControllerImpl(
-                    applicationScope.get(),
-                    applicationScope.get(),
+                DeleteSceneController.Implementation(
+                    applicationScope.get<ThreadTransformer>().guiContext,
+                    applicationScope.get<ThreadTransformer>().asyncContext,
+                    get(),
+                    get<DeleteScenePromptPresenter>(),
+                    get<DeleteSceneRamificationsReportPresenter>(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
                     get(),
                     get()
                 )
@@ -234,7 +253,13 @@ object SceneModule {
             provide<ReorderSceneController> {
                 ReorderSceneControllerImpl(
                     applicationScope.get(),
-                    applicationScope.get(),
+                    get(),
+                    get<ReorderScenePromptPresenter>(),
+                    get<ReorderSceneRamificationsReportPresenter>(),
+                    get(),
+                    get(),
+                    get(),
+                    get(),
                     get(),
                     get()
                 )
@@ -249,84 +274,6 @@ object SceneModule {
                 )
             }
 
-            provide<CreateNewSceneDialogViewListener> {
-                CreateNewSceneDialogController(
-                    CreateNewSceneDialogPresenter(
-                        get<CreateSceneDialogModel>(),
-                        get<CreateNewSceneNotifier>()
-                    ),
-                    get()
-                )
-            }
-            provide<DeleteSceneDialogViewListener> {
-                val presenter = DeleteSceneDialogPresenter(
-                    get<DeleteSceneDialogModel>()
-                )
-                DeleteSceneDialogController(
-                    applicationScope.get(),
-                    presenter,
-                    get(),
-                    get(),
-                    get(),
-                    presenter,
-                    get()
-                )
-            }
-            provide<ReorderSceneDialogViewListener> {
-                ReorderSceneDialogController(
-                    applicationScope.get(),
-                    ReorderSceneDialogPresenter(
-                        get<ReorderSceneDialogModel>()
-                    ),
-                    get(),
-                    get(),
-                    get(),
-                    get()
-                )
-            }
-
-        }
-
-        scoped<DeleteSceneRamificationsScope> {
-
-            provide<DeleteSceneRamificationsViewListener> {
-                DeleteSceneRamificationsController(
-                    sceneId,
-                    toolId,
-                    applicationScope.get(),
-                    applicationScope.get(),
-                    projectScope.get(),
-                    DeleteSceneRamificationsPresenter(
-                        get<DeleteSceneRamificationsModel>(),
-                        projectScope.get<SceneDeletedNotifier>(),
-                        projectScope.get<RemovedCharacterNotifier>(),
-                        projectScope.get<SetMotivationForCharacterInSceneNotifier>()
-                    ),
-                    projectScope.get(),
-                    projectScope.get()
-                )
-            }
-
-        }
-
-        scoped<ReorderSceneRamificationsScope> {
-            provide<ReorderSceneRamificationsViewListener> {
-                ReorderSceneRamificationsController(
-                    sceneId,
-                    toolId,
-                    reorderIndex,
-                    applicationScope.get(),
-                    projectScope.get(),
-                    ReorderSceneRamificationsPresenter(
-                        get<ReorderSceneRamificationsModel>(),
-                        projectScope.get<SceneDeletedNotifier>(),
-                        projectScope.get<RemovedCharacterFromSceneNotifier>(),
-                        projectScope.get<SetMotivationForCharacterInSceneNotifier>()
-                    ),
-                    projectScope.get(),
-                    projectScope.get()
-                )
-            }
         }
 
     }

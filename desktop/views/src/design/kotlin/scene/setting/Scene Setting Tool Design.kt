@@ -5,7 +5,6 @@ import com.soyle.stories.desktop.view.scene.sceneSetting.doubles.ListLocationsIn
 import com.soyle.stories.desktop.view.scene.sceneSetting.doubles.ListLocationsToUseInSceneControllerDouble
 import com.soyle.stories.desktop.view.scene.sceneSetting.item.SceneSettingItemFactory
 import com.soyle.stories.desktop.view.scene.sceneSetting.list.SceneSettingItemListFactory
-import com.soyle.stories.desktop.view.scene.sceneSetting.list.SceneSettingItemListMockActions
 import com.soyle.stories.desktop.view.scene.sceneSetting.useLocationButton.UseLocationButtonFactory
 import com.soyle.stories.desktop.view.testframework.DesignTest
 import com.soyle.stories.desktop.view.testframework.State
@@ -13,24 +12,16 @@ import com.soyle.stories.desktop.view.testframework.SubComponent
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.layout.config.fixed.SceneSetting
-import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
-import com.soyle.stories.scene.deleteScene.SceneDeletedNotifier
+import com.soyle.stories.scene.delete.SceneDeletedNotifier
 import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
-import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
-import com.soyle.stories.scene.setting.SceneSettingToolModel
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
-import com.soyle.stories.scene.setting.list.SceneSettingItemList
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemModel
-import com.soyle.stories.scene.setting.list.item.SceneSettingItemView
-import com.soyle.stories.scene.setting.list.useLocationButton.UseLocationButton
 import com.soyle.stories.scene.target.SceneTargeted
 import com.soyle.stories.scene.target.SceneTargetedNotifier
 import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 import com.soyle.stories.usecase.scene.inconsistencies.SceneInconsistencies
 import com.soyle.stories.usecase.scene.inconsistencies.SceneSettingLocationInconsistencies
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 import com.soyle.stories.usecase.scene.location.listLocationsToUse.ListAvailableLocationsToUseInScene
 import com.soyle.stories.usecase.scene.location.listLocationsUsed.ListLocationsUsedInScene
 import javafx.scene.Node
@@ -38,14 +29,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import tornadofx.FX
 import tornadofx.booleanProperty
-import tornadofx.objectProperty
-import tornadofx.stringProperty
-import kotlin.properties.Delegates
 
 class `Scene Setting Tool Design` : DesignTest() {
 
