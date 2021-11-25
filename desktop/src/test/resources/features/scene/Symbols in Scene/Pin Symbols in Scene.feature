@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Pin Symbols in Scene
   Walter wants to pin a tracked symbol to a scene so he can note it for use later.
 

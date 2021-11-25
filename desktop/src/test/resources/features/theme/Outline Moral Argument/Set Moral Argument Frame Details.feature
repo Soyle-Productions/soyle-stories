@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Set Moral Argument Frame Details
 
   Background:

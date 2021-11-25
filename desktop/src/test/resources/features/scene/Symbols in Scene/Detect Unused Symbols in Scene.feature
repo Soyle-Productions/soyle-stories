@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Detect Unused Symbols in Scene
   Walter wants to be informed about a pinned symbol in a scene that has not been used
   so he remembers to mention that symbol within the scene's prose.

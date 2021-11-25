@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Track Symbols in Scene
   Walter wants a symbol he's mentioned in a scene's prose to be tracked in that scene so he can quickly see which symbols are being used.
 

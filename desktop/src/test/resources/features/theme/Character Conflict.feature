@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Character Conflict
 
   Background:

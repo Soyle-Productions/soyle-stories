@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Compare Character Values
 
   Background:

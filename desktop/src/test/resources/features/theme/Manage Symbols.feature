@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Manage Symbols
   Describes the basic CRUD actions for symbols
 

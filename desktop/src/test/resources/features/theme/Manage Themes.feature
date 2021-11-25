@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Manage Themes
   Describes the basic CRUD actions for themes
 

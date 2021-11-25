@@ -1,3 +1,4 @@
+@PostAlpha
 Feature: Manage Opposition Values
   Describes the basic CRUD actions for opposition values
 
