@@ -8,6 +8,7 @@ import com.soyle.stories.domain.scene.Updated
 import com.soyle.stories.domain.scene.WithoutChange
 import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.sceneName
+import com.soyle.stories.domain.storyevent.StoryEvent
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
@@ -17,6 +18,7 @@ class `Scene Order Service Unit Test` {
 
     private val service = SceneOrderService()
     private val projectId = Project.Id()
+    private val storyEventId = StoryEvent.Id()
     private val proseId = Prose.Id()
     private val inputName = sceneName()
 
@@ -27,18 +29,18 @@ class `Scene Order Service Unit Test` {
 
         @Test
         fun `should create new scene in project`() {
-            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, storyEventId, proseId) }
 
             update as SuccessfulSceneOrderUpdate
             val sceneUpdate = update.change
             sceneUpdate.change.name.mustEqual(inputName.value)
             sceneUpdate.change.proseId.mustEqual(proseId)
-            sceneUpdate.change.storyEventId.mustEqual(sceneUpdate.scene.storyEventId)
+            sceneUpdate.change.storyEventId.mustEqual(storyEventId)
         }
 
         @Test
         fun `first scene should be at the first index`() {
-            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, storyEventId, proseId) }
 
             update as SuccessfulSceneOrderUpdate
             val sceneUpdate = update.change
@@ -55,7 +57,7 @@ class `Scene Order Service Unit Test` {
 
         @Test
         fun `scene should be added to the end of the project`() {
-            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, storyEventId, proseId) }
 
             update as SuccessfulSceneOrderUpdate
             update.sceneOrder.order.size.mustEqual(5)
@@ -64,7 +66,7 @@ class `Scene Order Service Unit Test` {
 
         @Test
         fun `new scene should be at provided index`() {
-            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId, 2) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, storyEventId, proseId, 2) }
 
             update as SuccessfulSceneOrderUpdate
             update.sceneOrder.order.size.mustEqual(5)
@@ -73,7 +75,7 @@ class `Scene Order Service Unit Test` {
 
         @Test
         fun `if scene insertion fails, should not create new scene`() {
-            val update = runBlocking { service.createScene(sceneOrder, inputName, proseId, -4) }
+            val update = runBlocking { service.createScene(sceneOrder, inputName, storyEventId, proseId, -4) }
 
             update as UnSuccessfulSceneOrderUpdate
         }

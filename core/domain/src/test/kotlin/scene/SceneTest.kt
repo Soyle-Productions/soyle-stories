@@ -7,6 +7,7 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.events.SceneRenamed
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -22,20 +23,22 @@ class SceneTest {
 
         val projectId = Project.Id()
         val proseId = Prose.Id()
+        val storyEventId = StoryEvent.Id()
         val inputName = sceneName()
 
         @Test
         fun `should produce new scene with provided inputs`() {
-            val update: SceneUpdate<*> = Scene.create(projectId, inputName, proseId)
+            val update: SceneUpdate<*> = Scene.create(projectId, inputName, storyEventId, proseId)
 
             update.scene.name.mustEqual(inputName)
             update.scene.projectId.mustEqual(projectId)
+            update.scene.storyEventId.mustEqual(storyEventId)
             update.scene.proseId.mustEqual(proseId)
         }
 
         @Test
         fun `should produce scene created event`() {
-            val update: SceneUpdate<SceneCreated> = Scene.create(projectId, inputName, proseId)
+            val update: SceneUpdate<SceneCreated> = Scene.create(projectId, inputName, storyEventId, proseId)
 
             update as Updated
             update.event.sceneId.mustEqual(update.scene.id)

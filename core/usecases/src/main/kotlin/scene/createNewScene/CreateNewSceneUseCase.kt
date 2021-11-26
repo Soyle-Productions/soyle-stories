@@ -9,9 +9,11 @@ import com.soyle.stories.domain.scene.order.SceneOrder
 import com.soyle.stories.domain.scene.order.SceneOrderService
 import com.soyle.stories.domain.scene.order.SceneOrderUpdate
 import com.soyle.stories.domain.scene.order.SuccessfulSceneOrderUpdate
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.StoryEventTimeService
 import com.soyle.stories.domain.storyevent.Successful
 import com.soyle.stories.domain.storyevent.SuccessfulStoryEventUpdate
+import com.soyle.stories.domain.storyevent.events.StoryEventCoveredByScene
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.usecase.prose.ProseRepository
 import com.soyle.stories.usecase.scene.SceneDoesNotExist
@@ -28,12 +30,14 @@ class CreateNewSceneUseCase(
 
     override suspend fun invoke(request: CreateNewScene.RequestModel, output: CreateNewScene.OutputPort) {
         val (prose) = Prose.create(request.projectId)
-        val sceneOrderUpdate = createSceneInProject(request, prose.id)
-        val storyEventUpdate = createCorrespondingStoryEvent(sceneOrderUpdate.change.scene)
+        val storyEventUpdate = createCorrespondingStoryEvent(request)
+        val sceneOrderUpdate = createSceneInProject(request, storyEventUpdate.storyEvent.id, prose.id)
+        val storyEventCovered = storyEventUpdate.storyEvent.coveredByScene(sceneOrderUpdate.change.scene.id)
+        storyEventCovered as Successful
 
-        commitChanges(sceneOrderUpdate, prose, storyEventUpdate)
+        commitChanges(sceneOrderUpdate, prose, storyEventCovered)
 
-        output.newSceneCreated(response(sceneOrderUpdate, storyEventUpdate))
+        output.newSceneCreated(response(sceneOrderUpdate, storyEventUpdate.change to storyEventCovered.change))
     }
 
     private suspend fun commitChanges(
@@ -49,15 +53,17 @@ class CreateNewSceneUseCase(
 
     private fun response(
         sceneOrderUpdate: SceneOrderUpdate.Successful<Updated<SceneCreated>>,
-        storyEventUpdate: Successful<StoryEventCreated>
+        storyEventUpdates: Pair<StoryEventCreated, StoryEventCoveredByScene>
     ) = CreateNewScene.ResponseModel(
         sceneOrderUpdate.change.change,
-        storyEventUpdate.change,
-        sceneOrderUpdate
+        storyEventUpdates.first,
+        sceneOrderUpdate,
+        storyEventUpdates.second
     )
 
     private suspend fun createSceneInProject(
         request: CreateNewScene.RequestModel,
+        storyEventId: StoryEvent.Id,
         proseId: Prose.Id
     ): SceneOrderUpdate.Successful<Updated<SceneCreated>> {
         val sceneOrder = sceneRepository.getSceneIdsInOrder(request.projectId) ?: SceneOrder.initializeInProject(request.projectId)
@@ -65,6 +71,7 @@ class CreateNewSceneUseCase(
         return sceneOrderService.createScene(
             sceneOrder,
             request.name,
+            storyEventId,
             proseId,
             relativeSceneIndex(request, sceneOrder.order)
         ) as SuccessfulSceneOrderUpdate
@@ -82,10 +89,11 @@ class CreateNewSceneUseCase(
         } else indexOfRelativeScene + 1
     }
 
-    private suspend fun createCorrespondingStoryEvent(scene: Scene): Successful<StoryEventCreated> {
+    private suspend fun createCorrespondingStoryEvent(request: CreateNewScene.RequestModel): Successful<StoryEventCreated> {
         val update = storyEventTimeService.createStoryEvent(
-            scene,
-            maxStoryEventTimeInProject(scene.projectId)
+            request.name,
+            maxStoryEventTimeInProject(request.projectId),
+            request.projectId
         ).single() as Successful
 
         update.change as StoryEventCreated

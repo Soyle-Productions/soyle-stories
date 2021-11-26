@@ -33,8 +33,8 @@ class Scene private constructor(
 
     companion object {
         @JvmStatic
-        internal fun create(projectId: Project.Id, name: NonBlankString, proseId: Prose.Id): SceneUpdate<SceneCreated> {
-            val newScene = Scene(projectId, name, StoryEvent.Id(), proseId)
+        internal fun create(projectId: Project.Id, name: NonBlankString, storyEventId: StoryEvent.Id, proseId: Prose.Id): SceneUpdate<SceneCreated> {
+            val newScene = Scene(projectId, name, storyEventId, proseId)
             return Updated(newScene, SceneCreated(newScene.id, newScene.name.value, proseId, newScene.storyEventId))
         }
 

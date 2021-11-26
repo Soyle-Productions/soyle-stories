@@ -40,7 +40,7 @@ class IncludeCharacterInSceneUseCase(
     override suspend fun invoke(sceneId: UUID, characterId: UUID, outputPort: IncludeCharacterInScene.OutputPort) {
         // get entities from repositories
         val scene = sceneRepository.getSceneOrError(sceneId)
-        val storyEvent = storyEventRepository.getStoryEventById(scene.storyEventId)!!
+        val storyEvent = storyEventRepository.getStoryEventOrError(scene.storyEventId)
         val character = characterRepository.getCharacterOrError(characterId)
 
         // update scene and backing story event

@@ -14,17 +14,6 @@ class StoryEventTimeService(
 ) {
 
     suspend fun createStoryEvent(
-        scene: Scene,
-        time: Long,
-    ): List<StoryEventUpdate<*>> {
-        if (time < 0) {
-            val creation = StoryEvent.create(scene.name, 0u, scene.projectId, scene.id)
-            return normalizeAllStoryEventsAboveZero(creation.storyEvent, time).plus(creation)
-        }
-        return listOf(StoryEvent.create(scene.name, time.toULong(), scene.projectId, scene.id))
-    }
-
-    suspend fun createStoryEvent(
         name: NonBlankString,
         time: Long,
         projectId: Project.Id,

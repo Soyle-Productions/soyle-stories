@@ -27,11 +27,10 @@ class StoryEvent(
         internal fun create(
             name: NonBlankString,
             time: ULong,
-            projectId: Project.Id,
-            sceneId: Scene.Id? = null
+            projectId: Project.Id
         ): StoryEventUpdate<StoryEventCreated> {
-            val storyEvent = StoryEvent(Id(), name, time, projectId, sceneId, null, null, null, listOf())
-            val change = StoryEventCreated(storyEvent.id, name.value, time, sceneId, projectId)
+            val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, null, listOf())
+            val change = StoryEventCreated(storyEvent.id, name.value, time, projectId)
             return Successful(storyEvent, change)
         }
 

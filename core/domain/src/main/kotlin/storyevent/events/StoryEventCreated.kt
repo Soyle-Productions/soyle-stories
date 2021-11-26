@@ -8,6 +8,5 @@ data class StoryEventCreated(
     override val storyEventId: StoryEvent.Id,
     val name: String,
     val time: ULong,
-    val sceneId: Scene.Id?,
     val projectId: Project.Id
 ) : StoryEventChange()

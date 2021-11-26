@@ -6,6 +6,7 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocale
 import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.order.SceneOrderUpdate
+import com.soyle.stories.domain.storyevent.events.StoryEventCoveredByScene
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
@@ -37,7 +38,8 @@ interface CreateNewScene {
     class ResponseModel(
         val sceneCreated: SceneCreated,
         val storyEventCreated: StoryEventCreated,
-        val sceneOrderUpdated: SceneOrderUpdate.Successful<*>
+        val sceneOrderUpdated: SceneOrderUpdate.Successful<*>,
+        val storyEventCoveredByScene: StoryEventCoveredByScene
     )
 
     fun interface OutputPort {

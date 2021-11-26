@@ -12,6 +12,7 @@ import com.soyle.stories.domain.scene.order.SceneOrderUpdate
 import com.soyle.stories.domain.scene.sceneName
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.StoryEventTimeService
+import com.soyle.stories.domain.storyevent.events.StoryEventCoveredByScene
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.usecase.repositories.ProseRepositoryDouble
@@ -46,6 +47,7 @@ class `Create New Scene Unit Test` {
     /** A story event should be created */
     var createdStoryEvent: StoryEvent? = null
     var storyEventCreated: StoryEventCreated? = null
+    var storyEventCoveredByScene: StoryEventCoveredByScene? = null
 
     /** Prose should be created for the scene */
     private var createdProse: Prose? = null
@@ -77,6 +79,7 @@ class `Create New Scene Unit Test` {
             sceneCreated = it.sceneCreated
             storyEventCreated = it.storyEventCreated
             sceneOrderUpdated = it.sceneOrderUpdated
+            storyEventCoveredByScene = it.storyEventCoveredByScene
         }
     }
 
@@ -101,16 +104,30 @@ class `Create New Scene Unit Test` {
         }
 
         @Test
+        fun `story event should be created and covered by scene`() {
+            createScene()
+
+            val createdStoryEvent = `story event should be created`()
+            createdScene!!.storyEventId.mustEqual(createdStoryEvent.id)
+            createdStoryEvent.name.mustEqual(inputName)
+
+            val storyEventCoveredByScene = storyEventCoveredByScene!!
+            storyEventCoveredByScene.storyEventId.mustEqual(createdStoryEvent.id)
+            storyEventCoveredByScene.sceneId.mustEqual(createdScene!!.id)
+            storyEventCoveredByScene.uncovered.mustEqual(null)
+        }
+
+        @Test
         fun `created story event should be at start of project`() {
             createScene()
 
             val createdStoryEvent = `story event should be created`()
             createdStoryEvent.time.shouldBeEqualTo(1u)
+            createdStoryEvent.sceneId.mustEqual(createdScene!!.id)
             storyEventCreated!!.mustEqual(StoryEventCreated(
                 createdStoryEvent.id,
                 createdStoryEvent.name.value,
                 createdStoryEvent.time,
-                createdScene!!.id,
                 projectId
             ))
         }
@@ -150,7 +167,6 @@ class `Create New Scene Unit Test` {
                     createdStoryEvent.id,
                     createdStoryEvent.name.value,
                     createdStoryEvent.time,
-                    createdScene!!.id,
                     projectId
                 ))
             }
@@ -238,11 +254,8 @@ class `Create New Scene Unit Test` {
         return createdScene
     }
 
-
     fun `story event should be created`(): StoryEvent {
-        val createdStoryEvent = createdStoryEvent.`should not be null`()
-        createdStoryEvent.sceneId.mustEqual(createdScene!!.id)
-        return createdStoryEvent
+        return this.createdStoryEvent.`should not be null`()
     }
 
     fun `scene order should be updated`(): SceneOrder {
