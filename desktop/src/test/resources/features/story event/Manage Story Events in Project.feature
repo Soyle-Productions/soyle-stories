@@ -6,7 +6,7 @@ Feature: Manage Story Events in Project
   Scenario: Create a Story Event
     When I create a story event named "Something happens"
     Then a story event named "Something happens" should have been created
-    And the "Something happens" story event should be at time 1
+    And the "Something happens" story event should be at time 0
 
   Scenario: Create a Story Event and Specify when it Happens
     When I create a story event named "Something happens" at time 6
@@ -30,6 +30,11 @@ Feature: Manage Story Events in Project
     When I create a story event named "Another thing" at the same time as the "Something happens" story event
     Then a story event named "Another thing" should have been created
     And the "Another thing" story event should be at time 3
+
+  Scenario: Create a Story Event with Scene
+    When I create a scene named "Big Battle"
+    Then a story event named "Big Battle" should have been created
+    And the "Big Battle" story event should be covered by the "Big Battle" scene
 
   Scenario: Rename a Story Event
     Given I have created a story event named "Something happens" at time 3
