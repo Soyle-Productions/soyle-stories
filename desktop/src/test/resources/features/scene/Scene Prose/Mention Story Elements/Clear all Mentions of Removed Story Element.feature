@@ -21,6 +21,7 @@ Feature: Clear all Mentions of Removed Story Element
         | character | "Bob"  |
         | location  | "Home" |
 
+    @PostAlpha
     Scenario: Symbol Mention can be Cleared
       Given I have created a theme named "Growing Up"
       And I have created a symbol named "Ring" in the "Growing Up" theme
@@ -47,6 +48,7 @@ Feature: Clear all Mentions of Removed Story Element
         | character | "Bob"  |
         | location  | "Home" |
 
+    @PostAlpha
     Scenario: Clear Symbol Mention
       Given I have created a theme named "Growing Up"
       And I have created a symbol named "Ring" in the "Growing Up" theme
