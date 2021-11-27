@@ -68,7 +68,7 @@ class RemoveCharacterFromSceneUnitTest {
 
 	private fun givenSceneExists(includesCharacter: Boolean = false)
 	{
-		sceneRepository.scenes[sceneId] = makeScene(sceneId, Project.Id(), storyEventId = storyEventId, charactersInScene = listOfNotNull(
+		sceneRepository.scenes[sceneId] = makeScene(sceneId, Project.Id(), coveredStoryEvents = setOf(storyEventId), charactersInScene = listOfNotNull(
 			characterId.takeIf { includesCharacter }?.let { CharacterInScene(sceneId, it, "") }
 		).toEntitySet())
 	}

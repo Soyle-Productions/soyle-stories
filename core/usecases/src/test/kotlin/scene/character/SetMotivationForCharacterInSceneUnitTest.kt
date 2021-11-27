@@ -129,7 +129,7 @@ class SetMotivationForCharacterInSceneUnitTest {
 		assertEquals(originalScene!!.id, actual.id)
 		assertEquals(originalScene!!.projectId, actual.projectId)
 		assertEquals(originalScene!!.name, actual.name)
-		assertEquals(originalScene!!.storyEventId, actual.storyEventId)
+		assertEquals(originalScene!!.coveredStoryEvents, actual.coveredStoryEvents)
 		assertEquals(motivationToSet, actual.getMotivationForCharacter(characterId)?.motivation)
 	}
 

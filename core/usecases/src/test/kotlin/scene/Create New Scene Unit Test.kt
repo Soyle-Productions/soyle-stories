@@ -108,7 +108,7 @@ class `Create New Scene Unit Test` {
             createScene()
 
             val createdStoryEvent = `story event should be created`()
-            createdScene!!.storyEventId.mustEqual(createdStoryEvent.id)
+            createdScene!!.coveredStoryEvents.single().mustEqual(createdStoryEvent.id)
             createdStoryEvent.name.mustEqual(inputName)
 
             val storyEventCoveredByScene = storyEventCoveredByScene!!

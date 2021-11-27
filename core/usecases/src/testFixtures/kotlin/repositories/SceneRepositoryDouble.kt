@@ -7,7 +7,6 @@ import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.order.SceneOrder
-import com.soyle.stories.domain.scene.order.SceneOrderUpdate
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -27,7 +26,7 @@ class SceneRepositoryDouble(
 	fun givenScene(scene: Scene)
 	{
 		scenes[scene.id] = scene
-		val sceneCreated = SceneCreated(scene.id, scene.name.value, scene.proseId, scene.storyEventId)
+		val sceneCreated = SceneCreated(scene.id, scene.name.value, scene.proseId, scene.coveredStoryEvents.firstOrNull() ?: StoryEvent.Id())
 		sceneOrders[scene.projectId] = (sceneOrders[scene.projectId] ?: SceneOrder.initializeInProject(scene.projectId))
 			.withScene(sceneCreated).sceneOrder
 	}
@@ -54,7 +53,7 @@ class SceneRepositoryDouble(
 	  scenes[sceneId]
 
 	override suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene? {
-		return scenes.values.find { it.storyEventId == storyEventId }
+		return scenes.values.find { storyEventId in it.coveredStoryEvents }
 	}
 
 	override suspend fun getSceneThatOwnsProse(proseId: Prose.Id): Scene? {

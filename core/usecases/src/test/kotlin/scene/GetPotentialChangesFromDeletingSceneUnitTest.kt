@@ -331,7 +331,7 @@ class GetPotentialChangesFromDeletingSceneUnitTest {
             sceneId,
             targetScene.projectId,
             targetScene.name,
-            targetScene.storyEventId,
+            targetScene.coveredStoryEvents,
             charactersInScene = targetScene.duplicateCharactersForNewScene(sceneId))
         sceneRepository.sceneOrders[projectId] = sceneRepository.sceneOrders.getValue(projectId).order.map {
             if (it == targetScene.id) sceneId

@@ -11,14 +11,14 @@ sealed class StoryEventUpdate<out E : StoryEventChange> : Update<StoryEvent> {
 
 class Successful<E : StoryEventChange>(
     override val storyEvent: StoryEvent,
-    val change: E
-) : StoryEventUpdate<E>() {
-    operator fun component2() = change
+    override val change: E
+) : StoryEventUpdate<E>(), Update.Successful<StoryEvent, E> {
+    override fun component2(): E = change
 }
 typealias SuccessfulStoryEventUpdate<E> = Successful<E>
 
 class UnSuccessful(
     override val storyEvent: StoryEvent,
-    val reason: Throwable? = null
-    ) : StoryEventUpdate<Nothing>()
+    override val reason: Throwable? = null
+    ) : StoryEventUpdate<Nothing>(), Update.UnSuccessful<StoryEvent>
 typealias UnSuccessfulStoryEventUpdate = UnSuccessful

@@ -33,11 +33,11 @@ import java.util.*
 
 class IncludeCharacterInSceneUnitTest {
 
-    private val scene = makeScene()
-    private val storyEvent = makeStoryEvent(scene.storyEventId)
+    private val storyEvent = makeStoryEvent()
+    private val scene = makeScene(coveredStoryEvents = setOf(storyEvent.id))
     private val character = makeCharacter(projectId = scene.projectId)
 
-    private val storyEventId = scene.storyEventId
+    private val storyEventId = storyEvent.id
     private val characterId = character.id
     private val characterName = character.name
     private val sceneId = scene.id
@@ -254,7 +254,7 @@ class IncludeCharacterInSceneUnitTest {
                 makeScene(
                     sceneId,
                     projectId,
-                    storyEventId = storyEventId
+                    coveredStoryEvents = setOf(storyEventId)
                 )
             ) { nextScene, character ->
                 nextScene.withCharacterIncluded(character).scene

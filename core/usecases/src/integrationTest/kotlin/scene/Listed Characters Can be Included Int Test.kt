@@ -26,7 +26,7 @@ class `Listed Characters Can be Included Int Test` {
 
     init {
         sceneRepository.givenScene(scene)
-        storyEventRepository.givenStoryEvent(makeStoryEvent(id = scene.storyEventId))
+        storyEventRepository.givenStoryEvent(makeStoryEvent(id = scene.coveredStoryEvents.single()))
         characterRepository.givenCharacter(character)
         repeat(4) { characterRepository.givenCharacter(makeCharacter(projectId = scene.projectId)) }
     }
