@@ -32,7 +32,7 @@ class SceneTest {
 
             update.scene.name.mustEqual(inputName)
             update.scene.projectId.mustEqual(projectId)
-            update.scene.storyEventId.mustEqual(storyEventId)
+            update.scene.coveredStoryEvents.single().mustEqual(storyEventId)
             update.scene.proseId.mustEqual(proseId)
         }
 
@@ -44,7 +44,7 @@ class SceneTest {
             update.event.sceneId.mustEqual(update.scene.id)
             update.event.name.mustEqual(update.scene.name)
             update.event.proseId.mustEqual(update.scene.proseId)
-            update.event.storyEventId.mustEqual(update.scene.storyEventId)
+            update.event.storyEventId.mustEqual(update.scene.coveredStoryEvents.single())
         }
 
     }

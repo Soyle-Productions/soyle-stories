@@ -19,7 +19,7 @@ class Scene private constructor(
     override val id: Id,
     val projectId: Project.Id,
     val name: NonBlankString,
-    val storyEventId: StoryEvent.Id,
+    val coveredStoryEvents: Set<StoryEvent.Id>,
     val settings: EntitySet<SceneSettingLocation>,
     val proseId: Prose.Id,
     private val charactersInScene: EntitySet<CharacterInScene>,
@@ -33,9 +33,14 @@ class Scene private constructor(
 
     companion object {
         @JvmStatic
-        internal fun create(projectId: Project.Id, name: NonBlankString, storyEventId: StoryEvent.Id, proseId: Prose.Id): SceneUpdate<SceneCreated> {
+        internal fun create(
+            projectId: Project.Id,
+            name: NonBlankString,
+            storyEventId: StoryEvent.Id,
+            proseId: Prose.Id
+        ): SceneUpdate<SceneCreated> {
             val newScene = Scene(projectId, name, storyEventId, proseId)
-            return Updated(newScene, SceneCreated(newScene.id, newScene.name.value, proseId, newScene.storyEventId))
+            return Updated(newScene, SceneCreated(newScene.id, newScene.name.value, proseId, storyEventId))
         }
 
         @JvmStatic
@@ -44,7 +49,7 @@ class Scene private constructor(
                 Scene::id,
                 Scene::projectId,
                 Scene::name,
-                Scene::storyEventId,
+                Scene::coveredStoryEvents,
                 Scene::settings,
                 Scene::proseId,
                 Scene::charactersInScene,
@@ -63,7 +68,7 @@ class Scene private constructor(
         Id(),
         projectId,
         name,
-        storyEventId,
+        setOf(storyEventId),
         entitySetOf(),
         proseId,
         entitySetOf(),
@@ -76,7 +81,7 @@ class Scene private constructor(
         id: Id,
         projectId: Project.Id,
         name: NonBlankString,
-        storyEventId: StoryEvent.Id,
+        coveredStoryEvents: Set<StoryEvent.Id>,
         settings: EntitySet<SceneSettingLocation>,
         proseId: Prose.Id,
         charactersInScene: EntitySet<CharacterInScene>,
@@ -87,7 +92,7 @@ class Scene private constructor(
         id,
         projectId,
         name,
-        storyEventId,
+        coveredStoryEvents,
         settings,
         proseId,
         charactersInScene,
@@ -140,12 +145,13 @@ class Scene private constructor(
         charactersInScene: EntitySet<CharacterInScene> = this.charactersInScene,
         symbols: Collection<TrackedSymbol> = this.symbols,
         conflict: SceneConflict = this.conflict,
-        resolution: SceneResolution = this.resolution
+        resolution: SceneResolution = this.resolution,
+        coveredStoryEvents: Set<StoryEvent.Id> = this.coveredStoryEvents
     ) = Scene(
         id,
         projectId,
         name,
-        storyEventId,
+        coveredStoryEvents,
         settings,
         this.proseId,
         charactersInScene,
@@ -322,6 +328,18 @@ class Scene private constructor(
     fun withoutCharacter(characterId: Character.Id) =
         copy(charactersInScene = charactersInScene.minus(characterId))
 
+    fun withStoryEvent(storyEventId: StoryEvent.Id): SceneUpdate<StoryEventAddedToScene> {
+        if (storyEventId in coveredStoryEvents) return noUpdate(SceneAlreadyCoversStoryEvent(id, storyEventId))
+        return copy(coveredStoryEvents = coveredStoryEvents + storyEventId)
+            .updatedBy(StoryEventAddedToScene(id, storyEventId))
+    }
+
+    fun withoutStoryEvent(storyEventId: StoryEvent.Id): SceneUpdate<StoryEventRemovedFromScene> {
+        if (storyEventId !in coveredStoryEvents) return noUpdate(SceneDoesNotCoverStoryEvent(id, storyEventId))
+        return copy(coveredStoryEvents = coveredStoryEvents - storyEventId)
+            .updatedBy(StoryEventRemovedFromScene(id, storyEventId))
+    }
+
     fun withCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene {
         val characterInScene = includedCharacters.getOrError(characterArcSection.characterId)
         return copy(
@@ -376,6 +394,7 @@ class Scene private constructor(
         return Updated(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
     }
 
+    private fun <E : SceneEvent> updatedBy(event: E) = Updated<E>(this, event)
     fun noUpdate(reason: Throwable? = null) = WithoutChange(this, reason)
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
