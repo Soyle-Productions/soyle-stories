@@ -112,7 +112,7 @@ class `Remove Story Event From Story Unit Test` {
 
         init {
             storyEventRepository.givenStoryEvent(storyEvent.coveredByScene(scene.id).storyEvent)
-            sceneRepository.givenScene(scene.withStoryEvent(storyEvent.id).scene)
+            sceneRepository.givenScene(scene.withStoryEvent(storyEvent).scene)
         }
 
         @Test

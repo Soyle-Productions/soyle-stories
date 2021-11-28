@@ -47,7 +47,7 @@ class CoverStoryEventInSceneUseCase(
 
         val updates: List<Update<Entity<out Any>>> = listOfNotNull(
             sceneWithoutOtherStoryEventUpdate,
-            (sceneWithoutOtherStoryEventUpdate?.scene ?: scene).withStoryEvent(storyEvent.id),
+            (sceneWithoutOtherStoryEventUpdate?.scene ?: scene).withStoryEvent(storyEvent),
             storyEvent.coveredByScene(scene.id),
             uncoverCoveredStoryEvent(sceneWithoutOtherStoryEventUpdate)
         )

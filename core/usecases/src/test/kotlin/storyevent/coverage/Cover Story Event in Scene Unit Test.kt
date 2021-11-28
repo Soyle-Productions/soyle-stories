@@ -107,9 +107,9 @@ class `Cover Story Event in Scene Unit Test` {
 
         updatedStoryEvents.single().id shouldBeEqualTo storyEvent.id
         updatedStoryEvents.single().sceneId shouldBeEqualTo scene.id
-        updatedScene!!.mustEqual(scene.withStoryEvent(storyEvent.id).scene)
+        updatedScene!!.mustEqual(scene.withStoryEvent(storyEvent).scene)
         storyEventCoveredByScene.shouldNotBeNull().mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
-        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id))
+        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
         storyEventRemovedFromScene.shouldBeNull()
         storyEventUncoveredFromScene.shouldBeNull()
     }
@@ -117,7 +117,7 @@ class `Cover Story Event in Scene Unit Test` {
     @Test
     fun `Scene Already Covers Story Event`() {
         storyEventRepository.givenStoryEvent(storyEvent.coveredByScene(scene.id).storyEvent)
-        sceneRepository.givenScene(scene.withStoryEvent(storyEvent.id).scene)
+        sceneRepository.givenScene(scene.withStoryEvent(storyEvent).scene)
 
         assertThrows<SceneAlreadyCoversStoryEvent> { coverStoryEventInScene() }
 
@@ -132,16 +132,16 @@ class `Cover Story Event in Scene Unit Test` {
 
         storyEventRepository.givenStoryEvent(storyEvent)
         storyEventRepository.givenStoryEvent(otherStoryEvent)
-        sceneRepository.givenScene(scene.withStoryEvent(otherStoryEvent.id).scene)
+        sceneRepository.givenScene(scene.withStoryEvent(otherStoryEvent).scene)
 
         coverStoryEventInScene()
 
         updatedStoryEvents.size shouldBeEqualTo 2
         updatedStoryEvents.single { it.id == storyEvent.id }
         updatedStoryEvents.single { it.id == otherStoryEvent.id }
-        updatedScene!!.mustEqual(scene.withStoryEvent(storyEvent.id).scene)
+        updatedScene!!.mustEqual(scene.withStoryEvent(storyEvent).scene)
         storyEventCoveredByScene.shouldNotBeNull().mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
-        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id))
+        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
         storyEventRemovedFromScene.shouldNotBeNull().mustEqual(StoryEventRemovedFromScene(scene.id, otherStoryEvent.id))
         storyEventUncoveredFromScene.shouldNotBeNull().mustEqual(StoryEventUncoveredFromScene(otherStoryEvent.id, scene.id))
     }
@@ -149,7 +149,7 @@ class `Cover Story Event in Scene Unit Test` {
     @Test
     fun `Scene Already Covers Story Event but Story Event is Out of Sync`() {
         storyEventRepository.givenStoryEvent(storyEvent) // doesn't know scene covers it
-        sceneRepository.givenScene(scene.withStoryEvent(storyEvent.id).scene)
+        sceneRepository.givenScene(scene.withStoryEvent(storyEvent).scene)
 
         coverStoryEventInScene()
 
@@ -169,10 +169,10 @@ class `Cover Story Event in Scene Unit Test` {
         coverStoryEventInScene()
 
         updatedStoryEvents.shouldBeEmpty()
-        updatedScene.shouldNotBeNull().mustEqual(scene.withStoryEvent(storyEvent.id).scene)
+        updatedScene.shouldNotBeNull().mustEqual(scene.withStoryEvent(storyEvent).scene)
         storyEventCoveredByScene.shouldBeNull()
         storyEventUncoveredFromScene.shouldBeNull()
-        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id))
+        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
         storyEventRemovedFromScene.shouldBeNull()
     }
 
