@@ -6,6 +6,7 @@ import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.events.StoryEventAddedToScene
 import com.soyle.stories.domain.scene.events.StoryEventRemovedFromScene
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -27,40 +28,40 @@ class `Covered Story Events Unit Test` {
     inner class `Can Add Story Event to Scene` {
 
         private val scene = makeScene(coveredStoryEvents = emptySet())
-        private val storyEventId = StoryEvent.Id()
-        private val secondStoryEventId = StoryEvent.Id()
+        private val storyEvent = makeStoryEvent()
+        private val secondStoryEvent = makeStoryEvent()
 
         @Test
         fun `Add New Story Event`() {
-            val update: SceneUpdate<StoryEventAddedToScene> = scene.withStoryEvent(storyEventId)
+            val update: SceneUpdate<StoryEventAddedToScene> = scene.withStoryEvent(storyEvent)
 
             update as Updated
 
-            update.scene.coveredStoryEvents.single().mustEqual(storyEventId)
+            update.scene.coveredStoryEvents.single().mustEqual(storyEvent.id)
 
-            update.event.mustEqual(StoryEventAddedToScene(scene.id, storyEventId))
+            update.event.mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
         }
 
         @Test
         fun `Add Second Story Event`() {
-            val update: SceneUpdate<StoryEventAddedToScene> = scene.withStoryEvent(storyEventId)
-                .scene.withStoryEvent(secondStoryEventId)
+            val update: SceneUpdate<StoryEventAddedToScene> = scene.withStoryEvent(storyEvent)
+                .scene.withStoryEvent(secondStoryEvent)
 
             update as Updated
 
-            update.scene.coveredStoryEvents.mustEqual(setOf(storyEventId, secondStoryEventId))
+            update.scene.coveredStoryEvents.mustEqual(setOf(storyEvent.id, secondStoryEvent.id))
 
-            update.event.mustEqual(StoryEventAddedToScene(scene.id, secondStoryEventId))
+            update.event.mustEqual(StoryEventAddedToScene(scene.id, secondStoryEvent.id, secondStoryEvent.name.value))
         }
 
         @Test
         fun `Add Story Event Again`() {
-            val update = scene.withStoryEvent(storyEventId).scene.withStoryEvent(storyEventId)
+            val update = scene.withStoryEvent(storyEvent).scene.withStoryEvent(storyEvent)
 
             update as WithoutChange
-            update.scene.coveredStoryEvents.mustEqual(setOf(storyEventId))
+            update.scene.coveredStoryEvents.mustEqual(setOf(storyEvent.id))
 
-            update.reason.mustEqual(SceneAlreadyCoversStoryEvent(scene.id, storyEventId))
+            update.reason.mustEqual(SceneAlreadyCoversStoryEvent(scene.id, storyEvent.id))
         }
 
     }
@@ -68,41 +69,41 @@ class `Covered Story Events Unit Test` {
     @Nested
     inner class `Can Remove Story Event from Scene` {
 
-        private val storyEventId = StoryEvent.Id()
+        private val storyEvent = makeStoryEvent()
         private val scene = makeScene(coveredStoryEvents = emptySet())
 
         @Test
         fun `Remove Story Event Not in Scene`() {
-            val update = scene.withoutStoryEvent(storyEventId)
+            val update = scene.withoutStoryEvent(storyEvent.id)
 
             update as WithoutChange
             update.scene.coveredStoryEvents.isEmpty().mustEqual(true)
-            update.reason.mustEqual(SceneDoesNotCoverStoryEvent(scene.id, storyEventId))
+            update.reason.mustEqual(SceneDoesNotCoverStoryEvent(scene.id, storyEvent.id))
         }
 
         @Test
         fun `Remove Story Event from Scene`() {
-            val scene = scene.withStoryEvent(storyEventId).scene
+            val scene = scene.withStoryEvent(storyEvent).scene
 
-            val update: SceneUpdate<StoryEventRemovedFromScene> = scene.withoutStoryEvent(storyEventId)
+            val update: SceneUpdate<StoryEventRemovedFromScene> = scene.withoutStoryEvent(storyEvent.id)
 
             update as Updated
             update.scene.coveredStoryEvents.isEmpty().mustEqual(true)
-            update.event.mustEqual(StoryEventRemovedFromScene(scene.id, storyEventId))
+            update.event.mustEqual(StoryEventRemovedFromScene(scene.id, storyEvent.id))
         }
 
         @Test
         fun `Remove Story Event from Scene with Many Covered Story Events`() {
-            val scene = scene.withStoryEvent(storyEventId).scene
-                .withStoryEvent(StoryEvent.Id()).scene
-                .withStoryEvent(StoryEvent.Id()).scene
+            val scene = scene.withStoryEvent(storyEvent).scene
+                .withStoryEvent(makeStoryEvent()).scene
+                .withStoryEvent(makeStoryEvent()).scene
 
-            val update: SceneUpdate<StoryEventRemovedFromScene> = scene.withoutStoryEvent(storyEventId)
+            val update: SceneUpdate<StoryEventRemovedFromScene> = scene.withoutStoryEvent(storyEvent.id)
 
             update as Updated
             update.scene.coveredStoryEvents.size.mustEqual(2)
-            update.scene.coveredStoryEvents.contains(storyEventId).mustEqual(false)
-            update.event.mustEqual(StoryEventRemovedFromScene(scene.id, storyEventId))
+            update.scene.coveredStoryEvents.contains(storyEvent.id).mustEqual(false)
+            update.event.mustEqual(StoryEventRemovedFromScene(scene.id, storyEvent.id))
         }
 
 

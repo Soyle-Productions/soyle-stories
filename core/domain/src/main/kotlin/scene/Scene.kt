@@ -328,10 +328,10 @@ class Scene private constructor(
     fun withoutCharacter(characterId: Character.Id) =
         copy(charactersInScene = charactersInScene.minus(characterId))
 
-    fun withStoryEvent(storyEventId: StoryEvent.Id): SceneUpdate<StoryEventAddedToScene> {
-        if (storyEventId in coveredStoryEvents) return noUpdate(SceneAlreadyCoversStoryEvent(id, storyEventId))
-        return copy(coveredStoryEvents = coveredStoryEvents + storyEventId)
-            .updatedBy(StoryEventAddedToScene(id, storyEventId))
+    fun withStoryEvent(storyEvent: StoryEvent): SceneUpdate<StoryEventAddedToScene> {
+        if (storyEvent.id in coveredStoryEvents) return noUpdate(SceneAlreadyCoversStoryEvent(id, storyEvent.id))
+        return copy(coveredStoryEvents = coveredStoryEvents + storyEvent.id)
+            .updatedBy(StoryEventAddedToScene(id, storyEvent.id, storyEvent.name.value))
     }
 
     fun withoutStoryEvent(storyEventId: StoryEvent.Id): SceneUpdate<StoryEventRemovedFromScene> {

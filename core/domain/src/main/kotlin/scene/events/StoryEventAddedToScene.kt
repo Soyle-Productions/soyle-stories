@@ -5,5 +5,6 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 
 data class StoryEventAddedToScene(
     override val sceneId: Scene.Id,
-    val storyEventId: StoryEvent.Id
+    val storyEventId: StoryEvent.Id,
+    val storyEventName: String
 ) : SceneEvent()
