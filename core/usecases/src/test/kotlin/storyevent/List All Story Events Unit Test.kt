@@ -44,7 +44,7 @@ class `List All Story Events Unit Test` {
 	@Test
 	fun `should return an empty result`() {
 		listAllStoryEvents()
-		responseModel!!.storyEventItems.size.mustEqual(0)
+		responseModel!!.size.mustEqual(0)
 	}
 
 	@Nested
@@ -60,8 +60,8 @@ class `List All Story Events Unit Test` {
 		@Test
 		fun `should output story event ids`() {
 			listAllStoryEvents()
-			responseModel!!.storyEventItems.size.mustEqual(8)
-			responseModel!!.storyEventItems.map { it.storyEventId }.toSet()
+			responseModel!!.size.mustEqual(8)
+			responseModel!!.map { it.storyEventId }.toSet()
 				.mustEqual(storyEventsInProject.map { it.id }.toSet())
 		}
 
@@ -69,7 +69,7 @@ class `List All Story Events Unit Test` {
 		fun `should output story event names`() {
 			listAllStoryEvents()
 			val storyEventMap = storyEventsInProject.associateBy { it.id }
-			responseModel!!.storyEventItems.forEach {
+			responseModel!!.forEach {
 				it.storyEventName.mustEqual(storyEventMap.getValue(it.storyEventId).name.value)
 			}
 		}
@@ -78,7 +78,7 @@ class `List All Story Events Unit Test` {
 		fun `should output story event times`() {
 			listAllStoryEvents()
 			val storyEventMap = storyEventsInProject.associateBy { it.id }
-			responseModel!!.storyEventItems.forEach {
+			responseModel!!.forEach {
 				it.time.mustEqual(storyEventMap.getValue(it.storyEventId).time.toLong())
 			}
 		}
