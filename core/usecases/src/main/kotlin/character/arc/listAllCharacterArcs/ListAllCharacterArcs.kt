@@ -11,7 +11,7 @@ interface ListAllCharacterArcs {
 
     suspend operator fun invoke(projectId: UUID, outputPort: OutputPort)
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun receiveCharacterArcList(response: CharacterArcsByCharacter)
     }
 

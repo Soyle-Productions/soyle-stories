@@ -6,9 +6,9 @@ interface ListAllScenes {
 
 	class ResponseModel(val scenes: List<SceneItem>)
 
-	interface OutputPort
+	fun interface OutputPort
 	{
-		fun receiveListAllScenesResponse(response: ResponseModel)
+		suspend fun receiveListAllScenesResponse(response: ResponseModel)
 	}
 
 }

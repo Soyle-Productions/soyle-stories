@@ -59,7 +59,7 @@ class ListAllScenesUnitTest {
 		val useCase: ListAllScenes = ListAllScenesUseCase(projectId.uuid, sceneRepository)
 		runBlocking {
 			useCase.invoke(object : ListAllScenes.OutputPort {
-				override fun receiveListAllScenesResponse(response: ListAllScenes.ResponseModel) {
+				override suspend fun receiveListAllScenesResponse(response: ListAllScenes.ResponseModel) {
 					result = response
 				}
 			})
