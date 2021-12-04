@@ -1,24 +1,27 @@
 package com.soyle.stories.desktop.config.drivers.storyevent
 
+import com.soyle.stories.desktop.config.drivers.awaitWithTimeout
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.access
 import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.drive
 import com.soyle.stories.di.DI
-import com.soyle.stories.di.get
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.layout.config.fixed.StoryEventList
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.storyevent.list.StoryEventListTool
 import com.soyle.stories.storyevent.list.StoryEventListToolView
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.fail
-import tornadofx.lookup
+import javafx.scene.control.RadioButton
+import javafx.scene.control.Tab
+import org.junit.jupiter.api.Assertions.*
+import tornadofx.select
 import tornadofx.selectedItem
 
-fun WorkBench.getOpenStoryEventListTool(): StoryEventListToolView? =
-    (DI.getRegisteredTypes(scope)[StoryEventListToolView::class] as? StoryEventListToolView)
-        ?.takeIf { it.scene?.window?.isShowing == true }
+fun WorkBench.getOpenStoryEventListTool(): StoryEventListToolView? {
+    val components = DI.getRegisteredTypes(scope)
+    val instance = components[StoryEventListToolView::class]
+    val view = instance as? StoryEventListToolView
+    return view?.takeIf { it.scene?.window?.isShowing == true }
+}
 
 fun WorkBench.getOpenStoryEventListToolOrError(): StoryEventListToolView = getOpenStoryEventListTool()
     ?: error("Story Event List Tool was not opened in this workbench ${scope.projectViewModel}")
@@ -29,12 +32,22 @@ fun WorkBench.givenStoryEventListToolHasBeenOpened(): StoryEventListToolView = g
 }
 
 fun WorkBench.openStoryEventListTool() {
-    findMenuItemById("tools_storyeventlist")!!
-        .apply {
-            robot.interact {
-                fire()
-            }
+    val view = DI.getRegisteredTypes(scope)[StoryEventListToolView::class] as? StoryEventListToolView
+    if (view != null) {
+        println("selecting tab...")
+        robot.interact {
+            val tab = view.properties["tornadofx.tab"] as Tab
+            tab.select()
+            assertTrue(tab.isSelected)
+            assertNotNull(tab.tabPane.scene)
+            assertNotNull(view.scene)
+            assertNotNull(view.scene.window)
+            assertTrue(view.scene.window.isShowing)
         }
+    } else {
+        findMenuItemById("tools_storyeventlist")!!
+            .apply { robot.interact { fire() } }
+    }
 }
 
 fun StoryEventListToolView.openCreateStoryEventDialog() {
@@ -121,5 +134,39 @@ fun StoryEventListToolView.viewStoryEventInTimeline() {
     drive {
         optionsButton!!.show()
         optionsButton!!.viewInTimeline!!.fire()
+    }
+}
+
+fun StoryEventListToolView.coverSelectedStoryEventIn(sceneId: Scene.Id) {
+    val coverageMenu = drive {
+        optionsButton!!.show()
+        optionsButton!!.coverageMenu!!.apply { show() }
+    }
+    awaitWithTimeout(100) {
+        with(access()) {
+            coverageMenu.options.first().id != "loading"
+        }
+    }
+    drive {
+        coverageMenu.run {
+            (options.find { it.id == sceneId.toString() } as RadioButton).fire()
+        }
+    }
+}
+
+fun StoryEventListToolView.uncoverSelectedStoryEvent() {
+    val coverageMenu = drive {
+        optionsButton!!.show()
+        optionsButton!!.coverageMenu!!.apply { show() }
+    }
+    awaitWithTimeout(100) {
+        with(access()) {
+            coverageMenu.options.first().id != "loading"
+        }
+    }
+    drive {
+        coverageMenu.run {
+            (options.find { it is RadioButton && it.isSelected } as RadioButton).fire()
+        }
     }
 }

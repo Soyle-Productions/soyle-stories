@@ -26,6 +26,7 @@ class SceneListDriver(private val sceneList: SceneListView) : FxRobot() {
 
     fun TreeItem<SceneItemViewModel?>.getSceneEditorItem(): MenuItem = sceneList.sceneContextMenu.items.find { it.id == "edit" }!!
     fun TreeItem<SceneItemViewModel?>.getSceneDetailsItem(): MenuItem = sceneList.sceneContextMenu.items.find { it.id == "open_details" }!!
+    fun TreeItem<SceneItemViewModel?>.getSceneOutlineItem(): MenuItem = sceneList.sceneContextMenu.items.find { it.id == "open_scene_outline" }!!
     fun TreeItem<SceneItemViewModel?>.getRenameItem(): MenuItem = sceneList.sceneContextMenu.items.find { it.id == "rename" }!!
     fun TreeItem<SceneItemViewModel?>.getDeleteItem(): MenuItem = sceneList.sceneContextMenu.items.find { it.id == "delete" }!!
 

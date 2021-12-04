@@ -7,6 +7,7 @@ import com.soyle.stories.desktop.view.scene.sceneList.SceneListDriver
 import com.soyle.stories.desktop.view.scene.sceneList.driver
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.WorkBench
+import com.soyle.stories.scene.outline.SceneOutlineView
 import com.soyle.stories.scene.sceneList.SceneListItem
 import com.soyle.stories.scene.sceneList.SceneListView
 import javafx.event.ActionEvent
@@ -29,6 +30,20 @@ fun WorkBench.openSceneListTool(): SceneListView
     findMenuItemById("tools_scenelist")!!
         .apply { robot.interact { fire() } }
     return getSceneListToolOrError()
+}
+
+fun SceneListView.openSceneOutlineTool(scene: Scene)
+{
+    val driver = SceneListDriver(this)
+    val sceneItem = driver.getSceneItemOrError(scene.name.value)
+    val tree = driver.tree
+
+    with(driver) {
+        interact {
+            tree.selectionModel.select(sceneItem)
+            sceneItem.getSceneOutlineItem().fire()
+        }
+    }
 }
 
 fun SceneListView.selectScene(scene: Scene)

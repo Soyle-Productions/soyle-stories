@@ -1,11 +1,8 @@
 package com.soyle.stories.desktop.view.storyevent.timeline
 
 import com.soyle.stories.common.components.ComponentsStyles.Companion.primary
-import com.soyle.stories.common.components.ComponentsStyles.Companion.secondary
 import com.soyle.stories.desktop.view.common.NodeAccess
-import com.soyle.stories.desktop.view.storyevent.timeline.viewport.TimelineViewportAccess.Companion.access
 import com.soyle.stories.storyevent.timeline.Timeline
-import com.soyle.stories.storyevent.timeline.TimelineStyles
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.timelineHeaderArea
 import com.soyle.stories.storyevent.timeline.UnitOfTime
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPort
@@ -14,7 +11,6 @@ import javafx.scene.control.CheckBox
 import javafx.scene.control.MenuButton
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
 import tornadofx.Stylesheet
 import tornadofx.hasClass
 
@@ -41,8 +37,11 @@ class TimelineAccess private constructor(val timeline: Timeline) : NodeAccess<Ti
     val MenuButton.deleteStoryEventOption: MenuItem?
         get() = items.find { it.id == "delete" }
 
-    val MenuButton.insertTimeOption: MenuItem?
-        get() = items.find { it.id == "insert-time" }
+    val MenuButton.insertTimeBeforeOption: MenuItem?
+        get() = items.find { it.id == "insert-before" }
+
+    val MenuButton.insertTimeAfterOption: MenuItem?
+        get() = items.find { it.id == "insert-after" }
 
     val condensedToggle: CheckBox?
         get() = header.findChild(Stylesheet.checkBox)

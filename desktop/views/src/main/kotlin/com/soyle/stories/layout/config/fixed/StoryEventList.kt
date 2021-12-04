@@ -10,9 +10,12 @@ import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import com.soyle.stories.storyevent.list.StoryEventListTool
 import com.soyle.stories.storyevent.list.StoryEventListToolView
+import javafx.scene.Node
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import tornadofx.add
+import tornadofx.onChange
+import tornadofx.singleAssign
 import kotlin.reflect.KClass
 
 object StoryEventList : ToolConfig<StoryEventList>, FixedTool() {
@@ -29,6 +32,7 @@ object StoryEventList : ToolConfig<StoryEventList>, FixedTool() {
             tabPane.add(list)
             return tabPane.tabs.last().apply {
                 text = getViewModelConfig(type).toolName()
+                list.properties["tornadofx.tab"] = this
             }
         }
     }

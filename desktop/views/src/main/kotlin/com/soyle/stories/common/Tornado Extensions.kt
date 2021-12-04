@@ -314,3 +314,9 @@ fun Node.makeSelectable(focusTraversable: Boolean = this.isFocusTraversable, sel
 
 	return selectedProperty
 }
+
+val MenuItem.rootMenu: Menu?
+	get() = when (val parentMenu = parentMenu) {
+		null -> this as? Menu
+		else -> parentMenu.rootMenu
+	}

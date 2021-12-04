@@ -6,6 +6,7 @@ import com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label.St
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label.StoryPointLabelAssertions.Companion.assertThat
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.storyevent.timeline.Timeline
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.fail
 import org.testfx.assertions.api.AbstractParentAssert
@@ -46,8 +47,8 @@ class TimelineAssertions private constructor(private val access: TimelineAccess)
 
     fun StoryPointLabelAssertions.isInView() {
         val viewport = access.viewport ?: fail("No story events have yet been loaded in the timeline.")
-        assertThat(viewport.access().grid.visibleLabels().value).contains(label)
+        assertThat(viewport.access().grid.visibleLabels().value)
+            .contains(label)
     }
-
 
 }

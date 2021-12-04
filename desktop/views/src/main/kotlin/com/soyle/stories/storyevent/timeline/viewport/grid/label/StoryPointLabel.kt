@@ -169,7 +169,6 @@ constructor(
         asSurface {
             absoluteElevation = Elevation[8]!!
         }
-        isPickOnBounds = false
         isFocusTraversable = true
     }
 

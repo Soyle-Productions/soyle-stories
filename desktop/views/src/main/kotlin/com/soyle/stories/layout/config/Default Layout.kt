@@ -31,16 +31,18 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                     }
                 }
                 primaryStack(6) {}
-                stack(2) {
-                    tool(Tool(SceneOutline, isOpen = false))
-                    tool(Tool(SceneSymbols, isOpen = false))
-                    tool(Tool(SceneSetting, isOpen = false))
-                    tool(Tool(SceneCharacters, isOpen = false))
-                }
-                stack(2) {
-                    tool(Tool(SceneList))
-                    tool(Tool(ThemeList, isOpen = false))
-                    //openTool(ToolType.NoteList)
+                stackSplitter(2) {
+                    stack(2) {
+                        tool(Tool(SceneList))
+                        tool(Tool(ThemeList, isOpen = false))
+                        //openTool(ToolType.NoteList)
+                    }
+                    stack(2) {
+                        tool(Tool(SceneOutline, isOpen = false))
+                        tool(Tool(SceneSymbols, isOpen = false))
+                        tool(Tool(SceneSetting, isOpen = false))
+                        tool(Tool(SceneCharacters, isOpen = false))
+                    }
                 }
             }
             stack(2) {

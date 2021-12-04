@@ -38,7 +38,7 @@ class SceneListPresenter(
         SceneInconsistenciesPresenter(view) listensTo sceneInconsistenciesNotifier
     )
 
-    override fun receiveListAllScenesResponse(response: ListAllScenes.ResponseModel) {
+    override suspend fun receiveListAllScenesResponse(response: ListAllScenes.ResponseModel) {
         view.update {
             SceneListViewModel(
                 toolTitle = "Scenes",

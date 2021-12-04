@@ -5,9 +5,9 @@ import com.soyle.stories.storyevent.list.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.StoryEventListToolView
 import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.layout.VBox
 import tornadofx.CssRule
 import tornadofx.Stylesheet
-import tornadofx.cssclass
 
 class StoryEventListToolAccess private constructor(private val tool: StoryEventListToolView) : NodeAccess<Node>(tool) {
     companion object {
@@ -46,6 +46,10 @@ class StoryEventListToolAccess private constructor(private val tool: StoryEventL
         get() = items.find { it.id == "delete" }?.takeIf { isDisable == false }
     val MenuButton.viewInTimeline: MenuItem?
         get() = items.find { it.id == "view-in-timeline" }?.takeIf { isDisable == false }
+    val MenuButton.coverageMenu: Menu?
+        get() = items.find { it.id == "coverage" }?.takeUnless { isDisable } as? Menu
+    val Menu.options: List<Labeled>
+        get() = ((items.single() as CustomMenuItem).content as VBox).children.filterIsInstance<Labeled>()
 
     val ListCell<StoryEventListItemViewModel>.nameLabel: Label?
         get() = findChild(CssRule.c("name"))

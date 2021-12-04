@@ -6,9 +6,7 @@ import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.soylestories.SoyleStories
-import javafx.scene.control.Menu
-import javafx.scene.control.MenuBar
-import javafx.scene.control.MenuItem
+import javafx.scene.control.*
 import tornadofx.FX
 
 fun ProjectScope.getWorkbenchOrError(): WorkBench =
@@ -43,6 +41,7 @@ fun MenuItem.collectItems(): Sequence<MenuItem> = when (this) {
 fun WorkBench.findMenuItemById(id: String): MenuItem? = getMenuBar()
     .menus.asSequence()
     .flatMap { it.collectItems() }
+    .filter { it !is SeparatorMenuItem }
     .toList()
     .run {
         find { it.id == id }

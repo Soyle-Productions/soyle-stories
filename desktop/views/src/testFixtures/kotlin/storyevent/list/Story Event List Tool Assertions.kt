@@ -16,7 +16,7 @@ class `Story Event List Tool Assertions` private constructor(private val access:
         val item = access.storyEventItems.find { it.id == storyEvent.id }
             ?: fail("Story Event List does not have an item matching the id ${storyEvent.id}")
         assertEquals(storyEvent.name, item.nameProperty.value)
-        assertEquals(storyEvent.time, item.timeProperty.value)
+        assertEquals(storyEvent.time.toLong(), item.timeProperty.value)
     }
 
     fun doesNotHaveStoryEventNamed(name: String) {

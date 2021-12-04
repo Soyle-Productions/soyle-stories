@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.config.features.storyevent
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.storyevent.*
 import com.soyle.stories.desktop.config.features.soyleStories
+import com.soyle.stories.desktop.view.storyevent.list.StoryEventListToolAccess.Companion.access
 import com.soyle.stories.desktop.view.storyevent.list.`Story Event List Tool Assertions`.Companion.assertThis
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.fail
 import org.testfx.assertions.api.Assertions.assertThat
 import com.soyle.stories.desktop.view.storyevent.timeline.TimelineAssertions.Companion.assertThat
+import com.soyle.stories.domain.scene.Scene
+import javafx.scene.control.CheckMenuItem
 
 class `Story Event Steps` : En {
 
@@ -27,6 +30,9 @@ class `Story Event Steps` : En {
         get() = `Story Event Robot`(soyleStories.getAnyOpenWorkbenchOrError())
 
     private fun givens() {
+        Given("I have created a story event named {string}") { name: String ->
+            storyEvents.givenStoryEventExists(withName = NonBlankString.create(name)!!)
+        }
         Given("I have created a story event named {string} at time {int}") { name: String, time: Int ->
             storyEvents.givenStoryEventExists(withName = NonBlankString.create(name)!!, atTime = time)
         }
@@ -127,6 +133,18 @@ class `Story Event Steps` : En {
                 .adjustTime(by = adjustment.toLong())
             runBlocking { delay(100) } // given events time to propagate
         }
+        When("I cover the {story event} in the {scene}") { storyEvent: StoryEvent, scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+                .coverSelectedStoryEventIn(scene.id)
+        }
+        When("I uncover the {story event}") { storyEvent: StoryEvent ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+                .uncoverSelectedStoryEvent()
+        }
         When("I want to delete the {story event}") { storyEvent: StoryEvent ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenStoryEventListToolHasBeenOpened()
@@ -140,12 +158,13 @@ class `Story Event Steps` : En {
             runBlocking { delay(100) } // give events time to propagate
         }
         When("I delete the {story event}") { storyEvent: StoryEvent ->
-            soyleStories.getAnyOpenWorkbenchOrError()
+            val workbench = soyleStories.getAnyOpenWorkbenchOrError()
+            workbench
                 .givenStoryEventListToolHasBeenOpened()
                 .givenStoryEventHasBeenSelected(storyEvent)
                 .openDeleteStoryEventDialog()
 
-            soyleStories.getAnyOpenWorkbenchOrError()
+            workbench
                 .getOpenDeleteStoryEventDialogOrError()
                 .confirm()
             runBlocking { delay(100) } // give events time to propagate
@@ -161,7 +180,7 @@ class `Story Event Steps` : En {
             workbench.givenTimelineToolHasBeenOpened()
                 .givenTimeUnitInView(unit.toLong())
                 .givenTimeUnitHasBeenSelected(unit.toLong())
-                .openInsertTimeDialog()
+                .openInsertTimeDialog(before = true)
 
             workbench.getOpenInsertTimeDialogOrError()
                 .insertTime(insertAmount.toLong())
@@ -188,6 +207,10 @@ class `Story Event Steps` : En {
                     hasStoryEvent(storyEvent)
                 }
         }
+        Then("the {story event} should be covered by the {scene}") { storyEvent: StoryEvent, scene: Scene ->
+            assertEquals(scene.id, storyEvent.sceneId)
+            assertEquals(storyEvent.id, scene.coveredStoryEvents.singleOrNull())
+        }
         Then("there should not be a story event named {string}") { nameThatShouldNotExist: String ->
             assertNull(storyEvents.getStoryEventByName(nameThatShouldNotExist))
 
@@ -201,7 +224,7 @@ class `Story Event Steps` : En {
             data.asMaps().forEach {
                 val expectedTime = it.getValue("Time").toLong()
                 val storyEvent = storyEvents.getStoryEventByName(it.getValue("Name"))!!
-                assertEquals(expectedTime, storyEvent.time) {
+                assertEquals(expectedTime, storyEvent.time.toLong()) {
                     "${storyEvent.name} should take place at time $expectedTime, but was found at time ${storyEvent.time}"
                 }
             }
@@ -247,6 +270,17 @@ class `Story Event Steps` : En {
                     isAtTime(expectedTime.toLong())
                 }
             }
+        }
+        Then("the {story event} should not be covered by a scene") { storyEvent: StoryEvent ->
+            assertNull(storyEvent.sceneId)
+
+            val storyEventList = soyleStories.getAnyOpenWorkbenchOrError()
+                .givenStoryEventListToolHasBeenOpened()
+                .givenStoryEventHasBeenSelected(storyEvent)
+
+            with(storyEventList.access()) {
+                optionsButton!!.coverageMenu!!.items.none { it is CheckMenuItem && it.isSelected }
+            }.let(::assertTrue)
         }
     }
 

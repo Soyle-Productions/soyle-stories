@@ -15,21 +15,37 @@ import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.project.WorkBench
 import tornadofx.FX
+import tornadofx.select
 import tornadofx.toProperty
 
-fun WorkBench.givenCharacterListToolHasBeenOpened(): CharacterListView =
-    getCharacterListTool() ?: openCharacterListTool().let { getCharacterListToolOrError() }
+fun WorkBench.givenCharacterListToolHasBeenOpened(): CharacterListView {
+    if (currentStage?.isShowing != true) IllegalStateException("Workbench is not yet showing")
+    return getCharacterListTool() ?: run {
+        openCharacterListTool()
+        getCharacterListToolOrError()
+    }
+}
 
 fun WorkBench.getCharacterListToolOrError(): CharacterListView =
-    getCharacterListTool() ?: throw NoSuchElementException("Theme List has not been opened")
+    getCharacterListTool() ?: throw NoSuchElementException("Character List has not been opened")
 
 fun WorkBench.getCharacterListTool(): CharacterListView? {
-    return (FX.getComponents(scope)[CharacterListView::class] as? CharacterListView)?.takeIf { it.currentStage?.isShowing == true }
+    val components = FX.getComponents(scope)
+    val instance = components[CharacterListView::class]
+    val view = instance as? CharacterListView
+    return view?.takeIf { it.currentStage?.isShowing == true }
 }
 
 fun WorkBench.openCharacterListTool() {
-    findMenuItemById("tools_characterlist")!!
-        .apply { robot.interact { fire() } }
+    val view = FX.getComponents(scope)[CharacterListView::class] as? CharacterListView
+    if (view != null) {
+        robot.interact {
+            view.owningTab?.select()
+        }
+    } else {
+        findMenuItemById("tools_characterlist")!!
+            .apply { robot.interact { fire() } }
+    }
 }
 
 fun CharacterListView.renameCharacter(characterId: Character.Id): RenameCharacterForm? {

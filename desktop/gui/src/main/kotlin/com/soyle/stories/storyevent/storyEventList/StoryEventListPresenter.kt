@@ -28,7 +28,7 @@ class StoryEventListPresenter(
 			  "Story Events",
 			  "No Story Events have been created yet.",
 			  "Create Story Event",
-			  response.storyEventItems.map(::StoryEventListItemViewModel),
+			  response.map(::StoryEventListItemViewModel),
 			  null
 			)
 		}

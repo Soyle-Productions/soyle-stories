@@ -17,6 +17,8 @@ import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.Remove
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedNotifier
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
+import com.soyle.stories.scene.create.SceneCreatedNotifier
+import com.soyle.stories.scene.create.SceneCreatedReceiver
 import com.soyle.stories.scene.delete.SceneDeletedNotifier
 import com.soyle.stories.scene.delete.SceneDeletedReceiver
 import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
@@ -27,6 +29,10 @@ import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsed
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneNotifier
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneReceiver
+import com.soyle.stories.scene.outline.StoryEventAddedToSceneNotifier
+import com.soyle.stories.scene.outline.StoryEventAddedToSceneReceiver
+import com.soyle.stories.scene.outline.StoryEventRemovedFromSceneNotifier
+import com.soyle.stories.scene.outline.StoryEventRemovedFromSceneReceiver
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedNotifier
@@ -34,11 +40,16 @@ import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedReceiver
 import com.soyle.stories.scene.target.SceneTargetedNotifier
 import com.soyle.stories.scene.target.SceneTargetedReceiver
 import com.soyle.stories.scene.trackSymbolInScene.*
+import com.soyle.stories.storyevent.coverage.StoryEventCoveredBySceneReceiver
+import com.soyle.stories.storyevent.coverage.StoryEventUncoveredBySceneReceiver
 
 object Notifiers {
 
     init {
         scoped<ProjectScope> {
+            provide(SceneCreatedReceiver::class) {
+                SceneCreatedNotifier()
+            }
             provide(IncludedCharacterInSceneReceiver::class) {
                 IncludedCharacterInSceneNotifier()
             }
@@ -99,6 +110,13 @@ object Notifiers {
             provide(SceneInconsistenciesReceiver::class) {
                 SceneInconsistenciesNotifier()
             }
+            provide(StoryEventAddedToSceneReceiver::class) {
+                StoryEventAddedToSceneNotifier()
+            }
+            provide(StoryEventRemovedFromSceneReceiver::class) {
+                StoryEventRemovedFromSceneNotifier()
+            }
+
         }
     }
 }

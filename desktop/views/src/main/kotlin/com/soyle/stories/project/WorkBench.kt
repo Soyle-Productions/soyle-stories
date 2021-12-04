@@ -16,6 +16,7 @@ import com.soyle.stories.project.projectList.ProjectListViewListener
 import com.soyle.stories.project.startProjectDialog.startProjectDialog
 import com.soyle.stories.scene.create.CreateNewSceneController
 import com.soyle.stories.soylestories.Styles
+import com.soyle.stories.storyevent.create.CreateStoryEventController
 import com.soyle.stories.theme.createSymbolDialog.CreateSymbolDialog
 import com.soyle.stories.theme.createThemeDialog.CreateThemeDialog
 import com.soyle.stories.writer.settingsDialog.SettingsDialog
@@ -56,6 +57,10 @@ class WorkBench : View() {
                     item("Location") {
                         id = "file_new_location"
                         action { scope.get<CreateLocationDialog.Factory>().invoke().show() }
+                    }
+                    item("Story Event") {
+                        id = "file_new_storyevent"
+                        action { scope.get<CreateStoryEventController>().create() }
                     }
                     item("Scene") {
                         id = "file_new_scene"

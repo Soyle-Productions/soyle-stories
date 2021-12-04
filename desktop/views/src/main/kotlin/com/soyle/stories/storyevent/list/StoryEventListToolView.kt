@@ -13,10 +13,13 @@ import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.common.emptyProperty
 import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.domain.storyevent.StoryEvent
+import javafx.application.Platform
 import javafx.beans.value.ObservableValue
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
+import javafx.event.EventHandler
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
@@ -165,12 +168,44 @@ class StoryEventListToolView(
                     action(controller::deleteSelectedItems)
                 }
                 separator()
+                menu("Covered By...") {
+                    id = "coverage"
+                    lazyLoadSceneItems()
+                }
+                separator()
                 item("View in Timeline") {
                     id = "view-in-timeline"
                     enableWhen(populatedViewModel.hasSingleSelection)
                     action(controller::viewSelectedItemInTimeline)
                 }
             }.items
+        }
+
+        private fun Menu.lazyLoadSceneItems() {
+            // using vbox and custom menu item because menu doesn't re-render while showing if you change the menu items
+
+            val loadingLabel = Label("Loading...").apply { id = "loading" }
+            val optionsMenu = VBox(loadingLabel)
+            val item = CustomMenuItem(optionsMenu, true)
+            items.setAll(item)
+
+            showingProperty().onChange { populatedViewModel.requestingScenesToCover().set(it) }
+            populatedViewModel.scenesToCover().onChange {
+                if (! isShowing) return@onChange
+                if (it != null) {
+                    if (it.isEmpty()) optionsMenu.children.setAll(Label("No scenes available"))
+                    else {
+                        optionsMenu.children.setAll(it.map { menuItem ->
+                            RadioButton(menuItem.text).apply {
+                                id = menuItem.id
+                                onAction = menuItem.onAction
+                                isSelected = (menuItem as? RadioMenuItem)?.isSelected ?: false
+                            }
+                        })
+                    }
+                } else optionsMenu.children.setAll(loadingLabel)
+            }
+            addEventHandler(MenuButton.ON_HIDDEN) { optionsMenu.children.setAll(loadingLabel) }
         }
 
     }

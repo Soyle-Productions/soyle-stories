@@ -56,10 +56,14 @@ fun Timeline.scrollToTime(unit: Long) {
     }
 }
 
-fun Timeline.openInsertTimeDialog() {
+fun Timeline.openInsertTimeDialog(before: Boolean = false, after: Boolean = false) {
+    assert(before || after && (before != after)) { "Only one option may be selected" }
     drive {
         optionsButton!!.show()
-        optionsButton!!.insertTimeOption!!.fire()
+        when {
+            before -> optionsButton!!.insertTimeBeforeOption!!.fire()
+            after -> optionsButton!!.insertTimeAfterOption!!.fire()
+        }
     }
 }
 

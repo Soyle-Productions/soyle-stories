@@ -20,7 +20,7 @@ interface OutlineSceneController {
 
             sceneRepository: SceneRepository,
 
-            outline: SceneOutlinePrompt,
+            getOutline: suspend (Scene.Id, String) -> SceneOutlineReport,
 
             listStoryEventsCoveredByScene: ListStoryEventsCoveredByScene
         ): OutlineSceneController  = object : OutlineSceneController, CoroutineScope by CoroutineScope(guiContext) {
@@ -31,7 +31,7 @@ interface OutlineSceneController {
                 }
 
                 // Inform User Outline Is Being Loaded
-                outline.loadingOutline(scene.id, scene.name.value)
+                val outline = getOutline(scene.id, scene.name.value)
 
                 // load story events and display result
                 try {

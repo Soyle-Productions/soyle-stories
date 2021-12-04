@@ -2,12 +2,15 @@ package com.soyle.stories.storyevent.list
 
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.common.rootMenu
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventNoLongerHappens
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
+import com.soyle.stories.storyevent.coverage.StoryEventCoverageController
 import com.soyle.stories.storyevent.create.CreateStoryEventController
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.remove.RemoveStoryEventController
@@ -17,20 +20,19 @@ import com.soyle.stories.storyevent.rename.StoryEventRenamedReceiver
 import com.soyle.stories.storyevent.time.StoryEventRescheduledReceiver
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
-import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
 import com.soyle.stories.usecase.storyevent.StoryEventItem
-import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import javafx.beans.property.ObjectProperty
-import kotlinx.coroutines.*
+import javafx.collections.ObservableList
+import javafx.scene.control.CheckMenuItem
+import javafx.scene.control.RadioMenuItem
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import tornadofx.objectProperty
-import tornadofx.observableListOf
-import tornadofx.toObservable
-import java.util.*
-import java.util.concurrent.atomic.AtomicReferenceArray
-import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.withContext
+import tornadofx.*
+import kotlin.collections.sortWith
 
 class StoryEventListPresenter(
     private val projectId: Project.Id,
@@ -41,6 +43,7 @@ class StoryEventListPresenter(
     private val rescheduleStoryEventController: RescheduleStoryEventController,
     private val adjustStoryEventsTimeController: AdjustStoryEventsTimeController,
     private val removeStoryEventController: RemoveStoryEventController,
+    private val storyEventCoverageController: StoryEventCoverageController,
     private val requestToViewStoryEventInTimeline: (StoryEvent.Id) -> Unit,
 
     storyEventCreated: Notifier<StoryEventCreatedReceiver>,
@@ -60,9 +63,9 @@ class StoryEventListPresenter(
             withContext(Dispatchers.JavaFx) {
                 outputReceived = true
 
-                val newVM = if (it.storyEventItems.isEmpty()) EmptyStoryEventListViewModel
+                val newVM = if (it.isEmpty()) EmptyStoryEventListViewModel
                 else {
-                    PopulatedStoryEventListViewModel(it.storyEventItems
+                    populatedViewModel(it
                         .asSequence()
                         .map { it.toViewModel() }
                         .orderAndGroupByTime()
@@ -172,6 +175,31 @@ class StoryEventListPresenter(
         loadStoryEvents()
     }
 
+    private fun populatedViewModel(items: ObservableList<StoryEventListItemViewModel>): PopulatedStoryEventListViewModel
+    {
+        return PopulatedStoryEventListViewModel(items).apply {
+            requestingScenesToCover().onChange { _ ->
+                scenesToCover = null
+                if (! isRequestingScenesToCover) return@onChange
+                val selectedItem = selectedItems.singleOrNull() ?: return@onChange
+                val deferred = CompletableDeferred<Scene.Id?>()
+                storyEventCoverageController.modifyStoryEventCoverage(selectedItem.id) { currentScene, sceneItems ->
+                    if (! isRequestingScenesToCover) return@modifyStoryEventCoverage null
+                    scenesToCover = sceneItems.map {
+                        RadioMenuItem(it.sceneName).apply {
+                            id = Scene.Id(it.id).toString()
+                            isSelected = it.id == currentScene?.uuid
+                            action {
+                                rootMenu?.hide()
+                                if (! deferred.isCompleted) deferred.complete(Scene.Id(it.id)) }
+                        }
+                    }
+                    deferred.await()
+                }
+            }
+        }
+    }
+
     private inner class EventReceiver : StoryEventCreatedReceiver, StoryEventRenamedReceiver,
         StoryEventRescheduledReceiver, StoryEventNoLongerHappensReceiver {
 
@@ -180,7 +208,7 @@ class StoryEventListPresenter(
                 val vm = viewModel.value as? LoadedStoryEventListViewModel ?: return@withContext
                 val newItem = event.toViewModel()
                 when (vm) {
-                    EmptyStoryEventListViewModel -> viewModel.set(PopulatedStoryEventListViewModel(observableListOf(
+                    EmptyStoryEventListViewModel -> viewModel.set(populatedViewModel(observableListOf(
                         newItem.apply { prevItemHasSameTime.set(true) }
                     )))
                     is PopulatedStoryEventListViewModel -> {

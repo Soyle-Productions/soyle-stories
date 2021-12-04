@@ -23,7 +23,7 @@ class CreateScenePromptView(
             fieldLabel("Name").labelFor = textfield {
                 disableWhen(viewModel.submitting())
                 requestFocus()
-                viewModel.name().bind(textProperty())
+                viewModel.name().bindBidirectional(textProperty())
                 singleDecorator().bind(viewModel.errorMessage().asDecorator(ValidationSeverity.Error))
                 action(viewModel::submit)
             }

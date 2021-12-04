@@ -10,66 +10,33 @@ import javafx.beans.WeakInvalidationListener
 import javafx.collections.ObservableList
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
-import tornadofx.action
-import tornadofx.booleanBinding
-import tornadofx.disableWhen
-import tornadofx.enableWhen
+import tornadofx.*
 
 class TimelineRulerLabelMenu(
-    selection: TimeRangeSelection = TimelineSelectionModel(),
+    private val selection: TimeRangeSelection = TimelineSelectionModel(),
     private val storyPointLabels: ObservableList<StoryPointLabel>,
 
     private val dependencies: TimelineRulerLabelMenuComponent.Dependencies
 ) : ContextMenu() {
 
-    private fun populateItems(selection: TimeRange?) {
-        val newItems = if (selection != null) singleRangeSelectionItems(selection)
-        else listOf(MenuItem())
-        items.setAll(newItems)
-    }
-
-    private fun singleRangeSelectionItems(range: TimeRange): List<MenuItem> {
-        return listOf(
-            MenuItem().apply {
-                id = "insert-before"
-                text =
-                    "Insert ${range.duration.value} unit${if (range.duration.value == 1L) "" else "s"} of time before"
-                action(insertBefore(range))
-            },
-            MenuItem().apply {
-                id = "insert-after"
-                text = "Insert ${range.duration.value} unit${if (range.duration.value == 1L) "" else "s"} of time after"
-                action(insertAfter(range))
-            },
-            MenuItem().apply {
-                id = "delete"
-                text = "Remove ${range.duration.value} unit${if (range.duration.value == 1L) "" else "s"} of time"
-                disableWhen(booleanBinding(storyPointLabels) {
-                    storyPointLabels.binarySubList(
-                        predicate = { range.range.contains(it.time) },
-                        lookForward = { it.time < range.range.last }
-                    ).isNotEmpty()
-                })
-                action(remove(range))
-            }
-        )
-    }
-
-    private fun insertBefore(range: TimeRange): () -> Unit = {
+    private fun insertBefore() {
+        val range = selection.get() ?: return
         dependencies.adjustStoryEventsTimeController.adjustTimesBy(
             setOfIdsAfterStart(range),
             range.duration.value
         )
     }
 
-    private fun insertAfter(range: TimeRange): () -> Unit = {
+    private fun insertAfter() {
+        val range = selection.get() ?: return
         dependencies.adjustStoryEventsTimeController.adjustTimesBy(
             setOfIdsAfterEnd(range),
             range.duration.value
         )
     }
 
-    private fun remove(range: TimeRange): () -> Unit = {
+    private fun remove() {
+        val range = selection.get() ?: return
         dependencies.adjustStoryEventsTimeController.adjustTimesBy(
             setOfIdsAfterStart(range),
             -range.duration.value
@@ -84,12 +51,37 @@ class TimelineRulerLabelMenu(
         .map { it.storyEventId }
         .toSet()
 
-    private val selectionListener = InvalidationListener { populateItems(selection.get()) }
-    private val weakSelectionListener = WeakInvalidationListener(selectionListener)
-
     init {
-        selection.addListener(weakSelectionListener)
-        populateItems(selection.get())
+        item("") {
+            id = "insert-before"
+            textProperty().bind(selection.stringBinding {
+                "Insert ${it?.duration?.value} unit${if (it?.duration?.value == 1L) "" else "s"} of time before"
+            })
+            action(::insertBefore)
+        }
+        item("") {
+            id = "insert-after"
+            textProperty().bind(selection.stringBinding {
+                "Insert ${it?.duration?.value} unit${if (it?.duration?.value == 1L) "" else "s"} of time after"
+            })
+            action(::insertAfter)
+        }
+        item("") {
+            id = "delete"
+            textProperty().bind(selection.stringBinding {
+                "Remove ${it?.duration?.value} unit${if (it?.duration?.value == 1L) "" else "s"} of time"
+            })
+            disableWhen(selectionContainsStoryPoint())
+            action(::remove)
+        }
+    }
+
+    private fun selectionContainsStoryPoint() = booleanBinding(storyPointLabels, selection) {
+        val range = selection.get() ?: return@booleanBinding false
+        storyPointLabels.binarySubList(
+            predicate = { range.range.contains(it.time) },
+            lookForward = { it.time < range.range.last }
+        ).isNotEmpty()
     }
 
 }

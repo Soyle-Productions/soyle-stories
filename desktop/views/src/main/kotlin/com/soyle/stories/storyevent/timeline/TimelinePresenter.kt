@@ -5,14 +5,9 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventNoLongerHappens
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
-import com.soyle.stories.storyevent.list.ListStoryEventsController
 import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensReceiver
-import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
-import com.soyle.stories.storyevent.timeline.viewport.grid.label.storyPointLabelMenu
 import com.sun.javafx.scene.control.skin.Utils
-import javafx.scene.control.ListView
 import javafx.scene.control.ScrollToEvent
-import javafx.scene.control.TableColumnBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,7 +31,7 @@ class TimelinePresenter(
     init {
         dependencies.listStoryEventsController.listStoryEventsInProject(projectId) {
             val initialItems = with (gui) {
-                it.storyEventItems.map {
+                it.map {
                     StoryPointLabel(it.storyEventId, it.storyEventName, UnitOfTime(it.time))
                 }
             }

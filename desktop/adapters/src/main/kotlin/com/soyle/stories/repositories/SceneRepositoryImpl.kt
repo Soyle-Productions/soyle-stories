@@ -21,7 +21,9 @@ class SceneRepositoryImpl : SceneRepository {
 
 	override suspend fun createNewScene(scene: Scene) {
 		scenes[scene.id] = scene
-		scenesByStoryEventId[scene.storyEventId] = scene.id
+		scene.coveredStoryEvents.forEach {
+			scenesByStoryEventId[it] = scene.id
+		}
 		scenesByProseId[scene.proseId] = scene.id
 	}
 
@@ -56,14 +58,22 @@ class SceneRepositoryImpl : SceneRepository {
 	  scenes[sceneId]
 
 	override suspend fun updateScene(scene: Scene) {
+		val oldScene = scenes[scene.id]
 		scenes[scene.id] = scene
-		scenesByStoryEventId[scene.storyEventId] = scene.id
+		oldScene?.coveredStoryEvents?.forEach {
+			scenesByStoryEventId.remove(it)
+		}
+		scene.coveredStoryEvents.forEach {
+			scenesByStoryEventId[it] = scene.id
+		}
 		scenesByProseId[scene.proseId] = scene.id
 	}
 
 	override suspend fun removeScene(sceneId: Scene.Id) {
 		val scene = scenes.remove(sceneId) ?: return
-		scenesByStoryEventId.remove(scene.storyEventId)
+		scene.coveredStoryEvents.forEach {
+			scenesByStoryEventId.remove(it)
+		}
 		scenesByProseId.remove(scene.proseId)
 	}
 

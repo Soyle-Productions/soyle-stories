@@ -1,9 +1,9 @@
 package com.soyle.stories.usecase.scene
 
-import com.soyle.stories.usecase.framework.`Int Test`
+import com.soyle.stories.usecase.framework.IntTest
 import org.junit.jupiter.api.Test
 
-class `Scene Outline Int Test` : `Int Test`(){
+class `Scene Outline Int Test` : IntTest(){
 
     private val project = given.`a project`().`has been started`()
     private val scene = given.`a scene`(named = "Big Battle").`has been created in`(project)

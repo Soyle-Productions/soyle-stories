@@ -72,7 +72,7 @@ object LayoutModule {
                 }
             }
 
-            provide(OpenToolController::class) {
+            provide(OpenToolController::class, OpenToolController.OpenSceneToolController::class) {
                 OpenToolControllerImpl(applicationScope.get(), applicationScope.get(), get(), get())
             }
             provide(CloseToolController::class) {

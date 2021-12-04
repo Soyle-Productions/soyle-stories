@@ -16,6 +16,12 @@ class DeleteScenePromptView(
 
 	private val alert = Alert(Alert.AlertType.CONFIRMATION)
 
+	init {
+		alert.resultProperty().onChange {
+			viewModel.result().set(it)
+		}
+	}
+
 	override val root: Parent = alert.dialogPane.apply {
 		headerText = "Delete Scene"
 		content = vbox {
@@ -29,10 +35,6 @@ class DeleteScenePromptView(
 			ButtonType("Show Ramifications", Ramifications),
 			ButtonType("Cancel", Cancel)
 		)
-	}
-
-	init {
-		viewModel.result().bind(alert.resultProperty())
 	}
 
 	companion object {

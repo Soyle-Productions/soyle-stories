@@ -11,24 +11,38 @@ import com.soyle.stories.project.WorkBench
 import javafx.event.ActionEvent
 import javafx.scene.control.TextField
 import tornadofx.FX
+import tornadofx.select
 
-fun WorkBench.givenLocationListToolHasBeenOpened(): LocationList =
-    getLocationListTool() ?: openLocationListTool().let { getCharacterListToolOrError() }
 
-fun WorkBench.getCharacterListToolOrError(): LocationList =
-    getLocationListTool() ?: throw NoSuchElementException("Theme List has not been opened")
-
-fun WorkBench.getLocationListTool(): LocationList?
-{
-    return (FX.getComponents(scope)[LocationList::class] as? LocationList)?.takeIf { it.currentStage?.isShowing == true }
+fun WorkBench.givenLocationListToolHasBeenOpened(): LocationList {
+    if (currentStage?.isShowing != true) IllegalStateException("Workbench is not yet showing")
+    return getLocationListTool() ?: run {
+        openLocationListTool()
+        getLocationListToolOrError()
+    }
 }
 
-fun WorkBench.openLocationListTool()
-{
-    findMenuItemById("tools_locationlist")!!
-        .apply { robot.interact { fire() } }
+fun WorkBench.getLocationListToolOrError(): LocationList =
+    getLocationListTool() ?: throw NoSuchElementException("Location List has not been opened")
+
+fun WorkBench.getLocationListTool(): LocationList? {
+    val components = FX.getComponents(scope)
+    val instance = components[LocationList::class]
+    val view = instance as? LocationList
+    return view?.takeIf { it.currentStage?.isShowing == true }
 }
 
+fun WorkBench.openLocationListTool() {
+    val view = FX.getComponents(scope)[LocationList::class] as? LocationList
+    if (view != null) {
+        robot.interact {
+            view.owningTab?.select()
+        }
+    } else {
+        findMenuItemById("tools_locationlist")!!
+            .apply { robot.interact { fire() } }
+    }
+}
 
 fun LocationList.renameLocationTo(locationId: Location.Id, newName: String)
 {

@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.drivers.location
 
+import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.view.location.details.`Location Details Access`.Companion.access
 import com.soyle.stories.desktop.view.location.details.`Location Details Access`.Companion.drive
 import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
@@ -12,6 +13,10 @@ import com.soyle.stories.location.locationList.LocationList
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.create.CreateScenePromptView
 import javafx.scene.control.MenuButton
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import org.junit.jupiter.api.fail
 
 fun LocationList.givenLocationDetailsToolHasBeenOpenedFor(location: Location): LocationDetailsView {
     return (scope as ProjectScope).getLocationDetailsToolForLocation(location) ?: run {
@@ -45,11 +50,11 @@ fun LocationDetailsView.requestScenesToHost()
 
 fun LocationDetailsView.selectCreateSceneOption(): CreateScenePromptView
 {
-    return drive {
+    drive {
         if ((hostSceneButton?.button as? MenuButton)?.isShowing != true) hostSceneButton!!.button.fire()
         hostSceneButton!!.createSceneItem!!.fire()
-        getOpenDialog<CreateScenePromptView>() ?: error("Create Scene Dialog was not opened")
     }
+    return robot.getOpenDialog<CreateScenePromptView>() ?: error("Create Scene Dialog was not opened")
 }
 
 fun LocationDetailsView.addScene(scene: Scene)
@@ -63,8 +68,20 @@ fun LocationDetailsView.addScene(scene: Scene)
 
 fun LocationDetailsView.removeScene(sceneId: Scene.Id)
 {
+    val hostedSceneItem = drive {
+        hostedScenesList!!.hostedSceneItems.find { it.id == sceneId.toString() }
+    }
+    tailrec suspend fun checkSkin() {
+        if (hostedSceneItem?.skin != null) return
+        delay(10)
+        checkSkin()
+    }
+    runBlocking {
+        withTimeout(1000) {
+            checkSkin()
+        }
+    }
     drive {
-        val hostedSceneItem = hostedScenesList!!.hostedSceneItems.find { it.id == sceneId.toString() }
         clickOn(hostedSceneItem!!.deleteGraphic!!)
     }
 }

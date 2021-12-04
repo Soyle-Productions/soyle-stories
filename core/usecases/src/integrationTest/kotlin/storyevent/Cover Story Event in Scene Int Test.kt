@@ -1,10 +1,10 @@
 package com.soyle.stories.usecase.storyevent
 
 import org.junit.jupiter.api.Test
-import com.soyle.stories.usecase.framework.`Int Test`
+import com.soyle.stories.usecase.framework.IntTest
 import org.junit.jupiter.api.Nested
 
-class `Cover Story Event in Scene Int Test` : `Int Test`() {
+class `Cover Story Event in Scene Int Test` : IntTest() {
 
     private val project = given.`a project`().`has been started`()
     private val scene = given.`a scene`(named = "Big Battle").`has been created in`(project)

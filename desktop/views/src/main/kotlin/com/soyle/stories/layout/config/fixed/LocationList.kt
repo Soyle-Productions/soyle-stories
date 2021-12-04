@@ -14,6 +14,10 @@ import kotlin.reflect.KClass
 
 object LocationList : ToolConfig<LocationList>, FixedTool() {
 
+	override fun toString(): String {
+		return "LocationList"
+	}
+
 	override fun getFixedType(): FixedTool? = LocationList
 
 	override fun getRegistration(): Pair<KClass<LocationList>, ToolConfig<LocationList>> {

@@ -28,10 +28,12 @@ import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInS
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
+import com.soyle.stories.scene.create.CreateScenePromptPresenter
 import com.soyle.stories.scene.create.CreateScenePromptView
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
 import com.soyle.stories.usecase.scene.SceneRepository
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 
 class SceneDriver private constructor(private val projectScope: ProjectScope) {
 
@@ -57,6 +59,11 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
 
     private fun createScene(sceneName: String) {
         projectScope.get<CreateNewSceneController>().create()
+        runBlocking {
+            withTimeout(100) {
+                while(robot.getOpenDialog<CreateScenePromptView>() == null) {}
+            }
+        }
         robot.getOpenDialog<CreateScenePromptView>()!!.createSceneWithName(sceneName)
     }
 

@@ -5,6 +5,7 @@ import com.soyle.stories.desktop.adapter.storyevent.list.ListStoryEventsControll
 import com.soyle.stories.desktop.view.storyevent.item.StoryEventItemMenuComponentDouble
 import com.soyle.stories.desktop.view.storyevent.timeline.header.TimelineHeaderComponentDouble
 import com.soyle.stories.desktop.view.storyevent.timeline.header.TimelineHeaderCreateButtonComponentDouble
+import com.soyle.stories.desktop.view.storyevent.timeline.header.TimelineHeaderOptionsButtonComponentDouble
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.TimelineViewPortComponentDouble
 import com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label.StoryPointLabelComponentDouble
 import com.soyle.stories.domain.project.Project
@@ -18,6 +19,7 @@ import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensReceiver
 import com.soyle.stories.storyevent.timeline.Timeline
 import com.soyle.stories.storyevent.timeline.TimelineComponent
 import com.soyle.stories.storyevent.timeline.header.TimelineHeaderComponent
+import com.soyle.stories.storyevent.timeline.header.TimelineHeaderOptionsButtonComponent
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewPortComponent
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelComponent
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +31,7 @@ class TimelineComponentDouble(
     val dependencies: TimelineComponent.Dependencies = Dependencies(),
     val viewPortDependencies: TimelineViewPortComponent.Dependencies = TimelineViewPortComponentDouble.Dependencies(),
     val createButtonDependencies: CreateStoryEventController = TimelineHeaderCreateButtonComponentDouble.Dependencies(),
-    val storyEventItemMenuDependencies: StoryEventItemMenuComponent.Dependencies = StoryEventItemMenuComponentDouble.Dependencies()
+    val optionsButtonComponentDependencies: TimelineHeaderOptionsButtonComponent.Dependencies = TimelineHeaderOptionsButtonComponentDouble.Dependencies()
 ) : TimelineComponent {
 
     private val gui = object : TimelineComponent.GUI,
@@ -38,11 +40,11 @@ class TimelineComponentDouble(
         ),
         TimelineHeaderComponent by TimelineHeaderComponentDouble(
             createButtonDependencies,
-            storyEventItemMenuDependencies
+            optionsButtonComponentDependencies
         ),
         StoryPointLabelComponent by StoryPointLabelComponentDouble(),
         StoryEventItemMenuComponent by StoryEventItemMenuComponentDouble(
-            storyEventItemMenuDependencies
+            optionsButtonComponentDependencies
         ) {}
 
     class Dependencies(

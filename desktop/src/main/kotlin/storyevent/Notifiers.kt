@@ -3,6 +3,10 @@ package com.soyle.stories.desktop.config.storyevent
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.storyevent.coverage.StoryEventCoveredBySceneNotifier
+import com.soyle.stories.storyevent.coverage.StoryEventCoveredBySceneReceiver
+import com.soyle.stories.storyevent.coverage.StoryEventUncoveredBySceneNotifier
+import com.soyle.stories.storyevent.coverage.StoryEventUncoveredBySceneReceiver
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensNotifier
@@ -20,6 +24,8 @@ object Notifiers {
             storyEventRenamed()
             storyEventRescheduled()
             storyEventNoLongerHappens()
+            storyEventCoveredByScene()
+            storyEventUncoveredByScene()
         }
     }
 
@@ -44,6 +50,18 @@ object Notifiers {
     private fun InProjectScope.storyEventNoLongerHappens() {
         provide(StoryEventNoLongerHappensReceiver::class) {
             StoryEventNoLongerHappensNotifier()
+        }
+    }
+
+    private fun InProjectScope.storyEventCoveredByScene() {
+        provide(StoryEventCoveredBySceneReceiver::class) {
+            StoryEventCoveredBySceneNotifier()
+        }
+    }
+
+    private fun InProjectScope.storyEventUncoveredByScene() {
+        provide(StoryEventUncoveredBySceneReceiver::class) {
+            StoryEventUncoveredBySceneNotifier()
         }
     }
 

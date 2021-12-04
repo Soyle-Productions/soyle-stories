@@ -7,7 +7,6 @@ import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.ButtonType
 import tornadofx.booleanProperty
-import tornadofx.objectProperty
 import tornadofx.stringProperty
 
 class DeleteScenePromptViewModel {
@@ -15,7 +14,7 @@ class DeleteScenePromptViewModel {
 	fun name(): StringExpression = stringProperty()
 	var name: String = ""
 
-	fun result(): ObjectProperty<ButtonType> = object : SimpleObjectProperty<ButtonType>() {
+	private val resultProperty = object : SimpleObjectProperty<ButtonType>(null) {
 		override fun set(newValue: ButtonType?) {
 			super.set(newValue)
 			when (newValue?.buttonData) {
@@ -26,6 +25,7 @@ class DeleteScenePromptViewModel {
 			}
 		}
 	}
+	fun result(): ObjectProperty<ButtonType> = resultProperty
 	fun doNotShowAgain(): BooleanProperty = booleanProperty()
 
 	val showAgain: Boolean

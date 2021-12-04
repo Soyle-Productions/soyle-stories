@@ -3,7 +3,6 @@ package com.soyle.stories.storyevent.timeline
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.item.StoryEventItemMenuComponent
 import com.soyle.stories.storyevent.list.ListStoryEventsController
@@ -45,8 +44,10 @@ interface TimelineComponent {
                     return TimelineSkin(timeline, gui)
                 }
 
+                private val timeline by lazy { Timeline(::actions, ::skin) }
+
                 override fun Timeline(): Timeline {
-                    return Timeline(::actions, ::skin)
+                    return timeline
                 }
             }
         }

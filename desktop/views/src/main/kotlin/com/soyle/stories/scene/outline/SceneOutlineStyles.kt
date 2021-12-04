@@ -23,6 +23,8 @@ class SceneOutlineStyles : Stylesheet() {
         val sceneOutline by cssclass()
 
         val untargeted by csspseudoclass()
+
+        val outlinedEvent by cssclass()
     }
 
     init {

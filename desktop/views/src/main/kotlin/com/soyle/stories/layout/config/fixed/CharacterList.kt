@@ -10,12 +10,17 @@ import com.soyle.stories.project.layout.ToolViewModel
 import com.soyle.stories.project.layout.config.ToolViewModelConfig
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import tornadofx.onChange
 import tornadofx.tab
 import kotlin.reflect.KClass
 
 object CharacterList : ToolConfig<CharacterList>, FixedTool() {
 
-	override fun getFixedType(): FixedTool? = CharacterList
+	override fun toString(): String {
+		return "CharacterList"
+	}
+
+	override fun getFixedType(): FixedTool = CharacterList
 
 	override fun getRegistration(): Pair<KClass<CharacterList>, ToolConfig<CharacterList>> {
 		return CharacterList::class to this
@@ -24,7 +29,7 @@ object CharacterList : ToolConfig<CharacterList>, FixedTool() {
 	override fun getTabConfig(tool: ToolViewModel, type: CharacterList): ToolTabConfig {
 		return object : ToolTabConfig {
 			override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
-				val list = projectScope.get<com.soyle.stories.character.list.CharacterListView>()
+				val list = projectScope.get<CharacterListView>()
 				list.title = getViewModelConfig(type).toolName()
 				return tabPane.tab(list)
 			}

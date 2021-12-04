@@ -1,17 +1,21 @@
 package com.soyle.stories.storyevent.item.icon
 
 import com.soyle.stories.common.ColorStyles
-import com.soyle.stories.common.StyleImporter
 import javafx.application.Platform
 import tornadofx.*
 
 class StoryEventItemIconStyles : Stylesheet() {
 
-    companion object : StyleImporter<StoryEventItemIconStyles>(StoryEventItemIconStyles::class) {
+    companion object {
 
         val storyEventItemIcon by cssclass()
 
         const val STORY_EVENT_ITEM_ICON_SIZE = 16
+
+        init {
+            if (Platform.isFxApplicationThread()) importStylesheet(StoryEventItemIconStyles::class)
+            else runLater { importStylesheet(StoryEventItemIconStyles::class) }
+        }
 
     }
 

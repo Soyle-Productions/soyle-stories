@@ -19,7 +19,7 @@ class LocationDetailsView : View() {
 
     override val scope: LocationDetailsScope = super.scope as LocationDetailsScope
 
-    private val createSceneController: CreateNewSceneController by resolveLater()
+    private val createSceneController: CreateNewSceneController by resolveLater(scope.projectScope)
 
     private val locationId = Location.Id(UUID.fromString(scope.locationId))
 

@@ -18,7 +18,8 @@ internal class CreateStoryEventPresenter(
 			val newItem = StoryEventListItemViewModel(StoryEventItem(
 				event.storyEventId,
 				event.name,
-				event.time.toLong()
+				event.time.toLong(),
+				null
 			))
 
 			copy(

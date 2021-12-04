@@ -13,7 +13,12 @@ data class SceneItemViewModel(
     val unusedSymbols: Boolean,
     val inconsistentSettings: Boolean
 ) {
-    constructor(sceneItem: SceneItem, invalidEntitiesMentioned: Boolean = false, unusedSymbols: Boolean = false, inconsistentSettings: Boolean = false) : this(
+    constructor(
+        sceneItem: SceneItem,
+        invalidEntitiesMentioned: Boolean = false,
+        unusedSymbols: Boolean = false,
+        inconsistentSettings: Boolean = false
+    ) : this(
         Scene.Id(sceneItem.id),
         sceneItem.proseId,
         sceneItem.sceneName,
@@ -22,6 +27,17 @@ data class SceneItemViewModel(
         unusedSymbols,
         inconsistentSettings
     )
+
+    private fun copy(
+        index: Int = this.index
+    ) = SceneItemViewModel(
+        id,
+        proseId,
+        name,
+        index, invalidEntitiesMentioned, unusedSymbols, inconsistentSettings
+    )
+
+    fun withIndex(index: Int) = copy(index = index)
 
     val hasProblem: Boolean
         get() = invalidEntitiesMentioned || unusedSymbols || inconsistentSettings

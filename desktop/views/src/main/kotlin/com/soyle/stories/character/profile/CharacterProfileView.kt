@@ -2,12 +2,9 @@ package com.soyle.stories.character.profile
 
 import com.soyle.stories.character.create.characterNameInput
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
-import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
 import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
 import com.soyle.stories.characterarc.components.characterIcon
-import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.common.components.buttons.ButtonVariant
 import com.soyle.stories.common.components.buttons.secondaryButton
 import com.soyle.stories.common.components.surfaces.Elevation
 import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
@@ -15,12 +12,8 @@ import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onLoseFocus
-import com.soyle.stories.di.DI.resolve
 import com.soyle.stories.di.get
-import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.character.CharacterNamesMustBeUnique
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.domain.validation.SoyleStoriesException
 import com.soyle.stories.domain.validation.ValidationException
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
@@ -30,12 +23,8 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Parent
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Priority
-import javafx.scene.paint.Color
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import tornadofx.*
@@ -60,8 +49,9 @@ class CharacterProfileView : View() {
                 state.isCreatingName.set(false)
             } catch (exception: ValidationException) {
                 state.creationFailure.set(exception.localizedMessage)
+            } finally {
+                state.executingNameChange.set(false)
             }
-            state.executingNameChange.set(false)
         }
     }
 

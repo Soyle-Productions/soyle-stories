@@ -58,6 +58,10 @@ object Presentation {
             provide<StoryEventListTool> {
                 object : StoryEventListTool {
                     override fun invoke(projectId: Project.Id): Node {
+                        if (DI.getRegisteredTypes(this@provide).containsKey(StoryEventListToolView::class)) {
+                            return DI.getRegisteredTypes(this@provide)[StoryEventListToolView::class] as StoryEventListToolView
+                        }
+
                         val presenter = StoryEventListPresenter(
                             projectId = projectId,
                             createStoryEventController = get(),
@@ -65,6 +69,7 @@ object Presentation {
                             rescheduleStoryEventController = get(),
                             adjustStoryEventsTimeController = get(),
                             removeStoryEventController = get(),
+                            storyEventCoverageController = get(),
                             listStoryEventsController = get(),
                             requestToViewStoryEventInTimeline = get<TimelineToolPresenter>()::viewTimeline,
                             storyEventCreated = get<StoryEventCreatedNotifier>(),
@@ -232,16 +237,25 @@ object Presentation {
             ).Timeline()
         }
 
-        override fun TimelineHeader(condensedProperty: BooleanProperty, selection: TimelineSelectionModel): Node {
-            return TimelineHeaderComponent.Implementation(this).TimelineHeader(condensedProperty, selection)
+        override fun TimelineHeader(
+            condensedProperty: BooleanProperty,
+            selection: TimelineSelectionModel,
+            storyPointLabels: ObservableList<StoryPointLabel>
+        ): Node {
+            return TimelineHeaderComponent.Implementation(this)
+                .TimelineHeader(condensedProperty, selection, storyPointLabels)
         }
 
         override fun TimelineHeaderCreateButton(): Node {
             return TimelineHeaderCreateButtonComponent.Implementation(projectScope.get()).TimelineHeaderCreateButton()
         }
 
-        override fun TimelineHeaderOptionsButton(selection: TimelineSelectionModel): Node {
-            return TimelineHeaderOptionsButtonComponent.Implementation(this).TimelineHeaderOptionsButton(selection)
+        override fun TimelineHeaderOptionsButton(
+            selection: TimelineSelectionModel,
+            storyPointLabels: ObservableList<StoryPointLabel>
+        ): Node {
+            return TimelineHeaderOptionsButtonComponent.Implementation(this)
+                .TimelineHeaderOptionsButton(selection, storyPointLabels)
         }
 
         override fun TimelineViewPort(storyEventItems: ObservableList<StoryPointLabel>): TimelineViewPort {
@@ -253,7 +267,8 @@ object Presentation {
         }
 
         override fun TimelineViewPortGrid(viewportContext: TimelineViewportContext): TimelineViewPortGrid {
-            return TimelineViewPortGridComponent.Implementation(asyncContext, guiContext, this).TimelineViewPortGrid(viewportContext)
+            return TimelineViewPortGridComponent.Implementation(asyncContext, guiContext, this)
+                .TimelineViewPortGrid(viewportContext)
         }
 
         override fun TimeSpanLabel(
@@ -267,7 +282,8 @@ object Presentation {
             selection: TimeRangeSelection,
             storyPointLabels: ObservableList<StoryPointLabel>
         ): TimelineRulerLabelMenu {
-            return TimelineRulerLabelMenuComponent.Implementation(this).TimelineRulerLabelMenu(selection, storyPointLabels)
+            return TimelineRulerLabelMenuComponent.Implementation(this)
+                .TimelineRulerLabelMenu(selection, storyPointLabels)
         }
 
         override fun StoryPointLabel(storyEventId: StoryEvent.Id, name: String, time: UnitOfTime): StoryPointLabel {

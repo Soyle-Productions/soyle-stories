@@ -400,6 +400,10 @@ class TimelineViewPortGrid(
         label.layoutYProperty().bind(label.row() * ROW_HEIGHT + ROW_V_PADDING)
         label.layoutYProperty().addListener(weakCachedHeightChangeListener)
         label.heightProperty().addListener(weakCachedHeightChangeListener)
+        // can add label to visible labels immediately while it awaits measurement and arrangement
+        if (label.layoutX > offsetX.value && label.layoutX < offsetX.value + width) {
+            visibleLabels.set(visibleLabels.get() + label)
+        }
     }
 
     private fun unbindRemovedLabel(label: StoryPointLabel) {
