@@ -18,10 +18,7 @@ import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.usecase.storyevent.coverage.cover.CoverStoryEventInScene
 import com.soyle.stories.usecase.storyevent.coverage.cover.CoverStoryEventInSceneUseCase
 import kotlinx.coroutines.runBlocking
-import org.amshove.kluent.shouldBeEmpty
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldBeNull
-import org.amshove.kluent.shouldNotBeNull
+import org.amshove.kluent.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -30,19 +27,24 @@ class `Cover Story Event in Scene Unit Test` {
     // Pre-requisites
     /** Project must be started */
     private val projectId = Project.Id()
+
     /** Scene must exist */
     private val scene = makeScene(projectId = projectId, coveredStoryEvents = emptySet())
+
     /** Story Event must exist */
     private val storyEvent = makeStoryEvent(projectId = projectId)
 
     // Post Conditions
     /** Should update up to two story events */
     private val updatedStoryEvents: List<StoryEvent>
-    /** Should update scene */
-    private var updatedScene: Scene? = null
+
+    /** Should update possibly two scene */
+    private val updatedScenes: List<Scene>
+
     /** Should produce up to two scene events */
     private var storyEventAddedToScene: StoryEventAddedToScene? = null
     private var storyEventRemovedFromScene: StoryEventRemovedFromScene? = null
+
     /** Should produce up to two story event events */
     private var storyEventCoveredByScene: StoryEventCoveredByScene? = null
     private var storyEventUncoveredFromScene: StoryEventUncoveredFromScene? = null
@@ -55,12 +57,16 @@ class `Cover Story Event in Scene Unit Test` {
 
     // Repositories
     private val storyEventRepository: StoryEventRepositoryDouble
-    private val sceneRepository = SceneRepositoryDouble(onUpdateScene = ::updatedScene::set)
+    private val sceneRepository: SceneRepositoryDouble
 
     init {
         val mutableUpdatedStoryEvents = mutableListOf<StoryEvent>()
         storyEventRepository = StoryEventRepositoryDouble(onUpdateStoryEvent = mutableUpdatedStoryEvents::add)
         updatedStoryEvents = mutableUpdatedStoryEvents
+
+        val mutableUpdatesScenes = mutableListOf<Scene>()
+        sceneRepository = SceneRepositoryDouble(onUpdateScene = mutableUpdatesScenes::add)
+        updatedScenes = mutableUpdatesScenes
     }
 
     // Use Case
@@ -82,7 +88,7 @@ class `Cover Story Event in Scene Unit Test` {
 
         error.storyEventId shouldBeEqualTo storyEvent.id.uuid
         updatedStoryEvents.shouldBeEmpty()
-        updatedScene.shouldBeNull()
+        updatedScenes.shouldBeEmpty()
         allEvents().shouldBeEmpty()
     }
 
@@ -94,7 +100,7 @@ class `Cover Story Event in Scene Unit Test` {
 
         error.sceneId shouldBeEqualTo scene.id.uuid
         updatedStoryEvents.shouldBeEmpty()
-        updatedScene.shouldBeNull()
+        updatedScenes.shouldBeEmpty()
         allEvents().shouldBeEmpty()
     }
 
@@ -107,9 +113,10 @@ class `Cover Story Event in Scene Unit Test` {
 
         updatedStoryEvents.single().id shouldBeEqualTo storyEvent.id
         updatedStoryEvents.single().sceneId shouldBeEqualTo scene.id
-        updatedScene!!.mustEqual(scene.withStoryEvent(storyEvent).scene)
+        updatedScenes.single().mustEqual(scene.withStoryEvent(storyEvent).scene)
         storyEventCoveredByScene.shouldNotBeNull().mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
-        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
+        storyEventAddedToScene.shouldNotBeNull()
+            .mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
         storyEventRemovedFromScene.shouldBeNull()
         storyEventUncoveredFromScene.shouldBeNull()
     }
@@ -122,7 +129,7 @@ class `Cover Story Event in Scene Unit Test` {
         assertThrows<SceneAlreadyCoversStoryEvent> { coverStoryEventInScene() }
 
         updatedStoryEvents.shouldBeEmpty()
-        updatedScene.shouldBeNull()
+        updatedScenes.shouldBeEmpty()
         allEvents().shouldBeEmpty()
     }
 
@@ -139,11 +146,11 @@ class `Cover Story Event in Scene Unit Test` {
         updatedStoryEvents.size shouldBeEqualTo 2
         updatedStoryEvents.single { it.id == storyEvent.id }
         updatedStoryEvents.single { it.id == otherStoryEvent.id }
-        updatedScene!!.mustEqual(scene.withStoryEvent(storyEvent).scene)
-        storyEventCoveredByScene.shouldNotBeNull().mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
-        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
-        storyEventRemovedFromScene.shouldNotBeNull().mustEqual(StoryEventRemovedFromScene(scene.id, otherStoryEvent.id))
-        storyEventUncoveredFromScene.shouldNotBeNull().mustEqual(StoryEventUncoveredFromScene(otherStoryEvent.id, scene.id))
+        updatedScenes.single().mustEqual(scene.withStoryEvent(storyEvent).scene)
+        storyEventCoveredByScene.mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
+        storyEventAddedToScene.mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
+        storyEventRemovedFromScene.mustEqual(StoryEventRemovedFromScene(scene.id, otherStoryEvent.id))
+        storyEventUncoveredFromScene.mustEqual(StoryEventUncoveredFromScene(otherStoryEvent.id, scene.id))
     }
 
     @Test
@@ -154,7 +161,7 @@ class `Cover Story Event in Scene Unit Test` {
         coverStoryEventInScene()
 
         updatedStoryEvents.single().id.mustEqual(storyEvent.id)
-        updatedScene.shouldBeNull()
+        updatedScenes.shouldBeEmpty()
         storyEventCoveredByScene.shouldNotBeNull().mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
         storyEventUncoveredFromScene.shouldBeNull()
         storyEventAddedToScene.shouldBeNull()
@@ -169,11 +176,31 @@ class `Cover Story Event in Scene Unit Test` {
         coverStoryEventInScene()
 
         updatedStoryEvents.shouldBeEmpty()
-        updatedScene.shouldNotBeNull().mustEqual(scene.withStoryEvent(storyEvent).scene)
+        updatedScenes.single().mustEqual(scene.withStoryEvent(storyEvent).scene)
         storyEventCoveredByScene.shouldBeNull()
         storyEventUncoveredFromScene.shouldBeNull()
-        storyEventAddedToScene.shouldNotBeNull().mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
+        storyEventAddedToScene.shouldNotBeNull()
+            .mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
         storyEventRemovedFromScene.shouldBeNull()
+    }
+
+    @Test
+    fun `Another Scene Currently Covers Story Event`() {
+        val otherScene = makeScene(coveredStoryEvents = setOf(storyEvent.id))
+        storyEventRepository.givenStoryEvent(storyEvent.coveredByScene(otherScene.id).storyEvent)
+        sceneRepository.givenScene(otherScene)
+        sceneRepository.givenScene(scene)
+
+        coverStoryEventInScene()
+
+        updatedStoryEvents.single().sceneId.shouldBeEqualTo(scene.id)
+        updatedScenes.toSet().shouldBeEqualTo(
+            setOf(
+                otherScene.withoutStoryEvent(storyEvent.id).scene,
+                scene.withStoryEvent(storyEvent).scene
+            )
+        )
+        storyEventRemovedFromScene.shouldBeEqualTo(StoryEventRemovedFromScene(otherScene.id, storyEvent.id))
     }
 
 }
