@@ -6,6 +6,8 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.events.*
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyInvolvesCharacter
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCharacter
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCoverage
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventException
 import com.soyle.stories.domain.validation.NonBlankString
@@ -20,7 +22,7 @@ class StoryEvent(
     val previousStoryEventId: Id?,
     val nextStoryEventId: Id?,
     val linkedLocationId: Location.Id?,
-    val includedCharacterIds: List<Character.Id>
+    val involvedCharacters: Set<Character.Id>
 ) : Entity<StoryEvent.Id> {
 
     companion object {
@@ -29,7 +31,7 @@ class StoryEvent(
             time: ULong,
             projectId: Project.Id
         ): StoryEventUpdate<StoryEventCreated> {
-            val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, null, listOf())
+            val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, null, setOf())
             val change = StoryEventCreated(storyEvent.id, name.value, time, projectId)
             return Successful(storyEvent, change)
         }
@@ -44,7 +46,7 @@ class StoryEvent(
                 StoryEvent::previousStoryEventId,
                 StoryEvent::nextStoryEventId,
                 StoryEvent::linkedLocationId,
-                StoryEvent::includedCharacterIds
+                StoryEvent::involvedCharacters
             )
     }
 
@@ -55,7 +57,7 @@ class StoryEvent(
         previousStoryEventId: Id? = this.previousStoryEventId,
         nextStoryEventId: Id? = this.nextStoryEventId,
         linkedLocationId: Location.Id? = this.linkedLocationId,
-        includedCharacterIds: List<Character.Id> = this.includedCharacterIds
+        involvedCharacters: Set<Character.Id> = this.involvedCharacters
     ) = StoryEvent(
         id,
         name,
@@ -65,7 +67,7 @@ class StoryEvent(
         previousStoryEventId,
         nextStoryEventId,
         linkedLocationId,
-        includedCharacterIds
+        involvedCharacters
     )
 
 
@@ -95,13 +97,17 @@ class StoryEvent(
         return copy(sceneId = null).updatedBy(StoryEventUncoveredFromScene(id, sceneId))
     }
 
-    fun withPreviousId(storyEventId: Id?) = copy(previousStoryEventId = storyEventId)
-    fun withNextId(storyEventId: Id?) = copy(nextStoryEventId = storyEventId)
     fun withLocationId(locationId: Location.Id?) = copy(linkedLocationId = locationId)
-    fun withIncludedCharacterId(characterId: Character.Id) =
-        copy(includedCharacterIds = includedCharacterIds + characterId)
 
-    fun withoutCharacterId(characterId: Character.Id) = copy(includedCharacterIds = includedCharacterIds - characterId)
+    fun withCharacterInvolved(characterId: Character.Id): StoryEventUpdate<CharacterInvolvedInStoryEvent> {
+        if (characterId in involvedCharacters) return noUpdate(StoryEventAlreadyInvolvesCharacter(id, characterId))
+        return copy(involvedCharacters = involvedCharacters + characterId).updatedBy(CharacterInvolvedInStoryEvent(id))
+    }
+
+    fun withCharacterRemoved(characterId: Character.Id): StoryEventUpdate<CharacterRemovedFromStoryEvent> =
+        if (characterId !in involvedCharacters) noUpdate(StoryEventAlreadyWithoutCharacter(id, characterId))
+        else copy(involvedCharacters = involvedCharacters - characterId)
+            .updatedBy(CharacterRemovedFromStoryEvent(id, characterId))
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
