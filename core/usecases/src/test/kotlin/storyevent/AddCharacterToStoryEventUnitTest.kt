@@ -8,7 +8,6 @@ import com.soyle.stories.usecase.character.CharacterRepository
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
-import com.soyle.stories.domain.storyevent.storyEventName
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEvent
 import com.soyle.stories.usecase.storyevent.addCharacterToStoryEvent.AddCharacterToStoryEventUseCase
@@ -73,7 +72,7 @@ class AddCharacterToStoryEventUnitTest {
 	private fun updated(storyEventId: UUID, characterId: UUID) = { update: Any? ->
 		update as StoryEvent
 		assertEquals(storyEventId, update.id.uuid)
-		assertTrue(update.includedCharacterIds.contains(Character.Id(characterId)))
+		assertTrue(update.involvedCharacters.contains(Character.Id(characterId)))
 	}
 
 	private fun responseModel(storyEventId: UUID, characterId: UUID) = { actual: Any? ->
@@ -113,7 +112,7 @@ class AddCharacterToStoryEventUnitTest {
 		{
 			return StoryEventRepositoryDouble(
 			  initialStoryEvents = storyEventIds.map { (it, characterIds) ->
-				  makeStoryEvent(StoryEvent.Id(it), time = 0u, includedCharacterIds = characterIds.map(Character::Id))
+				  makeStoryEvent(StoryEvent.Id(it), time = 0u, includedCharacterIds = characterIds.map(Character::Id).toSet())
 			  },
 			  onUpdateStoryEvent = { update = it }
 			)

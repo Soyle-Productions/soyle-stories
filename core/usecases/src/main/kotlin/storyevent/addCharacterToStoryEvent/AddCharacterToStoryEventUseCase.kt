@@ -30,8 +30,8 @@ class AddCharacterToStoryEventUseCase(
 	}
 
 	private suspend fun updateIfNeeded(storyEvent: StoryEvent, character: Character) {
-		if (!storyEvent.includedCharacterIds.contains(character.id)) {
-			storyEventRepository.updateStoryEvent(storyEvent.withIncludedCharacterId(character.id))
+		if (!storyEvent.involvedCharacters.contains(character.id)) {
+			storyEventRepository.updateStoryEvent(storyEvent.withCharacterInvolved(character.id).storyEvent)
 		}
 	}
 

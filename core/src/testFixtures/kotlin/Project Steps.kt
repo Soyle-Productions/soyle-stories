@@ -1,4 +1,4 @@
-package com.soyle.stories.usecase.framework
+package com.soyle.stories.core
 
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project

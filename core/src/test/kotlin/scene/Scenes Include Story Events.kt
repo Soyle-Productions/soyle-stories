@@ -1,12 +1,12 @@
-package com.soyle.stories.usecase.scene
+package com.soyle.stories.core.scene
 
-import com.soyle.stories.usecase.framework.IntTest
-import org.junit.jupiter.api.Test
+import com.soyle.stories.core.IntTest
+import kotlin.test.Test
 
-class `Scene Outline Int Test` : IntTest(){
+class `Scenes Include Story Events` : IntTest(){
 
     private val project = given.`a project`().`has been started`()
-    private val scene = given.`a scene`(named = "Big Battle").`has been created in`(project)
+    private val scene = given.`a scene`(named = "Big Battle").`has been created in the`(project)
 
     @Test
     fun `Create Scene with Initial Story Event`() {
@@ -18,21 +18,21 @@ class `Scene Outline Int Test` : IntTest(){
 
     @Test
     fun `Add Another Story Event to Scene`() {
-        val `original story event` = given.`a story event`(named = "Big Battle") `has been created in` project
-        val `new story event` = given.`a story event`(named = "Something happens") `has been created in` project
+        val `original story event` = given.`a story event`(named = "Big Battle") `has been created in the` project
+        val `new story event` = given.`a story event`(named = "Something happens") `has been created in the` project
 
         `when` the `new story event` `is covered by the` scene
 
         with(then) {
             then the scene `should contain the` `new story event`
-            but the scene `should not contain the` `original story event`
+            and the scene `should contain the` `original story event`
         }
     }
 
     @Test
     fun `Transfer Covered Story Event to New Scene`() {
-        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in` project
-        val newScene = given.`a scene`(named = "Large Conflict") `has been created in` project
+        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in the` project
+        val newScene = given.`a scene`(named = "Large Conflict") `has been created in the` project
 
         `when` the storyEvent `is covered by the` newScene
 
@@ -44,7 +44,7 @@ class `Scene Outline Int Test` : IntTest(){
 
     @Test
     fun `Remove Story Event from Scene`() {
-        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in` project
+        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in the` project
 
         `when`.the(storyEvent).`is uncovered`()
 
@@ -53,7 +53,7 @@ class `Scene Outline Int Test` : IntTest(){
 
     @Test
     fun `Delete a Covered Story Event`() {
-        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in` project
+        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in the` project
 
         `when`.the(storyEvent).`is deleted`()
 

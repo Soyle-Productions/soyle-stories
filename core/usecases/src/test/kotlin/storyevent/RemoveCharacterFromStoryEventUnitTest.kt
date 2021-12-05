@@ -1,10 +1,8 @@
 package com.soyle.stories.usecase.storyevent
 
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
-import com.soyle.stories.domain.storyevent.storyEventName
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEvent
 import com.soyle.stories.usecase.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventUseCase
@@ -60,7 +58,7 @@ class RemoveCharacterFromStoryEventUnitTest {
 	private fun updated(storyEventId: UUID, characterId: UUID) = { update: Any? ->
 		update as StoryEvent
 		assertEquals(storyEventId, update.id.uuid)
-		assertFalse(update.includedCharacterIds.contains(Character.Id(characterId)))
+		assertFalse(update.involvedCharacters.contains(Character.Id(characterId)))
 	}
 
 
@@ -100,7 +98,7 @@ class RemoveCharacterFromStoryEventUnitTest {
 		{
 			return StoryEventRepositoryDouble(
 			  initialStoryEvents = storyEventIds.map { (it, characterIds) ->
-				  makeStoryEvent(StoryEvent.Id(it), includedCharacterIds = characterIds.map(Character::Id))
+				  makeStoryEvent(StoryEvent.Id(it), includedCharacterIds = characterIds.map(Character::Id).toSet())
 			  },
 			  onUpdateStoryEvent = { update = it }
 			)

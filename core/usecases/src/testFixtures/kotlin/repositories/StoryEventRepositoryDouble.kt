@@ -37,7 +37,7 @@ class StoryEventRepositoryDouble(
 	}
 
 	override suspend fun getStoryEventsWithCharacter(characterId: Character.Id): List<StoryEvent> {
-		return storyEvents.values.filter { it.includedCharacterIds.contains(characterId) }
+		return storyEvents.values.filter { it.involvedCharacters.contains(characterId) }
 	}
 
 	override suspend fun getStoryEventsCoveredByScene(sceneId: Scene.Id): List<StoryEvent> {

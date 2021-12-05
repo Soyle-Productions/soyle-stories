@@ -45,7 +45,7 @@ class IncludeCharacterInSceneUseCase(
 
         // update scene and backing story event
         val sceneUpdate = scene.withCharacterIncluded(character)
-        val updatedStoryEvent = storyEvent.withIncludedCharacterId(character.id)
+        val updatedStoryEvent = storyEvent.withCharacterInvolved(character.id).storyEvent
 
         // persist scene and backing story event, if updated successfully
         if (sceneUpdate is Updated) {

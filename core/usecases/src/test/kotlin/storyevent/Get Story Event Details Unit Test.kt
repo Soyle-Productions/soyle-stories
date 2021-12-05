@@ -1,27 +1,18 @@
 package com.soyle.stories.usecase.storyevent
 
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.character.characterName
-import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
-import com.soyle.stories.domain.character.makeCharacter
-import com.soyle.stories.usecase.character.CharacterRepository
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
-import com.soyle.stories.domain.storyevent.storyEventName
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetails
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetailsUseCase
-import com.soyle.stories.usecase.storyevent.listAllStoryEvents.ListAllStoryEvents
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.*
 
 class `Get Story Event Details Unit Test` {
 
@@ -102,7 +93,7 @@ class `Get Story Event Details Unit Test` {
 			private val characterIds = List(14) { Character.Id() }
 			init {
 				characterIds.fold(storyEvent) { event, character ->
-					event.withIncludedCharacterId(character)
+					event.withCharacterInvolved(character).storyEvent
 				}
 					.let(storyEventRepository::givenStoryEvent)
 			}

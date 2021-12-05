@@ -27,7 +27,7 @@ class RemoveCharacterFromStoryEventUseCase(
 	) {
 		val character = Character.Id(characterId)
 		val updatedEvents = storyEventRepository.getStoryEventsWithCharacter(character)
-			.map { it.withoutCharacterId(character) }
+			.map { it.withCharacterRemoved(character).storyEvent }
 		if (updatedEvents.isNotEmpty()) {
 			storyEventRepository.updateStoryEvents(*updatedEvents.toTypedArray())
 			updatedEvents.forEach {
@@ -41,12 +41,12 @@ class RemoveCharacterFromStoryEventUseCase(
 	private suspend fun removeCharacterFromStoryEvent(storyEventId: UUID, characterId: UUID): RemoveCharacterFromStoryEvent.ResponseModel {
 		val storyEvent = getStoryEvent(storyEventId)
 		validateCharacterId(storyEvent, characterId, storyEventId)
-		storyEventRepository.updateStoryEvent(storyEvent.withoutCharacterId(Character.Id(characterId)))
+		storyEventRepository.updateStoryEvent(storyEvent.withCharacterRemoved(Character.Id(characterId)).storyEvent)
 		return RemoveCharacterFromStoryEvent.ResponseModel(storyEventId, characterId)
 	}
 
 	private fun validateCharacterId(storyEvent: StoryEvent, characterId: UUID, storyEventId: UUID) {
-		if (!storyEvent.includedCharacterIds.contains(Character.Id(characterId))) {
+		if (!storyEvent.involvedCharacters.contains(Character.Id(characterId))) {
 			throw CharacterNotInStoryEvent(storyEventId, characterId)
 		}
 	}

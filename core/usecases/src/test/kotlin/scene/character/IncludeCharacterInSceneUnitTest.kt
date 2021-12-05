@@ -347,7 +347,7 @@ class IncludeCharacterInSceneUnitTest {
     private fun assertStoryEventUpdated() {
         val actual = savedStoryEvent ?: error("No Story Event was saved")
         assertEquals(storyEventId, actual.id)
-        assertTrue(actual.includedCharacterIds.contains(characterId))
+        assertTrue(actual.involvedCharacters.contains(characterId))
     }
 
     private fun includedCharacterInScene(): (Any?) -> Unit = { actual ->

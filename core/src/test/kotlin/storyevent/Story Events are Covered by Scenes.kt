@@ -1,13 +1,13 @@
-package com.soyle.stories.usecase.storyevent
+package com.soyle.stories.core.storyevent
 
-import org.junit.jupiter.api.Test
-import com.soyle.stories.usecase.framework.IntTest
+import com.soyle.stories.core.IntTest
+import kotlin.test.Test
 import org.junit.jupiter.api.Nested
 
-class `Cover Story Event in Scene Int Test` : IntTest() {
+class `Story Events are Covered by Scenes` : IntTest() {
 
     private val project = given.`a project`().`has been started`()
-    private val scene = given.`a scene`(named = "Big Battle").`has been created in`(project)
+    private val scene = given.`a scene`(named = "Big Battle").`has been created in the`(project)
 
     @Test
     fun `Create Story Event with Scene`() {
@@ -19,7 +19,7 @@ class `Cover Story Event in Scene Int Test` : IntTest() {
 
     @Test
     fun `Uncover Story Event`() {
-        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in` project
+        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in the` project
 
         `when`.the(storyEvent).`is uncovered`()
 
@@ -28,7 +28,7 @@ class `Cover Story Event in Scene Int Test` : IntTest() {
 
     @Test
     fun `Delete Scene Covering Story Event`() {
-        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in` project
+        val storyEvent = given.`a story event`(named = "Big Battle") `has been created in the` project
 
         `when`.the(scene).`is deleted`()
 
@@ -40,8 +40,8 @@ class `Cover Story Event in Scene Int Test` : IntTest() {
 
         @Test
         fun `Cover Story Event with New Scene`() {
-            val newScene = given.`a scene`(named = "Large Conflict") `has been created in` project
-            val storyEvent = given.`a story event`(named = "Big Battle") `has been created in` project
+            val newScene = given.`a scene`(named = "Large Conflict") `has been created in the` project
+            val storyEvent = given.`a story event`(named = "Big Battle") `has been created in the` project
 
             `when` the storyEvent `is covered by the` newScene
 
