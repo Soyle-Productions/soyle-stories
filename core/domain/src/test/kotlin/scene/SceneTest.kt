@@ -10,8 +10,9 @@ import com.soyle.stories.domain.scene.events.SceneRenamed
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.makeSymbol
 import com.soyle.stories.domain.theme.makeTheme
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
+import com.soyle.stories.domain.scene.SceneUpdate.UnSuccessful
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -40,7 +41,7 @@ class SceneTest {
         fun `should produce scene created event`() {
             val update: SceneUpdate<SceneCreated> = Scene.create(projectId, inputName, storyEventId, proseId)
 
-            update as Updated
+            update as Successful
             update.event.sceneId.mustEqual(update.scene.id)
             update.event.name.mustEqual(update.scene.name)
             update.event.proseId.mustEqual(update.scene.proseId)
@@ -57,13 +58,13 @@ class SceneTest {
 
         @Test
         fun `should update scene`() {
-            val (newScene, _) = scene.withName(newName) as Updated
+            val (newScene, _) = scene.withName(newName) as Successful
             newScene.name.mustEqual(newName)
         }
 
         @Test
         fun `should produce scene renamed event`() {
-            val (_, event) = scene.withName(newName) as Updated
+            val (_, event) = scene.withName(newName) as Successful
             event.mustEqual(SceneRenamed(scene.id, newName.value))
         }
 
@@ -72,21 +73,10 @@ class SceneTest {
 
             @Test
             fun `should not produce event`() {
-                scene.withName(scene.name) as WithoutChange
+                scene.withName(scene.name) as UnSuccessful
             }
 
         }
-    }
-
-    @Test
-    fun `scene covers character arc section`() {
-        val character = makeCharacter()
-        val characterArcSection = makeCharacterArcSection(characterId = character.id)
-        val update = makeScene()
-            .withCharacterIncluded(character).scene
-            .withCharacterArcSectionCovered(characterArcSection)
-        val sections = update.getCoveredCharacterArcSectionsForCharacter(character.id)!!
-        sections.single { it == characterArcSection.id }
     }
 
     @Test
@@ -99,21 +89,6 @@ class SceneTest {
         }
         error.sceneId.mustEqual(scene.id)
         error.characterId.mustEqual(character.id)
-    }
-
-    @Test
-    fun `cannot cover the same character arc section twice`() {
-        val character = makeCharacter()
-        val characterArcSection = makeCharacterArcSection(characterId = character.id)
-        val scene = makeScene()
-            .withCharacterIncluded(character).scene
-            .withCharacterArcSectionCovered(characterArcSection)
-        val error = assertThrows<SceneAlreadyCoversCharacterArcSection> {
-            scene.withCharacterArcSectionCovered(characterArcSection)
-        }
-        assertEquals(scene.id.uuid, error.sceneId)
-        assertEquals(character.id.uuid, error.characterId)
-        assertEquals(characterArcSection.id.uuid, error.characterArcSectionId)
     }
 
     @Test
@@ -145,7 +120,7 @@ class SceneTest {
                 .withSymbolTracked(theme, symbol)
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
             update.scene.trackedSymbols.single().isPinned.mustEqual(false)
-            update as Updated
+            update as Successful
         }
 
         @Test
@@ -154,7 +129,7 @@ class SceneTest {
                 .withSymbolTracked(theme, symbol).scene
                 .withSymbolTracked(theme, symbol)
             update.scene.trackedSymbols.size.mustEqual(1)
-            update as WithoutChange
+            update as UnSuccessful
         }
 
         @Test
@@ -176,7 +151,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol, true)
                 update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(true) { "Did not track symbol $symbol" }
                 update.scene.trackedSymbols.single().isPinned.mustEqual(true)
-                update as Updated
+                update as Successful
             }
 
             @Test
@@ -193,7 +168,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol).scene
                     .withSymbolPinned(symbol.id)
                 update.scene.trackedSymbols.single().isPinned.mustEqual(true)
-                update as Updated
+                update as Successful
             }
 
             @Test
@@ -202,7 +177,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol, true).scene
                     .withSymbolPinned(symbol.id)
                 update.scene.trackedSymbols.single().isPinned.mustEqual(true)
-                update as WithoutChange
+                update as UnSuccessful
             }
 
             @Test
@@ -219,7 +194,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol, true).scene
                     .withSymbolUnpinned(symbol.id)
                 update.scene.trackedSymbols.single().isPinned.mustEqual(false)
-                update as Updated
+                update as Successful
             }
 
             @Test
@@ -228,7 +203,7 @@ class SceneTest {
                     .withSymbolTracked(theme, symbol).scene
                     .withSymbolUnpinned(symbol.id)
                 update.scene.trackedSymbols.single().isPinned.mustEqual(false)
-                update as WithoutChange
+                update as UnSuccessful
             }
 
         }
@@ -248,7 +223,7 @@ class SceneTest {
                 .withSymbolRenamed(symbol.id, "New Symbol Name")
             update.scene.trackedSymbols.size.mustEqual(1)
             update.scene.trackedSymbols.single().symbolName.mustEqual("New Symbol Name")
-            update as Updated
+            update as Successful
             with (update.event) {
                 trackedSymbol.symbolName.mustEqual("New Symbol Name")
             }
@@ -260,7 +235,7 @@ class SceneTest {
                 .withSymbolTracked(theme, symbol).scene
                 .withSymbolRenamed(symbol.id, symbol.name)
             update.scene.trackedSymbols.single().symbolName.mustEqual(symbol.name)
-            update as WithoutChange
+            update as UnSuccessful
         }
 
         @Test
@@ -269,7 +244,7 @@ class SceneTest {
                 .withSymbolTracked(theme, symbol).scene
                 .withoutSymbolTracked(symbol.id)
             update.scene.trackedSymbols.isSymbolTracked(symbol.id).mustEqual(false) { "Did not stop tracking symbol"}
-            update as Updated
+            update as Successful
         }
 
         @Test

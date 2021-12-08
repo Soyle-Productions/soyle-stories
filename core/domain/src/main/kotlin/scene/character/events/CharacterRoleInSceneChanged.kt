@@ -1,12 +1,10 @@
-package com.soyle.stories.domain.scene.events
+package com.soyle.stories.domain.scene.character.events
 
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.scene.RoleInScene
+import com.soyle.stories.domain.scene.character.RoleInScene
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.SceneFrameValue
 
-sealed class CharacterRoleInSceneChanged : SceneEvent() {
-    abstract val characterId: Character.Id
+sealed class CharacterRoleInSceneChanged : CharacterInSceneEvent() {
     abstract val newRole: RoleInScene?
 }
 

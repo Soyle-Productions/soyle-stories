@@ -6,13 +6,23 @@ import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.character.CharacterInScene
+import com.soyle.stories.domain.scene.character.CharacterInSceneOperations
+import com.soyle.stories.domain.scene.character.RoleInScene
+import com.soyle.stories.domain.scene.character.events.*
+import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasDesire
+import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasName
 import com.soyle.stories.domain.scene.events.*
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.events.CharacterInvolvedInStoryEvent
+import com.soyle.stories.domain.storyevent.events.CharacterRemovedFromStoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.entitySetOf
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
+import com.soyle.stories.domain.scene.SceneUpdate.UnSuccessful
 import java.util.*
 
 class Scene private constructor(
@@ -40,7 +50,7 @@ class Scene private constructor(
             proseId: Prose.Id
         ): SceneUpdate<SceneCreated> {
             val newScene = Scene(projectId, name, storyEventId, proseId)
-            return Updated(newScene, SceneCreated(newScene.id, newScene.name.value, proseId, storyEventId))
+            return Successful(newScene, SceneCreated(newScene.id, newScene.name.value, proseId, storyEventId))
         }
 
         @JvmStatic
@@ -185,93 +195,192 @@ class Scene private constructor(
 
     fun withName(newName: NonBlankString): SceneUpdate<SceneRenamed> {
         if (newName == name) return noUpdate()
-        return Updated(copy(name = newName), SceneRenamed(id, newName.value))
+        return Successful(copy(name = newName), SceneRenamed(id, newName.value))
     }
 
     fun withSceneFrameValue(value: SceneFrameValue): SceneUpdate<SceneFrameValueChanged> {
         when (value) {
             is SceneConflict -> {
-                if (value == conflict) return WithoutChange(this)
-                return Updated(copy(conflict = value), SceneFrameValueChanged(id, value))
+                if (value == conflict) return UnSuccessful(this)
+                return Successful(copy(conflict = value), SceneFrameValueChanged(id, value))
             }
             is SceneResolution -> {
-                if (value == resolution) return WithoutChange(this)
-                return Updated(copy(resolution = value), SceneFrameValueChanged(id, value))
+                if (value == resolution) return UnSuccessful(this)
+                return Successful(copy(resolution = value), SceneFrameValueChanged(id, value))
             }
         }
     }
 
-    fun withCharacterIncluded(character: Character): SceneUpdate<IncludedCharacterInScene> {
-        if (includesCharacter(character.id)) return noUpdate()
-        val characterInScene = CharacterInScene(id, character.id, character.name.value)
-        return Updated(
-            copy(
-                charactersInScene = charactersInScene + characterInScene
-            ),
-            IncludedCharacterInScene(id, IncludedCharacter(character.id, character.name.value))
+    fun withCharacterIncluded(characterInvolved: CharacterInvolvedInStoryEvent): SceneUpdate<CharacterInSceneEvent> {
+        if (characterInvolved.storyEventId !in coveredStoryEvents) return noUpdate()
+        if (includesCharacter(characterInvolved.characterId)) {
+            val characterInScene = includedCharacters.getOrError(characterInvolved.characterId)
+                .run {
+                    if (characterInvolved.storyEventId in sources) return noUpdate(
+                        CharacterInSceneAlreadySourcedFromStoryEvent(this@Scene.id, id, characterInvolved.storyEventId)
+                    )
+                    withSource(characterInvolved.storyEventId)
+                }
+            return copy(charactersInScene = charactersInScene.plus(characterInScene))
+                .updatedBy(
+                    CharacterInSceneSourceAdded(
+                        id,
+                        characterInvolved.characterId,
+                        characterInvolved.storyEventId
+                    )
+                )
+        }
+        return copy(
+            charactersInScene = charactersInScene
+                .plus(
+                    CharacterInScene(
+                        id,
+                        characterInvolved.characterId,
+                        characterInvolved.characterName,
+                        characterInvolved.storyEventId
+                    )
+                )
         )
+            .updatedBy(
+                IncludedCharacterInScene(
+                    id,
+                    IncludedCharacter(characterInvolved.characterId, characterInvolved.characterName)
+                )
+            )
     }
 
-    fun withCharacterRenamed(character: Character): SceneUpdate<RenamedCharacterInScene> {
-        val characterInScene = includedCharacters.getOrError(character.id)
-        if (characterInScene.characterName == character.name.value) return noUpdate()
+    fun withCharacter(characterId: Character.Id): CharacterInSceneOperations? {
+        val characterInScene = includedCharacters[characterId] ?: return null
 
-        return Updated(
-            copy(
-                charactersInScene = charactersInScene
-                    .minus(character.id)
-                    .plus(characterInScene.withName(character.name.value))
-            ),
-            RenamedCharacterInScene(id, IncludedCharacter(character.id, character.name.value))
-        )
+        return object : CharacterInSceneOperations {
+            override fun renamed(newName: String): SceneUpdate<CharacterInSceneRenamed> {
+                if (characterInScene.characterName == newName) return noUpdate(
+                    characterInSceneAlreadyHasName(id, characterId, newName)
+                )
+
+                return Successful(
+                    copy(
+                        charactersInScene = charactersInScene
+                            .minus(characterId)
+                            .plus(characterInScene.withName(newName))
+                    ),
+                    CharacterInSceneRenamed(id, characterId, newName)
+                )
+            }
+
+            override fun assignedRole(role: RoleInScene?): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>> {
+                if (characterInScene.roleInScene == role) return noUpdate()
+
+                val newCharacter = characterInScene.withRoleInScene(role)
+                val event = when (role) {
+                    null -> CharacterRoleInSceneCleared(id, characterId)
+                    else -> CharacterAssignedRoleInScene(id, characterId, role)
+                }
+
+                if (role == RoleInScene.IncitingCharacter && includedCharacters.incitingCharacter != null) {
+                    return withCharacter(includedCharacters.incitingCharacter!!.id)!!.assignedRole(null)
+                        .then { withCharacter(characterId)!!.assignedRole(role) }
+                }
+
+                return Successful(
+                    copy(charactersInScene = charactersInScene.minus(characterId).plus(newCharacter)),
+                    CompoundEvent(listOf(event))
+                )
+            }
+
+            override fun desireChanged(desire: String): SceneUpdate<CharacterDesireInSceneChanged> {
+                if (characterInScene.desire == desire) return noUpdate(
+                    characterInSceneAlreadyHasDesire(
+                        id,
+                        characterId,
+                        desire
+                    )
+                )
+                return Successful(
+                    copy(
+                        charactersInScene = charactersInScene.minus(characterId)
+                            .plus(characterInScene.withDesire(desire))
+                    ),
+                    CharacterDesireInSceneChanged(id, characterId, desire)
+                )
+            }
+
+            override fun motivationChanged(motivation: String?): Scene {
+                return copy(
+                    charactersInScene = charactersInScene
+                        .minus(characterId)
+                        .plus(characterInScene.withMotivation(motivation))
+                )
+            }
+
+            @Suppress("OverridingDeprecatedMember")
+            override fun withoutSource(storyEventId: StoryEvent.Id): SceneUpdate<CharacterInSceneEvent> {
+                if (storyEventId !in coveredStoryEvents)
+                    return noUpdate(SceneDoesNotCoverStoryEvent(id, storyEventId))
+                val updatedCharacter = characterInScene.withoutSource(storyEventId)
+                return if (updatedCharacter.sources.isEmpty())
+                    copy(charactersInScene = charactersInScene.minus(characterId))
+                        .updatedBy(CharacterRemovedFromScene(id, characterId))
+                else copy(charactersInScene = charactersInScene.plus(updatedCharacter))
+                    .updatedBy(CharacterInSceneSourceRemoved(id, updatedCharacter.id, storyEventId))
+            }
+
+            override fun removed(): Scene {
+                return copy(charactersInScene = charactersInScene.minus(characterId))
+            }
+
+
+        }
+
     }
 
+    @Deprecated(
+        message = "Outdated API",
+        replaceWith = ReplaceWith("withCharacter(character.id)?.renamed(character.name.value)"),
+        level = DeprecationLevel.WARNING
+    )
+    fun withCharacterRenamed(character: Character): SceneUpdate<CharacterInSceneRenamed> {
+        val op = withCharacter(character.id)!!
+        return op.renamed(character.name.value)
+    }
+
+    @Deprecated(
+        message = "Outdated API",
+        replaceWith = ReplaceWith("withCharacter(characterId)?.assignedRole(roleInScene)"),
+        level = DeprecationLevel.WARNING
+    )
     fun withRoleForCharacter(
         characterId: Character.Id,
         roleInScene: RoleInScene?
     ): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>> {
-        val characterInScene = includedCharacters.getOrError(characterId)
-        if (characterInScene.roleInScene == roleInScene) return noUpdate()
-
-        val newCharacter = characterInScene.withRoleInScene(roleInScene)
-        val event = when (roleInScene) {
-            null -> CharacterRoleInSceneCleared(id, characterId)
-            else -> CharacterAssignedRoleInScene(id, characterId, roleInScene)
-        }
-
-        if (roleInScene == RoleInScene.IncitingCharacter && includedCharacters.incitingCharacter != null) {
-            return withRoleForCharacter(includedCharacters.incitingCharacter!!.id, null)
-                .then { withRoleForCharacter(characterId, roleInScene) }
-        }
-
-        return Updated(
-            copy(charactersInScene = charactersInScene.minus(characterId).plus(newCharacter)),
-            CompoundEvent(listOf(event))
-        )
+        val op = withCharacter(characterId)!!
+        return op.assignedRole(roleInScene)
     }
 
+    @Deprecated(
+        message = "Outdated API",
+        replaceWith = ReplaceWith("withCharacter(characterId)?.desireChanged(desire)"),
+        level = DeprecationLevel.WARNING
+    )
     fun withDesireForCharacter(characterId: Character.Id, desire: String): SceneUpdate<CharacterDesireInSceneChanged> {
-        val includedCharacter = includedCharacters.getOrError(characterId)
-        if (includedCharacter.desire == desire) return noUpdate()
-        return Updated(
-            copy(charactersInScene = charactersInScene.minus(characterId).plus(includedCharacter.withDesire(desire))),
-            CharacterDesireInSceneChanged(id, characterId, desire)
-        )
+        val op = withCharacter(characterId)!!
+        return op.desireChanged(desire)
     }
 
+    @Deprecated(
+        message = "Outdated API",
+        replaceWith = ReplaceWith("withCharacter(characterId)?.motivationChanged(motivation)"),
+        level = DeprecationLevel.WARNING
+    )
     fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene {
-        val characterInScene = includedCharacters.getOrError(characterId)
-        return copy(
-            charactersInScene = charactersInScene
-                .minus(characterId)
-                .plus(characterInScene.withMotivation(motivation))
-        )
+        val op = withCharacter(characterId)!!
+        return op.motivationChanged(motivation)
     }
 
     fun withLocationLinked(locationId: Location.Id, locationName: String): SceneUpdate<LocationUsedInScene> {
         if (settings.containsEntityWithId(locationId)) return noUpdate()
         val sceneSetting = SceneSettingLocation(locationId, locationName)
-        return Updated(copy(settings = settings + sceneSetting), LocationUsedInScene(id, sceneSetting))
+        return Successful(copy(settings = settings + sceneSetting), LocationUsedInScene(id, sceneSetting))
     }
 
     fun withLocationLinked(location: Location): SceneUpdate<LocationUsedInScene> =
@@ -279,7 +388,7 @@ class Scene private constructor(
 
     fun withoutLocation(locationId: Location.Id): SceneUpdate<LocationRemovedFromScene> {
         val sceneSetting = settings.getEntityById(locationId) ?: return noUpdate()
-        return Updated(
+        return Successful(
             copy(settings = settings.minus(sceneSetting)),
             LocationRemovedFromScene(id, sceneSetting)
         )
@@ -289,7 +398,7 @@ class Scene private constructor(
         val sceneSetting = getSceneSettingOrError(locationId)
         if (sceneSetting.locationName == locationName) return noUpdate()
         val newSceneSetting = sceneSetting.copy(locationName = locationName)
-        return Updated(
+        return Successful(
             copy(settings = settings.minus(sceneSetting).plus(newSceneSetting)),
             SceneSettingLocationRenamed(id, newSceneSetting)
         )
@@ -305,7 +414,7 @@ class Scene private constructor(
                 if (location.id == sceneSetting.id) return noUpdate(
                     reason = SceneSettingCannotBeReplacedBySameLocation(id, location.id)
                 )
-                return Updated(
+                return Successful(
                     copy(
                         settings = settings
                             .minus(sceneSetting)
@@ -325,19 +434,88 @@ class Scene private constructor(
         return settings.getEntityById(locationId) ?: throw SceneDoesNotUseLocation(id, locationId)
     }
 
+    @Deprecated(
+        message = "Outdated API",
+        replaceWith = ReplaceWith("withCharacter(characterId)?.removed()"),
+        level = DeprecationLevel.WARNING
+    )
     fun withoutCharacter(characterId: Character.Id) =
         copy(charactersInScene = charactersInScene.minus(characterId))
 
+    @Deprecated(
+        message = "Outdated API",
+        replaceWith = ReplaceWith("withCharacter(removedFromStoryEvent.characterId)?.withoutSource(removedFromStoryEvent.storyEventId)"),
+        level = DeprecationLevel.WARNING
+    )
+    fun withCharacterWithoutSource(removedFromStoryEvent: CharacterRemovedFromStoryEvent): SceneUpdate<CharacterInSceneEvent> {
+        val op = withCharacter(removedFromStoryEvent.characterId)!!
+        @Suppress("DEPRECATION")
+        return op.withoutSource(removedFromStoryEvent.storyEventId)
+    }
+
     fun withStoryEvent(storyEvent: StoryEvent): SceneUpdate<StoryEventAddedToScene> {
         if (storyEvent.id in coveredStoryEvents) return noUpdate(SceneAlreadyCoversStoryEvent(id, storyEvent.id))
-        return copy(coveredStoryEvents = coveredStoryEvents + storyEvent.id)
-            .updatedBy(StoryEventAddedToScene(id, storyEvent.id, storyEvent.name.value))
+        val (updatedCharacters, newCharacters) = involvedCharactersInScene(storyEvent)
+        val newScene = copy(
+            coveredStoryEvents = coveredStoryEvents + storyEvent.id,
+            charactersInScene = charactersInScene + newCharacters + updatedCharacters
+        )
+        return newScene updatedBy storyEventAddedToScene(storyEvent, updatedCharacters, newCharacters)
+    }
+
+    private fun involvedCharactersInScene(storyEvent: StoryEvent): Pair<List<CharacterInScene>, List<CharacterInScene>> =
+        storyEvent.involvedCharacters
+            .partition { charactersInScene.containsEntityWithId(it.id) }
+            .run {
+                first.map { charactersInScene.getEntityById(it.id)!!.withSource(storyEvent.id) } to
+                        second.map { CharacterInScene(id, it.id, it.name, storyEvent.id) }
+            }
+
+    private fun storyEventAddedToScene(
+        storyEvent: StoryEvent,
+        updatedCharacters: List<CharacterInScene>,
+        newCharacters: List<CharacterInScene>
+    ): StoryEventAddedToScene {
+        return StoryEventAddedToScene(
+            id, storyEvent.id, storyEvent.name.value,
+            newCharacters.map(::includedCharacterInScene) + updatedCharacters.map {
+                CharacterInSceneSourceAdded(
+                    it.sceneId,
+                    it.id,
+                    storyEvent.id
+                )
+            }
+        )
+    }
+
+    private fun includedCharacterInScene(characterInScene: CharacterInScene): IncludedCharacterInScene {
+        return IncludedCharacterInScene(
+            id,
+            IncludedCharacter(characterInScene.characterId, characterInScene.characterName)
+        )
     }
 
     fun withoutStoryEvent(storyEventId: StoryEvent.Id): SceneUpdate<StoryEventRemovedFromScene> {
         if (storyEventId !in coveredStoryEvents) return noUpdate(SceneDoesNotCoverStoryEvent(id, storyEventId))
-        return copy(coveredStoryEvents = coveredStoryEvents - storyEventId)
-            .updatedBy(StoryEventRemovedFromScene(id, storyEventId))
+
+        val charactersSourcedFromStoryEvent = charactersInScene.filter { storyEventId in it.sources }
+
+        val (charactersToRemove, updatedCharacters) = charactersSourcedFromStoryEvent.map {
+            it.withoutSource(storyEventId)
+        }.partition { it.sources.isEmpty() }
+
+        return copy(
+            coveredStoryEvents = coveredStoryEvents - storyEventId,
+            charactersInScene = charactersInScene.minus(charactersToRemove).plus(updatedCharacters)
+        )
+            .updatedBy(
+                StoryEventRemovedFromScene(
+                    id,
+                    storyEventId,
+                    charactersToRemove.map { CharacterRemovedFromScene(id, it.id) } +
+                            updatedCharacters.map { CharacterInSceneSourceRemoved(id, it.id, storyEventId) }
+                )
+            )
     }
 
     fun withCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene {
@@ -364,7 +542,10 @@ class Scene private constructor(
         val newTrackedSymbol = TrackedSymbol(symbol.id, symbol.name, theme.id, pin)
         return if (trackedSymbols.isSymbolTracked(symbol.id)) noUpdate()
         else {
-            Updated(copy(symbols = symbols + newTrackedSymbol), SymbolTrackedInScene(id, theme.name, newTrackedSymbol))
+            Successful(
+                copy(symbols = symbols + newTrackedSymbol),
+                SymbolTrackedInScene(id, theme.name, newTrackedSymbol)
+            )
         }
     }
 
@@ -372,30 +553,37 @@ class Scene private constructor(
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
         if (existingSymbol.symbolName == newName) return noUpdate()
         val trackedSymbol = trackedSymbols.getSymbolById(symbolId)!!.copy(symbolName = newName)
-        return Updated(copy(symbols = symbols + trackedSymbol), TrackedSymbolRenamed(id, trackedSymbol))
+        return Successful(copy(symbols = symbols + trackedSymbol), TrackedSymbolRenamed(id, trackedSymbol))
     }
 
     fun withSymbolPinned(symbolId: Symbol.Id): SceneUpdate<SymbolPinnedToScene> {
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
         if (existingSymbol.isPinned) return noUpdate()
         val trackedSymbol = existingSymbol.copy(isPinned = true)
-        return Updated(copy(symbols = symbols + trackedSymbol), SymbolPinnedToScene(id, trackedSymbol))
+        return Successful(copy(symbols = symbols + trackedSymbol), SymbolPinnedToScene(id, trackedSymbol))
     }
 
     fun withSymbolUnpinned(symbolId: Symbol.Id): SceneUpdate<SymbolUnpinnedFromScene> {
         val existingSymbol = trackedSymbols.getSymbolByIdOrError(symbolId)
         if (!existingSymbol.isPinned) return noUpdate()
         val trackedSymbol = existingSymbol.copy(isPinned = false)
-        return Updated(copy(symbols = symbols + trackedSymbol), SymbolUnpinnedFromScene(id, trackedSymbol))
+        return Successful(copy(symbols = symbols + trackedSymbol), SymbolUnpinnedFromScene(id, trackedSymbol))
     }
 
     fun withoutSymbolTracked(symbolId: Symbol.Id): SceneUpdate<TrackedSymbolRemoved> {
         val trackedSymbol = trackedSymbols.getSymbolById(symbolId) ?: return noUpdate()
-        return Updated(copy(symbols = trackedSymbols.withoutSymbol(symbolId)), TrackedSymbolRemoved(id, trackedSymbol))
+        return Successful(
+            copy(symbols = trackedSymbols.withoutSymbol(symbolId)),
+            TrackedSymbolRemoved(id, trackedSymbol)
+        )
     }
 
-    private fun <E : SceneEvent> updatedBy(event: E) = Updated<E>(this, event)
-    fun noUpdate(reason: Throwable? = null) = WithoutChange(this, reason)
+    private infix fun <E : SceneEvent> updatedBy(event: E) = Successful<E>(
+        this,
+        event
+    )
+
+    fun noUpdate(reason: Throwable? = null) = UnSuccessful(this, reason)
 
     data class Id(val uuid: UUID = UUID.randomUUID()) {
 
@@ -407,7 +595,7 @@ class Scene private constructor(
         fun isInherited() = motivation == null
     }
 
-    class IncludedCharacter(val characterId: Character.Id, val characterName: String)
+    data class IncludedCharacter(val characterId: Character.Id, val characterName: String)
 
     inner class IncludedCharacters internal constructor() : Collection<CharacterInScene> by charactersInScene {
 

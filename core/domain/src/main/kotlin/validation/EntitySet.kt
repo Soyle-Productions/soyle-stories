@@ -46,6 +46,14 @@ class EntitySet<E : Entity<*>> private constructor(private val _backingMap: Map<
         } else this
     }
 
+    operator fun minus(entities: Collection<E>): EntitySet<E> {
+        val update = _backingMap.minus(entities.map { it.id }.toSet())
+        if (update.size == _backingMap.size) return this // nothing removed
+        return EntitySet(update)
+    }
+
+    operator fun plus(collection: Collection<E>) = EntitySet(_backingMap.plus(collection.map { it.id to it }))
+
 }
 
 fun <E : Entity<Id>, Id> entitySetOfNotNull(vararg entities: E?) = EntitySet.fromCollection(entities.asSequence().filterNotNull().toList())

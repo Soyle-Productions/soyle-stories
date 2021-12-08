@@ -2,6 +2,7 @@ package com.soyle.stories.domain.scene
 
 import com.soyle.stories.domain.location.makeLocation
 import com.soyle.stories.domain.mustEqual
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
 import org.junit.jupiter.api.Test
 
 /**
@@ -14,7 +15,7 @@ class `Scene and Location Int Test` {
 
     @Test
     fun `Location Used Event can be used to Host Scene`() {
-        val (_, locationUsed) = scene.withLocationLinked(location.id, location.name.value) as Updated
+        val (_, locationUsed) = scene.withLocationLinked(location.id, location.name.value) as Successful
         val (updatedLocation) = location.withSceneHosted(locationUsed.sceneId, scene.name.value)
 
         updatedLocation.hostedScenes.containsEntityWithId(scene.id).mustEqual(true)
@@ -23,7 +24,7 @@ class `Scene and Location Int Test` {
     @Test
     fun `Scene Renamed Event can be used to Rename Hosted Scene`() {
         val newName = sceneName()
-        val (_, sceneRenamed) = scene.withName(newName) as Updated
+        val (_, sceneRenamed) = scene.withName(newName) as Successful
         val (updatedLocation) = location.withSceneHosted(scene.id, scene.name.value).location
             .withHostedScene(sceneRenamed.sceneId)!!.renamed(to = sceneRenamed.sceneName)
 
@@ -33,7 +34,7 @@ class `Scene and Location Int Test` {
     @Test
     fun `Location Removed from Scene Event can Remove Hosted Scene`() {
         val (_, locationRemovedFromScene) = scene.withLocationLinked(location.id, location.name.value)
-            .scene.withoutLocation(location.id) as Updated
+            .scene.withoutLocation(location.id) as Successful
         val (updatedLocation) = location.withSceneHosted(scene.id, scene.name.value)
             .location.withHostedScene(locationRemovedFromScene.sceneId)!!.removed()
 

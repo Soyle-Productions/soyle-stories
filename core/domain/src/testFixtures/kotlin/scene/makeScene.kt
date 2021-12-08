@@ -3,6 +3,7 @@ package com.soyle.stories.domain.scene
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.character.CharacterInScene
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.str
 import com.soyle.stories.domain.validation.EntitySet

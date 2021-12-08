@@ -2,6 +2,8 @@ package com.soyle.stories.domain.scene
 
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.str
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
+import com.soyle.stories.domain.scene.SceneUpdate.UnSuccessful
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -17,14 +19,14 @@ class `Scene Frame Value Unit Test` {
         @Test
         fun `should update scene conflict`() {
             val update = scene.withSceneFrameValue(newConflict)
-            update as Updated
+            update as Successful
             update.scene.conflict.mustEqual(newConflict)
         }
 
         @Test
         fun `should output scene frame value changed event`() {
             val update = scene.withSceneFrameValue(newConflict)
-            update as Updated
+            update as Successful
             with (update.event) {
                 sceneId.mustEqual(scene.id)
                 newValue.mustEqual(newConflict)
@@ -35,7 +37,7 @@ class `Scene Frame Value Unit Test` {
         fun `should output no update when conflict is the same`() {
             val update = scene.withSceneFrameValue(newConflict)
                 .scene.withSceneFrameValue(newConflict)
-            update as WithoutChange
+            update as UnSuccessful
         }
 
     }
@@ -48,14 +50,14 @@ class `Scene Frame Value Unit Test` {
         @Test
         fun `should update scene resolution`() {
             val update = scene.withSceneFrameValue(newResolution)
-            update as Updated
+            update as Successful
             update.scene.resolution.mustEqual(newResolution)
         }
 
         @Test
         fun `should output scene frame value changed event`() {
             val update = scene.withSceneFrameValue(newResolution)
-            update as Updated
+            update as Successful
             with (update.event) {
                 sceneId.mustEqual(scene.id)
                 newValue.mustEqual(newResolution)
@@ -66,7 +68,7 @@ class `Scene Frame Value Unit Test` {
         fun `should output no update when conflict is the same`() {
             val update = scene.withSceneFrameValue(newResolution)
                 .scene.withSceneFrameValue(newResolution)
-            update as WithoutChange
+            update as UnSuccessful
         }
 
     }

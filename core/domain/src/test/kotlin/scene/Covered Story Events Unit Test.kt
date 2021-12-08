@@ -8,6 +8,8 @@ import com.soyle.stories.domain.scene.events.StoryEventRemovedFromScene
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
+import com.soyle.stories.domain.scene.SceneUpdate.UnSuccessful
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -19,7 +21,7 @@ class `Covered Story Events Unit Test` {
 
         val update = Scene.create(Project.Id(), NonBlankString.create("Something")!!, storyEventId, Prose.Id())
 
-        update as Updated
+        update as Successful
         update.scene.coveredStoryEvents.single().mustEqual(storyEventId)
         update.event.storyEventId.mustEqual(storyEventId)
     }
@@ -33,32 +35,32 @@ class `Covered Story Events Unit Test` {
 
         @Test
         fun `Add New Story Event`() {
-            val update: SceneUpdate<StoryEventAddedToScene> = scene.withStoryEvent(storyEvent)
+            val update = scene.withStoryEvent(storyEvent)
 
-            update as Updated
+            update as Successful
 
             update.scene.coveredStoryEvents.single().mustEqual(storyEvent.id)
 
-            update.event.mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
+            update.event.mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value, emptyList()))
         }
 
         @Test
         fun `Add Second Story Event`() {
-            val update: SceneUpdate<StoryEventAddedToScene> = scene.withStoryEvent(storyEvent)
+            val update = scene.withStoryEvent(storyEvent)
                 .scene.withStoryEvent(secondStoryEvent)
 
-            update as Updated
+            update as Successful
 
             update.scene.coveredStoryEvents.mustEqual(setOf(storyEvent.id, secondStoryEvent.id))
 
-            update.event.mustEqual(StoryEventAddedToScene(scene.id, secondStoryEvent.id, secondStoryEvent.name.value))
+            update.event.mustEqual(StoryEventAddedToScene(scene.id, secondStoryEvent.id, secondStoryEvent.name.value, emptyList()))
         }
 
         @Test
         fun `Add Story Event Again`() {
             val update = scene.withStoryEvent(storyEvent).scene.withStoryEvent(storyEvent)
 
-            update as WithoutChange
+            update as UnSuccessful
             update.scene.coveredStoryEvents.mustEqual(setOf(storyEvent.id))
 
             update.reason.mustEqual(SceneAlreadyCoversStoryEvent(scene.id, storyEvent.id))
@@ -76,7 +78,7 @@ class `Covered Story Events Unit Test` {
         fun `Remove Story Event Not in Scene`() {
             val update = scene.withoutStoryEvent(storyEvent.id)
 
-            update as WithoutChange
+            update as UnSuccessful
             update.scene.coveredStoryEvents.isEmpty().mustEqual(true)
             update.reason.mustEqual(SceneDoesNotCoverStoryEvent(scene.id, storyEvent.id))
         }
@@ -87,9 +89,9 @@ class `Covered Story Events Unit Test` {
 
             val update: SceneUpdate<StoryEventRemovedFromScene> = scene.withoutStoryEvent(storyEvent.id)
 
-            update as Updated
+            update as Successful
             update.scene.coveredStoryEvents.isEmpty().mustEqual(true)
-            update.event.mustEqual(StoryEventRemovedFromScene(scene.id, storyEvent.id))
+            update.event.mustEqual(StoryEventRemovedFromScene(scene.id, storyEvent.id, listOf()))
         }
 
         @Test
@@ -100,10 +102,10 @@ class `Covered Story Events Unit Test` {
 
             val update: SceneUpdate<StoryEventRemovedFromScene> = scene.withoutStoryEvent(storyEvent.id)
 
-            update as Updated
+            update as Successful
             update.scene.coveredStoryEvents.size.mustEqual(2)
             update.scene.coveredStoryEvents.contains(storyEvent.id).mustEqual(false)
-            update.event.mustEqual(StoryEventRemovedFromScene(scene.id, storyEvent.id))
+            update.event.mustEqual(StoryEventRemovedFromScene(scene.id, storyEvent.id, listOf()))
         }
 
 

@@ -10,7 +10,9 @@ import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyInvolvesC
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCharacter
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCoverage
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventException
+import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.domain.validation.entitySetOf
 import java.util.*
 
 class StoryEvent(
@@ -22,7 +24,7 @@ class StoryEvent(
     val previousStoryEventId: Id?,
     val nextStoryEventId: Id?,
     val linkedLocationId: Location.Id?,
-    val involvedCharacters: Set<Character.Id>
+    val involvedCharacters: EntitySet<InvolvedCharacter>
 ) : Entity<StoryEvent.Id> {
 
     companion object {
@@ -31,7 +33,7 @@ class StoryEvent(
             time: ULong,
             projectId: Project.Id
         ): StoryEventUpdate<StoryEventCreated> {
-            val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, null, setOf())
+            val storyEvent = StoryEvent(Id(), name, time, projectId, null, null, null, null, entitySetOf())
             val change = StoryEventCreated(storyEvent.id, name.value, time, projectId)
             return Successful(storyEvent, change)
         }
@@ -57,7 +59,7 @@ class StoryEvent(
         previousStoryEventId: Id? = this.previousStoryEventId,
         nextStoryEventId: Id? = this.nextStoryEventId,
         linkedLocationId: Location.Id? = this.linkedLocationId,
-        involvedCharacters: Set<Character.Id> = this.involvedCharacters
+        involvedCharacters: EntitySet<InvolvedCharacter> = this.involvedCharacters
     ) = StoryEvent(
         id,
         name,
@@ -99,13 +101,14 @@ class StoryEvent(
 
     fun withLocationId(locationId: Location.Id?) = copy(linkedLocationId = locationId)
 
-    fun withCharacterInvolved(characterId: Character.Id): StoryEventUpdate<CharacterInvolvedInStoryEvent> {
-        if (characterId in involvedCharacters) return noUpdate(StoryEventAlreadyInvolvesCharacter(id, characterId))
-        return copy(involvedCharacters = involvedCharacters + characterId).updatedBy(CharacterInvolvedInStoryEvent(id))
+    fun withCharacterInvolved(character: Character): StoryEventUpdate<CharacterInvolvedInStoryEvent> {
+        if (involvedCharacters.containsEntityWithId(character.id)) return noUpdate(StoryEventAlreadyInvolvesCharacter(id, character.id))
+        return copy(involvedCharacters = involvedCharacters + InvolvedCharacter(character.id, character.name.value))
+            .updatedBy(CharacterInvolvedInStoryEvent(id, character.id, character.name.value))
     }
 
     fun withCharacterRemoved(characterId: Character.Id): StoryEventUpdate<CharacterRemovedFromStoryEvent> =
-        if (characterId !in involvedCharacters) noUpdate(StoryEventAlreadyWithoutCharacter(id, characterId))
+        if (! involvedCharacters.containsEntityWithId(characterId)) noUpdate(StoryEventAlreadyWithoutCharacter(id, characterId))
         else copy(involvedCharacters = involvedCharacters - characterId)
             .updatedBy(CharacterRemovedFromStoryEvent(id, characterId))
 

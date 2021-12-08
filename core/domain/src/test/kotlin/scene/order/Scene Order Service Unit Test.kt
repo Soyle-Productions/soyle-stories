@@ -4,13 +4,9 @@ import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.Updated
-import com.soyle.stories.domain.scene.WithoutChange
-import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.sceneName
 import com.soyle.stories.domain.storyevent.StoryEvent
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
