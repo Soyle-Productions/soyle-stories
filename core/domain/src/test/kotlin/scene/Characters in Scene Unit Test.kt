@@ -7,7 +7,7 @@ import com.soyle.stories.domain.scene.character.events.*
 import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasDesire
 import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasName
 import com.soyle.stories.domain.scene.events.CharacterDesireInSceneChanged
-import com.soyle.stories.domain.storyevent.events.CharacterInvolvedInStoryEvent
+import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedInStoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertFalse

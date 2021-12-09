@@ -1,6 +1,6 @@
 package com.soyle.stories.domain.character
 
-import com.soyle.stories.domain.entities.updates.Change
+import com.soyle.stories.domain.character.exceptions.CharacterException
 import com.soyle.stories.domain.entities.updates.Update
 
 sealed class CharacterUpdate<out Event>(val character: Character) : Update<Character> {

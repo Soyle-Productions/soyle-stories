@@ -14,8 +14,8 @@ import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlrea
 import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasName
 import com.soyle.stories.domain.scene.events.*
 import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.domain.storyevent.events.CharacterInvolvedInStoryEvent
-import com.soyle.stories.domain.storyevent.events.CharacterRemovedFromStoryEvent
+import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedInStoryEvent
+import com.soyle.stories.domain.storyevent.character.changes.CharacterRemovedFromStoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.EntitySet

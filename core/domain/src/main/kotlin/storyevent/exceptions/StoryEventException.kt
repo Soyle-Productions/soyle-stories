@@ -1,3 +1,7 @@
 package com.soyle.stories.domain.storyevent.exceptions
 
-sealed interface StoryEventException
+import com.soyle.stories.domain.storyevent.StoryEvent
+
+interface StoryEventException {
+    val storyEventId: StoryEvent.Id
+}

@@ -5,10 +5,15 @@ import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.storyevent.character.InvolvedCharacter
+import com.soyle.stories.domain.storyevent.character.InvolvedCharacterOperations
+import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedInStoryEvent
+import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedWithStoryEventRenamed
+import com.soyle.stories.domain.storyevent.character.changes.CharacterRemovedFromStoryEvent
 import com.soyle.stories.domain.storyevent.events.*
-import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyInvolvesCharacter
-import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCharacter
-import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCoverage
+import com.soyle.stories.domain.storyevent.character.exceptions.storyEventAlreadyInvolvesCharacter
+import com.soyle.stories.domain.storyevent.character.exceptions.storyEventAlreadyWithoutCharacter
+import com.soyle.stories.domain.storyevent.exceptions.storyEventAlreadyWithoutCoverage
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventException
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
@@ -95,20 +100,26 @@ class StoryEvent(
     }
 
     fun withoutCoverage(): StoryEventUpdate<StoryEventUncoveredFromScene> {
-        if (sceneId == null) return noUpdate(StoryEventAlreadyWithoutCoverage)
+        if (sceneId == null) return noUpdate(storyEventAlreadyWithoutCoverage(id))
         return copy(sceneId = null).updatedBy(StoryEventUncoveredFromScene(id, sceneId))
     }
 
     fun withLocationId(locationId: Location.Id?) = copy(linkedLocationId = locationId)
 
     fun withCharacterInvolved(character: Character): StoryEventUpdate<CharacterInvolvedInStoryEvent> {
-        if (involvedCharacters.containsEntityWithId(character.id)) return noUpdate(StoryEventAlreadyInvolvesCharacter(id, character.id))
+        if (involvedCharacters.containsEntityWithId(character.id)) return noUpdate(storyEventAlreadyInvolvesCharacter(id, character.id))
         return copy(involvedCharacters = involvedCharacters + InvolvedCharacter(character.id, character.name.value))
             .updatedBy(CharacterInvolvedInStoryEvent(id, character.id, character.name.value))
     }
 
+    fun withCharacter(characterId: Character.Id): InvolvedCharacterOperations? {
+        val involvedCharacter = involvedCharacters.getEntityById(characterId) ?: return null
+
+        return InvolvedCharacterOperations(this, involvedCharacter)
+    }
+
     fun withCharacterRemoved(characterId: Character.Id): StoryEventUpdate<CharacterRemovedFromStoryEvent> =
-        if (! involvedCharacters.containsEntityWithId(characterId)) noUpdate(StoryEventAlreadyWithoutCharacter(id, characterId))
+        if (! involvedCharacters.containsEntityWithId(characterId)) noUpdate(storyEventAlreadyWithoutCharacter(id, characterId))
         else copy(involvedCharacters = involvedCharacters - characterId)
             .updatedBy(CharacterRemovedFromStoryEvent(id, characterId))
 
@@ -140,5 +151,14 @@ class StoryEvent(
 
     fun noUpdate(reason: StoryEventException? = null) = UnSuccessful(this, reason as? Throwable)
     private fun <Change : StoryEventChange> updatedBy(change: Change) = Successful(this, change)
+
+    internal fun withChangeApplied(change: CharacterInvolvedWithStoryEventRenamed): SuccessfulStoryEventUpdate<CharacterInvolvedWithStoryEventRenamed>
+    {
+        val involvedCharacter = involvedCharacters.getEntityById(change.characterId)!!
+        return SuccessfulStoryEventUpdate(
+            copy(involvedCharacters = involvedCharacters.plus(involvedCharacter.withName(change.newName))),
+            change
+        )
+    }
 
 }

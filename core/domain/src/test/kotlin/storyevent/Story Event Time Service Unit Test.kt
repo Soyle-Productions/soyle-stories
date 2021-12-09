@@ -1,9 +1,8 @@
 package com.soyle.stories.domain.storyevent
 
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.entitySetOf
@@ -19,6 +18,13 @@ class `Story Event Time Service Unit Test` {
 
     private val repoMap = mutableMapOf<StoryEvent.Id, StoryEvent>()
     private val repository = object : StoryEventRepository {
+        override suspend fun getStoryEventWithCharacterNotNamed(characterId: Character.Id, name: String): StoryEvent? {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun trySave(storyEvent: StoryEvent): Boolean {
+            TODO("Not yet implemented")
+        }
         override suspend fun listStoryEventsInProject(projectId: Project.Id): List<StoryEvent> {
             return repoMap.values.filter { it.projectId == projectId }
         }

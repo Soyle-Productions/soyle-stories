@@ -4,6 +4,7 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.storyevent.character.InvolvedCharacter
 import com.soyle.stories.domain.str
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString

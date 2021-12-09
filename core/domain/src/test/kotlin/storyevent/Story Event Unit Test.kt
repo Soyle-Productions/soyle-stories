@@ -5,10 +5,9 @@ import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.events.*
-import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCoverage
+import com.soyle.stories.domain.storyevent.exceptions.storyEventAlreadyWithoutCoverage
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.util.*
 import java.util.UUID.randomUUID
 
 class `Story Event Unit Test` {
@@ -197,7 +196,7 @@ class `Story Event Unit Test` {
             val update: StoryEventUpdate<*> = storyEvent.withoutCoverage()
 
             update as UnSuccessful
-            update.reason.mustEqual(StoryEventAlreadyWithoutCoverage)
+            update.reason.mustEqual(storyEventAlreadyWithoutCoverage(storyEvent.id))
         }
 
         @Nested

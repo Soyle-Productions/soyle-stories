@@ -1,12 +1,10 @@
 package com.soyle.stories.domain.storyevent
 
 import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.entitySetOf
-import com.soyle.stories.domain.validation.toEntitySet
 import kotlin.math.abs
 
 class StoryEventTimeService(

@@ -1,19 +1,23 @@
-package com.soyle.stories.domain.storyevent
+package com.soyle.stories.domain.storyevent.character
 
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.characterName
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.storyevent.events.CharacterInvolvedInStoryEvent
-import com.soyle.stories.domain.storyevent.events.CharacterRemovedFromStoryEvent
-import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyInvolvesCharacter
-import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCharacter
+import com.soyle.stories.domain.storyevent.Successful
+import com.soyle.stories.domain.storyevent.UnSuccessful
+import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedInStoryEvent
+import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedWithStoryEventRenamed
+import com.soyle.stories.domain.storyevent.character.changes.CharacterRemovedFromStoryEvent
+import com.soyle.stories.domain.storyevent.character.exceptions.involvedCharacterAlreadyHasName
+import com.soyle.stories.domain.storyevent.character.exceptions.storyEventAlreadyInvolvesCharacter
+import com.soyle.stories.domain.storyevent.character.exceptions.storyEventAlreadyWithoutCharacter
+import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.domain.validation.noEntities
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.DynamicNode
-import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.TestFactory
 
 class `Story Event Characters Unit Test` {
 
@@ -51,7 +55,7 @@ class `Story Event Characters Unit Test` {
                 },
                 dynamicTest("should produce unsuccessful update") {
                     update as UnSuccessful
-                    update.reason.mustEqual(StoryEventAlreadyInvolvesCharacter(storyEvent.id, character.id))
+                    update.reason.mustEqual(storyEventAlreadyInvolvesCharacter(storyEvent.id, character.id))
                 }
             )
         }
@@ -71,7 +75,7 @@ class `Story Event Characters Unit Test` {
                 },
                 dynamicTest("should produce unsuccessful update") {
                     update as UnSuccessful
-                    update.reason.mustEqual(StoryEventAlreadyWithoutCharacter(storyEvent.id, character.id))
+                    update.reason.mustEqual(storyEventAlreadyWithoutCharacter(storyEvent.id, character.id))
                 }
             )
         }
@@ -92,5 +96,39 @@ class `Story Event Characters Unit Test` {
                 }
             )
         }
+    }
+
+    @Nested
+    inner class `Rename Involved Character` {
+
+        @Test
+        fun `cannot rename character that is not involved`() {
+            assertNull(storyEvent.withCharacter(character.id)?.renamed(character.name.value))
+        }
+
+        @Test
+        fun `should not produce update if new name is identical`() {
+            val update = storyEvent.withCharacterInvolved(character)
+                .storyEvent.withCharacter(character.id)!!.renamed(character.name.value)
+
+            update as UnSuccessful
+
+            update.reason.mustEqual(involvedCharacterAlreadyHasName(storyEvent.id, character.id, character.name.value))
+        }
+
+        @Test
+        fun `should update story event and produce change when new name is different`() {
+            val newName = characterName().value
+
+            val update = storyEvent.withCharacterInvolved(character)
+                .storyEvent.withCharacter(character.id)!!.renamed(newName)
+
+            update as Successful
+
+            update.storyEvent.involvedCharacters.getEntityById(character.id)!!.name.mustEqual(newName)
+
+            update.change.mustEqual(CharacterInvolvedWithStoryEventRenamed(storyEvent.id, character.id, newName))
+        }
+
     }
 }

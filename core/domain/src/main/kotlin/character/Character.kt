@@ -1,8 +1,8 @@
 package com.soyle.stories.domain.character
 
-import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
-import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
-import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
+import com.soyle.stories.domain.character.events.*
+import com.soyle.stories.domain.character.exceptions.CharacterException
+import com.soyle.stories.domain.character.exceptions.characterAlreadyHasName
 import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.media.Media
 import com.soyle.stories.domain.project.Project
@@ -31,7 +31,11 @@ class Character(
         otherNames: Set<NonBlankString> = this.otherNames
     ) = Character(id, projectId, name, otherNames, media)
 
-    fun withName(name: NonBlankString): Character = copy(name = name)
+    fun withName(name: NonBlankString): CharacterUpdate<CharacterRenamed> {
+        if (name == this.name) return noUpdate(characterAlreadyHasName(id, name.value))
+
+        return withEventApplied(CharacterRenamed(id, name.value))
+    }
 
     /*
     Should add the variant to the list of other names, unless it is the same as the name or one of the other names.
@@ -85,6 +89,13 @@ class Character(
 
     fun noUpdate(reason: CharacterException? = null) = CharacterUpdate.WithoutChange(this, reason)
 
+    private fun withEventApplied(event: CharacterRenamed): CharacterUpdate.Updated<CharacterRenamed> {
+        return CharacterUpdate.Updated(
+            copy(name = NonBlankString.create(event.newName)!!),
+            event
+        )
+    }
+
     data class Id(val uuid: UUID = UUID.randomUUID()) {
 
         override fun toString(): String = "Character($uuid)"
@@ -95,5 +106,3 @@ class Character(
         fun buildNewCharacter(projectId: Project.Id, name: NonBlankString): Character = Character(projectId, name)
     }
 }
-
-class CharacterRenamed(val characterId: Character.Id, val newName: String)

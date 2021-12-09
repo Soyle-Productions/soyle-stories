@@ -2,10 +2,13 @@ package com.soyle.stories.domain.character
 
 import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
+import com.soyle.stories.domain.character.events.CharacterRenamed
+import com.soyle.stories.domain.character.exceptions.characterAlreadyHasName
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.validation.NonBlankString
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class CharacterTest {
@@ -17,13 +20,32 @@ class CharacterTest {
         Character.buildNewCharacter(projectId, NonBlankString.create("Bob")!!)
     }
 
-    @Test
-    fun `characters can be renamed`() {
-        val character = Character.buildNewCharacter(projectId, NonBlankString.create("Bob")!!)
-            .withName(NonBlankString.create("Frank")!!)
-        assertEquals("Frank", character.name.value)
-    }
+    @Nested
+    inner class `Rename Character` {
 
+        @Test
+        fun `should produce update when new name provided`() {
+            val character = Character.buildNewCharacter(projectId, NonBlankString.create("Bob")!!)
+
+            val update = character.withName(NonBlankString.create("Frank")!!)
+
+            update as CharacterUpdate.Updated
+            assertEquals("Frank", update.character.name.value)
+            update.event.mustEqual(CharacterRenamed(character.id, "Frank"))
+        }
+
+        @Test
+        fun `should not produce update when new name is the same`() {
+            val character = Character.buildNewCharacter(projectId, NonBlankString.create("Bob")!!)
+
+            val update = character.withName(NonBlankString.create("Bob")!!)
+
+            update as CharacterUpdate.WithoutChange
+            assertEquals("Bob", update.character.name.value)
+            update.reason.mustEqual(characterAlreadyHasName(character.id, "Bob"))
+        }
+
+    }
     @Test
     fun `can create a new name variant`() {
         val character = makeCharacter()
