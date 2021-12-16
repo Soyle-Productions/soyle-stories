@@ -1,8 +1,14 @@
 package com.soyle.stories.domain.character
 
-import com.soyle.stories.domain.character.events.*
 import com.soyle.stories.domain.character.exceptions.CharacterException
-import com.soyle.stories.domain.character.exceptions.characterAlreadyHasName
+import com.soyle.stories.domain.character.name.CharacterNames
+import com.soyle.stories.domain.character.name.events.CharacterDisplayNameSelected
+import com.soyle.stories.domain.character.name.events.CharacterNameAdded
+import com.soyle.stories.domain.character.name.events.CharacterNameRemoved
+import com.soyle.stories.domain.character.name.events.CharacterRenamed
+import com.soyle.stories.domain.character.name.exceptions.CannotRemoveDisplayName
+import com.soyle.stories.domain.character.name.exceptions.CharacterAlreadyHasName
+import com.soyle.stories.domain.character.name.exceptions.CharacterDisplayNameAlreadySet
 import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.media.Media
 import com.soyle.stories.domain.project.Project
@@ -12,86 +18,101 @@ import java.util.*
 class Character(
     override val id: Id,
     val projectId: Project.Id,
-    val name: NonBlankString,
-    val otherNames: Set<NonBlankString>,
+    val names: CharacterNames,
     val media: Media.Id?
 ) : Entity<Character.Id> {
 
     constructor(projectId: Project.Id, name: NonBlankString, media: Media.Id? = null) : this(
         Id(),
         projectId,
-        name,
-        setOf(),
+        CharacterNames(name, emptySet()),
         media
     )
 
-    private fun copy(
-        name: NonBlankString = this.name,
-        media: Media.Id? = this.media,
-        otherNames: Set<NonBlankString> = this.otherNames
-    ) = Character(id, projectId, name, otherNames, media)
+    val displayName: NonBlankString
+        get() = names.displayName
 
-    fun withName(name: NonBlankString): CharacterUpdate<CharacterRenamed> {
-        if (name == this.name) return noUpdate(characterAlreadyHasName(id, name.value))
-
-        return withEventApplied(CharacterRenamed(id, name.value))
+    fun withName(newVariant: NonBlankString): CharacterUpdate<CharacterNameAdded> {
+        if (newVariant in names) return noUpdate(CharacterAlreadyHasName(id, newVariant.value))
+        return withEventApplied(CharacterNameAdded(id, newVariant.value))
     }
 
-    /*
-    Should add the variant to the list of other names, unless it is the same as the name or one of the other names.
-     */
-    fun withNameVariant(variant: NonBlankString): CharacterUpdate<CharacterNameVariantAdded> {
-        if (variant == name) return noUpdate(reason = CharacterNameVariantCannotEqualDisplayName(id, variant.value))
-        if (variant in otherNames) return noUpdate(
-            reason = CharacterNameVariantCannotEqualOtherVariant(
-                id,
-                variant.value
-            )
-        )
-        return CharacterUpdate.Updated(
-            character = copy(otherNames = otherNames + variant),
-            event = CharacterNameVariantAdded(id, variant.value)
-        )
+    interface NameOperations {
+        fun asDisplayName(): CharacterUpdate<*>
+        fun renamed(newName: NonBlankString): CharacterUpdate<CharacterRenamed>
+        fun removed(): CharacterUpdate<CharacterNameRemoved>
     }
+    fun withName(reference: String): NameOperations? {
+        val nonBlankRef = NonBlankString.create(reference) ?: return null
+        if (nonBlankRef !in names) return null
+        return object : NameOperations {
+            override fun renamed(newName: NonBlankString): CharacterUpdate<CharacterRenamed> {
+                if (newName in names) return noUpdate(CharacterAlreadyHasName(id, newName.value))
+                return withEventApplied(CharacterRenamed(id, nonBlankRef.value, newName.value))
+            }
 
-    fun withoutNameVariant(variant: NonBlankString): CharacterUpdate<CharacterNameVariantRemoved> {
-        if (variant !in otherNames) return noUpdate(CharacterDoesNotHaveNameVariant(id, variant.value))
-        return CharacterUpdate.Updated(
-            character = copy(otherNames = otherNames - variant),
-            event = CharacterNameVariantRemoved(id, variant)
-        )
-    }
+            override fun asDisplayName(): CharacterUpdate<*> {
+                if (nonBlankRef == displayName) return noUpdate(CharacterDisplayNameAlreadySet(id, nonBlankRef.value))
+                return withEventApplied(CharacterDisplayNameSelected(id, displayName.value, nonBlankRef.value))
+            }
 
-    fun withNameVariantModified(
-        currentVariant: NonBlankString,
-        replacement: NonBlankString
-    ): CharacterUpdate<CharacterNameVariantRenamed> {
-        if (currentVariant == replacement) return noUpdate()
-        if (currentVariant !in otherNames) return noUpdate(CharacterDoesNotHaveNameVariant(id, currentVariant.value))
-        if (replacement == name) return noUpdate(
-            reason = CharacterNameVariantCannotEqualDisplayName(
-                id,
-                replacement.value
-            )
-        )
-        if (replacement in otherNames) return noUpdate(
-            reason = CharacterNameVariantCannotEqualOtherVariant(
-                id,
-                replacement.value
-            )
-        )
-
-        return CharacterUpdate.Updated(
-            character = copy(otherNames = otherNames - currentVariant + replacement),
-            event = CharacterNameVariantRenamed(id, currentVariant, replacement)
-        )
+            override fun removed(): CharacterUpdate<CharacterNameRemoved> {
+                if (displayName == nonBlankRef) return noUpdate(CannotRemoveDisplayName(id, nonBlankRef.value))
+                return withEventApplied(CharacterNameRemoved(id, nonBlankRef.value))
+            }
+        }
     }
 
     fun noUpdate(reason: CharacterException? = null) = CharacterUpdate.WithoutChange(this, reason)
 
-    private fun withEventApplied(event: CharacterRenamed): CharacterUpdate.Updated<CharacterRenamed> {
+    private fun withEventApplied(event: CharacterNameAdded): CharacterUpdate.Updated<CharacterNameAdded>
+    {
         return CharacterUpdate.Updated(
-            copy(name = NonBlankString.create(event.newName)!!),
+            Character(
+                id,
+                projectId,
+                names.withName(NonBlankString.create(event.name)!!),
+                media
+            ),
+            event
+        )
+    }
+
+    private fun withEventApplied(event: CharacterNameRemoved): CharacterUpdate.Updated<CharacterNameRemoved>
+    {
+        return CharacterUpdate.Updated(
+            Character(
+                id,
+                projectId,
+                names.withoutName(NonBlankString.create(event.name)!!),
+                media
+            ),
+            event
+        )
+    }
+
+    private fun withEventApplied(event: CharacterRenamed): CharacterUpdate.Updated<CharacterRenamed>
+    {
+        return CharacterUpdate.Updated(
+            Character(
+                id,
+                projectId,
+                names.rename(NonBlankString.create(event.oldName)!!, NonBlankString.create(event.name)!!),
+                media
+            ),
+            event
+        )
+    }
+
+    private fun withEventApplied(event: CharacterDisplayNameSelected): CharacterUpdate.Updated<CharacterDisplayNameSelected>
+    {
+        return CharacterUpdate.Updated(
+            Character(
+                id,
+                projectId,
+                CharacterNames(NonBlankString.create(event.name)!!, names),
+                media
+            ),
             event
         )
     }

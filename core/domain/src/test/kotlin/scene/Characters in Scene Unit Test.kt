@@ -32,7 +32,7 @@ class `Characters in Scene Unit Test` {
             fun `Given Scene Does not Cover any Story Events`(): List<DynamicTest> {
                 val update = scene.withCharacterIncluded(
                     CharacterInvolvedInStoryEvent(
-                        storyEvent.id, character.id, character.name.value
+                        storyEvent.id, character.id, character.names.displayName.value
                     )
                 )
 
@@ -45,20 +45,20 @@ class `Characters in Scene Unit Test` {
             fun `Given Scene Covers Story Event`(): List<DynamicTest> {
                 val update = scene.withStoryEvent(storyEvent).scene.withCharacterIncluded(
                     CharacterInvolvedInStoryEvent(
-                        storyEvent.id, character.id, character.name.value
+                        storyEvent.id, character.id, character.names.displayName.value
                     )
                 )
 
                 return listOf(dynamicTest("character should have been included") {
                     update.scene.includedCharacters.getOrError(character.id).run {
                         sceneId.mustEqual(scene.id)
-                        characterName.mustEqual(character.name)
+                        characterName.mustEqual(character.names.displayName)
                     }
                 }, dynamicTest("should produce character included event") {
                     update as Successful
                     update.event.mustEqual(
                         IncludedCharacterInScene(
-                            scene.id, Scene.IncludedCharacter(character.id, character.name.value)
+                            scene.id, Scene.IncludedCharacter(character.id, character.names.displayName.value)
                         )
                     )
                 })
@@ -71,11 +71,11 @@ class `Characters in Scene Unit Test` {
                     .scene.withStoryEvent(otherSource)
                     .scene.withCharacterIncluded(
                         CharacterInvolvedInStoryEvent(
-                            otherSource.id, character.id, character.name.value
+                            otherSource.id, character.id, character.names.displayName.value
                         )
                     ).scene.withCharacterIncluded(
                         CharacterInvolvedInStoryEvent(
-                            storyEvent.id, character.id, character.name.value
+                            storyEvent.id, character.id, character.names.displayName.value
                         )
                     )
 
@@ -95,11 +95,11 @@ class `Characters in Scene Unit Test` {
                     .scene.withStoryEvent(storyEvent)
                     .scene.withCharacterIncluded(
                         CharacterInvolvedInStoryEvent(
-                            storyEvent.id, character.id, character.name.value
+                            storyEvent.id, character.id, character.displayName.value
                         )
                     ).scene.withCharacterIncluded(
                         CharacterInvolvedInStoryEvent(
-                            storyEvent.id, character.id, character.name.value
+                            storyEvent.id, character.id, character.displayName.value
                         )
                     )
 
@@ -129,7 +129,7 @@ class `Characters in Scene Unit Test` {
                 return listOf(dynamicTest("character should have been included") {
                     update.scene.includedCharacters.getOrError(character.id).run {
                         sceneId.mustEqual(scene.id)
-                        characterName.mustEqual(character.name)
+                        characterName.mustEqual(character.displayName)
                     }
                 }, dynamicTest("should produce story event added event") {
                     update as Successful
@@ -141,7 +141,7 @@ class `Characters in Scene Unit Test` {
                     update.event.characterInSceneUpdates.mustEqual(
                         listOf(
                             IncludedCharacterInScene(
-                                scene.id, Scene.IncludedCharacter(character.id, character.name.value)
+                                scene.id, Scene.IncludedCharacter(character.id, character.displayName.value)
                             )
                         )
                     )
@@ -154,7 +154,7 @@ class `Characters in Scene Unit Test` {
                 val otherStoryEvent = makeStoryEvent()
                 val scene = scene.withStoryEvent(otherStoryEvent).scene.withCharacterIncluded(
                     CharacterInvolvedInStoryEvent(
-                        otherStoryEvent.id, character.id, character.name.value
+                        otherStoryEvent.id, character.id, character.displayName.value
                     )
                 ).scene
 
@@ -313,12 +313,12 @@ class `Characters in Scene Unit Test` {
         @Test
         fun `no update should be produced if the name is identical`() {
             val update = scene.withStoryEvent(storyEvent.withCharacterInvolved(character).storyEvent)
-                .scene.withCharacter(character.id)?.renamed(character.name.value)
+                .scene.withCharacter(character.id)?.renamed(character.displayName.value)
 
             update as UnSuccessful
-            update.scene.includedCharacters.getOrError(character.id).characterName.mustEqual(character.name.value)
+            update.scene.includedCharacters.getOrError(character.id).characterName.mustEqual(character.displayName.value)
 
-            update.reason.mustEqual(characterInSceneAlreadyHasName(scene.id, character.id, character.name.value))
+            update.reason.mustEqual(characterInSceneAlreadyHasName(scene.id, character.id, character.displayName.value))
         }
 
         @Test
@@ -404,7 +404,7 @@ class `Characters in Scene Unit Test` {
                     CharacterInvolvedInStoryEvent(
                         storyEvent.id,
                         secondCharacter.id,
-                        secondCharacter.name.value
+                        secondCharacter.displayName.value
                     )
                 )
                 .scene.withCharacter(character.id)!!.assignedRole(RoleInScene.IncitingCharacter)

@@ -108,8 +108,8 @@ class StoryEvent(
 
     fun withCharacterInvolved(character: Character): StoryEventUpdate<CharacterInvolvedInStoryEvent> {
         if (involvedCharacters.containsEntityWithId(character.id)) return noUpdate(storyEventAlreadyInvolvesCharacter(id, character.id))
-        return copy(involvedCharacters = involvedCharacters + InvolvedCharacter(character.id, character.name.value))
-            .updatedBy(CharacterInvolvedInStoryEvent(id, character.id, character.name.value))
+        return copy(involvedCharacters = involvedCharacters + InvolvedCharacter(character.id, character.names.displayName.value))
+            .updatedBy(CharacterInvolvedInStoryEvent(id, character.id, character.names.displayName.value))
     }
 
     fun withCharacter(characterId: Character.Id): InvolvedCharacterOperations? {

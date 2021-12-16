@@ -95,7 +95,7 @@ class Theme(
 
     fun withCharacterIncluded(character: Character) = withCharacterIncluded(
         character.id,
-        character.name.value,
+        character.names.displayName.value,
         character.media
     )
     fun withCharacterIncluded(characterId: Character.Id, characterName: String, characterMediaId: Media.Id?): Theme

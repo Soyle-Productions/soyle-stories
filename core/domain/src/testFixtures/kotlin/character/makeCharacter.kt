@@ -1,5 +1,6 @@
 package com.soyle.stories.domain.character
 
+import com.soyle.stories.domain.character.name.CharacterNames
 import com.soyle.stories.domain.media.Media
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
@@ -14,4 +15,4 @@ fun makeCharacter(
     name: NonBlankString = characterName(),
     otherNames: Set<NonBlankString> = setOf(),
     media: Media.Id? = null
-) = Character(id, projectId, name, otherNames, media)
+) = Character(id, projectId, CharacterNames(name, otherNames), media)

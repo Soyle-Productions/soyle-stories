@@ -34,11 +34,11 @@ class `Story Event Characters Unit Test` {
             return listOf(
                 dynamicTest("should involve character") {
                     assertTrue(update.storyEvent.involvedCharacters.containsEntityWithId(character.id))
-                    update.storyEvent.involvedCharacters.getEntityById(character.id)!!.name.mustEqual(character.name.value)
+                    update.storyEvent.involvedCharacters.getEntityById(character.id)!!.name.mustEqual(character.displayName.value)
                 },
                 dynamicTest("should produce successful update with event") {
                     update as Successful
-                    update.change.mustEqual(CharacterInvolvedInStoryEvent(storyEvent.id, character.id, character.name.value))
+                    update.change.mustEqual(CharacterInvolvedInStoryEvent(storyEvent.id, character.id, character.displayName.value))
                 }
             )
         }
@@ -103,17 +103,17 @@ class `Story Event Characters Unit Test` {
 
         @Test
         fun `cannot rename character that is not involved`() {
-            assertNull(storyEvent.withCharacter(character.id)?.renamed(character.name.value))
+            assertNull(storyEvent.withCharacter(character.id)?.renamed(character.displayName.value))
         }
 
         @Test
         fun `should not produce update if new name is identical`() {
             val update = storyEvent.withCharacterInvolved(character)
-                .storyEvent.withCharacter(character.id)!!.renamed(character.name.value)
+                .storyEvent.withCharacter(character.id)!!.renamed(character.displayName.value)
 
             update as UnSuccessful
 
-            update.reason.mustEqual(involvedCharacterAlreadyHasName(storyEvent.id, character.id, character.name.value))
+            update.reason.mustEqual(involvedCharacterAlreadyHasName(storyEvent.id, character.id, character.displayName.value))
         }
 
         @Test

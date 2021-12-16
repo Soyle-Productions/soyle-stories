@@ -7,13 +7,6 @@ import com.soyle.stories.domain.validation.ValidationException
 import java.util.*
 
 
-sealed interface CharacterNamesMustBeUnique : CharacterException
-data class CharacterNameVariantCannotEqualDisplayName(override val characterId: Character.Id, val name: String) :
-    CharacterNamesMustBeUnique, ValidationException()
-
-data class CharacterNameVariantCannotEqualOtherVariant(override val characterId: Character.Id, val name: String) :
-    CharacterNamesMustBeUnique, ValidationException()
-
 data class CharacterDoesNotHaveNameVariant(override val characterId: Character.Id, val name: String) : ValidationException(), CharacterException
 
 class CharacterArcAlreadyContainsMaximumNumberOfTemplateSection(

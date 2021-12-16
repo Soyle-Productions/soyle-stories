@@ -341,7 +341,7 @@ class Scene private constructor(
     )
     fun withCharacterRenamed(character: Character): SceneUpdate<CharacterInSceneRenamed> {
         val op = withCharacter(character.id)!!
-        return op.renamed(character.name.value)
+        return op.renamed(character.names.displayName.value)
     }
 
     @Deprecated(

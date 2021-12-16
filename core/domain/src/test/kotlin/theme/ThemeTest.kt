@@ -33,16 +33,16 @@ class ThemeTest {
 	@Test
 	fun `character can be included in a theme`() {
 		val newCharacter = makeCharacter()
-		val theme = makeTheme().withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
+		val theme = makeTheme().withCharacterIncluded(newCharacter.id, newCharacter.displayName.value, newCharacter.media)
 		assert(theme.containsCharacter(newCharacter.id))
 	}
 
 	@Test
 	fun `a character cannot be included in a theme more than once`() {
 		val newCharacter = makeCharacter()
-		val themeWithCharacter = makeTheme().withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
+		val themeWithCharacter = makeTheme().withCharacterIncluded(newCharacter.id, newCharacter.displayName.value, newCharacter.media)
 		val error = assertThrows<CharacterAlreadyIncludedInTheme> {
-			themeWithCharacter.withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
+			themeWithCharacter.withCharacterIncluded(newCharacter.id, newCharacter.displayName.value, newCharacter.media)
 		}
 		assertEquals(themeWithCharacter.id.uuid, error.themeId)
 		assertEquals(newCharacter.id.uuid, error.characterId)
@@ -52,7 +52,7 @@ class ThemeTest {
 	fun `character can be removed from a theme`() {
 		val newCharacter = makeCharacter()
 		val theme = makeTheme()
-			.withCharacterIncluded(newCharacter.id, newCharacter.name.value, newCharacter.media)
+			.withCharacterIncluded(newCharacter.id, newCharacter.displayName.value, newCharacter.media)
 			.withoutCharacter(newCharacter.id)
 		assert(! theme.containsCharacter(newCharacter.id))
 	}
@@ -72,14 +72,14 @@ class ThemeTest {
 		val characterB = makeCharacter()
 
 		val themeWithCharacterA = makeTheme()
-			.withCharacterIncluded(characterA.id, characterA.name.value, characterA.media)
+			.withCharacterIncluded(characterA.id, characterA.displayName.value, characterA.media)
 
 		val newSimilarities = "We're similar"
 
 		@Test
 		fun `pairs of characters have similarities`() {
 			themeWithCharacterA
-				.withCharacterIncluded(characterB.id, characterB.name.value, characterB.media)
+				.withCharacterIncluded(characterB.id, characterB.displayName.value, characterB.media)
 				.getSimilaritiesBetweenCharacters(characterA.id, characterB.id)
 		}
 
@@ -93,7 +93,7 @@ class ThemeTest {
 		@Test
 		fun `can change similarities`() {
 			val similarities = themeWithCharacterA
-				.withCharacterIncluded(characterB.id, characterB.name.value, characterB.media)
+				.withCharacterIncluded(characterB.id, characterB.displayName.value, characterB.media)
 				.withCharactersSimilarToEachOther(characterA.id, characterB.id, newSimilarities)
 				.getSimilaritiesBetweenCharacters(characterA.id, characterB.id)
 			assertEquals(newSimilarities, similarities)
