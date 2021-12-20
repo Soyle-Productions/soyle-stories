@@ -13,6 +13,7 @@ import com.soyle.stories.domain.storyevent.character.changes.CharacterRemovedFro
 import com.soyle.stories.domain.storyevent.events.*
 import com.soyle.stories.domain.storyevent.character.exceptions.storyEventAlreadyInvolvesCharacter
 import com.soyle.stories.domain.storyevent.character.exceptions.storyEventAlreadyWithoutCharacter
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyCoveredByScene
 import com.soyle.stories.domain.storyevent.exceptions.storyEventAlreadyWithoutCoverage
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventException
 import com.soyle.stories.domain.validation.EntitySet
@@ -90,7 +91,7 @@ class StoryEvent(
 
     fun coveredByScene(sceneId: Scene.Id): StoryEventUpdate<StoryEventCoveredByScene> {
         val currentSceneId = this.sceneId
-        if (currentSceneId == sceneId) return noUpdate()
+        if (currentSceneId == sceneId) return noUpdate(StoryEventAlreadyCoveredByScene(id, sceneId))
         return copy(sceneId = sceneId).updatedBy(
             StoryEventCoveredByScene(
                 id,

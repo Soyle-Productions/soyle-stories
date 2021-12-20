@@ -5,6 +5,7 @@ import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.events.*
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyCoveredByScene
 import com.soyle.stories.domain.storyevent.exceptions.storyEventAlreadyWithoutCoverage
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -164,6 +165,7 @@ class `Story Event Unit Test` {
 
                 update as UnSuccessful
                 update.storyEvent.mustEqual(coveredStoryEvent)
+                update.reason.mustEqual(StoryEventAlreadyCoveredByScene(storyEvent.id, inputSceneId))
             }
 
         }
