@@ -4,14 +4,11 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneUpdate
 import com.soyle.stories.domain.scene.character.events.CharacterInSceneEvent
 import com.soyle.stories.domain.scene.character.events.CharacterRoleInSceneChanged
-import com.soyle.stories.domain.scene.character.events.CharacterInSceneRenamed
 import com.soyle.stories.domain.scene.events.CharacterDesireInSceneChanged
 import com.soyle.stories.domain.scene.events.CompoundEvent
 import com.soyle.stories.domain.storyevent.StoryEvent
 
 interface CharacterInSceneOperations {
-
-    fun renamed(newName: String): SceneUpdate<CharacterInSceneRenamed>
 
     fun assignedRole(role: RoleInScene?): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>>
 

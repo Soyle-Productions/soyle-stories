@@ -10,9 +10,5 @@ data class DuplicateCharacterInSceneOperation(
     override val message: String
 ) : DuplicateOperationException(), CharacterInSceneException
 
-internal fun characterInSceneAlreadyHasName(sceneId: Scene.Id, characterId: Character.Id, name: String) =
-    DuplicateCharacterInSceneOperation(sceneId, characterId, "$characterId in $sceneId already has name \"$name\"")
-
-
 internal fun characterInSceneAlreadyHasDesire(sceneId: Scene.Id, characterId: Character.Id, desire: String) =
     DuplicateCharacterInSceneOperation(sceneId, characterId, "$characterId in $sceneId already has desire \"$desire\"")

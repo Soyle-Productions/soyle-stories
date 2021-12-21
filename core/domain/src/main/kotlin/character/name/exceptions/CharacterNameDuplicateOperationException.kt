@@ -9,8 +9,8 @@ data class CharacterNameDuplicateOperationException(
     override val message: String?
 ) : DuplicateOperationException(), CharacterNameException
 
-internal fun CharacterAlreadyHasName(characterId: Character.Id, name: String) =
+fun CharacterAlreadyHasName(characterId: Character.Id, name: String) =
     CharacterNameDuplicateOperationException(characterId, name, "$characterId already has name \"$name\"")
 
-internal fun CharacterDisplayNameAlreadySet(characterId: Character.Id, name: String) =
+fun CharacterDisplayNameAlreadySet(characterId: Character.Id, name: String) =
     CharacterNameDuplicateOperationException(characterId, name, "$characterId already has display name \"$name\"")

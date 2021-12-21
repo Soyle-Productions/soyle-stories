@@ -11,7 +11,6 @@ import com.soyle.stories.domain.scene.character.CharacterInSceneOperations
 import com.soyle.stories.domain.scene.character.RoleInScene
 import com.soyle.stories.domain.scene.character.events.*
 import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasDesire
-import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasName
 import com.soyle.stories.domain.scene.events.*
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedInStoryEvent
@@ -129,7 +128,7 @@ class Scene private constructor(
 
     fun getMotivationForCharacter(characterId: Character.Id): CharacterMotivation? {
         return charactersInScene.getEntityById(characterId)?.let {
-            CharacterMotivation(it.characterId, it.characterName, it.motivation)
+            CharacterMotivation(it.characterId, it.motivation)
         }
     }
 
@@ -236,7 +235,6 @@ class Scene private constructor(
                     CharacterInScene(
                         id,
                         characterInvolved.characterId,
-                        characterInvolved.characterName,
                         characterInvolved.storyEventId
                     )
                 )
@@ -244,7 +242,7 @@ class Scene private constructor(
             .updatedBy(
                 IncludedCharacterInScene(
                     id,
-                    IncludedCharacter(characterInvolved.characterId, characterInvolved.characterName)
+                    IncludedCharacter(characterInvolved.characterId)
                 )
             )
     }
@@ -253,21 +251,6 @@ class Scene private constructor(
         val characterInScene = includedCharacters[characterId] ?: return null
 
         return object : CharacterInSceneOperations {
-            override fun renamed(newName: String): SceneUpdate<CharacterInSceneRenamed> {
-                if (characterInScene.characterName == newName) return noUpdate(
-                    characterInSceneAlreadyHasName(id, characterId, newName)
-                )
-
-                return Successful(
-                    copy(
-                        charactersInScene = charactersInScene
-                            .minus(characterId)
-                            .plus(characterInScene.withName(newName))
-                    ),
-                    CharacterInSceneRenamed(id, characterId, newName)
-                )
-            }
-
             override fun assignedRole(role: RoleInScene?): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>> {
                 if (characterInScene.roleInScene == role) return noUpdate()
 
@@ -332,16 +315,6 @@ class Scene private constructor(
 
         }
 
-    }
-
-    @Deprecated(
-        message = "Outdated API",
-        replaceWith = ReplaceWith("withCharacter(character.id)?.renamed(character.name.value)"),
-        level = DeprecationLevel.WARNING
-    )
-    fun withCharacterRenamed(character: Character): SceneUpdate<CharacterInSceneRenamed> {
-        val op = withCharacter(character.id)!!
-        return op.renamed(character.names.displayName.value)
     }
 
     @Deprecated(
@@ -468,7 +441,7 @@ class Scene private constructor(
             .partition { charactersInScene.containsEntityWithId(it.id) }
             .run {
                 first.map { charactersInScene.getEntityById(it.id)!!.withSource(storyEvent.id) } to
-                        second.map { CharacterInScene(id, it.id, it.name, storyEvent.id) }
+                        second.map { CharacterInScene(id, it.id, storyEvent.id) }
             }
 
     private fun storyEventAddedToScene(
@@ -491,7 +464,7 @@ class Scene private constructor(
     private fun includedCharacterInScene(characterInScene: CharacterInScene): IncludedCharacterInScene {
         return IncludedCharacterInScene(
             id,
-            IncludedCharacter(characterInScene.characterId, characterInScene.characterName)
+            IncludedCharacter(characterInScene.characterId)
         )
     }
 
@@ -590,12 +563,12 @@ class Scene private constructor(
         override fun toString(): String = "Scene($uuid)"
     }
 
-    class CharacterMotivation(val characterId: Character.Id, val characterName: String, val motivation: String?) {
+    class CharacterMotivation(val characterId: Character.Id, val motivation: String?) {
 
         fun isInherited() = motivation == null
     }
 
-    data class IncludedCharacter(val characterId: Character.Id, val characterName: String)
+    data class IncludedCharacter(val characterId: Character.Id)
 
     inner class IncludedCharacters internal constructor() : Collection<CharacterInScene> by charactersInScene {
 

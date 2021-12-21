@@ -5,7 +5,6 @@ import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.scene.character.RoleInScene
 import com.soyle.stories.domain.scene.character.events.*
 import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasDesire
-import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasName
 import com.soyle.stories.domain.scene.events.CharacterDesireInSceneChanged
 import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedInStoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
@@ -52,13 +51,12 @@ class `Characters in Scene Unit Test` {
                 return listOf(dynamicTest("character should have been included") {
                     update.scene.includedCharacters.getOrError(character.id).run {
                         sceneId.mustEqual(scene.id)
-                        characterName.mustEqual(character.names.displayName)
                     }
                 }, dynamicTest("should produce character included event") {
                     update as Successful
                     update.event.mustEqual(
                         IncludedCharacterInScene(
-                            scene.id, Scene.IncludedCharacter(character.id, character.names.displayName.value)
+                            scene.id, Scene.IncludedCharacter(character.id)
                         )
                     )
                 })
@@ -129,7 +127,6 @@ class `Characters in Scene Unit Test` {
                 return listOf(dynamicTest("character should have been included") {
                     update.scene.includedCharacters.getOrError(character.id).run {
                         sceneId.mustEqual(scene.id)
-                        characterName.mustEqual(character.displayName)
                     }
                 }, dynamicTest("should produce story event added event") {
                     update as Successful
@@ -141,7 +138,7 @@ class `Characters in Scene Unit Test` {
                     update.event.characterInSceneUpdates.mustEqual(
                         listOf(
                             IncludedCharacterInScene(
-                                scene.id, Scene.IncludedCharacter(character.id, character.displayName.value)
+                                scene.id, Scene.IncludedCharacter(character.id)
                             )
                         )
                     )
@@ -300,38 +297,6 @@ class `Characters in Scene Unit Test` {
 
         }
 
-    }
-
-    @Nested
-    inner class `Rename Character in Scene` {
-
-        @Test
-        fun `cannot rename character that is not in the scene`() {
-            scene.withCharacter(character.id)?.renamed("New Name").mustEqual(null)
-        }
-
-        @Test
-        fun `no update should be produced if the name is identical`() {
-            val update = scene.withStoryEvent(storyEvent.withCharacterInvolved(character).storyEvent)
-                .scene.withCharacter(character.id)?.renamed(character.displayName.value)
-
-            update as UnSuccessful
-            update.scene.includedCharacters.getOrError(character.id).characterName.mustEqual(character.displayName.value)
-
-            update.reason.mustEqual(characterInSceneAlreadyHasName(scene.id, character.id, character.displayName.value))
-        }
-
-        @Test
-        fun `should update scene when name is new`() {
-            val newName = "New Name"
-            val update = scene.withStoryEvent(storyEvent.withCharacterInvolved(character).storyEvent)
-                .scene.withCharacter(character.id)?.renamed(newName)
-
-            update as Successful
-            update.scene.includedCharacters.getOrError(character.id).characterName.mustEqual(newName)
-
-            update.event.mustEqual(CharacterInSceneRenamed(scene.id, character.id, newName))
-        }
     }
 
     @Nested
