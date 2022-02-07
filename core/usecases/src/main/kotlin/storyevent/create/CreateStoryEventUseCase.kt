@@ -1,45 +1,62 @@
 package com.soyle.stories.usecase.storyevent.create
 
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.*
+import com.soyle.stories.domain.storyevent.events.StoryEventChange
+import com.soyle.stories.domain.storyevent.events.StoryEventCoveredByScene
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
-import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
+import com.soyle.stories.usecase.scene.SceneRepository
+import com.soyle.stories.usecase.storyevent.*
 import com.soyle.stories.usecase.storyevent.StoryEventRepository
-import com.soyle.stories.usecase.storyevent.getOrderOfEventsInProject
-import com.soyle.stories.usecase.storyevent.toItem
-import java.util.*
 
 class CreateStoryEventUseCase(
-    private val storyEventRepository: StoryEventRepository
+    private val storyEventRepository: StoryEventRepository,
+    private val scenes: SceneRepository
 ) : CreateStoryEvent {
 
     override suspend fun invoke(request: CreateStoryEvent.RequestModel, output: CreateStoryEvent.OutputPort) {
-        val response = createStoryEvent(request)
+        val (creationUpdate, rescheduleUpdates) = createStoryEvent(request)
+        val coveredBySceneUpdate = creationUpdate.coverBySceneIfNeeded(request.sceneId)
+
+        commitChanges(coveredBySceneUpdate ?: creationUpdate, rescheduleUpdates)
+
+        val response = CreateStoryEvent.ResponseModel(
+            creationUpdate.change,
+            coveredBySceneUpdate?.result()?.getOrNull(),
+            rescheduleUpdates.map { it.change }
+        )
         output.receiveCreateStoryEventResponse(response)
     }
 
-    private suspend fun createStoryEvent(request: CreateStoryEvent.RequestModel): CreateStoryEvent.ResponseModel {
-        val updates = makeNewStoryEvent(request).filterIsInstance<SuccessfulStoryEventUpdate<*>>()
-
-        updates.forEach {
-            if (it.change is StoryEventCreated) storyEventRepository.addNewStoryEvent(it.storyEvent)
-            else storyEventRepository.updateStoryEvent(it.storyEvent)
-        }
-
-        return CreateStoryEvent.ResponseModel(
-            updates.single { it.change is StoryEventCreated }.change as StoryEventCreated,
-            updates.mapNotNull { it.change as? StoryEventRescheduled }
-        )
-    }
-
-    private suspend fun makeNewStoryEvent(request: CreateStoryEvent.RequestModel): List<StoryEventUpdate<*>> {
-        return StoryEventTimeService(storyEventRepository)
+    private suspend fun createStoryEvent(
+        request: CreateStoryEvent.RequestModel
+    ): Pair<SuccessfulStoryEventCreatedUpdate, List<SuccessfulStoryEventRescheduledUpdate>> {
+        val (creationUpdate, rescheduleUpdates) = StoryEventTimeService(storyEventRepository)
             .createStoryEvent(
                 request.name,
                 calculateStoryEventTime(request),
                 request.projectId
             )
+        return creationUpdate as SuccessfulStoryEventUpdate to
+                rescheduleUpdates.filterIsInstance<SuccessfulStoryEventRescheduledUpdate>()
+    }
+
+    private suspend fun StoryEventCreatedUpdate.coverBySceneIfNeeded(
+        sceneId: Scene.Id?
+    ): StoryEventCoveredBySceneUpdate? {
+        if (sceneId == null) return null
+        scenes.getSceneOrError(sceneId.uuid)
+        return storyEvent.coveredByScene(sceneId)
+    }
+
+    private suspend fun commitChanges(
+        storyEventUpdate: StoryEventUpdate<*>,
+        rescheduleUpdates: List<SuccessfulStoryEventRescheduledUpdate>
+    ) {
+        storyEventRepository.addNewStoryEvent(storyEventUpdate.storyEvent)
+        rescheduleUpdates.forEach { storyEventRepository.updateStoryEvent(it.storyEvent) }
     }
 
     private suspend fun calculateStoryEventTime(request: CreateStoryEvent.RequestModel): Long {

@@ -5,6 +5,7 @@ import com.soyle.stories.domain.character.Drive
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.character.makeCharacterArc
 import com.soyle.stories.domain.mustEqual
+import com.soyle.stories.domain.scene.givenCharacter
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArcUseCase
@@ -21,7 +22,7 @@ class `Cover Character Arc Section in Scene Int Test` {
 
     private val character = makeCharacter()
     private val scene = makeScene(projectId = character.projectId)
-        .withCharacterIncluded(character).scene
+        .givenCharacter(character)
     private val characterArc = makeCharacterArc(character.id)
 
     private val sceneRepository = SceneRepositoryDouble(listOf(scene))

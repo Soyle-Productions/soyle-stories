@@ -13,9 +13,11 @@ import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.usecase.repositories.LocationRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
-import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
-import com.soyle.stories.usecase.scene.deleteScene.DeleteSceneUseCase
+import com.soyle.stories.usecase.scene.delete.PotentialChangesOfDeletingScene
+import com.soyle.stories.usecase.scene.delete.DeleteScene
+import com.soyle.stories.usecase.scene.delete.DeleteSceneUseCase
 import kotlinx.coroutines.runBlocking
+import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeNull
 import org.amshove.kluent.shouldNotBeNull
@@ -31,7 +33,7 @@ class `Delete Scene Unit Test` {
     val projectId = Project.Id()
 
     /** The scene must exist */
-    private val scene = makeScene(projectId = projectId, coveredStoryEvents = emptySet())
+    private val scene = makeScene(projectId = projectId)
 
     // Post conditions
     /** The scene must be deleted from the repository */
@@ -127,7 +129,7 @@ class `Delete Scene Unit Test` {
             deleteScene()
 
             updatedStoryEvent.shouldBeNull()
-            result!!.storyEventUncovered.shouldBeNull()
+            result!!.storyEventsUncovered.shouldBeEmpty()
         }
 
         @Nested
@@ -173,7 +175,6 @@ class `Delete Scene Unit Test` {
 
             init {
                 storyEventRepository.givenStoryEvent(storyEvent)
-                sceneRepository.givenScene(scene.withStoryEvent(storyEvent).scene)
             }
 
             @Test
@@ -191,7 +192,7 @@ class `Delete Scene Unit Test` {
                 deleteScene()
 
                 with(result!!) {
-                    storyEventUncovered.shouldNotBeNull()
+                    storyEventsUncovered.single()
                         .shouldBeEqualTo(StoryEventUncoveredFromScene(storyEvent.id, scene.id))
                 }
             }

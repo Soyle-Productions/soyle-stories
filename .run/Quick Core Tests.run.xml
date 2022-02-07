@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Quick Core Tests" type="CompoundRunConfigurationType">
+    <toRun name="soyle-stories-desktop:core:domain [test]" type="GradleRunConfiguration" />
+    <toRun name="soyle-stories-desktop:core:usecases [test]" type="GradleRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>

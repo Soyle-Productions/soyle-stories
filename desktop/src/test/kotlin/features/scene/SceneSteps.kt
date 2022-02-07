@@ -5,8 +5,13 @@ import com.soyle.stories.desktop.config.drivers.character.createCharacterWithNam
 import com.soyle.stories.desktop.config.drivers.location.LocationDriver
 import com.soyle.stories.desktop.config.drivers.location.createLocationWithName
 import com.soyle.stories.desktop.config.drivers.prose.*
+import com.soyle.stories.desktop.config.drivers.ramifications.confirmation.showRamifications
+import com.soyle.stories.desktop.config.drivers.ramifications.getOpenRamificationsToolOrError
+import com.soyle.stories.desktop.config.drivers.ramifications.getOpenReportOrError
+import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.scene.*
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
+import com.soyle.stories.desktop.config.drivers.storyevent.`Story Event Robot`
 import com.soyle.stories.desktop.config.features.getParagraphs
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.scene.sceneEditor.SceneEditorAssertions
@@ -19,11 +24,18 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.anyNewLineCharacter
+import com.soyle.stories.scene.delete.ramifications.DeleteSceneRamificationsReportView
 import com.soyle.stories.scene.sceneList.SceneListView
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
+import javafx.scene.control.Labeled
 import javafx.scene.input.KeyCode
+import javafx.scene.layout.StackPane
+import javafx.scene.text.Text
+import javafx.scene.text.TextFlow
 import org.junit.jupiter.api.Assertions.*
+import tornadofx.getChildList
+import tornadofx.uiComponent
 
 class SceneSteps : En {
 
@@ -123,26 +135,25 @@ class SceneSteps : En {
 
     private fun charactersInSceneSteps() {
         val characterDriver by lazy { CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()) }
-        Given("I have included the following characters in the {scene}") { scene: Scene, dataTable: DataTable ->
-            val sceneDriver = sceneDriver
-            dataTable.asList().forEach {
-                val character = characterDriver.getCharacterByNameOrError(it)
-                sceneDriver.givenCharacterIncludedInScene(scene, character)
-            }
-        }
         Given("I have set the following motivations in the following scenes for the following characters") { dataTable: DataTable ->
             val sceneDriver = sceneDriver
+            val storyEventDriver = `Story Event Robot`.invoke(soyleStories.getAnyOpenWorkbenchOrError())
             val dataLists = dataTable.asLists()
             val scenes = dataLists[0].drop(1).map(sceneDriver::givenScene)
+            val storyEvents = scenes.map {
+                with (storyEventDriver) {
+                    givenStoryEventIsCoveredByScene(givenStoryEventExists(it.name), it.id)
+                }
+            }
             dataLists.drop(1).forEach {
                 val character = characterDriver.givenCharacterNamed(NonBlankString.create(it.first())!!)
                 it.drop(1).forEachIndexed { index, s ->
                     if (s == "-") return@forEach
                     val scene = scenes[index]
+                    val storyEvent = storyEvents[index]
+                    storyEventDriver.givenStoryEventInvolvesCharacter(storyEvent, character)
                     if (s != "inherit") {
-                        sceneDriver.givenCharacterIncludedInScene(scene, character, s)
-                    } else {
-                        sceneDriver.givenCharacterIncludedInScene(scene, character)
+                        sceneDriver.givenCharacterHasMotivationInScene(scene, character, s)
                     }
                 }
             }
@@ -183,12 +194,12 @@ class SceneSteps : En {
         }
         Given("I have mentioned the {character} in the {scene}'s prose") { character: Character, scene: Scene ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
-            SceneDriver(workbench).givenSceneHasProse(scene, listOf(character.name.value))
+            SceneDriver(workbench).givenSceneHasProse(scene, listOf(character.displayName.value))
             SceneDriver(workbench).givenSceneProseMentionsEntity(
                 scene,
                 character.id.mentioned(),
                 0,
-                character.name.length
+                character.displayName.length
             )
         }
         Given("I have mentioned the {location} in the {scene}'s prose") { location: Location, scene: Scene ->
@@ -384,6 +395,11 @@ class SceneSteps : En {
             sceneListView.givenSceneEditorToolHasBeenOpened(scene)
                 .setResolution(resolution)
         }
+        When("I show the ramifications of deleting the {scene}") { scene: Scene ->
+            soyleStories.getAnyOpenWorkbenchOrError()
+                .givenDeleteSceneDialogHasBeenOpened(scene)
+                .showRamifications()
+        }
     }
 
     private fun thens() {
@@ -540,11 +556,6 @@ class SceneSteps : En {
                     })
                 }
             }
-        }
-        Then(
-            "the {character} should be included in the {scene}"
-        ) { character: Character, scene: Scene ->
-            assertTrue(scene.includesCharacter(character.id))
         }
         Then(
             "the {location} should be used in the {scene}"
@@ -741,6 +752,39 @@ class SceneSteps : En {
             val sceneEditor = sceneListView.givenSceneEditorToolHasBeenOpened(scene)
             SceneEditorAssertions.assertThat(sceneEditor) {
                 hasResolution(expectedResolution)
+            }
+        }
+        Then(
+            "the following should be listed as ramifications of deleting the {scene}"
+        ) { scene: Scene, data: DataTable ->
+            val ramifications = soyleStories.getAnyOpenWorkbenchOrError()
+                .getOpenRamificationsToolOrError()
+                .getOpenReportOrError(DeleteSceneRamificationsReportView::class)
+                .content!!.uiComponent<DeleteSceneRamificationsReportView>()!!
+
+            val effects = ramifications.root.lookup(".effects")
+
+            val messages = effects.getChildList().orEmpty().flatMap {
+                val headline = it.lookup(".field-label") as Labeled
+                val bodies = robot.from(it).lookup(".message").queryAll<TextFlow>()
+                bodies.map { body ->
+                    body.children.map { child ->
+                        when (child) {
+                            is Text -> child.text
+                            is Labeled -> child.text
+                            else -> ""
+                        }
+                    }.joinToString(prefix = headline.text + " ", separator = "")
+                }
+            }
+            data.asList().forEach {
+                assertTrue(messages.contains(it)) {
+                    """
+                        Did not find expected message in ramifications.
+                            Expected: $it
+                                  In: $messages
+                    """.trimIndent()
+                }
             }
         }
     }

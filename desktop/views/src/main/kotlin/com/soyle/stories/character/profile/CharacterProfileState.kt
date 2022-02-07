@@ -5,21 +5,23 @@ import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVaria
 import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
 import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedNotifier
 import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedReceiver
-import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedNotifier
-import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedReceiver
+import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
+import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.common.guiUpdate
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
-import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
 import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
-import javafx.application.Platform
+import com.soyle.stories.domain.character.name.events.CharacterNameAdded
+import com.soyle.stories.domain.character.name.events.CharacterNameRemoved
+import com.soyle.stories.domain.character.name.events.CharacterRenamed
+import javafx.beans.Observable
 import javafx.beans.property.*
+import javafx.beans.value.ObservableValue
 import tornadofx.*
 
 class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterNameVariantAddedReceiver,
-    CharacterNameVariantRenamedReceiver, CharacterNameVariantRemovedReceiver {
+    CharacterNameVariantRemovedReceiver, CharacterRenamedReceiver {
 
     val characterId: ReadOnlyProperty<Character.Id> = bind(CharacterProfileProps::characterId)
     val characterImageResource: ReadOnlyStringProperty = bind(CharacterProfileProps::imageResource)
@@ -46,39 +48,39 @@ class CharacterProfileState : ItemViewModel<CharacterProfileProps>(), CharacterN
     init {
         (scope as CharacterProfileScope).projectScope.run {
             this@CharacterProfileState listensTo get<CharacterNameVariantAddedNotifier>()
-            this@CharacterProfileState listensTo get<CharacterNameVariantRenamedNotifier>()
+            this@CharacterProfileState listensTo get<CharacterRenamedNotifier>()
             this@CharacterProfileState listensTo get<CharacterNameVariantRemovedNotifier>()
         }
     }
 
-    override suspend fun receiveCharacterNameVariantAdded(event: CharacterNameVariantAdded) {
+    override suspend fun receiveCharacterNameVariantAdded(event: CharacterNameAdded) {
         if (event.characterId == item?.characterId) {
             guiUpdate {
                 if (alternativeNames.value != null) {
-                    alternativeNames.add(event.newVariant)
+                    alternativeNames.add(event.name)
                 }
             }
         }
     }
 
-    override suspend fun receiveCharacterNameVariantRenamed(event: CharacterNameVariantRenamed) {
-        if (event.characterId == item?.characterId) {
+    override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
+        if (characterRenamed.characterId == item?.characterId) {
             guiUpdate {
                 if (alternativeNames.value != null) {
-                    alternativeNames.replaceAll {
-                        if (it == event.originalVariant.value) event.newVariant.value
-                        else it
-                    }
+                    val index = alternativeNames.indexOf(characterRenamed.oldName)
+                    if (index < 0) return@guiUpdate
+                    alternativeNames.add(index, characterRenamed.name)
+                    alternativeNames.removeAt(index + 1)
                 }
             }
         }
     }
 
-    override suspend fun receiveCharacterNameVariantRemoved(event: CharacterNameVariantRemoved) {
+    override suspend fun receiveCharacterNameVariantRemoved(event: CharacterNameRemoved) {
         if (event.characterId == item?.characterId) {
             guiUpdate {
                 if (alternativeNames.value != null) {
-                    alternativeNames.removeIf { it == event.variant.value }
+                    alternativeNames.removeIf { it == event.name }
                 }
             }
         }

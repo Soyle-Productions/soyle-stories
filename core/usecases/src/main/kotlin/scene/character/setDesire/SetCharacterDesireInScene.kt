@@ -2,7 +2,8 @@ package com.soyle.stories.usecase.scene.character.setDesire
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.events.CharacterDesireInSceneChanged
+import com.soyle.stories.domain.scene.character.events.CharacterIncludedInScene
+import com.soyle.stories.domain.scene.character.events.CharacterDesireInSceneChanged
 
 interface SetCharacterDesireInScene {
 
@@ -15,10 +16,11 @@ interface SetCharacterDesireInScene {
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
     class ResponseModel(
-        val characterDesireInSceneChanged: CharacterDesireInSceneChanged?
+        val characterIncludedInScene: CharacterIncludedInScene?,
+        val characterDesireInSceneChanged: CharacterDesireInSceneChanged
     )
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun receiveSetCharacterDesireInSceneResponse(response: ResponseModel)
     }
 

@@ -2,7 +2,7 @@ package com.soyle.stories.theme.renameSymbolicItems
 
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.domain.character.CharacterRenamed
+import com.soyle.stories.domain.character.name.events.CharacterRenamed
 import com.soyle.stories.domain.location.events.LocationRenamed
 import com.soyle.stories.location.renameLocation.LocationRenamedReceiver
 import com.soyle.stories.theme.renameSymbol.RenamedSymbolReceiver
@@ -17,7 +17,7 @@ class RenameSymbolicItemController(
 
     override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
         threadTransformer.async {
-            renameSymbolicItem.invoke(characterRenamed.characterId.uuid, characterRenamed.newName, renameSymbolicItemOutputPort)
+            renameSymbolicItem.invoke(characterRenamed.characterId.uuid, characterRenamed.name, renameSymbolicItemOutputPort)
         }
     }
 

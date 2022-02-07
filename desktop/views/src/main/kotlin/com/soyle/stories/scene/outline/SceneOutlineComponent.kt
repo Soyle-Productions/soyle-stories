@@ -1,10 +1,13 @@
 package com.soyle.stories.scene.outline
 
 import com.soyle.stories.common.onChangeUntil
+import com.soyle.stories.common.scopedListener
 import com.soyle.stories.di.get
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.FocusedSceneQueries
 import com.soyle.stories.scene.outline.item.OutlinedStoryEventItemComponent
-import com.soyle.stories.scene.target.SceneTargetedNotifier
+import com.soyle.stories.storyevent.coverage.StoryEventCoveredBySceneNotifier
+import com.soyle.stories.storyevent.coverage.uncover.StoryEventUncoveredBySceneNotifier
 import javafx.scene.Node
 import javafx.scene.Parent
 import tornadofx.UI_COMPONENT_PROPERTY
@@ -47,16 +50,16 @@ interface SceneOutlineComponent {
                     if (scene != null) return@onChangeUntil
                     deactivateComponent(eventHandler)
                 }
-                projectScope.get<SceneTargetedNotifier>().addListener(eventHandler)
-                projectScope.get<StoryEventAddedToSceneNotifier>().addListener(eventHandler)
-                projectScope.get<StoryEventRemovedFromSceneNotifier>().addListener(eventHandler)
+                val outlineSceneHandler = eventHandler::outlineScene
+                eventHandler.scopedListener(projectScope.get<FocusedSceneQueries>().focusedScene()) { outlineSceneHandler(it) }
+                projectScope.get<StoryEventCoveredBySceneNotifier>().addListener(eventHandler)
+                projectScope.get<StoryEventUncoveredBySceneNotifier>().addListener(eventHandler)
                 root.properties["com.soyle.stories.active"] = true
             }
 
             private fun deactivateComponent(eventHandler: SceneOutlineEventHandler) {
-                projectScope.get<SceneTargetedNotifier>().removeListener(eventHandler)
-                projectScope.get<StoryEventAddedToSceneNotifier>().removeListener(eventHandler)
-                projectScope.get<StoryEventRemovedFromSceneNotifier>().removeListener(eventHandler)
+                projectScope.get<StoryEventCoveredBySceneNotifier>().removeListener(eventHandler)
+                projectScope.get<StoryEventUncoveredBySceneNotifier>().removeListener(eventHandler)
                 root.properties["com.soyle.stories.active"] = false
             }
         }

@@ -6,8 +6,9 @@ import com.soyle.stories.usecase.storyevent.StoryEventItem
 
 class StoryEventsInScene(
     val sceneId: Scene.Id,
-    list: List<StoryEventItem>) : List<StoryEventItem> by list {
+    list: List<StoryEventInSceneItem>
+) : List<StoryEventInSceneItem> by list {
 
-    constructor(sceneId: Scene.Id, vararg items: StoryEventItem) : this(sceneId, items.toList())
+    constructor(sceneId: Scene.Id, vararg items: StoryEventInSceneItem) : this(sceneId, items.toList())
 
 }

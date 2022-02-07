@@ -3,10 +3,12 @@ package com.soyle.stories.desktop.config.storyevent
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolScope
+import com.soyle.stories.storyevent.character.remove.CharacterRemovedFromStoryEventNotifier
 import com.soyle.stories.storyevent.coverage.StoryEventCoveredBySceneNotifier
 import com.soyle.stories.storyevent.coverage.StoryEventCoveredBySceneReceiver
-import com.soyle.stories.storyevent.coverage.StoryEventUncoveredBySceneNotifier
-import com.soyle.stories.storyevent.coverage.StoryEventUncoveredBySceneReceiver
+import com.soyle.stories.storyevent.coverage.uncover.StoryEventUncoveredBySceneNotifier
+import com.soyle.stories.storyevent.coverage.uncover.StoryEventUncoveredBySceneReceiver
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
 import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensNotifier
@@ -26,6 +28,8 @@ object Notifiers {
             storyEventNoLongerHappens()
             storyEventCoveredByScene()
             storyEventUncoveredByScene()
+
+            characterRemovedFromStoryEvent()
         }
     }
 
@@ -51,6 +55,9 @@ object Notifiers {
         provide(StoryEventNoLongerHappensReceiver::class) {
             StoryEventNoLongerHappensNotifier()
         }
+        scoped<SceneCharactersToolScope> {
+            hoist<StoryEventNoLongerHappensNotifier> { projectScope }
+        }
     }
 
     private fun InProjectScope.storyEventCoveredByScene() {
@@ -63,6 +70,13 @@ object Notifiers {
         provide(StoryEventUncoveredBySceneReceiver::class) {
             StoryEventUncoveredBySceneNotifier()
         }
+        scoped<SceneCharactersToolScope> {
+            hoist<StoryEventUncoveredBySceneNotifier> { projectScope }
+        }
+    }
+
+    private fun InProjectScope.characterRemovedFromStoryEvent() {
+        provide { CharacterRemovedFromStoryEventNotifier() }
     }
 
 }

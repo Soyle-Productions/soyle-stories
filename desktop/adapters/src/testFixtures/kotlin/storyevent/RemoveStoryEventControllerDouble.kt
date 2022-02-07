@@ -20,8 +20,7 @@ class RemoveStoryEventControllerDouble private constructor(
     val showShowConfirmation = slot<Boolean>()
 
     init {
-        every { spy.removeStoryEvent(capture(requestedStoryEventIds)) } returns Unit
-        every { spy.confirmRemoveStoryEvent(capture(confirmedStoryEventIds), capture(showShowConfirmation)) } returns Job()
+        every { spy.removeStoryEvent(capture(requestedStoryEventIds), any(), any()) } returns Job()
     }
 
 }

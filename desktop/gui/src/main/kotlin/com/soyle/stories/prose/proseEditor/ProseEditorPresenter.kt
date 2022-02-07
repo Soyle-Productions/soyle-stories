@@ -1,94 +1,89 @@
 package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.domain.prose.content.ProseContent
-import com.soyle.stories.domain.prose.MentionedCharacterId
-import com.soyle.stories.domain.prose.MentionedLocationId
-import com.soyle.stories.domain.prose.MentionedSymbolId
-import com.soyle.stories.domain.prose.events.*
+import com.soyle.stories.domain.prose.events.ContentReplaced
+import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.validation.SingleLine
-import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.gui.View
 import com.soyle.stories.prose.editProse.ContentReplacedReceiver
 import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
 import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.usecase.prose.readProse.ReadProse
-import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
-import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
+import com.soyle.stories.usecase.scene.prose.mentions.AvailableStoryElementsToMentionInScene
 
 class ProseEditorPresenter internal constructor(
     private val view: View.Nullable<ProseEditorViewModel>
 ) : ReadProse.OutputPort, OnLoadMentionQueryOutput, ContentReplacedReceiver, MentionTextReplacedReceiver,
     DetectInvalidatedMentions.OutputPort, OnLoadMentionReplacementsOutput {
 
-    @Synchronized
     override suspend fun receiveProse(response: ReadProse.ResponseModel) {
         view.update {
             ProseEditorViewModel(
                 versionNumber = response.revision,
                 isLocked = false,
                 breakBodyIntoContentElements(response.body, response.mentions),
-                mentionQueryState = NoQuery,
+                mentionQueryState = null,
                 replacementOptions = null
             )
         }
     }
 
-    override fun invoke(matchingStoryElements: List<GetStoryElementsToMentionInScene.MatchingStoryElement>) {
-        view.updateOrInvalidated {
-            if (mentionQueryState !is MentionQueryLoading) return@updateOrInvalidated this
-            copy(
-                mentionQueryState = MentionQueryLoaded(
-                    mentionQueryState.initialQuery,
-                    mentionQueryState.query,
-                    mentionQueryState.primedIndex,
-                    matchingStoryElements,
-                    listOf()
-                ).updateQuery(mentionQueryState.query)
-            )
-        }
-    }
+//    override fun invoke(matchingStoryElements: List<GetStoryElementsToMentionInScene.MatchingStoryElement>) {
+//        view.updateOrInvalidated {
+//            if (mentionQueryState !is MentionQueryLoading) return@updateOrInvalidated this
+//            copy(
+//                mentionQueryState = MentionQueryLoaded(
+//                    mentionQueryState.initialQuery,
+//                    mentionQueryState.query,
+//                    mentionQueryState.primedIndex,
+//                    matchingStoryElements,
+//                    listOf()
+//                ).updateQuery(mentionQueryState.query)
+//            )
+//        }
+//    }
 
-    internal fun MentionQueryLoaded.updateQuery(query: String): MentionQueryState {
-        val mentionedIds = view.viewModel!!.content.asSequence().filterIsInstance<Mention>().map { it.entityId }.toSet()
-        val newMatches = matchesForInitialQuery
-            .filter { it.name.contains(query, ignoreCase = true) }
-            .sortedWith(compareBy(
-                {
-                    it.entityId !in mentionedIds
-                },
-                {
-                    val index = it.name.indexOf(query, ignoreCase = true)
-                    when {
-                        index == 0 -> 0
-                        it.name.substring(index - 1, index) == " " -> 1
-                        else -> 2
-                    }
-                },
-                {
-                    it.name.length.toDouble() / query.length
-                }
-            )).map {
-                MatchingStoryElementViewModel(
-                    countLines(it.name) as SingleLine,
-                    it.parentEntityName?.let { countLines(it) as? SingleLine },
-                    it.name.indexOf(query, ignoreCase = true).let { it until it + query.length },
-                    when (it.entityId) {
-                        is MentionedCharacterId -> "character"
-                        is MentionedLocationId -> "location"
-                        is MentionedSymbolId -> "symbol"
-                    },
-                    it.entityId
-                )
-            }
-        if (newMatches.isEmpty()) return NoQuery
-        return MentionQueryLoaded(
-            initialQuery,
-            query,
-            primedIndex,
-            matchesForInitialQuery,
-            newMatches
-        )
-    }
+//    internal fun MentionQueryLoaded.updateQuery(query: String): MentionQueryState {
+//        val mentionedIds = view.viewModel!!.content.asSequence().filterIsInstance<Mention>().map { it.entityId }.toSet()
+//        val newMatches = matchesForInitialQuery
+//            .filter { it.name.contains(query, ignoreCase = true) }
+//            .sortedWith(compareBy(
+//                {
+//                    it.entityId !in mentionedIds
+//                },
+//                {
+//                    val index = it.name.indexOf(query, ignoreCase = true)
+//                    when {
+//                        index == 0 -> 0
+//                        it.name.substring(index - 1, index) == " " -> 1
+//                        else -> 2
+//                    }
+//                },
+//                {
+//                    it.name.length.toDouble() / query.length
+//                }
+//            )).map {
+//                MatchingStoryElementViewModel(
+//                    countLines(it.name) as SingleLine,
+//                    it.parentEntityName?.let { countLines(it) as? SingleLine },
+//                    it.name.indexOf(query, ignoreCase = true).let { it until it + query.length },
+//                    when (it.entityId) {
+//                        is MentionedCharacterId -> "character"
+//                        is MentionedLocationId -> "location"
+//                        is MentionedSymbolId -> "symbol"
+//                    },
+//                    it.entityId
+//                )
+//            }
+//        if (newMatches.isEmpty()) return NoQuery
+//        return MentionQueryLoaded(
+//            initialQuery,
+//            query,
+//            primedIndex,
+//            matchesForInitialQuery,
+//            newMatches
+//        )
+//    }
 
 
     override suspend fun receiveContentReplacedEvent(contentReplaced: ContentReplaced) {
@@ -124,17 +119,17 @@ class ProseEditorPresenter internal constructor(
             )
         }
     }
-
-    override fun loadedReplacements(replacements: List<ListOptionsToReplaceMentionInSceneProse.MentionOption<*>>) {
-        view.updateOrInvalidated {
-            val mentionedEntities = content.asSequence().filterIsInstance<Mention>().map { it.entityId }.toSet()
-            copy(
-                replacementOptions = replacements.sortedBy { it.entityId !in mentionedEntities }.map {
-                    ReplacementElementViewModel(it.name, it.entityId)
-                }
-            )
-        }
-    }
+//
+//    override fun loadedReplacements(replacements: List<ListOptionsToReplaceMentionInSceneProse.MentionOption<*>>) {
+//        view.updateOrInvalidated {
+//            val mentionedEntities = content.asSequence().filterIsInstance<Mention>().map { it.entityId }.toSet()
+//            copy(
+//                replacementOptions = replacements.sortedBy { it.entityId !in mentionedEntities }.map {
+//                    ReplacementElementViewModel(it.name, it.entityId)
+//                }
+//            )
+//        }
+//    }
 
     private fun breakBodyIntoContentElements(body: String, mentions: List<ProseContent.Mention<*>>): List<ContentElement> {
         var lastMentionEnd = 0
@@ -166,7 +161,7 @@ class ProseEditorPresenter internal constructor(
         }
     }
 
-    internal fun replaceRangeWithMention(range: IntRange, mention: com.soyle.stories.domain.prose.content.ProseContent.Mention<*>, mentionedText: SingleLine) {
+    internal fun replaceRangeWithMention(range: IntRange, mention: ProseContent.Mention<*>, mentionedText: SingleLine) {
         val newElement = Mention(mentionedText.toString(), mention.entityId)
         view.updateOrInvalidated {
             var offset = 0
@@ -197,6 +192,12 @@ class ProseEditorPresenter internal constructor(
                 }
             )
         }
+    }
+
+    override fun loadedReplacements(replacements: AvailableStoryElementsToMentionInScene) {
+    }
+
+    override fun invoke(p1: AvailableStoryElementsToMentionInScene) {
     }
 
 }

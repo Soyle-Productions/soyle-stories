@@ -1,23 +1,18 @@
 package com.soyle.stories.usecase.scene.character.removeCharacterFromScene
 
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocale
+import com.soyle.stories.domain.scene.character.events.CharacterRemovedFromScene
 import java.util.*
 
 interface RemoveCharacterFromScene {
 
-	class RequestModel internal constructor(val sceneId: UUID?, val storyEventId: UUID?, val characterId: UUID, val locale: SceneLocale)
+	suspend operator fun invoke(sceneId: Scene.Id, characterId: Character.Id, output: OutputPort)
 
-	suspend fun removeCharacterFromScene(sceneId: UUID, locale: SceneLocale, characterId: UUID, output: OutputPort) =
-	  invoke(RequestModel(sceneId, null, characterId, locale), output)
-	suspend fun removeCharacterFromSceneWithStoryEventId(storyEventId: UUID, locale: SceneLocale, characterId: UUID, output: OutputPort) =
-	  invoke(RequestModel(null, storyEventId, characterId, locale), output)
+	class ResponseModel(val characterRemoved: CharacterRemovedFromScene)
 
-	suspend operator fun invoke(request: RequestModel, output: OutputPort)
-
-	class ResponseModel(val sceneId: UUID, val characterId: UUID)
-
-	interface OutputPort {
-		fun failedToRemoveCharacterFromScene(failure: Exception)
+	fun interface OutputPort {
 		suspend fun characterRemovedFromScene(response: ResponseModel)
 	}
 }

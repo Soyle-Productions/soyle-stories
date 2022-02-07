@@ -3,7 +3,9 @@ package com.soyle.stories.storyevent.timeline
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevated
+import com.soyle.stories.common.components.surfaces.elevation
+import com.soyle.stories.common.components.surfaces.elevationVariant
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import javafx.event.EventTarget
 import javafx.scene.control.ScrollToEvent
@@ -48,12 +50,11 @@ class TimelineSkin(
     @ViewBuilder
     private fun EventTarget.loaded(loadedState: Timeline.State.Loaded) {
         with(gui) {
-            timelineHeader(timeline.condensedLabels(), loadedState.selection, loadedState.storyEventItems()).apply {
-                asSurface {
-                    relativeElevation = Elevation.getValue(8)
-                    inheritedElevation = Elevation.getValue(4)
+            timelineHeader(timeline.condensedLabels(), loadedState.selection, loadedState.storyEventItems())
+                .apply {
+                    elevation = Elevation.getValue(12)
+                    elevationVariant = elevated(objectProperty(Elevation.getValue(4)))
                 }
-            }
             timelineViewPort(loadedState.storyEventItems()) {
                 vgrow = Priority.ALWAYS
                 labelsCollapsed().bind(timeline.condensedLabels())

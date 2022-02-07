@@ -10,6 +10,6 @@ class CharacterItem(
     val mediaId: UUID?
 ) {
 
-    constructor(character: Character) : this(character.id.uuid, character.name.value, character.media?.uuid)
+    constructor(character: Character) : this(character.id.uuid, character.displayName.value, character.media?.uuid)
     constructor(character: CharacterInTheme) : this(character.id.uuid, character.name, null)
 }

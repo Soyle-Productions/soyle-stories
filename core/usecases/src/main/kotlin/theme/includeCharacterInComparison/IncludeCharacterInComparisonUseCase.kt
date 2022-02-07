@@ -26,24 +26,20 @@ class IncludeCharacterInComparisonUseCase(
         characterId: UUID,
         themeId: UUID
     ): CharacterIncludedInTheme {
-        val character = getCharacterById(characterId)
+        val character = characterRepository.getCharacterOrError(characterId)
         val theme = getThemeById(themeId)
 
-        val themeWithCharacter = theme.withCharacterIncluded(character.id, character.name.value, character.media)
+        val themeWithCharacter = theme.withCharacterIncluded(character.id, character.displayName.value, character.media)
         themeRepository.updateTheme(themeWithCharacter)
 
         return CharacterIncludedInTheme(
             themeId,
             "",
             characterId,
-            character.name.value,
+            character.displayName.value,
             false
         )
     }
-
-    private suspend fun getCharacterById(characterId: UUID) =
-        characterRepository.getCharacterById(Character.Id(characterId))
-            ?: throw CharacterDoesNotExist(characterId)
 
     private suspend fun getThemeById(themeId: UUID) =
         themeRepository.getThemeById(Theme.Id(themeId))

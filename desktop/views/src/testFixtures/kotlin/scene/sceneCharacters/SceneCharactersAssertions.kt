@@ -1,82 +1,87 @@
 package com.soyle.stories.desktop.view.scene.sceneCharacters
 
-import com.soyle.stories.common.exists
+import com.soyle.stories.common.ViewOf
+import com.soyle.stories.desktop.view.scene.sceneCharacters.`Scene Characters Access`.Companion.access
+import com.soyle.stories.desktop.view.scene.sceneCharacters.`Scene Characters Access`.Companion.drive
+import com.soyle.stories.desktop.view.scene.sceneCharacters.list.CharacterInSceneItemViewAccess
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArc
 import com.soyle.stories.domain.character.CharacterArcSection
-import com.soyle.stories.scene.sceneCharacters.SceneCharactersView
-import com.soyle.stories.scene.sceneCharacters.includedCharacterItem.IncludedCharacterItemView
+import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.scene.characters.list.item.CharacterInSceneItemViewModel
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolComponent
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolViewModel
 import org.junit.jupiter.api.Assertions.*
 
-class SceneCharactersAssertions private constructor(private val view: SceneCharactersView) {
+class SceneCharactersAssertions private constructor(private val view: SceneCharactersToolComponent) {
     companion object {
-        fun assertThat(view: SceneCharactersView, assertions: SceneCharactersAssertions.() -> Unit)
+        fun assertThat(view: SceneCharactersToolComponent, assertions: SceneCharactersAssertions.() -> Unit)
         {
             SceneCharactersAssertions(view).assertions()
         }
     }
 
     fun hasCharacter(character: Character) {
-        with(view.driver()) {
-            assertNotNull(getCharacterItem(character.id))
-        }
+        val item = view.access().getCharacterItem(character.id)
+        assertNotNull(item) { "Did not find character item listed in scene characters tool for ${character.displayName.value}" }
+        assertEquals(character.displayName.value, item!!.name.text)
+    }
+
+    fun hasCharacterNamed(name: String) {
+        assertNotNull(view.access().getCharacterItemByName(name))
     }
 
     fun doesNotHaveCharacter(character: Character) {
-        with(view.driver()) {
+        with(view.access()) {
             assertNull(getCharacterItem(character.id))
         }
     }
     fun doesNotHaveCharacterNamed(characterName: String) {
-        with(view.driver()) {
+        with(view.access()) {
             assertNull(getCharacterItemByName(characterName))
         }
     }
 
-    class IncludedCharacterAssertions private constructor(private val view: SceneCharactersView, private val item: IncludedCharacterItemView) {
+    fun hasNoListedStoryEventsToIncludeACharacter() {
+        with(view.access()) {
+            assertEquals(0, availableStoryEventItems.size)
+        }
+    }
+
+    fun hasStoryEventToIncludeACharacter(storyEvent: StoryEvent) {
+        val item = view.access().getAvailableStoryEventItem(storyEvent.id)
+        assertNotNull(item)
+        assertEquals(storyEvent.name.value, item!!.text)
+    }
+
+    fun hasNoCharactersToInclude() {
+        val availableCharacterItems = view.access().availableCharacterItems
+        assertEquals(0, availableCharacterItems.size) {
+            "Available characters: ${availableCharacterItems.map { it.text }}"
+        }
+    }
+
+    fun hasCharacterToInclude(character: Character) {
+        val item = view.access().getAvailableCharacterItem(character)
+        assertNotNull(item)
+        assertEquals(character.displayName.value, item!!.text)
+    }
+
+    class IncludedCharacterAssertions private constructor(private val view: SceneCharactersToolComponent, private val item: CharacterInSceneItemViewAccess) {
         companion object {
             fun SceneCharactersAssertions.andCharacter(characterId: Character.Id, assertions: IncludedCharacterAssertions.() -> Unit) {
-                IncludedCharacterAssertions(view, view.driver().getCharacterItemOrError(characterId)).assertions()
+                IncludedCharacterAssertions(view, view.access().getCharacterItemOrError(characterId)).assertions()
             }
-        }
-
-        fun doesNotHaveDesire() {
-            val desireInput = view.drive {
-                getCharacterEditorOrError().desireInput
+            fun SceneCharactersAssertions.andCharacter(name: String, assertions: IncludedCharacterAssertions.() -> Unit) {
+                IncludedCharacterAssertions(view, view.access().getCharacterItemByName(name)!!).assertions()
             }
-            assert(desireInput.text.isNullOrEmpty())
-        }
-
-        fun hasDesire(expectedDesire: String) {
-            val desireInput = view.drive {
-                getCharacterEditorOrError().desireInput
-            }
-            assertEquals(expectedDesire, desireInput.text ?: "")
-        }
-
-        fun hasMotivationValue(expectedMotivation: String) {
-            val motivationInput = view.drive {
-                getCharacterEditorOrError().motivationInput
-            }
-            assertEquals(expectedMotivation, motivationInput.text ?: "")
-        }
-
-        fun hasInheritedMotivationValue(expectedInheritedMotivation: String) {
-            val motivationInput = view.drive {
-                getCharacterEditorOrError().motivationInput
-            }
-            assertEquals(expectedInheritedMotivation, motivationInput.promptText)
         }
 
         fun doesNotHaveRole(unexpectedRole: String? = null) {
-            val characterRole = view.drive {
-                item.role
-            }
             if (unexpectedRole == null) {
-                assert(characterRole.text.isNullOrBlank())
-                assertFalse(characterRole.exists)
+                assert(item.role.text.isBlank())
             } else {
-                assertNotEquals(unexpectedRole, characterRole.text)
+                assertNotEquals(unexpectedRole, item.role)
             }
         }
 
@@ -85,7 +90,10 @@ class SceneCharactersAssertions private constructor(private val view: SceneChara
                 item.role
             }
             assertEquals(expectedRole, characterRole.text)
-            assertTrue(characterRole.exists)
+        }
+
+        fun hasWarning() {
+            assertTrue(view.drive { item.warning }!!.text.isNotBlank())
         }
 
         fun isListingAvailableArcToCover(characterArcId: CharacterArc.Id, expectedName: String) {

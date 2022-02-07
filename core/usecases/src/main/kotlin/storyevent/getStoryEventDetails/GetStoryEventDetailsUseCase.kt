@@ -16,10 +16,12 @@ class GetStoryEventDetailsUseCase(
     }
 
     private fun responseModel(storyEvent: StoryEvent) =
-        GetStoryEventDetails.ResponseModel(
-            storyEvent.id.uuid,
+        StoryEventDetails(
+            storyEvent.id,
             storyEvent.name.value,
-            storyEvent.linkedLocationId,
-            storyEvent.involvedCharacters.toList()
+            storyEvent.linkedLocationId?.let { StoryEventLocation(it, "") },
+            storyEvent.involvedCharacters.map {
+                StoryEventCharacter(it.id, it.name)
+            }
         )
 }

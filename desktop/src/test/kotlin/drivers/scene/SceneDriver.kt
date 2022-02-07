@@ -11,24 +11,22 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.MentionedEntityId
 import com.soyle.stories.domain.prose.ProseContent
-import com.soyle.stories.domain.scene.RoleInScene
+import com.soyle.stories.domain.scene.character.RoleInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
-import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.prose.editProse.EditProseController
 import com.soyle.stories.prose.proseEditor.ProseEditorScope
 import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneController
+import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.scene.create.CreateNewSceneController
-import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.sceneFrame.SetSceneFrameValueController
 import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
-import com.soyle.stories.scene.create.CreateScenePromptPresenter
 import com.soyle.stories.scene.create.CreateScenePromptView
 import com.soyle.stories.scene.trackSymbolInScene.PinSymbolToSceneController
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -55,6 +53,12 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
             previouslyNamedScenes[sceneName] = previouslyNamedScenes.getValue(sceneName).apply { add(scene.id) }
         }
         return scene
+    }
+
+    private fun getSceneOrError(sceneId: Scene.Id): Scene
+    {
+        val sceneRepository = projectScope.get<SceneRepository>()
+        return runBlocking { sceneRepository.getSceneOrError(sceneId.uuid) }
     }
 
     private fun createScene(sceneName: String) {
@@ -98,27 +102,27 @@ class SceneDriver private constructor(private val projectScope: ProjectScope) {
         projectScope.get<SetSceneFrameValueController>().setSceneResolution(sceneId, resolution)
     }
 
-
-    fun givenCharacterIncludedInScene(scene: Scene, character: Character, motivation: String? = null) {
-        if (!scene.includesCharacter(character.id)) includeCharacterInScene(scene, character)
-        if (motivation != null) {
-            if (getSceneByNameOrError(scene.name.value).getMotivationForCharacter(character.id)!!.motivation != motivation) {
-                setCharacterMotivationInScene(scene, character, motivation)
-            }
-        }
+    fun givenSceneDoesNotIncludeCharacter(scene: Scene, character: Character): Scene
+    {
+        if (! scene.includesCharacter(character.id)) return scene
+        removeCharacterFromScene(scene.id, character.id)
+        return getSceneOrError(scene.id)
     }
 
-    private fun includeCharacterInScene(scene: Scene, character: Character) {
-        projectScope.get<IncludeCharacterInSceneController>().includeCharacterInScene(
-            scene.id.uuid.toString(),
-            character.id.uuid.toString()
-        )
+    private fun removeCharacterFromScene(sceneId: Scene.Id, characterId: Character.Id) {
+        val controller = projectScope.get<RemoveCharacterFromSceneController>()
+        controller.removeCharacterFromScene(sceneId, characterId) { _, _, _ -> }
+    }
+
+    fun givenCharacterHasMotivationInScene(scene: Scene, character: Character, motivation: String) {
+        if (scene.includedCharacters[character.id]?.motivation == motivation) return
+        setCharacterMotivationInScene(scene, character, motivation)
     }
 
     private fun setCharacterMotivationInScene(scene: Scene, character: Character, motivation: String) {
         projectScope.get<SetMotivationForCharacterInSceneController>().setMotivationForCharacter(
-            scene.id.uuid.toString(),
-            character.id.uuid.toString(),
+            scene.id,
+            character.id,
             motivation
         )
     }

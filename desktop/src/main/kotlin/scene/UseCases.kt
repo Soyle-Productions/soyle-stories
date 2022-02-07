@@ -1,8 +1,6 @@
 package com.soyle.stories.desktop.config.scene
 
-import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.common.listensTo
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
@@ -10,35 +8,34 @@ import com.soyle.stories.di.scoped
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.order.SceneOrderService
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.prose.editProse.ContentReplacedNotifier
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolScope
 import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneController
 import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneOutput
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneController
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverArcSectionsInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CoverCharacterArcSectionsInSceneOutputPort
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.ListAvailableArcSectionsToCoverInSceneController
+import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.CharacterIncludedInSceneNotifier
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
-import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneOutput
+import com.soyle.stories.scene.charactersInScene.inspect.InspectCharacterInSceneController
+import com.soyle.stories.scene.charactersInScene.involve.InvolveCharacterInSceneOutput
 import com.soyle.stories.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInSceneController
 import com.soyle.stories.scene.charactersInScene.listCharactersInScene.ListCharactersInSceneController
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneController
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneControllerImpl
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneOutput
+import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
 import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
 import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneOutput
-import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
-import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneControllerImpl
-import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneNotifier
+import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.*
 import com.soyle.stories.scene.create.CreateNewSceneController
 import com.soyle.stories.scene.create.CreateNewSceneOutput
 import com.soyle.stories.scene.create.CreateScenePromptPresenter
 import com.soyle.stories.scene.delete.DeleteSceneController
 import com.soyle.stories.scene.delete.DeleteSceneOutput
-import com.soyle.stories.scene.delete.DeleteScenePromptPresenter
-import com.soyle.stories.scene.delete.ramifications.DeleteSceneRamificationsReportPresenter
-import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
-import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionControllerImpl
+import com.soyle.stories.scene.delete.deleteScenePrompt
+import com.soyle.stories.scene.delete.ramifications.deleteSceneRamifications
 import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneController
 import com.soyle.stories.scene.listSymbolsInScene.ListSymbolsInSceneControllerImpl
 import com.soyle.stories.scene.locationsInScene.detectInconsistencies.DetectInconsistenciesInSceneSettingsController
@@ -66,16 +63,22 @@ import com.soyle.stories.scene.reorder.ReorderSceneNotifier
 import com.soyle.stories.scene.reorder.ReorderScenePromptPresenter
 import com.soyle.stories.scene.reorder.ramifications.ReorderSceneRamificationsReportPresenter
 import com.soyle.stories.scene.sceneFrame.*
-import com.soyle.stories.scene.target.TargetScene
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInScene
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInSceneUseCase
-import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.*
-import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInScene
-import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInSceneUseCase
+import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.GetAvailableCharacterArcsForCharacterInScene
+import com.soyle.stories.usecase.scene.character.include.IncludeCharacterInScene
+import com.soyle.stories.usecase.scene.character.include.IncludeCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.character.inspect.InspectCharacterInScene
+import com.soyle.stories.usecase.scene.character.inspect.InspectCharacterInSceneUseCase
+import com.soyle.stories.usecase.scene.character.involve.InvolveCharacterInScene
+import com.soyle.stories.usecase.scene.character.involve.InvolveCharacterInSceneService
+import com.soyle.stories.usecase.scene.character.list.ListCharactersInScene
+import com.soyle.stories.usecase.scene.character.list.ListCharactersInSceneUseCase
 import com.soyle.stories.usecase.scene.character.listAvailableCharacters.ListAvailableCharactersToIncludeInScene
-import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInScene
-import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInSceneUseCase
+import com.soyle.stories.usecase.scene.character.listAvailableCharacters.ListAvailableCharactersToIncludeInSceneUseCase
 import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
 import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromSceneUseCase
 import com.soyle.stories.usecase.scene.character.setDesire.SetCharacterDesireInScene
@@ -84,16 +87,12 @@ import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScen
 import com.soyle.stories.usecase.scene.character.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneUseCase
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
 import com.soyle.stories.usecase.scene.createNewScene.CreateNewSceneUseCase
-import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
-import com.soyle.stories.usecase.scene.deleteScene.DeleteSceneUseCase
-import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
-import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingSceneUseCase
-import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
-import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingSceneUseCase
-import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
-import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenesUseCase
-import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
-import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProseUseCase
+import com.soyle.stories.usecase.scene.delete.DeleteScene
+import com.soyle.stories.usecase.scene.delete.DeleteSceneUseCase
+import com.soyle.stories.usecase.scene.delete.GetPotentialChangesFromDeletingScene
+import com.soyle.stories.usecase.scene.delete.GetPotentialChangesFromDeletingSceneUseCase
+import com.soyle.stories.usecase.scene.list.ListAllScenes
+import com.soyle.stories.usecase.scene.list.ListAllScenesUseCase
 import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettings
 import com.soyle.stories.usecase.scene.location.detectInconsistencies.DetectInconsistenciesInSceneSettingsUseCase
 import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocationToScene
@@ -108,6 +107,8 @@ import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInScene
 import com.soyle.stories.usecase.scene.location.replace.ReplaceSettingInSceneUseCase
 import com.soyle.stories.usecase.scene.renameScene.RenameScene
 import com.soyle.stories.usecase.scene.renameScene.RenameSceneUseCase
+import com.soyle.stories.usecase.scene.reorderScene.GetPotentialChangesFromReorderingScene
+import com.soyle.stories.usecase.scene.reorderScene.GetPotentialChangesFromReorderingSceneUseCase
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderSceneUseCase
 import com.soyle.stories.usecase.scene.sceneFrame.GetSceneFrame
@@ -119,7 +120,6 @@ import com.soyle.stories.usecase.scene.storyevent.list.ListStoryEventsCoveredByS
 import com.soyle.stories.usecase.scene.symbol.listSymbolsInScene.ListSymbolsInScene
 import com.soyle.stories.usecase.scene.symbol.listSymbolsInScene.ListSymbolsInSceneUseCase
 import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.*
-import kotlinx.coroutines.runBlocking
 
 object UseCases {
 
@@ -131,7 +131,6 @@ object UseCases {
             listAllScenes()
             renameScene()
             deleteScene()
-            targetScene()
             outlineScene()
             includeCharacterInScene()
             setMotivationForCharacterInScene()
@@ -142,7 +141,6 @@ object UseCases {
             coverCharacterArcSectionsInScene()
             assignRoleToCharacter()
             setCharacterDesireInScene()
-            listOptionsToReplaceMention()
             synchronizeTrackedSymbolsWithProse()
             listSymbolsInScene()
             listAvailableSymbolsToTrackInScene()
@@ -156,6 +154,7 @@ object UseCases {
             removeLocationFromScene()
             detectInconsistenciesInScene()
             replaceSettingInScene()
+            inspectCharacterInScene()
         }
     }
 
@@ -183,7 +182,7 @@ object UseCases {
 
     private fun InProjectScope.listAllScenes() {
         provide<ListAllScenes> {
-            ListAllScenesUseCase(projectId, get())
+            ListAllScenesUseCase(get())
         }
     }
 
@@ -194,7 +193,6 @@ object UseCases {
 
         provide<RenameSceneController> {
             RenameSceneControllerImpl(
-                applicationScope.get(),
                 applicationScope.get(),
                 get(),
                 get()
@@ -208,25 +206,20 @@ object UseCases {
 
     private fun InScope<ProjectScope>.deleteScene() {
         provide<GetPotentialChangesFromDeletingScene> {
-            GetPotentialChangesFromDeletingSceneUseCase(get())
+            GetPotentialChangesFromDeletingSceneUseCase(get(), get(), get(), get())
         }
         provide<DeleteScene> {
             DeleteSceneUseCase(get(), get(), get())
         }
 
-        provide {
+        provide<DeleteSceneController> {
             DeleteSceneController.Implementation(
                 applicationScope.get<ThreadTransformer>().guiContext,
                 applicationScope.get<ThreadTransformer>().asyncContext,
                 get(),
-                get<DeleteScenePromptPresenter>(),
-                get<DeleteSceneRamificationsReportPresenter>(),
+                { deleteScenePrompt(this) },
+                { deleteSceneRamifications(this, get(), it) },
                 get(),
-                applicationScope.get<LocaleManager>().run {
-                    runBlocking {
-                        getCurrentLocale()
-                    }
-                },
                 get(),
                 get(),
                 get(),
@@ -238,10 +231,6 @@ object UseCases {
         provide(DeleteScene.OutputPort::class) {
             DeleteSceneOutput(get(), get(), get())
         }
-    }
-
-    private fun InProjectScope.targetScene() {
-        provide { TargetScene(applicationScope.get(), get()) }
     }
 
     private fun InProjectScope.outlineScene() {
@@ -258,62 +247,94 @@ object UseCases {
         provide<ListStoryEventsCoveredByScene> {
             ListStoryEventsCoveredBySceneUseCase(
                 get(),
+                get(),
                 get()
             )
         }
     }
 
     private fun InProjectScope.includeCharacterInScene() {
-        provide(
-            IncludeCharacterInScene::class,
-            ListAvailableCharactersToIncludeInScene::class
-        ) {
-            IncludeCharacterInSceneUseCase(get(), get(), get())
+
+        provide<ListAvailableCharactersToIncludeInScene> {
+            ListAvailableCharactersToIncludeInSceneUseCase(get(), get(), get())
+        }
+        provide<IncludeCharacterInScene> {
+            IncludeCharacterInSceneUseCase(get(), get())
+        }
+        provide<IncludeCharacterInScene.OutputPort> {
+            IncludeCharacterInSceneOutput(get<CharacterIncludedInSceneNotifier>())
         }
 
         provide {
             ListAvailableCharactersToIncludeInSceneController(applicationScope.get(), get())
         }
-
-        provide(IncludeCharacterInSceneController::class) {
-            IncludeCharacterInSceneControllerImpl(
-                applicationScope.get(),
+        provide<InvolveCharacterInScene.OutputPort> {
+            InvolveCharacterInSceneOutput(get(), get())
+        }
+        provide<InvolveCharacterInScene> {
+            InvolveCharacterInSceneService(get(), get())
+        }
+        provide<IncludeCharacterInSceneController> {
+            IncludeCharacterInSceneController.Implementation(
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
                 get(),
                 get()
             )
         }
-
-        provide(IncludeCharacterInScene.OutputPort::class) {
-            IncludeCharacterInSceneOutput(get(), get())
+        scoped<SceneCharactersToolScope> {
+            hoist<IncludeCharacterInSceneController> { projectScope }
         }
     }
 
     private fun InProjectScope.setMotivationForCharacterInScene() {
         provide<SetMotivationForCharacterInScene> {
-            SetMotivationForCharacterInSceneUseCase(get(), get())
+            SetMotivationForCharacterInSceneUseCase(get(), get(), get())
         }
 
         provide<SetMotivationForCharacterInSceneController> {
             SetMotivationForCharacterInSceneControllerImpl(
                 applicationScope.get(),
-                applicationScope.get(),
                 get(),
                 get()
             )
         }
+        scoped<SceneCharactersToolScope> {
+            hoist<SetMotivationForCharacterInSceneController> { projectScope }
+        }
 
         provide(SetMotivationForCharacterInScene.OutputPort::class) {
-            SetMotivationForCharacterInSceneNotifier(applicationScope.get())
+            SetMotivationForCharacterInSceneOutput(
+                get<CharacterGainedMotivationInSceneNotifier>(),
+                get<CharacterMotivationInSceneClearedNotifier>(),
+                get<CharacterIncludedInSceneNotifier>()
+            )
         }
     }
 
     private fun InProjectScope.listCharactersInScene() {
         provide<ListCharactersInScene> {
-            ListCharactersInSceneUseCase(get())
+            ListCharactersInSceneUseCase(get(), get(), get())
         }
 
-        provide {
-            ListCharactersInSceneController(applicationScope.get(), get())
+        provide<ListCharactersInSceneController> {
+            ListCharactersInSceneController.Implementation(
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get()
+            )
+        }
+        scoped<SceneCharactersToolScope> {
+            hoist<ListCharactersInSceneController> { projectScope }
         }
     }
 
@@ -324,7 +345,6 @@ object UseCases {
 
         provide<LinkLocationToSceneController> {
             LinkLocationToSceneControllerImpl(
-                applicationScope.get(),
                 applicationScope.get(),
                 get(),
                 get()
@@ -343,21 +363,28 @@ object UseCases {
 
         provide(RemoveCharacterFromSceneController::class) {
             RemoveCharacterFromSceneControllerImpl(
-                applicationScope.get(),
-                applicationScope.get(),
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                applicationScope.get<ThreadTransformer>().guiContext,
+                get(),
+                get(),
+                get(),
+                get(),
                 get(),
                 get()
             )
         }
+        scoped<SceneCharactersToolScope> {
+            hoist<RemoveCharacterFromSceneController> { projectScope }
+        }
 
         provide(RemoveCharacterFromScene.OutputPort::class) {
-            RemoveCharacterFromSceneOutput(get())
+            RemoveCharacterFromSceneOutput(get<RemovedCharacterFromSceneNotifier>())
         }
     }
 
     private fun InProjectScope.reorderScene() {
         provide<GetPotentialChangesFromReorderingScene> {
-            GetPotentialChangesFromReorderingSceneUseCase(get())
+            GetPotentialChangesFromReorderingSceneUseCase(get(), get())
         }
         provide<ReorderScene> {
             ReorderSceneUseCase(get())
@@ -390,15 +417,6 @@ object UseCases {
         ) {
             CoverCharacterArcSectionsInSceneUseCase(get(), get())
         }
-        provide<ChangeCharacterArcSectionValueAndCoverInScene> {
-            ChangeCharacterArcSectionValueAndCoverInSceneUseCase(get(), get(), get())
-        }
-        provide(
-            CreateCharacterArcSectionAndCoverInScene::class,
-            GetAvailableCharacterArcSectionTypesForCharacterArc::class
-        ) {
-            CreateCharacterArcSectionAndCoverInSceneUseCase(get(), get())
-        }
         provide {
             ListAvailableArcSectionsToCoverInSceneController(applicationScope.get(), get())
         }
@@ -407,28 +425,27 @@ object UseCases {
             CoverArcSectionsInSceneControllerImpl(
                 applicationScope.get(),
                 get(),
-                get(),
-                get(),
                 get()
             )
         }
 
         provide(
-            CoverCharacterArcSectionsInScene.OutputPort::class,
-            ChangeCharacterArcSectionValueAndCoverInScene.OutputPort::class,
-            CreateCharacterArcSectionAndCoverInScene.OutputPort::class
+            CoverCharacterArcSectionsInScene.OutputPort::class
         ) {
-            CoverCharacterArcSectionsInSceneOutputPort(get(), get(), get())
+            CoverCharacterArcSectionsInSceneOutputPort(get(), get())
         }
     }
 
     private fun InProjectScope.assignRoleToCharacter() {
         provide<AssignRoleToCharacterInScene> {
-            AssignRoleToCharacterInSceneUseCase(get())
+            AssignRoleToCharacterInSceneUseCase(get(), get(), get())
         }
 
         provide {
             AssignRoleToCharacterInSceneController(applicationScope.get(), get(), get())
+        }
+        scoped<SceneCharactersToolScope> {
+            hoist<AssignRoleToCharacterInSceneController> { projectScope }
         }
         provide<AssignRoleToCharacterInScene.OutputPort> {
             AssignRoleToCharacterInSceneOutput(get())
@@ -437,36 +454,21 @@ object UseCases {
 
     private fun InProjectScope.setCharacterDesireInScene() {
         provide<SetCharacterDesireInScene> {
-            SetCharacterDesireInSceneUseCase(get())
+            SetCharacterDesireInSceneUseCase(get(), get(), get())
         }
 
         provide {
             SetCharacterDesireInSceneController(applicationScope.get(), get(), get())
+        }
+        scoped<SceneCharactersToolScope> {
+            hoist<SetCharacterDesireInSceneController> { projectScope }
         }
         provide<SetCharacterDesireInScene.OutputPort> {
             SetCharacterDesireInSceneOutput(get())
         }
     }
 
-    private fun InProjectScope.listOptionsToReplaceMention() {
-        provide<ListOptionsToReplaceMentionController> {
-            ListOptionsToReplaceMentionControllerImpl(
-                applicationScope.get(),
-                get()
-            )
-        }
-
-        provide<ListOptionsToReplaceMentionInSceneProse> {
-            ListOptionsToReplaceMentionInSceneProseUseCase(get(), get(), get(), get())
-        }
-    }
-
     private fun InProjectScope.synchronizeTrackedSymbolsWithProse() {
-        keepInScope {
-            SynchronizeTrackedSymbolsWithProseController(get(), get()).also {
-                it listensTo get<ContentReplacedNotifier>()
-            }
-        }
         provide<SynchronizeTrackedSymbolsWithProse> {
             SynchronizeTrackedSymbolsWithProseUseCase(get(), get(), get())
         }
@@ -606,6 +608,21 @@ object UseCases {
                 get(),
                 get()
             )
+        }
+    }
+
+    private fun InProjectScope.inspectCharacterInScene() {
+        provide<InspectCharacterInScene> {
+            InspectCharacterInSceneUseCase(get(), get(), get())
+        }
+        provide<InspectCharacterInSceneController> {
+            InspectCharacterInSceneController.Implementation(
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get()
+            )
+        }
+        scoped<SceneCharactersToolScope> {
+            hoist<InspectCharacterInSceneController> { projectScope }
         }
     }
 }

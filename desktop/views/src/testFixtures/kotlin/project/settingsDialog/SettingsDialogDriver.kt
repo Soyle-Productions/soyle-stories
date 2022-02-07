@@ -10,7 +10,7 @@ class SettingsDialogDriver(private val dialog: SettingsDialog) : FxRobot() {
 
     fun getDialogCheckbox(dialogType: DialogType): CheckBox
     {
-        return from(dialog.root).lookup("#${dialogType.name}").query()
+        return from(dialog.root).lookup("#${dialogType::class.simpleName}").query()
     }
 
     fun getSaveButton(): Button

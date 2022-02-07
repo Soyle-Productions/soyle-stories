@@ -163,7 +163,7 @@ class DemoteCharacterTest {
             if (charactersToInclude.isNullOrEmpty()) return@map theme
             charactersToInclude.fold(theme) { currentTheme, (character, promote) ->
                 val themeWithCharacter =
-                    currentTheme.withCharacterIncluded(character.id, character.name.value, character.media)
+                    currentTheme.withCharacterIncluded(character.id, character.displayName.value, character.media)
                 if (promote) themeWithCharacter.withCharacterPromoted(character.id)
                 else themeWithCharacter
 

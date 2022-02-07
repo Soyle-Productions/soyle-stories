@@ -3,6 +3,7 @@ package com.soyle.stories.location.details.components
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.surfaces.elevated
+import com.soyle.stories.common.components.surfaces.elevationProperty
 import com.soyle.stories.location.details.components.LocationDescription.Companion.locationDescription
 import com.soyle.stories.location.details.LocationDetailsActions
 import com.soyle.stories.location.details.LocationDetailsLocale
@@ -58,7 +59,7 @@ class LocationDetailsRoot(
         locationDescription(state.description, actions, locale)
         scenesHostedInLocation(state, actions, locale).apply {
             vgrow = Priority.ALWAYS
-            elevated().inheritedElevationProperty().bind(content.elevated().absoluteElevationProperty())
+            elevationProperty().bind(content.elevationProperty())
         }
     }
 

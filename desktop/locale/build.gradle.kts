@@ -5,6 +5,10 @@ plugins {
     id(plugin.constants.ideaExt)
 }
 
+dependencies {
+    implementation(project(":desktop:views"))
+}
+
 idea {
     module {
         (this as ExtensionAware).configure<org.jetbrains.gradle.ext.ModuleSettings> {

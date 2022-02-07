@@ -1,6 +1,7 @@
 package com.soyle.stories.theme.characterValueComparison
 
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.theme.oppositionValue.CharacterAddedToOpposition
 import com.soyle.stories.domain.theme.oppositionValue.RenamedOppositionValue
 import com.soyle.stories.domain.theme.valueWeb.ValueWeb
@@ -86,7 +87,7 @@ class CharacterValueComparisonPresenter(
         view.updateOrInvalidated {
             copy(
                 availableCharacters = response.map {
-                    CharacterItemViewModel(it.characterId.toString(), it.characterName, "")
+                    CharacterItemViewModel(Character.Id(it.characterId), it.characterName, "")
                 }
             )
         }

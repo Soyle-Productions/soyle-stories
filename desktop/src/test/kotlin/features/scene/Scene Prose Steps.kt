@@ -48,8 +48,8 @@ class `Scene Prose Steps` : En {
                 .givenSceneProseDoesNotMention(scene, mentionName)
         }
         Given(
-            "I have mentioned the {string} name variant for the {character} in the {scene}'s prose"
-        ) { nameVariant: String, character: Character, scene: Scene ->
+            "I have mentioned the {character} as {string} in the {scene}'s prose"
+        ) { character: Character, nameVariant: String, scene: Scene ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenSceneProseMentionsEntity(scene, MentionedCharacterId(character.id), nameVariant)
         }

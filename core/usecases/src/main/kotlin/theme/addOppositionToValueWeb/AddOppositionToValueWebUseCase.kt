@@ -51,8 +51,7 @@ class AddOppositionToValueWebUseCase(
     }
 
     private suspend fun getCharacter(firstLinkedItem: CharacterId) =
-        (characterRepository.getCharacterById(Character.Id(firstLinkedItem.characterId))
-            ?: throw CharacterDoesNotExist(firstLinkedItem.characterId))
+        characterRepository.getCharacterOrError(firstLinkedItem.characterId)
 
     private inner class Executor(
         val theme: Theme,
@@ -94,7 +93,7 @@ class AddOppositionToValueWebUseCase(
             return if (firstLinkedItem is CharacterId) {
                 val character = getCharacter(firstLinkedItem)
                 val executorWithCharacter = includeCharacterInThemeIfNeeded(character)
-                val symbolicItem = SymbolicRepresentation(character.id.uuid, character.name.value)
+                val symbolicItem = SymbolicRepresentation(character.id.uuid, character.displayName.value)
 
                 val executorWithoutRepresentation = if (valueWeb.hasRepresentation(symbolicItem.entityUUID)) {
                     executorWithCharacter.removeSymbolicItemFromValueWeb(symbolicItem)
@@ -156,7 +155,7 @@ class AddOppositionToValueWebUseCase(
             return if (theme.containsCharacter(character.id)) this
             else {
                 Executor(
-                    theme.withCharacterIncluded(character.id, character.name.value, character.media),
+                    theme.withCharacterIncluded(character.id, character.displayName.value, character.media),
                     valueWebId,
                     oppositionValueId,
                     response!!.let {
@@ -164,7 +163,7 @@ class AddOppositionToValueWebUseCase(
                             it.oppositionAddedToValueWeb,
                             it.symbolicRepresentationRemoved,
                             it.symbolicRepresentationAddedToOpposition,
-                            CharacterIncludedInTheme(theme.id.uuid, theme.name, character.id.uuid, character.name.value, false)
+                            CharacterIncludedInTheme(theme.id.uuid, theme.name, character.id.uuid, character.displayName.value, false)
                         )
                     }
                 )

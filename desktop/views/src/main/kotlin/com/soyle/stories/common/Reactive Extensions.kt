@@ -56,7 +56,7 @@ fun <Scope: Any, T> Scope.scopedListener(source: ObservableList<T>, listener: Sc
 /**
  * listens to the source observable value until the receiver is GC'd.
  */
-fun <T : Any, R : Any> Any.boundProperty(source: ObservableValue<T?>, selector: (T?) -> R?): Property<R?>
+fun <T, R : Any> Any.boundProperty(source: ObservableValue<T>, selector: (T?) -> R?): Property<R?>
 {
     val prop = SimpleObjectProperty<R>()
     scopedListener(source) { prop.value = selector(it) }

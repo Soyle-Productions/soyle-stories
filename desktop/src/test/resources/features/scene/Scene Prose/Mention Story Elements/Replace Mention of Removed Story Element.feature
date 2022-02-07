@@ -123,8 +123,8 @@ Feature: Replace Mention of Removed Story Element
 
     Scenario Outline: Story Element can be replaced by New Story Element
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
-      And I have removed the <element> <name> from the story
+      And I have mentioned the <name> <element> in the "Big Battle" scene's prose
+      And I have removed the <name> <element> from the story
       And I am editing the "Big Battle" scene's prose
       When I investigate the <name> mention in the "Big Battle" scene's prose
       Then I should be able to create a new <element> to replace the <name> mention in the "Big Battle" scene's prose
@@ -147,8 +147,8 @@ Feature: Replace Mention of Removed Story Element
 
     Scenario Outline: Create New Story Element to Replace Removed Mentioned Story Element
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
-      And I have removed the <element> <name> from the story
+      And I have mentioned the <name> <element> in the "Big Battle" scene's prose
+      And I have removed the <name> <element> from the story
       And I am editing the "Big Battle" scene's prose
       And I am investigating the <name> mention in the "Big Battle" scene's prose
       When I create a <element> named <replacement name> to replace the <name> mention in the "Big Battle" scene's prose

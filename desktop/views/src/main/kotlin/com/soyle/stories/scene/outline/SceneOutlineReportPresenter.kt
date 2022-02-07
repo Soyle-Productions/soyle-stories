@@ -6,7 +6,7 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.outline.item.OutlinedStoryEventItem
-import com.soyle.stories.storyevent.coverage.CoverStoryEventController
+import com.soyle.stories.storyevent.coverage.cover.CoverStoryEventController
 import com.soyle.stories.usecase.scene.storyevent.list.StoryEventsInScene
 import javafx.scene.control.MenuItem
 import kotlinx.coroutines.CompletableDeferred

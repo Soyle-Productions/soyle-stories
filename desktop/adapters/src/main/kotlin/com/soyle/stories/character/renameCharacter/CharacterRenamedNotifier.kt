@@ -1,7 +1,7 @@
 package com.soyle.stories.character.renameCharacter
 
 import com.soyle.stories.common.Notifier
-import com.soyle.stories.domain.character.CharacterRenamed
+import com.soyle.stories.domain.character.name.events.CharacterRenamed
 
 class CharacterRenamedNotifier : CharacterRenamedReceiver, Notifier<CharacterRenamedReceiver>() {
 

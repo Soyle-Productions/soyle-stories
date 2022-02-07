@@ -21,7 +21,7 @@ class SymbolicCharacterList : Fragment("Characters") {
         selectionModel.selectionMode = SelectionMode.SINGLE
         selectionModel.selectedItemProperty().onChange {
             if (it != null) {
-                viewListener.selectCharacter(it.characterId)
+                viewListener.selectCharacter(it.characterId.uuid.toString())
             }
         }
     }

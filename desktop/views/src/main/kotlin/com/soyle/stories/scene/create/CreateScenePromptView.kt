@@ -4,8 +4,11 @@ import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.dataDisplay.decorator.asDecorator
 import com.soyle.stories.common.components.dataDisplay.decorator.singleDecorator
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevation
 import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
+import com.soyle.stories.common.styleImporter
+import com.soyle.stories.scene.create.CreateScenePromptView.Styles.Companion.createScenePrompt
+import javafx.geometry.Pos
 import tornadofx.*
 
 class CreateScenePromptView(
@@ -17,9 +20,10 @@ class CreateScenePromptView(
     }
 
     override val root = vbox {
-        asSurface { absoluteElevation = Elevation[16]!! }
-        addClass(Stylesheet.form)
+        elevation = Elevation.getValue(16)
+        addClass(createScenePrompt)
         vbox {
+            addClass(Stylesheet.form)
             fieldLabel("Name").labelFor = textfield {
                 disableWhen(viewModel.submitting())
                 requestFocus()
@@ -46,6 +50,34 @@ class CreateScenePromptView(
         }
     }
 
+    class Styles : Stylesheet() {
 
+        companion object {
+            val createScenePrompt by cssclass()
+
+            init {
+                styleImporter<Styles>()
+            }
+        }
+
+        init {
+            createScenePrompt {
+
+                form {
+
+                    padding = box(24.px)
+
+                }
+
+                buttonBar {
+                    alignment = Pos.CENTER_RIGHT
+                    spacing = 8.px
+                    padding = box(8.px)
+                }
+
+            }
+        }
+
+    }
 
 }

@@ -5,6 +5,7 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 
 data class StoryEventCoveredByScene(
     override val storyEventId: StoryEvent.Id,
+    val storyEventName: String,
     val sceneId: Scene.Id,
     val uncovered: StoryEventUncoveredFromScene?
 ) : StoryEventChange()

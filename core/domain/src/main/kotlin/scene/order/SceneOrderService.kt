@@ -12,11 +12,10 @@ class SceneOrderService {
     fun createScene(
         sceneOrder: SceneOrder,
         name: NonBlankString,
-        storyEventId: StoryEvent.Id,
         proseId: Prose.Id,
         index: Int = -1
     ): SceneOrderUpdate<Successful<SceneCreated>> {
-        val sceneUpdate = Scene.create(sceneOrder.projectId, name, storyEventId, proseId) as Successful
+        val sceneUpdate = Scene.create(sceneOrder.projectId, name, proseId) as Successful
         val update = sceneOrder.withScene(sceneUpdate.change, index)
         if (update is UnSuccessfulSceneOrderUpdate) {
             return update

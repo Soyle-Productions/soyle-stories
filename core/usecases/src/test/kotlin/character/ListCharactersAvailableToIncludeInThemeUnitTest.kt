@@ -65,7 +65,7 @@ class ListCharactersAvailableToIncludeInThemeUnitTest {
         fun `check characters have correct names`() {
             availableCharacters shouldBe charactersAvailableToIncludeInTheme {
                 it.forEach {
-                    assertEquals(expectedCharacters[Character.Id(it.characterId)]!!.name.value, it.characterName)
+                    assertEquals(expectedCharacters[Character.Id(it.characterId)]!!.displayName.value, it.characterName)
                 }
             }
         }
@@ -92,7 +92,7 @@ class ListCharactersAvailableToIncludeInThemeUnitTest {
 
     private fun givenTheme(withCharactersIncluded: List<Character> = listOf()) {
         themeRepository.themes[themeId] = withCharactersIncluded.fold(makeTheme(themeId, projectId = projectId)) { theme, character ->
-            theme.withCharacterIncluded(character.id, character.name.value, character.media)
+            theme.withCharacterIncluded(character.id, character.displayName.value, character.media)
         }
     }
 

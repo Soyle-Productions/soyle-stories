@@ -2,9 +2,8 @@ package com.soyle.stories.storyevent.time.normalization
 
 import com.soyle.stories.common.components.ComponentsStyles
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevation
 import com.soyle.stories.common.components.text.SectionTitle.Companion.sectionTitle
-import com.soyle.stories.common.components.text.TextStyles.Companion.section
 import com.soyle.stories.common.components.text.TextStyles.Companion.sectionTitle
 import javafx.application.Platform
 import javafx.geometry.Pos
@@ -17,7 +16,7 @@ class NormalizationPromptView(
 ) : Fragment() {
 
     override val root: Parent = vbox {
-        asSurface { absoluteElevation = Elevation[16]!! }
+        elevation = Elevation[16]!!
         addClass(Styles.normalizationPrompt)
         vbox {
             addClass(Stylesheet.form)

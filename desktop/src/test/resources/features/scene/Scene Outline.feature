@@ -13,7 +13,7 @@ Feature: Scene Outline
     And I am viewing the "Big Battle" scene outline
     When I add the "Something happens" story event to the "Big Battle" scene outline
     Then the "Something happens" story event should be listed in the "Big Battle" scene outline
-    And the "Big Battle" scene outline should not list a story event named "Big Battle"
+    And the "Big Battle" story event should be listed in the "Big Battle" scene outline
 
   Scenario: Remove Story Event from Scene Outline
     Given I am viewing the "Big Battle" scene outline

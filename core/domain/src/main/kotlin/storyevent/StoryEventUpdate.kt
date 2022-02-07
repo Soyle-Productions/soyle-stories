@@ -22,3 +22,13 @@ class UnSuccessful(
     override val reason: Throwable? = null
     ) : StoryEventUpdate<Nothing>(), Update.UnSuccessful<StoryEvent>
 typealias UnSuccessfulStoryEventUpdate = UnSuccessful
+
+operator fun <T : StoryEventChange> StoryEventUpdate<T>.component2(): Result<T> = result()
+
+fun <T : StoryEventChange> StoryEventUpdate<T>.result(): Result<T>
+{
+    return when (this) {
+        is Successful -> Result.success(change)
+        is UnSuccessful -> Result.failure(reason ?: Exception("Unsuccessful update"))
+    }
+}

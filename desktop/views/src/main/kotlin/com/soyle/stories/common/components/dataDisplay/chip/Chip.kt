@@ -3,8 +3,6 @@ package com.soyle.stories.common.components.dataDisplay.chip
 import com.soyle.stories.common.ColorStyles
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.ComponentsStyles
-import com.soyle.stories.common.components.surfaces.*
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
 import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.ObjectPropertyBase
@@ -18,7 +16,6 @@ import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.Node
 import javafx.scene.control.*
-import javafx.scene.paint.Color
 import javafx.scene.shape.SVGPath
 import javafx.scene.text.FontWeight
 import tornadofx.*

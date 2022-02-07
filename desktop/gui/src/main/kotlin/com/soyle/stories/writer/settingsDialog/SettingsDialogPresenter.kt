@@ -15,7 +15,7 @@ class SettingsDialogPresenter(
 			  dialogSectionLabel = "Dialogs Enabled",
 			  dialogs = response.dialogs.map {
 				  DialogSettingViewModel(
-					it.id.name,
+					it.id.toString(),
 					getDialogName(it.id),
 					it.shouldShow
 				  )
@@ -33,6 +33,8 @@ class SettingsDialogPresenter(
 			DialogType.DeleteSymbol -> "Confirm Delete Symbol Dialog"
 			DialogType.DeleteValueWeb -> "Confirm Delete Value Web Dialog"
 			DialogType.DeleteStoryEvent -> "Confirm Delete Story Event Dialog"
+			DialogType.DeleteCharacter -> "Confirm Delete Character Dialog"
+			is DialogType.Other -> "Confirm ${dialogType.useCase} Dialog"
 		}
 	}
 

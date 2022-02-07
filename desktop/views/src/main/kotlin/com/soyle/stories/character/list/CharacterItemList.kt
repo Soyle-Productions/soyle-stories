@@ -3,12 +3,11 @@ package com.soyle.stories.character.list
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.components.characterIcon
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface
-import com.soyle.stories.common.components.surfaces.Surface.Companion.noOverrides
-import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
+import com.soyle.stories.common.components.surfaces.surface
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.common.scopedListener
 import com.soyle.stories.di.get
+import com.soyle.stories.project.ProjectScope
 import javafx.scene.Parent
 import javafx.scene.control.TreeCell
 import javafx.scene.control.TreeItem
@@ -17,6 +16,7 @@ import tornadofx.*
 
 class CharacterItemList : Fragment() {
 
+    override val scope: ProjectScope = super.scope as ProjectScope
     private val viewModel = scope.get<CharacterListState>()
 
     private fun viewCharacterProfile(characterItem: CharacterItemViewModel, originatingCell: TreeCell<*>?)
@@ -27,37 +27,38 @@ class CharacterItemList : Fragment() {
 
     override val root: Parent = surface<TreeView<CharacterListState.CharacterListItem?>>(
         elevation = Elevation.getValue(8),
-        classes = noOverrides
-    ) {
-        root = TreeItem(null)
-        applyCharacterListBehavior()
-        isShowRoot = false
-        cellFormat {
-            when (it) {
-                is CharacterListState.CharacterListItem.CharacterItem -> {
-                    textProperty().cleanBind(it.character.stringBinding { it?.characterName })
-                    graphic = characterIcon(it.character.select { it.imageResource.toProperty() })
-                    disclosureNode.style { padding = box(7.px, 5.px, 0.px, 5.px) }
+        configure = {
+            root = TreeItem(null)
+            applyCharacterListBehavior()
+            isShowRoot = false
+            cellFormat {
+                when (it) {
+                    is CharacterListState.CharacterListItem.CharacterItem -> {
+                        textProperty().cleanBind(it.character.stringBinding { it?.characterName })
+                        graphic = characterIcon(it.character.select { it.imageResource.toProperty() })
+                        disclosureNode.style { padding = box(7.px, 5.px, 0.px, 5.px) }
+                    }
+                    is CharacterListState.CharacterListItem.ArcItem -> {
+                        text = it.arc.value.name
+                        graphic = null
+                    }
+                    else -> {}
                 }
-                is CharacterListState.CharacterListItem.ArcItem -> {
-                    text = it.arc.value.name
-                    graphic = null
+            }
+            setOnMouseClicked {
+                if (it.clickCount == 2) {
+                    val item = selectionModel.selectedItem ?: return@setOnMouseClicked
+                    val characterItem = item.value as? CharacterListState.CharacterListItem.CharacterItem
+                    if (characterItem != null) {
+                        val treeCell = lookupAll(".tree-cell").asSequence()
+                            .filterIsInstance<TreeCell<*>>()
+                            .find { it.treeItem == item }
+                        viewCharacterProfile(characterItem.character.value, treeCell)
+                    }
                 }
             }
         }
-        setOnMouseClicked {
-            if (it.clickCount == 2) {
-                val item = selectionModel.selectedItem ?: return@setOnMouseClicked
-                val characterItem = item.value as? CharacterListState.CharacterListItem.CharacterItem
-                if (characterItem != null) {
-                    val treeCell = lookupAll(".tree-cell").asSequence()
-                        .filterIsInstance<TreeCell<*>>()
-                        .find { it.treeItem == item }
-                    viewCharacterProfile(characterItem.character.value, treeCell)
-                }
-            }
-        }
-    }
+    )
 
     private fun TreeView<CharacterListState.CharacterListItem?>.applyCharacterListBehavior() {
         root.children.bind(viewModel.characters) { characterItem ->
@@ -78,6 +79,12 @@ class CharacterItemList : Fragment() {
                     is CharacterListState.CharacterListItem.CharacterItem -> items.setAll(
                         characterOptions(
                             scope,
+                            { itemViewModel ->
+                                val treeCell = lookupAll(".tree-cell").asSequence()
+                                    .filterIsInstance<TreeCell<*>>()
+                                    .find { it.treeItem.value == itemViewModel }
+                                viewCharacterProfile(it.character.value, treeCell)
+                            },
                             it.character.value
                         )
                     )

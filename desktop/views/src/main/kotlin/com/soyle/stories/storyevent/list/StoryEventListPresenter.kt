@@ -3,6 +3,7 @@ package com.soyle.stories.storyevent.list
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.rootMenu
+import com.soyle.stories.di.get
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.StoryEvent
@@ -10,11 +11,14 @@ import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventNoLongerHappens
 import com.soyle.stories.domain.storyevent.events.StoryEventRenamed
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
-import com.soyle.stories.storyevent.coverage.StoryEventCoverageController
+import com.soyle.stories.storyevent.coverage.cover.StoryEventCoverageController
 import com.soyle.stories.storyevent.create.CreateStoryEventController
 import com.soyle.stories.storyevent.create.StoryEventCreatedReceiver
+import com.soyle.stories.storyevent.details.StoryEventDetailsController
+import com.soyle.stories.storyevent.details.StoryEventDetailsPrompt
 import com.soyle.stories.storyevent.remove.RemoveStoryEventController
 import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensReceiver
+import com.soyle.stories.storyevent.remove.ramifications.removeStoryEventFromStoryRamifications
 import com.soyle.stories.storyevent.rename.RenameStoryEventController
 import com.soyle.stories.storyevent.rename.StoryEventRenamedReceiver
 import com.soyle.stories.storyevent.time.StoryEventRescheduledReceiver
@@ -23,7 +27,6 @@ import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventControll
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import javafx.beans.property.ObjectProperty
 import javafx.collections.ObservableList
-import javafx.scene.control.CheckMenuItem
 import javafx.scene.control.RadioMenuItem
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -35,9 +38,11 @@ import tornadofx.*
 import kotlin.collections.sortWith
 
 class StoryEventListPresenter(
+    private val scope: Scope,
     private val projectId: Project.Id,
 
     private val createStoryEventController: CreateStoryEventController,
+    private val getStoryEventDetailsController: StoryEventDetailsController,
     private val listStoryEventsController: ListStoryEventsController,
     private val renameStoryEventController: RenameStoryEventController,
     private val rescheduleStoryEventController: RescheduleStoryEventController,
@@ -120,6 +125,18 @@ class StoryEventListPresenter(
         createStoryEventController.create()
     }
 
+    override fun viewDetails(storyEventId: StoryEvent.Id) {
+        with(viewModel.value as? PopulatedStoryEventListViewModel) {
+            this?.focusOn(storyEventId)
+        }
+    }
+
+    override fun viewSelectedItemDetails() {
+        selectedItem {
+            viewDetails(it.id)
+        }
+    }
+
     override fun insertStoryEventBeforeSelectedItem() = insertStoryEvent(createStoryEventController::before)
     override fun insertStoryEventAtSameTimeAsSelectedItem() = insertStoryEvent(createStoryEventController::inPlaceWith)
     override fun insertStoryEventAfterSelectedItem() = insertStoryEvent(createStoryEventController::after)
@@ -156,7 +173,15 @@ class StoryEventListPresenter(
 
     override fun deleteSelectedItems() {
         val selectedItems = (viewModel.value as PopulatedStoryEventListViewModel).selectedItems
-        removeStoryEventController.removeStoryEvent(selectedItems.map { it.id }.toSet())
+        removeStoryEventController.removeStoryEvent(
+            selectedItems.map { it.id }.toSet(),
+            scope.get(),
+            removeStoryEventFromStoryRamifications(
+                scope,
+                scope.get(),
+                selectedItems.mapTo(LinkedHashSet(selectedItems.size)) { it.id }
+            )
+        )
     }
 
     override fun viewSelectedItemInTimeline() {
@@ -175,23 +200,23 @@ class StoryEventListPresenter(
         loadStoryEvents()
     }
 
-    private fun populatedViewModel(items: ObservableList<StoryEventListItemViewModel>): PopulatedStoryEventListViewModel
-    {
+    private fun populatedViewModel(items: ObservableList<StoryEventListItemViewModel>): PopulatedStoryEventListViewModel {
         return PopulatedStoryEventListViewModel(items).apply {
             requestingScenesToCover().onChange { _ ->
                 scenesToCover = null
-                if (! isRequestingScenesToCover) return@onChange
+                if (!isRequestingScenesToCover) return@onChange
                 val selectedItem = selectedItems.singleOrNull() ?: return@onChange
                 val deferred = CompletableDeferred<Scene.Id?>()
                 storyEventCoverageController.modifyStoryEventCoverage(selectedItem.id) { currentScene, sceneItems ->
-                    if (! isRequestingScenesToCover) return@modifyStoryEventCoverage null
+                    if (!isRequestingScenesToCover) return@modifyStoryEventCoverage null
                     scenesToCover = sceneItems.map {
-                        RadioMenuItem(it.sceneName).apply {
-                            id = Scene.Id(it.id).toString()
-                            isSelected = it.id == currentScene?.uuid
+                        RadioMenuItem(it.name).apply {
+                            id = it.scene.toString()
+                            isSelected = it.scene == currentScene
                             action {
                                 rootMenu?.hide()
-                                if (! deferred.isCompleted) deferred.complete(Scene.Id(it.id)) }
+                                if (!deferred.isCompleted) deferred.complete(it.scene)
+                            }
                         }
                     }
                     deferred.await()

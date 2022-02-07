@@ -19,6 +19,8 @@ import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRuler
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRulerComponent
 import javafx.collections.ObservableList
 import javafx.collections.ObservableSet
+import tornadofx.FX
+import tornadofx.Scope
 
 class TimelineViewPortComponentDouble(
     val dependencies: TimelineViewPortComponent.Dependencies = Dependencies(),
@@ -39,6 +41,9 @@ class TimelineViewPortComponentDouble(
     class Dependencies(
         override val removeStoryEventController: RemoveStoryEventController = RemoveStoryEventControllerDouble(),
         override val adjustStoryEventsTimeController: AdjustStoryEventsTimeController = AdjustStoryEventsTimeControllerDouble()
-    ) : TimelineViewPortComponent.Dependencies
+    ) : TimelineViewPortComponent.Dependencies {
+        override val scope: Scope
+            get() = FX.defaultScope
+    }
 
 }

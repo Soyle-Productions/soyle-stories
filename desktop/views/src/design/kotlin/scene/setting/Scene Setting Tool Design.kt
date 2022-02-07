@@ -12,13 +12,12 @@ import com.soyle.stories.desktop.view.testframework.SubComponent
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.scene.FocusedSceneViewModel
 import com.soyle.stories.scene.delete.SceneDeletedNotifier
 import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemModel
-import com.soyle.stories.scene.target.SceneTargeted
-import com.soyle.stories.scene.target.SceneTargetedNotifier
 import com.soyle.stories.usecase.location.listAllLocations.LocationItem
 import com.soyle.stories.usecase.scene.inconsistencies.SceneInconsistencies
 import com.soyle.stories.usecase.scene.inconsistencies.SceneSettingLocationInconsistencies
@@ -33,7 +32,7 @@ import tornadofx.booleanProperty
 
 class `Scene Setting Tool Design` : DesignTest() {
 
-    private val sceneTargetedNotifier = SceneTargetedNotifier()
+    private val focusedSceneViewModel = FocusedSceneViewModel()
 
     @State
     fun `no scene targeted`() = verifyDesign {
@@ -47,7 +46,7 @@ class `Scene Setting Tool Design` : DesignTest() {
             width = 400.0
             height = 600.0
             runBlocking {
-                sceneTargetedNotifier.receiveSceneTargeted(SceneTargeted(Scene.Id(), Prose.Id(), "Scene Name"))
+                focusedSceneViewModel.focusOn(Scene.Id())
             }
         }
     }
@@ -58,7 +57,7 @@ class `Scene Setting Tool Design` : DesignTest() {
             SceneSettingToolMockLocale(),
             SceneRenamedNotifier(),
             SceneDeletedNotifier(),
-            sceneTargetedNotifier,
+            focusedSceneViewModel,
             SceneSettingItemListFactory()
         )
 

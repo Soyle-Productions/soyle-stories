@@ -1,12 +1,12 @@
 package com.soyle.stories.domain.scene.character
 
-import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneUpdate
-import com.soyle.stories.domain.scene.character.events.CharacterInSceneEvent
+import com.soyle.stories.domain.scene.character.events.CharacterRemovedFromScene
 import com.soyle.stories.domain.scene.character.events.CharacterRoleInSceneChanged
-import com.soyle.stories.domain.scene.events.CharacterDesireInSceneChanged
+import com.soyle.stories.domain.scene.character.events.CharacterDesireInSceneChanged
+import com.soyle.stories.domain.scene.character.events.CharacterMotivationInSceneChanged
 import com.soyle.stories.domain.scene.events.CompoundEvent
-import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.scene.events.SceneEvent
 
 interface CharacterInSceneOperations {
 
@@ -14,11 +14,8 @@ interface CharacterInSceneOperations {
 
     fun desireChanged(desire: String): SceneUpdate<CharacterDesireInSceneChanged>
 
-    fun motivationChanged(motivation: String?): Scene
+    fun motivationChanged(motivation: String?): SceneUpdate<CharacterMotivationInSceneChanged>
 
-    @Deprecated(message = "Should not be called from application code.  Only use from domain service", level = DeprecationLevel.WARNING)
-    fun withoutSource(storyEventId: StoryEvent.Id): SceneUpdate<CharacterInSceneEvent>
-
-    fun removed(): Scene
+    fun removed(): SceneUpdate<CharacterRemovedFromScene>
 
 }

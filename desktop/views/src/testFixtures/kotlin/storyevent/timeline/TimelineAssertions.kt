@@ -23,6 +23,11 @@ class TimelineAssertions private constructor(private val access: TimelineAccess)
             TimelineAssertions(timeline.access()).apply(op)
     }
 
+    fun hasNotStoryEvents() {
+        val viewport = access.viewport ?: return
+        assertTrue(viewport.storyPointLabels.isEmpty())
+    }
+
     fun hasStoryPointLabel(storyEventId: StoryEvent.Id) {
         val viewport = access.viewport ?: fail("No story events have yet been loaded in the timeline.")
         assertTrue(

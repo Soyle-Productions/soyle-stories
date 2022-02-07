@@ -1,24 +1,14 @@
 package com.soyle.stories.usecase.scene
 
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.SceneLocaleDouble
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.scene.order.SceneOrder
-import com.soyle.stories.domain.scene.order.SceneOrderUpdate
 import com.soyle.stories.domain.scene.order.SuccessfulSceneOrderUpdate
-import com.soyle.stories.domain.shouldBe
-import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderSceneUseCase
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

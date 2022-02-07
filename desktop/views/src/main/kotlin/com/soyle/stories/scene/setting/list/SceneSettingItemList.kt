@@ -10,6 +10,7 @@ import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
 import com.soyle.stories.common.components.text.SectionTitle.Companion.sectionTitle
 import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
+import com.soyle.stories.common.markdown.markdown
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.LocationRemovedFromScene
@@ -230,11 +231,8 @@ class SceneSettingItemList(
         toggleClass(invitation, true)
         sceneSettingInviteImage()
         toolTitle { textProperty().bind(locale.useLocationsAsSceneSetting) }
-        textflow {
+        markdown(locale.noLocationUsedInSceneMessage).apply {
             addClass(TextStyles.fieldLabel)
-            dynamicContent(locale.noLocationUsedInSceneMessage) {
-                it?.invoke(this)
-            }
         }
         add(useLocationButton)
     }

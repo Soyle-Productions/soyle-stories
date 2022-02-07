@@ -5,7 +5,6 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterDesire
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterMoralWeakness
 import com.soyle.stories.usecase.character.arc.section.changeCharacterArcSectionValue.ChangeCharacterPsychologicalWeakness
-import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
 import kotlinx.coroutines.Job
 import java.util.*
 
@@ -18,9 +17,7 @@ class ChangeSectionValueControllerImpl(
     private val changeCharacterMoralWeakness: ChangeCharacterMoralWeakness,
     private val changeCharacterMoralWeaknessOutputPort: ChangeCharacterMoralWeakness.OutputPort,
     private val changeCharacterArcSectionValue: ChangeCharacterArcSectionValue,
-    private val changeCharacterArcSectionValueOutputPort: ChangeCharacterArcSectionValue.OutputPort,
-    private val changeCharacterArcSectionValueAndCoverInScene: ChangeCharacterArcSectionValueAndCoverInScene,
-    private val changeCharacterArcSectionValueAndCoverInSceneOutputPort: ChangeCharacterArcSectionValueAndCoverInScene.OutputPort
+    private val changeCharacterArcSectionValueOutputPort: ChangeCharacterArcSectionValue.OutputPort
 ) : ChangeSectionValueController {
 
     override fun changeDesire(themeId: String, characterId: String, desire: String) {
@@ -89,17 +86,5 @@ class ChangeSectionValueControllerImpl(
         value: String,
         sceneId: String
     ) {
-        val request = ChangeCharacterArcSectionValueAndCoverInScene.RequestModel(
-            UUID.fromString(themeId),
-            UUID.fromString(characterId),
-            UUID.fromString(arcSectionId),
-            UUID.fromString(sceneId),
-            value
-        )
-        threadTransformer.async {
-            changeCharacterArcSectionValueAndCoverInScene.invoke(
-                request, changeCharacterArcSectionValueAndCoverInSceneOutputPort
-            )
-        }
     }
 }

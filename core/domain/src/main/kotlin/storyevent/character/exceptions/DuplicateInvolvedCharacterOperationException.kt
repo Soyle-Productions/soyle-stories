@@ -14,7 +14,7 @@ internal fun storyEventAlreadyInvolvesCharacter(storyEventId: StoryEvent.Id, cha
     DuplicateInvolvedCharacterOperationException(characterId, storyEventId, "$storyEventId already involves $characterId")
 
 
-internal fun storyEventAlreadyWithoutCharacter(storyEventId: StoryEvent.Id, characterId: Character.Id) =
+fun storyEventAlreadyWithoutCharacter(storyEventId: StoryEvent.Id, characterId: Character.Id) =
     DuplicateInvolvedCharacterOperationException(characterId, storyEventId, "$storyEventId already without $characterId")
 
 internal fun involvedCharacterAlreadyHasName(storyEventId: StoryEvent.Id, characterId: Character.Id, name: String) =

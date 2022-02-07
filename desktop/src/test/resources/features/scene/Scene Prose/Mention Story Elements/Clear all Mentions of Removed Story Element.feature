@@ -10,8 +10,8 @@ Feature: Clear all Mentions of Removed Story Element
 
     Scenario Outline: Story Element Mention can be Cleared
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
-      And I have removed the <element> <name> from the story
+      And I have mentioned the <name> <element> in the "Big Battle" scene's prose
+      And I have removed the <name> <element> from the story
       And I am editing the "Big Battle" scene's prose
       When I investigate the <name> mention in the "Big Battle" scene's prose
       Then I should be able to clear the <name> mention in the "Big Battle" scene's prose
@@ -35,8 +35,8 @@ Feature: Clear all Mentions of Removed Story Element
 
     Scenario Outline: Clear Story Element Mention
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
-      And I have removed the <element> <name> from the story
+      And I have mentioned the <name> <element> in the "Big Battle" scene's prose
+      And I have removed the <name> <element> from the story
       And I am editing the "Big Battle" scene's prose
       And I am investigating the <name> mention in the "Big Battle" scene's prose
       When I clear the <name> mention from the "Big Battle" scene's prose

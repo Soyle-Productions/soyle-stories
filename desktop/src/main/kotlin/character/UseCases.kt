@@ -8,15 +8,16 @@ import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVa
 import com.soyle.stories.character.nameVariant.list.ListCharacterNameVariantsController
 import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantOutput
-import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
-import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantOutput
+import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
+import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryControllerImpl
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryOutput
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.character.renameCharacter.RenameCharacterControllerImpl
-import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStory
-import com.soyle.stories.usecase.character.removeCharacterFromStory.RemoveCharacterFromStoryUseCase
-import com.soyle.stories.usecase.character.renameCharacter.RenameCharacter
-import com.soyle.stories.usecase.character.renameCharacter.RenameCharacterUseCase
+import com.soyle.stories.usecase.character.remove.RemoveCharacterFromStory
+import com.soyle.stories.usecase.character.remove.RemoveCharacterFromStoryUseCase
+import com.soyle.stories.usecase.character.name.rename.RenameCharacter
+import com.soyle.stories.usecase.character.name.rename.RenameCharacterUseCase
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentController
 import com.soyle.stories.characterarc.addArcSectionToMoralArgument.AddArcSectionToMoralArgumentControllerImpl
 import com.soyle.stories.characterarc.eventbus.RenameCharacterOutput
@@ -36,26 +37,33 @@ import com.soyle.stories.usecase.character.arc.section.removeCharacterArcSection
 import com.soyle.stories.usecase.character.arc.viewBaseStoryStructure.ViewBaseStoryStructure
 import com.soyle.stories.usecase.character.arc.viewBaseStoryStructure.ViewBaseStoryStructureUseCase
 import com.soyle.stories.characterarc.viewBaseStoryStructure.ViewBaseStoryStructureController
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.domain.character.events.CharacterRemovedFromStory
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.AddCharacterArcSectionToMoralArgumentOutput
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArcUseCase
-import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariant
-import com.soyle.stories.usecase.character.nameVariant.create.AddCharacterNameVariantUseCase
-import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariants
-import com.soyle.stories.usecase.character.nameVariant.list.ListCharacterNameVariantsUseCase
-import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariant
-import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariantUseCase
-import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariant
-import com.soyle.stories.usecase.character.nameVariant.rename.RenameCharacterNameVariantUseCase
+import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacter
+import com.soyle.stories.usecase.character.buildNewCharacter.BuildNewCharacterUseCase
+import com.soyle.stories.usecase.character.name.create.AddCharacterNameVariant
+import com.soyle.stories.usecase.character.name.create.AddCharacterNameVariantUseCase
+import com.soyle.stories.usecase.character.name.list.ListCharacterNameVariants
+import com.soyle.stories.usecase.character.name.list.ListCharacterNameVariantsUseCase
+import com.soyle.stories.usecase.character.name.remove.RemoveCharacterNameVariant
+import com.soyle.stories.usecase.character.name.remove.RemoveCharacterNameVariantUseCase
+import com.soyle.stories.usecase.character.remove.GetPotentialChangesOfRemovingCharacterFromStory
+import com.soyle.stories.usecase.character.remove.GetPotentialChangesOfRemovingCharacterFromStoryUseCase
 
 object UseCases {
 
     init {
         scoped<ProjectScope> {
+
+            buildNewCharacter()
+
             provide(
                 ListAvailableArcSectionTypesToAddToMoralArgument::class,
                 AddCharacterArcSectionToMoralArgument::class
@@ -116,8 +124,13 @@ object UseCases {
             // name variants
             addNameVariant()
             listCharacterNameVariants()
-            renameCharacterNameVariant()
             removeCharacterNameVariant()
+        }
+    }
+
+    private fun InProjectScope.buildNewCharacter() {
+        provide<BuildNewCharacter> {
+            BuildNewCharacterUseCase(get(), get())
         }
     }
 
@@ -129,16 +142,16 @@ object UseCases {
             AddSectionToCharacterArcOutput(get())
         }
         provide<CreateArcSectionController> {
-            CreateArcSectionControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get())
+            CreateArcSectionControllerImpl(applicationScope.get(), get(), get(), get(), get())
         }
     }
 
     private fun InProjectScope.renameCharacter() {
         provide<RenameCharacter> {
-            RenameCharacterUseCase(get(), get(), get(), get())
+            RenameCharacterUseCase(get(), get())
         }
         provide(RenameCharacter.OutputPort::class) {
-            RenameCharacterOutput(get(), get(), get())
+            RenameCharacterOutput(get(), get())
         }
         provide<RenameCharacterController> {
             RenameCharacterControllerImpl(applicationScope.get(), get(), get())
@@ -147,12 +160,31 @@ object UseCases {
 
     private fun InProjectScope.removeCharacterFromStory() {
         provide<RemoveCharacterFromStory> {
-            RemoveCharacterFromStoryUseCase(get(), get(), get())
+            RemoveCharacterFromStoryUseCase(get())
         }
 
         provide(RemoveCharacterFromStory.OutputPort::class) {
-            RemoveCharacterFromStoryOutput(get(), get(), get())
+            RemoveCharacterFromStoryOutput(get<RemovedCharacterNotifier>())
         }
+
+        provide<RemoveCharacterFromStoryController> {
+            RemoveCharacterFromStoryControllerImpl(
+                applicationScope.get<ThreadTransformer>().guiContext,
+                applicationScope.get<ThreadTransformer>().asyncContext,
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
+
+        provide<GetPotentialChangesOfRemovingCharacterFromStory> {
+            GetPotentialChangesOfRemovingCharacterFromStoryUseCase(get(), get(), get())
+        }
+
     }
 
     private fun InProjectScope.viewBaseStoryStructure() {
@@ -183,18 +215,6 @@ object UseCases {
         }
         provide<ListCharacterNameVariants> {
             ListCharacterNameVariantsUseCase(get())
-        }
-    }
-
-    private fun InProjectScope.renameCharacterNameVariant() {
-        provide {
-            RenameCharacterNameVariantController(applicationScope.get(), get(), get())
-        }
-        provide<RenameCharacterNameVariant> {
-            RenameCharacterNameVariantUseCase(get(), get())
-        }
-        provide<RenameCharacterNameVariant.OutputPort> {
-            RenameCharacterNameVariantOutput(get(), get())
         }
     }
 

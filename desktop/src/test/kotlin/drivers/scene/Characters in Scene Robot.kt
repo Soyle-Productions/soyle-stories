@@ -1,71 +1,157 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
+import com.soyle.stories.character.create.CreateCharacterDialog
 import com.soyle.stories.characterarc.createArcSectionDialog.CreateArcSectionDialogView
+import com.soyle.stories.common.ViewOf
+import com.soyle.stories.desktop.config.drivers.awaitOrContinue
+import com.soyle.stories.desktop.config.drivers.awaitWithTimeout
 import com.soyle.stories.desktop.config.drivers.character.getCreateArcSectionDialog
 import com.soyle.stories.desktop.config.drivers.character.getCreateArcSectionDialogOrError
+import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialog
+import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialogOrError
 import com.soyle.stories.desktop.config.drivers.robot
+import com.soyle.stories.desktop.config.drivers.scene.character.getOpenStoryEventPrompt
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
-import com.soyle.stories.desktop.view.scene.sceneCharacters.drive
-import com.soyle.stories.desktop.view.scene.sceneCharacters.driver
+import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
+import com.soyle.stories.desktop.view.scene.sceneCharacters.`Scene Characters Access`.Companion.access
+import com.soyle.stories.desktop.view.scene.sceneCharacters.`Scene Characters Access`.Companion.drive
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.project.WorkBench
-import com.soyle.stories.scene.sceneCharacters.SceneCharactersView
+import com.soyle.stories.scene.characters.include.selectCharacter.CharacterSuggestion
+import com.soyle.stories.scene.characters.inspect.CharacterInSceneInspectionViewModel
+import com.soyle.stories.scene.characters.remove.ConfirmRemoveCharacterFromScenePromptView
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolComponent
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolViewModel
+import impl.org.controlsfx.skin.AutoCompletePopup
 import javafx.scene.control.ButtonBase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.javafx.awaitPulse
+import kotlinx.coroutines.withContext
 import tornadofx.FX
 
+fun WorkBench.givenSceneCharactersToolHasBeenOpened(): SceneCharactersToolComponent =
+    getOpenSceneCharactersTool() ?: run {
+        openSceneCharactersTool()
+        getOpenSceneCharactersToolOrError()
+    }
 
-fun WorkBench.givenSceneCharactersToolHasBeenOpened(): SceneCharactersView =
-    getOpenSceneCharactersTool() ?: openSceneCharactersTool().run { getOpenSceneCharactersToolOrError() }
+fun WorkBench.getOpenSceneCharactersToolOrError(scene: Scene? = null): SceneCharactersToolComponent =
+    getOpenSceneCharactersTool(scene) ?: error("No Scene Characters tool is open in the project")
 
-fun WorkBench.getOpenSceneCharactersToolOrError(): SceneCharactersView =
-    getOpenSceneCharactersTool() ?: error("No Scene Characters tool is open in the project")
-
-fun WorkBench.getOpenSceneCharactersTool(): SceneCharactersView? {
-    return (FX.getComponents(scope)[SceneCharactersView::class] as? SceneCharactersView)?.takeIf { it.currentWindow?.isShowing == true }
+fun WorkBench.getOpenSceneCharactersTool(scene: Scene? = null): SceneCharactersToolComponent? {
+    return (FX.getComponents(scope)[SceneCharactersToolComponent::class] as? SceneCharactersToolComponent)?.takeIf { it.currentWindow?.isShowing == true }
+    //    ?.takeIf { scene == null || (it.viewModel.sceneSelection.value as? SceneCharactersToolViewModel.SceneSelection.Selected)?.sceneId == scene.id }
 }
 
-fun WorkBench.openSceneCharactersTool() {
-    findMenuItemById("tools_scene characters")!!
-        .apply { robot.interact { fire() } }
+fun WorkBench.openSceneCharactersTool(scene: Scene? = null) {
+    findMenuItemById("tools_scene characters")!!.apply {
+            robot.interact { fire() }
+        }
+    awaitWithTimeout(1000) { getOpenSceneCharactersTool(scene) != null }
 }
 
-fun SceneCharactersView.givenFocusedOn(scene: Scene): SceneCharactersView {
-    if (!driver().isFocusedOn(scene)) focusOn(scene)
+fun SceneCharactersToolComponent.givenFocusedOn(scene: Scene): SceneCharactersToolComponent {
+    if (!access().isFocusedOn(scene)) focusOn(scene)
     return this
 }
 
-fun SceneCharactersView.focusOn(scene: Scene) {
-    scope.get<WorkBench>().givenSceneListToolHasBeenOpened()
-        .selectScene(scene)
+fun SceneCharactersToolComponent.focusOn(scene: Scene) {
+    scope.get<WorkBench>().givenSceneListToolHasBeenOpened().selectScene(scene)
+    awaitWithTimeout(1000) { access().isFocusedOn(scene) }
 }
 
-fun SceneCharactersView.includeCharacter(character: Character) {
-    drive {
-        includeCharacterSelection.show()
-        getAvailableCharacterItem(character)!!.fire()
-    }
-}
-
-fun SceneCharactersView.givenEditing(character: Character): SceneCharactersView
-{
-    if (!driver().isEditing(character.id)) editCharacter(character)
+fun SceneCharactersToolComponent.givenIncludingCharacter(): SceneCharactersToolComponent {
+    if (access().includeCharacterPopup?.isShowing != true) includeCharacter()
     return this
 }
 
-fun SceneCharactersView.removeCharacter(character: Character)
-{
-    givenEditing(character)
+fun SceneCharactersToolComponent.includeCharacter() {
     drive {
-        getCharacterEditorOrError().removeButton.fire()
+        includeCharacterSelection!!.fire()
+    }
+    awaitWithTimeout(1000) { drive { includeCharacterPopup?.isShowing == true } }
+}
+
+fun SceneCharactersToolComponent.givenCreatingNewCharacter(): CreateCharacterDialog {
+    if (getCreateCharacterDialog() == null) createNewCharacter()
+    return getCreateCharacterDialogOrError()
+}
+
+fun SceneCharactersToolComponent.createNewCharacter() {
+    givenIncludingCharacter()
+    drive {
+        createNewCharacterItem.fireEvent(AutoCompletePopup.SuggestionEvent(CharacterSuggestion(null)))
+    }
+    awaitWithTimeout(1000) { getCreateCharacterDialog() != null }
+}
+
+fun SceneCharactersToolComponent.givenCharacterChosen(character: Character): SceneCharactersToolComponent {
+    if (getOpenStoryEventPrompt() == null) chooseCharacter(character)
+    awaitWithTimeout(1000) { getOpenStoryEventPrompt() != null }
+    return this
+}
+
+fun SceneCharactersToolComponent.chooseCharacter(character: Character) {
+    drive {
+        clickOn(getAvailableCharacterItem(character)!!)
     }
 }
 
-fun SceneCharactersView.givenAvailableArcsToCoverHaveBeenRequestedFor(character: Character): SceneCharactersView {
-    givenEditing(character)
+fun SceneCharactersToolComponent.givenStoryEventSelected(storyEvent: StoryEvent): SceneCharactersToolComponent {
+    if (access().includeCharacterPopup?.isShowing != true || access().availableStoryEventItems.isNotEmpty()) {
+        selectStoryEvent(storyEvent)
+    }
+    return this
+}
+
+fun SceneCharactersToolComponent.selectStoryEvent(storyEvent: StoryEvent) {
+    drive {
+        clickOn(getAvailableStoryEventItem(storyEvent.id)!!)
+    }
+}
+
+fun SceneCharactersToolComponent.givenInspecting(characterId: Character.Id): ViewOf<CharacterInSceneInspectionViewModel> {
+    if (!access().isInspecting(characterId)) {
+        inspectCharacter(characterId)
+        awaitWithTimeout(1000) {
+            drive { isInspecting(characterId) }
+        }
+    }
+    return access().characterInspection!!
+}
+
+fun SceneCharactersToolComponent.givenRemovingCharacter(character: Character) {
+    givenInspecting(character.id)
+    drive {
+        characterInspection!!.removeButton.fire()
+    }
+}
+
+fun SceneCharactersToolComponent.openConfirmRemoveCharacterFromScenePrompt(characterId: Character.Id) {
+    givenInspecting(characterId)
+    drive {
+        characterInspection!!.removeButton.fire()
+    }
+    awaitOrContinue(1000) {
+        robot.getOpenDialog<ConfirmRemoveCharacterFromScenePromptView> { it.viewModel.isNeeded } != null
+    }
+}
+
+fun SceneCharactersToolComponent.removeCharacter(character: Character) {
+    givenInspecting(character.id)
+    drive {
+        characterInspection!!.removeButton.fire()
+    }
+}
+
+fun SceneCharactersToolComponent.givenAvailableArcsToCoverHaveBeenRequestedFor(character: Character): SceneCharactersToolComponent {
+    givenInspecting(character.id)
     val arcRequested = drive {
-        with(getCharacterEditorOrError()) {
+        with(characterInspection!!) {
             haveAvailableArcsToCoverBeenRequested()
         }
     }
@@ -73,50 +159,47 @@ fun SceneCharactersView.givenAvailableArcsToCoverHaveBeenRequestedFor(character:
     return this
 }
 
-private fun SceneCharactersView.editCharacter(character: Character) {
+private fun SceneCharactersToolComponent.inspectCharacter(characterId: Character.Id) {
     drive {
-        getCharacterItemOrError(character.id)
-            .editButton.fire()
+        getCharacterItem(characterId)!!.editButton.fire()
     }
 }
 
-fun SceneCharactersView.requestAvailableArcsToCoverFor(character: Character) {
-    givenEditing(character)
+fun SceneCharactersToolComponent.requestAvailableArcsToCoverFor(character: Character) {
+    givenInspecting(character.id)
     drive {
-        getCharacterEditorOrError().positionOnArcSelection.show()
+        characterInspection!!.positionOnArcSelection.show()
     }
 }
 
-fun SceneCharactersView.coverSectionInArc(arcName: String, sectionLabel: String) {
+fun SceneCharactersToolComponent.coverSectionInArc(arcName: String, sectionLabel: String) {
     drive {
-        getCharacterEditorOrError().positionOnArcSelection.show()
-        getCharacterEditorOrError().positionOnArcSelection.getSectionItemOrError(arcName, sectionLabel).fire()
+        characterInspection!!.positionOnArcSelection.show()
+        characterInspection!!.positionOnArcSelection.getSectionItemOrError(arcName, sectionLabel).fire()
     }
 }
 
-fun SceneCharactersView.uncoverSectionInArc(arcName: String, sectionLabel: String) {
+fun SceneCharactersToolComponent.uncoverSectionInArc(arcName: String, sectionLabel: String) {
     drive {
-        getCharacterEditorOrError().positionOnArcSelection.show()
-        getCharacterEditorOrError().positionOnArcSelection.getSectionItemOrError(arcName, sectionLabel).fire()
+        characterInspection!!.positionOnArcSelection.show()
+        characterInspection!!.positionOnArcSelection.getSectionItemOrError(arcName, sectionLabel).fire()
     }
 }
 
-fun SceneCharactersView.givenCreateNewSectionInArcSelected(arcName: String): CreateArcSectionDialogView {
+fun SceneCharactersToolComponent.givenCreateNewSectionInArcSelected(arcName: String): CreateArcSectionDialogView {
     val dialog = getCreateArcSectionDialog()
     if (dialog == null) {
         drive {
-            getCharacterEditorOrError().positionOnArcSelection.show()
-            getCharacterEditorOrError().positionOnArcSelection.getCreateArcSectionOptionOrError(arcName).fire()
+            characterInspection!!.positionOnArcSelection.show()
+            characterInspection!!.positionOnArcSelection.getCreateArcSectionOptionOrError(arcName).fire()
         }
         return getCreateArcSectionDialogOrError()
-    }
-    else return dialog
+    } else return dialog
 }
 
-fun SceneCharactersView.setDesireAs(desire: String)
-{
+fun SceneCharactersToolComponent.setDesireAs(desire: String) {
     drive {
-        with(getCharacterEditorOrError().desireInput) {
+        with(characterInspection!!.desireInput) {
             requestFocus()
             text = desire
             parent.requestFocus()
@@ -124,23 +207,24 @@ fun SceneCharactersView.setDesireAs(desire: String)
     }
 }
 
-fun SceneCharactersView.setMotivationAs(motivation: String)
-{
-    drive {
-        with(getCharacterEditorOrError().motivationInput) {
-            requestFocus()
-            text = motivation
-            parent.requestFocus()
+suspend fun SceneCharactersToolComponent.setMotivationAs(motivation: String) {
+    with(access()) {
+        withContext(Dispatchers.JavaFx) {
+            with(characterInspection!!.motivationInput) {
+                requestFocus()
+                text = motivation
+                parent.requestFocus()
+            }
         }
+        awaitPulse()
     }
 }
 
-fun SceneCharactersView.assignRole(role: String)
-{
+fun SceneCharactersToolComponent.assignRole(role: String) {
     drive {
         val roleToggle: ButtonBase = when (role) {
-            "Inciting Character" -> getCharacterEditorOrError().incitingCharacterToggle
-            else -> getCharacterEditorOrError().opponentCharacterToggle
+            "Inciting Character" -> characterInspection!!.incitingCharacterToggle
+            else -> characterInspection!!.opponentCharacterToggle
         }
         roleToggle.fire()
     }

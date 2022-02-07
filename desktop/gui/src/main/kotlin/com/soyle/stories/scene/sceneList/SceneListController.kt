@@ -1,6 +1,7 @@
 package com.soyle.stories.scene.sceneList
 
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.validation.NonBlankString
@@ -9,12 +10,12 @@ import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.outline.OutlineSceneController
 import com.soyle.stories.scene.renameScene.RenameSceneController
 import com.soyle.stories.scene.reorder.ReorderSceneController
-import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
-import java.util.*
+import com.soyle.stories.usecase.scene.list.ListAllScenes
+import com.soyle.stories.usecase.scene.list.SceneItem
 
 class SceneListController(
     private val threadTransformer: ThreadTransformer,
+    private val projectId: Project.Id,
     private val listAllScenes: ListAllScenes,
     private val listAllScenesOutputPort: ListAllScenes.OutputPort,
     private val renameSceneController: RenameSceneController,
@@ -24,7 +25,7 @@ class SceneListController(
 ) : SceneListViewListener {
     override fun getValidState() {
         threadTransformer.async {
-            listAllScenes.invoke(listAllScenesOutputPort)
+            listAllScenes.invoke(projectId, listAllScenesOutputPort)
         }
     }
 

@@ -10,6 +10,11 @@ plugins {
     id(plugin.constants.javafx) version plugin.constants.javaFxVersion
     id(plugin.constants.ideaExt)
     id("java-test-fixtures")
+    id("com.athaydes.osgi-run") version "1.6.0"
+}
+
+repositories {
+    maven(url = "https://sandec.jfrog.io/artifactory/repo")
 }
 
 sourceSets {
@@ -54,7 +59,7 @@ val integration: SourceSet by sourceSets.creating {
 
 javafx {
     version = "14"
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml"/*, 'javafx.web', 'javafx.swing'*/)
+    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml", "javafx.swing"/*, 'javafx.web'*/)
     configuration = "compileOnly"
 }
 
@@ -74,9 +79,10 @@ dependencies {
     }
     api (Libraries.kotlin.coroutines.core)
     api ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.2")
-    implementation( "org.controlsfx:controlsfx:11.1.0") {
+    api( "org.controlsfx:controlsfx:11.1.0") {
         exclude(group = "org.jetbrains.kotlin")
     }
+
     implementation( "org.fxmisc.richtext:richtextfx:0.10.6")
     implementation( "no.tornado:tornadofx-controlsfx:0.1.1")
 
@@ -93,6 +99,7 @@ dependencies {
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.4.2")
     testImplementation(Libraries.kotlin.coroutines.test)
     testImplementation(testFixtures(project(":desktop:adapters")))
+    testImplementation(project(":desktop:locale"))
 
     testFixturesApi( Libraries.junit.api)
     testFixturesApi( Libraries.junit.engine)
@@ -121,6 +128,7 @@ dependencies {
     designImplementation( Libraries.assertJ)
     designImplementation( "org.testfx:testfx-core:4.0.16-alpha")
     designImplementation( "org.testfx:testfx-junit5:4.0.16-alpha")
+    designImplementation("org.osgi:org.osgi.core:6.0.0")
 
     JavaFXPlatform.values().forEach { platform ->
         val cfg = configurations.create("javafx_" + platform.classifier)
@@ -165,7 +173,6 @@ project.parent?.tasks?.getByName("runtime")?.doLast {
         }
     }
 }
-
 
 idea {
     module {

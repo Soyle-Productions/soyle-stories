@@ -144,7 +144,7 @@ class ChangeCharacterPerspectivePropertyValueUnitTest {
         val theme = makeTheme(Theme.Id(themeId)).let {
             andCharacters.fold(it) { nextTheme, characterId ->
                 val character = makeCharacter(Character.Id(characterId), Project.Id())
-                nextTheme.withCharacterIncluded(character.id, character.name.value, character.media)
+                nextTheme.withCharacterIncluded(character.id, character.displayName.value, character.media)
             }
         }.let { theme ->
             if (andMajorCharacter != null) theme.getMinorCharacterById(Character.Id(andMajorCharacter))?.let {

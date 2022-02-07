@@ -107,7 +107,7 @@ class UseCharacterAsOpponentUnitTest {
                 themeRepository.givenTheme(
                     theme.withCharacterIncluded(perspectiveCharacter).withCharacterPromoted(perspectiveCharacter.id).let {
                         otherIncludedCharacters.fold(it) { nextTheme, character ->
-                            nextTheme.withCharacterIncluded(character.id, character.name.value, character.media)
+                            nextTheme.withCharacterIncluded(character.id, character.displayName.value, character.media)
                         }
                     }
                 )
@@ -131,7 +131,7 @@ class UseCharacterAsOpponentUnitTest {
                 result.forEach { availableCharacter ->
                     val backingCharacter =
                         otherIncludedCharacters.find { it.id.uuid == availableCharacter.characterId }!!
-                    availableCharacter.characterName.mustEqual(backingCharacter.name.value)
+                    availableCharacter.characterName.mustEqual(backingCharacter.displayName.value)
                 }
             }
 
@@ -199,7 +199,7 @@ class UseCharacterAsOpponentUnitTest {
                 val result = result as AvailableCharactersToUseAsOpponents
                 result.forEach { availableCharacter ->
                     val backingCharacter = otherCharacters.find { it.id.uuid == availableCharacter.characterId }!!
-                    availableCharacter.characterName.mustEqual(backingCharacter.name.value)
+                    availableCharacter.characterName.mustEqual(backingCharacter.displayName.value)
                 }
             }
 
@@ -272,7 +272,7 @@ class UseCharacterAsOpponentUnitTest {
 
                 val error = degenerateTest<CharacterDoesNotExist> { useCharacterAsOpponent() }
 
-                error.characterId.mustEqual(opponent.id.uuid)
+                error.characterId.mustEqual(opponent.id)
             }
 
         }
@@ -451,7 +451,7 @@ class UseCharacterAsOpponentUnitTest {
 
                 (result as UseCharacterAsMainOpponent.ResponseModel).mainOpponent shouldBe opponent(
                     opponent.id.uuid,
-                    opponent.name.value,
+                    opponent.displayName.value,
                     perspectiveCharacterId.uuid,
                     themeId.uuid,
                     true
@@ -505,7 +505,7 @@ class UseCharacterAsOpponentUnitTest {
 
                 val previousOpponent = (result as UseCharacterAsMainOpponent.ResponseModel).previousMainOpponent!!
                 previousOpponent.characterId.mustEqual(otherCharacter.id.uuid)
-                previousOpponent.characterName.mustEqual(otherCharacter.name.value)
+                previousOpponent.characterName.mustEqual(otherCharacter.displayName.value)
                 previousOpponent.opponentOfCharacterId.mustEqual(perspectiveCharacter.id.uuid)
                 previousOpponent.themeId.mustEqual(theme.id.uuid)
             }
@@ -532,7 +532,7 @@ class UseCharacterAsOpponentUnitTest {
                 assertEquals(StoryFunction.MainAntagonist, storyFunction)
                 theme.characters.asSequence().filterNot { it.id == opponentCharacter.id }.forEach {
                     assertNotEquals(StoryFunction.MainAntagonist, majorCharacter.getStoryFunctionsForCharacter(it.id)) {
-                        "Only ${opponentCharacter.name} should be the main antagonist.  Instead, ${it.name} was found to also " +
+                        "Only ${opponentCharacter.displayName} should be the main antagonist.  Instead, ${it.name} was found to also " +
                                 "be a main antagonist"
                     }
                 }
@@ -554,7 +554,7 @@ class UseCharacterAsOpponentUnitTest {
 
     private fun givenCharacterInTheme(character: Character, isMajorCharacter: Boolean = false) {
         themeRepository.themes[themeId] = themeRepository.themes[themeId]!!
-            .withCharacterIncluded(character.id, character.name.value, character.media).let {
+            .withCharacterIncluded(character.id, character.displayName.value, character.media).let {
                 if (isMajorCharacter) it.withCharacterPromoted(character.id)
                 else it
             }
@@ -571,7 +571,7 @@ class UseCharacterAsOpponentUnitTest {
 
     private fun themeWithCharacter(expectedCharacter: Character) = fun(actual: Theme) {
         val includedCharacter = actual.characters.single { it.id == expectedCharacter.id }
-        assertEquals(expectedCharacter.name.value, includedCharacter.name)
+        assertEquals(expectedCharacter.displayName.value, includedCharacter.name)
     }
 
     private fun themeWithCharacterAsOpponent() = fun(actual: Any?) {
@@ -585,7 +585,7 @@ class UseCharacterAsOpponentUnitTest {
 
     private fun opponent() = opponent(
         opponent.id.uuid,
-        opponent.name.value,
+        opponent.displayName.value,
         perspectiveCharacter.id.uuid,
         themeId.uuid,
         false

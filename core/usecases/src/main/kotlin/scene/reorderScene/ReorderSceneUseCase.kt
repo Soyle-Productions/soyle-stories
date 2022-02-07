@@ -2,9 +2,7 @@ package com.soyle.stories.usecase.scene.reorderScene
 
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.order.SceneOrderUpdate
-import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.SceneRepository
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
 
 class ReorderSceneUseCase(
   private val sceneRepository: SceneRepository

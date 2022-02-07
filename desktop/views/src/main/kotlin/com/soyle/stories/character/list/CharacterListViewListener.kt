@@ -8,9 +8,9 @@ interface CharacterListViewListener {
     fun openBaseStoryStructureTool(characterId: String, themeId: String)
     fun openCharacterValueComparison(themeId: String)
     fun openCentralConflict(themeId: String, characterId: String)
-    fun removeCharacter(characterId: String)
+//    fun removeCharacter(characterId: String)
     fun removeCharacterArc(characterId: String, themeId: String)
-    fun renameCharacter(characterId: String, newName: NonBlankString)
+    fun renameCharacter(characterId: String, currentName: NonBlankString, newName: NonBlankString)
     fun renameCharacterArc(characterId: String, themeId: String, newName: NonBlankString)
 
 }

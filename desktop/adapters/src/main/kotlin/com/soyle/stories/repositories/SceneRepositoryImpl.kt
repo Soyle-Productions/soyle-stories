@@ -16,14 +16,10 @@ class SceneRepositoryImpl : SceneRepository {
 	private val sceneOrder = mutableMapOf<Project.Id, SceneOrder>()
 
 	// indexes
-	private val scenesByStoryEventId = mutableMapOf<StoryEvent.Id, Scene.Id>()
 	private val scenesByProseId = mutableMapOf<Prose.Id, Scene.Id>()
 
 	override suspend fun createNewScene(scene: Scene) {
 		scenes[scene.id] = scene
-		scene.coveredStoryEvents.forEach {
-			scenesByStoryEventId[it] = scene.id
-		}
 		scenesByProseId[scene.proseId] = scene.id
 	}
 
@@ -50,30 +46,17 @@ class SceneRepositoryImpl : SceneRepository {
 		return sceneOrder[projectId]
 	}
 
-	override suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene? {
-		return scenesByStoryEventId[storyEventId]?.let { scenes[it] }
-	}
-
 	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =
 	  scenes[sceneId]
 
 	override suspend fun updateScene(scene: Scene) {
 		val oldScene = scenes[scene.id]
 		scenes[scene.id] = scene
-		oldScene?.coveredStoryEvents?.forEach {
-			scenesByStoryEventId.remove(it)
-		}
-		scene.coveredStoryEvents.forEach {
-			scenesByStoryEventId[it] = scene.id
-		}
 		scenesByProseId[scene.proseId] = scene.id
 	}
 
 	override suspend fun removeScene(sceneId: Scene.Id) {
 		val scene = scenes.remove(sceneId) ?: return
-		scene.coveredStoryEvents.forEach {
-			scenesByStoryEventId.remove(it)
-		}
 		scenesByProseId.remove(scene.proseId)
 	}
 

@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.view.storyevent.list
 
+import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.desktop.view.common.NodeAccess
 import com.soyle.stories.storyevent.list.StoryEventListItemViewModel
 import com.soyle.stories.storyevent.list.StoryEventListToolView
@@ -20,6 +21,8 @@ class StoryEventListToolAccess private constructor(private val tool: StoryEventL
             return result.getOrThrow()
         }
     }
+
+    val welcomeMessage by temporaryChild<Labeled>(TextStyles.toolLevelTitle) { it.text == "No Story Events Yet" }
 
     val createStoryEventButton by temporaryChild<Button>(Stylesheet.button) { it.id == "create-story-event" }
     val storyEventList by temporaryChild<ListView<StoryEventListItemViewModel>>(Stylesheet.listView)

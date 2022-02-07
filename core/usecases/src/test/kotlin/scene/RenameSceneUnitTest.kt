@@ -124,7 +124,7 @@ class RenameSceneUnitTest {
 	}
 
     private fun requestModel(withName: NonBlankString = inputName) =
-        RenameScene.RequestModel(scene.id.uuid, withName, SceneLocaleDouble())
+        RenameScene.RequestModel(scene.id.uuid, withName)
 
     private fun output() = object : RenameScene.OutputPort {
         override suspend fun receiveRenameSceneFailure(failure: Exception) {

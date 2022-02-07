@@ -1,83 +1,40 @@
 package com.soyle.stories.storyevent.remove
 
+import com.soyle.stories.character.removeCharacterFromStory.ConfirmationPrompt
+import com.soyle.stories.common.Confirmation
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.ramifications.confirmation.ConfirmationPromptViewModel
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
+import javafx.beans.value.ObservableValue
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
+import kotlinx.coroutines.CompletableDeferred
 import tornadofx.*
 
-class RemoveStoryEventConfirmationPromptViewModel(
-    private val threadTransformer: ThreadTransformer
-) {
+class RemoveStoryEventConfirmationPromptViewModel : RemoveStoryEventConfirmationPrompt, ConfirmationPromptViewModel() {
 
-    private enum class Invariant(
-        val isShowing: Boolean,
-        val isConfirming: Boolean,
-        val canConfirm: Boolean,
-        val isCompleted: Boolean
-    ) {
+    private val _items = observableListOf<String>()
+    val items: List<String> by lazy { FXCollections.unmodifiableObservableList(_items) }
+    fun items(): ObservableList<String> = items as ObservableList<String>
 
-        Undefined(false, false, false, false),
-        Unneeded(false, true, false, false),
-        AwaitingConfirmation(true, false, true, false),
-        Confirming(true, true, false, false),
-        Confirmed(false, false, false, true)
+    private val _hasMultiple by lazy { booleanBinding(_items) { _items.size > 1 } }
+    fun hasMultiple(): ObservableValue<Boolean> = _hasMultiple
 
-    }
+    override suspend fun confirmRemoveStoryEventsFromProject(storyEvents: List<StoryEvent>): Confirmation<ConfirmationPrompt.Response> {
+        val confirmation = CompletableDeferred<Confirmation<ConfirmationPrompt.Response>>()
 
-    private val invariantProperty: ObjectProperty<Invariant> = objectProperty<Invariant>(Invariant.Undefined)
-    private var invariant: Invariant
-        get() = invariantProperty.value
-        set(value) {
-            if (threadTransformer.isGuiThread()) invariantProperty.set(value)
-            else threadTransformer.gui { invariantProperty.set(value) }
-        }
+        _items.setAll(storyEvents.map { it.name.value })
+        _isNeeded.set(true)
 
-    private val showingProperty: BooleanBinding = invariantProperty.booleanBinding { it!!.isShowing }
-    fun showing(): BooleanExpression = showingProperty
-    val isShowing: Boolean by showingProperty
+        onConfirm = { confirmation.complete(Confirmation(ConfirmationPrompt.Response.Confirm, !doNotShowAgain)) }
+        onCheck = { confirmation.complete(Confirmation(ConfirmationPrompt.Response.ShowRamifications, !doNotShowAgain)) }
+        onCancel = { confirmation.cancel() }
 
-    private val completedProperty: BooleanBinding = invariantProperty.booleanBinding { it!!.isCompleted }
-    fun completed(): BooleanExpression = completedProperty
-    val isCompleted: Boolean by completedProperty
-
-    val isConfirming: Boolean get() = invariant.isConfirming
-
-    private val canConfirmProperty: BooleanBinding = invariantProperty.booleanBinding { it!!.canConfirm }
-    fun canConfirm(): BooleanExpression = canConfirmProperty
-    val canConfirm: Boolean by canConfirmProperty
-
-    private val shouldNotShowAgainProperty: BooleanProperty = booleanProperty()
-    fun shouldNotShowAgain() = shouldNotShowAgainProperty
-    var shouldNotShowAgain: Boolean by shouldNotShowAgainProperty
-
-    fun unneeded() {
-        invariant = Invariant.Unneeded
-        shouldNotShowAgain = true
-    }
-
-    fun needed() {
-        invariant = Invariant.AwaitingConfirmation
-    }
-
-    fun cancel() {
-        if (!isShowing) return
-        invariant = Invariant.Confirmed
-    }
-
-    fun confirm() {
-        if (!isShowing) return
-        invariant = Invariant.Confirming
-    }
-
-    fun failed() {
-        invariant = Invariant.AwaitingConfirmation
-    }
-
-    fun complete() {
-        if (!isConfirming) return
-        invariant = Invariant.Confirmed
+        return confirmation.await().also { _isNeeded.set(false) }
     }
 
 }

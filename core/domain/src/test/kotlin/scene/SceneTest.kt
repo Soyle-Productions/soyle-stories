@@ -24,28 +24,25 @@ class SceneTest {
 
         val projectId = Project.Id()
         val proseId = Prose.Id()
-        val storyEventId = StoryEvent.Id()
         val inputName = sceneName()
 
         @Test
         fun `should produce new scene with provided inputs`() {
-            val update: SceneUpdate<*> = Scene.create(projectId, inputName, storyEventId, proseId)
+            val update: SceneUpdate<*> = Scene.create(projectId, inputName, proseId)
 
             update.scene.name.mustEqual(inputName)
             update.scene.projectId.mustEqual(projectId)
-            update.scene.coveredStoryEvents.single().mustEqual(storyEventId)
             update.scene.proseId.mustEqual(proseId)
         }
 
         @Test
         fun `should produce scene created event`() {
-            val update: SceneUpdate<SceneCreated> = Scene.create(projectId, inputName, storyEventId, proseId)
+            val update: SceneUpdate<SceneCreated> = Scene.create(projectId, inputName, proseId)
 
             update as Successful
             update.event.sceneId.mustEqual(update.scene.id)
             update.event.name.mustEqual(update.scene.name)
             update.event.proseId.mustEqual(update.scene.proseId)
-            update.event.storyEventId.mustEqual(update.scene.coveredStoryEvents.single())
         }
 
     }

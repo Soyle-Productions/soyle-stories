@@ -190,7 +190,7 @@ class `Character in Theme Steps` : En {
             "the {character} should be included in the {theme}'s character value comparison"
         ) { character: Character, theme: Theme ->
             theme.getIncludedCharacterById(character.id)
-                ?: fail("Character ${character.name} was not included in the ${theme.name} theme")
+                ?: fail("Character ${character.displayName} was not included in the ${theme.name} theme")
 
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenThemeListToolHasBeenOpened()

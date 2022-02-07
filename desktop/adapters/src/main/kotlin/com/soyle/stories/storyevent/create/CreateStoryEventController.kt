@@ -92,6 +92,7 @@ interface CreateStoryEventController {
                         CreateStoryEvent.RequestModel(
                             name,
                             projectId,
+                            null,
                             time
                         ),
                         createStoryEventOutput

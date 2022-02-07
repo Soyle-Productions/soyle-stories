@@ -3,6 +3,7 @@ package com.soyle.stories.desktop.view.storyevent.timeline.viewport.grid.label
 import com.soyle.stories.desktop.view.storyevent.timeline.TimelineAssertions
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.testfx.assertions.api.AbstractParentAssert
 
 class StoryPointLabelAssertions(val label: StoryPointLabel) :
@@ -19,6 +20,10 @@ class StoryPointLabelAssertions(val label: StoryPointLabel) :
     }
     fun isAtTime(expectedTime: Long) {
         assertEquals(expectedTime, label.time)
+    }
+
+    fun isEmphasized() {
+        assertTrue(label.isEmphasized)
     }
 
 }

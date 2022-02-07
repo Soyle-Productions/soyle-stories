@@ -3,7 +3,7 @@ package com.soyle.stories.usecase.scene.symbol.trackSymbolInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SymbolUnpinnedFromScene
 import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
-import com.soyle.stories.domain.scene.Updated
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.usecase.prose.ProseRepository
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -21,7 +21,7 @@ class UnpinSymbolFromSceneUseCase(
         else
             scene.withoutSymbolTracked(symbolId)
 
-        if (sceneUpdate is Updated) {
+        if (sceneUpdate is Successful) {
             sceneRepository.updateScene(sceneUpdate.scene)
             output.symbolUnpinnedFromScene(
                 UnpinSymbolFromScene.ResponseModel(

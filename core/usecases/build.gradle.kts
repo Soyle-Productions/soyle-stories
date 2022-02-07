@@ -28,6 +28,7 @@ dependencies {
     testImplementation(Libraries.junit.api)
     testImplementation(Libraries.junit.engine)
     testImplementation(Libraries.junit.params)
+    testImplementation(Libraries.kotlin.coroutines.test)
     testImplementation(testFixtures(project(path = ":core:domain")))
     testImplementation(Libraries.kluent)
 
@@ -36,8 +37,9 @@ dependencies {
 }
 
 tasks.getByName<Test>("test") {
-    reports.junitXml.isEnabled = false
-    reports.html.isEnabled = false
+//    reports.junitXml.isEnabled = false
+//    reports.html.isEnabled = false
+    reports.forEach { it.isEnabled = false }
 }
 
 task<Test>("integrationTest") {

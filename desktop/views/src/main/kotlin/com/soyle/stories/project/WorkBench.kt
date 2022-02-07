@@ -1,6 +1,6 @@
 package com.soyle.stories.project
 
-import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
+import com.soyle.stories.character.create.createCharacter
 import com.soyle.stories.common.async
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.di.get
@@ -8,7 +8,6 @@ import com.soyle.stories.di.resolve
 import com.soyle.stories.layout.GroupSplitter
 import com.soyle.stories.layout.ToolGroup
 import com.soyle.stories.location.createLocationDialog.CreateLocationDialog
-import com.soyle.stories.project.dialogs.ActiveDialogsView
 import com.soyle.stories.project.layout.GroupSplitterViewModel
 import com.soyle.stories.project.layout.LayoutViewListener
 import com.soyle.stories.project.layout.ToolGroupViewModel
@@ -36,7 +35,6 @@ class WorkBench : View() {
 
     private val projectViewListener = resolve<ProjectListViewListener>(scope = scope.applicationScope)
     private val layoutViewListener = resolve<LayoutViewListener>()
-    private val activeDialogsView = resolve<ActiveDialogsView>()
     private val model = resolve<WorkBenchModel>()
 
     override val root: Parent = borderpane {
@@ -52,7 +50,7 @@ class WorkBench : View() {
                     separator()
                     item("Character") {
                         id = "file_new_character"
-                        action { createCharacterDialog(scope) }
+                        action { createCharacter(scope) }
                     }
                     item("Location") {
                         id = "file_new_location"

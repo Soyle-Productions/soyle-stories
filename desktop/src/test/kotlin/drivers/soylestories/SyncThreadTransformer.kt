@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.config.drivers.soylestories
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.config.drivers.robot
+import com.soyle.stories.desktop.config.soylestories.main
 import javafx.application.Platform
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.*
@@ -22,15 +23,19 @@ class SyncThreadTransformer : ThreadTransformer {
 	}
 
 	override val asyncContext: CoroutineContext
-		get() = asyncScope.coroutineContext
+		get() = asyncScope.coroutineContext + CoroutineExceptionHandler { coroutineContext, throwable ->
+			uncaughtExceptionHandler.uncaughtException(mainThread, throwable)
+		}
 
 	override val guiContext: CoroutineContext
-		get() = guiScope.coroutineContext
+		get() = Dispatchers.JavaFx + CoroutineExceptionHandler { coroutineContext, throwable ->
+			uncaughtExceptionHandler.uncaughtException(mainThread, throwable)
+		}
 
-	private val guiScope = CoroutineScope(Dispatchers.JavaFx)
+	private val guiScope = CoroutineScope(guiContext)
 	@Suppress("EXPERIMENTAL_IS_NOT_ENABLED")
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private val asyncScope: CoroutineScope = TestCoroutineScope()
+	override val asyncScope: CoroutineScope = TestCoroutineScope()
 	override fun isGuiThread(): Boolean = Platform.isFxApplicationThread()
 
 	override fun gui(update: suspend CoroutineScope.() -> Unit) {

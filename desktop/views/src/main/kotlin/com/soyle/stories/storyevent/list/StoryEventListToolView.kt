@@ -1,33 +1,43 @@
 package com.soyle.stories.storyevent.list
 
+import com.soyle.stories.common.boundProperty
+import com.soyle.stories.common.builders.build
 import com.soyle.stories.common.components.ComponentsStyles.Companion.filled
 import com.soyle.stories.common.components.ComponentsStyles.Companion.outlined
 import com.soyle.stories.common.components.ComponentsStyles.Companion.primary
 import com.soyle.stories.common.components.ComponentsStyles.Companion.secondary
 import com.soyle.stories.common.components.buttons.ButtonStyles.Companion.inviteButton
 import com.soyle.stories.common.components.buttons.ButtonStyles.Companion.noArrow
+import com.soyle.stories.common.components.buttons.primaryButton
 import com.soyle.stories.common.components.dataDisplay.list.ListStyles
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevated
+import com.soyle.stories.common.components.surfaces.elevation
+import com.soyle.stories.common.components.surfaces.elevationVariant
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.common.emptyProperty
-import com.soyle.stories.common.onChangeWithCurrent
-import com.soyle.stories.domain.storyevent.StoryEvent
-import javafx.application.Platform
+import com.soyle.stories.common.existsWhen
+import com.soyle.stories.di.get
+import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.storyevent.details.StoryEventDetails
+import com.soyle.stories.storyevent.details.StoryEventDetailsPrompt
+import com.soyle.stories.storyevent.details.StoryEventDetailsViewModel
 import javafx.beans.value.ObservableValue
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
-import javafx.event.EventHandler
+import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Node
+import javafx.scene.Parent
 import javafx.scene.control.*
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.scene.text.TextAlignment
 import tornadofx.*
 import java.lang.ref.WeakReference
 
 class StoryEventListToolView(
+    private val projectScope: ProjectScope,
     private val controller: StoryEventListViewActions,
     private val viewModel: ObservableValue<StoryEventListViewModel>,
 
@@ -84,17 +94,41 @@ class StoryEventListToolView(
     private inner class Populated(private val populatedViewModel: PopulatedStoryEventListViewModel) {
 
         init {
-            header()
-            list()
+            stackpane {
+                vgrow = Priority.ALWAYS
+                vbox {
+                    elevation = Elevation.getValue(8)
+                    header()
+                    list()
+                }
+
+                val storyEventDetailsViewModel = StoryEventDetailsViewModel(
+                    populatedViewModel.focusedStoryEvent(),
+                    projectScope.get()
+                )
+                vbox {
+                    elevation = Elevation.getValue(16)
+                    existsWhen(populatedViewModel.focusedStoryEvent().isNotNull)
+                }.build {
+                    hbox(
+                        alignment = Pos.CENTER_RIGHT
+                    ) {
+                        style { backgroundColor += Color.WHITE }
+                        padding = Insets(8.0)
+                        primaryButton("DONE") {
+                            action { populatedViewModel.focusOn(null) }
+                        }
+                    }
+                    add(StoryEventDetails(storyEventDetailsViewModel))
+                }
+            }
         }
 
-        private fun header() {
+        private fun Parent.header() {
             hbox {
                 style { padding = box(8.px) }
-                asSurface {
-                    inheritedElevation = Elevation.get(8)!!
-                    relativeElevation = Elevation.get(4)!!
-                }
+                elevation = Elevation.getValue(12)
+                elevationVariant = elevated(objectProperty(Elevation.getValue(4)))
                 button("Create New Story Event") {
                     addClass(primary, filled)
                     id = "create-story-event"
@@ -109,9 +143,9 @@ class StoryEventListToolView(
             }
         }
 
-        private fun list() {
+        private fun Parent.list() {
             listview<StoryEventListItemViewModel>(populatedViewModel.items) {
-                asSurface { inheritedElevation = Elevation[8]!! }
+                elevation = Elevation.getValue(8)
                 addClass(ListStyles.noCellShading)
                 selectionModel.selectionMode = SelectionMode.MULTIPLE
                 populatedViewModel.selectedItems.bindTo(selectionModel.selectedItems)
@@ -121,6 +155,7 @@ class StoryEventListToolView(
                         addClass(StoryEventListStyles.storyEventItem)
                         toggleClass(StoryEventListStyles.equalTime, itemProperty().select { it.prevItemHasSameTime })
                         contextMenuProperty().bind(itemProperty().objectBinding { storyEventContextMenu.takeIf { item != null } })
+                        onDoubleClick { item?.let { controller.viewDetails(item.id) } }
                     }
                 }
             }
@@ -173,6 +208,9 @@ class StoryEventListToolView(
                     lazyLoadSceneItems()
                 }
                 separator()
+                item("Details") {
+                    action { controller.viewSelectedItemDetails() }
+                }
                 item("View in Timeline") {
                     id = "view-in-timeline"
                     enableWhen(populatedViewModel.hasSingleSelection)

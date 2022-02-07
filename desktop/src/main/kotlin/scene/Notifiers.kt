@@ -1,22 +1,25 @@
 package com.soyle.stories.desktop.config.scene
 
-import com.soyle.stories.di.get
+import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.di.scoped
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneNotifier
-import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneReceiver
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolScope
 import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedNotifier
 import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedReceiver
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneNotifier
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionUncoveredInSceneReceiver
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneNotifier
 import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.CharacterArcSectionsCoveredBySceneReceiver
-import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludedCharacterInSceneNotifier
-import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludedCharacterInSceneReceiver
+import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.CharacterIncludedInSceneNotifier
+import com.soyle.stories.scene.charactersInScene.involve.CharacterInvolvedInSceneNotifier
+import com.soyle.stories.scene.charactersInScene.involve.CharacterInvolvedInSceneReceiver
 import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
-import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedNotifier
 import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
+import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.CharacterGainedMotivationInSceneNotifier
+import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.CharacterMotivationInSceneClearedNotifier
+import com.soyle.stories.scene.charactersInScene.source.added.SourceAddedToCharacterInSceneNotifier
+import com.soyle.stories.scene.charactersInScene.source.added.SourceAddedToCharacterInSceneReceiver
 import com.soyle.stories.scene.create.SceneCreatedNotifier
 import com.soyle.stories.scene.create.SceneCreatedReceiver
 import com.soyle.stories.scene.delete.SceneDeletedNotifier
@@ -29,19 +32,14 @@ import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsed
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneReceiver
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneNotifier
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneReceiver
-import com.soyle.stories.scene.outline.StoryEventAddedToSceneNotifier
-import com.soyle.stories.scene.outline.StoryEventAddedToSceneReceiver
-import com.soyle.stories.scene.outline.StoryEventRemovedFromSceneNotifier
-import com.soyle.stories.scene.outline.StoryEventRemovedFromSceneReceiver
 import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedNotifier
 import com.soyle.stories.scene.sceneFrame.SceneFrameValueChangedReceiver
-import com.soyle.stories.scene.target.SceneTargetedNotifier
-import com.soyle.stories.scene.target.SceneTargetedReceiver
 import com.soyle.stories.scene.trackSymbolInScene.*
-import com.soyle.stories.storyevent.coverage.StoryEventCoveredBySceneReceiver
-import com.soyle.stories.storyevent.coverage.StoryEventUncoveredBySceneReceiver
+import com.soyle.stories.storyevent.character.remove.CharacterRemovedFromStoryEventNotifier
+import com.soyle.stories.storyevent.coverage.uncover.StoryEventUncoveredBySceneNotifier
+import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensNotifier
 
 object Notifiers {
 
@@ -50,8 +48,11 @@ object Notifiers {
             provide(SceneCreatedReceiver::class) {
                 SceneCreatedNotifier()
             }
-            provide(IncludedCharacterInSceneReceiver::class) {
-                IncludedCharacterInSceneNotifier()
+            provide {
+                CharacterIncludedInSceneNotifier()
+            }
+            provide(CharacterInvolvedInSceneReceiver::class) {
+                CharacterInvolvedInSceneNotifier()
             }
             provide(CharacterArcSectionsCoveredBySceneReceiver::class) {
                 CharacterArcSectionsCoveredBySceneNotifier()
@@ -86,12 +87,6 @@ object Notifiers {
             provide(SceneSettingLocationRenamedReceiver::class) {
                 SceneSettingLocationRenamedNotifier()
             }
-            provide(RemovedCharacterFromSceneReceiver::class) {
-                RemovedCharacterFromSceneNotifier(applicationScope.get())
-            }
-            provide(RenamedCharacterInSceneReceiver::class) {
-                RenamedCharacterInSceneNotifier()
-            }
             provide(CharacterRoleInSceneChangedReceiver::class) {
                 CharacterRoleInSceneChangedNotifier()
             }
@@ -104,19 +99,26 @@ object Notifiers {
             provide(SceneRenamedReceiver::class) {
                 SceneRenamedNotifier()
             }
-            provide(SceneTargetedReceiver::class) {
-                SceneTargetedNotifier()
-            }
             provide(SceneInconsistenciesReceiver::class) {
                 SceneInconsistenciesNotifier()
             }
-            provide(StoryEventAddedToSceneReceiver::class) {
-                StoryEventAddedToSceneNotifier()
+            provide(SourceAddedToCharacterInSceneReceiver::class) {
+                SourceAddedToCharacterInSceneNotifier()
             }
-            provide(StoryEventRemovedFromSceneReceiver::class) {
-                StoryEventRemovedFromSceneNotifier()
+            provide { CharacterGainedMotivationInSceneNotifier() }
+            provide { CharacterMotivationInSceneClearedNotifier() }
+            provide { RemovedCharacterFromSceneNotifier() }
+            scoped<SceneCharactersToolScope> {
+                hoist<SceneRenamedNotifier> { projectScope }
+                hoist<CharacterInvolvedInSceneNotifier> { projectScope }
+                hoist<RemovedCharacterFromSceneNotifier> { projectScope }
+                hoist<CharacterIncludedInSceneNotifier> { projectScope }
+                hoist<CharacterRemovedFromStoryEventNotifier> { projectScope }
+                hoist<CharacterRoleInSceneChangedNotifier> { projectScope }
+                hoist<SourceAddedToCharacterInSceneNotifier>(SceneCharactersToolScope::projectScope)
+                hoist<CharacterGainedMotivationInSceneNotifier>(SceneCharactersToolScope::projectScope)
+                hoist<CharacterMotivationInSceneClearedNotifier>(SceneCharactersToolScope::projectScope)
             }
-
         }
     }
 }

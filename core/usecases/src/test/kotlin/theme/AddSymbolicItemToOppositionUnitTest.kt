@@ -14,7 +14,6 @@ import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.oppositionValue.*
 import com.soyle.stories.domain.theme.valueWeb.ValueWeb
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.domain.validation.SingleNonBlankLine
 import com.soyle.stories.usecase.character.CharacterDoesNotExist
 import com.soyle.stories.usecase.location.LocationDoesNotExist
 import com.soyle.stories.usecase.location.locationDoesNotExist
@@ -261,7 +260,7 @@ class AddSymbolicItemToOppositionUnitTest {
         val character = makeCharacter(characterId, Project.Id(), name)
         characterRepository.characters[characterId] = character
         if (inTheme) {
-            themeRepository.themes[themeId]!!.withCharacterIncluded(character.id, character.name.value, character.media)
+            themeRepository.themes[themeId]!!.withCharacterIncluded(character.id, character.displayName.value, character.media)
                 .let {
                     themeRepository.themes[themeId] = it
                 }

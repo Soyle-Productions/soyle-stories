@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.config.drivers.theme
 
-import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterForm
+import com.soyle.stories.character.create.CreateCharacterDialog
+import com.soyle.stories.character.create.CreateCharacterPromptView
 import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialogOrError
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.view.theme.characterComparison.`Character Card View Access`.Companion.access
@@ -13,11 +14,8 @@ import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.theme.oppositionValue.OppositionValue
 import com.soyle.stories.domain.theme.valueWeb.ValueWeb
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.theme.characterConflict.CharacterConflictScope
 import com.soyle.stories.theme.characterValueComparison.CharacterValueComparison
 import com.soyle.stories.theme.characterValueComparison.CharacterValueComparisonScope
-import com.soyle.stories.theme.createOppositionValueDialog.CreateOppositionValueDialog
-import com.soyle.stories.theme.createValueWebDialog.CreateValueWebDialog
 import com.soyle.stories.theme.themeList.ThemeList
 import com.soyle.stories.theme.valueWeb.create.CreateValueWebForm
 import com.soyle.stories.theme.valueWeb.opposition.create.CreateOppositionValueForm
@@ -25,7 +23,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.fail
 import tornadofx.FX
-import tornadofx.item
 
 fun ThemeList.givenCharacterComparisonToolHasBeenOpenedFor(themeId: Theme.Id): CharacterValueComparison {
     return getOpenCharacterComparisonToolFor(themeId) ?: openCharacterComparison(themeId).run {
@@ -52,7 +49,7 @@ fun CharacterValueComparison.addCharacter(character: Character)
     drive {
         addCharacterSelection.show()
         val availableCharacterItem = getAvailableCharacterToAdd(character.id)
-            ?: fail("Character ${character.name} is not available to be added to theme")
+            ?: fail("Character ${character.displayName} is not available to be added to theme")
         availableCharacterItem.fire()
     }
 }
@@ -73,7 +70,7 @@ fun CharacterValueComparison.loadAvailableValuesFor(characterId: Character.Id)
     }
 }
 
-fun CharacterValueComparison.givenCreateCharacterDialogHasBeenOpened(): CreateCharacterForm
+fun CharacterValueComparison.givenCreateCharacterDialogHasBeenOpened(): CreateCharacterDialog
 {
     drive {
         addCharacterSelection.show()

@@ -9,7 +9,7 @@ class StartNewProjectUseCase(
 ) : StartNewProject {
 
     override suspend fun invoke(name: NonBlankString, output: StartNewProject.OutputPort) {
-        val project = Project.startNew(name)
+        val (project) = Project.startNew(name)
 
         projectRepository.addNewProject(project)
         output.receiveStartNewProjectResponse(StartNewProject.ResponseModel(project.id.uuid, name.value))

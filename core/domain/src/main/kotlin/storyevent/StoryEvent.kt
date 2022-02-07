@@ -14,7 +14,7 @@ import com.soyle.stories.domain.storyevent.events.*
 import com.soyle.stories.domain.storyevent.character.exceptions.storyEventAlreadyInvolvesCharacter
 import com.soyle.stories.domain.storyevent.character.exceptions.storyEventAlreadyWithoutCharacter
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyCoveredByScene
-import com.soyle.stories.domain.storyevent.exceptions.storyEventAlreadyWithoutCoverage
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCoverage
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventException
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
@@ -95,13 +95,14 @@ class StoryEvent(
         return copy(sceneId = sceneId).updatedBy(
             StoryEventCoveredByScene(
                 id,
+                name.value,
                 sceneId,
                 currentSceneId?.let { StoryEventUncoveredFromScene(id, currentSceneId) })
         )
     }
 
     fun withoutCoverage(): StoryEventUpdate<StoryEventUncoveredFromScene> {
-        if (sceneId == null) return noUpdate(storyEventAlreadyWithoutCoverage(id))
+        if (sceneId == null) return noUpdate(StoryEventAlreadyWithoutCoverage(id))
         return copy(sceneId = null).updatedBy(StoryEventUncoveredFromScene(id, sceneId))
     }
 

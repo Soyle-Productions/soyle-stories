@@ -1,12 +1,14 @@
 package com.soyle.stories.character.list
 
+import com.soyle.stories.character.delete.confirmDeleteCharacterPrompt
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.usecase.character.arc.listAllCharacterArcs.ListAllCharacterArcs
-import com.soyle.stories.usecase.character.renameCharacter.RenameCharacter
 import com.soyle.stories.usecase.character.arc.renameCharacterArc.RenameCharacterArc
+import com.soyle.stories.usecase.character.name.rename.RenameCharacter
 import com.soyle.stories.usecase.theme.demoteMajorCharacter.DemoteMajorCharacter
 import java.util.*
 
@@ -45,19 +47,29 @@ class CharacterListController(
         openToolController.openCentralConflict(themeId, characterId)
     }
 
-    override fun renameCharacter(characterId: String, newName: NonBlankString) {
+    override fun renameCharacter(characterId: String, currentName: NonBlankString, newName: NonBlankString) {
+        val request = RenameCharacter.RequestModel(
+            Character.Id(UUID.fromString(characterId)),
+            currentName,
+            newName
+        )
         threadTransformer.async {
             renameCharacter.invoke(
-              UUID.fromString(characterId),
-              newName,
-              renameCharacterOutputPort
+                request,
+                renameCharacterOutputPort
             )
         }
     }
-
-    override fun removeCharacter(characterId: String) {
-        removeCharacterFromStoryController.requestRemoveCharacter(characterId)
-    }
+//
+//    override fun removeCharacter(
+//        characterId: String,
+//    ) {
+//        removeCharacterFromStoryController.removeCharacter(
+//            Character.Id(UUID.fromString(characterId)),
+//            confirmDeleteCharacterPrompt(scope),
+//            null
+//        )
+//    }
 
     override fun removeCharacterArc(characterId: String, themeId: String) {
         threadTransformer.async {
@@ -72,12 +84,12 @@ class CharacterListController(
     override fun renameCharacterArc(characterId: String, themeId: String, newName: NonBlankString) {
         threadTransformer.async {
             renameCharacterArc.invoke(
-              RenameCharacterArc.RequestModel(
-                UUID.fromString(characterId),
-                UUID.fromString(themeId),
-                newName
-              ),
-              renameCharacterArcOutputPort
+                RenameCharacterArc.RequestModel(
+                    UUID.fromString(characterId),
+                    UUID.fromString(themeId),
+                    newName
+                ),
+                renameCharacterArcOutputPort
             )
         }
     }

@@ -9,7 +9,7 @@ import java.util.*
 
 interface RenameScene {
 
-	class RequestModel(val sceneId: UUID, val name: NonBlankString, val locale: SceneLocale)
+	class RequestModel(val sceneId: UUID, val name: NonBlankString)
 
 	suspend operator fun invoke(request: RequestModel, output: OutputPort)
 

@@ -232,7 +232,7 @@ class ExamineCentralConflictOfThemeUnitTest {
             themeRepository.themes[themeId] = themeRepository.themes.getValue(themeId).let {
                 (1..count).fold(it) { theme, i ->
                     val opponent = makeCharacter()
-                    theme.withCharacterIncluded(opponent.id, opponent.name.value, opponent.media)
+                    theme.withCharacterIncluded(opponent.id, opponent.displayName.value, opponent.media)
                         .withCharacterAsStoryFunctionForMajorCharacter(
                             opponent.id,
                             StoryFunction.Antagonist,

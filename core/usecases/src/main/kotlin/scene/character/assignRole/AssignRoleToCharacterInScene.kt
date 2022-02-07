@@ -1,9 +1,10 @@
 package com.soyle.stories.usecase.scene.character.assignRole
 
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.scene.RoleInScene
+import com.soyle.stories.domain.scene.character.RoleInScene
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.events.CharacterRoleInSceneChanged
+import com.soyle.stories.domain.scene.character.events.CharacterIncludedInScene
+import com.soyle.stories.domain.scene.character.events.CharacterRoleInSceneChanged
 import com.soyle.stories.domain.scene.events.CompoundEvent
 
 interface AssignRoleToCharacterInScene {
@@ -16,9 +17,12 @@ interface AssignRoleToCharacterInScene {
 
     suspend operator fun invoke(request: RequestModel, output: OutputPort)
 
-    class ResponseModel(val characterRolesInSceneChanged: CompoundEvent<CharacterRoleInSceneChanged>?)
+    class ResponseModel(
+        val characterIncludedInScene: CharacterIncludedInScene?,
+        val characterRolesInSceneChanged: CompoundEvent<CharacterRoleInSceneChanged>?
+    )
 
-    interface OutputPort {
+    fun interface OutputPort {
         suspend fun roleAssignedToCharacterInScene(response: ResponseModel)
     }
 }

@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
-import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterForm
+import com.soyle.stories.character.create.CreateCharacterDialog
+import com.soyle.stories.character.create.CreateCharacterPromptView
 import com.soyle.stories.desktop.config.drivers.character.getCreateCharacterDialogOrError
 import com.soyle.stories.desktop.config.drivers.location.getCreateLocationDialogOrError
 import com.soyle.stories.desktop.config.drivers.theme.getCreateSymbolDialogOrError
@@ -238,7 +239,7 @@ fun SceneEditorView.selectReplacementSuggestion(suggestionText: String)
     }
 }
 
-fun SceneEditorView.givenReplacingInvestigatedMentionWithNewCharacter(): CreateCharacterForm
+fun SceneEditorView.givenReplacingInvestigatedMentionWithNewCharacter(): CreateCharacterDialog
 {
     val replacementOption = with(driver().getProseEditor().driver()) {
         mentionIssueMenu!!.replacementOption()!!

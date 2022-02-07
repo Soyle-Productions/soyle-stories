@@ -10,7 +10,7 @@ import java.io.File
 
 class ProjectFileRepository(
     private val fileStore: FileStore<ProjectFile>
-) : ProjectRepository, com.soyle.stories.usecase.project.ProjectRepository, FileRepository {
+) : ProjectRepository, FileRepository {
 
     private val fileSystem: Map<String, MutableSet<String>> = mapOf(
         "directories" to mutableSetOf(),
@@ -33,8 +33,6 @@ class ProjectFileRepository(
             isFile && exists()
         } || fileSystem.getValue("files").contains(filePath)
     }
-
-    override suspend fun addNewProject(project: Project) {}
 
     override suspend fun getProjectAtLocation(location: String): Project? = fileStore.getFileAt(location)?.let {
         Project(it.projectId, NonBlankString.create(it.projectName)!!)

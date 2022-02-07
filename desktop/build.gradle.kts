@@ -29,6 +29,7 @@ dependencies {
     // this update prevents us from having to make sure that Kotlin isn't performing SAM conversions on lambdas anymore
     testImplementation("io.cucumber:cucumber-java8:6.11.0")
     testImplementation("io.cucumber:cucumber-junit:6.11.0")
+    testImplementation(testFixtures(project(":desktop:views")))
 
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:openjfx-monocle:jdk-12.0.1+2")
@@ -105,7 +106,6 @@ tasks.processResources {
         expand("APPLICATION_VERSION" to project.version)
     }
 }
-
 idea {
     module {
         (this as ExtensionAware).configure<org.jetbrains.gradle.ext.ModuleSettings> {

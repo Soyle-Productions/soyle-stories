@@ -1,9 +1,8 @@
 package com.soyle.stories.usecase.scene.location.removeLocationFromScene
 
 import com.soyle.stories.domain.location.Location
-import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.Updated
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
 import com.soyle.stories.usecase.location.LocationRepository
 import com.soyle.stories.usecase.scene.SceneDoesNotUseLocation
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -20,7 +19,7 @@ class RemoveLocationFromSceneUseCase(
     ) {
         val scene = sceneRepository.getSceneOrError(sceneId.uuid)
         val updatedScene = scene.withoutLocation(locationId)
-        if (updatedScene is Updated) {
+        if (updatedScene is Successful) {
             val location = locationRepository.getLocationById(locationId)
             val locationUpdate = if (location != null) {
                 location.withHostedScene(scene.id)!!.removed()

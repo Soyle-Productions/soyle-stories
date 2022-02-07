@@ -8,7 +8,6 @@ import java.util.*
 
 class RenameSceneControllerImpl(
   private val threadTransformer: ThreadTransformer,
-  private val localeManager: LocaleManager,
   private val renameScene: RenameScene,
   private val renameSceneOutputPort: RenameScene.OutputPort
 ) : RenameSceneController {
@@ -27,7 +26,6 @@ class RenameSceneControllerImpl(
 		return RenameScene.RequestModel(
 		  sceneId = formattedSceneId,
 		  name = newName,
-		  locale = localeManager.getCurrentLocale()
 		)
 	}
 

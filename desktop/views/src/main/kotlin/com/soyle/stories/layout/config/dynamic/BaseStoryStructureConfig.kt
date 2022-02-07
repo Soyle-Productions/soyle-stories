@@ -53,17 +53,17 @@ object BaseStoryStructureConfig : ToolConfig<BaseStoryStructure> {
 
 }
 
-data class BaseStoryStructure(val characterId: UUID, val themeId: UUID) : DynamicTool() {
+data class BaseStoryStructure(val characterId: Character.Id, val themeId: UUID) : DynamicTool() {
 	override val isTemporary: Boolean
 		get() = false
 
 	override suspend fun validate(context: OpenToolContext) {
-		context.characterRepository.getCharacterById(Character.Id(characterId))
+		context.characterRepository.getCharacterById(characterId)
 		  ?: throw CharacterDoesNotExist(characterId)
 		context.themeRepository.getThemeById(Theme.Id(themeId))
 		  ?: throw ThemeDoesNotExist(themeId)
 	}
 
 	override fun identifiedWithId(id: UUID): Boolean =
-	  id == characterId || id == themeId
+	  id == characterId.uuid || id == themeId
 }

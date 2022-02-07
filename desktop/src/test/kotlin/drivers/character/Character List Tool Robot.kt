@@ -5,6 +5,7 @@ import com.soyle.stories.character.list.CharacterListView
 import com.soyle.stories.character.rename.RenameCharacterForm
 import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
+import com.soyle.stories.desktop.config.drivers.awaitWithTimeout
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
 import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.access
@@ -112,5 +113,8 @@ fun CharacterListView.openCharacterProfileFor(character: Character) {
             profileOption!!
         }
         profileOptionItem.fire()
+    }
+    awaitWithTimeout(1000) {
+        getCharacterProfileFor(character) != null
     }
 }

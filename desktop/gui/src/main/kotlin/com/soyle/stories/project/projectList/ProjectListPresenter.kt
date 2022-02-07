@@ -17,7 +17,7 @@ class ProjectListPresenter(
     ClosedProjectReceiver by CloseProjectPresenter(view),
     CloseProjectRequestReceiver by CloseProjectPresenter(view) {
 
-    override fun receiveListOpenProjectsResponse(response: ListOpenProjects.ResponseModel) {
+    override suspend fun receiveListOpenProjectsResponse(response: ListOpenProjects.ResponseModel) {
         view.update {
             updateViewModelOrDefault(this, response)
         }

@@ -4,20 +4,21 @@ import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.components.layouts.LayoutStyles.Companion.inviteMessage
 import com.soyle.stories.common.components.layouts.inviteMessage
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevated
+import com.soyle.stories.common.components.surfaces.elevation
+import com.soyle.stories.common.components.surfaces.elevationVariant
 import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
-import com.soyle.stories.common.guiUpdate
+import com.soyle.stories.common.markdown.markdown
 import com.soyle.stories.common.scopedListener
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SceneRemoved
 import com.soyle.stories.domain.scene.events.SceneRenamed
+import com.soyle.stories.scene.FocusedSceneQueries
 import com.soyle.stories.scene.delete.SceneDeletedReceiver
 import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
 import com.soyle.stories.scene.setting.list.SceneSettingInviteImage.Companion.sceneSettingInviteImage
 import com.soyle.stories.scene.setting.list.SceneSettingItemList
-import com.soyle.stories.scene.target.SceneTargeted
-import com.soyle.stories.scene.target.SceneTargetedReceiver
 import javafx.application.Platform
 import javafx.geometry.Pos
 import javafx.scene.layout.Priority
@@ -33,7 +34,7 @@ class SceneSettingToolRoot(
 
     sceneRenamed: Notifier<SceneRenamedReceiver>,
     sceneRemoved: Notifier<SceneDeletedReceiver>,
-    sceneTargeted: Notifier<SceneTargetedReceiver>,
+    focsedSceneQueries: FocusedSceneQueries,
 
     private val makeSceneSettingItemList: SceneSettingItemList.Factory
 ) : VBox() {
@@ -52,17 +53,13 @@ class SceneSettingToolRoot(
     init {
         addClass(Styles.sceneSettingToolRoot)
         toggleClass(Styles.noScene, noSceneSelected)
-        asSurface {
-            inheritedElevation = Elevation.getValue(4)
-        }
+        elevation = Elevation.getValue(4)
     }
 
     private val header = hbox {
         addClass(Stylesheet.headerPanel)
-        asSurface {
-            inheritedElevation = Elevation.getValue(4)
-            relativeElevation = Elevation.getValue(8)
-        }
+        elevation = Elevation.getValue(12)
+        elevationVariant = elevated(objectProperty(Elevation.getValue(4)))
 
         label {
             addClass(Styles.sceneName)
@@ -72,9 +69,7 @@ class SceneSettingToolRoot(
             scopedListener(model) {
                 when (it) {
                     is SceneSettingToolModel.NoSceneSelected -> textProperty().bind(locale.noSceneSelected)
-                    is SceneSettingToolModel.SceneSelected -> textProperty().bind(stringBinding(locale.selectedScene, it.sceneName) {
-                        locale.selectedScene.value.invoke(it.sceneName.value)
-                    })
+                    is SceneSettingToolModel.SceneSelected -> textProperty().bind(locale.selectedScene(it.sceneName))
                 }
             }
         }
@@ -94,10 +89,10 @@ class SceneSettingToolRoot(
                     }
                     is SceneSettingToolModel.NoSceneSelected -> {
                         sceneSettingInviteImage()
-                        toolTitle { textProperty().bind(locale.useLocationsAsSceneSetting) }
+                        toolTitle { textProperty().bind(locale.sceneSettingToolTitle) }
                         inviteMessage {
                             addClass(TextStyles.fieldLabel)
-                            dynamicContent(locale.noSceneSelectedInviteMessage) { if (it != null) apply(it) }
+                            markdown(locale.noSceneSelected_inviteMessage)
                         }
                     }
                 }
@@ -135,18 +130,10 @@ class SceneSettingToolRoot(
         sceneRemoved.addListener(domainEventListener)
     }
 
-    private val guiEventListener = object :
-        SceneTargetedReceiver
-    {
-        override suspend fun receiveSceneTargeted(event: SceneTargeted) {
-            guiUpdate {
-                model.set(SceneSettingToolModel.SceneSelected(event.sceneId, stringProperty(event.sceneName)))
-            }
-        }
-    }
-
     init {
-        sceneTargeted.addListener(guiEventListener)
+        scopedListener(focsedSceneQueries.focusedScene()) {
+            if (it != null) model.set(SceneSettingToolModel.SceneSelected(it, stringProperty("")))
+        }
         if (initialScene != null) {
             model.set(SceneSettingToolModel.SceneSelected(initialScene.first, stringProperty(initialScene.second)))
         }

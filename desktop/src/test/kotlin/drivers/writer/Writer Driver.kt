@@ -11,10 +11,10 @@ class WriterDriver(private val projectScope: ProjectScope)
 {
 
     fun givenDialogShouldNotBeShown(dialog: DialogType) {
-        projectScope.get<SetDialogPreferencesController>().setDialogPreferences(dialog.name, false)
+        projectScope.get<SetDialogPreferencesController>().setDialogPreferences(dialog::class.simpleName!!, false)
     }
     fun givenDialogShouldBeShown(dialog: DialogType) {
-        projectScope.get<SetDialogPreferencesController>().setDialogPreferences(dialog.name, true)
+        projectScope.get<SetDialogPreferencesController>().setDialogPreferences(dialog::class.simpleName!!, true)
     }
 
     companion object {

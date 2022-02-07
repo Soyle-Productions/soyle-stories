@@ -1,9 +1,9 @@
 package com.soyle.stories.desktop.config.storyevent
 
+import com.soyle.stories.Locale
 import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.onChangeUntil
-import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.desktop.config.InProjectScope
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
@@ -12,11 +12,17 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
+import com.soyle.stories.storyevent.character.add.AddCharacterToStoryEventController
+import com.soyle.stories.storyevent.character.remove.RemoveCharacterFromStoryEventController
+import com.soyle.stories.storyevent.character.remove.RemoveCharacterFromStoryEventPromptLocale
+import com.soyle.stories.storyevent.character.remove.ramifications.RemoveCharacterFromStoryEventRamificationsReportLocale
 import com.soyle.stories.storyevent.create.*
+import com.soyle.stories.storyevent.details.StoryEventDetailsDependencies
 import com.soyle.stories.storyevent.item.StoryEventItemMenuComponent
 import com.soyle.stories.storyevent.item.StoryEventItemSelection
 import com.soyle.stories.storyevent.list.*
 import com.soyle.stories.storyevent.remove.*
+import com.soyle.stories.storyevent.remove.ramifications.RemoveStoryEventFromStoryRamificationsReportLocale
 import com.soyle.stories.storyevent.rename.*
 import com.soyle.stories.storyevent.time.*
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
@@ -43,12 +49,15 @@ import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
+import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetails
 import javafx.beans.property.BooleanProperty
 import javafx.collections.ObservableList
 import javafx.scene.Node
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListCell
 import javafx.stage.Modality
+import kotlinx.coroutines.CoroutineScope
+import tornadofx.Scope
 import kotlin.coroutines.CoroutineContext
 
 object Presentation {
@@ -58,13 +67,15 @@ object Presentation {
             provide<StoryEventListTool> {
                 object : StoryEventListTool {
                     override fun invoke(projectId: Project.Id): Node {
-                        if (DI.getRegisteredTypes(this@provide).containsKey(StoryEventListToolView::class)) {
+                        if (DI.getRegisteredTypes(this@provide).hasInstanceOf(StoryEventListToolView::class)) {
                             return DI.getRegisteredTypes(this@provide)[StoryEventListToolView::class] as StoryEventListToolView
                         }
 
                         val presenter = StoryEventListPresenter(
+                            this@provide,
                             projectId = projectId,
                             createStoryEventController = get(),
+                            getStoryEventDetailsController = get(),
                             renameStoryEventController = get(),
                             rescheduleStoryEventController = get(),
                             adjustStoryEventsTimeController = get(),
@@ -80,6 +91,7 @@ object Presentation {
                         )
 
                         val view = StoryEventListToolView(
+                            this@provide,
                             presenter,
                             presenter.viewModel,
                             get()
@@ -144,27 +156,36 @@ object Presentation {
                 StoryEventTimeChangePromptPresenter(get<WorkBench>()::currentStage)
             }
 
-            provide<RemoveStoryEventConfirmation> {
-                object : RemoveStoryEventConfirmation {
-                    override fun requestDeleteStoryEventConfirmation(storyEventIds: Set<StoryEvent.Id>) {
-                        val viewModel = RemoveStoryEventConfirmationPromptViewModel(applicationScope.get())
-                        val presenter = RemoveStoryEventConfirmationPromptPresenter(
-                            storyEventIds,
-                            viewModel,
-                            get(),
-                            get()
-                        )
-                        val stageInit = lazy {
-                            RemoveStoryEventConfirmationPromptView(
-                                presenter,
-                                viewModel
-                            ).openModal(owner = get<WorkBench>().root.scene?.window)
-                        }
-                        viewModel.showing().onChangeWithCurrent {
-                            if (it == true) stageInit.value?.show()
-                            else if (stageInit.isInitialized()) stageInit.value?.hide()
-                        }
-                    }
+            provide<RemoveStoryEventConfirmationPrompt> {
+                removeStoryEventConfirmationPrompt(this)
+            }
+            provide<RemoveCharacterFromStoryEventPromptLocale> {
+                applicationScope.get<Locale>().storyEvents.characters.remove.confirmation
+            }
+            provide<RemoveCharacterFromStoryEventRamificationsReportLocale> {
+                applicationScope.get<Locale>().storyEvents.characters.remove.ramifications
+            }
+            provide<RemoveStoryEventFromStoryRamificationsReportLocale> {
+                applicationScope.get<Locale>().storyEvents.remove.ramifications
+            }
+            provide<RemoveStoryEventConfirmationPromptLocale> {
+                applicationScope.get<Locale>().storyEvents.remove.prompt
+            }
+
+            provide<StoryEventDetailsDependencies> {
+                object : StoryEventDetailsDependencies {
+                    override val addCharacterToStoryEventController: AddCharacterToStoryEventController
+                        get() = get()
+                    override val getStoryEventDetails: GetStoryEventDetails
+                        get() = get()
+                    override val projectScope: ProjectScope
+                        get() = this@provide
+                    override val removeCharacterFromStoryEventController: RemoveCharacterFromStoryEventController
+                        get() = get()
+                    override val asyncScope: CoroutineScope
+                        get() = applicationScope
+                    override val guiContext: CoroutineContext
+                        get() = applicationScope.get<ThreadTransformer>().guiContext
                 }
             }
 
@@ -201,6 +222,9 @@ object Presentation {
 
         StoryPointLabelComponent.Dependencies,
         StoryEventItemMenuComponent.Dependencies {
+
+        override val scope: Scope
+            get() = projectScope
 
         override val listStoryEventsController: ListStoryEventsController
             get() = projectScope.get()
@@ -291,7 +315,7 @@ object Presentation {
         }
 
         override fun StoryEventItemMenu(selection: StoryEventItemSelection): ContextMenu {
-            return StoryEventItemMenuComponent.Implementation(this).StoryEventItemMenu(selection)
+            return StoryEventItemMenuComponent.Implementation(projectScope, this).StoryEventItemMenu(selection)
         }
 
     }

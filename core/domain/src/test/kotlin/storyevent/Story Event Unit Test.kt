@@ -6,7 +6,7 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.events.*
 import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyCoveredByScene
-import com.soyle.stories.domain.storyevent.exceptions.storyEventAlreadyWithoutCoverage
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyWithoutCoverage
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID.randomUUID
@@ -110,11 +110,13 @@ class `Story Event Unit Test` {
             val update: StoryEventUpdate<StoryEventRescheduled> = storyEvent.withTime(inputTime)
             update as Successful
 
-            update.change.mustEqual(StoryEventRescheduled(
-                storyEventId = storyEvent.id,
-                newTime = inputTime,
-                originalTime = storyEvent.time
-            ))
+            update.change.mustEqual(
+                StoryEventRescheduled(
+                    storyEventId = storyEvent.id,
+                    newTime = inputTime,
+                    originalTime = storyEvent.time
+                )
+            )
         }
 
         @Nested
@@ -150,8 +152,7 @@ class `Story Event Unit Test` {
             val update: StoryEventUpdate<StoryEventCoveredByScene> = storyEvent.coveredByScene(inputSceneId)
 
             update as Successful
-            update.change.storyEventId.mustEqual(storyEvent.id)
-            update.change.sceneId.mustEqual(inputSceneId)
+            update.change.mustEqual(StoryEventCoveredByScene(storyEvent.id, storyEvent.name.value, inputSceneId, null))
         }
 
         @Nested
@@ -181,7 +182,14 @@ class `Story Event Unit Test` {
                 val update = coveredStoryEvent.coveredByScene(inputSceneId)
 
                 update as Successful
-                update.change.uncovered.mustEqual(StoryEventUncoveredFromScene(storyEvent.id, otherSceneId))
+                update.change.mustEqual(
+                    StoryEventCoveredByScene(
+                        storyEvent.id,
+                        storyEvent.name.value,
+                        inputSceneId,
+                        StoryEventUncoveredFromScene(storyEvent.id, otherSceneId)
+                    )
+                )
             }
 
         }
@@ -198,7 +206,7 @@ class `Story Event Unit Test` {
             val update: StoryEventUpdate<*> = storyEvent.withoutCoverage()
 
             update as UnSuccessful
-            update.reason.mustEqual(storyEventAlreadyWithoutCoverage(storyEvent.id))
+            update.reason.mustEqual(StoryEventAlreadyWithoutCoverage(storyEvent.id))
         }
 
         @Nested

@@ -8,6 +8,8 @@ import tornadofx.runLater
 
 class AsyncThreadTransformer(val applicationScope: ApplicationScope) : ThreadTransformer {
 
+    override val asyncScope: CoroutineScope = applicationScope
+
     var exceptionHandler: CoroutineExceptionHandler? = null
 
     override fun async(task: suspend CoroutineScope.() -> Unit): Job {

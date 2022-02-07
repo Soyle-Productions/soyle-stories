@@ -8,8 +8,8 @@ Feature: Indicate Issue with Mention
 
     Scenario Outline: Remove a Mentioned Story Element without Reading the Scene
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
-      When I remove the <element> <name> from the story
+      And I have mentioned the <name> <element> in the "Big Battle" scene's prose
+      When I remove the <name> <element> from the story
       Then the "Big Battle" scene should not indicate that it has an issue
 
       Examples:
@@ -34,23 +34,23 @@ Feature: Indicate Issue with Mention
     Scenario: Remove a Character's Alternative Name without Reading the Scene
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
       When I remove the "Bobby" name variant for the "Bob" character
       Then the "Big Battle" scene should not indicate that it has an issue
 
     Scenario: Remove a Character with a mentioned Alternative Name without Reading the Scene
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
-      When I remove the character "Bob" from the story
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
+      When I remove the "Bob" character from the story
       Then the "Big Battle" scene should not indicate that it has an issue
 
   Rule: Should detect issues once scene is edited
 
     Scenario Outline: Remove a Mentioned Story Element and then Read the Scene
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
-      And I have removed the <element> <name> from the story
+      And I have mentioned the <name> <element> in the "Big Battle" scene's prose
+      And I have removed the <name> <element> from the story
       When I edit the "Big Battle" scene's prose
       Then the <name> mention in the "Big Battle" scene's prose should indicate that it was removed
       And the "Big Battle" scene should indicate that it has an issue
@@ -79,16 +79,16 @@ Feature: Indicate Issue with Mention
     Scenario: Remove a Character's Alternative Name with and then Read the Scene
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
-      And I have removed the "Bobby" name variant for the character "Bob"
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
+      And I have removed the "Bobby" name variant for the "Bob" character
       When I edit the "Big Battle" scene's prose
       Then the "Big Battle" scene should indicate that it has an issue
 
     Scenario: Remove a Character with a mentioned Alternative Name and then Read the Scene
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
-      And I have removed the character "Bob" from the story
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
+      And I have removed the "Bob" character from the story
       When I edit the "Big Battle" scene's prose
       Then the "Big Battle" scene should indicate that it has an issue
 
@@ -96,9 +96,9 @@ Feature: Indicate Issue with Mention
 
     Scenario Outline: Remove a Mentioned Story Element While Reading Scene Prose
       Given I have created a <element> named <name>
-      And I have mentioned the <element> <name> in the "Big Battle" scene's prose
+      And I have mentioned the <name> <element> in the "Big Battle" scene's prose
       And I am editing the "Big Battle" scene's prose
-      When I remove the <element> <name> from the story
+      When I remove the <name> <element> from the story
       Then the <name> mention in the "Big Battle" scene's prose should indicate that it was removed
       And the "Big Battle" scene should indicate that it has an issue
 
@@ -126,7 +126,7 @@ Feature: Indicate Issue with Mention
     Scenario: Remove a Character's Alternative Name While Reading Scene Prose
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
       And I am editing the "Big Battle" scene's prose
       When I remove the "Bobby" name variant for the "Bob" character
       Then the "Big Battle" scene should indicate that it has an issue
@@ -134,7 +134,7 @@ Feature: Indicate Issue with Mention
     Scenario: Remove a Character with a mentioned Alternative Name While Reading Scene Prose
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
       And I am editing the "Big Battle" scene's prose
-      When I remove the character "Bob" from the story
+      When I remove the "Bob" character from the story
       Then the "Big Battle" scene should indicate that it has an issue

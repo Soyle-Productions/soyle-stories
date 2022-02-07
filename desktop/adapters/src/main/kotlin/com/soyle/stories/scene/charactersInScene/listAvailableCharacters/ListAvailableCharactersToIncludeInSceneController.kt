@@ -13,7 +13,7 @@ class ListAvailableCharactersToIncludeInSceneController(
     fun listAvailableCharacters(sceneId: Scene.Id, output: ListAvailableCharactersToIncludeInScene.OutputPort): Job
     {
         return threadTransformer.async {
-            listAvailableCharactersToIncludeInScene.invoke(sceneId.uuid, output)
+            listAvailableCharactersToIncludeInScene.invoke(sceneId, output)
         }
     }
 

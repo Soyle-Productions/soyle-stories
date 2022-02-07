@@ -19,7 +19,7 @@ import tornadofx.*
 import java.util.*
 
 class ProseEditorTextArea : GenericStyledArea<Unit, ContentElement, Collection<String>>(
-    /*initialParagraphStyle = */Unit,
+    /* initialParagraphStyle = */Unit,
     /*applyParagraphStyle =  */{ _, _ -> },
     /*initialTextStyle =  */listOf(""),
     /*segmentOps =  */ContentElementOps(),

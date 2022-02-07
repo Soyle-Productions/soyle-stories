@@ -32,6 +32,7 @@ idea {
             this as ExtensionAware
             val packagePrefix = "com.soyle.stories.desktop.adapter"
 
+            the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/test/kotlin"] = packagePrefix
             the<org.jetbrains.gradle.ext.PackagePrefixContainer>()["src/testFixtures/kotlin"] = packagePrefix
         }
     }

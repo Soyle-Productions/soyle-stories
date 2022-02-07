@@ -153,7 +153,7 @@ class OutlineMoralArgumentUnitTest {
         inner class `Character is not a Major Character in Theme` {
 
             init {
-                themeRepository.givenTheme(theme.withCharacterIncluded(character.id, character.name.value, character.media))
+                themeRepository.givenTheme(theme.withCharacterIncluded(character.id, character.displayName.value, character.media))
             }
 
             @Test
@@ -179,7 +179,7 @@ class OutlineMoralArgumentUnitTest {
 
             init {
                 theme
-                    .withCharacterIncluded(character.id, character.name.value, character.media)
+                    .withCharacterIncluded(character.id, character.displayName.value, character.media)
                     .withCharacterPromoted(character.id)
                     .let(themeRepository::givenTheme)
                 characterArcRepository.givenCharacterArc(characterArc)
@@ -191,7 +191,7 @@ class OutlineMoralArgumentUnitTest {
 
                 val result = result as OutlineMoralArgumentForCharacterInTheme.ResponseModel
                 result.characterId.mustEqual(character.id.uuid)
-                result.characterName.mustEqual(character.name.value)
+                result.characterName.mustEqual(character.displayName.value)
             }
 
             @Test

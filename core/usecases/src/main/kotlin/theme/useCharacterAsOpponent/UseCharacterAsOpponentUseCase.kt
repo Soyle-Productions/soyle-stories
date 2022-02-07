@@ -172,7 +172,7 @@ class UseCharacterAsOpponentUseCase(
         opponentId: UUID,
     ): Theme {
         val opponentCharacter = characterRepository.getCharacterOrError(opponentId)
-        return withCharacterIncluded(opponentCharacter.id, opponentCharacter.name.value, opponentCharacter.media)
+        return withCharacterIncluded(opponentCharacter.id, opponentCharacter.displayName.value, opponentCharacter.media)
     }
 
     private fun reportCharacterUsedAsOpponentIfExists(
@@ -255,7 +255,7 @@ class UseCharacterAsOpponentUseCase(
         return characterRepository.listCharactersInProject(theme.projectId)
             .asSequence()
             .filterNot { theme.containsCharacter(it.id) }
-            .map { AvailableCharacterToUseAsOpponent(it.id.uuid, it.name.value, it.media?.uuid, false) }
+            .map { AvailableCharacterToUseAsOpponent(it.id.uuid, it.displayName.value, it.media?.uuid, false) }
     }
 
     private fun getCharactersInThemeNotAntagonisticTowardsMajorCharacter(

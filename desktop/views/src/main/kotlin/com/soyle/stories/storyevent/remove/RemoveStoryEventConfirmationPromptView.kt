@@ -4,49 +4,30 @@ import com.soyle.stories.common.components.ComponentsStyles.Companion.filled
 import com.soyle.stories.common.components.ComponentsStyles.Companion.outlined
 import com.soyle.stories.common.components.ComponentsStyles.Companion.primary
 import com.soyle.stories.common.components.ComponentsStyles.Companion.secondary
+import com.soyle.stories.di.get
+import com.soyle.stories.project.WorkBench
+import com.soyle.stories.ramifications.confirmation.ConfirmationPromptView
+import com.soyle.stories.ramifications.confirmation.confirmationPrompt
+import com.soyle.stories.storyevent.character.remove.RemoveCharacterFromStoryEventPromptLocale
 import javafx.scene.Parent
 import javafx.scene.control.*
 import tornadofx.*
 import javax.swing.text.Style
 
-class RemoveStoryEventConfirmationPromptView(
-    private val actions: RemoveStoryEventConfirmationPromptViewActions,
-    private val viewModel: RemoveStoryEventConfirmationPromptViewModel
-) : Fragment() {
+typealias RemoveStoryEventConfirmationPromptView = ConfirmationPromptView<RemoveStoryEventConfirmationPromptViewModel>
 
-    init {
-        title = "Confirm Removal"
+fun removeStoryEventConfirmationPrompt(
+    scope: Scope = FX.defaultScope,
+    viewModel: RemoveStoryEventConfirmationPromptViewModel = RemoveStoryEventConfirmationPromptViewModel()
+): RemoveStoryEventConfirmationPrompt {
+
+    val locale = scope.get<RemoveStoryEventConfirmationPromptLocale>()
+
+    confirmationPrompt(scope, scope.get<WorkBench>().currentStage, viewModel) {
+        confirmationText().bind(locale.remove())
+        headerText().bind(locale.areYouSureYouWantToRemoveTheseStoryEventsFromTheProject(viewModel.items()))
+        titleProperty.bind(locale.confirmRemoveStoryEventFromProject())
     }
 
-    override val root: Parent = DialogPane().apply {
-        addClass(Stylesheet.alert, Stylesheet.confirmation, Stylesheet.header)
-        headerText = "Are you sure you want to delete this/these story event(s)?"
-        content = checkbox {
-            id = "show-again"
-            text = "Don't show this dialog again"
-            viewModel.shouldNotShowAgain().bind(selectedProperty())
-            enableWhen(viewModel.canConfirm())
-        }
-
-        buttonTypes.setAll(ButtonType.OK, ButtonType.CANCEL)
-        lookupButton(ButtonType.OK).apply {
-            id = "confirm"
-            addClass(primary, filled)
-            enableWhen(viewModel.canConfirm())
-            if (this is ButtonBase) {
-                action(actions::confirm)
-            }
-        }
-        lookupButton(ButtonType.CANCEL).apply {
-            id = "cancel"
-            addClass(secondary, outlined)
-            if (this is ButtonBase) {
-                action(actions::cancel)
-            }
-        }
-    }
-
-    init {
-        root.properties[UI_COMPONENT_PROPERTY] = this
-    }
+    return viewModel
 }

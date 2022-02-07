@@ -1,29 +1,21 @@
 package com.soyle.stories.location.createLocationDialog
 
-import com.soyle.stories.common.*
-import com.soyle.stories.common.components.ComponentsStyles
+import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.components.buttons.primaryButton
 import com.soyle.stories.common.components.buttons.secondaryButton
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevation
 import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
-import com.soyle.stories.common.components.text.WindowTitle.Companion.windowTitle
-import com.soyle.stories.di.get
-import com.soyle.stories.di.resolve
-import com.soyle.stories.domain.location.Location
+import com.soyle.stories.common.guiUpdate
+import com.soyle.stories.common.scopedListener
 import com.soyle.stories.domain.validation.SingleLine
 import com.soyle.stories.domain.validation.SingleNonBlankLine
 import com.soyle.stories.domain.validation.countLines
 import com.soyle.stories.location.controllers.CreateNewLocationController
-import com.soyle.stories.location.events.CreateNewLocationNotifier
-import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.project.WorkBench
 import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
 import javafx.beans.property.SimpleStringProperty
-import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
@@ -33,11 +25,6 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import javafx.stage.Window
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.javafx.JavaFx
-import kotlinx.coroutines.withContext
 import tornadofx.*
 
 class CreateLocationDialog(
@@ -58,9 +45,7 @@ class CreateLocationDialog(
     inner class View : VBox() {
 
         init {
-            asSurface {
-                absoluteElevation = Elevation.getValue(24)
-            }
+            elevation = Elevation.getValue(24)
             padding = Insets(16.0)
             spacing = 16.0
             isFillWidth = true

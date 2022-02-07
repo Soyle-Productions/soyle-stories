@@ -35,7 +35,6 @@ class RenameCharacterArcUseCase(
 	}
 
 	private suspend fun validateCharacter(request: RenameCharacterArc.RequestModel) {
-		characterRepository.getCharacterById(Character.Id(request.characterId))
-		  ?: throw CharacterDoesNotExist(request.characterId)
+		characterRepository.getCharacterOrError(request.characterId)
 	}
 }

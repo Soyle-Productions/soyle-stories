@@ -21,8 +21,8 @@ class PlanNewCharacterArcUseCase(
         name: String,
         outputPort: PlanNewCharacterArc.OutputPort
     ) {
-        val character = getCharacter(characterId)
-        val theme = Theme(character.projectId, name, emptyList(), "")
+        val character = characterRepository.getCharacterOrError(characterId)
+        val theme = Theme(character.projectId!!, name, emptyList(), "")
 
         val themeWithCharacter = addArcToCharacter(character, theme)
         val newArc = CharacterArc.planNewCharacterArc(character.id, theme.id, theme.name)
@@ -43,11 +43,7 @@ class PlanNewCharacterArcUseCase(
         character: Character,
         theme: Theme
     ): Theme {
-        return theme.withCharacterIncluded(character.id, character.name.value, character.media)
+        return theme.withCharacterIncluded(character.id, character.displayName.value, character.media)
             .withCharacterPromoted(character.id)
     }
-
-    private suspend fun getCharacter(characterId: UUID) =
-        characterRepository.getCharacterById(Character.Id(characterId))
-            ?: throw CharacterDoesNotExist(characterId)
 }

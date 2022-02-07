@@ -5,7 +5,7 @@ import com.soyle.stories.domain.location.events
 import com.soyle.stories.domain.location.locations
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneSettingLocation
-import com.soyle.stories.domain.scene.Updated
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
 import com.soyle.stories.usecase.location.LocationRepository
 import com.soyle.stories.usecase.scene.SceneRepository
 
@@ -25,7 +25,7 @@ class RenameSceneUseCase(
 	private suspend fun renameScene(request: RenameScene.RequestModel): RenameScene.ResponseModel {
 		val scene = sceneRepository.getSceneOrError(request.sceneId)
 		val sceneUpdate = scene.withName(request.name)
-		return if (sceneUpdate is Updated) {
+		return if (sceneUpdate is Successful) {
 
 			val sceneSettings = scene.locationsInWhichItTakesPlace()
 

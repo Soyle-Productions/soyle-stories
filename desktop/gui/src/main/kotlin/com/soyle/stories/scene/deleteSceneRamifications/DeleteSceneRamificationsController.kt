@@ -5,26 +5,24 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.closeTool.CloseToolController
 import com.soyle.stories.scene.delete.DeleteSceneController
-import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
+import com.soyle.stories.usecase.scene.delete.GetPotentialChangesFromDeletingScene
 import java.util.*
 
 class DeleteSceneRamificationsController(
-  sceneId: String,
-  private val toolId: String,
-  private val threadTransformer: ThreadTransformer,
-  private val localeManager: LocaleManager,
-  private val getPotentialChangesFromDeletingScene: GetPotentialChangesFromDeletingScene,
-  private val getPotentialChangesFromDeletingSceneOutputPort: GetPotentialChangesFromDeletingScene.OutputPort,
-  private val deleteSceneController: DeleteSceneController,
-  private val closeToolController: CloseToolController
+    private val sceneId: Scene.Id,
+    private val toolId: String,
+    private val threadTransformer: ThreadTransformer,
+    private val localeManager: LocaleManager,
+    private val getPotentialChangesFromDeletingScene: GetPotentialChangesFromDeletingScene,
+    private val getPotentialChangesFromDeletingSceneOutputPort: GetPotentialChangesFromDeletingScene.OutputPort,
+    private val deleteSceneController: DeleteSceneController,
+    private val closeToolController: CloseToolController
 ) : DeleteSceneRamificationsViewListener {
-
-	private val sceneId = UUID.fromString(sceneId)
 
 	override fun getValidState() {
 		threadTransformer.async {
 			getPotentialChangesFromDeletingScene.invoke(
-			  GetPotentialChangesFromDeletingScene.RequestModel(sceneId, localeManager.getCurrentLocale()),
+			  sceneId,
 			  getPotentialChangesFromDeletingSceneOutputPort
 			)
 		}

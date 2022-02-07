@@ -1,0 +1,16 @@
+package com.soyle.stories.usecase.storyevent
+
+import com.soyle.stories.domain.storyevent.StoryEventUpdate
+import com.soyle.stories.domain.storyevent.SuccessfulStoryEventUpdate
+import com.soyle.stories.domain.storyevent.events.StoryEventCoveredByScene
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
+
+typealias StoryEventCreatedUpdate = StoryEventUpdate<StoryEventCreated>
+typealias SuccessfulStoryEventCreatedUpdate = SuccessfulStoryEventUpdate<StoryEventCreated>
+
+typealias StoryEventCoveredBySceneUpdate = StoryEventUpdate<StoryEventCoveredByScene>
+typealias SuccessfulStoryEventCoveredBySceneUpdate = SuccessfulStoryEventUpdate<StoryEventCoveredByScene>
+
+typealias StoryEventRescheduledUpdate = StoryEventUpdate<StoryEventRescheduled>
+typealias SuccessfulStoryEventRescheduledUpdate = SuccessfulStoryEventUpdate<StoryEventRescheduled>

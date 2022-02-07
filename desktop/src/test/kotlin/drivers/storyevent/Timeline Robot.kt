@@ -1,5 +1,6 @@
 package com.soyle.stories.desktop.config.drivers.storyevent
 
+import com.soyle.stories.desktop.config.drivers.awaitWithTimeout
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
 import com.soyle.stories.desktop.view.storyevent.timeline.TimelineAccess.Companion.access
@@ -15,7 +16,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 fun WorkBench.givenTimelineToolHasBeenOpened(): Timeline =
     getOpenTimelineTool() ?: run {
         openTimelineTool()
-        getOpenTimelineToolOrError()
+        getOpenTimelineToolOrError().also {
+            awaitWithTimeout(1000) { ! it.isLoading }
+        }
     }
 
 fun WorkBench.getOpenTimelineTool(): Timeline? =

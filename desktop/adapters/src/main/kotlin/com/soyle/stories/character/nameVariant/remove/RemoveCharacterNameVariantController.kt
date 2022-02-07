@@ -2,9 +2,9 @@ package com.soyle.stories.character.nameVariant.remove
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.character.CharacterException
+import com.soyle.stories.domain.character.exceptions.CharacterException
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.usecase.character.nameVariant.remove.RemoveCharacterNameVariant
+import com.soyle.stories.usecase.character.name.remove.RemoveCharacterNameVariant
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 

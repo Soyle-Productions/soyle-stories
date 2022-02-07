@@ -112,7 +112,7 @@ class ChangeCharacterPropertyValueUnitTest {
             if (andCharacter == null) it
             else {
                 val character = makeCharacter(Character.Id(andCharacter), Project.Id())
-                it.withCharacterIncluded(character.id, character.name.value, character.media)
+                it.withCharacterIncluded(character.id, character.displayName.value, character.media)
             }
         }
         themeRepository.givenTheme(theme)

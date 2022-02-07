@@ -156,7 +156,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
                 makeValueWeb(
                     oppositions = listOf(
                         makeOppositionValue(oppositionId, representations = characterSymbols.map {
-                            SymbolicRepresentation(it.id.uuid, it.name.value)
+                            SymbolicRepresentation(it.id.uuid, it.displayName.value)
                         } + locationSymbols.map {
                             SymbolicRepresentation(it.id.uuid, it.name.value)
                         } + symbols.map {
@@ -204,7 +204,7 @@ class ListAvailableEntitiesToAddToOppositionUnitTest {
             actual as EntitiesAvailableToAddToOpposition
             assertEquals(characterIds, actual.characters.map { it.characterId }.toSet())
             assertEquals(
-                characterIds.map { characterRepository.characters[Character.Id(it)]!!.name.value }.toSet(),
+                characterIds.map { characterRepository.characters[Character.Id(it)]!!.displayName.value }.toSet(),
                 actual.characters.map { it.characterName }.toSet()
             ) { "Character Names not properly mapped" }
 

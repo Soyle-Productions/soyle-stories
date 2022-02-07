@@ -1,7 +1,6 @@
 package com.soyle.stories.prose.proseEditor
 
-import com.soyle.stories.domain.character.Character
-import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
+import com.soyle.stories.character.create.createCharacter
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
@@ -17,7 +16,6 @@ import javafx.scene.control.MenuItem
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import tornadofx.*
-import java.util.*
 import kotlin.collections.set
 
 class ProseEditorView : Fragment() {
@@ -225,7 +223,7 @@ class ProseEditorView : Fragment() {
                     *(listOf(creationOption) + state.replacementOptions.map {
                         MenuItem(it.name).apply {
                             action {
-                                textArea.replaceMention(mention, Mention(it.name, it.id))
+                                textArea.replaceMention(mention, Mention(it.name, it.entityId))
                                 viewListener.save()
                             }
                         }
@@ -254,7 +252,7 @@ class ProseEditorView : Fragment() {
                     *(listOf(creationOption) + state.replacementOptions.map {
                         MenuItem(it.name).apply {
                             action {
-                                textArea.replaceAllMentionsOfEntity(mention, with = Mention(it.name, it.id))
+                                textArea.replaceAllMentionsOfEntity(mention, with = Mention(it.name, it.entityId))
                                 viewListener.save()
                             }
                         }
@@ -274,9 +272,7 @@ class ProseEditorView : Fragment() {
         return when (entityId) {
             is MentionedCharacterId -> MenuItem("Create New Character").apply {
                 action {
-                    createCharacterDialog(scope.projectScope, onCharacterCreated = {
-                        onNewMentionedEntity(Mention(it.characterName, Character.Id(it.characterId).mentioned()))
-                    })
+                    createCharacter(scope.projectScope)
                 }
             }
             is MentionedLocationId -> MenuItem("Create New Location").apply {

@@ -12,5 +12,5 @@ interface LocationDetailsLocale {
     val hostSceneInLocationInvitationMessage: ObservableValue<String>
     val allExistingScenesInProjectHaveBeenHosted: ObservableValue<String>
 
-    fun locationDetailsToolName(locationName: String): ObservableValue<String>
+    fun locationDetailsToolName(locationName: ObservableValue<String>): ObservableValue<String>
 }

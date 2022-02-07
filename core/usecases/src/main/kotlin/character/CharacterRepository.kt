@@ -11,7 +11,7 @@ interface CharacterRepository {
     suspend fun getCharacters(characterIds: Set<Character.Id>): List<Character>
 
     suspend fun getCharacterOrError(characterId: UUID) = getCharacterById(Character.Id(characterId))
-        ?: throw CharacterDoesNotExist(characterId)
+        ?: throw CharacterDoesNotExist(Character.Id(characterId))
     suspend fun updateCharacter(character: Character)
     suspend fun deleteCharacterWithId(characterId: Character.Id)
 

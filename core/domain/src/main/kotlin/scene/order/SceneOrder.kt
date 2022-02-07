@@ -7,6 +7,7 @@ import com.soyle.stories.domain.scene.events.SceneRemoved
 import com.soyle.stories.domain.scene.order.exceptions.cannotAddSceneOutOfBounds
 import com.soyle.stories.domain.scene.order.exceptions.sceneAlreadyAtIndex
 import com.soyle.stories.domain.scene.order.exceptions.sceneCannotBeAddedTwice
+import com.soyle.stories.domain.scene.order.exceptions.sceneIndexOutOfBounds
 import kotlin.IndexOutOfBoundsException
 
 class SceneOrder private constructor(
@@ -42,7 +43,7 @@ class SceneOrder private constructor(
         if (sceneId !in order) return null
         return object : SceneModifications {
             override fun movedTo(index: Int): SceneOrderUpdate<Nothing?> {
-                if (index < 0 || index >= order.size) return noUpdate(IndexOutOfBoundsException(""))
+                if (index < 0 || index >= order.size) return noUpdate(sceneIndexOutOfBounds(index, order.indices))
                 if (index == order.indexOf(sceneId)) return noUpdate(sceneAlreadyAtIndex(sceneId, index))
                 val newOrder = order.minus(sceneId).toMutableList().apply { add(index, sceneId) }.toSet()
                 return copy(newOrder).updatedBy(null)

@@ -3,18 +3,16 @@ package com.soyle.stories.character.profile
 import com.soyle.stories.character.create.characterNameInput
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
-import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
+import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.characterarc.components.characterIcon
 import com.soyle.stories.common.components.buttons.secondaryButton
-import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
-import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
+import com.soyle.stories.common.components.surfaces.*
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onLoseFocus
+import com.soyle.stories.common.scopedListener
 import com.soyle.stories.di.get
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.domain.validation.ValidationException
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.beans.property.ObjectProperty
@@ -23,10 +21,8 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Parent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import kotlinx.coroutines.launch
 import tornadofx.*
 
 class CharacterProfileView : View() {
@@ -44,12 +40,16 @@ class CharacterProfileView : View() {
         state.executingNameChange.set(true)
         val controller = scope.projectScope.get<AddCharacterNameVariantController>()
         CoroutineScope(Dispatchers.JavaFx).launch {
-            try {
-                controller.addCharacterNameVariant(state.characterId.value, altName).join()
-                state.isCreatingName.set(false)
-            } catch (exception: ValidationException) {
-                state.creationFailure.set(exception.localizedMessage)
-            } finally {
+            with(controller) {
+                val job = CoroutineExceptionHandler { coroutineContext, throwable ->
+                    state.creationFailure.set(throwable.localizedMessage)
+                    state.executingNameChange.set(false)
+                    coroutineContext[Job]?.cancel(message = "", throwable)
+                }.addCharacterNameVariant(state.characterId.value, altName)
+                job.join()
+                if (! job.isCancelled) {
+                    state.isCreatingName.set(false)
+                }
                 state.executingNameChange.set(false)
             }
         }
@@ -57,9 +57,9 @@ class CharacterProfileView : View() {
 
     private fun renameAlternativeName(currentName: NonBlankString, newName: NonBlankString) {
         state.executingNameChange.set(true)
-        val controller = scope.projectScope.get<RenameCharacterNameVariantController>()
+        val controller = scope.projectScope.get<RenameCharacterController>()
         CoroutineScope(Dispatchers.JavaFx).launch {
-            controller.renameCharacterNameVariant(state.characterId.value, currentName, newName)
+            controller.renameCharacter(state.characterId.value, currentName, newName)
                 .join()
             state.executingNameChange.set(false)
         }
@@ -82,8 +82,10 @@ class CharacterProfileView : View() {
             alignment = Pos.CENTER
             spacing = 16.0
             padding = Insets(64.0, 32.0, 32.0, 32.0)
+            scopedListener(this@vbox.elevationProperty()) {
+                elevation = Elevation[it?.value?.plus(4) ?: 4] ?: Elevation.getValue(Elevation.max)
+            }
             asSurface {
-                inheritedElevationProperty().bind(this@vbox.asSurface().absoluteElevationProperty())
                 relativeElevation = Elevation.getValue(4)
             }
 
@@ -116,7 +118,12 @@ class CharacterProfileView : View() {
                 onLoseFocus(::cancelCreateAltName)
                 disableWhen(state.executingNameChange)
 
-                val creationFailureDecorator = state.creationFailure.objectBinding { if (it != null) SimpleMessageDecorator(it, ValidationSeverity.Error) else null }
+                val creationFailureDecorator = state.creationFailure.objectBinding {
+                    if (it != null) SimpleMessageDecorator(
+                        it,
+                        ValidationSeverity.Error
+                    ) else null
+                }
                 properties["creationFailureBinding"] = creationFailureDecorator
                 creationFailureDecorator.addListener { _, oldValue, newValue ->
                     oldValue?.let(::removeDecorator)

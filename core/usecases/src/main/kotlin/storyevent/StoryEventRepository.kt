@@ -4,8 +4,11 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.scene.Scene
+import com.soyle.stories.domain.storyevent.StoryEventRepository
+import com.soyle.stories.domain.storyevent.StoryEventUpdate
+import com.soyle.stories.domain.storyevent.SuccessfulStoryEventUpdate
 
-interface StoryEventRepository : com.soyle.stories.domain.storyevent.StoryEventRepository {
+interface StoryEventRepository : StoryEventRepository {
 
     suspend fun addNewStoryEvent(storyEvent: StoryEvent)
     suspend fun getStoryEventById(storyEventId: StoryEvent.Id): StoryEvent?
@@ -19,7 +22,10 @@ interface StoryEventRepository : com.soyle.stories.domain.storyevent.StoryEventR
     suspend fun getStoryEventsWithCharacter(characterId: Character.Id): List<StoryEvent>
     suspend fun getLastStoryEventInProject(projectId: Project.Id): StoryEvent?
     suspend fun getStoryEventsCoveredByScene(sceneId: Scene.Id): List<StoryEvent>
-    suspend fun updateStoryEvent(storyEvent: StoryEvent)
+    suspend fun getStoryEventsCoveredBySceneAndInvolvingCharacter(sceneId: Scene.Id, characterId: Character.Id): List<StoryEvent>
+
+    suspend fun updateStoryEvent(storyEvent: StoryEvent): Throwable?
+    suspend fun save(update: SuccessfulStoryEventUpdate<*>): Throwable?
     suspend fun updateStoryEvents(vararg storyEvents: StoryEvent)
 
     suspend fun removeStoryEvent(storyEventId: StoryEvent.Id)

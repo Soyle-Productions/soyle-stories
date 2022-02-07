@@ -1,6 +1,7 @@
 package com.soyle.stories.domain.storyevent
 
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
@@ -15,12 +16,12 @@ class StoryEventTimeService(
         name: NonBlankString,
         time: Long,
         projectId: Project.Id,
-    ): List<StoryEventUpdate<*>> {
+    ): Pair<StoryEventUpdate<StoryEventCreated>, List<StoryEventUpdate<StoryEventRescheduled>>> {
         if (time < 0) {
             val creation = StoryEvent.create(name, 0u, projectId)
-            return normalizeAllStoryEventsAboveZero(creation.storyEvent, time).plus(creation)
+            return creation to normalizeAllStoryEventsAboveZero(creation.storyEvent, time)
         }
-        return listOf(StoryEvent.create(name, time.toULong(), projectId))
+        return StoryEvent.create(name, time.toULong(), projectId) to emptyList()
     }
 
     suspend fun rescheduleStoryEvent(

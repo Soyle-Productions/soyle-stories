@@ -10,6 +10,7 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.storyevent.list.StoryEventListToolView
+import com.soyle.stories.usecase.storyevent.getStoryEventDetails.StoryEventDetails
 import javafx.scene.control.RadioButton
 import javafx.scene.control.Tab
 import org.junit.jupiter.api.Assertions.*
@@ -68,15 +69,16 @@ fun StoryEventListToolView.givenStoryEventHasBeenSelected(storyEvent: StoryEvent
 }
 
 fun StoryEventListToolView.givenStoryEventsHaveBeenSelected(storyEvents: List<StoryEvent>): StoryEventListToolView {
-    if (access().storyEventList?.selectionModel?.selectedItems?.map { it.id }?.toSet() == storyEvents.map { it.id }
-            .toSet()) return this
+    val storyEventIdSet = storyEvents.map { it.id }.toSet()
+    if (access().storyEventList?.selectionModel?.selectedItems?.map { it.id }?.toSet() == storyEventIdSet) return this
     drive {
+        storyEventList!!.selectionModel!!.clearSelection()
         storyEvents.forEach { storyEvent ->
             storyEventList!!.selectionModel!!.select(storyEventItems.find { it.id == storyEvent.id })
         }
     }
     assertEquals(
-        storyEvents.map { it.id }.toSet(),
+        storyEventIdSet,
         access().storyEventList!!.selectionModel.selectedItems.map { it.id }.toSet()
     ) {
         "Did not correctly select all of the story events"
@@ -99,6 +101,13 @@ fun StoryEventListToolView.openCreateRelativeStoryEventDialog(placement: String)
         val option = optionsButton!!.insertNewStoryEventOption(placement.replace(" ", "-"))
             ?: fail("No option to insert new story event $placement")
         option.fire()
+    }
+}
+
+fun StoryEventListToolView.openStoryEventDetailsFor(storyEventId: StoryEvent.Id) {
+    drive {
+        storyEventList!!.selectionModel.clearSelection()
+        storyEventList!!.selectionModel.select(storyEventList!!.items.find { it.id == storyEventId })
     }
 }
 

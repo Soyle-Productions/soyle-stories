@@ -1,31 +1,15 @@
 package com.soyle.stories.character.list
 
-import com.soyle.stories.characterarc.characterList.CharacterArcItemViewModel
-import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.components.characterIcon
-import com.soyle.stories.common.*
-import com.soyle.stories.common.components.cardBody
-import com.soyle.stories.common.components.cardHeader
+import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.layouts.WaterfallPane
-import com.soyle.stories.common.components.surfaces.*
-import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
-import com.soyle.stories.common.components.text.ResizableLabel
-import com.soyle.stories.common.components.text.SectionTitle.Companion.sectionTitle
+import com.soyle.stories.common.components.surfaces.Elevation
+import com.soyle.stories.common.components.surfaces.surface
 import com.soyle.stories.di.get
-import javafx.beans.property.*
-import javafx.beans.value.ObservableValue
-import javafx.collections.ObservableList
-import javafx.geometry.VPos
-import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.TreeItem
-import javafx.scene.layout.*
-import javafx.scene.paint.Color
-import tornadofx.*
-import tornadofx.Stylesheet.Companion.arrow
-import tornadofx.Stylesheet.Companion.arrowButton
-import tornadofx.Stylesheet.Companion.expanded
+import javafx.scene.layout.Pane
+import tornadofx.Fragment
+import tornadofx.item
 
 class CharacterItemGrid : Fragment() {
 
@@ -33,7 +17,7 @@ class CharacterItemGrid : Fragment() {
 
     private val characterContextMenu = ContextMenu().apply { item("") }
 
-    override val root: Parent = surface<WaterfallPane>(elevation = Elevation.getValue(8), classes = {}) {
+    override val root: Parent = surface<WaterfallPane>(elevation = Elevation.getValue(8)) {
         hgap = 8.0
         vgap = 8.0
     //    rowValignment = VPos.TOP

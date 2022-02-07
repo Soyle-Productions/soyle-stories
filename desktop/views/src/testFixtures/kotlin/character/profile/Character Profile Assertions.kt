@@ -32,7 +32,7 @@ class `Character Profile Assertions` private constructor(private val access: `Ch
         assertTrue(access.altNameRenameField(variant)?.isVisible == true)
     }
 
-    fun isNotRenamingNameVariantFor(character: Character) = character.otherNames.none {
+    fun isNotRenamingNameVariantFor(character: Character) = character.names.none {
         access.altNameRenameField(it.value)?.isVisible == true
     }
 }

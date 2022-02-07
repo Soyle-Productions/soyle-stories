@@ -47,12 +47,12 @@ class AddSymbolicItemToOppositionUseCase(
         val theme = getTheme(oppositionId)
         val valueWeb = getValueWeb(theme, oppositionId)
 
-        val character = getCharacter(characterId)
-        val representation = SymbolicRepresentation(characterId, character.name.value)
+        val character = characterRepository.getCharacterOrError(characterId)
+        val representation = SymbolicRepresentation(characterId, character.displayName.value)
 
         val characterIncludedInTheme: CharacterIncludedInTheme?
         val themeWithCharacter = if (!theme.containsCharacter(character.id)) {
-            theme.withCharacterIncluded(character.id, character.name.value, character.media).also {
+            theme.withCharacterIncluded(character.id, character.displayName.value, character.media).also {
                 characterIncludedInTheme = CharacterIncludedInTheme(
                     theme.id.uuid,
                     "",
@@ -187,11 +187,5 @@ class AddSymbolicItemToOppositionUseCase(
         return locationRepository.getLocationById(Location.Id(locationId))
             ?: throw LocationDoesNotExist(locationId)
     }
-
-    private suspend fun getCharacter(characterId: UUID): Character {
-        return characterRepository.getCharacterById(Character.Id(characterId))
-            ?: throw CharacterDoesNotExist(characterId)
-    }
-
 
 }

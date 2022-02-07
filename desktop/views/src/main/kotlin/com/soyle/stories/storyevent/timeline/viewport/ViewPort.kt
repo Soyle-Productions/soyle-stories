@@ -1,32 +1,28 @@
 package com.soyle.stories.storyevent.timeline.viewport
 
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
-import com.soyle.stories.storyevent.item.StoryEventItemSelection
-import com.soyle.stories.storyevent.item.StoryEventItemViewModel
+import com.soyle.stories.common.components.surfaces.elevated
+import com.soyle.stories.common.components.surfaces.elevation
+import com.soyle.stories.common.components.surfaces.elevationVariant
+import com.soyle.stories.di.get
 import com.soyle.stories.storyevent.timeline.*
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import javafx.beans.InvalidationListener
 import javafx.beans.WeakInvalidationListener
-import javafx.beans.binding.Binding
 import javafx.beans.binding.Bindings.createObjectBinding
 import javafx.beans.binding.DoubleExpression
-import javafx.beans.binding.LongExpression
 import javafx.beans.binding.ObjectExpression
 import javafx.beans.property.*
-import javafx.beans.value.WeakChangeListener
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.collections.WeakListChangeListener
 import javafx.event.EventHandler
-import javafx.event.WeakEventHandler
 import javafx.scene.Node
 import javafx.scene.control.Control
 import javafx.scene.control.Skin
 import javafx.scene.input.*
 import tornadofx.*
 import tornadofx.Stylesheet.Companion.viewport
-import kotlin.math.max
 
 class TimelineViewPort(
     override val storyPointLabels: ObservableList<StoryPointLabel>,
@@ -155,10 +151,8 @@ class TimelineViewPort(
                         resize(it.width, it.height)
                         properties["origin"] = it
                         layoutXProperty().bind(scaleProperty.doubleBinding(time()) { scale(UnitOfTime(time)).value })
-                        asSurface {
-                            inheritedElevation = Elevation.getValue(8)
-                            relativeElevation = Elevation.getValue(6)
-                        }
+                        elevation = Elevation.getValue(14)
+                        elevationVariant = elevated(objectProperty(Elevation.getValue(6)))
                     }
             }
 
@@ -196,9 +190,7 @@ class TimelineViewPort(
 
     init {
         addClass(viewport)
-        asSurface {
-            absoluteElevation = Elevation.getValue(4)
-        }
+        elevation = Elevation.getValue(4)
         prefHeight = USE_COMPUTED_SIZE
         prefWidth = USE_COMPUTED_SIZE
         isFocusTraversable = true
@@ -306,7 +298,11 @@ private class TimelineViewPortPresenter(
 
     private fun deleteSelection() {
         if (!viewModel.selection.empty().value) {
-            dependencies.removeStoryEventController.removeStoryEvent(viewModel.selection.storyEvents.selectedIds)
+            dependencies.removeStoryEventController.removeStoryEvent(
+                viewModel.selection.storyEvents.selectedIds,
+                dependencies.scope.get(),
+                dependencies.scope.get()
+            )
         }
     }
 }

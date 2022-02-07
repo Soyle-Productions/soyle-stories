@@ -26,10 +26,6 @@ class StoryEventListController(
 		}
 	}
 
-	override fun openStoryEventDetails(storyEventId: String) {
-		openToolController.openStoryEventDetailsTool(storyEventId)
-	}
-
 	override fun renameStoryEvent(storyEventId: StoryEvent.Id, newName: NonBlankString) {
 		renameStoryEventController.renameStoryEvent(storyEventId, newName)
 	}

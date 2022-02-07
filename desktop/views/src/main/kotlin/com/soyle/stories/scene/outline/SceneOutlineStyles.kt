@@ -1,17 +1,16 @@
 package com.soyle.stories.scene.outline
 
 import com.soyle.stories.common.ColorStyles
-import com.soyle.stories.common.StyleImporter
 import com.soyle.stories.common.components.ComponentsStyles.Companion.card
 import com.soyle.stories.common.components.ComponentsStyles.Companion.failed
 import com.soyle.stories.common.components.ComponentsStyles.Companion.loading
 import com.soyle.stories.common.components.dataDisplay.chip.Chip
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chip
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chipColor
-import com.soyle.stories.common.components.dataDisplay.chip.Chip.Styles.Companion.chipVariant
 import com.soyle.stories.common.components.surfaces.SurfaceStyles
 import com.soyle.stories.common.components.text.TextStyles.Companion.fieldLabel
 import com.soyle.stories.common.components.text.TextStyles.Companion.sectionTitle
+import com.soyle.stories.common.styleImporter
 import javafx.geometry.Pos
 import javafx.scene.control.ContentDisplay
 import javafx.scene.paint.Color
@@ -19,12 +18,16 @@ import javafx.scene.text.TextAlignment
 import tornadofx.*
 
 class SceneOutlineStyles : Stylesheet() {
-    companion object : StyleImporter<SceneOutlineStyles>(SceneOutlineStyles::class) {
+    companion object {
         val sceneOutline by cssclass()
 
         val untargeted by csspseudoclass()
 
         val outlinedEvent by cssclass()
+
+        init {
+            styleImporter<SceneOutlineStyles>()
+        }
     }
 
     init {

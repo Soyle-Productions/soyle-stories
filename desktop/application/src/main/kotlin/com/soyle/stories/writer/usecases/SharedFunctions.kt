@@ -15,6 +15,6 @@ internal fun getWriterPreferenceFor(writer: Writer, request: DialogType): Boolea
 {
 	val preference = writer.preferences["dialog.$request"] ?: true
 	if (preference !is Boolean)
-		throw UnexpectedPreferenceValue(request.name, preference)
+		throw UnexpectedPreferenceValue(request::class.simpleName ?: request.toString(), preference)
 	return preference
 }

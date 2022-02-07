@@ -16,8 +16,8 @@ interface ListOpenProjects {
 
     class OpenProjectItem(val projectId: UUID, val projectName: String, val projectLocation: String)
 
-    interface OutputPort {
-        fun receiveListOpenProjectsResponse(response: ResponseModel)
+    fun interface OutputPort {
+        suspend fun receiveListOpenProjectsResponse(response: ResponseModel)
     }
 
 }

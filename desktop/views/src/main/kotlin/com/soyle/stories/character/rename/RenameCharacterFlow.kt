@@ -5,6 +5,6 @@ import com.soyle.stories.domain.validation.NonBlankString
 
 interface RenameCharacterFlow {
 
-    fun start(characterId: Character.Id, currentName: String? = null)
+    fun start(characterId: Character.Id, currentName: NonBlankString)
 
 }

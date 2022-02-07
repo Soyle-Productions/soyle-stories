@@ -1,5 +1,7 @@
 package com.soyle.stories.domain.character
 
+import com.soyle.stories.domain.character.events.CharacterRemovedFromStory
+import com.soyle.stories.domain.character.exceptions.CharacterAlreadyRemovedFromStory
 import com.soyle.stories.domain.character.exceptions.CharacterException
 import com.soyle.stories.domain.character.name.CharacterNames
 import com.soyle.stories.domain.character.name.events.CharacterDisplayNameSelected
@@ -17,7 +19,7 @@ import java.util.*
 
 class Character(
     override val id: Id,
-    val projectId: Project.Id,
+    val projectId: Project.Id?,
     val names: CharacterNames,
     val media: Media.Id?
 ) : Entity<Character.Id> {
@@ -35,6 +37,11 @@ class Character(
     fun withName(newVariant: NonBlankString): CharacterUpdate<CharacterNameAdded> {
         if (newVariant in names) return noUpdate(CharacterAlreadyHasName(id, newVariant.value))
         return withEventApplied(CharacterNameAdded(id, newVariant.value))
+    }
+
+    fun removedFromStory(): CharacterUpdate<CharacterRemovedFromStory> {
+        if (projectId == null) return noUpdate(CharacterAlreadyRemovedFromStory(id))
+        return withEventApplied(CharacterRemovedFromStory(id, projectId))
     }
 
     interface NameOperations {
@@ -65,15 +72,21 @@ class Character(
 
     fun noUpdate(reason: CharacterException? = null) = CharacterUpdate.WithoutChange(this, reason)
 
+    private fun copy(
+        projectId: Project.Id? = this.projectId,
+        names: CharacterNames = this.names,
+        media: Media.Id? = this.media
+    ) = Character(
+        id,
+        projectId,
+        names,
+        media
+    )
+
     private fun withEventApplied(event: CharacterNameAdded): CharacterUpdate.Updated<CharacterNameAdded>
     {
         return CharacterUpdate.Updated(
-            Character(
-                id,
-                projectId,
-                names.withName(NonBlankString.create(event.name)!!),
-                media
-            ),
+            copy(names = names.withName(NonBlankString.create(event.name)!!)),
             event
         )
     }
@@ -81,12 +94,7 @@ class Character(
     private fun withEventApplied(event: CharacterNameRemoved): CharacterUpdate.Updated<CharacterNameRemoved>
     {
         return CharacterUpdate.Updated(
-            Character(
-                id,
-                projectId,
-                names.withoutName(NonBlankString.create(event.name)!!),
-                media
-            ),
+            copy(names = names.withoutName(NonBlankString.create(event.name)!!)),
             event
         )
     }
@@ -94,12 +102,7 @@ class Character(
     private fun withEventApplied(event: CharacterRenamed): CharacterUpdate.Updated<CharacterRenamed>
     {
         return CharacterUpdate.Updated(
-            Character(
-                id,
-                projectId,
-                names.rename(NonBlankString.create(event.oldName)!!, NonBlankString.create(event.name)!!),
-                media
-            ),
+            copy(names = names.rename(NonBlankString.create(event.oldName)!!, NonBlankString.create(event.name)!!)),
             event
         )
     }
@@ -107,12 +110,15 @@ class Character(
     private fun withEventApplied(event: CharacterDisplayNameSelected): CharacterUpdate.Updated<CharacterDisplayNameSelected>
     {
         return CharacterUpdate.Updated(
-            Character(
-                id,
-                projectId,
-                CharacterNames(NonBlankString.create(event.name)!!, names),
-                media
-            ),
+            copy(names = CharacterNames(NonBlankString.create(event.name)!!, names)),
+            event
+        )
+    }
+
+    private fun withEventApplied(event: CharacterRemovedFromStory): CharacterUpdate.Updated<CharacterRemovedFromStory>
+    {
+        return CharacterUpdate.Updated(
+            copy(projectId = null),
             event
         )
     }

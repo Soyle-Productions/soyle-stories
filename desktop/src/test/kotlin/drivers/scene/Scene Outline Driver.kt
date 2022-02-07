@@ -76,7 +76,7 @@ fun SceneOutlineView.addStoryEvent(storyEventId: StoryEvent.Id) {
     }
 }
 
-fun SceneOutlineView.removeStoryEvent(storyEventId: StoryEvent.Id) {
+fun SceneOutlineView.openConfirmRemoveStoryEventFromSceneDialog(storyEventId: StoryEvent.Id) {
     drive {
         val optionsMenu = getListedStoryEvent(storyEventId)!!
             .optionsMenu

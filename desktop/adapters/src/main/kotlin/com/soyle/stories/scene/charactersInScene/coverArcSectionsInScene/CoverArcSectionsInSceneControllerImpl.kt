@@ -1,16 +1,13 @@
 package com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene
 
 import com.soyle.stories.common.ThreadTransformer
-import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.ChangeCharacterArcSectionValueAndCoverInScene
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
 import java.util.*
 
 class CoverArcSectionsInSceneControllerImpl(
     private val threadTransformer: ThreadTransformer,
     private val coverCharacterArcSectionsInScene: CoverCharacterArcSectionsInScene,
-    private val coverCharacterArcSectionsInSceneOutput: CoverCharacterArcSectionsInScene.OutputPort,
-    private val changeCharacterArcSectionValueAndCoverInScene: ChangeCharacterArcSectionValueAndCoverInScene,
-    private val changeCharacterArcSectionValueAndCoverInSceneOutput: ChangeCharacterArcSectionValueAndCoverInScene.OutputPort
+    private val coverCharacterArcSectionsInSceneOutput: CoverCharacterArcSectionsInScene.OutputPort
 ) : CoverArcSectionsInSceneController {
 
     override fun coverCharacterArcSectionInScene(
@@ -39,18 +36,6 @@ class CoverArcSectionsInSceneControllerImpl(
         arcSectionId: String,
         value: String
     ) {
-        val request = ChangeCharacterArcSectionValueAndCoverInScene.RequestModel(
-            UUID.fromString(themeId),
-            UUID.fromString(characterId),
-            UUID.fromString(arcSectionId),
-            UUID.fromString(sceneId),
-            value
-        )
-        threadTransformer.async {
-            changeCharacterArcSectionValueAndCoverInScene.invoke(
-                request, changeCharacterArcSectionValueAndCoverInSceneOutput
-            )
-        }
     }
 
 }

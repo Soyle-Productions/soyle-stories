@@ -5,7 +5,6 @@ import kotlinx.coroutines.Job
 
 interface RemoveCharacterFromStoryController {
 
-    fun requestRemoveCharacter(characterId: String)
-    fun confirmRemoveCharacter(characterId: Character.Id): Job
+    fun removeCharacter(characterId: Character.Id, prompt: ConfirmationPrompt, report: RamificationsReport): Job
 
 }

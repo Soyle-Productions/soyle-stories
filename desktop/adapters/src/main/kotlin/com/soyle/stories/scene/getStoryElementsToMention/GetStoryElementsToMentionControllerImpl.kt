@@ -3,7 +3,7 @@ package com.soyle.stories.scene.getStoryElementsToMention
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.validation.NonBlankString
-import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
+import com.soyle.stories.usecase.scene.prose.mentions.GetStoryElementsToMentionInScene
 
 class GetStoryElementsToMentionControllerImpl(
     private val getStoryElementsToMentionInScene: GetStoryElementsToMentionInScene,
@@ -12,11 +12,10 @@ class GetStoryElementsToMentionControllerImpl(
 
     override fun getElementsForScene(
         sceneId: Scene.Id,
-        query: NonBlankString,
         output: GetStoryElementsToMentionInScene.OutputPort
     ) {
         threadTransformer.async {
-            getStoryElementsToMentionInScene.invoke(sceneId, query, output)
+            getStoryElementsToMentionInScene.invoke(sceneId, output)
         }
     }
 

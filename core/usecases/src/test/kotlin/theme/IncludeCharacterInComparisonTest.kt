@@ -62,7 +62,7 @@ class IncludeCharacterInComparisonTest {
     val character = makeCharacter(
         Character.Id(characterUUID), Project.Id()
     )
-    val characterName = character.name
+    val characterName = character.displayName
 
     @Nested
     inner class GivenCharacterDoesNotExist {

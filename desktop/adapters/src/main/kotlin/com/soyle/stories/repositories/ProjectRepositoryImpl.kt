@@ -9,14 +9,16 @@ import com.soyle.stories.workspace.valueobjects.ProjectFile
 class ProjectRepositoryImpl(
     private val projectLocation: String,
     private val fileStore: FileStore<ProjectFile>
-) : ProjectRepository, com.soyle.stories.workspace.repositories.ProjectRepository {
+) : ProjectRepository {
 
     override suspend fun addNewProject(project: Project) {
         fileStore.createFile(projectLocation, ProjectFile(project.id, project.name.value, projectLocation))
     }
 
-    override suspend fun getProjectAtLocation(location: String): Project? = fileStore.getFileAt(location)?.let {
-        Project(it.projectId, NonBlankString.create(it.projectName)!!)
+    override suspend fun getProject(projectId: Project.Id): Project? {
+        return fileStore.getFileAt(projectLocation)?.takeIf { it.projectId == projectId }?.let {
+            Project(it.projectId, NonBlankString.create(it.projectName)!!)
+        }
     }
 
 }

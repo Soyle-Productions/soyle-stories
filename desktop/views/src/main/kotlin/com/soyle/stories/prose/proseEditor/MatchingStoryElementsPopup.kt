@@ -43,7 +43,7 @@ class MatchingStoryElementsPopup(
         return ListView<MatchingStoryElementViewModel>().apply {
             cellFragment(scope, MentionSuggestion::class)
             whenMentionQueryStateIsLoaded {
-                items.setAll(it.prioritizedMatches)
+                items.setAll(it.items)
                 selectionModel.select(0)
                 runLater { sizeToFitItems() }
             }

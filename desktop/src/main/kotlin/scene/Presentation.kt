@@ -1,47 +1,52 @@
 package com.soyle.stories.desktop.config.scene
 
-import com.soyle.stories.character.createArcSection.CreateArcSectionController
-import com.soyle.stories.common.Notifier
+import com.soyle.stories.Locale
+import com.soyle.stories.common.ComponentContext
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.desktop.config.InProjectScope
-import com.soyle.stories.desktop.config.locale.LocaleHolder
+import com.soyle.stories.desktop.config.scene.Presentation.effects
 import com.soyle.stories.di.InScope
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
+import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.project.WorkBench
 import com.soyle.stories.prose.editProse.ContentReplacedNotifier
 import com.soyle.stories.prose.invalidateRemovedMentions.DetectInvalidatedMentionsOutput
-import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneNotifier
-import com.soyle.stories.scene.charactersInScene.RenamedCharacterInSceneReceiver
-import com.soyle.stories.scene.charactersInScene.assignRole.AssignRoleToCharacterInSceneController
-import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedNotifier
-import com.soyle.stories.scene.charactersInScene.assignRole.CharacterRoleInSceneChangedReceiver
-import com.soyle.stories.scene.charactersInScene.coverArcSectionsInScene.*
+import com.soyle.stories.ramifications.confirmation.ConfirmationPromptLocale
+import com.soyle.stories.scene.FocusedSceneQueries
+import com.soyle.stories.scene.FocusedSceneViewModel
+import com.soyle.stories.scene.characters.list.item.CharacterInSceneItemLocale
+import com.soyle.stories.scene.characters.remove.ConfirmRemoveCharacterFromScenePromptLocale
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolLocale
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolScope
+import com.soyle.stories.scene.create.CreateScenePrompt
+import com.soyle.stories.scene.create.CreateScenePromptPresenter
+import com.soyle.stories.scene.create.SceneCreatedNotifier
+import com.soyle.stories.scene.delete.DeleteSceneConfirmationPromptLocale
+import com.soyle.stories.scene.delete.SceneDeletedNotifier
+import com.soyle.stories.scene.effects.InheritedMotivationChangedLocale
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
-import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludeCharacterInSceneController
-import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludedCharacterInSceneNotifier
-import com.soyle.stories.scene.charactersInScene.includeCharacterInScene.IncludedCharacterInSceneReceiver
-import com.soyle.stories.scene.charactersInScene.listAvailableCharacters.ListAvailableCharactersToIncludeInSceneController
-import com.soyle.stories.scene.charactersInScene.listCharactersInScene.ListCharactersInSceneController
-import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemoveCharacterFromSceneController
-import com.soyle.stories.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionController
+import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
 import com.soyle.stories.scene.locationsInScene.SceneSettingLocationRenamedNotifier
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LinkLocationToSceneController
 import com.soyle.stories.scene.locationsInScene.linkLocationToScene.LocationUsedInSceneNotifier
 import com.soyle.stories.scene.locationsInScene.removeLocationFromScene.LocationRemovedFromSceneNotifier
-import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneNotifier
-import com.soyle.stories.scene.charactersInScene.removeCharacterFromScene.RemovedCharacterFromSceneReceiver
-import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedNotifier
-import com.soyle.stories.scene.charactersInScene.setDesire.CharacterDesireInSceneChangedReceiver
-import com.soyle.stories.scene.charactersInScene.setDesire.SetCharacterDesireInSceneController
-import com.soyle.stories.scene.charactersInScene.setMotivationForCharacterInScene.SetMotivationForCharacterInSceneController
+import com.soyle.stories.scene.outline.SceneOutlineComponent
+import com.soyle.stories.scene.outline.SceneOutlineReportPresenter
+import com.soyle.stories.scene.outline.SceneOutlineViewModel
+import com.soyle.stories.scene.outline.item.OutlinedStoryEventItemComponent
+import com.soyle.stories.scene.outline.remove.ConfirmRemoveStoryEventFromScenePromptLocale
+import com.soyle.stories.scene.outline.remove.confirmRemoveStoryEventFromScenePrompt
+import com.soyle.stories.scene.outline.remove.ramifications.UncoverStoryEventRamificationsReportLocale
+import com.soyle.stories.scene.outline.remove.ramifications.uncoverStoryEventRamifications
+import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
 import com.soyle.stories.scene.reorder.ReorderSceneNotifier
-import com.soyle.stories.scene.sceneCharacters.SceneCharactersController
-import com.soyle.stories.scene.sceneCharacters.SceneCharactersViewListener
+import com.soyle.stories.scene.reorder.ReorderScenePromptPresenter
+import com.soyle.stories.scene.reorder.ramifications.ReorderSceneRamificationsReportPresenter
 import com.soyle.stories.scene.sceneEditor.SceneEditorController
 import com.soyle.stories.scene.sceneEditor.SceneEditorScope
 import com.soyle.stories.scene.sceneEditor.SceneEditorState
@@ -55,32 +60,15 @@ import com.soyle.stories.scene.sceneList.SceneListViewListener
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneController
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneState
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneViewListener
-import com.soyle.stories.scene.create.CreateScenePrompt
-import com.soyle.stories.scene.create.CreateScenePromptPresenter
-import com.soyle.stories.scene.create.SceneCreatedNotifier
-import com.soyle.stories.scene.delete.DeleteScenePromptPresenter
-import com.soyle.stories.scene.delete.SceneDeletedNotifier
-import com.soyle.stories.scene.delete.ramifications.DeleteSceneRamificationsReportPresenter
-import com.soyle.stories.scene.inconsistencies.SceneInconsistenciesNotifier
-import com.soyle.stories.scene.outline.SceneOutlineComponent
-import com.soyle.stories.scene.outline.SceneOutlineReport
-import com.soyle.stories.scene.outline.SceneOutlineReportPresenter
-import com.soyle.stories.scene.outline.SceneOutlineViewModel
-import com.soyle.stories.scene.outline.item.OutlinedStoryEventItem
-import com.soyle.stories.scene.outline.item.OutlinedStoryEventItemComponent
-import com.soyle.stories.scene.renameScene.SceneRenamedNotifier
-import com.soyle.stories.scene.reorder.ReorderScenePromptPresenter
-import com.soyle.stories.scene.reorder.ramifications.ReorderSceneRamificationsReportPresenter
-import com.soyle.stories.scene.sceneCharacters.SceneCharactersState
+import com.soyle.stories.scene.setting.SceneSettingToolLocale
 import com.soyle.stories.scene.setting.SceneSettingToolRoot
 import com.soyle.stories.scene.setting.list.SceneSettingItemList
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemModel
 import com.soyle.stories.scene.setting.list.item.SceneSettingItemView
 import com.soyle.stories.scene.setting.list.useLocationButton.UseLocationButton
-import com.soyle.stories.scene.target.SceneTargetedNotifier
 import com.soyle.stories.scene.trackSymbolInScene.*
 import com.soyle.stories.theme.changeThemeDetails.renameTheme.RenamedThemeNotifier
-import javafx.scene.Node
+import kotlin.coroutines.CoroutineContext
 
 object Presentation {
 
@@ -95,6 +83,8 @@ object Presentation {
             symbolsInScene()
             charactersInScene()
             sceneOutline()
+
+            effects()
 
             reorderSceneRamifications()
             deleteSceneRamifications()
@@ -112,13 +102,14 @@ object Presentation {
     }
 
     private fun InProjectScope.deleteScenePrompt() {
-        provide { DeleteScenePromptPresenter() }
+        provide< DeleteSceneConfirmationPromptLocale> { applicationScope.get<Locale>().scenes.remove.prompt }
     }
 
     private fun InScope<ProjectScope>.sceneList() {
         provide<SceneListViewListener> {
             SceneListController(
                 applicationScope.get(),
+                Project.Id(projectId),
                 get(),
                 SceneListPresenter(
                     get<SceneListModel>(),
@@ -143,10 +134,10 @@ object Presentation {
             object : SceneSettingToolRoot.Factory {
                 override fun invoke(initialScene: Pair<Scene.Id, String>?): SceneSettingToolRoot = SceneSettingToolRoot(
                     initialScene,
-                    applicationScope.get<LocaleHolder>(),
+                    applicationScope.get<Locale>().scenes.locations,
                     get<SceneRenamedNotifier>(),
                     get<SceneDeletedNotifier>(),
-                    get<SceneTargetedNotifier>(),
+                    get(),
                     get()
                 )
             }
@@ -155,7 +146,7 @@ object Presentation {
             object : SceneSettingItemList.Factory {
                 override fun invoke(sceneId: Scene.Id): SceneSettingItemList = SceneSettingItemList(
                     sceneId,
-                    applicationScope.get<LocaleHolder>(),
+                    applicationScope.get<Locale>().scenes.locations.list,
                     get(),
                     get(),
                     get<LocationRemovedFromSceneNotifier>(),
@@ -170,7 +161,7 @@ object Presentation {
             object : SceneSettingItemView.Factory {
                 override fun invoke(model: SceneSettingItemModel): SceneSettingItemView = SceneSettingItemView(
                     model,
-                    applicationScope.get<LocaleHolder>(),
+                    applicationScope.get<Locale>().scenes.locations.list.item,
                     get(),
                     get(),
                     get(),
@@ -183,12 +174,15 @@ object Presentation {
             object : UseLocationButton.Factory {
                 override fun invoke(sceneId: Scene.Id): UseLocationButton = UseLocationButton(
                     sceneId,
-                    applicationScope.get<LocaleHolder>(),
+                    applicationScope.get<Locale>().scenes.locations.list.useLocation,
                     get(),
                     get(),
                     get()
                 )
             }
+        }
+        provide<SceneSettingToolLocale> {
+            applicationScope.get<Locale>().scenes.locations
         }
     }
 
@@ -216,48 +210,36 @@ object Presentation {
     }
 
     private fun InProjectScope.charactersInScene() {
-        provide<SceneCharactersViewListener> {
-            SceneCharactersController(
-                object : SceneCharactersController.Dependencies {
-                    override val listCharactersInSceneController: ListCharactersInSceneController
-                        get() = get()
-                    override val listAvailableCharactersToIncludeInSceneController: ListAvailableCharactersToIncludeInSceneController
-                        get() = get()
-                    override val includeCharacterInSceneController: IncludeCharacterInSceneController
-                        get() = get()
-                    override val listAvailableArcSectionsToCoverInSceneController: ListAvailableArcSectionsToCoverInSceneController
-                        get() = get()
-                    override val coverArcSectionsInSceneController: CoverArcSectionsInSceneController
-                        get() = get()
-                    override val createArcSectionController: CreateArcSectionController
-                        get() = get()
-                    override val removeCharacterFromSceneController: RemoveCharacterFromSceneController
-                        get() = get()
-                    override val setMotivationForCharacterInSceneController: SetMotivationForCharacterInSceneController
-                        get() = get()
-                    override val assignRoleToCharacterInSceneController: AssignRoleToCharacterInSceneController
-                        get() = get()
-                    override val setCharacterDesireInSceneController: SetCharacterDesireInSceneController
-                        get() = get()
-
-                    override val includedCharacterInSceneNotifier: Notifier<IncludedCharacterInSceneReceiver>
-                        get() = get<IncludedCharacterInSceneNotifier>()
-                    override val removedCharacterFromSceneNotifier: Notifier<RemovedCharacterFromSceneReceiver>
-                        get() = get<RemovedCharacterFromSceneNotifier>()
-                    override val renamedCharacterInSceneNotifier: Notifier<RenamedCharacterInSceneReceiver>
-                        get() = get<RenamedCharacterInSceneNotifier>()
-                    override val characterArcSectionsCoveredBySceneNotifier: Notifier<CharacterArcSectionsCoveredBySceneReceiver>
-                        get() = get<CharacterArcSectionsCoveredBySceneNotifier>()
-                    override val characterArcSectionUncoveredInSceneNotifier: Notifier<CharacterArcSectionUncoveredInSceneReceiver>
-                        get() = get<CharacterArcSectionUncoveredInSceneNotifier>()
-                    override val characterRoleInSceneChangedNotifier: Notifier<CharacterRoleInSceneChangedReceiver>
-                        get() = get<CharacterRoleInSceneChangedNotifier>()
-                    override val characterDesireInSceneChangedNotifier: Notifier<CharacterDesireInSceneChangedReceiver>
-                        get() = get<CharacterDesireInSceneChangedNotifier>()
-                },
-                get<SceneCharactersState>()
-            )
+        provide(FocusedSceneQueries::class) { FocusedSceneViewModel(this) }
+        provide<ComponentContext> {
+            object : ComponentContext {
+                override val gui: CoroutineContext = applicationScope.get<ThreadTransformer>().guiContext
+                override val projectScope: ProjectScope = this@provide
+            }
         }
+        provide<SceneCharactersToolLocale> { applicationScope.get<Locale>().scenes.characters.tool }
+        provide<CharacterInSceneItemLocale> { applicationScope.get<Locale>().scenes.characters.list.item }
+
+        provide<ConfirmRemoveCharacterFromScenePromptLocale> {
+            applicationScope.get<Locale>().scenes.characters.remove
+        }
+        provide<ConfirmationPromptLocale> {
+            applicationScope.get<Locale>().ramifications.confirmation
+        }
+
+        scoped<SceneCharactersToolScope> {
+            hoist<Locale> { projectScope.applicationScope }
+            provide<SceneCharactersToolLocale> { get<Locale>().scenes.characters.tool }
+            provide<CharacterInSceneItemLocale> { get<Locale>().scenes.characters.list.item }
+            hoist<FocusedSceneQueries> { projectScope }
+            hoist<ConfirmRemoveCharacterFromScenePromptLocale> { projectScope }
+            hoist<ConfirmationPromptLocale> { projectScope }
+        }
+
+    }
+
+    private fun InProjectScope.effects() {
+        provide<InheritedMotivationChangedLocale> { applicationScope.get<Locale>().scenes.effects }
     }
 
     private fun InProjectScope.reorderSceneRamifications() {
@@ -265,7 +247,7 @@ object Presentation {
     }
 
     private fun InProjectScope.deleteSceneRamifications() {
-        provide { DeleteSceneRamificationsReportPresenter(get(), this) }
+//        provide { DeleteSceneRamificationsReportPresenter(get(), this) }
     }
 
     private fun InProjectScope.sceneOutline() {
@@ -283,7 +265,19 @@ object Presentation {
             object : SceneOutlineComponent.Gui,
                 OutlinedStoryEventItemComponent by get<OutlinedStoryEventItemComponent>() {}
         }
-        provide<OutlinedStoryEventItemComponent> { OutlinedStoryEventItemComponent.Implementation(get()) }
+        provide<OutlinedStoryEventItemComponent> {
+            OutlinedStoryEventItemComponent.Implementation(
+                { confirmRemoveStoryEventFromScenePrompt(this, get<WorkBench>().currentStage) },
+                { uncoverStoryEventRamifications(this, it) },
+                get()
+            )
+        }
+        provide<ConfirmRemoveStoryEventFromScenePromptLocale> {
+            applicationScope.get<Locale>().scenes.storyEvents.remove.prompt
+        }
+        provide<UncoverStoryEventRamificationsReportLocale> {
+            applicationScope.get<Locale>().scenes.storyEvents.remove.ramifications
+        }
     }
 
     private fun sceneEditor() {
@@ -296,11 +290,7 @@ object Presentation {
                             get() = projectScope.get()
                         override val getStoryElementsToMentionController: GetStoryElementsToMentionController
                             get() = projectScope.get()
-                        override val includeCharacterInSceneController: IncludeCharacterInSceneController
-                            get() = projectScope.get()
                         override val linkLocationToSceneController: LinkLocationToSceneController
-                            get() = projectScope.get()
-                        override val listOptionsToReplaceMentionController: ListOptionsToReplaceMentionController
                             get() = projectScope.get()
                         override val setSceneFrameValueController: SetSceneFrameValueController
                             get() = projectScope.get()

@@ -4,8 +4,7 @@ import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.scene.PromptChoice
 import com.soyle.stories.usecase.scene.SceneRepository
-import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.GetPotentialChangesFromReorderingScene
-import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
+import com.soyle.stories.usecase.scene.reorderScene.GetPotentialChangesFromReorderingScene
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.writer.DialogType
 import com.soyle.stories.writer.usecases.DialogPreference
@@ -14,9 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.BufferedInputStream
-import java.io.File
-import java.io.InputStream
 
 class ReorderSceneControllerImpl(
     threadTransformer: ThreadTransformer,
@@ -79,7 +75,7 @@ class ReorderSceneControllerImpl(
         val report = getReportForScene(sceneId)
         withContext(asyncContext) {
             getPotentialChangesFromReorderingScene.invoke(
-                sceneId.uuid,
+                sceneId,
                 newIndex,
                 report
             )

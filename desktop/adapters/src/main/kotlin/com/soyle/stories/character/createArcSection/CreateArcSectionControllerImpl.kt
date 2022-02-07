@@ -6,7 +6,6 @@ import com.soyle.stories.domain.character.CharacterArcTemplateSection
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.usecase.character.arc.section.addSectionToArc.AddSectionToCharacterArc
 import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CoverCharacterArcSectionsInScene
-import com.soyle.stories.usecase.scene.character.coverCharacterArcSectionsInScene.CreateCharacterArcSectionAndCoverInScene
 import kotlinx.coroutines.Job
 import java.util.*
 
@@ -15,9 +14,7 @@ class CreateArcSectionControllerImpl(
     private val addSectionToCharacterArc: AddSectionToCharacterArc,
     private val addSectionToCharacterArcOutput: AddSectionToCharacterArc.OutputPort,
     private val coverCharacterArcSectionsInScene: CoverCharacterArcSectionsInScene,
-    private val coverCharacterArcSectionsInSceneOutput: CoverCharacterArcSectionsInScene.OutputPort,
-    private val createCharacterArcSectionAndCoverInScene: CreateCharacterArcSectionAndCoverInScene,
-    private val createCharacterArcSectionAndCoverInSceneOutputPort: CreateCharacterArcSectionAndCoverInScene.OutputPort
+    private val coverCharacterArcSectionsInSceneOutput: CoverCharacterArcSectionsInScene.OutputPort
 ) : CreateArcSectionController {
 
     override fun createArcSection(
@@ -41,18 +38,6 @@ class CreateArcSectionControllerImpl(
         value: String,
         sceneId: String
     ) {
-        threadTransformer.async {
-            createCharacterArcSectionAndCoverInScene.invoke(
-                CreateCharacterArcSectionAndCoverInScene.RequestModel(
-                    UUID.fromString(themeId),
-                    UUID.fromString(characterId),
-                    UUID.fromString(sceneId),
-                    UUID.fromString(sectionTemplateId),
-                    value
-                ),
-                createCharacterArcSectionAndCoverInSceneOutputPort
-            )
-        }
     }
 
 }

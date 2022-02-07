@@ -1,30 +1,23 @@
 package com.soyle.stories.scene.sceneSymbols
 
-import com.soyle.stories.common.components.ComponentsStyles.Companion.cardBody
 import com.soyle.stories.common.components.layouts.emptyToolInvitation
-import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
 import com.soyle.stories.common.components.text.TextStyles
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
+import com.soyle.stories.common.scopedListener
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.FocusedSceneQueries
 import com.soyle.stories.scene.SceneStyles
-import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.sceneList.SceneListModel
 import com.soyle.stories.scene.sceneSymbols.SymbolsInSceneView.Styles.Companion.symbolsInScene
-import com.soyle.stories.scene.target.SceneTargeted
-import com.soyle.stories.scene.target.SceneTargetedNotifier
-import com.soyle.stories.scene.target.SceneTargetedReceiver
 import com.soyle.stories.soylestories.Styles.Companion.Orange
 import javafx.application.Platform
-import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.ContentDisplay
-import javafx.scene.effect.BlurType
-import javafx.scene.effect.DropShadow
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
@@ -110,24 +103,9 @@ class SymbolsInSceneView : View() {
         state.targetScene.value = Triple(sceneId, proseId, sceneName)
     }
 
-    private val guiEventListener = object :
-        SceneTargetedReceiver
-    {
-        override suspend fun receiveSceneTargeted(event: SceneTargeted) {
-            if (! Platform.isFxApplicationThread()) {
-                withContext(Dispatchers.JavaFx) {
-                    targetSceneItem(event.sceneId, event.proseId, event.sceneName)
-                }
-            } else {
-                targetSceneItem(event.sceneId, event.proseId, event.sceneName)
-            }
-        }
-    }
-
     init {
-        (scope as ProjectScope).get<SceneTargetedNotifier>().addListener(guiEventListener)
-        (FX.getComponents(scope)[SceneListModel::class] as? SceneListModel)?.let {
-            it.selectedItem.value?.let { targetSceneItem(it.id, it.proseId, it.name) }
+        scopedListener((scope as ProjectScope).get<FocusedSceneQueries>().focusedScene()) {
+            if (it != null) targetSceneItem(it, Prose.Id(), "")
         }
     }
 

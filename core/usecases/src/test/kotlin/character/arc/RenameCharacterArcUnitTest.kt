@@ -40,7 +40,7 @@ class RenameCharacterArcUnitTest {
         val result = assertThrows<CharacterDoesNotExist> {
             whenUseCaseIsExecuted()
         }
-        result.characterId.mustEqual(characterId)
+        result.characterId.uuid.mustEqual(characterId)
     }
 
     @Test
@@ -100,7 +100,7 @@ class RenameCharacterArcUnitTest {
         andThemeWithId?.let {
             val theme = makeTheme(Theme.Id(andThemeWithId), name = characterArcName.value)
             if (andThemeHasCharacter) {
-                theme.withCharacterIncluded(character!!.id, character.name.value, character.media).let {
+                theme.withCharacterIncluded(character!!.id, character.displayName.value, character.media).let {
                     if (andCharacterIsMajorCharacter) {
                         characterArcRepository.givenCharacterArc(
                             CharacterArc.planNewCharacterArc(

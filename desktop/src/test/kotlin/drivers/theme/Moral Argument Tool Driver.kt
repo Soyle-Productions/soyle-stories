@@ -50,7 +50,7 @@ fun MoralArgumentView.givenMoralArgumentHasBeenLoadedForPerspectiveCharacter(cha
 {
     val driver = MoralArgumentViewDriver(this)
     val perspectiveCharacterSelection = driver.getPerspectiveCharacterSelection()
-    if (perspectiveCharacterSelection.text == character.name.value) return this
+    if (perspectiveCharacterSelection.text == character.displayName.value) return this
     loadMoralArgumentForPerspectiveCharacter(character)
     return this
 }
@@ -64,8 +64,8 @@ fun MoralArgumentView.loadMoralArgumentForPerspectiveCharacter(character: Charac
             perspectiveCharacterSelection.fire()
         }
     }
-    val characterItem = perspectiveCharacterSelection.items.find { it.text == character.name.value }
-        ?: error("Could not find item with text ${character.name.value} in ${perspectiveCharacterSelection.items.map { it.text }}")
+    val characterItem = perspectiveCharacterSelection.items.find { it.text == character.displayName.value }
+        ?: error("Could not find item with text ${character.displayName.value} in ${perspectiveCharacterSelection.items.map { it.text }}")
     driver.interact {
         characterItem.fire()
     }

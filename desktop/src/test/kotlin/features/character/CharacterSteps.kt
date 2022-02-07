@@ -2,6 +2,7 @@ package com.soyle.stories.desktop.config.features.character
 
 import com.soyle.stories.character.rename.RenameCharacterForm
 import com.soyle.stories.desktop.config.drivers.character.*
+import com.soyle.stories.desktop.config.drivers.ramifications.confirmation.confirm
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.ScenarioContext
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbench
@@ -11,7 +12,6 @@ import com.soyle.stories.desktop.config.drivers.theme.givenMoralArgumentToolHasB
 import com.soyle.stories.desktop.config.features.soyleStories
 import com.soyle.stories.desktop.view.character.list.CharacterListAssertions
 import com.soyle.stories.desktop.view.character.profile.`Character Profile Assertions`.Companion.assertThat
-import com.soyle.stories.desktop.view.character.profile.`Character Profile View Access`.Companion.access
 import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.desktop.view.theme.moralArgument.MoralArgumentViewAssert
 import com.soyle.stories.domain.character.Character
@@ -19,10 +19,8 @@ import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.NonBlankString
 import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import java.util.*
-import kotlin.math.exp
 
 class CharacterSteps : En {
 
@@ -58,12 +56,12 @@ class CharacterSteps : En {
             characterDriver.givenCharacterNamed(NonBlankString.create(characterName)!!)
         }
         Given("I have renamed the {character} to {string}") { character: Character, newName: String ->
-            if (character.name.value != newName) {
+            if (character.displayName.value != newName) {
                 CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
-                    .givenCharacterRenamedTo(character.id, newName)
+                    .givenCharacterRenamedTo(character.id, character.displayName.value, newName)
             }
         }
-        Given("I am deleting the {character}") { character: Character ->
+        Given("I am removing the {character} from the story") { character: Character ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCharacterListToolHasBeenOpened()
                 .givenDeleteCharacterDialogHasBeenOpened(character.id)
@@ -124,7 +122,7 @@ class CharacterSteps : En {
             "I have renamed the name variant of {string} for the {character} to {string}"
         ) { originalVariant: String, character: Character, newVariant: String ->
             CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError())
-                .givenCharacterNameVariantRenamedTo(character.id, originalVariant, newVariant)
+                .givenCharacterRenamedTo(character.id, originalVariant, newVariant)
         }
     }
 
@@ -144,13 +142,13 @@ class CharacterSteps : En {
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCharacterListToolHasBeenOpened()
                 .givenDeleteCharacterDialogHasBeenOpened(character.id)
-                .confirmDelete()
+                .confirm()
         }
         When("I remove the {character} from the story") { character: Character ->
             soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCharacterListToolHasBeenOpened()
                 .givenDeleteCharacterDialogHasBeenOpened(character.id)
-                .confirmDelete()
+                .confirm()
         }
         When("I create a character named {string}") { name: String ->
             soyleStories.getAnyOpenWorkbenchOrError()
@@ -282,7 +280,7 @@ class CharacterSteps : En {
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val character = CharacterDriver(workbench)
                 .getCharacterAtOnePointNamed(originalName)!!
-            assertEquals(expectedName, character.name.value)
+            assertEquals(expectedName, character.displayName.value)
 
             CharacterListAssertions.assertThat(workbench.givenCharacterListToolHasBeenOpened()) {
                 characterHasName(character.id, expectedName)
@@ -294,7 +292,7 @@ class CharacterSteps : En {
         Then(
             "the {character} should still have the display name of {string}"
         ) { character: Character, expectedName: String ->
-            assertEquals(expectedName, character.name.value)
+            assertEquals(expectedName, character.displayName.value)
         }
         Then(
             "I should not be creating a name variant for the {character}"
@@ -312,7 +310,7 @@ class CharacterSteps : En {
         Then(
             "the {character} should have a name variant of {string}"
         ) { character: Character, expectedVariant: String ->
-            assertTrue(character.otherNames.contains(NonBlankString.create(expectedVariant)!!))
+            assertTrue(character.names.contains(NonBlankString.create(expectedVariant)!!))
 
             val characterProfile = soyleStories.getAnyOpenWorkbenchOrError()
                 .givenCharacterListToolHasBeenOpened()
@@ -354,12 +352,12 @@ class CharacterSteps : En {
         Then(
             "the {character} should not have a name variant of {string}"
         ) { character: Character, variant: String ->
-            assertNull(character.otherNames.find { it.value == variant })
+            assertNull(character.names.secondaryNames.find { it.value == variant })
         }
         Then(
             "the {character} should have only one name variant of {string}"
         ) { character: Character, variant: String ->
-            character.otherNames.filter { it.value == variant }.single()
+            character.names.filter { it.value == variant }.single()
         }
     }
 }

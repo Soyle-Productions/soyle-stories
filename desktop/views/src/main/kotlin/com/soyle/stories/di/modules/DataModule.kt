@@ -38,7 +38,6 @@ object DataModule {
 			}
 
 			provide(
-			  ProjectRepository::class,
 			  com.soyle.stories.workspace.repositories.ProjectRepository::class,
 			  FileRepository::class
 			) {
@@ -47,6 +46,10 @@ object DataModule {
 		}
 
 		scoped<ProjectScope> {
+
+			provide<ProjectRepository> {
+				ProjectRepositoryImpl(projectViewModel.location, applicationScope.get<ProjectFileStore>())
+			}
 
 			provide<LayoutRepository> { LayoutRepositoryImpl() }
 
@@ -66,10 +69,6 @@ object DataModule {
 
 			provide<Context> {
 				ContextDouble(this)
-			}
-
-			provide<SceneRepository> {
-				SceneRepositoryImpl()
 			}
 
 			provide<StoryEventRepository> {

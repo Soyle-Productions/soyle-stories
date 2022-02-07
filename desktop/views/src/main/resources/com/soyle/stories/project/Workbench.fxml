@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            prefHeight="400.0" prefWidth="600.0">
+    <top>
+        <MenuBar>
+            <Menu text="File" fx:id="file">
+                <Menu text="New" fx:id="file_new" accelerator="Shortcut+N">
+                    <MenuItem text="Project" fx:id="file_new_project"/>
+                    <SeparatorMenuItem />
+                    <MenuItem text="Character" fx:id="file_new_character"/>
+                    <MenuItem text="Location" fx:id="file_new_location"/>
+                    <MenuItem text="Story Event" fx:id="file_new_storyevent"/>
+                    <MenuItem text="Scene" fx:id="file_new_scene"/>
+                </Menu>
+            </Menu>
+            <Menu text="Edit" fx:id="edit" />
+            <Menu text="View" fx:id="view" />
+            <Menu text="Tools" fx:id="tools">
+            </Menu>
+        </MenuBar>
+    </top>
+    <center>
+
+    </center>
+</BorderPane>

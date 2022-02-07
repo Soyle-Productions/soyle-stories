@@ -2,51 +2,71 @@ package com.soyle.stories.usecase.scene.character.setMotivationForCharacterInSce
 
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.usecase.character.CharacterDoesNotExist
+import com.soyle.stories.domain.scene.SceneDoesNotIncludeCharacter
+import com.soyle.stories.domain.scene.SceneUpdate
+import com.soyle.stories.domain.scene.SuccessfulSceneUpdate
+import com.soyle.stories.domain.scene.character.CharacterInSceneOperations
+import com.soyle.stories.domain.scene.character.events.CharacterIncludedInScene
+import com.soyle.stories.domain.scene.character.events.CharacterMotivationInSceneChanged
 import com.soyle.stories.usecase.character.CharacterRepository
-import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.scene.SceneRepository
-import java.util.*
+import com.soyle.stories.usecase.storyevent.StoryEventRepository
 
 class SetMotivationForCharacterInSceneUseCase(
-  private val sceneRepository: SceneRepository,
-  private val characterRepository: CharacterRepository
+    private val scenes: SceneRepository,
+    private val storyEvents: StoryEventRepository,
+    private val characters: CharacterRepository
 ) : SetMotivationForCharacterInScene {
 
-	override suspend fun invoke(request: SetMotivationForCharacterInScene.RequestModel, output: SetMotivationForCharacterInScene.OutputPort) {
-		val response = try { execute(request) }
-		catch (e: Exception) { return output.failedToSetMotivationForCharacterInScene(e) }
-		output.motivationSetForCharacterInScene(response)
-	}
+    override suspend fun invoke(
+        request: SetMotivationForCharacterInScene.RequestModel,
+        output: SetMotivationForCharacterInScene.OutputPort
+    ) {
+        val scene = sceneMustExist(request.sceneId)
+        val sceneWithCharacter = scene.mustIncludeCharacter(request.characterId)
+        val update = sceneWithCharacter.setMotivation(request.characterId, request.motivation)
+        when (update) {
+            is SceneUpdate.UnSuccessful -> update.reason?.let { throw it }
+            is SceneUpdate.Successful -> {
+                scenes.updateScene(update.scene)
+                val response = update.asResponse(sceneWithCharacter)
+                output.motivationSetForCharacterInScene(response)
+            }
+        }
+    }
 
-	private suspend fun execute(request: SetMotivationForCharacterInScene.RequestModel): SetMotivationForCharacterInScene.ResponseModel {
-		val scene = getScene(request)
-		val character = getCharacter(request.characterId)
-		setMotivationIfNeeded(scene, character, request)
-		return convertRequestToResponse(request)
-	}
+    private suspend fun sceneMustExist(sceneId: Scene.Id): Scene {
+        return scenes.getSceneOrError(sceneId.uuid)
+    }
 
-	private suspend fun getScene(request: SetMotivationForCharacterInScene.RequestModel) =
-	  (sceneRepository.getSceneById(Scene.Id(request.sceneId))
-		?: throw SceneDoesNotExist(request.locale, request.sceneId))
+    private suspend fun Scene.mustIncludeCharacter(characterId: Character.Id): SceneUpdate<CharacterIncludedInScene> {
+        return if (includesCharacter(characterId)) noUpdate()
+        else {
+            val character = characters.getCharacterOrError(characterId.uuid)
+            ensureCharacterImplicitlyIncluded(characterId)
+            withCharacterIncluded(character)
+        }
+    }
 
-	private suspend fun getCharacter(characterId: UUID) =
-	  (characterRepository.getCharacterById(Character.Id(characterId))
-		?: throw CharacterDoesNotExist(characterId))
+    private suspend fun Scene.ensureCharacterImplicitlyIncluded(characterId: Character.Id) {
+        storyEvents.getStoryEventsCoveredByScene(id)
+            .find { it.involvedCharacters.containsEntityWithId(characterId) }
+            ?: throw SceneDoesNotIncludeCharacter(id, characterId)
+    }
 
-	private suspend fun setMotivationIfNeeded(scene: Scene, character: Character, request: SetMotivationForCharacterInScene.RequestModel) {
-		if (scene.getMotivationForCharacter(character.id)?.motivation != request.motivation) {
-			sceneRepository.updateScene(scene.withMotivationForCharacter(character.id, request.motivation))
-		}
-	}
+    private fun SceneUpdate<CharacterIncludedInScene>.setMotivation(
+        characterId: Character.Id,
+        motivation: String?
+    ): SceneUpdate<CharacterMotivationInSceneChanged> {
+        return scene.withCharacter(characterId)!!.motivationChanged(motivation)
+    }
 
-	private fun convertRequestToResponse(request: SetMotivationForCharacterInScene.RequestModel): SetMotivationForCharacterInScene.ResponseModel {
-		return SetMotivationForCharacterInScene.ResponseModel(
-		  request.sceneId,
-		  request.characterId,
-		  request.motivation
-		)
-	}
-
-
+    private fun SuccessfulSceneUpdate<CharacterMotivationInSceneChanged>.asResponse(
+        characterIncludedUpdate: SceneUpdate<CharacterIncludedInScene>?
+    ): SetMotivationForCharacterInScene.ResponseModel {
+        return SetMotivationForCharacterInScene.ResponseModel(
+            change,
+            (characterIncludedUpdate as? SceneUpdate.Successful)?.change
+        )
+    }
 }

@@ -4,7 +4,7 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.openTool.OpenToolController
 import com.soyle.stories.project.ProjectScope
 import com.soyle.stories.scene.reorder.ReorderSceneRamificationsReport
-import com.soyle.stories.usecase.scene.getPotentialChangeFromReorderingScene.PotentialChangesFromReorderingScene
+import com.soyle.stories.usecase.scene.reorderScene.PotentialChangesFromReorderingScene
 import kotlinx.coroutines.CompletableDeferred
 import tornadofx.FX
 
@@ -24,7 +24,7 @@ class ReorderSceneRamificationsReportPresenter(
         openToolController.openReorderSceneRamificationsTool(sceneId.uuid.toString())
 
         return object : ReorderSceneRamificationsReport {
-            override fun receivePotentialChangesFromReorderingScene(response: PotentialChangesFromReorderingScene) {
+            override suspend fun receivePotentialChangesFromReorderingScene(response: PotentialChangesFromReorderingScene) {
                 viewModel.scenes.setAll(response.affectedScenes)
             }
 

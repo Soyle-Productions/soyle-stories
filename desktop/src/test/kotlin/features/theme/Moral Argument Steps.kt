@@ -348,7 +348,7 @@ class `Moral Argument Steps` : En {
         ) { template: CharacterArcTemplateSection, character: Character, theme: Theme ->
             val workbench = soyleStories.getAnyOpenWorkbenchOrError()
             val arc = CharacterArcDriver(workbench).getCharacterArcForCharacterAndThemeOrError(character.id, theme.id)
-            assertFalse(arc.arcSections.any { it.template == template }) { "${character.name}'s ${theme.name} moral argument still contains ${template.name}" }
+            assertFalse(arc.arcSections.any { it.template == template }) { "${character.displayName}'s ${theme.name} moral argument still contains ${template.name}" }
 
             val moralArgument = workbench.givenMoralArgumentToolHasBeenOpenedForTheme(theme)
             assertThat(moralArgument) {

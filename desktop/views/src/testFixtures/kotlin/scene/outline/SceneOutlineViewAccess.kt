@@ -40,9 +40,6 @@ class SceneOutlineViewAccess private constructor(private val view: SceneOutlineV
 
     fun getListedStoryEvent(storyEventId: StoryEvent.Id): OutlinedStoryEventItemView? {
         val list = list ?: return null
-        val item = getStoryEvent(storyEventId)
-        val cells = list.findChildren<ListCell<*>>(Stylesheet.listCell)
-        println("Finding outlined event for $item in $cells")
         return list.findChild(SceneOutlineStyles.outlinedEvent) { it.id == storyEventId.toString() }
     }
 

@@ -4,7 +4,7 @@ import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.events.LocationRenamed
 import com.soyle.stories.domain.prose.events.MentionTextReplaced
 import com.soyle.stories.domain.prose.mentioned
-import com.soyle.stories.domain.scene.Updated
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
 import com.soyle.stories.domain.scene.events.SceneSettingLocationRenamed
 import com.soyle.stories.domain.validation.SingleNonBlankLine
 import com.soyle.stories.usecase.location.LocationRepository
@@ -60,7 +60,7 @@ class RenameLocationUseCase(
 	): List<SceneSettingLocationRenamed> {
 		val (renamedLocation) = location.withName(newName)
 		val sceneUpdates = sceneRepository.getScenesUsingLocation(location.id).mapNotNull {
-			it.withLocationRenamed(renamedLocation) as? Updated
+			it.withLocationRenamed(renamedLocation) as? Successful
 		}
 		sceneRepository.updateScenes(sceneUpdates.map { it.scene })
 		return sceneUpdates.map { it.event }

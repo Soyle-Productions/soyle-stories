@@ -1,8 +1,8 @@
 package com.soyle.stories.character.renameCharacter
 
-import com.soyle.stories.domain.character.CharacterRenamed
+import com.soyle.stories.domain.character.name.events.CharacterRenamed
 
-interface CharacterRenamedReceiver {
+fun interface CharacterRenamedReceiver {
 
     suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed)
 

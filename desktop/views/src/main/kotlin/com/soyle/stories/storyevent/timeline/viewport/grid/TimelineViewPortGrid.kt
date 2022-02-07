@@ -2,7 +2,7 @@ package com.soyle.stories.storyevent.timeline.viewport.grid
 
 import com.soyle.stories.common.collections.binarySubList
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevation
 import com.soyle.stories.common.onChangeUntil
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.storyevent.timeline.*
@@ -18,14 +18,9 @@ import javafx.beans.WeakInvalidationListener
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.binding.ObjectExpression
 import javafx.beans.property.*
-import javafx.beans.value.WeakChangeListener
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.WeakListChangeListener
-import javafx.event.EventHandler
-import javafx.event.WeakEventHandler
-import javafx.geometry.Point2D
-import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Region
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -37,7 +32,6 @@ import tornadofx.*
 import java.lang.Double.max
 import java.util.*
 import kotlin.coroutines.CoroutineContext
-
 
 /**
  * Responsible to laying out the [labels].  They will be arranged according to their time and id.  Labels will not
@@ -385,10 +379,7 @@ class TimelineViewPortGrid(
 
     private fun initializeAddedLabel(label: StoryPointLabel) {
         label.collapsed().bind(labelsCollapsedProperty)
-        label.asSurface {
-            inheritedElevation = Elevation[4]!!
-            relativeElevation = Elevation[4]!!
-        }
+        elevation = Elevation.getValue(4)
         label.layoutXProperty().bind(scaleProperty.doubleBinding(label.time()) {
             scale(UnitOfTime(label.time)).value })
         label.cachedWidth().addListener(weakInvalidDurationListener)

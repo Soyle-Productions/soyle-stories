@@ -1,6 +1,6 @@
 package com.soyle.stories.di.theme
 
-import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
+import com.soyle.stories.character.buildNewCharacter.CharacterCreatedNotifier
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.usecase.character.listCharactersAvailableToIncludeInTheme.ListCharactersAvailableToIncludeInTheme
@@ -16,7 +16,6 @@ import com.soyle.stories.location.deleteLocation.DeletedLocationNotifier
 import com.soyle.stories.location.events.CreateNewLocationNotifier
 import com.soyle.stories.location.renameLocation.LocationRenamedNotifier
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArcNotifier
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebController
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebControllerImpl
 import com.soyle.stories.theme.addOppositionToValueWeb.AddOppositionToValueWebNotifier
@@ -118,10 +117,6 @@ import com.soyle.stories.usecase.theme.addValueWebToTheme.AddValueWebToTheme
 import com.soyle.stories.usecase.theme.addValueWebToTheme.AddValueWebToThemeUseCase
 import com.soyle.stories.usecase.theme.changeCharacterChange.ChangeCharacterChange
 import com.soyle.stories.usecase.theme.changeCharacterChange.ChangeCharacterChangeUseCase
-import com.soyle.stories.usecase.theme.changeThemeDetails.ChangeCentralConflict
-import com.soyle.stories.usecase.theme.changeThemeDetails.ChangeCentralMoralQuestion
-import com.soyle.stories.usecase.theme.changeThemeDetails.ChangeThemeDetailsUseCase
-import com.soyle.stories.usecase.theme.changeThemeDetails.RenameTheme
 import com.soyle.stories.usecase.theme.compareCharacterValues.CompareCharacterValues
 import com.soyle.stories.usecase.theme.compareCharacterValues.CompareCharacterValuesUseCase
 import com.soyle.stories.usecase.theme.createTheme.CreateTheme
@@ -132,8 +127,6 @@ import com.soyle.stories.usecase.theme.examineCentralConflictOfTheme.ExamineCent
 import com.soyle.stories.usecase.theme.examineCentralConflictOfTheme.ExamineCentralConflictOfThemeUseCase
 import com.soyle.stories.usecase.theme.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOpposition
 import com.soyle.stories.usecase.theme.listAvailableEntitiesToAddToOpposition.ListAvailableEntitiesToAddToOppositionUseCase
-import com.soyle.stories.usecase.theme.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInTheme
-import com.soyle.stories.usecase.theme.listAvailableOppositionValuesForCharacterInTheme.ListAvailableOppositionValuesForCharacterInThemeUseCase
 import com.soyle.stories.usecase.theme.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharacters
 import com.soyle.stories.usecase.theme.listAvailablePerspectiveCharacters.ListAvailablePerspectiveCharactersUseCase
 import com.soyle.stories.usecase.theme.listOppositionsInValueWeb.ListOppositionsInValueWeb
@@ -189,13 +182,6 @@ object ThemeModule {
         provide { provideCreateTheme(this) }
         provide<ListSymbolsByTheme> { ListSymbolsByThemeUseCase(get()) }
         provide<DeleteTheme> { DeleteThemeUseCase(get(), get()) }
-        provide(
-            ChangeCentralMoralQuestion::class,
-            RenameTheme::class,
-            ChangeCentralConflict::class
-        ) {
-            ChangeThemeDetailsUseCase(get())
-        }
         provide<AddSymbolToTheme> { AddSymbolToThemeUseCase(get()) }
         provide<ListThemes> { ListThemesUseCase(get()) }
         provide<ListValueWebsInTheme> { ListValueWebsInThemeUseCase(get()) }
@@ -232,13 +218,6 @@ object ThemeModule {
             UseCharacterAsMainOpponent::class,
             ListAvailableCharactersToUseAsOpponents::class
         ) { UseCharacterAsOpponentUseCase(get(), get()) }
-        provide(
-            ChangeCentralConflict::class,
-            RenameTheme::class,
-            ChangeCentralMoralQuestion::class
-        ) {
-            ChangeThemeDetailsUseCase(get())
-        }
         provide<ChangeCharacterDesire> { ChangeCharacterDesireUseCase(get(), get()) }
         provide<ChangeCharacterPsychologicalWeakness> { ChangeCharacterPsychologicalWeaknessUseCase(get(), get()) }
         provide<ChangeCharacterMoralWeakness> { ChangeCharacterMoralWeaknessUseCase(get(), get()) }
@@ -382,7 +361,7 @@ object ThemeModule {
             ChangeCentralConflictControllerImpl(applicationScope.get(), get(), get())
         }
         provide<ChangeSectionValueController> {
-            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
+            ChangeSectionValueControllerImpl(applicationScope.get(), get(), get(), get(), get(), get(), get(), get(), get())
         }
         provide<ChangeCharacterChangeController> {
             ChangeCharacterChangeControllerImpl(applicationScope.get(), get(), get())
@@ -612,7 +591,6 @@ object ThemeModule {
                     get<AddSymbolDialogModel>()
                 )
 
-                presenter listensTo projectScope.get<CreatedCharacterNotifier>()
                 presenter listensTo projectScope.get<CharacterRenamedNotifier>()
                 presenter listensTo projectScope.get<RemovedCharacterNotifier>()
 

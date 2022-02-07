@@ -9,6 +9,7 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.storyevent.create.CreateStoryEventController
 import com.soyle.stories.storyevent.create.StoryEventCreatedNotifier
+import com.soyle.stories.storyevent.details.StoryEventDetailsPrompt
 import com.soyle.stories.storyevent.list.*
 import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensNotifier
 import com.soyle.stories.storyevent.rename.StoryEventRenamedNotifier
@@ -42,6 +43,9 @@ class `Story Event List Tool Design` : DesignTest() {
         override fun adjustTimesOfSelectedItems() = Unit
         override fun deleteSelectedItems() = Unit
         override fun viewSelectedItemInTimeline() = Unit
+        override fun viewDetails(prompt: StoryEventDetailsPrompt) {
+
+        }
     }
     private val viewModel = objectProperty<StoryEventListViewModel>(null)
     private val cell = object : StoryEventListCell {
@@ -59,8 +63,8 @@ class `Story Event List Tool Design` : DesignTest() {
             }
         }
     }
-    private val view by lazy {
-        StoryEventListToolView(actions, viewModel, cell)
+    private val view: StoryEventListToolView by lazy {
+        TODO() //StoryEventListToolView(actions, viewModel, cell)
     }
     override val node: Node by lazy {
         TabPane(Tab("Story Events", view).apply {

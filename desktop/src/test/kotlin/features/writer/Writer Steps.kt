@@ -20,7 +20,7 @@ class `Writer Steps` : En {
             WriterDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenDialogShouldNotBeShown(DialogType.DeleteScene)
         }
-        Given("I have requested to not be prompted to confirm deleting a story event") {
+        Given("I have requested to not be prompted to confirm removing a story event") {
             WriterDriver(soyleStories.getAnyOpenWorkbenchOrError())
                 .givenDialogShouldNotBeShown(DialogType.DeleteStoryEvent)
         }

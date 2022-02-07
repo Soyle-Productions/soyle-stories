@@ -1,13 +1,14 @@
 package com.soyle.stories.prose.proseEditor
 
 import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedReceiver
-import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
-import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
+import com.soyle.stories.common.Receiver
+import com.soyle.stories.domain.character.events.CharacterRemovedFromStory
+import com.soyle.stories.domain.character.name.events.CharacterNameRemoved
 import com.soyle.stories.domain.prose.*
 import com.soyle.stories.domain.prose.content.ProseContent
 import com.soyle.stories.domain.prose.events.ContentReplaced
 import com.soyle.stories.domain.prose.events.MentionTextReplaced
-import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.usecase.character.remove.RemovedCharacter
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.SingleLine
 import com.soyle.stories.domain.validation.countLines
@@ -21,17 +22,16 @@ import com.soyle.stories.prose.mentionTextReplaced.MentionTextReplacedReceiver
 import com.soyle.stories.prose.readProse.ReadProseController
 import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMentions
 import com.soyle.stories.usecase.prose.readProse.ReadProse
-import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
-import com.soyle.stories.usecase.scene.listOptionsToReplaceMention.ListOptionsToReplaceMentionInSceneProse
 import com.soyle.stories.theme.deleteTheme.ThemeDeletedReceiver
 import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
+import com.soyle.stories.usecase.scene.prose.mentions.AvailableStoryElementsToMentionInScene
 import com.soyle.stories.usecase.theme.deleteTheme.DeletedTheme
 import com.soyle.stories.usecase.theme.removeSymbolFromTheme.SymbolRemovedFromTheme
 
-fun interface OnLoadMentionQueryOutput : (List<GetStoryElementsToMentionInScene.MatchingStoryElement>) -> Unit
+fun interface OnLoadMentionQueryOutput : (AvailableStoryElementsToMentionInScene) -> Unit
 fun interface OnLoadMentionReplacementsOutput {
 
-    fun loadedReplacements(replacements: List<ListOptionsToReplaceMentionInSceneProse.MentionOption<*>>)
+    fun loadedReplacements(replacements: AvailableStoryElementsToMentionInScene)
 }
 
 class ProseEditorController private constructor(
@@ -41,11 +41,11 @@ class ProseEditorController private constructor(
     private val invalidateRemovedMentionsController: InvalidateRemovedMentionsController,
     private val editProseController: EditProseController,
     private val onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit,
-    private val onUseStoryElement: (com.soyle.stories.domain.prose.content.ProseContent.Mention<*>) -> Unit,
+    private val onUseStoryElement: (ProseContent.Mention<*>) -> Unit,
     private val onLoadMentionReplacements: (MentionedEntityId<*>, OnLoadMentionReplacementsOutput) -> Unit,
     private val presenter: ProseEditorPresenter
 ) : ReadProse.OutputPort, ProseEditorViewListener, ContentReplacedReceiver, MentionTextReplacedReceiver,
-    DetectInvalidatedMentions.OutputPort, RemovedCharacterReceiver, DeletedLocationReceiver, ThemeDeletedReceiver,
+    DetectInvalidatedMentions.OutputPort, Receiver<CharacterRemovedFromStory>, DeletedLocationReceiver, ThemeDeletedReceiver,
     SymbolRemovedFromThemeReceiver, CharacterNameVariantRemovedReceiver {
 
     constructor(
@@ -55,7 +55,7 @@ class ProseEditorController private constructor(
         invalidateRemovedMentionsController: InvalidateRemovedMentionsController,
         editProseController: EditProseController,
         onLoadMentionQuery: (NonBlankString, OnLoadMentionQueryOutput) -> Unit,
-        onUseStoryElement: (com.soyle.stories.domain.prose.content.ProseContent.Mention<*>) -> Unit,
+        onUseStoryElement: (ProseContent.Mention<*>) -> Unit,
         onLoadMentionReplacements: (MentionedEntityId<*>, OnLoadMentionReplacementsOutput) -> Unit,
     ) : this(
         proseId,
@@ -95,7 +95,7 @@ class ProseEditorController private constructor(
     override fun selectStoryElement(filteredListIndex: Int, andUseElement: Boolean) {
         val queryState = view.viewModel?.mentionQueryState ?: return
         if (queryState is MentionQueryLoaded) {
-            val match = queryState.prioritizedMatches[filteredListIndex]
+            val match = queryState.items[filteredListIndex]
             val newMention = object : ProseContent.Mention<Any> {
                 override val entityId: MentionedEntityId<Any> = match.id as MentionedEntityId<Any>
                 override val startIndex: Int = queryState.primedIndex
@@ -138,7 +138,7 @@ class ProseEditorController private constructor(
                 }
             }
             is MentionQueryLoaded -> {
-                view.updateOrInvalidated { copy(mentionQueryState = with(presenter) { queryState.updateQuery(query.value) }) }
+                view.updateOrInvalidated { copy(replacementOptions = queryState.allAvailableItems.getMatches(query)) }
             }
             else -> return
         }
@@ -161,7 +161,7 @@ class ProseEditorController private constructor(
         presenter.receiveDetectedInvalidatedMentions(response)
     }
 
-    override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
+    override suspend fun receiveEvent(event: CharacterRemovedFromStory) {
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
@@ -177,7 +177,7 @@ class ProseEditorController private constructor(
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 
-    override suspend fun receiveCharacterNameVariantRemoved(event: CharacterNameVariantRemoved) {
+    override suspend fun receiveCharacterNameVariantRemoved(event: CharacterNameRemoved) {
         invalidateRemovedMentionsController.invalidateRemovedMentions(proseId)
     }
 

@@ -1,6 +1,9 @@
 package com.soyle.stories.storyevent.list
 
+import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.storyevent.details.StoryEventDetailsViewModel
 import javafx.beans.binding.ObjectExpression
+import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
 import javafx.scene.control.MenuItem
 import tornadofx.booleanProperty
@@ -38,6 +41,10 @@ class PopulatedStoryEventListViewModel(val items: ObservableList<StoryEventListI
 
     val selectedItems: ObservableList<StoryEventListItemViewModel> = observableListOf()
     val hasSingleSelection = selectedItems.sizeProperty.isEqualTo(1)
+
+    private val _focusedStoryEvent = objectProperty<StoryEvent.Id?>()
+    fun focusedStoryEvent(): ObjectExpression<StoryEvent.Id?> = _focusedStoryEvent
+    fun focusOn(storyEvent: StoryEvent.Id?) { _focusedStoryEvent.set(storyEvent) }
 
     override fun addStoryEvent(storyEvent: StoryEventListItemViewModel): PopulatedStoryEventListViewModel {
         items.add(storyEvent)

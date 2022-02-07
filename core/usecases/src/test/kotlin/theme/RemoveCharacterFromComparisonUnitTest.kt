@@ -89,7 +89,7 @@ class RemoveCharacterFromComparisonUnitTest {
             .fold(themeRepository.themes[themeId]!!) { nextTheme, characterId ->
                 val character = makeCharacter(Character.Id(characterId), Project.Id())
                 characterRepository.characters[character.id] = character
-                nextTheme.withCharacterIncluded(character.id, character.name.value, character.media)
+                nextTheme.withCharacterIncluded(character.id, character.displayName.value, character.media)
             }
         themeRepository.themes[themeId] = andMajorCharacterIds
             .fold(themeRepository.themes[themeId]!!) { nextTheme, characterId ->

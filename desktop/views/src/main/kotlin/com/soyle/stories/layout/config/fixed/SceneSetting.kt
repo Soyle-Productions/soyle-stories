@@ -36,7 +36,7 @@ object SceneSetting : ToolConfig<SceneSetting>, FixedTool() {
     override fun getTabConfig(tool: ToolViewModel, type: SceneSetting): ToolTabConfig = object : ToolTabConfig {
         override fun getTab(tabPane: TabPane, projectScope: ProjectScope): Tab {
             val factory = projectScope.get<SceneSettingToolRoot.Factory>()
-            val locale = projectScope.applicationScope.get<SceneSettingToolLocale>()
+            val locale = projectScope.get<SceneSettingToolLocale>()
             val tab = Tab().apply {
                 val selectedScene = projectScope.get<SceneListModel>().selectedItem.value?.let {
                     it.id to it.name

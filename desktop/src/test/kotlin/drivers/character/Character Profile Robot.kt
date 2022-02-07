@@ -2,7 +2,9 @@ package com.soyle.stories.desktop.config.drivers.character
 
 import com.soyle.stories.character.list.CharacterListView
 import com.soyle.stories.character.profile.CharacterProfileView
+import com.soyle.stories.desktop.config.drivers.awaitWithTimeout
 import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.drive
+import com.soyle.stories.desktop.view.character.profile.`Character Profile Assertions`.Companion.assertThat
 import com.soyle.stories.desktop.view.character.profile.`Character Profile View Access`.Companion.access
 import com.soyle.stories.desktop.view.character.profile.`Character Profile View Access`.Companion.drive
 import com.soyle.stories.domain.character.Character
@@ -10,7 +12,7 @@ import javafx.event.ActionEvent
 
 fun CharacterListView.givenCharacterProfileOpenedFor(character: Character): CharacterProfileView =
     getCharacterProfileFor(character) ?: openCharacterProfileFor(character).run {
-        getCharacterProfileFor(character) ?: error("Character profile was not opened for ${character.name}")
+        getCharacterProfileFor(character) ?: error("Character profile was not opened for ${character.displayName}")
     }
 
 fun CharacterListView.getCharacterProfileFor(character: Character): CharacterProfileView?

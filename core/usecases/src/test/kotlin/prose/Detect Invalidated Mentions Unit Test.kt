@@ -1,5 +1,6 @@
 package com.soyle.stories.usecase.prose
 
+import arrow.core.const
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.characterName
 import com.soyle.stories.domain.character.makeCharacter
@@ -63,9 +64,11 @@ class `Detect Invalidated Mentions Unit Test` {
 
             private fun givenMentionedCharacter(
                 displayName: NonBlankString = characterName(),
-                nameVariants: List<NonBlankString> = listOf()
+                nameVariants: List<NonBlankString> = listOf(),
+                configureCharacter: Character.() -> Character = { this }
             ): MentionedCharacterId {
                 val character = makeCharacter(name = displayName, otherNames = nameVariants.toSet())
+                    .configureCharacter()
                 characterRepository.givenCharacter(character)
                 return character.id.mentioned()
             }
@@ -112,6 +115,25 @@ class `Detect Invalidated Mentions Unit Test` {
                     proseRepository.givenProse(
                         prose.withTextInserted("Robert").prose.withEntityMentioned(
                             mentionedCharacterId, 0, 6
+                        ).prose
+                    )
+                    detectInvalidatedMentions()
+                    result!!.invalidEntityIds.single().mustEqual(mentionedCharacterId)
+                }
+
+            }
+
+            @Nested
+            inner class `When Mentioned Character is No Longer in Project` {
+
+                @Test
+                fun `should output character id`() {
+                    val mentionedCharacterId = givenMentionedCharacter(displayName = nonBlankStr("Bob")) {
+                        removedFromStory().character
+                    }
+                    proseRepository.givenProse(
+                        prose.withTextInserted("Bob").prose.withEntityMentioned(
+                            mentionedCharacterId, 0, 3
                         ).prose
                     )
                     detectInvalidatedMentions()

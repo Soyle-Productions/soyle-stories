@@ -23,7 +23,6 @@ interface SceneRepository {
     suspend fun getSceneOrError(sceneId: UUID) = getSceneById(Scene.Id(sceneId))
         ?: throw SceneDoesNotExist(sceneId)
 
-    suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene?
     suspend fun getSceneThatOwnsProse(proseId: Prose.Id): Scene?
     suspend fun updateScene(scene: Scene)
     suspend fun updateScenes(scenes: List<Scene>) = coroutineScope {

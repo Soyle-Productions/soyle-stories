@@ -8,7 +8,7 @@ import com.soyle.stories.domain.scene.SceneLocale
 
 interface LinkLocationToScene {
 
-	class RequestModel(val sceneId: Scene.Id, val locationId: Location.Id, val locale: SceneLocale)
+	class RequestModel(val sceneId: Scene.Id, val locationId: Location.Id)
 
 	suspend operator fun invoke(request: RequestModel, output: OutputPort)
 

@@ -4,8 +4,8 @@ import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.SceneLocale
 import com.soyle.stories.scene.PromptChoice
 import com.soyle.stories.usecase.scene.SceneRepository
-import com.soyle.stories.usecase.scene.deleteScene.DeleteScene
-import com.soyle.stories.usecase.scene.getPotentialChangesFromDeletingScene.GetPotentialChangesFromDeletingScene
+import com.soyle.stories.usecase.scene.delete.DeleteScene
+import com.soyle.stories.usecase.scene.delete.GetPotentialChangesFromDeletingScene
 import com.soyle.stories.writer.DialogType
 import com.soyle.stories.writer.usecases.DialogPreference
 import com.soyle.stories.writer.usecases.setDialogPreferences.SetDialogPreferences
@@ -30,7 +30,6 @@ interface DeleteSceneController {
             getReportForScene: (Scene.Id) -> DeleteSceneRamificationsReport,
 
             sceneRepository: SceneRepository,
-            locale: SceneLocale,
 
             deleteScene: DeleteScene,
             deleteSceneOutput: DeleteScene.OutputPort,
@@ -75,10 +74,7 @@ interface DeleteSceneController {
             private suspend fun showRamifications(sceneId: Scene.Id) {
                 val report = getReportForScene(sceneId)
                 withContext(asyncContext) {
-                    getPotentialChangesFromDeletingScene.invoke(
-                        GetPotentialChangesFromDeletingScene.RequestModel(sceneId.uuid, locale),
-                        report
-                    )
+                    getPotentialChangesFromDeletingScene.invoke(sceneId, report)
                 }
                 report.requestContinuation() ?: return
                 deleteSceneConfirmed(sceneId)

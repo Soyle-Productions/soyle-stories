@@ -1,17 +1,14 @@
 package com.soyle.stories.scene.charactersInScene.includeCharacterInScene
 
-import com.soyle.stories.usecase.scene.character.includeCharacterInScene.IncludeCharacterInScene
-import com.soyle.stories.storyevent.addCharacterToStoryEvent.IncludedCharacterInStoryEventReceiver
+import com.soyle.stories.common.Receiver
+import com.soyle.stories.domain.scene.character.events.CharacterIncludedInScene
+import com.soyle.stories.usecase.scene.character.include.IncludeCharacterInScene
 
 class IncludeCharacterInSceneOutput(
-	private val includedCharacterInSceneReceiver: IncludedCharacterInSceneReceiver,
-	private val includedCharacterInStoryEventReceiver: IncludedCharacterInStoryEventReceiver
+    private val characterIncludedInSceneReceiver: Receiver<CharacterIncludedInScene>
 ) : IncludeCharacterInScene.OutputPort {
 
-	override suspend fun characterIncludedInScene(response: IncludeCharacterInScene.ResponseModel) {
-		includedCharacterInSceneReceiver.receiveIncludedCharacterInScene(response.includedCharacterInScene)
-		response.includedCharacterInStoryEvent?.let {
-			includedCharacterInStoryEventReceiver.receiveIncludedCharacterInStoryEvent(it)
-		}
-	}
+    override suspend fun characterIncludedInScene(response: IncludeCharacterInScene.ResponseModel) {
+        characterIncludedInSceneReceiver.receiveEvent(response.characterIncludedInScene)
+    }
 }

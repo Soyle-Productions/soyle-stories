@@ -1,12 +1,13 @@
 package com.soyle.stories.theme.characterConflict
 
+import com.soyle.stories.character.create.createCharacter
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
 import com.soyle.stories.common.components.associateChildrenTo
 import com.soyle.stories.common.components.responsiveBox
 import com.soyle.stories.common.existsWhen
 import com.soyle.stories.common.onLoseFocus
 import com.soyle.stories.di.resolve
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.theme.characterConflict.components.*
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -23,6 +24,7 @@ import javafx.scene.control.ToggleButton
 import javafx.scene.layout.Priority
 import javafx.scene.text.FontWeight
 import tornadofx.*
+import java.util.*
 
 class CharacterConflict : View() {
 
@@ -89,14 +91,10 @@ class CharacterConflict : View() {
             setOnHidden { model.availablePerspectiveCharacters.value = null }
             populatePerspectiveCharacterList(model)
             onCreateCharacter = {
-                createCharacterDialog(
-                    model.scope.projectScope,
-                    model.scope.themeId,
-                    true
-                )
+                createCharacter(model.scope.projectScope)
             }
             onPerspectiveCharacterSelected = {
-                model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId, it.characterName, "")
+                model.selectedPerspectiveCharacter.value = CharacterItemViewModel(it.characterId.let(UUID::fromString).let(Character::Id), it.characterName, "")
                 viewListener.getValidState(it.characterId)
             }
         }
@@ -185,25 +183,25 @@ class CharacterConflict : View() {
     private fun setDesire(desire: String)
     {
         val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
-        viewListener.setDesire(perspectiveCharacterId, desire)
+        viewListener.setDesire(perspectiveCharacterId.uuid.toString(), desire)
     }
 
     private fun setPsychologicalWeakness(weakness: String)
     {
         val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
-        viewListener.setPsychologicalWeakness(perspectiveCharacterId, weakness)
+        viewListener.setPsychologicalWeakness(perspectiveCharacterId.uuid.toString(), weakness)
     }
 
     private fun setMoralWeakness(weakness: String)
     {
         val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
-        viewListener.setMoralWeakness(perspectiveCharacterId, weakness)
+        viewListener.setMoralWeakness(perspectiveCharacterId.uuid.toString(), weakness)
     }
 
     private fun setCharacterChange(characterChange: String)
     {
         val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return
-        viewListener.setCharacterChange(perspectiveCharacterId, characterChange)
+        viewListener.setCharacterChange(perspectiveCharacterId.uuid.toString(), characterChange)
     }
 
     private fun Parent.characterChangeField(
@@ -274,24 +272,20 @@ class CharacterConflict : View() {
             setOnShowing {
                 val perspectiveCharacterId =
                     model.selectedPerspectiveCharacter.value?.characterId ?: return@setOnShowing
-                viewListener.getAvailableOpponents(perspectiveCharacterId)
+                viewListener.getAvailableOpponents(perspectiveCharacterId.uuid.toString())
             }
             populateOpponentList(model)
             onCreateCharacter = onCreateCharacter@{
                 val perspectiveCharacterId =
                     model.selectedPerspectiveCharacter.value?.characterId ?: return@onCreateCharacter
-                createCharacterDialog(
-                    model.scope.projectScope,
-                    model.scope.themeId,
-                    useAsOpponentForCharacter = perspectiveCharacterId
-                )
+                createCharacter(model.scope.projectScope)
             }
             onOpponentCharacterSelected = onOpponentCharacterSelected@{
                 val perspectiveCharacter =
                     model.selectedPerspectiveCharacter.value
                         ?: return@onOpponentCharacterSelected
                 viewListener.addOpponent(
-                    perspectiveCharacter.characterId,
+                    perspectiveCharacter.characterId.uuid.toString(),
                     it.characterId
                 )
             }
@@ -352,23 +346,23 @@ class CharacterConflict : View() {
             itemProperty.bind(opponentModel)
             onOpponentSelectedToBeMain = listener@{
                 val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@listener
-                viewListener.makeOpponentMainOpponent(perspectiveCharacterId, it)
+                viewListener.makeOpponentMainOpponent(perspectiveCharacterId.uuid.toString(), it)
             }
             onRemoveOpponent = listener@{
                 val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@listener
-                viewListener.removeOpponent(perspectiveCharacterId, it)
+                viewListener.removeOpponent(perspectiveCharacterId.uuid.toString(), it)
             }
             opponentAttack.onChange {
                 if (it == null) return@onChange
                 val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@onChange
                 val opponentId = opponentModel.value?.characterId ?: return@onChange
-                viewListener.setAttackFromOpponent(perspectiveCharacterId, opponentId, it)
+                viewListener.setAttackFromOpponent(perspectiveCharacterId.uuid.toString(), opponentId, it)
             }
             opponentSimilarities.onChange {
                 if (it == null) return@onChange
                 val perspectiveCharacterId = model.selectedPerspectiveCharacter.value?.characterId ?: return@onChange
                 val opponentId = opponentModel.value?.characterId ?: return@onChange
-                viewListener.setCharactersSimilarities(perspectiveCharacterId, opponentId, it)
+                viewListener.setCharactersSimilarities(perspectiveCharacterId.uuid.toString(), opponentId, it)
             }
             opponentAbility.onChange {
                 if (it == null) return@onChange

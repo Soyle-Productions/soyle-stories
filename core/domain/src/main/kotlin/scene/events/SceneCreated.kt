@@ -7,6 +7,5 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 data class SceneCreated(
     override val sceneId: Scene.Id,
     val name: String,
-    val proseId: Prose.Id,
-    val storyEventId: StoryEvent.Id
+    val proseId: Prose.Id
 ) : SceneEvent()

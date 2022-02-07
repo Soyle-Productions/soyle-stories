@@ -2,7 +2,8 @@ package com.soyle.stories.usecase.scene.symbol.trackSymbolInScene
 
 import com.soyle.stories.domain.prose.MentionedSymbolId
 import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.domain.scene.*
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
+import com.soyle.stories.domain.scene.SceneUpdate.UnSuccessful
 import com.soyle.stories.domain.scene.events.SceneEvent
 import com.soyle.stories.domain.scene.events.SymbolTrackedInScene
 import com.soyle.stories.domain.scene.events.TrackedSymbolRemoved
@@ -30,9 +31,9 @@ class SynchronizeTrackedSymbolsWithProseUseCase(
         val sceneWithSymbols = symbols.fold(scene) { nextScene, (theme, symbol) ->
             val update = nextScene.withSymbolTracked(theme, symbol)
             when (update) {
-                is WithoutChange -> {
+                is UnSuccessful -> {
                 }
-                is Updated -> events.add(update.event)
+                is Successful -> events.add(update.event)
             }
             update.scene
         }
@@ -40,9 +41,9 @@ class SynchronizeTrackedSymbolsWithProseUseCase(
             if (! trackedSymbol.isPinned && trackedSymbol.symbolId !in symbolIds) {
                 val update = nextScene.withoutSymbolTracked(trackedSymbol.symbolId)
                 when (update) {
-                    is WithoutChange -> {
+                    is UnSuccessful -> {
                     }
-                    is Updated -> events.add(update.event)
+                    is Successful -> events.add(update.event)
                 }
                 update.scene
             } else nextScene

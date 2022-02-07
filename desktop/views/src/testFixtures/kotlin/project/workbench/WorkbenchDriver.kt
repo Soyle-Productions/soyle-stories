@@ -15,7 +15,8 @@ class WorkbenchDriver(private val workbench: WorkBench) : FxRobot() {
     fun getConfirmDeleteSceneDialog(): DeleteScenePromptView? = getOpenDialog()
 }
 
-inline fun <reified T : UIComponent> FxRobot.getOpenDialog(): T? =
+inline fun <reified T : UIComponent> FxRobot.getOpenDialog(noinline filter: (T) -> Boolean = {true}): T? =
     listWindows().asSequence()
         .mapNotNull { it.scene.root.uiComponent<T>() }
+        .filter(filter)
         .firstOrNull { it.currentStage?.isShowing == true }

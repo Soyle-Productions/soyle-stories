@@ -4,7 +4,7 @@ import com.soyle.stories.domain.scene.SceneLocale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import tornadofx.FX
-
+/*
 class LocaleManagerImpl : LocaleManager {
 
 	private var localeLoader = lazy {
@@ -23,4 +23,4 @@ class LocaleManagerImpl : LocaleManager {
 		localeLoader.value
 	}
 
-}
+}*/

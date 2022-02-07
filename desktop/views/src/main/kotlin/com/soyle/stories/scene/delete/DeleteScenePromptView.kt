@@ -1,46 +1,24 @@
 package com.soyle.stories.scene.delete
 
-import javafx.scene.Parent
-import javafx.scene.control.Alert
-import javafx.scene.control.ButtonBar
-import javafx.scene.control.ButtonType
+import com.soyle.stories.di.get
+import com.soyle.stories.project.WorkBench
+import com.soyle.stories.ramifications.confirmation.ConfirmationPromptView
+import com.soyle.stories.ramifications.confirmation.confirmationPrompt
 import tornadofx.*
 
-class DeleteScenePromptView(
-	private val viewModel: DeleteScenePromptViewModel
-) : Fragment() {
 
-	init {
-		title = "Delete Scene"
+typealias DeleteScenePromptView = ConfirmationPromptView<DeleteScenePromptViewModel>
+
+fun deleteScenePrompt(
+	scope: Scope = FX.defaultScope,
+	viewModel: DeleteScenePromptViewModel = DeleteScenePromptViewModel()
+): DeleteScenePromptViewModel {
+
+	val locale = scope.get<DeleteSceneConfirmationPromptLocale>()
+
+	return confirmationPrompt(scope, scope.get<WorkBench>().currentStage, viewModel) {
+		confirmationText().bind(locale.remove)
+		headerText().bind(locale.message(viewModel.name()))
+		titleProperty.bind(locale.title)
 	}
-
-	private val alert = Alert(Alert.AlertType.CONFIRMATION)
-
-	init {
-		alert.resultProperty().onChange {
-			viewModel.result().set(it)
-		}
-	}
-
-	override val root: Parent = alert.dialogPane.apply {
-		headerText = "Delete Scene"
-		content = vbox {
-			label(stringBinding(viewModel.name()) { "Are you sure you want to delete the \"${viewModel.name}\" scene?" })
-			checkbox("Do not show this dialog again.") {
-				selectedProperty().bindBidirectional(viewModel.doNotShowAgain())
-			}
-		}
-		buttonTypes.setAll(
-			ButtonType("Delete", Delete),
-			ButtonType("Show Ramifications", Ramifications),
-			ButtonType("Cancel", Cancel)
-		)
-	}
-
-	companion object {
-		val Delete = ButtonBar.ButtonData.FINISH
-		val Ramifications = ButtonBar.ButtonData.YES
-		val Cancel = ButtonBar.ButtonData.CANCEL_CLOSE
-	}
-
 }

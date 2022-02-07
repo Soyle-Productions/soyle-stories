@@ -2,24 +2,19 @@ package com.soyle.stories.storyevent.timeline.viewport.ruler.label
 
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevated
+import com.soyle.stories.common.components.surfaces.elevationProperty
+import com.soyle.stories.common.components.surfaces.elevationVariant
 import com.soyle.stories.storyevent.timeline.TimeRange
 import com.soyle.stories.storyevent.timeline.TimelineSelectionModel
 import com.soyle.stories.storyevent.timeline.TimelineStyles
-import com.soyle.stories.storyevent.timeline.UnitOfTime
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimeRangeSelection
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenu
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
-import javafx.beans.binding.BooleanExpression
-import javafx.beans.property.LongProperty
 import javafx.beans.property.ObjectProperty
 import javafx.collections.ObservableList
-import javafx.collections.ObservableSet
 import javafx.event.EventTarget
-import javafx.scene.control.ContextMenu
-import javafx.scene.input.MouseEvent
-import javafx.scene.input.TransferMode
 import javafx.scene.layout.Region
 import tornadofx.*
 
@@ -72,9 +67,7 @@ class TimeSpanLabel(
 
     init {
         addClass(TimelineStyles.timeLabel)
-        asSurface {
-            relativeElevation = Elevation[2]!!
-        }
+        elevationVariant = elevated(elevationProperty().objectBinding { Elevation[it?.value?.plus(2) ?: 2] ?: Elevation.getValue(2) })
         minHeight = USE_PREF_SIZE
         setOnMousePressed {
             if (selection.value?.hasOverlapWith(range) != true) {

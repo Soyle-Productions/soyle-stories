@@ -1,15 +1,15 @@
 package com.soyle.stories.storyevent.timeline.viewport.grid
 
-import com.soyle.stories.common.StyleImporter
+import com.soyle.stories.common.styleImporter
 import com.soyle.stories.storyevent.item.icon.StoryEventItemIconStyles
-import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelStyles
 import tornadofx.Stylesheet
 import tornadofx.cssclass
+import tornadofx.px
 
 class TimelineViewPortGridStyles : Stylesheet() {
 
-    companion object : StyleImporter<TimelineViewPortGridStyles>(TimelineViewPortGridStyles::class) {
+    companion object {
 
         const val ROW_V_PADDING = 4.0
 
@@ -28,10 +28,16 @@ class TimelineViewPortGridStyles : Stylesheet() {
 
         val timelineViewPortGrid by cssclass()
 
+        init {
+            styleImporter<TimelineViewPortGridStyles>()
+        }
+
     }
 
     init {
-
+        timelineViewPortGrid {
+            minHeight = ROW_HEIGHT.px
+        }
     }
 
 }

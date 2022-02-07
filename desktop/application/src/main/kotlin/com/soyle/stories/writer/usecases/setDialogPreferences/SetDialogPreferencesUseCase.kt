@@ -25,7 +25,7 @@ class SetDialogPreferencesUseCase(
 		if (writer.preferences["dialog.$dialog"] != preference) {
 			writerRepository.replaceWriter(writer.withPreferenceFor("dialog.$dialog", preference))
 		}
-		return SetDialogPreferences.ResponseModel(dialog.name, preference)
+		return SetDialogPreferences.ResponseModel(dialog::class.simpleName ?: dialog.toString(), preference)
 	}
 
 	private suspend fun getWriter() = (writerRepository.getWriterById(writerId)

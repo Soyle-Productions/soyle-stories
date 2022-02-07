@@ -6,29 +6,27 @@ import com.soyle.stories.domain.entities.Entity
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.prose.Prose
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
+import com.soyle.stories.domain.scene.SceneUpdate.UnSuccessful
 import com.soyle.stories.domain.scene.character.CharacterInScene
 import com.soyle.stories.domain.scene.character.CharacterInSceneOperations
 import com.soyle.stories.domain.scene.character.RoleInScene
 import com.soyle.stories.domain.scene.character.events.*
-import com.soyle.stories.domain.scene.character.exceptions.characterInSceneAlreadyHasDesire
+import com.soyle.stories.domain.scene.character.exceptions.*
+import com.soyle.stories.domain.scene.character.exceptions.CharacterInSceneAlreadyHasDesire
 import com.soyle.stories.domain.scene.events.*
-import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.domain.storyevent.character.changes.CharacterInvolvedInStoryEvent
-import com.soyle.stories.domain.storyevent.character.changes.CharacterRemovedFromStoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.EntitySet
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.domain.validation.entitySetOf
-import com.soyle.stories.domain.scene.SceneUpdate.Successful
-import com.soyle.stories.domain.scene.SceneUpdate.UnSuccessful
 import java.util.*
+import java.util.logging.Logger
 
 class Scene private constructor(
     override val id: Id,
     val projectId: Project.Id,
     val name: NonBlankString,
-    val coveredStoryEvents: Set<StoryEvent.Id>,
     val settings: EntitySet<SceneSettingLocation>,
     val proseId: Prose.Id,
     private val charactersInScene: EntitySet<CharacterInScene>,
@@ -45,11 +43,10 @@ class Scene private constructor(
         internal fun create(
             projectId: Project.Id,
             name: NonBlankString,
-            storyEventId: StoryEvent.Id,
             proseId: Prose.Id
         ): SceneUpdate<SceneCreated> {
-            val newScene = Scene(projectId, name, storyEventId, proseId)
-            return Successful(newScene, SceneCreated(newScene.id, newScene.name.value, proseId, storyEventId))
+            val newScene = Scene(projectId, name, proseId)
+            return Successful(newScene, SceneCreated(newScene.id, newScene.name.value, proseId))
         }
 
         @JvmStatic
@@ -58,7 +55,6 @@ class Scene private constructor(
                 Scene::id,
                 Scene::projectId,
                 Scene::name,
-                Scene::coveredStoryEvents,
                 Scene::settings,
                 Scene::proseId,
                 Scene::charactersInScene,
@@ -71,13 +67,11 @@ class Scene private constructor(
     private constructor(
         projectId: Project.Id,
         name: NonBlankString,
-        storyEventId: StoryEvent.Id,
         proseId: Prose.Id
     ) : this(
         Id(),
         projectId,
         name,
-        setOf(storyEventId),
         entitySetOf(),
         proseId,
         entitySetOf(),
@@ -90,7 +84,6 @@ class Scene private constructor(
         id: Id,
         projectId: Project.Id,
         name: NonBlankString,
-        coveredStoryEvents: Set<StoryEvent.Id>,
         settings: EntitySet<SceneSettingLocation>,
         proseId: Prose.Id,
         charactersInScene: EntitySet<CharacterInScene>,
@@ -101,7 +94,6 @@ class Scene private constructor(
         id,
         projectId,
         name,
-        coveredStoryEvents,
         settings,
         proseId,
         charactersInScene,
@@ -155,12 +147,10 @@ class Scene private constructor(
         symbols: Collection<TrackedSymbol> = this.symbols,
         conflict: SceneConflict = this.conflict,
         resolution: SceneResolution = this.resolution,
-        coveredStoryEvents: Set<StoryEvent.Id> = this.coveredStoryEvents
     ) = Scene(
         id,
         projectId,
         name,
-        coveredStoryEvents,
         settings,
         this.proseId,
         charactersInScene,
@@ -210,39 +200,23 @@ class Scene private constructor(
         }
     }
 
-    fun withCharacterIncluded(characterInvolved: CharacterInvolvedInStoryEvent): SceneUpdate<CharacterInSceneEvent> {
-        if (characterInvolved.storyEventId !in coveredStoryEvents) return noUpdate()
-        if (includesCharacter(characterInvolved.characterId)) {
-            val characterInScene = includedCharacters.getOrError(characterInvolved.characterId)
-                .run {
-                    if (characterInvolved.storyEventId in sources) return noUpdate(
-                        CharacterInSceneAlreadySourcedFromStoryEvent(this@Scene.id, id, characterInvolved.storyEventId)
-                    )
-                    withSource(characterInvolved.storyEventId)
-                }
-            return copy(charactersInScene = charactersInScene.plus(characterInScene))
-                .updatedBy(
-                    CharacterInSceneSourceAdded(
-                        id,
-                        characterInvolved.characterId,
-                        characterInvolved.storyEventId
-                    )
-                )
-        }
+    fun withCharacterIncluded(character: Character): SceneUpdate<CharacterIncludedInScene> {
+        if (includesCharacter(character.id)) return noUpdate(CharacterAlreadyIncludedInScene(id, character.id))
         return copy(
             charactersInScene = charactersInScene
                 .plus(
                     CharacterInScene(
                         id,
-                        characterInvolved.characterId,
-                        characterInvolved.storyEventId
+                        character.id
                     )
                 )
         )
             .updatedBy(
-                IncludedCharacterInScene(
+                CharacterIncludedInScene(
                     id,
-                    IncludedCharacter(characterInvolved.characterId)
+                    character.id,
+                    character.displayName.value,
+                    projectId
                 )
             )
     }
@@ -252,7 +226,10 @@ class Scene private constructor(
 
         return object : CharacterInSceneOperations {
             override fun assignedRole(role: RoleInScene?): SceneUpdate<CompoundEvent<CharacterRoleInSceneChanged>> {
-                if (characterInScene.roleInScene == role) return noUpdate()
+                if (characterInScene.roleInScene == null && role == null) {
+                    return noUpdate(CharacterAlreadyDoesNotHaveRoleInScene(id, characterId))
+                }
+                if (characterInScene.roleInScene == role) return noUpdate(CharacterAlreadyHasRoleInScene(id, characterId, role!!))
 
                 val newCharacter = characterInScene.withRoleInScene(role)
                 val event = when (role) {
@@ -273,7 +250,7 @@ class Scene private constructor(
 
             override fun desireChanged(desire: String): SceneUpdate<CharacterDesireInSceneChanged> {
                 if (characterInScene.desire == desire) return noUpdate(
-                    characterInSceneAlreadyHasDesire(
+                    CharacterInSceneAlreadyHasDesire(
                         id,
                         characterId,
                         desire
@@ -288,28 +265,30 @@ class Scene private constructor(
                 )
             }
 
-            override fun motivationChanged(motivation: String?): Scene {
+            override fun motivationChanged(motivation: String?): SceneUpdate<CharacterMotivationInSceneChanged> {
+                if (characterInScene.motivation == null && motivation == null) return noUpdate(
+                    CharacterInSceneAlreadyDoesNotHaveMotivation(id, characterId)
+                )
+                if (characterInScene.motivation == motivation) return noUpdate(
+                    CharacterInSceneAlreadyHasMotivation(
+                        id,
+                        characterId,
+                        motivation.orEmpty()
+                    )
+                )
                 return copy(
                     charactersInScene = charactersInScene
                         .minus(characterId)
                         .plus(characterInScene.withMotivation(motivation))
+                ).updatedBy(
+                    motivation?.let { CharacterGainedMotivationInScene(id, characterId, it) }
+                        ?: CharacterMotivationInSceneCleared(id, characterId)
                 )
             }
 
-            @Suppress("OverridingDeprecatedMember")
-            override fun withoutSource(storyEventId: StoryEvent.Id): SceneUpdate<CharacterInSceneEvent> {
-                if (storyEventId !in coveredStoryEvents)
-                    return noUpdate(SceneDoesNotCoverStoryEvent(id, storyEventId))
-                val updatedCharacter = characterInScene.withoutSource(storyEventId)
-                return if (updatedCharacter.sources.isEmpty())
-                    copy(charactersInScene = charactersInScene.minus(characterId))
-                        .updatedBy(CharacterRemovedFromScene(id, characterId))
-                else copy(charactersInScene = charactersInScene.plus(updatedCharacter))
-                    .updatedBy(CharacterInSceneSourceRemoved(id, updatedCharacter.id, storyEventId))
-            }
-
-            override fun removed(): Scene {
+            override fun removed(): SceneUpdate<CharacterRemovedFromScene> {
                 return copy(charactersInScene = charactersInScene.minus(characterId))
+                    .updatedBy(CharacterRemovedFromScene(id, characterId))
             }
 
 
@@ -338,16 +317,6 @@ class Scene private constructor(
     fun withDesireForCharacter(characterId: Character.Id, desire: String): SceneUpdate<CharacterDesireInSceneChanged> {
         val op = withCharacter(characterId)!!
         return op.desireChanged(desire)
-    }
-
-    @Deprecated(
-        message = "Outdated API",
-        replaceWith = ReplaceWith("withCharacter(characterId)?.motivationChanged(motivation)"),
-        level = DeprecationLevel.WARNING
-    )
-    fun withMotivationForCharacter(characterId: Character.Id, motivation: String?): Scene {
-        val op = withCharacter(characterId)!!
-        return op.motivationChanged(motivation)
     }
 
     fun withLocationLinked(locationId: Location.Id, locationName: String): SceneUpdate<LocationUsedInScene> {
@@ -414,82 +383,6 @@ class Scene private constructor(
     )
     fun withoutCharacter(characterId: Character.Id) =
         copy(charactersInScene = charactersInScene.minus(characterId))
-
-    @Deprecated(
-        message = "Outdated API",
-        replaceWith = ReplaceWith("withCharacter(removedFromStoryEvent.characterId)?.withoutSource(removedFromStoryEvent.storyEventId)"),
-        level = DeprecationLevel.WARNING
-    )
-    fun withCharacterWithoutSource(removedFromStoryEvent: CharacterRemovedFromStoryEvent): SceneUpdate<CharacterInSceneEvent> {
-        val op = withCharacter(removedFromStoryEvent.characterId)!!
-        @Suppress("DEPRECATION")
-        return op.withoutSource(removedFromStoryEvent.storyEventId)
-    }
-
-    fun withStoryEvent(storyEvent: StoryEvent): SceneUpdate<StoryEventAddedToScene> {
-        if (storyEvent.id in coveredStoryEvents) return noUpdate(SceneAlreadyCoversStoryEvent(id, storyEvent.id))
-        val (updatedCharacters, newCharacters) = involvedCharactersInScene(storyEvent)
-        val newScene = copy(
-            coveredStoryEvents = coveredStoryEvents + storyEvent.id,
-            charactersInScene = charactersInScene + newCharacters + updatedCharacters
-        )
-        return newScene updatedBy storyEventAddedToScene(storyEvent, updatedCharacters, newCharacters)
-    }
-
-    private fun involvedCharactersInScene(storyEvent: StoryEvent): Pair<List<CharacterInScene>, List<CharacterInScene>> =
-        storyEvent.involvedCharacters
-            .partition { charactersInScene.containsEntityWithId(it.id) }
-            .run {
-                first.map { charactersInScene.getEntityById(it.id)!!.withSource(storyEvent.id) } to
-                        second.map { CharacterInScene(id, it.id, storyEvent.id) }
-            }
-
-    private fun storyEventAddedToScene(
-        storyEvent: StoryEvent,
-        updatedCharacters: List<CharacterInScene>,
-        newCharacters: List<CharacterInScene>
-    ): StoryEventAddedToScene {
-        return StoryEventAddedToScene(
-            id, storyEvent.id, storyEvent.name.value,
-            newCharacters.map(::includedCharacterInScene) + updatedCharacters.map {
-                CharacterInSceneSourceAdded(
-                    it.sceneId,
-                    it.id,
-                    storyEvent.id
-                )
-            }
-        )
-    }
-
-    private fun includedCharacterInScene(characterInScene: CharacterInScene): IncludedCharacterInScene {
-        return IncludedCharacterInScene(
-            id,
-            IncludedCharacter(characterInScene.characterId)
-        )
-    }
-
-    fun withoutStoryEvent(storyEventId: StoryEvent.Id): SceneUpdate<StoryEventRemovedFromScene> {
-        if (storyEventId !in coveredStoryEvents) return noUpdate(SceneDoesNotCoverStoryEvent(id, storyEventId))
-
-        val charactersSourcedFromStoryEvent = charactersInScene.filter { storyEventId in it.sources }
-
-        val (charactersToRemove, updatedCharacters) = charactersSourcedFromStoryEvent.map {
-            it.withoutSource(storyEventId)
-        }.partition { it.sources.isEmpty() }
-
-        return copy(
-            coveredStoryEvents = coveredStoryEvents - storyEventId,
-            charactersInScene = charactersInScene.minus(charactersToRemove).plus(updatedCharacters)
-        )
-            .updatedBy(
-                StoryEventRemovedFromScene(
-                    id,
-                    storyEventId,
-                    charactersToRemove.map { CharacterRemovedFromScene(id, it.id) } +
-                            updatedCharacters.map { CharacterInSceneSourceRemoved(id, it.id, storyEventId) }
-                )
-            )
-    }
 
     fun withCharacterArcSectionCovered(characterArcSection: CharacterArcSection): Scene {
         val characterInScene = includedCharacters.getOrError(characterArcSection.characterId)

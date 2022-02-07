@@ -85,7 +85,7 @@ class MoralArgumentInsertionPoint : Fragment() {
         val selectedCharacter = state.item?.selectedPerspectiveCharacter
             ?: kotlin.error("cannot load available types if perspective character not yet selected")
 
-        viewListener.getAvailableArcSectionTypesToAdd(selectedCharacter.characterId)
+        viewListener.getAvailableArcSectionTypesToAdd(selectedCharacter.characterId.uuid.toString())
     }
 
     private fun createSectionTypeItems(sectionTypes: List<MoralArgumentSectionTypeViewModel>): List<MenuItem> {
@@ -109,9 +109,9 @@ class MoralArgumentInsertionPoint : Fragment() {
             state.sections.indexOf(addToTopOfSection).takeIf { it >= 0 }
         }
         if (addIndex == null) {
-            viewListener.addCharacterArcSectionType(characterId, sectionTypeId)
+            viewListener.addCharacterArcSectionType(characterId.uuid.toString(), sectionTypeId)
         } else {
-            viewListener.addCharacterArcSectionTypeAtIndex(characterId, sectionTypeId, addIndex)
+            viewListener.addCharacterArcSectionTypeAtIndex(characterId.uuid.toString(), sectionTypeId, addIndex)
         }
     }
 
@@ -129,7 +129,7 @@ class MoralArgumentInsertionPoint : Fragment() {
                 val characterId = state.item?.selectedPerspectiveCharacter?.characterId ?: return@action
                 val arcSectionId = addToTopOfSection?.arcSectionId ?: return@action
                 val index = state.sections.indexOfFirst { it.arcSectionId == arcSectionId }.takeIf { it >= 0 } ?: return@action
-                viewListener.moveSectionTo(sectionType.existingArcSectionId!!, characterId, index)
+                viewListener.moveSectionTo(sectionType.existingArcSectionId!!, characterId.uuid.toString(), index)
             }
         }
     }

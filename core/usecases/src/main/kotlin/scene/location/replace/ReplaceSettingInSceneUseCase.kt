@@ -5,8 +5,8 @@ import com.soyle.stories.domain.location.events.HostedSceneRemoved
 import com.soyle.stories.domain.location.events.SceneHostedAtLocation
 import com.soyle.stories.domain.location.Updated as UpdatedLocation
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.WithoutChange
-import com.soyle.stories.domain.scene.Updated as UpdatedScene
+import com.soyle.stories.domain.scene.SceneUpdate.UnSuccessful
+import com.soyle.stories.domain.scene.SuccessfulSceneUpdate
 import com.soyle.stories.usecase.location.LocationRepository
 import com.soyle.stories.usecase.scene.SceneDoesNotUseLocation
 import com.soyle.stories.usecase.scene.SceneRepository
@@ -29,9 +29,9 @@ class ReplaceSettingInSceneUseCase(
 
         val sceneUpdate = sceneSettingOps.replacedWith(replacementLocation)
 
-        if (sceneUpdate !is UpdatedScene) {
-            sceneUpdate as WithoutChange
-            (sceneUpdate.reason as? Throwable)?.let { throw it }
+        if (sceneUpdate !is SuccessfulSceneUpdate) {
+            sceneUpdate as UnSuccessful
+            sceneUpdate.reason?.let { throw it }
             return null
         }
 

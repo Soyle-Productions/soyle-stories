@@ -1,46 +1,38 @@
 package com.soyle.stories.scene.delete
 
+import com.soyle.stories.common.Confirmation
+import com.soyle.stories.ramifications.confirmation.ConfirmationPromptViewModel
 import com.soyle.stories.scene.PromptChoice
 import javafx.beans.binding.StringExpression
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.ButtonType
+import kotlinx.coroutines.CompletableDeferred
 import tornadofx.booleanProperty
 import tornadofx.stringProperty
 
-class DeleteScenePromptViewModel {
+class DeleteScenePromptViewModel : ConfirmationPromptViewModel(), DeleteScenePrompt {
 
-	fun name(): StringExpression = stringProperty()
+	private val _name = stringProperty()
+	fun name(): StringExpression = _name
 	var name: String = ""
 
-	private val resultProperty = object : SimpleObjectProperty<ButtonType>(null) {
-		override fun set(newValue: ButtonType?) {
-			super.set(newValue)
-			when (newValue?.buttonData) {
-				DeleteScenePromptView.Delete -> onConfirm(PromptChoice.Confirm)
-				DeleteScenePromptView.Ramifications -> onConfirm(PromptChoice.ShowRamifications)
-				DeleteScenePromptView.Cancel -> onCancel()
-				else -> error("Invalid selection")
-			}
-		}
-	}
-	fun result(): ObjectProperty<ButtonType> = resultProperty
-	fun doNotShowAgain(): BooleanProperty = booleanProperty()
+	override suspend fun requestConfirmation(sceneName: String): Confirmation<PromptChoice>? {
+		val deferred = CompletableDeferred<Confirmation<PromptChoice>?>()
 
-	val showAgain: Boolean
-		get() = doNotShowAgain().not().get()
+		onConfirm = { deferred.complete(Confirmation(PromptChoice.Confirm, !doNotShowAgain)) }
+		onCheck = { deferred.complete(Confirmation(PromptChoice.ShowRamifications, !doNotShowAgain)) }
+		onCancel = { deferred.complete(null) }
 
-	private var onConfirm : (PromptChoice) -> Unit = {}
+		_name.set(sceneName)
+		_isNeeded.set(true)
 
-	fun setOnConfirm(handler: (PromptChoice) -> Unit) {
-		onConfirm = handler
+		return deferred.await().also { _isNeeded.set(false) }
 	}
 
-	private var onCancel : () -> Unit = {}
-
-	fun setOnCancel(handler: () -> Unit) {
-		onCancel = handler
+	override fun close() {
+		_isNeeded.set(false)
 	}
 
 }

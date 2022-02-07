@@ -9,7 +9,7 @@ data class DuplicateStoryEventOperationException(
     override val message: String
 ) : DuplicateOperationException(), StoryEventException
 
-internal fun storyEventAlreadyWithoutCoverage(storyEventId: StoryEvent.Id) =
+fun StoryEventAlreadyWithoutCoverage(storyEventId: StoryEvent.Id) =
     DuplicateStoryEventOperationException(storyEventId, "$storyEventId already without coverage")
 
 fun StoryEventAlreadyCoveredByScene(storyEventId: StoryEvent.Id, sceneId: Scene.Id) =

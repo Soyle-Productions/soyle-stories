@@ -1,7 +1,7 @@
 package com.soyle.stories.layout.openTool
 
 import com.soyle.stories.domain.prose.Prose
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
+import com.soyle.stories.usecase.scene.list.SceneItem
 
 interface OpenToolController {
 
@@ -11,10 +11,10 @@ interface OpenToolController {
 	val theme: OpenThemeToolController
 
 	fun openSceneList()
+	fun openRamificationsTool()
 	fun openLocationDetailsTool(locationId: String)
 	fun openBaseStoryStructureTool(themeId: String, characterId: String)
 	fun openCharacterValueComparison(themeId: String)
-	fun openStoryEventDetailsTool(storyEventId: String)
 	fun openDeleteSceneRamificationsTool(sceneId: String)
 	fun openReorderSceneRamificationsTool(sceneId: String)
 	fun openValueOppositionWeb(themeId: String)

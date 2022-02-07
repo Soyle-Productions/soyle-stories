@@ -2,6 +2,7 @@ package com.soyle.stories.storyevent.list
 
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
+import com.soyle.stories.storyevent.details.StoryEventDetailsPrompt
 import com.soyle.stories.theme.themeOppositionWebs.Styles.Companion.selectedItem
 import com.soyle.stories.usecase.storyevent.StoryEventItem
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
@@ -14,6 +15,8 @@ interface StoryEventListViewActions {
 
     fun loadStoryEvents()
     fun createStoryEvent()
+    fun viewSelectedItemDetails()
+    fun viewDetails(storyEventId: StoryEvent.Id)
     fun insertStoryEventBeforeSelectedItem()
     fun insertStoryEventAtSameTimeAsSelectedItem()
     fun insertStoryEventAfterSelectedItem()

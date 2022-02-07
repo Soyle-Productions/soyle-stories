@@ -1,10 +1,7 @@
 package com.soyle.stories.common.components.dataDisplay.chip
 
 import com.soyle.stories.common.components.ComponentsStyles
-import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
-import com.soyle.stories.common.components.surfaces.SurfaceStyles
+import com.soyle.stories.common.components.surfaces.*
 import com.soyle.stories.common.existsWhen
 import javafx.event.ActionEvent
 import javafx.scene.control.Label
@@ -61,10 +58,8 @@ class ChipSkin(chip: Chip) : SkinBase<Chip>(chip) {
     init {
         children.clear()
         children.add(container)
-        skinnable.asSurface {
-            relativeElevation = Elevation.getValue(4)
-            liftedStyle = SurfaceStyles.relativeElevation[0]
-        }
+        if (! skinnable.elevationProperty().isBound) skinnable.elevation = Elevation.getValue(4)
+        if (! skinnable.elevationVariantProperty().isBound) skinnable.elevationVariant = outlined
         registerChangeListener(chip.colorProperty()) {
             toggleColorClasses()
         }

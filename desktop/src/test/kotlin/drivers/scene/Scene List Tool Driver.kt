@@ -1,6 +1,7 @@
 package com.soyle.stories.desktop.config.drivers.scene
 
 import com.soyle.stories.common.editingCell
+import com.soyle.stories.desktop.config.drivers.awaitWithTimeout
 import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.soylestories.findMenuItemById
 import com.soyle.stories.desktop.view.scene.sceneList.SceneListDriver
@@ -53,6 +54,7 @@ fun SceneListView.selectScene(scene: Scene)
         val tree = tree
         interact {
             tree.selectionModel.clearSelection()
+            println("selecting ${scene.id}")
             tree.selectionModel.select(sceneItem)
         }
     }

@@ -3,10 +3,11 @@ package com.soyle.stories.theme.characterConflict
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.characterarc.changeSectionValue.ChangedCharacterArcSectionValueReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.domain.character.CharacterRenamed
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.Desire
 import com.soyle.stories.domain.character.MoralWeakness
 import com.soyle.stories.domain.character.PsychologicalWeakness
+import com.soyle.stories.domain.character.name.events.CharacterRenamed
 import com.soyle.stories.gui.View
 import com.soyle.stories.theme.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArcReceiver
 import com.soyle.stories.theme.changeCharacterChange.ChangedCharacterChangeReceiver
@@ -57,7 +58,7 @@ class CharacterConflictPresenter(
                 perspectiveCharacterLabel = "Perspective Character",
                 selectedPerspectiveCharacter = response.characterChange?.let {
                     CharacterItemViewModel(
-                        it.characterId.toString(),
+                        Character.Id(it.characterId),
                         it.characterName,
                         ""
                     )
@@ -131,7 +132,7 @@ class CharacterConflictPresenter(
         if (characterUsedAsMainOpponent.themeId != themeId) return
         val opponentId = characterUsedAsMainOpponent.characterId.toString()
         view.updateOrInvalidated {
-            if (characterUsedAsMainOpponent.opponentOfCharacterId.toString() != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
+            if (Character.Id(characterUsedAsMainOpponent.opponentOfCharacterId) != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
 
             val existingOpponent = opponents.find { it.characterId == opponentId }
 
@@ -152,7 +153,7 @@ class CharacterConflictPresenter(
         if (characterUsedAsOpponent.themeId != themeId) return
         val opponentId = characterUsedAsOpponent.characterId.toString()
         view.updateOrInvalidated {
-            if (characterUsedAsOpponent.opponentOfCharacterId.toString() != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
+            if (Character.Id(characterUsedAsOpponent.opponentOfCharacterId) != selectedPerspectiveCharacter?.characterId) return@updateOrInvalidated this
 
             val existingOpponent = mainOpponent?.takeIf { it.characterId == opponentId }
 
@@ -182,7 +183,7 @@ class CharacterConflictPresenter(
     override suspend fun receiveChangedCharacterChange(changedCharacterChange: ChangedCharacterChange) {
         if (changedCharacterChange.themeId != themeId) return
         view.updateOrInvalidated {
-            if (selectedPerspectiveCharacter?.characterId != changedCharacterChange.characterId.toString())
+            if (selectedPerspectiveCharacter?.characterId != Character.Id(changedCharacterChange.characterId))
                 return@updateOrInvalidated this
 
             copy(
@@ -221,7 +222,7 @@ class CharacterConflictPresenter(
             )
         ) return
         view.updateOrInvalidated {
-            if (selectedPerspectiveCharacter?.characterId != changedCharacterArcSectionValue.characterId.toString())
+            if (selectedPerspectiveCharacter?.characterId != Character.Id(changedCharacterArcSectionValue.characterId))
                 return@updateOrInvalidated this
 
             when (changedCharacterArcSectionValue.type) {
@@ -242,7 +243,7 @@ class CharacterConflictPresenter(
         ) return
         val opponentId = propertyChanged.targetCharacterId.toString()
         view.updateOrInvalidated {
-            if (selectedPerspectiveCharacter?.characterId != propertyChanged.perspectiveCharacterId.toString())
+            if (selectedPerspectiveCharacter?.characterId != Character.Id(propertyChanged.perspectiveCharacterId))
                 return@updateOrInvalidated this
 
             fun CharacterChangeOpponentViewModel.copyWithProperty() = copy(
@@ -263,25 +264,25 @@ class CharacterConflictPresenter(
     }
 
     override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
-        val renamedCharacterId = characterRenamed.characterId.toString()
+        val renamedCharacterId = characterRenamed.characterId
         view.updateOrInvalidated {
             copy(
                 selectedPerspectiveCharacter = if (selectedPerspectiveCharacter?.characterId == renamedCharacterId) {
-                    selectedPerspectiveCharacter.copy(characterName = characterRenamed.newName)
+                    selectedPerspectiveCharacter.copy(characterName = characterRenamed.name)
                 } else selectedPerspectiveCharacter,
                 availablePerspectiveCharacters = availablePerspectiveCharacters?.map {
-                    if (it.characterId == renamedCharacterId) it.copy(characterName = characterRenamed.newName)
+                    if (it.characterId == renamedCharacterId.uuid.toString()) it.copy(characterName = characterRenamed.name)
                     else it
                 },
                 availableOpponents = availableOpponents?.map {
-                    if (it.characterId == renamedCharacterId) it.copy(characterName = characterRenamed.newName)
+                    if (it.characterId == renamedCharacterId.uuid.toString()) it.copy(characterName = characterRenamed.name)
                     else it
                 },
-                mainOpponent = if (mainOpponent?.characterId == renamedCharacterId) {
-                    mainOpponent.copy(characterName = characterRenamed.newName)
+                mainOpponent = if (mainOpponent?.characterId == renamedCharacterId.uuid.toString()) {
+                    mainOpponent.copy(characterName = characterRenamed.name)
                 } else mainOpponent,
                 opponents = opponents.map {
-                    if (it.characterId == renamedCharacterId) it.copy(characterName = characterRenamed.newName)
+                    if (it.characterId == renamedCharacterId.uuid.toString()) it.copy(characterName = characterRenamed.name)
                     else it
                 }
             )
@@ -297,7 +298,7 @@ class CharacterConflictPresenter(
             )
         ) return
         view.updateOrInvalidated {
-            if (selectedPerspectiveCharacter?.characterId != event.characterId.toString())
+            if (selectedPerspectiveCharacter?.characterId != Character.Id(event.characterId))
                 return@updateOrInvalidated this
 
             when (event.templateSectionId) {
@@ -313,7 +314,7 @@ class CharacterConflictPresenter(
         if (characterRemovedAsOpponent.themeId != themeId) return
         val removedCharacterId = characterRemovedAsOpponent.characterId.toString()
         view.updateOrInvalidated {
-            if (selectedPerspectiveCharacter?.characterId != characterRemovedAsOpponent.opponentOfCharacterId.toString())
+            if (selectedPerspectiveCharacter?.characterId != Character.Id(characterRemovedAsOpponent.opponentOfCharacterId))
                 return@updateOrInvalidated this
 
             copy(
@@ -327,15 +328,15 @@ class CharacterConflictPresenter(
 
     override suspend fun receiveRemovedCharacterFromTheme(removedCharacterFromTheme: RemovedCharacterFromTheme) {
         if (removedCharacterFromTheme.themeId != themeId) return
-        val removedCharacterId = removedCharacterFromTheme.characterId.toString()
+        val removedCharacterId = Character.Id(removedCharacterFromTheme.characterId)
         view.updateOrInvalidated {
             if (selectedPerspectiveCharacter?.characterId == removedCharacterId)
                 copy(selectedPerspectiveCharacter = null, mainOpponent = null, opponents = emptyList())
             else
                 copy(
-                    mainOpponent = mainOpponent?.takeUnless { it.characterId == removedCharacterId },
+                    mainOpponent = mainOpponent?.takeUnless { it.characterId == removedCharacterId.uuid.toString() },
                     opponents = opponents.filterNot {
-                        it.characterId == removedCharacterId
+                        it.characterId == removedCharacterId.uuid.toString()
                     }
                 )
         }

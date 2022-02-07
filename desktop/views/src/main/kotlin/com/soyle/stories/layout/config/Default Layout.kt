@@ -2,17 +2,10 @@ package com.soyle.stories.layout.config
 
 import com.soyle.stories.domain.project.Project
 import com.soyle.stories.layout.config.fixed.*
-import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications
 import com.soyle.stories.layout.entities.Layout
 import com.soyle.stories.layout.entities.Tool
 import com.soyle.stories.layout.entities.layout
-
-/**
- * Created by Brendan
- * Date: 2/15/2020
- * Time: 12:17 AM
- */
 
 fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(projectId, layoutId) {
     window {
@@ -46,7 +39,7 @@ fun defaultLayout(projectId: Project.Id, layoutId: Layout.Id): Layout = layout(p
                 }
             }
             stack(2) {
-                marker(DeleteSceneRamifications::class)
+                tool(Tool(Ramifications, isOpen = false))
                 marker(ReorderSceneRamifications::class)
                 tool(Tool(Timeline, isOpen = false))
                 //openTool(ToolType.ContinuityErrors)

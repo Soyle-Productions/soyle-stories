@@ -1,7 +1,7 @@
 package com.soyle.stories.desktop.config.location
 
 import com.soyle.stories.desktop.config.InProjectScope
-import com.soyle.stories.desktop.config.locale.LocaleHolder
+import com.soyle.stories.desktop.locale.LocaleHolder
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.domain.location.Location
@@ -26,7 +26,7 @@ object Presentation {
             deleteLocationDialog()
 
             scoped<LocationDetailsScope> {
-                provide<LocationDetailsLocale> { projectScope.applicationScope.get<LocaleHolder>() }
+                provide<LocationDetailsLocale> { projectScope.applicationScope.get<LocaleHolder>().locations.details }
             }
         }
     }
@@ -39,7 +39,7 @@ object Presentation {
                         applicationScope.get(),
                         onCreateLocation,
                         get(),
-                        applicationScope.get<LocaleHolder>()
+                        applicationScope.get<LocaleHolder>().locations.create
                     )
             }
         }

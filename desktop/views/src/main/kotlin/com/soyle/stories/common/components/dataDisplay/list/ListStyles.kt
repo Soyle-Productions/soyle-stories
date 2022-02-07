@@ -20,6 +20,9 @@ class ListStyles : Stylesheet() {
 
         fun CssSelectionBlock.removeListViewBorder() {
             backgroundInsets = multi(box(0.px))
+            and(focused) {
+                borderWidth = multi(box(0.px))
+            }
         }
 
         fun ListCell<*>.applyFirstChildPseudoClasses() {
@@ -41,6 +44,13 @@ class ListStyles : Stylesheet() {
                 and(hover) {
                     backgroundColor = multi(ColorStyles.primary.light)
                     effect = SurfaceStyles.dropShadow(2.0)
+                    textFill = ColorStyles.lightSelectionTextColor
+                    label {
+                        textFill = ColorStyles.lightSelectionTextColor
+                    }
+                    button {
+                        textFill = ColorStyles.lightSelectionTextColor
+                    }
                     and(empty) {
                         backgroundColor = multi(Color.TRANSPARENT)
                         effect = SurfaceStyles.dropShadow(0.0)
@@ -56,6 +66,12 @@ class ListStyles : Stylesheet() {
                 and(selected) {
                     backgroundColor = multi(ColorStyles.primary.state.selectedBackground)
                     textFill = ColorStyles.lightSelectionTextColor
+                    label {
+                        textFill = ColorStyles.lightSelectionTextColor
+                    }
+                    button {
+                        textFill = ColorStyles.lightSelectionTextColor
+                    }
                 }
             }
         }

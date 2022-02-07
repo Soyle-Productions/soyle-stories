@@ -2,8 +2,9 @@ package com.soyle.stories.location.details.components
 
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Companion.chip
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.asSurface
 import com.soyle.stories.common.components.surfaces.elevated
+import com.soyle.stories.common.components.surfaces.elevationProperty
 import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
 import com.soyle.stories.common.components.text.SectionTitle.Companion.sectionTitle
 import com.soyle.stories.location.details.LocationDetailsActions
@@ -94,7 +95,7 @@ class ScenesHostedInLocation(
         return chip(model.name).apply {
             addClass(LocationDetailsStyles.hostedSceneItem)
             id = model.id.toString()
-            asSurface { inheritedElevationProperty().bind(this@ScenesHostedInLocation.elevated().absoluteElevationProperty()) }
+            elevationProperty().bind(this@ScenesHostedInLocation.elevationProperty())
             deleteGraphic = MaterialIconView(MaterialIcon.DELETE)
             onDelete { actions.removeScene(model.id) }
         }

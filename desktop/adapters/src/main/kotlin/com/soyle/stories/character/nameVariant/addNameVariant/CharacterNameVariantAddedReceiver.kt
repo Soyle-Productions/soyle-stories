@@ -1,7 +1,7 @@
 package com.soyle.stories.character.nameVariant.addNameVariant
 
-import com.soyle.stories.domain.character.events.CharacterNameVariantAdded
+import com.soyle.stories.domain.character.name.events.CharacterNameAdded
 
 interface CharacterNameVariantAddedReceiver {
-    suspend fun receiveCharacterNameVariantAdded(event: CharacterNameVariantAdded)
+    suspend fun receiveCharacterNameVariantAdded(event: CharacterNameAdded)
 }

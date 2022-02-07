@@ -3,17 +3,23 @@ package com.soyle.stories.usecase.storyevent
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.nonBlankStr
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.storyevent.StoryEvent
+import com.soyle.stories.domain.storyevent.events.StoryEventCoveredByScene
 import com.soyle.stories.domain.storyevent.events.StoryEventCreated
 import com.soyle.stories.domain.storyevent.events.StoryEventRescheduled
 import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.domain.storyevent.storyEventName
 import com.soyle.stories.domain.storyevent.storyEventTime
 import com.soyle.stories.domain.validation.NonBlankString
+import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEvent
 import com.soyle.stories.usecase.storyevent.create.CreateStoryEventUseCase
 import kotlinx.coroutines.runBlocking
+import org.amshove.kluent.shouldBeEmpty
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -32,12 +38,18 @@ class `Create Story Event Unit Test` {
     // post conditions
     /** outputs a story event created event */
     private var createdStoryEvent: StoryEventCreated? = null
+    /** may output a story event covered by scene event */
+    private var storyEventCovered: StoryEventCoveredByScene? = null
 
     /** may output story event rescheduled events, if time is less than zero */
     private var rescheduledStoryEvents: List<StoryEventRescheduled>? = null
 
     /** stores a new story event in the repository */
     private var storyEvent: StoryEvent? = null
+        set(value) {
+            if (field != null) error("Should only save new story event once")
+            field = value
+        }
 
     /** may update story events, if time is less than zero */
     private val updatedStoryEvents = mutableListOf<StoryEvent>()
@@ -45,13 +57,15 @@ class `Create Story Event Unit Test` {
         onAddNewStoryEvent = ::storyEvent::set,
         onUpdateStoryEvent = updatedStoryEvents::add
     )
+    private val sceneRepository = SceneRepositoryDouble()
 
     // Use Case
-    private val useCase: CreateStoryEvent = CreateStoryEventUseCase(storyEventRepository)
+    private val useCase: CreateStoryEvent = CreateStoryEventUseCase(storyEventRepository, sceneRepository)
     private fun createStoryEvent(request: CreateStoryEvent.RequestModel) {
         runBlocking {
             useCase.invoke(request) {
                 createdStoryEvent = it.createdStoryEvent
+                storyEventCovered = it.storyEventCovered
                 rescheduledStoryEvents = it.rescheduledStoryEvents
             }
         }
@@ -122,6 +136,57 @@ class `Create Story Event Unit Test` {
                 createdStoryEvent!!.time.toLong().mustEqual(0L)
             }
 
+        }
+
+    }
+
+    @Nested
+    inner class `When Scene is Provided` {
+
+        private val scene = makeScene()
+        private val request = CreateStoryEvent.RequestModel(
+            storyEventName(),
+            projectId,
+            scene.id
+        )
+
+        @Nested
+        inner class `Scene Must Exist` {
+
+            @Test
+            fun `given scene does not exist - should throw error`() {
+                val error = assertThrows<SceneDoesNotExist> { createStoryEvent(request) }
+
+                error.shouldBeEqualTo(SceneDoesNotExist(scene.id.uuid))
+            }
+
+            @Test
+            fun `given scene does not exist - should not save any updated`() {
+                val error = assertThrows<SceneDoesNotExist> { createStoryEvent(request) }
+
+                updatedStoryEvents.shouldBeEmpty()
+            }
+
+        }
+
+        @Test
+        fun `should have stored a new story event with scene id`() {
+            sceneRepository.givenScene(scene)
+
+            createStoryEvent(request)
+
+            assertNotNull(storyEvent) { "Story event was not added to repository" }
+            storyEvent!!.sceneId.shouldBeEqualTo(scene.id)
+        }
+
+        @Test
+        fun `should output story event covered by scene event`() {
+            sceneRepository.givenScene(scene)
+
+            createStoryEvent(request)
+
+            assertNotNull(storyEventCovered) { "Story event covered by scene event was not output" }
+            storyEventCovered.shouldBeEqualTo(StoryEventCoveredByScene(storyEvent!!.id, storyEvent!!.name.value, scene.id, null))
         }
 
     }

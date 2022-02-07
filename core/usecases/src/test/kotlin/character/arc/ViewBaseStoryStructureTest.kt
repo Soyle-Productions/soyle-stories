@@ -97,7 +97,7 @@ class ViewBaseStoryStructureTest {
             if (includedCharacterIds.isNotEmpty()) {
                 includedCharacterIds.fold(initialTheme) { theme, (id, isPromoted) ->
                     val character1 = makeCharacter(Character.Id(id))
-                    val included = theme.withCharacterIncluded(character1.id, character1.name.value, character1.media)
+                    val included = theme.withCharacterIncluded(character1.id, character1.displayName.value, character1.media)
                     if (isPromoted) {
                         included.withCharacterPromoted(Character.Id(id))
                     } else included

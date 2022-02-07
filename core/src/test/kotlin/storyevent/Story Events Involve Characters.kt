@@ -1,11 +1,11 @@
 package com.soyle.stories.core.storyevent
 
-import com.soyle.stories.core.IntTest
+import com.soyle.stories.core.definitions.CoreTest
 import kotlin.test.Test
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.storyevent.StoryEvent
 
-class `Story Events Involve Characters` : IntTest() {
+class `Story Events Involve Characters` : CoreTest() {
 
     private val project = given.`a project`().`has been started`()
 
@@ -14,6 +14,21 @@ class `Story Events Involve Characters` : IntTest() {
         val storyEvent = `when`.`a story event`().`is created in the`(project)
 
         then.the(storyEvent).`should not involve any characters`()
+    }
+
+    @Test
+    fun `Can Involve Character in Story Event`() {
+        val storyEvent: StoryEvent.Id
+        val character: Character.Id
+
+        with(given) {
+            storyEvent = given.`a story event`().`has been created in the`(project)
+            character = and.`a character`() `has been created in the` project
+        }
+
+        val availableCharacters = `when`.`the user`() `lists the available characters to involve in the` storyEvent
+
+        then the availableCharacters `should have an item for the` character
     }
 
     @Test
@@ -32,7 +47,7 @@ class `Story Events Involve Characters` : IntTest() {
     }
 
     @Test
-    fun `Delete Character Involved in Story Event`() {
+    fun `Character is No Longer Available After Involvement`() {
         val storyEvent: StoryEvent.Id
         val character: Character.Id
 
@@ -42,9 +57,9 @@ class `Story Events Involve Characters` : IntTest() {
             and the character `has been involved in the` storyEvent
         }
 
-        `when` the character `is removed from the` project
+        val availableCharacters = `when`.`the user`() `lists the available characters to involve in the` storyEvent
 
-        then.the(storyEvent).`should not involve any characters`()
+        then the availableCharacters `should not have an item for the` character
     }
 
     @Test
@@ -53,7 +68,7 @@ class `Story Events Involve Characters` : IntTest() {
         val character: Character.Id
 
         with(given) {
-            storyEvent = given.`a story event`().`has been created in the`(project)
+            storyEvent = given.`a story event`() `has been created in the` project
             character = and.`a character`() `has been created in the` project
             and the character `has been involved in the` storyEvent
         }
@@ -62,16 +77,5 @@ class `Story Events Involve Characters` : IntTest() {
 
         then.the(storyEvent).`should not involve any characters`()
     }
-
-    /*
-
-
-  Scenario: Stop Involving Character in Story Event
-    Given I have created a story event named "Something Happens"
-    And I have created a character named "Bob"
-    And I have involved the "Bob" character in the "Something Happens" story event
-    When I stop involving the "Bob" character in the "Something Happens" story event
-    Then the "Something Happens" story event should not involve any characters
-     */
 
 }

@@ -2,7 +2,6 @@ package com.soyle.stories.character.rename
 
 import com.soyle.stories.character.create.characterNameInput
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
-import com.soyle.stories.characterarc.createCharacterDialog.CreateCharacterForm
 import com.soyle.stories.di.DI
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
@@ -21,14 +20,14 @@ class RenameCharacterForm : View("Rename") {
 
         override fun start(
             characterId: Character.Id,
-            currentName: String?
+            currentName: NonBlankString
         ) {
             val scope = RenamingCharacterScope(
                 characterId,
                 currentName,
                 projectScope
             )
-            setInScope(RenameCharacterViewModel(characterId, currentName ?: ""), scope, RenameCharacterViewModel::class)
+            setInScope(RenameCharacterViewModel(characterId, currentName.value), scope, RenameCharacterViewModel::class)
             val form = scope.get<RenameCharacterForm>()
 
             form.openModal(
@@ -60,7 +59,7 @@ class RenameCharacterForm : View("Rename") {
         viewModel.locked.set(true)
         val renameCharacterController: RenameCharacterController = scope.projectScope.get()
         renameCharacterController
-            .renameCharacter(viewModel.characterId.uuid.toString(), newName)
+            .renameCharacter(viewModel.characterId, scope.currentName, newName)
             .invokeOnCompletion { failure ->
                 if (failure == null) runLater { close() }
                 else runLater { viewModel.locked.set(false) }

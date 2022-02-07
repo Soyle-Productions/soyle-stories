@@ -1,6 +1,5 @@
 package com.soyle.stories.usecase.prose.detectInvalidMentions
 
-import arrow.core.valid
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.prose.*
@@ -50,8 +49,10 @@ class DetectInvalidatedMentionsUseCase(
         assert(charactersToInspect.size == remainingIds.size)
 
         return nonExistingIds.map { it.mentioned() } + charactersToInspect.filter {
-            val otherNameSet = it.otherNames.map { it.value }.toSet() + it.name.value
-            mentionsByCharacterId[it.id].orEmpty().any { it.text.toString() !in otherNameSet }
+            it.projectId == null || run {
+                val otherNameSet = it.names.map { it.value }.toSet()
+                mentionsByCharacterId[it.id].orEmpty().any { it.text.toString() !in otherNameSet }
+            }
         }.map { it.id.mentioned() }
     }
 

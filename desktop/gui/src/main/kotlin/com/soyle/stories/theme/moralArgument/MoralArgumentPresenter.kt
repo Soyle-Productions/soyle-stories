@@ -3,6 +3,7 @@ package com.soyle.stories.theme.moralArgument
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgumentReceiver
 import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument.CharacterArcSectionRemovedReceiver
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.ArcSectionAddedToCharacterArc
 import com.soyle.stories.usecase.character.arc.section.addCharacterArcSectionToMoralArgument.ListAvailableArcSectionTypesToAddToMoralArgument
 import com.soyle.stories.usecase.character.arc.section.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgument
@@ -80,7 +81,7 @@ class MoralArgumentPresenter(
         view.updateOrInvalidated {
             copy(
                 selectedPerspectiveCharacter = CharacterItemViewModel(
-                    response.characterId.toString(),
+                    Character.Id(response.characterId),
                     response.characterName,
                     ""
                 ),
@@ -99,7 +100,7 @@ class MoralArgumentPresenter(
     override suspend fun receiveAvailableArcSectionTypesToAddToMoralArgument(response: ListAvailableArcSectionTypesToAddToMoralArgument.ResponseModel) {
         if (response.themeId != themeId) return
         view.updateOrInvalidated {
-            if (selectedPerspectiveCharacter?.characterId != response.characterId.toString())
+            if (selectedPerspectiveCharacter?.characterId != Character.Id(response.characterId))
                 return@updateOrInvalidated this
             copy(
                 availableSectionTypes = response.map {
@@ -118,7 +119,7 @@ class MoralArgumentPresenter(
         if (event.themeId != themeId) return
         if (event.indexInMoralArgument == null) return
         view.updateOrInvalidated {
-            if (selectedPerspectiveCharacter?.characterId != event.characterId.toString())
+            if (selectedPerspectiveCharacter?.characterId != Character.Id(event.characterId))
                 return@updateOrInvalidated this
             copy(
                 sections = sections?.toMutableList()?.apply {
@@ -156,7 +157,7 @@ class MoralArgumentPresenter(
         if (event.themeId != themeId) return
         val arcSectionId = event.arcSectionId.toString()
         view.updateOrInvalidated {
-            if (event.characterId.toString() != selectedPerspectiveCharacter?.characterId) {
+            if (Character.Id(event.characterId) != selectedPerspectiveCharacter?.characterId) {
                 return@updateOrInvalidated this
             }
 

@@ -2,6 +2,7 @@ package com.soyle.stories.common
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import java.lang.ref.WeakReference
 
 /**
@@ -43,7 +44,7 @@ abstract class Notifier<Listener : Any> {
         }
         listeners.forEach {
             val listener = it.get()
-            coroutineScope {
+            supervisorScope {
                 launch {
                     listener?.also {
                         block(it)

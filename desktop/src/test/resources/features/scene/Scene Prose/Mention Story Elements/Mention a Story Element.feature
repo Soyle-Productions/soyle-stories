@@ -104,7 +104,7 @@ Feature: Mention a Story Element
     Scenario Outline: Rename a Mentioned Story Element and then Read the Scene
       Given I have created a <element> named <name>
       And I have mentioned the <element> <name> in the "Big Battle" scene's prose
-      And I have renamed the <element> <name> to <new name>
+      And I have renamed the <name> <element> to <new name>
       When I edit the "Big Battle" scene's prose
       Then the <name> mention in the "Big Battle" scene's prose should read <new name>
 
@@ -117,7 +117,7 @@ Feature: Mention a Story Element
       Given I have created a <element> named <name>
       And I have mentioned the <element> <name> in the "Big Battle" scene's prose
       And I am editing the "Big Battle" scene's prose
-      When I rename the <element> <name> to <new name>
+      When I rename the <name> <element> to <new name>
       Then the <name> mention in the "Big Battle" scene's prose should read <new name>
 
       Examples:
@@ -144,7 +144,7 @@ Feature: Mention a Story Element
     Scenario: Rename a Mentioned Character's Other Name and then Read the Scene
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
       And I have renamed the name variant of "Bobby" for the "Bob" character to "Robert"
       When I edit the "Big Battle" scene's prose
       Then the "Bobby" mention in the "Big Battle" scene's prose should read "Robert"
@@ -152,7 +152,7 @@ Feature: Mention a Story Element
     Scenario: Rename a Mentioned Character's Other Name while Reading Scene Prose
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
       And I am editing the "Big Battle" scene's prose
       When I rename the name variant of "Bobby" for the "Bob" character to "Robert"
       Then the "Bobby" mention in the "Big Battle" scene's prose should read "Robert"
@@ -162,7 +162,7 @@ Feature: Mention a Story Element
     Scenario: Rename a Character Mentioned via an Alternative Name
       Given I have created a character named "Bob"
       And I have created a name variant of "Bobby" for the "Bob" character
-      And I have mentioned the "Bobby" name variant for the character "Bob" in the "Big Battle" scene's prose
+      And I have mentioned the "Bob" character as "Bobby" in the "Big Battle" scene's prose
       And I am editing the "Big Battle" scene's prose
       When I rename the "Bob" character to "Frank"
       Then I should see "Bobby" mentioned in the "Big Battle" scene's prose

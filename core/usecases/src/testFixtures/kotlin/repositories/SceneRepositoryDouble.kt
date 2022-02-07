@@ -7,9 +7,9 @@ import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.domain.scene.events.SceneCreated
 import com.soyle.stories.domain.scene.order.SceneOrder
-import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.usecase.scene.SceneRepository
+import java.util.*
 
 class SceneRepositoryDouble(
 	initialScenes: List<Scene> = emptyList(),
@@ -21,14 +21,27 @@ class SceneRepositoryDouble(
 ) : SceneRepository {
 
 	val scenes = initialScenes.associateBy { it.id }.toMutableMap()
+	val sceneLastUpdate = initialScenes.associate { it.id to Date().time }.toMutableMap()
 	val sceneOrders = initialScenes.groupBy { it.projectId }.mapValues { SceneOrder.reInstantiate(it.key, it.value.map(Scene::id)) }.toMutableMap()
 
-	fun givenScene(scene: Scene)
+	fun givenScene(scene: Scene): Scene
 	{
 		scenes[scene.id] = scene
-		val sceneCreated = SceneCreated(scene.id, scene.name.value, scene.proseId, scene.coveredStoryEvents.firstOrNull() ?: StoryEvent.Id())
+		val sceneCreated = SceneCreated(scene.id, scene.name.value, scene.proseId)
 		sceneOrders[scene.projectId] = (sceneOrders[scene.projectId] ?: SceneOrder.initializeInProject(scene.projectId))
 			.withScene(sceneCreated).sceneOrder
+		return scene
+	}
+
+	fun givenOrder(order: SceneOrder) {
+		sceneOrders[order.projectId] = order
+	}
+
+	fun givenOrder(vararg orderedScenes: Scene) {
+		orderedScenes.groupBy { it.projectId }
+			.forEach { (projectId, orderedScenesInProject) ->
+				sceneOrders[projectId] = SceneOrder.reInstantiate(projectId, orderedScenesInProject.map { it.id })
+			}
 	}
 
 	override suspend fun createNewScene(scene: Scene) {
@@ -51,10 +64,6 @@ class SceneRepositoryDouble(
 
 	override suspend fun getSceneById(sceneId: Scene.Id): Scene? =
 	  scenes[sceneId]
-
-	override suspend fun getSceneForStoryEvent(storyEventId: StoryEvent.Id): Scene? {
-		return scenes.values.find { storyEventId in it.coveredStoryEvents }
-	}
 
 	override suspend fun getSceneThatOwnsProse(proseId: Prose.Id): Scene? {
 		return scenes.values.find { it.proseId == proseId }

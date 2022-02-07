@@ -1,11 +1,7 @@
 package com.soyle.stories.usecase.scene.reorderScene
 
 import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.SceneLocale
-import com.soyle.stories.domain.scene.order.SceneOrderUpdate
 import com.soyle.stories.domain.scene.order.SuccessfulSceneOrderUpdate
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
-import java.util.*
 
 interface ReorderScene {
 

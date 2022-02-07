@@ -4,12 +4,7 @@ import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVaria
 import com.soyle.stories.character.nameVariant.addNameVariant.CharacterNameVariantAddedReceiver
 import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedNotifier
 import com.soyle.stories.character.nameVariant.remove.CharacterNameVariantRemovedReceiver
-import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedNotifier
-import com.soyle.stories.character.nameVariant.rename.CharacterNameVariantRenamedReceiver
-import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterConfirmationNotifier
-import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterConfirmationReceiver
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
-import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
 import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.characterarc.moveCharacterArcSectionInMoralArgument.CharacterArcSectionMovedInMoralArgumentNotifier
@@ -19,10 +14,10 @@ import com.soyle.stories.characterarc.removeCharacterArcSectionFromMoralArgument
 import com.soyle.stories.common.listensTo
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
-import com.soyle.stories.domain.character.events.CharacterNameVariantRemoved
-import com.soyle.stories.domain.character.events.CharacterNameVariantRenamed
 import com.soyle.stories.project.ProjectScope
-import com.soyle.stories.storyevent.removeCharacterFromStoryEvent.RemoveCharacterFromStoryEventControllerImpl
+import com.soyle.stories.scene.characters.tool.SceneCharactersToolScope
+import com.soyle.stories.storyevent.coverage.uncover.StoryEventUncoveredBySceneNotifier
+import com.soyle.stories.storyevent.remove.StoryEventNoLongerHappensNotifier
 import com.soyle.stories.theme.removeSymbolicItem.RemoveSymbolicItemControllerImpl
 
 object Notifiers {
@@ -42,16 +37,14 @@ object Notifiers {
                 CharacterRenamedNotifier()
             }
 
-            provide(RemoveCharacterConfirmationReceiver::class) { RemoveCharacterConfirmationNotifier() }
-            provide(RemovedCharacterReceiver::class) {
-                RemovedCharacterNotifier().also {
-                    get<RemoveCharacterFromStoryEventControllerImpl>() listensTo it
-                    get<RemoveSymbolicItemControllerImpl>() listensTo it
-                }
-            }
             provide(CharacterNameVariantAddedReceiver::class) { CharacterNameVariantAddedNotifier() }
-            provide(CharacterNameVariantRenamedReceiver::class) { CharacterNameVariantRenamedNotifier() }
             provide(CharacterNameVariantRemovedReceiver::class) { CharacterNameVariantRemovedNotifier() }
+            provide { RemovedCharacterNotifier() }
+
+            scoped<SceneCharactersToolScope> {
+                hoist<CharacterRenamedNotifier> { projectScope }
+                hoist<RemovedCharacterNotifier> { projectScope }
+            }
         }
     }
 

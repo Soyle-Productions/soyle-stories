@@ -8,7 +8,9 @@ import com.soyle.stories.common.components.buttons.ButtonStyles.Companion.noArro
 import com.soyle.stories.common.components.buttons.primaryButton
 import com.soyle.stories.common.components.dataDisplay.chip.Chip.Companion.chip
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevated
+import com.soyle.stories.common.components.surfaces.elevation
+import com.soyle.stories.common.components.surfaces.elevationVariant
 import com.soyle.stories.common.components.text.SectionTitle.Companion.sectionTitle
 import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.common.emptyProperty
@@ -39,9 +41,7 @@ class SceneOutlineView(
 
     init {
         id = "scene-outline"
-        asSurface {
-            absoluteElevation = Elevation[4]!!
-        }
+        elevation = Elevation[4]!!
     }
 
     init {
@@ -96,10 +96,7 @@ class SceneOutlineView(
             properties["com.soyle.stories.scene.outline.empty"] = emptyProperty
             addClass(Stylesheet.content)
             vgrow = Priority.ALWAYS
-            asSurface {
-                inheritedElevation = Elevation[4]!!
-                relativeElevation = Elevation[4]!!
-            }
+            elevation = Elevation[4]!!
             dynamicContent(emptyProperty) {
                 when (viewModel.items().isEmpty()) {
                     true -> empty()
@@ -112,10 +109,8 @@ class SceneOutlineView(
     private fun header() {
         hbox {
             addClass(headerPanel)
-            asSurface {
-                inheritedElevation = Elevation[4]!!
-                relativeElevation = Elevation[12]!!
-            }
+            elevation = Elevation[4]!!
+            elevationVariant = elevated(objectProperty(Elevation.getValue(12)))
             sectionTitle(viewModel.sceneName()) {
                 graphic = chip(viewModel.itemCount().asString())
             }
@@ -155,9 +150,7 @@ class SceneOutlineView(
         removeClass(Stylesheet.empty)
         listview<OutlinedStoryEventItem>(viewModel.items()) {
             vgrow = Priority.ALWAYS
-            asSurface {
-                inheritedElevation = Elevation[4]!!
-            }
+            elevation = Elevation.getValue(4)
             setOnMouseClicked { if ((it.target as? ListCell<*>)?.isEmpty == true) selectionModel?.clearSelection() }
 
             cellFormat {

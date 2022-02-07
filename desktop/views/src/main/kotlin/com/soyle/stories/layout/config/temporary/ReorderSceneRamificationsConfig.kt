@@ -52,10 +52,10 @@ object ReorderSceneRamificationsConfig : ToolConfig<ReorderSceneRamifications> {
     }
 }
 
-data class ReorderSceneRamifications(val sceneId: UUID, private val locale: SceneLocale) : TemporaryTool() {
+data class ReorderSceneRamifications(val sceneId: UUID) : TemporaryTool() {
     override suspend fun validate(context: OpenToolContext) {
         context.sceneRepository.getSceneById(Scene.Id(sceneId))
-            ?: throw SceneDoesNotExist(locale, sceneId)
+            ?: throw SceneDoesNotExist(sceneId)
     }
 
     override fun identifiedWithId(id: UUID): Boolean =

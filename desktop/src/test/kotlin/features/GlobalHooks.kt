@@ -3,17 +3,16 @@ package com.soyle.stories.desktop.config.features
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.desktop.config.drivers.character.CharacterDriver
 import com.soyle.stories.desktop.config.drivers.location.LocationDriver
+import com.soyle.stories.desktop.config.drivers.robot
 import com.soyle.stories.desktop.config.drivers.scene.SceneDriver
 import com.soyle.stories.desktop.config.drivers.soylestories.SyncThreadTransformer
 import com.soyle.stories.desktop.config.drivers.soylestories.getAnyOpenWorkbenchOrError
 import com.soyle.stories.desktop.config.drivers.storyevent.`Story Event Robot`
 import com.soyle.stories.desktop.config.drivers.theme.ThemeDriver
-import com.soyle.stories.desktop.config.locale.LocaleHolder
 import com.soyle.stories.desktop.config.soylestories.configureLocalization
 import com.soyle.stories.desktop.config.soylestories.configureModules
-import com.soyle.stories.desktop.locale.SoyleMessages
 import com.soyle.stories.desktop.view.runHeadless
-import com.soyle.stories.di.DI
+import com.soyle.stories.di.registerSingleton
 import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.character.CharacterArcTemplate
 import com.soyle.stories.domain.character.CharacterArcTemplateSection
@@ -24,10 +23,18 @@ import com.soyle.stories.soylestories.ApplicationScope
 import com.soyle.stories.soylestories.SoyleStories
 import io.cucumber.java8.En
 import io.cucumber.java8.Scenario
-import kotlinx.coroutines.CoroutineScope
-import org.junit.jupiter.api.fail
+import javafx.embed.swing.SwingFXUtils
+import javafx.scene.SnapshotParameters
+import javafx.scene.image.PixelFormat
+import javafx.stage.Stage
+import javafx.stage.Window
 import org.testfx.api.FxToolkit
-import java.util.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.OutputStream
+import java.util.logging.Level
+import java.util.logging.Logger
+import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
 lateinit var soyleStories: SoyleStories
@@ -44,23 +51,30 @@ class GlobalHooks : En {
             close
         }
     }
+    private val logger = Logger.getGlobal()
 
     private fun synchronizeBackgroundTasks() {
-        DI.register(ThreadTransformer::class, ApplicationScope::class, { SyncThreadTransformer() })
+        val originalLevel = logger.level
+        logger.level = Level.OFF
+        registerSingleton(ApplicationScope::class, ThreadTransformer::class) { SyncThreadTransformer() }
+        logger.level = originalLevel
     }
 
     private val primaryTestThread = Thread.getAllStackTraces().keys.find { it.name == "main" }!!
 
+    private val initializeDI by lazy {
+        configureModules()
+        synchronizeBackgroundTasks()
+    }
+
     init {
         Before { scenario: Scenario ->
-            if (! FxToolkit.isFXApplicationThreadRunning()) {
+            if (!FxToolkit.isFXApplicationThreadRunning()) {
+                logger.level = Level.INFO
                 runHeadless()
                 closeThread
-                SoyleStories.initialization = {
-                    configureLocalization()
-                    configureModules()
-                    synchronizeBackgroundTasks()
-                }
+                configureLocalization()
+                SoyleStories.initialization = { initializeDI }
                 FxToolkit.registerPrimaryStage()
                 Thread.getAllStackTraces().keys.find { it.name == "JavaFX Application Thread" }?.let {
                     val currentHandler = it.uncaughtExceptionHandler
@@ -82,6 +96,19 @@ class GlobalHooks : En {
             soyleStories = FxToolkit.setupApplication(SoyleStories::class.java) as SoyleStories
         }
 
+//        AfterStep { scenario: Scenario ->
+//            robot.listWindows().filter { it.isShowing }
+//                .forEach {
+//                    robot.interact {
+//                        val image = SwingFXUtils.fromFXImage(it.scene.root.snapshot(SnapshotParameters(), null), null)
+//                        val output = ByteArrayOutputStream(image.width * image.height * 4)
+//                        ImageIO.write(image, "png", output)
+//                        scenario.log((it as? Stage)?.title ?: it.toString())
+//                        scenario.attach(output.toByteArray(), "image/png", (it as? Stage)?.title ?: it.toString())
+//                    }
+//                }
+//        }
+
         After { scenario: Scenario ->
             try {
                 FxToolkit.cleanupApplication(soyleStories)
@@ -92,22 +119,27 @@ class GlobalHooks : En {
             }
         }
 
-        ParameterType<Character?>("character", "character \"(.*?)\"|\"(.*?)\" character") { _: String?, name: String ->
-            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByNameOrError(name)
-        }
-        ParameterType<Location?>("location", "location \"(.*?)\"|\"(.*?)\" location") { _: String?, name: String ->
-            LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByName(name)
-        }
+        ParameterType<Character>("character", "character \"(.*?)\"|\"(.*?)\" character", CharacterParam())
+        ParameterType<Location?>("location", "location \"(.*?)\"|\"(.*?)\" location", LocationParam())
         ParameterType<Theme>("theme", "theme \"(.*?)\"|\"(.*?)\" theme") { _: String?, name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
         }
-        ParameterType<Theme>("moral argument", "moral argument \"(.*?)\"|\"(.*?)\" moral argument") { _: String?, name: String ->
+        ParameterType<Theme>(
+            "moral argument",
+            "moral argument \"(.*?)\"|\"(.*?)\" moral argument"
+        ) { _: String?, name: String ->
             ThemeDriver(soyleStories.getAnyOpenWorkbenchOrError()).getThemeByNameOrError(name)
         }
-        ParameterType<com.soyle.stories.domain.scene.Scene>("scene", "scene \"(.*?)\"|\"(.*?)\" scene") { _: String?, name: String ->
+        ParameterType<com.soyle.stories.domain.scene.Scene>(
+            "scene",
+            "scene \"(.*?)\"|\"(.*?)\" scene"
+        ) { _: String?, name: String ->
             SceneDriver(soyleStories.getAnyOpenWorkbenchOrError()).getSceneByNameOrError(name)
         }
-        ParameterType<StoryEvent>("story event", "story event \"(.*?)\"|\"(.*?)\" story event") { _: String?, name: String ->
+        ParameterType<StoryEvent>(
+            "story event",
+            "story event \"(.*?)\"|\"(.*?)\" story event"
+        ) { _: String?, name: String ->
             `Story Event Robot`(soyleStories.getAnyOpenWorkbenchOrError()).getStoryEventByName(name)!!
         }
         ParameterType<CharacterArcTemplateSection>("template", "\"(.*?)\"") { _: String?, name: String ->
@@ -119,6 +151,16 @@ class GlobalHooks : En {
                 ?: error("detected ordinal, but did not find parsable string")
         }
 
+    }
+
+    private class CharacterParam : io.cucumber.java8.ParameterDefinitionBody.A2<Character> {
+        override fun accept(p1: String?, name: String?): Character =
+            CharacterDriver(soyleStories.getAnyOpenWorkbenchOrError()).getCharacterByNameOrError(name ?: p1 ?: error("NO NAME PROVIDED"))
+    }
+
+    private class LocationParam : io.cucumber.java8.ParameterDefinitionBody.A2<Location?> {
+        override fun accept(p1: String?, name: String?): Location? =
+            LocationDriver(soyleStories.getAnyOpenWorkbenchOrError()).getLocationByName(name ?: p1 ?: error("NO NAME PROVIDED"))
     }
 
 }

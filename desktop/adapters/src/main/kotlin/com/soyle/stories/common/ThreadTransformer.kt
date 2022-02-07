@@ -12,6 +12,8 @@ interface ThreadTransformer {
     val asyncContext: CoroutineContext
         get() = Dispatchers.Default
 
+    val asyncScope: CoroutineScope
+
     val guiContext: CoroutineContext
         get() = Dispatchers.Main
 

@@ -1,10 +1,11 @@
 package com.soyle.stories.theme.addSymbolDialog
 
-import com.soyle.stories.character.buildNewCharacter.CreatedCharacterReceiver
-import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterReceiver
 import com.soyle.stories.character.renameCharacter.CharacterRenamedReceiver
 import com.soyle.stories.characterarc.characterList.CharacterItemViewModel
-import com.soyle.stories.domain.character.CharacterRenamed
+import com.soyle.stories.common.Receiver
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.events.CharacterRemovedFromStory
+import com.soyle.stories.domain.character.name.events.CharacterRenamed
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.location.events.LocationRenamed
 import com.soyle.stories.gui.View
@@ -15,8 +16,7 @@ import com.soyle.stories.theme.addSymbolToTheme.SymbolAddedToThemeReceiver
 import com.soyle.stories.theme.removeSymbolFromTheme.SymbolRemovedFromThemeReceiver
 import com.soyle.stories.theme.renameSymbol.RenamedSymbolReceiver
 import com.soyle.stories.theme.themeList.SymbolListItemViewModel
-import com.soyle.stories.usecase.character.buildNewCharacter.CreatedCharacter
-import com.soyle.stories.usecase.character.removeCharacterFromStory.RemovedCharacter
+import com.soyle.stories.usecase.character.remove.RemovedCharacter
 import com.soyle.stories.usecase.location.createNewLocation.CreateNewLocation
 import com.soyle.stories.usecase.location.deleteLocation.DeletedLocation
 import com.soyle.stories.usecase.theme.addSymbolToTheme.SymbolAddedToTheme
@@ -32,7 +32,7 @@ class AddSymbolDialogPresenter(
     oppositionId: String,
     private val view: View.Nullable<AddSymbolDialogViewModel>
 ) : ListAvailableEntitiesToAddToOpposition.OutputPort,
-    CreatedCharacterReceiver, CharacterRenamedReceiver, RemovedCharacterReceiver,
+    CharacterRenamedReceiver, Receiver<CharacterRemovedFromStory>,
     CreateNewLocation.OutputPort, LocationRenamedReceiver, DeletedLocationReceiver, SymbolAddedToThemeReceiver,
     RenamedSymbolReceiver, SymbolRemovedFromThemeReceiver, AddSymbolicItemToOpposition.OutputPort {
 
@@ -44,7 +44,7 @@ class AddSymbolDialogPresenter(
             copyOrDefault(
                 characters = response.characters.map {
                     CharacterItemViewModel(
-                        it.characterId.toString(),
+                        Character.Id(it.characterId),
                         it.characterName,
                         ""
                     )
@@ -56,32 +56,20 @@ class AddSymbolDialogPresenter(
         }
     }
 
-    override suspend fun receiveCreatedCharacter(createdCharacter: CreatedCharacter) {
-        view.updateOrInvalidated {
-            copyOrDefault(
-                characters = characters + CharacterItemViewModel(
-                    createdCharacter.characterId.toString(),
-                    createdCharacter.characterName,
-                    ""
-                )
-            )
-        }
-    }
-
     override suspend fun receiveCharacterRenamed(characterRenamed: CharacterRenamed) {
-        val characterId = characterRenamed.characterId.toString()
+        val characterId = characterRenamed.characterId
         view.updateOrInvalidated {
             copyOrDefault(
                 characters = characters.map {
-                    if (it.characterId == characterId) it.copy(characterName = characterRenamed.newName)
+                    if (it.characterId == characterId) it.copy(characterName = characterRenamed.name)
                     else it
                 }
             )
         }
     }
 
-    override suspend fun receiveCharacterRemoved(characterRemoved: RemovedCharacter) {
-        val characterId = characterRemoved.characterId.toString()
+    override suspend fun receiveEvent(event: CharacterRemovedFromStory) {
+        val characterId = event.characterId
         view.updateOrInvalidated {
             copyOrDefault(
                 characters = characters.filterNot { it.characterId == characterId }

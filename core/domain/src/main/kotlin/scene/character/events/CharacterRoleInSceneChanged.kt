@@ -20,7 +20,7 @@ data class CharacterRoleInSceneCleared(
 ) : CharacterRoleInSceneChanged() {
 
     /**
-     * always null
+     * always `null`
      */
     override val newRole: RoleInScene?
         get() = null

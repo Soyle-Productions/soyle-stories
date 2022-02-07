@@ -1,10 +1,10 @@
 package com.soyle.stories.core.storyevent
 
-import com.soyle.stories.core.IntTest
+import com.soyle.stories.core.definitions.CoreTest
 import kotlin.test.Test
 import org.junit.jupiter.api.Nested
 
-class `Story Events are Covered by Scenes` : IntTest() {
+class `Story Events are Covered by Scenes` : CoreTest() {
 
     private val project = given.`a project`().`has been started`()
     private val scene = given.`a scene`(named = "Big Battle").`has been created in the`(project)

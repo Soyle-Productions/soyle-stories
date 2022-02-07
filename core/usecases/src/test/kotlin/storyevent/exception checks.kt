@@ -17,5 +17,5 @@ fun characterNotInStoryEvent(storyEventId: UUID, characterId: UUID) = { actual: 
 
 fun characterDoesNotExist(characterId: UUID) = { actual: Any? ->
 	actual as CharacterDoesNotExist
-	Assertions.assertEquals(characterId, actual.characterId)
+	Assertions.assertEquals(characterId, actual.characterId.uuid)
 }

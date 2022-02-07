@@ -17,6 +17,7 @@ import javafx.stage.Stage
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import tornadofx.*
+import java.util.logging.Logger
 
 /**
  * Created by Brendan

@@ -5,7 +5,7 @@ import com.soyle.stories.domain.prose.mentioned
 import com.soyle.stories.domain.scene.events.SceneEvent
 import com.soyle.stories.domain.scene.SceneUpdate
 import com.soyle.stories.domain.scene.events.TrackedSymbolRenamed
-import com.soyle.stories.domain.scene.Updated
+import com.soyle.stories.domain.scene.SceneUpdate.Successful
 import com.soyle.stories.domain.theme.Symbol
 import com.soyle.stories.domain.theme.Theme
 import com.soyle.stories.domain.validation.NonBlankString
@@ -35,7 +35,7 @@ class RenameSymbolUseCase(
         output.symbolRenamed(
             RenameSymbol.ResponseModel(
                 RenamedSymbol(theme.id.uuid, symbolId, name.value),
-                sceneUpdates.mapNotNull { (it as? Updated<*>)?.event as? TrackedSymbolRenamed },
+                sceneUpdates.mapNotNull { (it as? Successful<*>)?.event as? TrackedSymbolRenamed },
                 proseUpdates
             )
         )

@@ -4,7 +4,6 @@ import com.soyle.stories.layout.config.ToolConfig
 import com.soyle.stories.layout.config.ToolTabConfig
 import com.soyle.stories.layout.config.dynamic.*
 import com.soyle.stories.layout.config.fixed.*
-import com.soyle.stories.layout.config.temporary.DeleteSceneRamificationsConfig
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamificationsConfig
 import com.soyle.stories.layout.tools.FixedTool
 import com.soyle.stories.layout.tools.ToolType
@@ -29,6 +28,7 @@ object ToolModule : RegisteredToolsConfig {
         SceneOutline.getRegistration(),
         StoryEventList.getRegistration(),
         Timeline.getRegistration(),
+        Ramifications.getRegistration(),
         /**
          * Dynamic Tools
          */
@@ -42,7 +42,6 @@ object ToolModule : RegisteredToolsConfig {
         /**
          * Temporary Tools
          */
-        DeleteSceneRamificationsConfig.getRegistration(),
         ReorderSceneRamificationsConfig.getRegistration()
     )
 

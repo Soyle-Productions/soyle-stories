@@ -8,7 +8,6 @@ import com.soyle.stories.usecase.scene.location.linkLocationToScene.LinkLocation
 
 class LinkLocationToSceneControllerImpl(
     private val threadTransformer: ThreadTransformer,
-    private val localeManager: LocaleManager,
     private val linkLocationToScene: LinkLocationToScene,
     private val linkLocationToSceneOutputPort: LinkLocationToScene.OutputPort
 ) : LinkLocationToSceneController {
@@ -19,7 +18,6 @@ class LinkLocationToSceneControllerImpl(
                 LinkLocationToScene.RequestModel(
                     sceneId,
                     locationId,
-                    localeManager.getCurrentLocale()
                 ),
                 linkLocationToSceneOutputPort
             )

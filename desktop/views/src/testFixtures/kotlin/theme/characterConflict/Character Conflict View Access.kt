@@ -31,7 +31,7 @@ class `Character Conflict View Access`(val view: CharacterConflict) : NodeAccess
 
     fun isFocusedOn(characterId: Character.Id): Boolean
     {
-        return view.scope.get<CharacterConflictModel>().selectedPerspectiveCharacter.value?.characterId == characterId.uuid.toString()
+        return view.scope.get<CharacterConflictModel>().selectedPerspectiveCharacter.value?.characterId == characterId
     }
 
     val perspectiveCharacterSelection: MenuButton

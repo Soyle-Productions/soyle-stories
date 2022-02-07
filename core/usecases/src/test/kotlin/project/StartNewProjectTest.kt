@@ -8,6 +8,7 @@ import com.soyle.stories.domain.project.Project
 import com.soyle.stories.domain.validation.NonBlankString
 import com.soyle.stories.usecase.project.startNewProject.StartNewProject
 import com.soyle.stories.usecase.project.startNewProject.StartNewProjectUseCase
+import com.soyle.stories.usecase.repositories.ProjectRepositoryDouble
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -17,9 +18,7 @@ import java.util.*
 class StartNewProjectTest {
 
 	private fun given(addNewProject: (Project) -> Unit = {}): (NonBlankString) -> Either<*, *> {
-		val repo = object : ProjectRepository {
-			override suspend fun addNewProject(project: Project) = addNewProject.invoke(project)
-		}
+		val repo = ProjectRepositoryDouble(addNewProject)
 		val useCase: StartNewProject = StartNewProjectUseCase(repo)
 		val output = object : StartNewProject.OutputPort {
 			var result: Either<*, *>? = null

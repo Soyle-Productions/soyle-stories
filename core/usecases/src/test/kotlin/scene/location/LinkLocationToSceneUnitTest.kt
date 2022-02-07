@@ -126,7 +126,7 @@ class LinkLocationToSceneUnitTest {
     }
 
     private fun linkLocationToScene() {
-        val requestModel = LinkLocationToScene.RequestModel(scene.id, location.id, SceneLocaleDouble())
+        val requestModel = LinkLocationToScene.RequestModel(scene.id, location.id)
         val useCase: LinkLocationToScene = LinkLocationToSceneUseCase(sceneRepository, locationRepository)
         val output = object : LinkLocationToScene.OutputPort {
             override suspend fun locationLinkedToScene(response: LinkLocationToScene.ResponseModel) {

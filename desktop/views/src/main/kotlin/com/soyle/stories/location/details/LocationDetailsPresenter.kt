@@ -49,6 +49,7 @@ class LocationDetailsPresenter : ViewModel(), GetLocationDetails.OutputPort, ReD
 
 
     override suspend fun receiveGetLocationDetailsResponse(response: GetLocationDetails.ResponseModel) {
+        println("received ${response.hostedScenes}")
         threadTransformer.gui {
             if (state.value is LocationDetailsModel.Loading) state.set(
                 LocationDetailsModel.Loaded(
@@ -62,7 +63,7 @@ class LocationDetailsPresenter : ViewModel(), GetLocationDetails.OutputPort, ReD
             hostedScenesProperty.setAll(response.hostedScenes.map {
                 HostedSceneItemModel(it.sceneId, stringProperty(it.sceneName))
             })
-            _toolNameProperty.bind(locale.locationDetailsToolName(response.locationName))
+            _toolNameProperty.bind(locale.locationDetailsToolName(stringProperty(response.locationName)))
         }
     }
 
@@ -80,7 +81,7 @@ class LocationDetailsPresenter : ViewModel(), GetLocationDetails.OutputPort, ReD
         val locationEvents = scope.projectScope.get<LocationEvents>()
         locationEvents.locationRenamed.addListener {
             if (it.locationId == locationId) {
-                _toolNameProperty.bind(locale.locationDetailsToolName(it.newName))
+                _toolNameProperty.bind(locale.locationDetailsToolName(stringProperty(it.newName)))
             }
         }
 

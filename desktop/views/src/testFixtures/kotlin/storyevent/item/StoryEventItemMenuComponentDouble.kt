@@ -10,6 +10,7 @@ import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventControllerDouble
 import javafx.scene.control.ContextMenu
+import tornadofx.FX
 
 class StoryEventItemMenuComponentDouble(
     private val dependencies: StoryEventItemMenuComponent.Dependencies = Dependencies()
@@ -23,6 +24,6 @@ class StoryEventItemMenuComponentDouble(
     ) : StoryEventItemMenuComponent.Dependencies
 
     override fun StoryEventItemMenu(selection: StoryEventItemSelection): ContextMenu {
-        return StoryEventItemMenuComponent.Implementation(dependencies).StoryEventItemMenu(selection)
+        return StoryEventItemMenuComponent.Implementation(FX.Companion.defaultScope, dependencies).StoryEventItemMenu(selection)
     }
 }

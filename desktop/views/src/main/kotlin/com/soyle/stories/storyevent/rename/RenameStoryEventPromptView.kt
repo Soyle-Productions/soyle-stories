@@ -5,7 +5,7 @@ import com.soyle.stories.common.components.ComponentsStyles.Companion.outlined
 import com.soyle.stories.common.components.ComponentsStyles.Companion.primary
 import com.soyle.stories.common.components.ComponentsStyles.Companion.secondary
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevation
 import com.soyle.stories.common.components.text.FieldLabel.Companion.fieldLabel
 import javafx.application.Platform
 import javafx.geometry.Pos
@@ -27,7 +27,7 @@ class RenameStoryEventPromptView(
 
     override val root: Parent = vbox {
         addClass(Styles.renameStoryEventPrompt)
-        asSurface { absoluteElevation = Elevation.get(16)!! }
+        elevation = Elevation.getValue(16)
         vbox {
             addClass(field)
             fieldLabel("New Name").labelFor = textfield {

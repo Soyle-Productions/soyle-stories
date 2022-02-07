@@ -13,7 +13,7 @@ class `Scene Outline Tool Design` : DesignTest() {
 
     private val viewModel = SceneOutlineViewModel()
     override val node: Node
-        get() = SceneOutlineView(viewModel)
+        get() = TODO()//SceneOutlineView(viewModel)
 
     @Test
     fun `opened without targeted scene`() {
@@ -43,7 +43,7 @@ class `Scene Outline Tool Design` : DesignTest() {
     @Test
     fun `populated with story events`() {
         viewModel.reset(Scene.Id(), "Frank Dies")
-        viewModel.setItems(List(5) { StoryEventItem(StoryEvent.Id(), "Story Event $it", (0L..100L).random()) })
+        //viewModel.setItems(List(5) { StoryEventItem(StoryEvent.Id(), "Story Event $it", (0L..100L).random()) })
         verifyDesign()
     }
 

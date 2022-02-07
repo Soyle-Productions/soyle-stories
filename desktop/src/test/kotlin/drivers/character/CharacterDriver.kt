@@ -1,12 +1,16 @@
 package com.soyle.stories.desktop.config.drivers.character
 
 import com.soyle.stories.character.buildNewCharacter.BuildNewCharacterController
+import com.soyle.stories.character.buildNewCharacter.CreateCharacterPrompt
 import com.soyle.stories.character.nameVariant.addNameVariant.AddCharacterNameVariantController
 import com.soyle.stories.character.nameVariant.remove.RemoveCharacterNameVariantController
-import com.soyle.stories.character.nameVariant.rename.RenameCharacterNameVariantController
+import com.soyle.stories.character.removeCharacterFromStory.ConfirmationPrompt
+import com.soyle.stories.character.removeCharacterFromStory.RamificationsReport
 import com.soyle.stories.character.removeCharacterFromStory.RemoveCharacterFromStoryController
 import com.soyle.stories.character.renameCharacter.RenameCharacterController
 import com.soyle.stories.characterarc.planNewCharacterArc.PlanNewCharacterArcController
+import com.soyle.stories.common.Confirmation
+import com.soyle.stories.desktop.config.drivers.awaitWithTimeout
 import com.soyle.stories.di.get
 import com.soyle.stories.di.scoped
 import com.soyle.stories.domain.character.Character
@@ -20,6 +24,7 @@ import com.soyle.stories.project.WorkBench
 import com.soyle.stories.usecase.character.CharacterArcRepository
 import com.soyle.stories.usecase.character.CharacterRepository
 import kotlinx.coroutines.runBlocking
+import tornadofx.runLater
 
 class CharacterDriver private constructor(private val projectScope: ProjectScope) {
 
@@ -37,9 +42,9 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
         val projectId = Project.Id(projectScope.projectId)
         val allCharacters = runBlocking { characterRepository.listCharactersInProject(projectId) }
         allCharacters.onEach {
-            characterNameHistory[it.name.value] = characterNameHistory.getValue(it.name.value).apply { add(it.id) }
+            characterNameHistory[it.displayName.value] = characterNameHistory.getValue(it.displayName.value).apply { add(it.id) }
         }
-        return allCharacters.find { it.name.value == characterName }
+        return allCharacters.find { it.displayName.value == characterName }
     }
 
     fun getCharacterCountInProject(): Int {
@@ -57,10 +62,10 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
     }
 
     private fun createCharacterWithName(characterName: NonBlankString): Character {
-        runBlocking {
-            projectScope.get<BuildNewCharacterController>()
-                .createCharacter(characterName).join()
-        }
+        val result = projectScope.get<BuildNewCharacterController>()
+            .createCharacter { characterName }
+        result.invokeOnCompletion { result.getCompletionExceptionOrNull()?.let { throw it } }
+        awaitWithTimeout(1000) { result.isCompleted }
         return getCharacterByNameOrError(characterName.value)
     }
 
@@ -76,7 +81,7 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
     fun getCharacterNameVariant(characterId: Character.Id, variant: String): NonBlankString? = runBlocking {
         projectScope.get<CharacterRepository>()
             .getCharacterById(characterId)
-            ?.otherNames?.find { it.value == variant }
+            ?.names?.find { it.value == variant }
     }
 
     fun createNameVariant(characterId: Character.Id, variant: String) {
@@ -92,7 +97,7 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
         ).run { getCharacterArcByNameOrError(character, name) }
 
     fun getCharacterArcByNameOrError(character: Character, name: String): CharacterArc =
-        getCharacterArcByName(character, name) ?: error("No character arc for ${character.name} with name $name")
+        getCharacterArcByName(character, name) ?: error("No character arc for ${character.displayName} with name $name")
 
     fun getCharacterArcByName(character: Character, name: String): CharacterArc? {
         val repository = projectScope.get<CharacterArcRepository>()
@@ -119,7 +124,7 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
     }
 
     fun getCharacterArcSectionByNameOrError(character: Character, theme: Theme, sectionName: String): CharacterArcSection =
-        getCharacterArcSectionByName(character, theme, sectionName) ?: error("${character.name} does not have a $sectionName section for the ${theme.name} theme")
+        getCharacterArcSectionByName(character, theme, sectionName) ?: error("${character.displayName} does not have a $sectionName section for the ${theme.name} theme")
 
     fun getCharacterArcSectionByName(character: Character, theme: Theme, sectionName: String): CharacterArcSection?
     {
@@ -134,14 +139,18 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
         }
     }
 
-    fun givenCharacterRenamedTo(characterId: Character.Id, name: String) {
+    fun givenCharacterRenamedTo(characterId: Character.Id, currentName: String, name: String) {
         projectScope.get<RenameCharacterController>()
-            .renameCharacter(characterId.uuid.toString(), NonBlankString.create(name)!!)
+            .renameCharacter(characterId, NonBlankString.create(currentName)!!, NonBlankString.create(name)!!)
     }
 
     fun givenCharacterRemoved(character: Character) {
         projectScope.get<RemoveCharacterFromStoryController>()
-            .confirmRemoveCharacter(character.id)
+            .removeCharacter(
+                character.id,
+                { Confirmation(ConfirmationPrompt.Response.Confirm, true) },
+                {  }
+            )
     }
 
     fun givenCharacterNameVariantRemoved(characterId: Character.Id, variant: String) {
@@ -154,20 +163,6 @@ class CharacterDriver private constructor(private val projectScope: ProjectScope
         runBlocking {
             projectScope.get<RemoveCharacterNameVariantController>()
                 .removeCharacterNameVariant(characterId, variant).join()
-        }
-    }
-
-    fun givenCharacterNameVariantRenamedTo(characterId: Character.Id, original: String, rename: String)
-    {
-        val originalVariant = getCharacterNameVariant(characterId, original) ?: return
-        renameNameVariant(characterId, originalVariant, NonBlankString.create(rename)!!)
-    }
-
-    private fun renameNameVariant(characterId: Character.Id, original: NonBlankString, newName: NonBlankString)
-    {
-        runBlocking {
-            projectScope.get<RenameCharacterNameVariantController>()
-                .renameCharacterNameVariant(characterId, original, newName).join()
         }
     }
 

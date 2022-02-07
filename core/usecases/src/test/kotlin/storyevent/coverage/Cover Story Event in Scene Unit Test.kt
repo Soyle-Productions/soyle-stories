@@ -1,15 +1,13 @@
 package com.soyle.stories.usecase.storyevent.coverage
 
+import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.scene.Scene
-import com.soyle.stories.domain.scene.SceneAlreadyCoversStoryEvent
-import com.soyle.stories.domain.scene.events.StoryEventAddedToScene
-import com.soyle.stories.domain.scene.events.StoryEventRemovedFromScene
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.events.StoryEventCoveredByScene
 import com.soyle.stories.domain.storyevent.events.StoryEventUncoveredFromScene
+import com.soyle.stories.domain.storyevent.exceptions.StoryEventAlreadyCoveredByScene
 import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
@@ -18,9 +16,13 @@ import com.soyle.stories.usecase.storyevent.StoryEventDoesNotExist
 import com.soyle.stories.usecase.storyevent.coverage.cover.CoverStoryEventInScene
 import com.soyle.stories.usecase.storyevent.coverage.cover.CoverStoryEventInSceneUseCase
 import kotlinx.coroutines.runBlocking
-import org.amshove.kluent.*
+import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeNull
+import org.amshove.kluent.shouldNotBeNull
+import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.TestFactory
 
 class `Cover Story Event in Scene Unit Test` {
 
@@ -29,178 +31,131 @@ class `Cover Story Event in Scene Unit Test` {
     private val projectId = Project.Id()
 
     /** Scene must exist */
-    private val scene = makeScene(projectId = projectId, coveredStoryEvents = emptySet())
+    private val scene = makeScene(projectId = projectId)
 
     /** Story Event must exist */
     private val storyEvent = makeStoryEvent(projectId = projectId)
 
     // Post Conditions
-    /** Should update up to two story events */
-    private val updatedStoryEvents: List<StoryEvent>
+    /** Should update the story event */
+    private var updatedStoryEvent: StoryEvent? = null
 
-    /** Should update possibly two scene */
-    private val updatedScenes: List<Scene>
-
-    /** Should produce up to two scene events */
-    private var storyEventAddedToScene: StoryEventAddedToScene? = null
-    private var storyEventRemovedFromScene: StoryEventRemovedFromScene? = null
-
-    /** Should produce up to two story event events */
-    private var storyEventCoveredByScene: StoryEventCoveredByScene? = null
-    private var storyEventUncoveredFromScene: StoryEventUncoveredFromScene? = null
-    private fun allEvents() = listOfNotNull(
-        storyEventAddedToScene,
-        storyEventRemovedFromScene,
-        storyEventCoveredByScene,
-        storyEventUncoveredFromScene
-    )
+    /** Should output coverage event */
+    private var event: StoryEventCoveredByScene? = null
 
     // Repositories
-    private val storyEventRepository: StoryEventRepositoryDouble
-    private val sceneRepository: SceneRepositoryDouble
+    private val storyEventRepository: StoryEventRepositoryDouble = StoryEventRepositoryDouble(onUpdateStoryEvent = ::updatedStoryEvent::set)
+    private val sceneRepository: SceneRepositoryDouble = SceneRepositoryDouble()
 
-    init {
-        val mutableUpdatedStoryEvents = mutableListOf<StoryEvent>()
-        storyEventRepository = StoryEventRepositoryDouble(onUpdateStoryEvent = mutableUpdatedStoryEvents::add)
-        updatedStoryEvents = mutableUpdatedStoryEvents
-
-        val mutableUpdatesScenes = mutableListOf<Scene>()
-        sceneRepository = SceneRepositoryDouble(onUpdateScene = mutableUpdatesScenes::add)
-        updatedScenes = mutableUpdatesScenes
-    }
+    // other services
 
     // Use Case
-    private val useCase: CoverStoryEventInScene = CoverStoryEventInSceneUseCase(storyEventRepository, sceneRepository)
-    private fun coverStoryEventInScene() {
-        runBlocking {
+    private val useCase: CoverStoryEventInScene = CoverStoryEventInSceneUseCase(
+        storyEventRepository,
+        sceneRepository
+    )
+    private fun coverStoryEventInScene(): Result<Nothing?> {
+        return runBlocking {
             useCase.invoke(storyEvent.id, scene.id) {
-                storyEventAddedToScene = it.storyEventAddedToScene
-                storyEventRemovedFromScene = it.storyEventRemovedFromScene
-                storyEventCoveredByScene = it.storyEventCoveredByScene
-                storyEventUncoveredFromScene = it.storyEventUncoveredFromScene
+                event = it
             }
         }
     }
 
-    @Test
-    fun `Story Event Doesn't Exist`() {
-        val error = assertThrows<StoryEventDoesNotExist> { coverStoryEventInScene() }
+    @TestFactory
+    fun `Story Event Doesn't Exist`(): List<DynamicTest> {
+        sceneRepository.givenScene(scene)
 
-        error.storyEventId shouldBeEqualTo storyEvent.id.uuid
-        updatedStoryEvents.shouldBeEmpty()
-        updatedScenes.shouldBeEmpty()
-        allEvents().shouldBeEmpty()
+        val error = coverStoryEventInScene().exceptionOrNull() as StoryEventDoesNotExist
+
+        return shouldFailCompletely {
+            error.storyEventId shouldBeEqualTo storyEvent.id.uuid
+        }
     }
 
-    @Test
-    fun `Scene Doesn't Exist`() {
+    @TestFactory
+    fun `Scene Doesn't Exist`(): List<DynamicTest> {
         storyEventRepository.givenStoryEvent(storyEvent)
 
-        val error = assertThrows<SceneDoesNotExist> { coverStoryEventInScene() }
+        val error = coverStoryEventInScene().exceptionOrNull() as SceneDoesNotExist
 
-        error.sceneId shouldBeEqualTo scene.id.uuid
-        updatedStoryEvents.shouldBeEmpty()
-        updatedScenes.shouldBeEmpty()
-        allEvents().shouldBeEmpty()
+        return shouldFailCompletely {
+            error.sceneId shouldBeEqualTo scene.id.uuid
+        }
     }
 
-    @Test
-    fun `Scene Does Not Yet Cover Story Event`() {
+    @TestFactory
+    fun `Story Event Already Covered by the Scene`(): List<DynamicTest> {
+        storyEventRepository.givenStoryEvent(storyEvent.coveredByScene(scene.id).storyEvent)
+        sceneRepository.givenScene(scene)
+
+        val error = coverStoryEventInScene().exceptionOrNull()!!
+
+        return shouldFailCompletely {
+            error.shouldBeEqualTo(StoryEventAlreadyCoveredByScene(storyEvent.id, scene.id))
+        }
+    }
+
+    @TestFactory
+    fun `Story Event Not Yet Covered by the Scene`(): List<DynamicTest> {
         storyEventRepository.givenStoryEvent(storyEvent)
         sceneRepository.givenScene(scene)
 
-        coverStoryEventInScene()
+        coverStoryEventInScene().exceptionOrNull().shouldBeNull()
 
-        updatedStoryEvents.single().id shouldBeEqualTo storyEvent.id
-        updatedStoryEvents.single().sceneId shouldBeEqualTo scene.id
-        updatedScenes.single().mustEqual(scene.withStoryEvent(storyEvent).scene)
-        storyEventCoveredByScene.shouldNotBeNull().mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
-        storyEventAddedToScene.shouldNotBeNull()
-            .mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
-        storyEventRemovedFromScene.shouldBeNull()
-        storyEventUncoveredFromScene.shouldBeNull()
+        return listOf(
+            dynamicTest("should update story event") {
+                updatedStoryEvent!!.id.shouldBeEqualTo(storyEvent.id)
+                updatedStoryEvent!!.sceneId.shouldBeEqualTo(scene.id)
+            },
+            dynamicTest("should produce story event covered by scene event") {
+                with(event!!) {
+                    storyEventId.mustEqual(storyEvent.id)
+                    sceneId.mustEqual(scene.id)
+                }
+            },
+            dynamicTest("should not output a previous scene id") {
+                event!!.uncovered.shouldBeNull()
+            }
+        )
     }
 
-    @Test
-    fun `Scene Already Covers Story Event`() {
-        storyEventRepository.givenStoryEvent(storyEvent.coveredByScene(scene.id).storyEvent)
-        sceneRepository.givenScene(scene.withStoryEvent(storyEvent).scene)
-
-        assertThrows<SceneAlreadyCoversStoryEvent> { coverStoryEventInScene() }
-
-        updatedStoryEvents.shouldBeEmpty()
-        updatedScenes.shouldBeEmpty()
-        allEvents().shouldBeEmpty()
-    }
-
-    @Test
-    fun `Scene Already Covers Another Story Event`() {
-        val otherStoryEvent = makeStoryEvent(sceneId = scene.id)
-
-        storyEventRepository.givenStoryEvent(storyEvent)
-        storyEventRepository.givenStoryEvent(otherStoryEvent)
-        sceneRepository.givenScene(scene.withStoryEvent(otherStoryEvent).scene)
-
-        coverStoryEventInScene()
-
-        updatedStoryEvents.size shouldBeEqualTo 2
-        updatedStoryEvents.single { it.id == storyEvent.id }
-        updatedStoryEvents.single { it.id == otherStoryEvent.id }
-        updatedScenes.single().mustEqual(scene.withStoryEvent(storyEvent).scene)
-        storyEventCoveredByScene.mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
-        storyEventAddedToScene.mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
-        storyEventRemovedFromScene.mustEqual(StoryEventRemovedFromScene(scene.id, otherStoryEvent.id))
-        storyEventUncoveredFromScene.mustEqual(StoryEventUncoveredFromScene(otherStoryEvent.id, scene.id))
-    }
-
-    @Test
-    fun `Scene Already Covers Story Event but Story Event is Out of Sync`() {
-        storyEventRepository.givenStoryEvent(storyEvent) // doesn't know scene covers it
-        sceneRepository.givenScene(scene.withStoryEvent(storyEvent).scene)
-
-        coverStoryEventInScene()
-
-        updatedStoryEvents.single().id.mustEqual(storyEvent.id)
-        updatedScenes.shouldBeEmpty()
-        storyEventCoveredByScene.shouldNotBeNull().mustEqual(StoryEventCoveredByScene(storyEvent.id, scene.id, null))
-        storyEventUncoveredFromScene.shouldBeNull()
-        storyEventAddedToScene.shouldBeNull()
-        storyEventRemovedFromScene.shouldBeNull()
-    }
-
-    @Test
-    fun `Story Event Already Covered by Scene but Scene is Out of Sync`() {
-        storyEventRepository.givenStoryEvent(storyEvent.coveredByScene(scene.id).storyEvent)
-        sceneRepository.givenScene(scene) // doesn't know it covers story event
-
-        coverStoryEventInScene()
-
-        updatedStoryEvents.shouldBeEmpty()
-        updatedScenes.single().mustEqual(scene.withStoryEvent(storyEvent).scene)
-        storyEventCoveredByScene.shouldBeNull()
-        storyEventUncoveredFromScene.shouldBeNull()
-        storyEventAddedToScene.shouldNotBeNull()
-            .mustEqual(StoryEventAddedToScene(scene.id, storyEvent.id, storyEvent.name.value))
-        storyEventRemovedFromScene.shouldBeNull()
-    }
-
-    @Test
-    fun `Another Scene Currently Covers Story Event`() {
-        val otherScene = makeScene(coveredStoryEvents = setOf(storyEvent.id))
+    @TestFactory
+    fun `Another Scene Currently Covers Story Event`(): List<DynamicTest> {
+        val otherScene = makeScene()
         storyEventRepository.givenStoryEvent(storyEvent.coveredByScene(otherScene.id).storyEvent)
         sceneRepository.givenScene(otherScene)
         sceneRepository.givenScene(scene)
 
-        coverStoryEventInScene()
+        coverStoryEventInScene().exceptionOrNull().shouldBeNull()
 
-        updatedStoryEvents.single().sceneId.shouldBeEqualTo(scene.id)
-        updatedScenes.toSet().shouldBeEqualTo(
-            setOf(
-                otherScene.withoutStoryEvent(storyEvent.id).scene,
-                scene.withStoryEvent(storyEvent).scene
-            )
+        return listOf(
+            dynamicTest("should update story event") {
+                updatedStoryEvent!!.id.shouldBeEqualTo(storyEvent.id)
+                updatedStoryEvent!!.sceneId.shouldBeEqualTo(scene.id)
+            },
+            dynamicTest("should produce story event covered by scene event") {
+                with(event!!) {
+                    storyEventId.mustEqual(storyEvent.id)
+                    sceneId.mustEqual(scene.id)
+                }
+            },
+            dynamicTest("should output previous scene id") {
+                event!!.uncovered shouldBeEqualTo StoryEventUncoveredFromScene(storyEvent.id, otherScene.id)
+            }
         )
-        storyEventRemovedFromScene.shouldBeEqualTo(StoryEventRemovedFromScene(otherScene.id, storyEvent.id))
     }
 
+
+    private fun shouldFailCompletely(name: String = "Should throw error", testError: () -> Unit): List<DynamicTest> {
+        return listOf(
+            dynamicTest(name, testError),
+            dynamicTest("should not update story event") {
+                updatedStoryEvent.shouldBeNull()
+            },
+            dynamicTest("should not produce event") {
+                event.shouldBeNull()
+            }
+        )
+    }
 }

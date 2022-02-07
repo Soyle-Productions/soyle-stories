@@ -2,19 +2,18 @@ package com.soyle.stories.layout.openTool
 
 import com.soyle.stories.common.LocaleManager
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.character.Character
 import com.soyle.stories.domain.prose.Prose
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.layout.config.dynamic.*
 import com.soyle.stories.layout.config.fixed.*
-import com.soyle.stories.layout.config.temporary.DeleteSceneRamifications
 import com.soyle.stories.layout.config.temporary.ReorderSceneRamifications
 import com.soyle.stories.layout.usecases.openTool.OpenTool
-import com.soyle.stories.usecase.scene.listAllScenes.SceneItem
+import com.soyle.stories.usecase.scene.list.SceneItem
 import java.util.*
 
 class OpenToolControllerImpl(
     private val threadTransformer: ThreadTransformer,
-    private val localeManager: LocaleManager,
     private val openTool: OpenTool,
     private val openToolOutputPort: OpenTool.OutputPort
 ) : OpenToolController, OpenToolController.OpenCharacterToolController, OpenToolController.OpenLocationToolController,
@@ -35,6 +34,12 @@ class OpenToolControllerImpl(
         }
     }
 
+    override fun openRamificationsTool() {
+        threadTransformer.async {
+            openTool.invoke(Ramifications, openToolOutputPort)
+        }
+    }
+
     override fun openLocationDetailsTool(locationId: String) {
         threadTransformer.async {
             openTool.invoke(
@@ -48,7 +53,7 @@ class OpenToolControllerImpl(
         threadTransformer.async {
             openTool.invoke(
                 BaseStoryStructure(
-                    UUID.fromString(characterId),
+                    Character.Id(UUID.fromString(characterId)),
                     UUID.fromString(themeId)
                 ),
                 openToolOutputPort
@@ -84,35 +89,15 @@ class OpenToolControllerImpl(
         }
     }
 
-    override fun openStoryEventDetailsTool(storyEventId: String) {
-        threadTransformer.async {
-            openTool.invoke(
-                StoryEventDetails(
-                    UUID.fromString(storyEventId)
-                ),
-                openToolOutputPort
-            )
-        }
-    }
-
     override fun openDeleteSceneRamificationsTool(sceneId: String) {
-        threadTransformer.async {
-            openTool.invoke(
-                DeleteSceneRamifications(
-                    UUID.fromString(sceneId),
-                    localeManager.getCurrentLocale()
-                ),
-                openToolOutputPort
-            )
-        }
+
     }
 
     override fun openReorderSceneRamificationsTool(sceneId: String) {
         threadTransformer.async {
             openTool.invoke(
                 ReorderSceneRamifications(
-                    UUID.fromString(sceneId),
-                    localeManager.getCurrentLocale()
+                    UUID.fromString(sceneId)
                 ),
                 openToolOutputPort
             )

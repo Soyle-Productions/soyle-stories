@@ -79,13 +79,13 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
         if (tree != null) {
             return tree.root.children.asSequence().mapNotNull {
                 (it.value as? CharacterListState.CharacterListItem.CharacterItem)?.character?.value
-            }.find { it.characterId == characterId.uuid.toString() }
+            }.find { it.characterId == characterId }
         }
         val grid = grid
         if (grid != null) {
             return grid.children.asSequence().mapNotNull {
                 (it.userData as? CharacterListState.CharacterListItem.CharacterItem)?.character?.value
-            }.find { it.characterId == characterId.uuid.toString() }
+            }.find { it.characterId == characterId }
         }
         return null
     }
@@ -98,7 +98,7 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
         if (tree != null) {
             return tree.root.children.asSequence().find {
                 val value = (it.value as? CharacterListState.CharacterListItem.CharacterItem)?.character?.value
-                value?.characterId == characterId.uuid.toString()
+                value?.characterId == characterId
             }?.children?.asSequence()?.mapNotNull {
                 (it.value as? CharacterListState.CharacterListItem.ArcItem)?.arc?.value
             }?.find { it.themeId == themeId.uuid.toString() }
@@ -107,7 +107,7 @@ class CharacterListViewAccess(private val view: CharacterListView) : FxRobot() {
         if (grid != null) {
             return grid.children.asSequence().find {
                 val value = (it.userData as? CharacterListState.CharacterListItem.CharacterItem)?.character?.value
-                value?.characterId == characterId.uuid.toString()
+                value?.characterId == characterId
             }?.getChildList()?.asSequence()?.mapNotNull {
                 (it.userData as? CharacterListState.CharacterListItem.ArcItem)?.arc?.value
             }?.find { it.themeId == themeId.uuid.toString() }

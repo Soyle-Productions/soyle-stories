@@ -2,7 +2,6 @@ package com.soyle.stories.desktop.view.storyevent.remove
 
 import com.soyle.stories.desktop.view.common.ThreadTransformerDouble
 import com.soyle.stories.domain.storyevent.StoryEvent
-import com.soyle.stories.storyevent.remove.RemoveStoryEventConfirmationPromptPresenter
 import com.soyle.stories.storyevent.remove.RemoveStoryEventConfirmationPromptViewModel
 import com.soyle.stories.storyevent.remove.RemoveStoryEventController
 import com.soyle.stories.writer.DialogType

@@ -1,13 +1,12 @@
 package com.soyle.stories.storyevent.item
 
+import com.soyle.stories.di.get
 import com.soyle.stories.storyevent.remove.RemoveStoryEventController
 import com.soyle.stories.storyevent.rename.RenameStoryEventController
 import com.soyle.stories.storyevent.time.adjust.AdjustStoryEventsTimeController
 import com.soyle.stories.storyevent.time.reschedule.RescheduleStoryEventController
 import javafx.scene.control.ContextMenu
-import tornadofx.action
-import tornadofx.enableWhen
-import tornadofx.item
+import tornadofx.*
 
 
 class StoryEventItemMenuViewModel(
@@ -48,6 +47,7 @@ fun storyEventItemMenu(
 }
 
 class StoryEventItemMenuPresenter(
+    private val scope: Scope,
     private val viewModel: StoryEventItemMenuViewModel,
     private val dependencies: StoryEventItemMenuComponent.Dependencies
 ) : StoryEventItemMenuActions {
@@ -70,7 +70,11 @@ class StoryEventItemMenuPresenter(
 
     override fun deleteSelectedItems() {
         val selectedItems = viewModel.selection.selectedIds
-        dependencies.removeStoryEventController.removeStoryEvent(selectedItems)
+        dependencies.removeStoryEventController.removeStoryEvent(
+            selectedItems,
+            scope.get(),
+            scope.get()
+        )
     }
 
     private inline fun singleSelection(op: (StoryEventItemViewModel) -> Unit) {
@@ -91,13 +95,14 @@ interface StoryEventItemMenuComponent {
 
     companion object {
         fun Implementation(
+            scope: Scope,
             dependencies: Dependencies
         ) = object : StoryEventItemMenuComponent {
             override fun StoryEventItemMenu(selection: StoryEventItemSelection): ContextMenu {
                 val viewModel = StoryEventItemMenuViewModel(selection)
                 return storyEventItemMenu(
                     viewModel,
-                    StoryEventItemMenuPresenter(viewModel, dependencies)
+                    StoryEventItemMenuPresenter(scope, viewModel, dependencies)
                 )
             }
         }

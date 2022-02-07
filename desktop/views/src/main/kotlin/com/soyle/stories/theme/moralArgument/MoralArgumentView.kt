@@ -143,10 +143,10 @@ class MoralArgumentView : View() {
                     state.sections.mapObservableTo(children, { it.arcSectionId }) {
                         val section = op(it).apply {
                             onSectionPlacedAbove = {
-                                viewListener.moveSectionTo(it, state.item!!.selectedPerspectiveCharacter!!.characterId, root.indexInParent)
+                                viewListener.moveSectionTo(it, state.item!!.selectedPerspectiveCharacter!!.characterId.uuid.toString(), root.indexInParent)
                             }
                             onSectionPlacedBelow = {
-                                viewListener.moveSectionTo(it, state.item!!.selectedPerspectiveCharacter!!.characterId, root.indexInParent + 1)
+                                viewListener.moveSectionTo(it, state.item!!.selectedPerspectiveCharacter!!.characterId.uuid.toString(), root.indexInParent + 1)
                             }
                             onSectionDraggedAbove = {
                                 moralArgumentInsertionIndex.set(root.indexInParent)
@@ -158,7 +158,7 @@ class MoralArgumentView : View() {
                                 moralArgumentInsertionIndex.set(-1)
                             }
                             onMoved = {
-                                viewListener.moveSectionTo(it.arcSectionId, state.item!!.selectedPerspectiveCharacter!!.characterId, root.indexInParent)
+                                viewListener.moveSectionTo(it.arcSectionId, state.item!!.selectedPerspectiveCharacter!!.characterId.uuid.toString(), root.indexInParent)
                             }
                             onDragging = {
                                 this@content.addClass(Styles.dragging)

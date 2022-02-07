@@ -10,6 +10,7 @@ import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.TimelineRulerComponent
 import javafx.collections.ObservableList
 import javafx.event.EventTarget
+import tornadofx.Scope
 import tornadofx.add
 import tornadofx.observableListOf
 
@@ -31,6 +32,7 @@ interface TimelineViewPortComponent {
     interface Gui : TimelineViewPortGridComponent, TimelineRulerComponent, StoryPointLabelComponent
 
     interface Dependencies {
+        val scope: Scope
         val removeStoryEventController: RemoveStoryEventController
         val adjustStoryEventsTimeController: AdjustStoryEventsTimeController
     }

@@ -1,3 +1,5 @@
+@file:Suppress("PropertyName")
+
 package com.soyle.stories.desktop.locale
 
 import java.util.*
@@ -13,8 +15,8 @@ interface SoyleMessageBundle {
     val hostSceneInLocationInvitationMessage: String
     val allExistingScenesInProjectHaveBeenHosted: String
     val locationDetailsToolName: String
-    val noLocationUsedInSceneMessage: List<MessageSegment>
-    val noSceneSelectedInviteMessage: List<MessageSegment>
+    val noLocationUsedInScene: String
+    val noSceneSelected_inviteMessage: String
     val noSceneSelected: String
     val sceneSettingToolTitle: String
     val selectedScene: String
@@ -38,6 +40,43 @@ interface SoyleMessageBundle {
     val createOppositionValue: String
     val themeHasNoValueWebs: String
     val nameCannotBeBlank: String
+    val sceneCharactersToolTitle: String
+    val addCharacter: String
+    val options: String
+    val opponentCharacter: String
+    val incitingCharacter: String
+    val makeIncitingCharacter: String
+    val removeIncitingCharacter: String
+    val makeOpponentCharacter: String
+    val removeOpponentCharacter: String
+    val remove: String
+    val confirmRemoveCharacterFromSceneTitle: String
+    val confirmRemoveCharacterFromSceneMessage: String
+    val confirm: String
+    val doNotShowDialogAgain: String
+    val ramifications: String
+    val characterRemovedFromStory: String
+    val characterNotInvolvedInAnyStoryEvents: String
+    val confirmRemoveCharacterFromStory: String
+    val confirmRemoveCharacterFromStoryMesssage: String
+    val noCharacterName: String
+    val areYouSureYouWantToRemoveTheCharacterFromTheStoryEvent: String
+    val areYouSureYouWantToRemoveTheStoryEventFromTheScene: String
+    val confirmRemoveCharacterFromStoryEvent: String
+    val confirmRemoveStoryEventFromScene: String
+    val uncoverStoryEventRamifications: String
+    val removeCharacterFromStoryRamifications: String
+    val confirmRemoveStoryEventFromProject: String
+    val areYouSureYouWantToRemoveStoryEventFromProject: String
+
+    /**
+     * Should format with [Character.Id], [String] as character name, [Scene.Id], and [String] as scene name
+     */
+    val effect_scene_characters_implicitCharacterWillBeRemoved: String
+    /**
+     * Should format with [Character.Id], [String] as character name, [Scene.Id], and [String] as scene name
+     */
+    val effect_scene_characters_sceneWillBeInconsistentDueToIncludedCharacterRemoved: String
 
     sealed class MessageSegment {
         abstract val message: String

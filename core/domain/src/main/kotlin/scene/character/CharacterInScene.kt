@@ -11,28 +11,26 @@ import com.soyle.stories.domain.storyevent.StoryEvent
 class CharacterInScene(
     override val id: Character.Id,
     val sceneId: Scene.Id,
-    internal val sources: Set<StoryEvent.Id>,
     val roleInScene: RoleInScene?,
     val desire: String,
     val motivation: String?,
     val coveredArcSections: List<CharacterArcSection.Id>
 ) : Entity<Character.Id> {
 
-    constructor(sceneId: Scene.Id, id: Character.Id, initialSource: StoryEvent.Id) : this(
-        id, sceneId, setOf(initialSource), null, "", null, emptyList()
+    constructor(sceneId: Scene.Id, id: Character.Id) : this(
+        id, sceneId, null, "", null, emptyList()
     )
 
     val characterId
         get() = id
 
     private fun copy(
-        sources: Set<StoryEvent.Id> = this.sources,
         roleInScene: RoleInScene? = this.roleInScene,
         desire: String = this.desire,
         motivation: String? = this.motivation,
         coveredArcSections: List<CharacterArcSection.Id> = this.coveredArcSections
     ) = CharacterInScene(
-        characterId, sceneId, sources, roleInScene, desire, motivation, coveredArcSections
+        characterId, sceneId, roleInScene, desire, motivation, coveredArcSections
     )
 
     internal fun withRoleInScene(roleInScene: RoleInScene?) = copy(roleInScene = roleInScene)
@@ -51,9 +49,6 @@ class CharacterInScene(
         return copy(coveredArcSections = coveredArcSections + characterArcSection.id)
     }
 
-    internal fun withoutSource(storyEventId: StoryEvent.Id) = copy(sources = sources.minus(storyEventId))
-    internal fun withSource(storyEventId: StoryEvent.Id) = copy(sources = sources.plus(storyEventId))
-
     internal fun withoutCoveredArcSection(characterArcSection: CharacterArcSection): CharacterInScene {
         if (characterArcSection.characterId != characterId) throw CharacterArcSectionIsNotPartOfCharactersArc(
             characterId.uuid, characterArcSection.id.uuid, characterArcSection.characterId.uuid
@@ -69,7 +64,6 @@ class CharacterInScene(
 
         if (id != other.id) return false
         if (sceneId != other.sceneId) return false
-        if (sources != other.sources) return false
         if (roleInScene != other.roleInScene) return false
         if (motivation != other.motivation) return false
         if (coveredArcSections != other.coveredArcSections) return false
@@ -81,14 +75,13 @@ class CharacterInScene(
         var result = id.hashCode()
         result = 31 * result + sceneId.hashCode()
         result = 31 * result + (roleInScene?.hashCode() ?: 0)
-        result = 31 * result + sources.hashCode()
         result = 31 * result + (motivation?.hashCode() ?: 0)
         result = 31 * result + coveredArcSections.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "CharacterInScene(id=$id, sceneId=$sceneId, roleInScene=$roleInScene, sources=$sources, motivation=$motivation, coveredArcSections=$coveredArcSections)"
+        return "CharacterInScene(id=$id, sceneId=$sceneId, roleInScene=$roleInScene, motivation=$motivation, coveredArcSections=$coveredArcSections)"
     }
 
 }

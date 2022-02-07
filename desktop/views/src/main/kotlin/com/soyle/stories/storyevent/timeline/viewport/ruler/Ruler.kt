@@ -2,15 +2,15 @@ package com.soyle.stories.storyevent.timeline.viewport.ruler
 
 import com.soyle.stories.common.ViewBuilder
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevation
+import com.soyle.stories.common.components.surfaces.elevationVariant
+import com.soyle.stories.common.components.surfaces.outlined
 import com.soyle.stories.common.existsWhen
-import com.soyle.stories.common.onChangeWithCurrent
 import com.soyle.stories.storyevent.timeline.*
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.incrementalLabelHolder
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.largeMagnitudeLabelHolder
 import com.soyle.stories.storyevent.timeline.TimelineStyles.Companion.rulerSpacing
 import com.soyle.stories.storyevent.timeline.viewport.TimelineViewportContext
-import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabel
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.TimeSpanLabelComponent
 import com.soyle.stories.storyevent.timeline.viewport.ruler.label.menu.TimelineRulerLabelMenuComponent
@@ -20,7 +20,6 @@ import javafx.beans.binding.BooleanExpression
 import javafx.beans.binding.DoubleExpression
 import javafx.beans.binding.ObjectBinding
 import javafx.beans.binding.ObjectExpression
-import javafx.beans.property.ObjectProperty
 import javafx.event.EventTarget
 import javafx.scene.control.Control
 import javafx.scene.control.Label
@@ -28,7 +27,6 @@ import javafx.scene.control.Skin
 import javafx.scene.control.SkinBase
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
 import tornadofx.*
 import java.text.NumberFormat
 import java.util.*
@@ -185,10 +183,8 @@ class TimelineRulerSkin(ruler: TimelineRuler, gui: TimelineRulerComponent.Gui) :
                 existsWhen(ruler.isVisibleOver1K())
                 dynamicContent(ruler.secondaryLabels()) { labels ->
                     children.setAll(labels.orEmpty().onEach { label ->
-                        label.asSurface {
-                            inheritedElevation = Elevation[4]!!
-                            relativeElevation = Elevation.getValue(0)
-                        }
+                        label.elevation = Elevation[4]!!
+                        label.elevationVariant = outlined
                     })
                 }
             }
@@ -198,7 +194,7 @@ class TimelineRulerSkin(ruler: TimelineRuler, gui: TimelineRulerComponent.Gui) :
                     paddingLeftProperty.bind(ruler.relativeOffsetX())
                     dynamicContent(ruler.labels()) { labels ->
                         children.setAll(labels.orEmpty().onEach { label ->
-                            label.asSurface { inheritedElevation = Elevation[4]!! }
+                            label.elevation = Elevation[4]!!
                         })
                     }
                 }

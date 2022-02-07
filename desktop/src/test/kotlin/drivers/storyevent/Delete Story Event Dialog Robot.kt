@@ -20,9 +20,3 @@ fun WorkBench.givenDeleteStoryEventDialogHasBeenOpened(storyEvents: List<StoryEv
             .openDeleteStoryEventDialog()
         getOpenDeleteStoryEventDialogOrError()
     }
-
-fun RemoveStoryEventConfirmationPromptView.confirm() {
-    robot.interact {
-        robot.from(root).lookup("#confirm").queryButton().fire()
-    }
-}

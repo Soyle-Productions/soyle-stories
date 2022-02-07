@@ -1,13 +1,16 @@
 package com.soyle.stories.usecase.storyevent
 
 import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.location.Location
 import com.soyle.stories.domain.mustEqual
 import com.soyle.stories.domain.project.Project
+import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.domain.storyevent.makeStoryEvent
 import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetails
 import com.soyle.stories.usecase.storyevent.getStoryEventDetails.GetStoryEventDetailsUseCase
+import com.soyle.stories.usecase.storyevent.getStoryEventDetails.StoryEventDetails
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
@@ -27,7 +30,7 @@ class `Get Story Event Details Unit Test` {
 
 	// post conditions
 	/** outputs story event details */
-	private var responseModel: GetStoryEventDetails.ResponseModel? = null
+	private var responseModel: StoryEventDetails? = null
 	private val storyEventRepository = StoryEventRepositoryDouble()
 
 	// Use Case
@@ -56,19 +59,19 @@ class `Get Story Event Details Unit Test` {
 		@Test
 		fun `should output story event name`() {
 			getStoryEventDetails()
-			responseModel!!.storyEventName.mustEqual(storyEvent.name.value)
+			responseModel!!.name.mustEqual(storyEvent.name.value)
 		}
 
 		@Test
 		fun `should not output location`() {
 			getStoryEventDetails()
-			assertNull(responseModel!!.locationId)
+			assertNull(responseModel!!.location)
 		}
 
 		@Test
 		fun `should not output any character`() {
 			getStoryEventDetails()
-			responseModel!!.includedCharacterIds.size.mustEqual(0)
+			responseModel!!.includedCharacters.size.mustEqual(0)
 		}
 
 		@Nested
@@ -82,7 +85,7 @@ class `Get Story Event Details Unit Test` {
 			@Test
 			fun `should output location id`() {
 				getStoryEventDetails()
-				responseModel!!.locationId.mustEqual(locationId)
+				responseModel!!.location?.location.mustEqual(locationId)
 			}
 
 		}
@@ -90,9 +93,9 @@ class `Get Story Event Details Unit Test` {
 		@Nested
 		inner class `Given Story Event has Included Characters` {
 
-			private val characterIds = List(14) { Character.Id() }
+			private val characters = List(14) { makeCharacter() }
 			init {
-				characterIds.fold(storyEvent) { event, character ->
+				characters.fold(storyEvent) { event, character ->
 					event.withCharacterInvolved(character).storyEvent
 				}
 					.let(storyEventRepository::givenStoryEvent)
@@ -101,8 +104,8 @@ class `Get Story Event Details Unit Test` {
 			@Test
 			fun `should output character ids`() {
 				getStoryEventDetails()
-				responseModel!!.includedCharacterIds.size.mustEqual(14)
-				responseModel!!.includedCharacterIds.toSet().mustEqual(characterIds.toSet())
+				responseModel!!.includedCharacters.size.mustEqual(14)
+				responseModel!!.includedCharacters.map { it.character }.toSet().mustEqual(characters.map(Character::id).toSet())
 			}
 
 		}

@@ -6,9 +6,10 @@ import com.soyle.stories.common.components.text.ToolTitle.Companion.toolTitle
 import com.soyle.stories.di.get
 import com.soyle.stories.di.resolve
 import com.soyle.stories.project.ProjectScope
+import com.soyle.stories.scene.FocusedSceneQueries
+import com.soyle.stories.scene.FocusedSceneViewModel
 import com.soyle.stories.scene.create.CreateNewSceneController
 import com.soyle.stories.scene.items.SceneItemViewModel
-import com.soyle.stories.scene.target.TargetScene
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
 import javafx.scene.Parent
@@ -111,11 +112,7 @@ class SceneListView : View() {
                 val selectedItem = it?.value
                 model.selectedItem.value = selectedItem
                 if (selectedItem != null) {
-                    scope.get<TargetScene>().invoke(
-                        selectedItem.id,
-                        selectedItem.proseId,
-                        selectedItem.name
-                    )
+                    scope.get<FocusedSceneViewModel>().focusOn(selectedItem.id)
                 }
             }
             model.selectedItem.onChange { newSelection ->

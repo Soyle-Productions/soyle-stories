@@ -1,27 +1,36 @@
 package com.soyle.stories.storyevent.timeline.viewport.grid.label
 
 import com.soyle.stories.common.ColorStyles
+import com.soyle.stories.common.Notifier
 import com.soyle.stories.common.components.surfaces.Elevation
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
+import com.soyle.stories.common.components.surfaces.elevation
+import com.soyle.stories.common.listensTo
+import com.soyle.stories.common.scopedListener
 import com.soyle.stories.domain.storyevent.StoryEvent
 import com.soyle.stories.storyevent.item.StoryEventItemSelection
 import com.soyle.stories.storyevent.item.StoryEventItemViewModel
+import com.soyle.stories.storyevent.item.icon.StoryEventItemIconStyles
+import com.soyle.stories.storyevent.rename.StoryEventRenamedReceiver
+import com.soyle.stories.storyevent.time.StoryEventRescheduledReceiver
+import com.soyle.stories.storyevent.timeline.Pixels
 import com.soyle.stories.storyevent.timeline.TimeRange
 import com.soyle.stories.storyevent.timeline.UnitOfTime
 import com.soyle.stories.storyevent.timeline.viewport.grid.label.StoryPointLabelStyles.Companion.STORY_POINT_BORDER_RADIUS
 import javafx.animation.Interpolator
-import javafx.animation.KeyFrame
 import javafx.beans.InvalidationListener
 import javafx.beans.WeakInvalidationListener
 import javafx.beans.binding.BooleanExpression
 import javafx.beans.property.*
+import javafx.beans.value.ObservableValue
 import javafx.beans.value.WeakChangeListener
 import javafx.geometry.Insets
+import javafx.scene.Node
 import javafx.scene.control.Label
 import javafx.scene.layout.*
 import javafx.util.Duration
+import kotlinx.coroutines.withContext
 import tornadofx.*
-
+import kotlin.coroutines.CoroutineContext
 
 class StoryPointLabel
 
@@ -105,6 +114,7 @@ constructor(
     private val emphasizedProperty = object : SimpleBooleanProperty(false) {
         override fun invalidated() {
             if (get()) {
+                requestFocus()
                 timeline(true) {
                     repeat(10) {
                         keyframe(Duration.millis(it * 50.0)) {
@@ -125,7 +135,6 @@ constructor(
                     isAutoReverse = true
                     setOnFinished { isEmphasized = false }
                 }
-
             }
             super.invalidated()
         }
@@ -166,9 +175,7 @@ constructor(
         addClass(StoryPointLabelStyles.storyPointLabel)
         toggleClass(Stylesheet.collapsed, collapsedProperty)
         toggleClass(Stylesheet.selected, selectedProperty)
-        asSurface {
-            absoluteElevation = Elevation[8]!!
-        }
+        elevation = Elevation.getValue(8)
         isFocusTraversable = true
     }
 

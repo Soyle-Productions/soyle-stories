@@ -10,8 +10,7 @@ import com.soyle.stories.usecase.prose.detectInvalidMentions.DetectInvalidatedMe
 import com.soyle.stories.scene.items.SceneItemViewModel
 import com.soyle.stories.scene.renameScene.SceneRenamedReceiver
 import com.soyle.stories.scene.sceneList.presenters.*
-import com.soyle.stories.usecase.scene.createNewScene.CreateNewScene
-import com.soyle.stories.usecase.scene.listAllScenes.ListAllScenes
+import com.soyle.stories.usecase.scene.list.ListAllScenes
 import com.soyle.stories.usecase.scene.reorderScene.ReorderScene
 import com.soyle.stories.usecase.scene.symbol.trackSymbolInScene.DetectUnusedSymbolsInScene
 
@@ -38,13 +37,13 @@ class SceneListPresenter(
         SceneInconsistenciesPresenter(view) listensTo sceneInconsistenciesNotifier
     )
 
-    override suspend fun receiveListAllScenesResponse(response: ListAllScenes.ResponseModel) {
+    override suspend fun receiveListOfScenesInStory(response: ListAllScenes.ListOfScenesInStory) {
         view.update {
             SceneListViewModel(
                 toolTitle = "Scenes",
                 emptyLabel = "No Scenes to display",
                 createSceneButtonLabel = "Create New Scene",
-                scenes = response.scenes.map(::SceneItemViewModel),
+                scenes = response.map(::SceneItemViewModel),
                 renameSceneFailureMessage = null
             )
         }

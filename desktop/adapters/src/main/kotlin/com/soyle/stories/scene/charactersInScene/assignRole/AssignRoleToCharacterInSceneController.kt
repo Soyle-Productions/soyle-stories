@@ -2,7 +2,7 @@ package com.soyle.stories.scene.charactersInScene.assignRole
 
 import com.soyle.stories.common.ThreadTransformer
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.domain.scene.RoleInScene
+import com.soyle.stories.domain.scene.character.RoleInScene
 import com.soyle.stories.domain.scene.Scene
 import com.soyle.stories.usecase.scene.character.assignRole.AssignRoleToCharacterInScene
 import kotlinx.coroutines.Job

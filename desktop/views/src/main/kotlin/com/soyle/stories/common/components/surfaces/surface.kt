@@ -1,27 +1,147 @@
 package com.soyle.stories.common.components.surfaces
 
 import com.soyle.stories.common.ViewBuilder
-import com.soyle.stories.common.components.surfaces.Surface.Companion.asSurface
-import com.soyle.stories.common.components.surfaces.Surface.Companion.surface
-import com.soyle.stories.common.scopedListener
-import javafx.beans.property.*
-import javafx.collections.ObservableList
-import javafx.css.*
+import com.soyle.stories.common.applyNothing
+import com.soyle.stories.common.doNothing
+import javafx.beans.binding.Binding
+import javafx.beans.binding.Bindings.createObjectBinding
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.value.ObservableValue
 import javafx.event.EventTarget
-import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Parent
-import javafx.scene.image.ImageView
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
-import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
-import tornadofx.*
+import tornadofx.addChildIfPossible
+import tornadofx.addClass
+import tornadofx.objectProperty
+import tornadofx.removeClass
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 private const val ELEVATION_PROP = "com.soyle.stories.common.components.surfaces.ELEVATION_PROP"
+private const val ELEVATION_VARIANT_PROP = "com.soyle.stories.common.components.surfaces.ELEVATION_VARIANT_PROP"
 private const val SURFACE_PROP = "com.soyle.stories.common.components.surfaces.SURFACE_PROP"
+
+sealed class ElevationVariant
+
+/**
+ * surface should appear with a drop shadow to represent its elevation
+ *
+ * @param relativeLift if no [relativeLift] is provided, the drop shadow to represent the full elevation will be used.
+ *      Otherwise, the drop shadow will appear based on the provided relativeLift
+ */
+class elevated(
+    relativeLift: ObservableValue<Elevation?>? = null
+) : ElevationVariant() {
+    private val relativeLiftProp: ObservableValue<Elevation?> by lazy { relativeLift ?: objectProperty(null) }
+    fun relativeLiftProperty(): ObservableValue<Elevation?> = relativeLiftProp
+    val relativeLift: Elevation?
+        get() = relativeLiftProp.value
+}
+object outlined : ElevationVariant()
+object none : ElevationVariant()
+
+private val Node.elevationVariantProp: ObjectProperty<ElevationVariant>
+    get() = properties.getOrPut(ELEVATION_VARIANT_PROP) { initializeElevationVariantProp(this) } as ObjectProperty<ElevationVariant>
+
+fun Node.elevationVariantProperty(): ObjectProperty<ElevationVariant> = elevationVariantProp
+
+var Node.elevationVariant: ElevationVariant
+    get() = elevationVariantProperty().get()
+    set(value) = elevationVariantProperty().set(value)
+
+private fun initializeElevationVariantProp(node: Node): ObjectProperty<ElevationVariant> {
+    return object : SimpleObjectProperty<ElevationVariant>(node, "elevationVariant", elevated(null)) {
+        private var oldValue: ElevationVariant = none
+        private var listAmountBinding: Binding<Elevation>? = null
+        override fun invalidated() {
+            @Suppress("NAME_SHADOWING")
+            val node = bean as Node
+            val newValue = get()
+            val oldValue = this.oldValue
+
+            when(oldValue) {
+                none -> doNothing()
+                outlined -> {
+                    node.removeClass(SurfaceStyles.relativeElevation[0])
+                }
+                is elevated -> {
+                    val liftAmount = oldValue.relativeLift ?: node.elevation ?: Elevation.getValue(0)
+                    node.removeClass(SurfaceStyles.relativeElevation[liftAmount.value])
+                }
+            }
+
+            this.listAmountBinding = null
+
+            when (newValue) {
+                none -> {
+                    if (! node.pickOnBoundsProperty().isBound) node.isPickOnBounds = false
+                }
+                outlined -> {
+                    if (! node.pickOnBoundsProperty().isBound) node.isPickOnBounds = false
+                    node.addClass(SurfaceStyles.relativeElevation[0])
+                }
+                is elevated -> {
+                    val liftAmountBinding: Binding<Elevation> = createObjectBinding({
+                        newValue.relativeLift ?: node.elevation ?: Elevation.getValue(0)
+                    }, newValue.relativeLiftProperty(), node.elevationProperty())
+
+                    liftAmountBinding.addListener { observable, oldLiftAmount, newLiftAmount ->
+                        if (this.listAmountBinding != liftAmountBinding) return@addListener
+                        oldLiftAmount!!
+                        newLiftAmount!!
+                        if (! node.pickOnBoundsProperty().isBound) node.isPickOnBounds = newLiftAmount.value > 0
+                        node.removeClass(SurfaceStyles.relativeElevation[oldLiftAmount.value])
+                        node.addClass(SurfaceStyles.relativeElevation[newLiftAmount.value])
+                    }
+                    this.listAmountBinding = liftAmountBinding
+                }
+            }
+
+            this.oldValue = newValue
+        }
+    }
+}
+
+private val Node.elevationProp: ObjectProperty<Elevation?>
+    get() = properties.getOrPut(ELEVATION_PROP) { initializeElevationProp(this) } as ObjectProperty<Elevation?>
+
+fun Node.elevationProperty(): ObjectProperty<Elevation?> = elevationProp
+
+var Node.elevation: Elevation?
+    get() = elevationProperty().get()
+    set(value) = elevationProperty().set(value)
+
+private fun initializeElevationProp(node: Node): ObjectProperty<Elevation?> {
+
+    return object : SimpleObjectProperty<Elevation?>(node, "elevation", null) {
+        private var oldValue: Elevation? = null
+        override fun invalidated() {
+            @Suppress("NAME_SHADOWING")
+            val node = bean as Node
+            val newValue = get()
+
+            oldValue?.let { oldValue ->
+                node.removeClass(SurfaceStyles.elevated[oldValue.value])
+            }
+
+            if (newValue == null) {
+                if (! node.viewOrderProperty().isBound) node.viewOrder = 0.0
+            }
+
+            if (newValue != null) {
+                if (! node.viewOrderProperty().isBound) node.viewOrder = (25.0 - newValue.value).coerceAtLeast(0.0)
+                node.addClass(SurfaceStyles.elevated[newValue.value])
+            }
+
+            node.elevationVariant // initialize if it hasn't already been
+            oldValue = newValue
+        }
+    }
+
+}
+
 
 @JvmInline
 value class Elevation private constructor(val value: Int) {
@@ -39,6 +159,58 @@ value class Elevation private constructor(val value: Int) {
     }
 }
 
+@ViewBuilder
+fun EventTarget.surface(
+    elevation: Elevation? = null,
+    configure: VBox.() -> Unit = Node::applyNothing,
+    createChildren: VBox.() -> Unit = {}
+): VBox = surface(VBox::class, elevation, configure, createChildren)
+
+@ViewBuilder
+inline fun <reified N : Parent> EventTarget.surface(
+    component: KClass<N> = N::class,
+    elevation: Elevation? = null,
+    configure: N.() -> Unit = Node::applyNothing,
+    createChildren: N.() -> Unit = {}
+): N {
+    val surface = component.createInstance()
+    if (elevation != null) surface.elevation = elevation
+    surface.configure()
+    surface.createChildren()
+    addChildIfPossible(surface)
+    return surface
+}
+
+@ViewBuilder
+inline fun <reified N : Node> EventTarget.surface(
+    component: KClass<N> = N::class,
+    elevation: Elevation? = null,
+    configure: N.() -> Unit = Node::applyNothing
+): N {
+    val surface = component.createInstance()
+    if (elevation != null) surface.elevation = elevation
+    addChildIfPossible(surface)
+    surface.configure()
+    return surface
+}
+
+@JvmInline
+value class SurfaceBuilder(private val node: Node) {
+    var absoluteElevation: Elevation?
+        get() = node.elevation
+        set(value) { node.elevation = value }
+
+    var relativeElevation: Elevation?
+        get() = (node.elevationVariant as? elevated)?.relativeLift
+        set(value) {
+            if (value == null) node.elevationVariant = elevated(null)
+            else node.elevationVariant = elevated(objectProperty(value))
+        }
+}
+
+inline fun <T : Node> T.asSurface(block: SurfaceBuilder.() -> Unit) = SurfaceBuilder(this).apply(block)
+
+/*
 interface SurfaceClasses {
 
     var lightLevelStyle: CssRule?
@@ -68,7 +240,7 @@ interface ElevatedSurface : Elevated, SurfaceClasses {
     val liftedStyleProperty: ObjectProperty<CssRule?>
 }
 
-// var DEBUG_SURFACE = false
+const val DEBUG_SURFACE = false
 
 private class SurfaceGraph(private val node: Node, private val calculator: ElevationCalculator = Companion) : Elevated {
 
@@ -98,7 +270,7 @@ private class SurfaceGraph(private val node: Node, private val calculator: Eleva
         override fun getBean(): Any = this@SurfaceGraph
         override fun getName(): String = "inheritedElevation"
         override fun invalidated() {
-            // if (DEBUG_SURFACE) println("inherited elevation of $node set to ${get()}")
+             if (DEBUG_SURFACE) println("inherited elevation of $node set to ${get()}")
             if (prefRelativeProperty) {
                 absoluteElevationProperty.set(calculator.calculateAbsoluteElevation(get(), relativeElevation))
             } else if (!relativeElevationProperty.isBound) {
@@ -118,7 +290,7 @@ private class SurfaceGraph(private val node: Node, private val calculator: Eleva
             override fun getBean(): Any = this@SurfaceGraph
             override fun getName(): String = "absoluteElevation"
             override fun invalidated() {
-                // if (DEBUG_SURFACE) println("absolute elevation of $node set to ${get()}")
+                 if (DEBUG_SURFACE) println("absolute elevation of $node set to ${get()}")
                 if (! prefRelativeProperty && ! relativeElevationProperty.isBound) {
                     relativeElevationProperty.set(calculator.calculateRelativeElevation(inheritedElevation, get()))
                 }
@@ -140,7 +312,7 @@ private class SurfaceGraph(private val node: Node, private val calculator: Eleva
             override fun getBean(): Any = this@SurfaceGraph
             override fun getName(): String = "relativeElevation"
             override fun invalidated() {
-                // if (DEBUG_SURFACE) println("relative elevation of $node set to ${get()}")
+                 if (DEBUG_SURFACE) println("relative elevation of $node set to ${get()}")
                 if (prefRelativeProperty && !absoluteElevationProperty.isBound)
                     absoluteElevationProperty.set(calculator.calculateAbsoluteElevation(inheritedElevation, get()))
             }
@@ -155,7 +327,7 @@ private class SurfaceGraph(private val node: Node, private val calculator: Eleva
         }
 
     init {
-        // if (DEBUG_SURFACE) println("initializing $this for $node")
+         if (DEBUG_SURFACE) println("initializing $this for $node")
         node.properties[ELEVATION_PROP] = this
     }
 }
@@ -268,3 +440,4 @@ class Surface<N : Node>(val node: N) : ElevatedSurface, Elevated by SurfaceGraph
     operator fun component1() = node
 
 }
+*/

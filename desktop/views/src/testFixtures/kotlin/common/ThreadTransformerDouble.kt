@@ -10,6 +10,9 @@ class ThreadTransformerDouble(
 ) : ThreadTransformer {
     var isGuiThreadProp = false
 
+    override val asyncScope: CoroutineScope
+        get() = TODO("Not yet implemented")
+
     override fun isGuiThread(): Boolean = isGuiThreadProp
 
     override fun gui(update: suspend CoroutineScope.() -> Unit) {

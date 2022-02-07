@@ -1,6 +1,6 @@
 package com.soyle.stories.theme.characterValueComparison
 
-import com.soyle.stories.characterarc.createCharacterDialog.createCharacterDialog
+import com.soyle.stories.character.create.createCharacter
 import com.soyle.stories.di.resolve
 import com.soyle.stories.theme.characterValueComparison.components.CharacterCard
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
@@ -37,9 +37,7 @@ class CharacterValueComparison : View() {
                 }
                 val createCharacterItem = MenuItem("[Create New Character]").apply {
                     id = "create-new-character"
-                    action {
-                        createCharacterDialog(scope.projectScope, scope.type.themeId.toString())
-                    }
+                    action { createCharacter(scope.projectScope) }
                 }
                 model.availableCharacters.onChange {
                     items.clear()
@@ -53,8 +51,8 @@ class CharacterValueComparison : View() {
                             items.add(createCharacterItem)
                             it.forEach {
                                 item(it.characterName) {
-                                    id = it.characterId
-                                    action { viewListener.addCharacter(it.characterId) }
+                                    id = it.characterId.uuid.toString()
+                                    action { viewListener.addCharacter(it.characterId.uuid.toString()) }
                                 }
                             }
                         }

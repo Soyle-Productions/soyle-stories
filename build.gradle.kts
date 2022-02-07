@@ -30,7 +30,6 @@ allprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = plugin.constants.javaVersion
-        kotlinOptions.useIR = true
     }
 
     tasks.withType<Test> {

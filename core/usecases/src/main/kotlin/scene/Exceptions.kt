@@ -10,9 +10,13 @@ import com.soyle.stories.domain.validation.ValidationException
 import java.util.*
 
 abstract class SceneException : Exception()
-class SceneDoesNotExist(private val locale: SceneLocale?, val sceneId: UUID): SceneException() {
-	constructor(sceneId: UUID) : this (null, sceneId)
-	override fun getLocalizedMessage(): String = locale?.sceneDoesNotExist ?: "Scene does not exist $sceneId"
+class SceneDoesNotExist(val sceneId: UUID): SceneException() {
+	override fun getLocalizedMessage(): String = "Scene does not exist $sceneId"
+
+	override fun equals(other: Any?): Boolean {
+		if (other !is SceneDoesNotExist) return false
+		return other.sceneId == sceneId
+	}
 }
 class NoSceneExistsWithStoryEventId(val storyEventId: UUID) : SceneException()
 class SceneDoesNotTrackSymbol(val sceneId: Scene.Id, val symbolId: Symbol.Id) : EntityNotFoundException(symbolId.uuid)

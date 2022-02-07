@@ -97,7 +97,7 @@ class `Update Prose Unit Test` {
     }
 
     private fun mentionOf(character: Character): Pair<MentionedEntityId<*>, SingleLine> {
-        return character.id.mentioned() to singleLine(character.name.toString())
+        return character.id.mentioned() to singleLine(character.displayName.toString())
     }
 
     private infix fun String.followedBy(mention: Pair<MentionedEntityId<*>, SingleLine>?): ProseContent {

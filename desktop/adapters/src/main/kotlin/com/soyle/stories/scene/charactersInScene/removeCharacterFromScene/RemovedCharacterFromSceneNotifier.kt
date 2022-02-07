@@ -1,15 +1,15 @@
 package com.soyle.stories.scene.charactersInScene.removeCharacterFromScene
 
 import com.soyle.stories.common.Notifier
+import com.soyle.stories.common.Receiver
 import com.soyle.stories.common.ThreadTransformer
+import com.soyle.stories.domain.scene.character.events.CharacterRemovedFromScene
 import com.soyle.stories.usecase.scene.character.removeCharacterFromScene.RemoveCharacterFromScene
 
-class RemovedCharacterFromSceneNotifier(
-	private val threadTransformer: ThreadTransformer
-) : Notifier<RemovedCharacterFromSceneReceiver>(), RemovedCharacterFromSceneReceiver {
+class RemovedCharacterFromSceneNotifier : Notifier<Receiver<CharacterRemovedFromScene>>(), Receiver<CharacterRemovedFromScene> {
 
-	override suspend fun receiveRemovedCharacterFromScene(removedCharacterFromScene: RemoveCharacterFromScene.ResponseModel) {
-		notifyAll { it.receiveRemovedCharacterFromScene(removedCharacterFromScene) }
+	override suspend fun receiveEvent(event: CharacterRemovedFromScene) {
+		notifyAll { it.receiveEvent(event) }
 	}
 
 }

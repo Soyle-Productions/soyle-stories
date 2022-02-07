@@ -13,7 +13,7 @@ interface SceneException {
 	val sceneId: Scene.Id
 }
 
-class SceneDoesNotIncludeCharacter(val sceneId: Scene.Id, val characterId: Character.Id) : EntityNotFoundException(characterId.uuid)
+data class SceneDoesNotIncludeCharacter(val sceneId: Scene.Id, val characterId: Character.Id) : EntityNotFoundException(characterId.uuid)
 {
 	override val message: String
 		get() = "$sceneId does not include $characterId"
@@ -29,7 +29,6 @@ class SceneDoesNotUseLocation(val sceneId: Scene.Id, val locationId: Location.Id
 		get() = "$sceneId does not use $locationId"
 }
 
-class SceneAlreadyContainsCharacter(val sceneId: UUID, val characterId: UUID) : DuplicateOperationException()
 
 class SceneAlreadyCoversCharacterArcSection(val sceneId: UUID, val characterId: UUID, val characterArcSectionId: UUID) : DuplicateOperationException()
 

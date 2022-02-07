@@ -1,142 +1,251 @@
 package com.soyle.stories.usecase.scene.character
 
+import com.soyle.stories.domain.character.Character
+import com.soyle.stories.domain.character.characterName
 import com.soyle.stories.domain.character.makeCharacter
 import com.soyle.stories.domain.mustEqual
-import com.soyle.stories.domain.project.Project
-import com.soyle.stories.domain.scene.RoleInScene
+import com.soyle.stories.domain.scene.character.RoleInScene
+import com.soyle.stories.domain.scene.givenCharacter
 import com.soyle.stories.domain.scene.makeScene
 import com.soyle.stories.domain.scene.order.SceneOrder
-import com.soyle.stories.usecase.exceptions.scene.assertThrowsSceneDoesNotExist
+import com.soyle.stories.domain.storyevent.character.InvolvedCharacter
+import com.soyle.stories.domain.storyevent.makeStoryEvent
+import com.soyle.stories.domain.validation.entitySetOf
+import com.soyle.stories.usecase.character.CharacterRepository
+import com.soyle.stories.usecase.repositories.CharacterRepositoryDouble
 import com.soyle.stories.usecase.repositories.SceneRepositoryDouble
-import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInScene
-import com.soyle.stories.usecase.scene.character.listIncluded.ListCharactersInSceneUseCase
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertNull
+import com.soyle.stories.usecase.repositories.StoryEventRepositoryDouble
+import com.soyle.stories.usecase.scene.SceneDoesNotExist
+import com.soyle.stories.usecase.scene.character.list.CharacterInSceneItem
+import com.soyle.stories.usecase.scene.character.list.CharactersInScene
+import com.soyle.stories.usecase.scene.character.list.ListCharactersInScene
+import com.soyle.stories.usecase.scene.character.list.ListCharactersInSceneUseCase
+import com.soyle.stories.usecase.scene.common.IncludedCharacterInScene
+import kotlinx.coroutines.*
+import org.amshove.kluent.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class `List Characters in Scene Unit Test` {
 
-    private val projectId = Project.Id()
-    private val includedCharacters = List(5) { makeCharacter(projectId = projectId) }
-    private val scene = includedCharacters.fold(makeScene(projectId = projectId)) { newScene, character ->
-        newScene.withCharacterIncluded(character).scene
-    }
+    // Prerequisites
+    private val scene = makeScene()
 
     private val sceneRepository = SceneRepositoryDouble()
+    private val characterRepository = CharacterRepositoryDouble()
+    private val storyEventRepository = StoryEventRepositoryDouble()
 
     @Test
-    fun `scene does not exist`() {
-        assertThrowsSceneDoesNotExist(scene.id) {
-            listCharactersInScene()
+    fun `Scene Does not Exist`() {
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val error = result.exceptionOrNull()!!
+        error.shouldBeEqualTo(SceneDoesNotExist(scene.id.uuid))
+    }
+
+    @Test
+    fun `Scene Has no Characters`() {
+        // given
+        sceneRepository.givenScene(scene)
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.sceneId.shouldBeEqualTo(scene.id)
+        response.sceneName.shouldBeEqualTo(scene.name.value)
+        response.items.shouldBeEmpty()
+    }
+
+    @Test
+    fun `Characters in Scene no Longer exist`() {
+        // given
+        val character = makeCharacter()
+        sceneRepository.givenScene(scene.givenCharacter(character))
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.sceneId.shouldBeEqualTo(scene.id)
+        response.sceneName.shouldBeEqualTo(scene.name.value)
+        response.items.shouldBeEmpty()
+    }
+
+    @Test
+    fun `Characters in Scene no Longer in Project`() {
+        // given
+        val (character) = makeCharacter().removedFromStory()
+        characterRepository.givenCharacter(character)
+        sceneRepository.givenScene(scene.givenCharacter(character))
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.sceneId.shouldBeEqualTo(scene.id)
+        response.sceneName.shouldBeEqualTo(scene.name.value)
+        with(response.items.single()) {
+            characterId.shouldBeEqualTo(character.id)
+            characterName.shouldBeEqualTo(character.displayName.value)
+            project.shouldBeNull()
         }
     }
 
-    @Nested
-    inner class `Given Scene Exists` {
-
-        private val includedCharactersById = includedCharacters.associateBy { it.id }
-
-        init {
-            sceneRepository.givenScene(scene)
-        }
-
-        @Test
-        fun `should output included characters`() {
-            val result = listCharactersInScene()
-            result.charactersInScene.forEach { it.sceneId.mustEqual(scene.id) }
-            result.charactersInScene.map { it.characterId }.toSet().mustEqual(includedCharacters.map { it.id }.toSet())
-            result.charactersInScene.forEach { assertNull(it.roleInScene) }
-        }
-
-        @Test
-        fun `should output character names`() {
-            val result = listCharactersInScene()
-            result.charactersInScene.forEach {
-                val backingCharacter = includedCharactersById.getValue(it.characterId)
-                it.characterName.mustEqual(backingCharacter.name.value)
-            }
-        }
-
-        @Test
-        fun `should output character desire`() {
-            val firstCharacter = scene.includedCharacters.getOrError(includedCharacters.first().id)
-            sceneRepository.givenScene(scene.withDesireForCharacter(firstCharacter.id, "Desire 1482").scene)
-            val result = listCharactersInScene()
-            result.charactersInScene.forEach {
-                if (it.characterId == firstCharacter.id) it.desire.mustEqual("Desire 1482")
-                else it.desire.mustEqual("")
-            }
-        }
-
-        @Test
-        fun `should output character motivation`() {
-            val firstCharacter = scene.includedCharacters.getOrError(includedCharacters.first().id)
-            sceneRepository.givenScene(scene.withMotivationForCharacter(firstCharacter.id, "Motivation 832"))
-            val result = listCharactersInScene()
-            result.charactersInScene.forEach {
-                if (it.characterId == firstCharacter.id) it.motivation.mustEqual("Motivation 832")
-                else assertNull(it.motivation)
-            }
-        }
-
-        @Test
-        fun `should output previous motivations`() {
-            val inheritedScene = makeScene(projectId = projectId)
-                .withCharacterIncluded(includedCharacters.first()).scene
-                .withMotivationForCharacter(includedCharacters.first().id, "Previous Motive")
-            sceneRepository.givenScene(inheritedScene)
-            sceneRepository.sceneOrders[scene.projectId] = listOf(inheritedScene.id, scene.id)
-                .let { SceneOrder.reInstantiate(scene.projectId, it) }
-            val result = listCharactersInScene()
-            result.charactersInScene.find { it.characterId == includedCharacters.first().id }!!
-                .inheritedMotivation!!.run {
-                    motivation.mustEqual("Previous Motive")
-                    sceneId.mustEqual(inheritedScene.id.uuid)
-                    sceneName.mustEqual(inheritedScene.name.value)
-                }
-        }
-
-        @Nested
-        inner class `Given Characters have roles`
-        {
-
-            private val incitingCharacterId = includedCharacters[3].id
-            private val opponentCharacterIds = listOf(includedCharacters[1].id, includedCharacters[4].id)
-
-            init {
-                sceneRepository.givenScene(
-                    scene.withRoleForCharacter(incitingCharacterId, RoleInScene.IncitingCharacter).scene
-                        .withRoleForCharacter(opponentCharacterIds[0], RoleInScene.OpponentCharacter).scene
-                        .withRoleForCharacter(opponentCharacterIds[1], RoleInScene.OpponentCharacter).scene
-                )
-            }
-
-            @Test
-            fun `should output character roles`() {
-                val result = listCharactersInScene()
-                result.charactersInScene.forEach {
-                    val backingCharacter = includedCharactersById.getValue(it.characterId)
-                    if (backingCharacter.id == incitingCharacterId) it.roleInScene.mustEqual(RoleInScene.IncitingCharacter)
-                    else if (backingCharacter.id in opponentCharacterIds) it.roleInScene.mustEqual(RoleInScene.OpponentCharacter)
-                    else assertNull(it.roleInScene)
-                }
-            }
-
-        }
-
+    @Test
+    fun `Included Characters have Backing Character`() {
+        // given
+        val character = makeCharacter().also(characterRepository::givenCharacter)
+        sceneRepository.givenScene(scene.givenCharacter(character))
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.shouldHaveExactly(listOf(character))
+        response.items.forEach { it.scene.shouldBeEqualTo(scene.id) }
+        response.items.forEach { it.roleInScene.shouldBeNull() }
+        response.items.forEach { it.sources.shouldBeEmpty() }
+        response.items.forEach { it.isExplicit.shouldBeTrue() }
     }
 
-    private fun listCharactersInScene(): ListCharactersInScene.ResponseModel = runBlocking {
-        val useCase: ListCharactersInScene = ListCharactersInSceneUseCase(sceneRepository)
-        val output = object : ListCharactersInScene.OutputPort {
-            lateinit var result: ListCharactersInScene.ResponseModel
-            override suspend fun receiveCharactersInScene(response: ListCharactersInScene.ResponseModel) {
-                result = response
+    @Test
+    fun `Included Characters have Roles`() {
+        // given
+        val characters = List(5) { makeCharacter() }.onEach(characterRepository::givenCharacter)
+        characters.fold(scene) { scene, character -> scene.givenCharacter(character) }
+            .withCharacter(characters[2].id)!!.assignedRole(RoleInScene.IncitingCharacter).scene
+            .withCharacter(characters[3].id)!!.assignedRole(RoleInScene.OpponentCharacter).scene
+            .withCharacter(characters[0].id)!!.assignedRole(RoleInScene.OpponentCharacter).scene
+            .also(sceneRepository::givenScene)
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.character(characters[0].id)!!.roleInScene.mustEqual(RoleInScene.OpponentCharacter)
+        response.character(characters[1].id)!!.roleInScene.shouldBeNull()
+        response.character(characters[2].id)!!.roleInScene.mustEqual(RoleInScene.IncitingCharacter)
+        response.character(characters[3].id)!!.roleInScene.mustEqual(RoleInScene.OpponentCharacter)
+        response.character(characters[4].id)!!.roleInScene.shouldBeNull()
+    }
+
+    @Test
+    fun `Story Events Covered by Scene Involve Characters that no longer exist`() {
+        sceneRepository.givenScene(scene)
+        List(3) {
+            makeStoryEvent(sceneId = scene.id, includedCharacterIds = entitySetOf(
+                InvolvedCharacter(Character.Id(), ""),
+                InvolvedCharacter(Character.Id(), "")
+            )).also(storyEventRepository::givenStoryEvent)
+        }.flatMap { it.involvedCharacters }
+
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.sceneId.mustEqual(scene.id)
+        response.items.shouldBeEmpty()
+    }
+
+    @Test
+    fun `Story Events Covered by Scene Involve Characters`() {
+        sceneRepository.givenScene(scene)
+        val characters = List(6) { makeCharacter() }
+            .onEach(characterRepository::givenCharacter)
+        repeat(3) {
+            makeStoryEvent(sceneId = scene.id, includedCharacterIds = entitySetOf(
+                InvolvedCharacter(characters[(it * 2)].id, ""),
+                InvolvedCharacter(characters[(it * 2) + 1].id, "")
+            )).also(storyEventRepository::givenStoryEvent)
+        }
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.sceneId.mustEqual(scene.id)
+        response.shouldHaveExactly(characters)
+        response.items.forEach { it.roleInScene.shouldBeNull() }
+        response.items.forEach { it.sources.shouldNotBeEmpty() }
+        response.items.forEach { it.isExplicit.shouldBeFalse() }
+    }
+
+    @Test
+    fun `Included Characters are Also Involved in Covered Story Events`() {
+        val characters = List(6) { makeCharacter() }
+            .onEach(characterRepository::givenCharacter)
+        repeat(3) {
+            makeStoryEvent(sceneId = scene.id, includedCharacterIds = entitySetOf(
+                InvolvedCharacter(characters[(it * 2)].id, ""),
+                InvolvedCharacter(characters[(it * 2) + 1].id, "")
+            )).also(storyEventRepository::givenStoryEvent)
+        }
+        val includedCharacters = characters.shuffled().take(3)
+        includedCharacters.fold(scene) { scene, character ->
+            scene.givenCharacter(character)
+                .withCharacter(character.id)!!.assignedRole(RoleInScene.OpponentCharacter).scene
+                .withCharacter(character.id)!!.desireChanged("Desire for ${character.displayName}").scene
+                .withCharacter(character.id)!!.motivationChanged("Motivation for ${character.displayName}").scene
+        }.also(sceneRepository::givenScene)
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.sceneId.mustEqual(scene.id)
+        response.shouldHaveExactly(characters)
+        includedCharacters.forEach {
+            val responseCharacter = response.character(it.id)!!
+            responseCharacter.roleInScene.shouldBeEqualTo(RoleInScene.OpponentCharacter)
+        }
+    }
+
+    @Test
+    fun `Story Events Covered by Scene Involve Characters with Inherited Motivations`() {
+        val characters = List(6) { makeCharacter() }
+            .onEach(characterRepository::givenCharacter)
+
+        repeat(3) {
+            makeStoryEvent(sceneId = scene.id, includedCharacterIds = entitySetOf(
+                InvolvedCharacter(characters[(it * 2)].id, ""),
+                InvolvedCharacter(characters[(it * 2) + 1].id, "")
+            )).also(storyEventRepository::givenStoryEvent)
+        }
+
+        val previousScene = makeScene(projectId = scene.projectId)
+            .withCharacterIncluded(characters[1]).scene
+            .withCharacter(characters[1].id)!!.motivationChanged("Initial Motivation").scene
+
+        sceneRepository.givenScene(previousScene)
+        sceneRepository.givenScene(scene)
+        sceneRepository.sceneOrders[scene.projectId] =
+            SceneOrder.reInstantiate(scene.projectId, listOf(previousScene.id, scene.id))
+
+        // when
+        val result = runCatching(::listCharactersInScene)
+        // then
+        val response = result.getOrThrow()
+        response.sceneId.mustEqual(scene.id)
+        response.shouldHaveExactly(characters)
+    }
+
+    private fun CharactersInScene.shouldHaveExactly(characters: List<Character>) {
+        sceneId.mustEqual(scene.id)
+        items.size.mustEqual(characters.size)
+        items.map { it.characterId }.toSet().mustEqual(characters.map { it.id }.toSet())
+        items.forEach { includedCharacter ->
+            with(includedCharacter) {
+                characterName.mustEqual(characters.single { it.id == characterId }.displayName.value)
             }
         }
-        useCase.invoke(scene.id, output)
-        output.result
+    }
+
+    private fun CharactersInScene.character(characterId: Character.Id): CharacterInSceneItem? =
+        items.find { it.characterId == characterId }
+
+    private fun listCharactersInScene(): CharactersInScene {
+        val useCase: ListCharactersInScene = ListCharactersInSceneUseCase(sceneRepository, characterRepository, storyEventRepository)
+        lateinit var response: CharactersInScene
+        runBlocking {
+            useCase.invoke(scene.id) { response = it }
+        }
+        return response
     }
 
 }

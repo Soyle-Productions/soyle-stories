@@ -1,6 +1,6 @@
 package com.soyle.stories.di.characterarc
 
-import com.soyle.stories.character.buildNewCharacter.CreatedCharacterNotifier
+import com.soyle.stories.character.buildNewCharacter.CharacterCreatedNotifier
 import com.soyle.stories.character.characterList.LiveCharacterList
 import com.soyle.stories.character.removeCharacterFromStory.RemovedCharacterNotifier
 import com.soyle.stories.character.renameCharacter.CharacterRenamedNotifier
@@ -16,7 +16,7 @@ internal object CharacterListModule {
 
             provide {
                 LiveCharacterList(
-                    get<CreatedCharacterNotifier>(),
+                    get<CharacterCreatedNotifier>(),
                     get<RemovedCharacterNotifier>(),
                     get<CharacterRenamedNotifier>()
                 )

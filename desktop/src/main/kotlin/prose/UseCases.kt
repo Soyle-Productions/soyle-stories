@@ -27,8 +27,8 @@ import com.soyle.stories.usecase.prose.updateProse.UpdateProse
 import com.soyle.stories.usecase.prose.updateProse.UpdateProseUseCase
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionController
 import com.soyle.stories.scene.getStoryElementsToMention.GetStoryElementsToMentionControllerImpl
-import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInScene
-import com.soyle.stories.usecase.scene.getStoryElementsToMention.GetStoryElementsToMentionInSceneUseCase
+import com.soyle.stories.usecase.scene.prose.mentions.GetStoryElementsToMentionInScene
+import com.soyle.stories.usecase.scene.prose.mentions.GetStoryElementsToMentionInSceneUseCase
 
 object UseCases {
 
@@ -90,7 +90,6 @@ object UseCases {
     private fun InProjectScope.getSuggestedMentions() {
         provide<GetStoryElementsToMentionInScene> {
             GetStoryElementsToMentionInSceneUseCase(
-                get(),
                 get(),
                 get(),
                 get()

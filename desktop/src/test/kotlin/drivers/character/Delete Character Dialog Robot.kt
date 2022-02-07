@@ -1,19 +1,15 @@
 package com.soyle.stories.desktop.config.drivers.character
 
-import com.soyle.stories.character.delete.DeleteCharacterForm
+import com.soyle.stories.character.delete.ConfirmDeleteCharacterPromptView
+import com.soyle.stories.character.delete.ConfirmDeleteCharacterPromptViewModel
 import com.soyle.stories.character.list.CharacterListView
-import com.soyle.stories.characterarc.deleteCharacterDialog.DeleteCharacterDialogView
 import com.soyle.stories.desktop.config.drivers.robot
-import com.soyle.stories.desktop.view.character.deleteCharacterDialog.DeleteCharacterFormAccess.Companion.drive
-import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.access
 import com.soyle.stories.desktop.view.character.list.CharacterListViewAccess.Companion.drive
 import com.soyle.stories.desktop.view.project.workbench.getOpenDialog
 import com.soyle.stories.domain.character.Character
-import com.soyle.stories.layout.config.fixed.CharacterList
-import javafx.scene.control.TreeItem
-import tornadofx.uiComponent
+import com.soyle.stories.ramifications.confirmation.ConfirmationPromptView
 
-fun CharacterListView.givenDeleteCharacterDialogHasBeenOpened(characterId: Character.Id): DeleteCharacterForm =
+fun CharacterListView.givenDeleteCharacterDialogHasBeenOpened(characterId: Character.Id): ConfirmDeleteCharacterPromptView =
     getDeleteCharacterDialog() ?: openDeleteCharacterDialog(characterId).let { getDeleteCharacterDialogOrError() }
 
 fun CharacterListView.openDeleteCharacterDialog(characterId: Character.Id) {
@@ -25,14 +21,7 @@ fun CharacterListView.openDeleteCharacterDialog(characterId: Character.Id) {
     }
 }
 
-fun getDeleteCharacterDialogOrError(): DeleteCharacterForm =
+fun getDeleteCharacterDialogOrError(): ConfirmDeleteCharacterPromptView =
     getDeleteCharacterDialog() ?: throw NoSuchElementException("Delete Character Dialog is not open in project")
 
-fun getDeleteCharacterDialog(): DeleteCharacterForm? = robot.getOpenDialog()
-
-fun DeleteCharacterForm.confirmDelete()
-{
-    drive {
-        confirmButton.fire()
-    }
-}
+fun getDeleteCharacterDialog(): ConfirmDeleteCharacterPromptView? = robot.getOpenDialog<ConfirmDeleteCharacterPromptView>()

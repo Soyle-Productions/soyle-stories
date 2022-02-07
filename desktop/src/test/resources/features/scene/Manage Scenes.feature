@@ -30,3 +30,9 @@ Feature: Manage Scenes
     And I am deleting the "Big Battle" scene
     When I confirm I want to delete the "Big Battle" scene
     Then the "Big Battle" scene should have been deleted
+
+  Scenario: Show Ramifications of Scene with no Dependents
+    Given I have created a scene named "Big Battle"
+    And I am deleting the "Big Battle" scene
+    When I show the ramifications of deleting the "Big Battle" scene
+    Then there should be no ramifications for deleting the "Big Battle" scene
