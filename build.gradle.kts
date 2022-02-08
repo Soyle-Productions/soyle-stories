@@ -22,7 +22,7 @@ tasks.withType<KotlinCompile> {
 allprojects {
 
     group = "com.soyle.stories"
-    version = "0.14 SNAPSHOT 21w37a"
+    version = "0.14 SNAPSHOT 22w07a"
 
     tasks.withType<Jar>().forEach {
         it.archiveBaseName.set(properties["archive-name"] as? String ?: name)

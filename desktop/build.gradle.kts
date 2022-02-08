@@ -73,7 +73,7 @@ runtime {
         use the same major and minor numbers as the branded version, but each build number will increment and will
         typically be out of sync with the branded version.
          */
-        appVersion = "0.14.21090"
+        appVersion = "0.14.22021"
         imageName = application.applicationName
         installerName = application.applicationName
         installerOptions = listOf(
